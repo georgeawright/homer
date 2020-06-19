@@ -1,0 +1,2 @@
+class Worldview:
+    pass
