@@ -11,5 +11,5 @@ class ConceptNode(ABC):
 
     @abstractmethod
     def distance_from(self, candidate_instance: Any) -> float:
-        """Return distance from prototype to candiate instance."""
+        """Return distance from prototype to candidate instance."""
         pass
