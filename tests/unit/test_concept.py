@@ -64,7 +64,10 @@ def test_boost_activation(depth, activation, amount, expected):
     )
 
 
-@pytest.mark.parametrize("depth,activation,decay_rate,expected", [(2, 0.6, 0.1, 0.55)])
+@pytest.mark.parametrize(
+    "depth,activation,decay_rate,expected",
+    [(2, 0.6, 0.1, 0.55), (2, 0.05, 0.1, 0.0), (2, 0.01, 0.1, 0.0)],
+)
 def test_decay_activation(depth, activation, decay_rate, expected):
     Concept.DECAY_RATE = decay_rate
     concept = Concept("hot", depth=depth, activation=activation)
