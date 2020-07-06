@@ -5,6 +5,22 @@ from homer.concept import Concept
 
 
 @pytest.mark.parametrize(
+    "depth,boundary,prototype,exception_message",
+    [
+        (0, None, None, "depth 0 is less than 1."),
+        (1, [1], "hot", "a concept with a symbolic prototype cannot have a boundary."),
+        (1, [1, 2], [2, 2], "boundary [1, 2] is multidimensional."),
+        (1, [1], [2, 2], "have different dimensionality."),
+        (1, [1], [1], "prototype and boundary are equal [1]."),
+    ],
+)
+def test_concept_constructor_exceptions(depth, boundary, prototype, exception_message):
+    with pytest.raises(Exception) as excinfo:
+        Concept("hot", depth=depth, prototype=prototype, boundary=boundary)
+    assert exception_message in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
     "prototype,boundary,distance_metric,candidate,expected",
     [
         ([22], [19], math.dist, [20], 2),
