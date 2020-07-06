@@ -1,8 +1,13 @@
 from __future__ import annotations
 from typing import Any, Callable, List, Optional, Union
 
+from .hyper_parameters import HyperParameters
+
 
 class Concept:
+
+    DECAY_RATE = HyperParameters.DECAY_RATE
+
     def __init__(
         self,
         name: str,
@@ -42,6 +47,7 @@ class Concept:
         self.name = name
         self.space = space
         self.depth = depth
+        self.activation_coefficient = 1 / depth
         self.prototype = prototype
         self.boundary = boundary
         self.distance_metric = distance_metric
@@ -57,3 +63,11 @@ class Concept:
         if self.boundary is not None and self.prototype[0] < self.boundary[0]:
             return 0 if candidate_instance[0] < self.prototype[0] else raw_distance
         return raw_distance
+
+    def boost_activation(self, amount: float):
+        raw_activation = self.activation + amount * self.activation_coefficient
+        self.activation = 1.0 if raw_activation > 1.0 else raw_activation
+
+    def decay_activation(self):
+        raw_activation = self.activation - self.DECAY_RATE * self.activation_coefficient
+        self.activation = 0.0 if raw_activation < 0.0 else raw_activation

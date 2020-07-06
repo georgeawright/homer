@@ -3,6 +3,8 @@ import pytest
 
 from homer.concept import Concept
 
+FLOAT_COMPARISON_TOLERANCE = 1e-5
+
 
 @pytest.mark.parametrize(
     "depth,boundary,prototype,exception_message",
@@ -48,3 +50,25 @@ def test_distance_from_raises_exception_if_no_distance_metric():
     with pytest.raises(Exception) as excinfo:
         concept.distance_from([1])
     assert "Concept hot has no distance metric." in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    "depth,activation,amount,expected",
+    [(2, 0.0, 0.1, 0.05), (2, 0.5, 0.5, 0.75), (2, 0.99, 0.1, 1)],
+)
+def test_boost_activation(depth, activation, amount, expected):
+    concept = Concept("hot", depth=depth, activation=activation)
+    concept.boost_activation(amount)
+    assert math.isclose(
+        expected, concept.activation, abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
+
+
+@pytest.mark.parametrize("depth,activation,decay_rate,expected", [(2, 0.6, 0.1, 0.55)])
+def test_decay_activation(depth, activation, decay_rate, expected):
+    Concept.DECAY_RATE = decay_rate
+    concept = Concept("hot", depth=depth, activation=activation)
+    concept.decay_activation()
+    assert math.isclose(
+        expected, concept.activation, abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
