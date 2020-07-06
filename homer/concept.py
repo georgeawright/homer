@@ -34,7 +34,7 @@ class Concept:
                 + f"prototype {prototype} and boundary {boundary} "
                 + f"have different dimensionality."
             )
-        if boundary == prototype:
+        if boundary == prototype and prototype is not None:
             raise Exception(
                 f"Creating concept {name} failed because "
                 + f" prototype and boundary are equal {prototype}."

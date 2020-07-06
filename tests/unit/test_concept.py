@@ -25,3 +25,10 @@ def test_distance_from(prototype, boundary, distance_metric, candidate, expected
         "hot", prototype=prototype, boundary=boundary, distance_metric=distance_metric
     )
     assert expected == concept.distance_from(candidate)
+
+
+def test_distance_from_raises_exception_if_no_distance_metric():
+    concept = Concept("hot")
+    with pytest.raises(Exception) as excinfo:
+        concept.distance_from([1])
+    assert "Concept hot has no distance metric." in str(excinfo.value)
