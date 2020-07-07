@@ -17,6 +17,7 @@ class BubbleChamber:
         self.event_trace = event_trace
         self.workspace = workspace
         self.worldview = worldview
+        self.result = None
 
     @property
     def satisfaction(self) -> float:
