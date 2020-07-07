@@ -16,7 +16,7 @@ class Homer:
         while self.bubble_chamber.result is None:
             self.coderack.select_and_run_codelet()
         return {
-            "answer": self.bubble_chamber.result,
+            "result": self.bubble_chamber.result,
             "satisfaction": self.bubble_chamber.satisfaction,
             "codelets_run": self.coderack.codelets_run,
         }
