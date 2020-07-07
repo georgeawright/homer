@@ -18,6 +18,7 @@ class BubbleChamber:
         self.workspace = workspace
         self.worldview = worldview
 
+    @property
     def satisfaction(self) -> float:
         """Calculate and return overall satisfaction with perceptual structures"""
         pass
