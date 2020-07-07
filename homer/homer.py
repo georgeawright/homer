@@ -18,4 +18,5 @@ class Homer:
         return {
             "answer": self.bubble_chamber.result,
             "satisfaction": self.bubble_chamber.satisfaction,
+            "codelets_run": self.coderack.codelets_run,
         }
