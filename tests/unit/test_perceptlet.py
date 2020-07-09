@@ -45,3 +45,16 @@ def test_number_and_proportion_of_neighbours_with_label(
     assert math.isclose(
         expected_proportion, actual_proportion, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )
+
+
+def test_has_label(concept, label):
+    perceptlet = Perceptlet("value", [])
+    perceptlet.labels.add(label)
+    assert perceptlet.has_label(concept)
+
+
+def test_add_label(label):
+    perceptlet = Perceptlet("value", [])
+    assert set() == perceptlet.labels
+    perceptlet.add_label(label)
+    assert {label} == perceptlet.labels
