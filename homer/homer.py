@@ -10,7 +10,10 @@ class Homer:
     @classmethod
     def setup(cls):
         """Set up every component and sub-component from a configuration file"""
-        pass
+        # include
+        # codelet classifier weights
+        # concepts, including depths, prototypes, distance metrics
+        # workspace with raw perceptlets
 
     def run(self):
         while self.bubble_chamber.result is None:
