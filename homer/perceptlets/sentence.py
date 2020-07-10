@@ -17,7 +17,7 @@ class Sentence(Perceptlet):
     ):
         neighbours = []
         value = text
-        Perceptlet.__init__(value, neighbours)
+        Perceptlet.__init__(self, value, neighbours)
         self.phrases = phrases
         self.relations = relations
         self.strength = strength

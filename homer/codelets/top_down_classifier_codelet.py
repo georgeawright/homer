@@ -38,9 +38,10 @@ class TopDownClassifierCodelet(Codelet):
         )
         self.parent_concept.boost_activation(confidence_of_class_membership)
         if confidence_of_class_membership > self.CONFIDENCE_THRESHOLD:
-            self.target_perceptlet.add_label(
+            label = self.bubble_chamber.create_label(
                 self.parent_concept, confidence_of_class_membership
             )
+            self.target_perceptlet.add_label(label)
             return self.engender_follow_up(confidence_of_class_membership)
         return None
 

@@ -13,7 +13,7 @@ class Phrase(Perceptlet):
     ):
         neighbours = []
         value = text
-        Perceptlet.__init__(value, neighbours)
+        Perceptlet.__init__(self, value, neighbours)
         self.words = words
         self.relations = relations
         self.strength = strength

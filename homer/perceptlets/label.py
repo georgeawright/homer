@@ -7,6 +7,6 @@ class Label(Perceptlet):
 
     def __init__(self, concept: Concept, strength: float):
         neighbours = []
-        Perceptlet.__init__(concept.name, neighbours)
+        Perceptlet.__init__(self, concept.name, neighbours)
         self.parent_concept = concept
         self.strength = strength
