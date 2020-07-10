@@ -1,5 +1,6 @@
 from typing import Optional
 
+from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.concept import Concept
 from homer.hyper_parameters import HyperParameters
@@ -12,11 +13,13 @@ class TopDownClassifierCodelet(Codelet):
 
     def __init__(
         self,
+        bubble_chamber: BubbleChamber,
         parent_concept: Concept,
         target_perceptlet: Optional[Perceptlet],
         classification_weights,
         urgency: float,
     ):
+        Codelet.__init__(self, bubble_chamber)
         self.parent_concept = parent_concept
         self.target_perceptlet = target_perceptlet
         self.classification_weights = classification_weights
@@ -46,5 +49,9 @@ class TopDownClassifierCodelet(Codelet):
 
     def engender_follow_up(self, confidence: float) -> Codelet:
         return TopDownClassifierCodelet(
-            self.parent_concept, None, self.classification_weights, confidence
+            self.bubble_chamber,
+            self.parent_concept,
+            None,
+            self.classification_weights,
+            confidence,
         )
