@@ -1,4 +1,6 @@
 class HyperParameters:
+    FLOATING_POINT_TOLERANCE = 1e-5
+
     DECAY_RATE = 0.1
     CONFIDENCE_THRESHOLD = 0.5
 
