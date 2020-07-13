@@ -14,15 +14,18 @@ class Perceptlet(ABC):
         self.labels = set()
 
     @property
-    def exigency(self):
+    def exigency(self) -> float:
+        """Returns a rating between 0 and 1."""
         return self.importance * self.unhappiness
 
     @property
-    def importance(self):
+    def importance(self) -> float:
+        """Returns a rating between 0 and 1."""
         raise NotImplementedError
 
     @property
-    def unhappiness(self):
+    def unhappiness(self) -> float:
+        """Returns a rating between 0 and 1."""
         raise NotImplementedError
 
     def proportion_of_neighbours_with_label(self, concept: Concept) -> float:
