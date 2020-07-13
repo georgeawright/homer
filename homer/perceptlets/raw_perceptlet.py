@@ -15,13 +15,13 @@ class RawPerceptlet(Perceptlet):
         self.relations = set()
 
     @property
-    def importance(self):
+    def importance(self) -> float:
         total_label_strengths = sum(label.strength for label in self.labels)
         total_label_strengths_inverse = 1.0 / (1.0 + total_label_strengths)
         return 1.0 - total_label_strengths_inverse
 
     @property
-    def unhappiness(self):
+    def unhappiness(self) -> float:
         total_connections = len(self.labels) + len(self.relations) + len(self.groups)
         print(total_connections)
         try:
