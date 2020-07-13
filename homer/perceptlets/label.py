@@ -10,3 +10,11 @@ class Label(Perceptlet):
         Perceptlet.__init__(self, concept.name, neighbours)
         self.parent_concept = concept
         self.strength = strength
+
+    @property
+    def importance(self) -> float:
+        return 0.0
+
+    @property
+    def unhappiness(self) -> float:
+        return 0.0
