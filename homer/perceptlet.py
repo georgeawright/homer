@@ -1,12 +1,17 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, List
+import statistics
 
 from homer.concept import Concept
+from homer.hyper_parameters import HyperParameters
 
 
 class Perceptlet(ABC):
     """Any unit of perception."""
+
+    IMPORTANCE_WEIGHT = HyperParameters.IMPORTANCE_WEIGHT
+    UNHAPPINESS_WEIGHT = HyperParameters.UNHAPPINESS_WEIGHT
 
     def __init__(self, value: Any, neighbours: List[Any]):
         self.value = value
@@ -16,7 +21,12 @@ class Perceptlet(ABC):
     @property
     def exigency(self) -> float:
         """Returns a rating between 0 and 1."""
-        return self.importance * self.unhappiness
+        return statistics.fmean(
+            [
+                self.IMPORTANCE_WEIGHT * self.importance,
+                self.UNHAPPINESS_WEIGHT * self.unhappiness,
+            ]
+        )
 
     @property
     def importance(self) -> float:
