@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, List
 
 from homer.concept import Concept
@@ -12,6 +12,18 @@ class Perceptlet(ABC):
         self.value = value
         self.neighbours = neighbours
         self.labels = set()
+
+    @property
+    def exigency(self):
+        return self.importance * self.unhappiness
+
+    @property
+    def importance(self):
+        raise NotImplementedError
+
+    @property
+    def unhappiness(self):
+        raise NotImplementedError
 
     def proportion_of_neighbours_with_label(self, concept: Concept) -> float:
         return self.number_of_neighbours_with_label(concept) / len(self.neighbours)
