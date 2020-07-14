@@ -34,25 +34,9 @@ def test_add_word():
     assert {word} == workspace.words
 
 
-def test_add_phrase():
+def test_add_textlet():
     workspace = Workspace(Mock(), Mock())
-    assert set() == workspace.phrases
-    phrase = Mock()
-    workspace.add_phrase(phrase)
-    assert {phrase} == workspace.phrases
-
-
-def test_add_sentence():
-    workspace = Workspace(Mock(), Mock())
-    assert set() == workspace.sentences
-    sentence = Mock()
-    workspace.add_sentence(sentence)
-    assert {sentence} == workspace.sentences
-
-
-def test_add_text():
-    workspace = Workspace(Mock(), Mock())
-    assert set() == workspace.texts
-    text = Mock()
-    workspace.add_text(text)
-    assert {text} == workspace.texts
+    assert set() == workspace.textlets
+    textlet = Mock()
+    workspace.add_textlet(textlet)
+    assert {textlet} == workspace.textlets

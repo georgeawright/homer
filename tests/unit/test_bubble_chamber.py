@@ -6,10 +6,8 @@ from homer.workspace import Workspace
 from homer.worldview import Worldview
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
-from homer.perceptlets.phrase import Phrase
 from homer.perceptlets.relation import Relation
-from homer.perceptlets.sentence import Sentence
-from homer.perceptlets.text import Text
+from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
 
 
@@ -71,28 +69,10 @@ def test_create_word_returns_word():
     add_word.assert_called_once_with(word)
 
 
-def test_create_phrase_returns_phrase():
-    with patch.object(Workspace, "add_phrase", return_value=None) as add_phrase:
+def test_create_text_returns_textlet():
+    with patch.object(Workspace, "add_textlet", return_value=None) as add_text:
         workspace = Workspace(Mock(), Mock())
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        phrase = bubble_chamber.create_phrase(Mock(), Mock(), Mock(), Mock())
-        assert Phrase == type(phrase)
-    add_phrase.assert_called_once_with(phrase)
-
-
-def test_create_sentence_returns_sentence():
-    with patch.object(Workspace, "add_sentence", return_value=None) as add_sentence:
-        workspace = Workspace(Mock(), Mock())
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        sentence = bubble_chamber.create_sentence(Mock(), Mock(), Mock(), Mock())
-        assert Sentence == type(sentence)
-    add_sentence.assert_called_once_with(sentence)
-
-
-def test_create_text_returns_text():
-    with patch.object(Workspace, "add_text", return_value=None) as add_text:
-        workspace = Workspace(Mock(), Mock())
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        text = bubble_chamber.create_text(Mock(), Mock(), Mock(), Mock())
-        assert Text == type(text)
-    add_text.assert_called_once_with(text)
+        textlet = bubble_chamber.create_textlet(Mock(), Mock(), Mock(), Mock())
+        assert Textlet == type(textlet)
+    add_text.assert_called_once_with(textlet)

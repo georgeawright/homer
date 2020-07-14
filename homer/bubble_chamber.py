@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set, Union
 
 from homer.concept import Concept
 from homer.concept_space import ConceptSpace
@@ -6,10 +6,8 @@ from homer.event_trace import EventTrace
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
-from homer.perceptlets.phrase import Phrase
 from homer.perceptlets.relation import Relation
-from homer.perceptlets.sentence import Sentence
-from homer.perceptlets.text import Text
+from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
 from homer.workspace import Workspace
 from homer.worldview import Worldview
@@ -73,31 +71,13 @@ class BubbleChamber:
         self.workspace.add_word(word)
         return word
 
-    def create_phrase(
-        self, text: str, words: List[Word], relations: List[Relation], strength: float
-    ) -> Phrase:
-        phrase = Phrase(text, words, relations, strength)
-        self.workspace.add_phrase(phrase)
-        return phrase
-
-    def create_sentence(
+    def create_textlet(
         self,
         text: str,
-        phrases: List[Phrase],
-        relations: List[Relation],
+        constituents: List[Union[Textlet, Word]],
+        relations: Set[Relation],
         strength: float,
-    ) -> Sentence:
-        sentence = Sentence(text, phrases, relations, strength)
-        self.workspace.add_sentence(sentence)
-        return sentence
-
-    def create_text(
-        self,
-        text: str,
-        sentences: List[Sentence],
-        relations: List[Relation],
-        strength: float,
-    ) -> Text:
-        text = Text(text, sentences, relations, strength)
-        self.workspace.add_text(text)
-        return text
+    ) -> Textlet:
+        textlet = Textlet(text, constituents, relations, strength)
+        self.workspace.add_textlet(textlet)
+        return textlet
