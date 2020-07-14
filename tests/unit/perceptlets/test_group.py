@@ -37,29 +37,6 @@ def test_size_based_importance(group_size, expected_importance):
 
 
 @pytest.mark.parametrize(
-    "label_strengths, expected_importance",
-    [
-        ([], 0),
-        ([0.2, 0.3], 0.333),
-        ([0.7, 0.8], 0.6),
-        ([1, 1], 0.667),
-        ([1, 1, 1, 1], 0.8),
-    ],
-)
-def test_label_based_importance(label_strengths, expected_importance):
-    group = Group([], [])
-    for label_strength in label_strengths:
-        label = Mock()
-        label.strength = label_strength
-        group.add_label(label)
-    assert math.isclose(
-        expected_importance,
-        group._label_based_importance,
-        abs_tol=FLOAT_COMPARISON_TOLERANCE,
-    )
-
-
-@pytest.mark.parametrize(
     "number_of_labels, number_of_groups, number_of_relations, expected_unhappiness",
     [(0, 0, 0, 1.0), (1, 0, 0, 1.0), (1, 1, 1, 0.333), (2, 3, 0, 0.2)],
 )
