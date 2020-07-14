@@ -11,8 +11,9 @@ from homer.perceptlets.relation import Relation
 class Group(Perceptlet):
     """A grouping of other perceptlets."""
 
-    SIZE_IMPORTANCE_WEIGHT = HyperParameters.SIZE_IMPORTANCE_WEIGHT
-    LABEL_IMPORTANCE_WEIGHT = HyperParameters.LABEL_IMPORTANCE_WEIGHT
+    IMPORTANCE_SIZE_WEIGHT = HyperParameters.GROUP_IMPORTANCE_SIZE_WEIGHT
+    IMPORTANCE_LABEL_WEIGHT = HyperParameters.GROUP_IMPORTANCE_LABEL_WEIGHT
+    IMPORTANCE_STRENGTH_WEIGHT = HyperParameters.GROUP_IMPORTANCE_STRENGTH_WEIGHT
 
     def __init__(self, members: List[Perceptlet], strength: float):
         value = "?"
@@ -33,9 +34,9 @@ class Group(Perceptlet):
     def importance(self) -> float:
         return statistics.fmean(
             [
-                self._size_based_importance * self.SIZE_IMPORTANCE_WEIGHT,
-                self._label_based_importance * self.LABEL_IMPORTANCE_WEIGHT,
-                self.strength * self.STRENGTH_IMPORTANCE_WEIGHT,
+                self._size_based_importance * self.IMPORTANCE_SIZE_WEIGHT,
+                self._label_based_importance * self.IMPORTANCE_LABEL_WEIGHT,
+                self.strength * self.IMPORTANCE_STRENGTH_WEIGHT,
             ]
         )
 
