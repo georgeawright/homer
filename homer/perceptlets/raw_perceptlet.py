@@ -16,18 +16,12 @@ class RawPerceptlet(Perceptlet):
 
     @property
     def importance(self) -> float:
-        total_label_strengths = sum(label.strength for label in self.labels)
-        total_label_strengths_inverse = 1.0 / (1.0 + total_label_strengths)
-        return 1.0 - total_label_strengths_inverse
+        return self._label_based_importance
 
     @property
     def unhappiness(self) -> float:
-        total_connections = len(self.labels) + len(self.relations) + len(self.groups)
-        print(total_connections)
-        try:
-            return 1.0 / total_connections
-        except ZeroDivisionError:
-            return 1.0
+        connections = self.labels | self.groups | self.relations
+        return self._unhappiness_based_on_connections(connections)
 
     def add_group(self, group: Group):
         self.groups.add(group)

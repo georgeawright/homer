@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, List
+from typing import Any, List, Set
 import statistics
 
 from homer.concept import Concept
@@ -37,6 +37,18 @@ class Perceptlet(ABC):
     def unhappiness(self) -> float:
         """Returns a rating between 0 and 1."""
         raise NotImplementedError
+
+    @property
+    def _label_based_importance(self) -> float:
+        total_label_strengths = sum(label.strength for label in self.labels)
+        total_label_strengths_inverse = 1.0 / (1.0 + total_label_strengths)
+        return 1.0 - total_label_strengths_inverse
+
+    def _unhappiness_based_on_connections(self, connections: Set[Perceptlet]) -> float:
+        try:
+            return 1.0 / len(connections)
+        except ZeroDivisionError:
+            return 1.0
 
     def proportion_of_neighbours_with_label(self, concept: Concept) -> float:
         return self.number_of_neighbours_with_label(concept) / len(self.neighbours)

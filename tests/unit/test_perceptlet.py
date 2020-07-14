@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from homer.perceptlet import Perceptlet
 
 
-FLOAT_COMPARISON_TOLERANCE = 1e-5
+FLOAT_COMPARISON_TOLERANCE = 1e-3
 
 
 @pytest.fixture
@@ -25,6 +25,41 @@ def test_exigency_raises_not_implemented_error():
     perceptlet = Perceptlet("value", [])
     with pytest.raises(NotImplementedError):
         perceptlet.exigency
+
+
+@pytest.mark.parametrize(
+    "label_strengths, expected_importance",
+    [
+        ([], 0),
+        ([0.2, 0.3], 0.333),
+        ([0.7, 0.8], 0.6),
+        ([1, 1], 0.667),
+        ([1, 1, 1, 1], 0.8),
+    ],
+)
+def test_label_based_importance(label_strengths, expected_importance):
+    perceptlet = Perceptlet("value", [])
+    for label_strength in label_strengths:
+        label = Mock()
+        label.strength = label_strength
+        perceptlet.add_label(label)
+    actual_importance = perceptlet._label_based_importance
+    assert math.isclose(
+        expected_importance, actual_importance, abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
+
+
+@pytest.mark.parametrize(
+    "number_of_connections, expected_unhappiness",
+    [(0, 1.0), (1, 1.0), (3, 0.333), (5, 0.2)],
+)
+def test_unhappiness_based_on_connections(number_of_connections, expected_unhappiness):
+    perceptlet = Perceptlet("value", [])
+    connections = {Mock() for _ in range(number_of_connections)}
+    actual_unhappiness = perceptlet._unhappiness_based_on_connections(connections)
+    assert math.isclose(
+        expected_unhappiness, actual_unhappiness, abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
 
 
 @pytest.mark.parametrize(
