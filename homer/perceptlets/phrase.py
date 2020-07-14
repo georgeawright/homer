@@ -24,6 +24,10 @@ class Phrase(Perceptlet):
         self.relations = set()
 
     @property
+    def size(self) -> int:
+        return len(self.words)
+
+    @property
     def importance(self) -> float:
         return max(word.importance for word in self.words)
 
