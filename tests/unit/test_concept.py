@@ -53,6 +53,36 @@ def test_distance_from_raises_exception_if_no_distance_metric():
 
 
 @pytest.mark.parametrize(
+    "a, b, distance_metric, expected",
+    [
+        ([22], [20], math.dist, 2),
+        ([10], [10], math.dist, 0),
+        ([0], [10], math.dist, 10),
+        ("hot", "hot", lambda a, b: 0 if a == b else math.inf, 0),
+        ("hot", "cold", lambda a, b: 0 if a == b else math.inf, math.inf),
+    ],
+)
+def test_distance_between(a, b, distance_metric, expected):
+    concept = Concept("hot", distance_metric=distance_metric)
+    assert expected == concept.distance_between(a, b)
+
+
+@pytest.mark.parametrize(
+    "a, b, distance_metric, maximum_distance, expected",
+    [
+        ([22], [20], math.dist, 10, 0.2),
+        ([10], [10], math.dist, 10, 0.0),
+        ([0], [10], math.dist, 10, 1.0),
+        ("hot", "hot", lambda a, b: 0 if a == b else math.inf, 10, 0.0),
+        ("hot", "cold", lambda a, b: 0 if a == b else math.inf, 10, 1.0),
+    ],
+)
+def test_distance_between_as_rating(a, b, distance_metric, maximum_distance, expected):
+    concept = Concept("hot", distance_metric=distance_metric)
+    assert expected == concept.distance_between_as_rating(a, b)
+
+
+@pytest.mark.parametrize(
     "depth, maximum_depth, expected", [(1, 10, 0.1), (10, 10, 1.0), (13, 10, 1.0)]
 )
 def test_depth_rating(depth, maximum_depth, expected):

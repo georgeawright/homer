@@ -61,17 +61,24 @@ class Concept:
 
     def distance_from(self, candidate_instance: Any) -> float:
         """Return distance from prototype to candidate instance."""
-        if self.distance_metric is None:
-            raise Exception(f"Concept {self.name} has no distance metric.")
-        raw_distance = self.distance_metric(self.prototype, candidate_instance)
+        raw_distance = self.distance_between(self.prototype, candidate_instance)
         if self.boundary is not None and self.prototype[0] > self.boundary[0]:
             return 0 if candidate_instance[0] > self.prototype[0] else raw_distance
         if self.boundary is not None and self.prototype[0] < self.boundary[0]:
             return 0 if candidate_instance[0] < self.prototype[0] else raw_distance
         return raw_distance
 
+    def distance_between(self, a: Any, b: Any) -> float:
+        if self.distance_metric is None:
+            raise Exception(f"Concept {self.name} has no distance metric.")
+        return self.distance_metric(a, b)
+
     def distance_rating(self, candidate_instance: Any) -> float:
         distance = self.distance_from(candidate_instance)
+        return self._value_as_decimal(distance, self.MAXIMUM_DISTANCE)
+
+    def distance_between_as_rating(self, a: Any, b: Any) -> float:
+        distance = self.distance_between(a, b)
         return self._value_as_decimal(distance, self.MAXIMUM_DISTANCE)
 
     def _value_as_decimal(self, value, maximum) -> float:
