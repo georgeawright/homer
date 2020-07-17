@@ -88,6 +88,11 @@ def test_number_and_proportion_of_neighbours_with_label(
     )
 
 
+def test_get_random_neighbour():
+    perceptlet = Perceptlet("value", [Mock(), Mock(), Mock()])
+    assert perceptlet.get_random_neighbour() in perceptlet.neighbours
+
+
 def test_has_label(concept, label):
     perceptlet = Perceptlet("value", [])
     perceptlet.labels.add(label)

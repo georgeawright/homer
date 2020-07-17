@@ -1,6 +1,7 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Any, List, Set
+import random
 import statistics
 
 from homer.concept import Concept
@@ -13,7 +14,7 @@ class Perceptlet(ABC):
     IMPORTANCE_WEIGHT = HyperParameters.IMPORTANCE_WEIGHT
     UNHAPPINESS_WEIGHT = HyperParameters.UNHAPPINESS_WEIGHT
 
-    def __init__(self, value: Any, neighbours: List[Any]):
+    def __init__(self, value: Any, neighbours: List[Perceptlet]):
         self.value = value
         self.neighbours = neighbours
         self.labels = set()
@@ -49,6 +50,9 @@ class Perceptlet(ABC):
             return 1.0 / len(connections)
         except ZeroDivisionError:
             return 1.0
+
+    def get_random_neighbour(self) -> Perceptlet:
+        return random.choice(self.neighbours)
 
     def proportion_of_neighbours_with_label(self, concept: Concept) -> float:
         return self.number_of_neighbours_with_label(concept) / len(self.neighbours)
