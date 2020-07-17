@@ -53,6 +53,43 @@ def test_distance_from_raises_exception_if_no_distance_metric():
 
 
 @pytest.mark.parametrize(
+    "depth, maximum_depth, expected", [(1, 10, 0.1), (10, 10, 1.0), (13, 10, 1.0)]
+)
+def test_depth_rating(depth, maximum_depth, expected):
+    concept = Concept("hot", depth=depth)
+    concept.MAXIMUM_DEPTH = maximum_depth
+    assert math.isclose(
+        expected, concept.depth_rating, abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
+
+
+@pytest.mark.parametrize(
+    "prototype,boundary,distance_metric,candidate,maximum_distance,expected",
+    [
+        ([22], [19], math.dist, [20], 10, 0.2),
+        ([22], [19], math.dist, [21], 10, 0.1),
+        ([22], [19], math.dist, [22], 10, 0.0),
+        ([22], [19], math.dist, [23], 10, 0.0),
+        ([16], None, math.dist, [16], 10, 0.0),
+        ([16], None, math.dist, [10], 10, 0.6),
+        ([16], None, math.dist, [26], 10, 1.0),
+        ([4], [7], math.dist, [7], 10, 0.3),
+        ([4], [7], math.dist, [-20], 10, 0.0),
+        ("hot", None, lambda a, b: 0 if a == b else math.inf, "hot", 10, 0.0),
+        ("cold", None, lambda a, b: 0 if a == b else math.inf, "hot", 10, 1.0),
+    ],
+)
+def test_distance_rating(
+    prototype, boundary, distance_metric, candidate, maximum_distance, expected
+):
+    concept = Concept(
+        "hot", prototype=prototype, boundary=boundary, distance_metric=distance_metric
+    )
+    concept.MAXIMUM_DISTANCE = maximum_distance
+    assert expected == concept.distance_rating(candidate)
+
+
+@pytest.mark.parametrize(
     "depth,activation,amount,expected",
     [(2, 0.0, 0.1, 0.05), (2, 0.5, 0.5, 0.75), (2, 0.99, 0.1, 1)],
 )

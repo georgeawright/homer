@@ -7,6 +7,8 @@ from .hyper_parameters import HyperParameters
 class Concept:
 
     DECAY_RATE = HyperParameters.DECAY_RATE
+    MAXIMUM_DEPTH = HyperParameters.MAXIMUM_CONCEPT_DEPTH
+    MAXIMUM_DISTANCE = HyperParameters.MAXIMUM_DISTANCE_FROM_PROTOTYPE
 
     def __init__(
         self,
@@ -53,6 +55,10 @@ class Concept:
         self.distance_metric = distance_metric
         self.activation = activation
 
+    @property
+    def depth_rating(self) -> float:
+        return self._value_as_decimal(self.depth, self.MAXIMUM_DEPTH)
+
     def distance_from(self, candidate_instance: Any) -> float:
         """Return distance from prototype to candidate instance."""
         if self.distance_metric is None:
@@ -63,6 +69,13 @@ class Concept:
         if self.boundary is not None and self.prototype[0] < self.boundary[0]:
             return 0 if candidate_instance[0] < self.prototype[0] else raw_distance
         return raw_distance
+
+    def distance_rating(self, candidate_instance: Any) -> float:
+        distance = self.distance_from(candidate_instance)
+        return self._value_as_decimal(distance, self.MAXIMUM_DISTANCE)
+
+    def _value_as_decimal(self, value, maximum) -> float:
+        return min(value / maximum, 1.0)
 
     def boost_activation(self, amount: float):
         raw_activation = self.activation + amount * self.activation_coefficient
