@@ -22,7 +22,7 @@ def label(concept):
 
 
 def test_exigency_raises_not_implemented_error():
-    perceptlet = Perceptlet("value", [])
+    perceptlet = Perceptlet("value", set())
     with pytest.raises(NotImplementedError):
         perceptlet.exigency
 
@@ -38,7 +38,7 @@ def test_exigency_raises_not_implemented_error():
     ],
 )
 def test_label_based_importance(label_strengths, expected_importance):
-    perceptlet = Perceptlet("value", [])
+    perceptlet = Perceptlet("value", set())
     for label_strength in label_strengths:
         label = Mock()
         label.strength = label_strength
@@ -54,7 +54,7 @@ def test_label_based_importance(label_strengths, expected_importance):
     [(0, 1.0), (1, 1.0), (3, 0.333), (5, 0.2)],
 )
 def test_unhappiness_based_on_connections(number_of_connections, expected_unhappiness):
-    perceptlet = Perceptlet("value", [])
+    perceptlet = Perceptlet("value", set())
     connections = {Mock() for _ in range(number_of_connections)}
     actual_unhappiness = perceptlet._unhappiness_based_on_connections(connections)
     assert math.isclose(
@@ -73,9 +73,9 @@ def test_number_and_proportion_of_neighbours_with_label(
     no_of_invalid_neighbours,
     expected_proportion,
 ):
-    valid_neighbour = Perceptlet("value", [])
+    valid_neighbour = Perceptlet("value", set())
     valid_neighbour.labels.add(label)
-    invalid_neighbour = Perceptlet("value", [])
+    invalid_neighbour = Perceptlet("value", set())
     valid_neighbours = [valid_neighbour for i in range(no_of_valid_neighbours)]
     invalid_neighbours = [invalid_neighbour for i in range(no_of_invalid_neighbours)]
     neighbours = valid_neighbours + invalid_neighbours
@@ -94,13 +94,29 @@ def test_get_random_neighbour():
 
 
 def test_has_label(concept, label):
-    perceptlet = Perceptlet("value", [])
+    perceptlet = Perceptlet("value", set())
     perceptlet.labels.add(label)
     assert perceptlet.has_label(concept)
 
 
 def test_add_label(label):
-    perceptlet = Perceptlet("value", [])
+    perceptlet = Perceptlet("value", set())
     assert set() == perceptlet.labels
     perceptlet.add_label(label)
     assert {label} == perceptlet.labels
+
+
+def test_add_neighbour():
+    perceptlet = Perceptlet("value", set())
+    assert set() == perceptlet.neighbours
+    neighbour = Mock()
+    perceptlet.add_neighbour(neighbour)
+    assert {neighbour} == perceptlet.neighbours
+
+
+def test_remove_neighbour():
+    neighbour = Mock()
+    perceptlet = Perceptlet("value", {neighbour})
+    assert {neighbour} == perceptlet.neighbours
+    perceptlet.remove_neighbour(neighbour)
+    assert set() == perceptlet.neighbours

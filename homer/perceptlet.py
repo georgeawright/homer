@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC
-from typing import Any, List, Set
+from typing import Any, Set
 import random
 import statistics
 
@@ -14,7 +14,7 @@ class Perceptlet(ABC):
     IMPORTANCE_WEIGHT = HyperParameters.IMPORTANCE_WEIGHT
     UNHAPPINESS_WEIGHT = HyperParameters.UNHAPPINESS_WEIGHT
 
-    def __init__(self, value: Any, neighbours: List[Perceptlet]):
+    def __init__(self, value: Any, neighbours: Set[Perceptlet]):
         self.value = value
         self.neighbours = neighbours
         self.labels = set()
@@ -67,3 +67,9 @@ class Perceptlet(ABC):
 
     def add_label(self, label: Perceptlet) -> None:
         self.labels.add(label)
+
+    def add_neighbour(self, neighbour: Perceptlet) -> None:
+        self.neighbours.add(neighbour)
+
+    def remove_neighbour(self, neighbour: Perceptlet) -> None:
+        self.neighbours.remove(neighbour)
