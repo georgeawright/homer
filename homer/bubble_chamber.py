@@ -1,3 +1,4 @@
+import statistics
 from typing import List, Set, Union
 
 from homer.concept import Concept
@@ -48,7 +49,20 @@ class BubbleChamber:
         return label
 
     def create_group(self, members: List[Perceptlet], strength: float) -> Group:
-        group = Group(members, strength)
+        value = (
+            members[0].value
+            if type(members[0].value) == str
+            else statistics.fmean(member.value for member in members)
+        )
+        neighbours = set()
+        for member in members:
+            neighbours |= member.neighbours
+        for member in members:
+            try:
+                neighbours.remove(member)
+            except KeyError:
+                pass
+        group = Group(value, neighbours, members, strength)
         self.workspace.add_group(group)
         return group
 

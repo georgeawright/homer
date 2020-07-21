@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock, patch
 
 from homer.bubble_chamber import BubbleChamber
+from homer.perceptlet import Perceptlet
 from homer.workspace import Workspace
 from homer.worldview import Worldview
 from homer.perceptlets.group import Group
@@ -44,7 +45,9 @@ def test_create_group_returns_group():
     with patch.object(Workspace, "add_group", return_value=None) as add_group:
         workspace = Workspace(Mock(), Mock())
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        group = bubble_chamber.create_group(Mock(), Mock())
+        perceptlet_1 = Perceptlet("value", set())
+        perceptlet_2 = Perceptlet("value", set())
+        group = bubble_chamber.create_group([perceptlet_1, perceptlet_2], Mock())
         assert Group == type(group)
     add_group.assert_called_once_with(group)
 

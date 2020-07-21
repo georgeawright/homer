@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List
+from typing import Any, List, Set
 
 import statistics
 
@@ -15,9 +15,13 @@ class Group(Perceptlet):
     IMPORTANCE_LABEL_WEIGHT = HyperParameters.GROUP_IMPORTANCE_LABEL_WEIGHT
     IMPORTANCE_STRENGTH_WEIGHT = HyperParameters.GROUP_IMPORTANCE_STRENGTH_WEIGHT
 
-    def __init__(self, members: List[Perceptlet], strength: float):
-        value = "?"
-        neighbours = set()
+    def __init__(
+        self,
+        value: Any,
+        neighbours: Set[Perceptlet],
+        members: List[Perceptlet],
+        strength: float,
+    ):
         Perceptlet.__init__(self, value, neighbours)
         self.members = members
         self.strength = strength
