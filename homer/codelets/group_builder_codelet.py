@@ -48,10 +48,12 @@ class GroupBuilderCodelet(Codelet):
             label.parent_concept for label in perceptlet_a.labels
         }.intersection({label.parent_concept for label in perceptlet_b.labels})
         distances = [
-            concept.distance_between(perceptlet_a.value, perceptlet_b.value)
+            concept.distance_between_as_rating(perceptlet_a.value, perceptlet_b.value)
             for concept in common_concepts
         ]
-        return fuzzy.OR(distances)
+        if distances == []:
+            return 0.0
+        return fuzzy.OR(*distances)
 
     def engender_follow_up(self, group: Group, confidence: float) -> Codelet:
         return GroupExtenderCodelet(self.bubble_chamber, group, confidence)
