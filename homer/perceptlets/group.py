@@ -17,7 +17,7 @@ class Group(Perceptlet):
 
     def __init__(self, members: List[Perceptlet], strength: float):
         value = "?"
-        neighbours = []
+        neighbours = set()
         Perceptlet.__init__(self, value, neighbours)
         self.members = members
         self.strength = strength
@@ -48,6 +48,13 @@ class Group(Perceptlet):
     def unhappiness(self) -> float:
         connections = self.labels | self.groups | self.relations
         return self._unhappiness_based_on_connections(connections)
+
+    def add_member(self, new_member: Perceptlet):
+        self.members.add(new_member)
+        self.remove_neighbour(new_member)
+        for new_neighbour in new_member.neighbours:
+            if new_neighbour not in self.members:
+                self.add_neighbour(new_neighbour)
 
     def add_group(self, group: Group):
         self.groups.add(group)

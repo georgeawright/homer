@@ -8,5 +8,5 @@ class RawPerceptletFieldSequence(Perceptlet):
     """A sequence of raw temporal data."""
 
     def __init__(self, value: List[RawPerceptletField]):
-        neighbours = []
+        neighbours = set()
         Perceptlet.__init__(value, neighbours)

@@ -26,7 +26,7 @@ class Textlet(Perceptlet):
         constituent_relations: Set[Relation],
         strength: float,
     ):
-        neighbours = []
+        neighbours = set()
         value = text
         Perceptlet.__init__(self, value, neighbours)
         self.constituents = constituents
