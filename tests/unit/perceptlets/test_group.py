@@ -1,5 +1,6 @@
 import math
 import pytest
+import statistics
 from unittest.mock import Mock
 
 from homer.perceptlets.group import Group
@@ -53,3 +54,18 @@ def test_unhappiness(
     assert math.isclose(
         expected_unhappiness, group.unhappiness, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )
+
+
+@pytest.mark.parametrize("original_value, member_values", [(1, [2, 3, 4, 0])])
+def test_add_member_maintains_average(original_value, member_values):
+    original_member = Mock()
+    original_member.value = original_value
+    original_member.size = 1
+    group = Group(original_value, set(), {original_member}, Mock())
+    for member_value in member_values:
+        new_member = Mock()
+        new_member.value = member_value
+        new_member.size = 1
+        new_member.neighbours = set()
+        group.add_member(new_member)
+        assert group.value == statistics.fmean(member.value for member in group.members)

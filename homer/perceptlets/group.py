@@ -19,7 +19,7 @@ class Group(Perceptlet):
         self,
         value: Any,
         neighbours: Set[Perceptlet],
-        members: List[Perceptlet],
+        members: Set[Perceptlet],
         strength: float,
     ):
         Perceptlet.__init__(self, value, neighbours)
@@ -54,8 +54,15 @@ class Group(Perceptlet):
         return self._unhappiness_based_on_connections(connections)
 
     def add_member(self, new_member: Perceptlet):
+        if type(self.value) != str:
+            self.value = (self.value * self.size + new_member.value) / (
+                self.size + new_member.size
+            )
         self.members.add(new_member)
-        self.remove_neighbour(new_member)
+        try:
+            self.remove_neighbour(new_member)
+        except KeyError:
+            pass
         for new_neighbour in new_member.neighbours:
             if new_neighbour not in self.members:
                 self.add_neighbour(new_neighbour)
