@@ -8,7 +8,7 @@ from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 
 
-class TopDownClassifierCodelet(Codelet):
+class RawPerceptletLabeler(Codelet):
 
     CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
 
@@ -55,6 +55,6 @@ class TopDownClassifierCodelet(Codelet):
         )
 
     def engender_follow_up(self, confidence: float) -> Codelet:
-        return TopDownClassifierCodelet(
+        return RawPerceptletLabeler(
             self.bubble_chamber, self.parent_concept, None, confidence,
         )

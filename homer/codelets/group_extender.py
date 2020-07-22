@@ -9,29 +9,31 @@ from homer.perceptlet import Perceptlet
 from homer.perceptlets.group import Group
 
 
-class GroupExtenderCodelet(Codelet):
+class GroupExtender(Codelet):
 
     CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
 
-    def __init__(self, bubble_chamber: BubbleChamber, group: Group, urgency: float):
+    def __init__(
+        self, bubble_chamber: BubbleChamber, target_group: Group, urgency: float
+    ):
         Codelet.__init__(self, bubble_chamber)
-        self.group = group
+        self.target_group = target_group
         self.urgency = urgency
 
     def run(self) -> Optional[Codelet]:
-        neighbour = self.group.get_random_neighbour()
+        neighbour = self.target_group.get_random_neighbour()
         confidence_of_group_membership = self._calculate_confidence(neighbour)
         if confidence_of_group_membership > self.CONFIDENCE_THRESHOLD:
             self.group.add_member(neighbour)
-            self.neighbour.add_group(self.group)
-        return self.engender_follow_up(self.group.strength)
+            self.neighbour.add_group(self.target_group)
+        return self.engender_follow_up(confidence_of_group_membership)
 
     def _calculate_confidence(self, candidate: Perceptlet) -> float:
         common_concepts = {
             label.parent_concept for label in candidate.labels
-        }.intersection({label.parent_concept for label in self.group.labels})
+        }.intersection({label.parent_concept for label in self.target_group.labels})
         distances = [
-            concept.distance_between_as_rating(candidate.value, self.group.value)
+            concept.distance_between_as_rating(candidate.value, self.target_group.value)
             for concept in common_concepts
         ]
         if distances == []:
@@ -39,4 +41,4 @@ class GroupExtenderCodelet(Codelet):
         return fuzzy.OR(*distances)
 
     def engender_follow_up(self, urgency: float):
-        return GroupExtenderCodelet(self.bubble_chamber, self.group, urgency)
+        return GroupExtender(self.bubble_chamber, self.target_group, urgency)

@@ -7,11 +7,11 @@ from homer.concept import Concept
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 
-from homer.codelets.group_extender_codelet import GroupExtenderCodelet
+from homer.codelets.group_extender import GroupExtender
 from homer.perceptlets.group import Group
 
 
-class GroupBuilderCodelet(Codelet):
+class GroupBuilder(Codelet):
 
     CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
 
@@ -56,4 +56,4 @@ class GroupBuilderCodelet(Codelet):
         return fuzzy.OR(*distances)
 
     def engender_follow_up(self, group: Group, confidence: float) -> Codelet:
-        return GroupExtenderCodelet(self.bubble_chamber, group, confidence)
+        return GroupExtender(self.bubble_chamber, group, confidence)

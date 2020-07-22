@@ -2,7 +2,7 @@ import math
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.top_down_classifier_codelet import TopDownClassifierCodelet
+from homer.codelets.raw_perceptlet_labeler import RawPerceptletLabeler
 
 FLOAT_COMPARISON_TOLERANCE = 1e-1
 
@@ -31,7 +31,7 @@ def test_calculate_confidence(
     proportion_of_neighbours,
     expected,
 ):
-    codelet = TopDownClassifierCodelet(Mock(), Mock(), Mock(), Mock())
+    codelet = RawPerceptletLabeler(Mock(), Mock(), Mock(), Mock())
     result = codelet._calculate_confidence(
         concept_activation,
         concept_depth,
@@ -42,6 +42,6 @@ def test_calculate_confidence(
 
 
 def test_engender_follow_up():
-    codelet = TopDownClassifierCodelet(Mock(), Mock(), Mock(), Mock())
+    codelet = RawPerceptletLabeler(Mock(), Mock(), Mock(), Mock())
     follow_up = codelet.engender_follow_up(Mock())
-    assert TopDownClassifierCodelet == type(follow_up)
+    assert RawPerceptletLabeler == type(follow_up)

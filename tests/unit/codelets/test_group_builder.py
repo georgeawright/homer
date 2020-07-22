@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 
-from homer.codelets.group_builder_codelet import GroupBuilderCodelet
-from homer.codelets.group_extender_codelet import GroupExtenderCodelet
+from homer.codelets.group_builder import GroupBuilder
+from homer.codelets.group_extender import GroupExtender
 from homer.concept import Concept
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.label import Label
@@ -20,7 +20,7 @@ def test_calculate_confidence():
         perceptlet_1.add_label(label_1)
         perceptlet_2 = Perceptlet(Mock(), Mock())
         perceptlet_2.add_label(label_2)
-        codelet = GroupBuilderCodelet(Mock(), Mock(), Mock(), Mock())
+        codelet = GroupBuilder(Mock(), Mock(), Mock(), Mock())
         confidence = codelet._calculate_confidence(perceptlet_1, perceptlet_2)
         assert expected == confidence
 
@@ -29,12 +29,12 @@ def test_calculate_confidence_with_no_common_concepts():
     expected = 0.0
     perceptlet_1 = Perceptlet(Mock(), Mock())
     perceptlet_2 = Perceptlet(Mock(), Mock())
-    codelet = GroupBuilderCodelet(Mock(), Mock(), Mock(), Mock())
+    codelet = GroupBuilder(Mock(), Mock(), Mock(), Mock())
     confidence = codelet._calculate_confidence(perceptlet_1, perceptlet_2)
     assert expected == confidence
 
 
 def test_engender_follow_up():
-    codelet = GroupBuilderCodelet(Mock(), Mock(), Mock(), Mock())
+    codelet = GroupBuilder(Mock(), Mock(), Mock(), Mock())
     follow_up = codelet.engender_follow_up(Mock(), Mock())
-    assert GroupExtenderCodelet == type(follow_up)
+    assert GroupExtender == type(follow_up)
