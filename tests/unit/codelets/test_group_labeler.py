@@ -8,14 +8,14 @@ from homer.codelets.group_extender import GroupExtender
 FLOAT_COMPARISON_TOLERANCE = 1e-1
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
-    "label_strengths, members_without_label, expected",
-    [([0.5, 0.5], 0, 0.5), ([0.5, 0.5], 2, 0.25)],
+    "label_strengths, group_size, expected",
+    [([0.5, 0.5], 2, 0.5), ([0.5, 0.5], 4, 0.25)],
 )
-def test_calculate_confidence(label_strengths, members_without_label, expected):
+def test_calculate_confidence(label_strengths, group_size, expected):
     concept = Mock()
     group = Mock()
+    group.size = group_size
     group.members = set()
     for label_strength in label_strengths:
         label = Mock()
@@ -23,10 +23,6 @@ def test_calculate_confidence(label_strengths, members_without_label, expected):
         label.strength = label_strength
         member = Mock()
         member.labels = {label}
-        group.members.add(member)
-    for i in range(members_without_label):
-        member = Mock()
-        member.labels = set()
         group.members.add(member)
     codelet = GroupLabeler(Mock(), concept, group, Mock())
     confidence = codelet._calculate_confidence()
