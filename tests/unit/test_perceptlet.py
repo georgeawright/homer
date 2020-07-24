@@ -9,8 +9,15 @@ FLOAT_COMPARISON_TOLERANCE = 1e-3
 
 
 @pytest.fixture
-def concept():
+def space():
     mock_concept = Mock()
+    return mock_concept
+
+
+@pytest.fixture
+def concept(space):
+    mock_concept = Mock()
+    mock_concept.space = space
     return mock_concept
 
 
@@ -97,6 +104,18 @@ def test_has_label(concept, label):
     perceptlet = Perceptlet("value", set())
     perceptlet.labels.add(label)
     assert perceptlet.has_label(concept)
+
+
+def test_labels_in_space(space, label):
+    perceptlet = Perceptlet("value", set())
+    perceptlet.labels.add(label)
+    assert {label} == perceptlet.labels_in_space(space)
+
+
+def has_label_in_space(space, label):
+    perceptlet = Perceptlet("value", set())
+    perceptlet.labels.add(label)
+    assert perceptlet.has_label_in_space(space)
 
 
 def test_add_label(label):

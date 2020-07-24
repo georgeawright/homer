@@ -65,6 +65,12 @@ class Perceptlet(ABC):
             True for label in self.labels if label.parent_concept == concept
         )
 
+    def labels_in_space(self, space: Concept) -> Set[Perceptlet]:
+        return {label for label in self.labels if label.parent_concept.space == space}
+
+    def has_label_in_space(self, space: Concept) -> bool:
+        return len(self.labels_in_space(space)) > 0
+
     def add_label(self, label: Perceptlet) -> None:
         self.labels.add(label)
 
