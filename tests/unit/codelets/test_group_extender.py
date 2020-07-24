@@ -10,7 +10,7 @@ from homer.perceptlets.label import Label
 def test_calculate_confidence():
     distance = 0.5
     expected = 0.5
-    with patch.object(Concept, "distance_between_as_rating", return_value=distance):
+    with patch.object(Concept, "proximity_between", return_value=distance):
         common_concept = Concept(Mock())
         label_1 = Label(common_concept, Mock())
         label_2 = Label(common_concept, Mock())

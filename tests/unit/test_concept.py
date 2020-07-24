@@ -77,9 +77,9 @@ def test_distance_between(a, b, distance_metric, expected):
         ("hot", "cold", lambda a, b: 0 if a == b else math.inf, 10, 1.0),
     ],
 )
-def test_distance_between_as_rating(a, b, distance_metric, maximum_distance, expected):
+def test_proximity_between(a, b, distance_metric, maximum_distance, expected):
     concept = Concept("hot", distance_metric=distance_metric)
-    assert expected == concept.distance_between_as_rating(a, b)
+    assert expected == concept.proximity_between(a, b)
 
 
 @pytest.mark.parametrize(
@@ -109,14 +109,14 @@ def test_depth_rating(depth, maximum_depth, expected):
         ("cold", None, lambda a, b: 0 if a == b else math.inf, "hot", 10, 1.0),
     ],
 )
-def test_distance_rating(
+def test_proximity_to(
     prototype, boundary, distance_metric, candidate, maximum_distance, expected
 ):
     concept = Concept(
         "hot", prototype=prototype, boundary=boundary, distance_metric=distance_metric
     )
     concept.MAXIMUM_DISTANCE = maximum_distance
-    assert expected == concept.distance_rating(candidate)
+    assert expected == concept.proximity_to(candidate)
 
 
 @pytest.mark.parametrize(

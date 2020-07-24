@@ -73,11 +73,13 @@ class Concept:
             raise Exception(f"Concept {self.name} has no distance metric.")
         return self.distance_metric(a, b)
 
-    def distance_rating(self, candidate_instance: Any) -> float:
+    def proximity_to(self, candidate_instance: Any) -> float:
+        """returns a score of proximity: 0 is far, 1 is close"""
         distance = self.distance_from(candidate_instance)
         return self._value_as_decimal(distance, self.MAXIMUM_DISTANCE)
 
-    def distance_between_as_rating(self, a: Any, b: Any) -> float:
+    def proximity_between(self, a: Any, b: Any) -> float:
+        """returns a score of proximity: 0 is far, 1 is close"""
         distance = self.distance_between(a, b)
         return self._value_as_decimal(distance, self.MAXIMUM_DISTANCE)
 

@@ -33,7 +33,7 @@ class GroupExtender(Codelet):
             label.parent_concept for label in candidate.labels
         }.intersection({label.parent_concept for label in self.target_group.labels})
         distances = [
-            concept.distance_between_as_rating(candidate.value, self.target_group.value)
+            concept.proximity_between(candidate.value, self.target_group.value)
             for concept in common_concepts
         ]
         if distances == []:
