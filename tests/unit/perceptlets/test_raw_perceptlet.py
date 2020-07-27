@@ -15,7 +15,7 @@ FLOAT_COMPARISON_TOLERANCE = 1e-3
 def test_unhappiness(
     number_of_labels, number_of_groups, number_of_relations, expected_unhappiness
 ):
-    perceptlet = RawPerceptlet("value", [])
+    perceptlet = RawPerceptlet("value", Mock(), Mock(), set())
     for i in range(number_of_labels):
         perceptlet.add_label(Mock())
     for i in range(number_of_groups):

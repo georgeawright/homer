@@ -9,6 +9,10 @@ class RawPerceptletField(Perceptlet):
     """A collection of raw perceptlets perceived at a single point in time"""
 
     def __init__(
-        self, value: List[List[RawPerceptlet]], neighbours: Set[RawPerceptletField]
+        self,
+        value: List[List[RawPerceptlet]],
+        time: int,
+        neighbours: Set[RawPerceptletField],
     ):
-        Perceptlet.__init__(value, neighbours)
+        location = None
+        Perceptlet.__init__(value, location, time, neighbours)

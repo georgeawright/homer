@@ -36,7 +36,10 @@ class RawPerceptletLabeler(Codelet):
         if confidence_of_class_membership > self.CONFIDENCE_THRESHOLD:
             self.parent_concept.boost_activation(confidence_of_class_membership)
             label = self.bubble_chamber.create_label(
-                self.parent_concept, confidence_of_class_membership
+                self.parent_concept,
+                self.target_perceptlet.location,
+                self.target_perceptlet.time,
+                confidence_of_class_membership,
             )
             self.target_perceptlet.add_label(label)
             return self.engender_follow_up(confidence_of_class_membership)

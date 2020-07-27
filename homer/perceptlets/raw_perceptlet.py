@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Union
+from typing import List, Union, Set
 
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.group import Group
@@ -9,8 +9,14 @@ from homer.perceptlets.relation import Relation
 class RawPerceptlet(Perceptlet):
     """A single piece of perceived raw data, ie a number or symbol"""
 
-    def __init__(self, value: Union[str, int, float], neighbours: List[RawPerceptlet]):
-        Perceptlet.__init__(self, value, neighbours)
+    def __init__(
+        self,
+        value: Union[str, int, float],
+        location: List[int],
+        time: int,
+        neighbours: Set[RawPerceptlet],
+    ):
+        Perceptlet.__init__(self, value, location, time, neighbours)
         self.groups = set()
         self.relations = set()
 

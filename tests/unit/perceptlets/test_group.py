@@ -12,15 +12,15 @@ FLOAT_COMPARISON_TOLERANCE = 1e-3
 def test_size_flat_group():
     expected_group_size = 30
     members = [Mock() for _ in range(expected_group_size)]
-    group = Group(Mock(), Mock(), members, Mock())
+    group = Group(Mock(), Mock(), Mock(), Mock(), members, Mock())
     assert expected_group_size == group.size
 
 
 def test_size_recursive_group():
     group_depth = 30
-    group = Group(Mock(), Mock(), [Mock()], Mock())
+    group = Group(Mock(), Mock(), Mock(), Mock(), [Mock()], Mock())
     for _ in range(group_depth):
-        group = Group(Mock(), Mock(), [group], Mock())
+        group = Group(Mock(), Mock(), Mock(), Mock(), [group], Mock())
     assert 1 == group.size
 
 
@@ -29,7 +29,7 @@ def test_size_recursive_group():
 )
 def test_size_based_importance(group_size, expected_importance):
     members = [Mock() for _ in range(group_size)]
-    group = Group(Mock(), Mock(), members, Mock())
+    group = Group(Mock(), Mock(), Mock(), Mock(), members, Mock())
     assert math.isclose(
         expected_importance,
         group._size_based_importance,
@@ -44,7 +44,7 @@ def test_size_based_importance(group_size, expected_importance):
 def test_unhappiness(
     number_of_labels, number_of_groups, number_of_relations, expected_unhappiness
 ):
-    group = Group(Mock(), Mock(), Mock(), Mock())
+    group = Group(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     for i in range(number_of_labels):
         group.add_label(Mock())
     for i in range(number_of_groups):
@@ -61,7 +61,7 @@ def test_add_member_maintains_average(original_value, member_values):
     original_member = Mock()
     original_member.value = original_value
     original_member.size = 1
-    group = Group(original_value, set(), {original_member}, Mock())
+    group = Group(original_value, Mock(), Mock(), set(), {original_member}, Mock())
     for member_value in member_values:
         new_member = Mock()
         new_member.value = member_value

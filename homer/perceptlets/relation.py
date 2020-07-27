@@ -17,8 +17,10 @@ class Relation(Perceptlet):
         second_argument: Perceptlet,
         strength: float,
     ):
+        location = None
+        time = None
         neighbours = set()
-        Perceptlet.__init__(self, name, neighbours)
+        Perceptlet.__init__(self, name, location, time, neighbours)
         self.parent_concept = parent_concept
         self.first_argument = first_argument
         self.second_argument = second_argument

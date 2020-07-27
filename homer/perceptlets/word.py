@@ -9,8 +9,10 @@ class Word(Perceptlet):
     """A word for use in text."""
 
     def __init__(self, text: str, parent_concept: Concept, strength: float):
+        location = None
+        time = None
         neighbours = set()
-        Perceptlet.__init__(self, text, neighbours)
+        Perceptlet.__init__(self, text, location, time, neighbours)
         self.parent_concept = parent_concept
         self.strength = strength
         self.relations = set()

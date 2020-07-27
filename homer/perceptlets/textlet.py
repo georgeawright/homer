@@ -26,9 +26,11 @@ class Textlet(Perceptlet):
         constituent_relations: Set[Relation],
         strength: float,
     ):
+        location = None
+        time = None
         neighbours = set()
         value = text
-        Perceptlet.__init__(self, value, neighbours)
+        Perceptlet.__init__(self, value, location, time, neighbours)
         self.constituents = constituents
         self.constituent_relations = constituent_relations
         self.strength = strength

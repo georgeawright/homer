@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC
-from typing import Any, Set
+from typing import Any, List, Optional, Set, Union
 import random
 import statistics
 
@@ -14,8 +14,16 @@ class Perceptlet(ABC):
     IMPORTANCE_WEIGHT = HyperParameters.IMPORTANCE_WEIGHT
     UNHAPPINESS_WEIGHT = HyperParameters.UNHAPPINESS_WEIGHT
 
-    def __init__(self, value: Any, neighbours: Set[Perceptlet]):
+    def __init__(
+        self,
+        value: Any,
+        location: Optional[List[Union[float, int]]],
+        time: Optional[Union[float, int]],
+        neighbours: Set[Perceptlet],
+    ):
         self.value = value
+        self.location = location
+        self.time = time
         self.neighbours = neighbours
         self.labels = set()
 
@@ -50,6 +58,9 @@ class Perceptlet(ABC):
             return 1.0 / len(connections)
         except ZeroDivisionError:
             return 1.0
+
+    def get_value(self, concept: Concept) -> Any:
+        return self.__getattr__(concept.relevant_value)
 
     def get_random_neighbour(self) -> Perceptlet:
         return random.choice(self.neighbours)

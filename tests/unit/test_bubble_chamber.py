@@ -36,7 +36,7 @@ def test_create_label_returns_label():
     with patch.object(Workspace, "add_label", return_value=None) as add_label:
         workspace = Workspace(Mock(), Mock())
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        label = bubble_chamber.create_label(Mock(), Mock())
+        label = bubble_chamber.create_label(Mock(), Mock(), Mock(), Mock())
         assert Label == type(label)
     add_label.assert_called_once_with(label)
 
@@ -45,8 +45,8 @@ def test_create_group_returns_group():
     with patch.object(Workspace, "add_group", return_value=None) as add_group:
         workspace = Workspace(Mock(), Mock())
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        perceptlet_1 = Perceptlet("value", set())
-        perceptlet_2 = Perceptlet("value", set())
+        perceptlet_1 = Perceptlet("value", [1, 2], 3, set())
+        perceptlet_2 = Perceptlet("value", [1, 3], 3, set())
         group = bubble_chamber.create_group([perceptlet_1, perceptlet_2], Mock())
         assert Group == type(group)
     add_group.assert_called_once_with(group)

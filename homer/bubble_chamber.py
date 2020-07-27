@@ -43,8 +43,14 @@ class BubbleChamber:
     def demote_from_worldview(self, perceptlet: Perceptlet) -> None:
         self.worldview.remove_perceptlet(perceptlet)
 
-    def create_label(self, parent_concept: Concept, strength: float) -> Label:
-        label = Label(parent_concept, strength)
+    def create_label(
+        self,
+        parent_concept: Concept,
+        location: List[Union[float, int]],
+        time: Union[float, int],
+        strength: float,
+    ) -> Label:
+        label = Label(parent_concept, location, time, strength)
         self.workspace.add_label(label)
         return label
 
@@ -54,6 +60,10 @@ class BubbleChamber:
             if type(members[0].value) == str
             else statistics.fmean(member.value for member in members)
         )
+        latitude = statistics.fmean([member.location[0] for member in members])
+        longitude = statistics.fmean([member.location[1] for member in members])
+        location = [latitude, longitude]
+        time = statistics.fmean(member.time for member in members)
         neighbours = set()
         for member in members:
             neighbours |= member.neighbours
@@ -62,7 +72,7 @@ class BubbleChamber:
                 neighbours.remove(member)
             except KeyError:
                 pass
-        group = Group(value, neighbours, members, strength)
+        group = Group(value, location, time, neighbours, members, strength)
         self.workspace.add_group(group)
         return group
 
