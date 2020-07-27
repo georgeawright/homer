@@ -32,9 +32,7 @@ class Group(Perceptlet):
 
     @property
     def size(self) -> int:
-        return sum(
-            member.size if type(member) == Group else 1 for member in self.members
-        )
+        return sum(member.size for member in self.members)
 
     @property
     def importance(self) -> float:

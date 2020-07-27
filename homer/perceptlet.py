@@ -28,6 +28,10 @@ class Perceptlet(ABC):
         self.labels = set()
 
     @property
+    def size(self) -> int:
+        return 1
+
+    @property
     def exigency(self) -> float:
         """Returns a rating between 0 and 1."""
         return statistics.fmean(

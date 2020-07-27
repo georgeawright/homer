@@ -11,14 +11,18 @@ FLOAT_COMPARISON_TOLERANCE = 1e-3
 
 def test_size_flat_group():
     expected_group_size = 30
-    members = [Mock() for _ in range(expected_group_size)]
+    member = Mock()
+    member.size = 1
+    members = [member for _ in range(expected_group_size)]
     group = Group(Mock(), Mock(), Mock(), Mock(), members, Mock())
     assert expected_group_size == group.size
 
 
 def test_size_recursive_group():
     group_depth = 30
-    group = Group(Mock(), Mock(), Mock(), Mock(), [Mock()], Mock())
+    member = Mock()
+    member.size = 1
+    group = Group(Mock(), Mock(), Mock(), Mock(), {member}, Mock())
     for _ in range(group_depth):
         group = Group(Mock(), Mock(), Mock(), Mock(), [group], Mock())
     assert 1 == group.size
@@ -28,7 +32,9 @@ def test_size_recursive_group():
     "group_size, expected_importance", [(1, 0), (2, 0.5), (10, 0.9), (100, 0.99)]
 )
 def test_size_based_importance(group_size, expected_importance):
-    members = [Mock() for _ in range(group_size)]
+    member = Mock()
+    member.size = 1
+    members = [member for _ in range(group_size)]
     group = Group(Mock(), Mock(), Mock(), Mock(), members, Mock())
     assert math.isclose(
         expected_importance,
