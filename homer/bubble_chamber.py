@@ -7,6 +7,7 @@ from homer.event_trace import EventTrace
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
+from homer.perceptlets.correspondence import Correspondence
 from homer.perceptlets.relation import Relation
 from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
@@ -76,6 +77,20 @@ class BubbleChamber:
         self.workspace.add_group(group)
         return group
 
+    def create_correspondence(
+        self,
+        name: str,
+        parent_concept: Concept,
+        first_argument: Perceptlet,
+        second_argument: Perceptlet,
+        strength: float,
+    ) -> Correspondence:
+        correspondence = Correspondence(
+            name, parent_concept, first_argument, second_argument, strength
+        )
+        self.workspace.add_correspondence(correspondence)
+        return correspondence
+
     def create_relation(
         self,
         name: str,
@@ -83,7 +98,7 @@ class BubbleChamber:
         first_argument: Perceptlet,
         second_argument: Perceptlet,
         strength: float,
-    ) -> Relation:
+    ) -> Correspondence:
         relation = Relation(
             name, parent_concept, first_argument, second_argument, strength
         )

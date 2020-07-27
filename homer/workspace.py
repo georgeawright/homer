@@ -4,6 +4,7 @@ from homer.event_trace import EventTrace
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
+from homer.perceptlets.correspondence import Correspondence
 from homer.perceptlets.relation import Relation
 from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
@@ -17,6 +18,7 @@ class Workspace:
         self.perceptlets = perceptlets
         self.labels = set()
         self.groups = set()
+        self.correspondences = set()
         self.relations = set()
         self.words = set()
         self.textlets = set()
@@ -26,6 +28,9 @@ class Workspace:
 
     def add_group(self, group: Group):
         self.groups.add(group)
+
+    def add_correspondence(self, correspondence: Correspondence):
+        self.correspondences.add(correspondence)
 
     def add_relation(self, relation: Relation):
         self.relations.add(relation)
