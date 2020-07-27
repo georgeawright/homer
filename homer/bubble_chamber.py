@@ -98,7 +98,7 @@ class BubbleChamber:
         first_argument: Perceptlet,
         second_argument: Perceptlet,
         strength: float,
-    ) -> Correspondence:
+    ) -> Relation:
         relation = Relation(
             name, parent_concept, first_argument, second_argument, strength
         )
