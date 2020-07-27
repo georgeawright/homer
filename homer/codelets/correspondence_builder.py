@@ -3,7 +3,6 @@ from typing import Optional
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
-from homer.codelets.correspondence_labeler import CorrespondenceLabeler
 from homer.concept import Concept
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlets.correspondence import Correspondence
@@ -62,4 +61,6 @@ class CorrespondenceBuilder(Codelet):
     def _engender_follow_up(
         self, correspondence: Correspondence, urgency: float
     ) -> Codelet:
+        from homer.codelets.correspondence_labeler import CorrespondenceLabeler
+
         return CorrespondenceLabeler(self.bubble_chamber, correspondence, urgency)
