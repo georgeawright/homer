@@ -1,4 +1,6 @@
 class HyperParameters:
+    ACTIVATION_UPDATE_FREQUENCY = 10
+
     FLOATING_POINT_TOLERANCE = 1e-5
 
     DECAY_RATE = 0.1
