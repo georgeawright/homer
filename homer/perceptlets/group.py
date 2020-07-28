@@ -54,7 +54,7 @@ class Group(Perceptlet):
         return self._unhappiness_based_on_connections(connections)
 
     def get_random_member(self) -> Perceptlet:
-        random.choice(self.members)
+        return random.sample(self.members, 1)[0]
 
     def add_member(self, new_member: Perceptlet):
         if type(self.value) != str:
