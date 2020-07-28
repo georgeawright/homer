@@ -1,3 +1,5 @@
+import random
+
 from homer.codelet import BubbleChamber
 from homer.codelet import Codelet
 
@@ -13,15 +15,11 @@ class Coderack:
         codelet = self.select_codelet()
         follow_up = codelet.run()
         self.codelets_run += 1
-        if follow_up is None:
-            return
-        if follow_up.target_perceptlet is None:
-            new_target = self.bubble_chamber.select_target_perceptlet
-            follow_up.target_perceptlet = new_target
-        self.codelets.append(follow_up)
+        if follow_up is not None:
+            self.codelets.append(follow_up)
 
-    def calculate_randomness(self):
-        pass
+    def calculate_randomness(self) -> float:
+        return (1 - self.bubble_chamber.satisfaction) * random.random()
 
     def select_codelet(self) -> Codelet:
         pass
