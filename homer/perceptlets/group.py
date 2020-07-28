@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Any, List, Set
-
 import statistics
+import random
+from typing import Any, List, Set
 
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
@@ -52,6 +52,9 @@ class Group(Perceptlet):
     def unhappiness(self) -> float:
         connections = self.labels | self.groups | self.relations
         return self._unhappiness_based_on_connections(connections)
+
+    def get_random_member(self) -> Perceptlet:
+        random.choice(self.members)
 
     def add_member(self, new_member: Perceptlet):
         if type(self.value) != str:

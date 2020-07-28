@@ -62,6 +62,13 @@ def test_unhappiness(
     )
 
 
+@pytest.mark.parametrize("no_of_members", [(10)])
+def test_get_random_member_returns_member(no_of_members):
+    members = {Mock() for _ in range(no_of_members)}
+    group = Group(Mock(), Mock(), Mock(), Mock(), members, Mock())
+    assert group.get_random_member in members
+
+
 @pytest.mark.parametrize("original_value, member_values", [(1, [2, 3, 4, 0])])
 def test_add_member_maintains_average(original_value, member_values):
     original_member = Mock()
