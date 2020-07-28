@@ -25,18 +25,24 @@ class Workspace:
 
     def add_label(self, label: Label):
         self.labels.add(label)
+        self.perceptlets.add(label)
 
     def add_group(self, group: Group):
         self.groups.add(group)
+        self.perceptlets.add(group)
 
     def add_correspondence(self, correspondence: Correspondence):
         self.correspondences.add(correspondence)
+        self.perceptlets.add(correspondence)
 
     def add_relation(self, relation: Relation):
         self.relations.add(relation)
+        self.perceptlets.add(relation)
 
     def add_word(self, word: Word):
         self.words.add(word)
+        self.perceptlets.add(word)
 
     def add_textlet(self, textlet: Textlet):
         self.textlets.add(textlet)
+        self.perceptlets.add(textlet)
