@@ -32,6 +32,14 @@ class BubbleChamber:
     @property
     def satisfaction(self) -> float:
         """Calculate and return overall satisfaction with perceptual structures"""
+        return statistics.fmean(
+            [
+                perceptlet.unhappiness * perceptlet.importance
+                for perceptlet in self.workspace.perceptlets
+            ]
+        )
+
+    def update_activations(self) -> None:
         pass
 
     def select_target_perceptlet(self) -> Perceptlet:
