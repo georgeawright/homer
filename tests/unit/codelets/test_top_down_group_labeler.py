@@ -2,7 +2,7 @@ import math
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.group_labeler import GroupLabeler
+from homer.codelets.top_down_group_labeler import TopDownGroupLabeler
 from homer.codelets.group_extender import GroupExtender
 
 FLOAT_COMPARISON_TOLERANCE = 1e-1
@@ -24,18 +24,12 @@ def test_calculate_confidence(label_strengths, group_size, expected):
         member = Mock()
         member.labels = {label}
         group.members.add(member)
-    codelet = GroupLabeler(Mock(), group, Mock())
-    confidence = codelet._calculate_confidence(concept)
+    codelet = TopDownGroupLabeler(Mock(), concept, group, Mock())
+    confidence = codelet._calculate_confidence()
     assert math.isclose(expected, confidence, abs_tol=FLOAT_COMPARISON_TOLERANCE)
 
 
 def test_engender_follow_up():
-    codelet = GroupLabeler(Mock(), Mock(), Mock())
-    follow_up = codelet._engender_follow_up(Mock())
+    codelet = TopDownGroupLabeler(Mock(), Mock(), Mock(), Mock())
+    follow_up = codelet.engender_follow_up(Mock())
     assert GroupExtender == type(follow_up)
-
-
-def test_engender_alternative_follow_up():
-    codelet = GroupLabeler(Mock(), Mock(), Mock())
-    follow_up = codelet._engender_alternative_follow_up(Mock())
-    assert GroupLabeler == type(follow_up)
