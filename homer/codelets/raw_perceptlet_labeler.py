@@ -58,6 +58,7 @@ class RawPerceptletLabeler(Codelet):
         )
 
     def engender_follow_up(self, confidence: float) -> Codelet:
+        new_target = self.target_perceptlet.most_exigent_neighbour()
         return RawPerceptletLabeler(
-            self.bubble_chamber, self.parent_concept, None, confidence,
+            self.bubble_chamber, self.parent_concept, new_target, confidence,
         )
