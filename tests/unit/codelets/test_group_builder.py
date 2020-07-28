@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 
 from homer.codelets.group_builder import GroupBuilder
-from homer.codelets.group_extender import GroupExtender
+from homer.codelets.group_labeler import GroupLabeler
 from homer.concept import Concept
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.label import Label
@@ -36,5 +36,5 @@ def test_calculate_confidence_with_no_common_concepts():
 
 def test_engender_follow_up():
     codelet = GroupBuilder(Mock(), Mock(), Mock(), Mock())
-    follow_up = codelet.engender_follow_up(Mock(), Mock())
-    assert GroupExtender == type(follow_up)
+    follow_up = codelet._engender_follow_up(Mock(), Mock())
+    assert GroupLabeler == type(follow_up)

@@ -7,7 +7,7 @@ from homer.concept import Concept
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 
-from homer.codelets.group_extender import GroupExtender
+from homer.codelets.group_labeler import GroupLabeler
 from homer.perceptlets.group import Group
 
 
@@ -55,5 +55,5 @@ class GroupBuilder(Codelet):
             return 0.0
         return fuzzy.OR(*distances)
 
-    def engender_follow_up(self, group: Group, confidence: float) -> Codelet:
-        return GroupExtender(self.bubble_chamber, group, confidence)
+    def _engender_follow_up(self, group: Group, confidence: float) -> Codelet:
+        return GroupLabeler(self.bubble_chamber, group, confidence)
