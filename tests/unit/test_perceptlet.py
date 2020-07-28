@@ -57,6 +57,20 @@ def test_label_based_importance(label_strengths, expected_importance):
 
 
 @pytest.mark.parametrize(
+    "neighbour_exigencies",
+    [([0, 0.4, 1.0]), ([0.9, 0.4, 0.3]), ([0.4, 0.9, 0.4]), ([0.0, 0.0])],
+)
+def test_most_exigent_neighbour(neighbour_exigencies):
+    neighbours = set()
+    for exigency in neighbour_exigencies:
+        neighbour = Mock()
+        neighbour.exigency = exigency
+        neighbours.add(neighbour)
+    perceptlet = Perceptlet("value", Mock(), Mock(), neighbours)
+    assert max(neighbour_exigencies) == perceptlet.most_exigent_neighbour().exigency
+
+
+@pytest.mark.parametrize(
     "number_of_connections, expected_unhappiness",
     [(0, 1.0), (1, 1.0), (3, 0.333), (5, 0.2)],
 )

@@ -57,6 +57,16 @@ class Perceptlet(ABC):
         total_label_strengths_inverse = 1.0 / (1.0 + total_label_strengths)
         return 1.0 - total_label_strengths_inverse
 
+    def most_exigent_neighbour(self) -> Perceptlet:
+        # TODO: consider searching further afield
+        highest_exigency = 0.0
+        most_exigent = None
+        for neighbour in self.neighbours:
+            if neighbour.exigency >= highest_exigency:
+                most_exigent = neighbour
+                highest_exigency = neighbour.exigency
+        return most_exigent
+
     def _unhappiness_based_on_connections(self, connections: Set[Perceptlet]) -> float:
         try:
             return 1.0 / len(connections)
