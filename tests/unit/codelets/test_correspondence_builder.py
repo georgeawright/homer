@@ -24,7 +24,7 @@ def test_calculate_confidence(
     ):
         target_group_a = Group(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
         target_group_b = Group(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-        parent_space = Concept(Mock())
+        parent_space = Concept(Mock(), Mock())
         correspondence_builder = CorrespondenceBuilder(
             Mock(), parent_space, target_group_a, target_group_b, Mock()
         )

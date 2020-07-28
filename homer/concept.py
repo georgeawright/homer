@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 from typing import Any, Callable, List, Optional, Union
 
-from .hyper_parameters import HyperParameters
+from homer.activation_pattern import ActivationPattern
+from homer.hyper_parameters import HyperParameters
 
 
 class Concept:
@@ -13,8 +15,8 @@ class Concept:
     def __init__(
         self,
         name: str,
+        activation_pattern: ActivationPattern,
         depth: int = 1,
-        activation: float = 0.0,
         space: Optional[Concept] = None,
         prototype: Optional[Union[List[int], List[float], str]] = None,
         boundary: Optional[Union[List[int], List[float]]] = None,
@@ -47,13 +49,13 @@ class Concept:
                 + f" prototype and boundary are equal {prototype}."
             )
         self.name = name
+        self.activation_pattern = activation_pattern
         self.space = space
         self.depth = depth
         self.activation_coefficient = 1 / depth
         self.prototype = prototype
         self.boundary = boundary
         self.distance_metric = distance_metric
-        self.activation = activation
 
     @property
     def depth_rating(self) -> float:
@@ -86,10 +88,10 @@ class Concept:
     def _value_as_decimal(self, value, maximum) -> float:
         return min(value / maximum, 1.0)
 
-    def boost_activation(self, amount: float):
-        raw_activation = self.activation + amount * self.activation_coefficient
-        self.activation = 1.0 if raw_activation > 1.0 else raw_activation
+    def boost_activation(self, amount: float, location):
+        self.activation_pattern.boost_activation(amount, location)
 
-    def decay_activation(self):
-        raw_activation = self.activation - self.DECAY_RATE * self.activation_coefficient
-        self.activation = 0.0 if raw_activation < 0.0 else raw_activation
+    def decay_activation(self, location):
+        self.activation_pattern.decay_activation(location)
+        # raw_activation = self.activation - self.DECAY_RATE * self.activation_coefficient
+        # self.activation = 0.0 if raw_activation < 0.0 else raw_activation

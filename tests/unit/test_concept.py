@@ -1,7 +1,9 @@
 import math
 import pytest
+from unittest.mock import Mock, patch
 
 from homer.concept import Concept
+from homer.activation_pattern import ActivationPattern
 
 FLOAT_COMPARISON_TOLERANCE = 1e-5
 
@@ -18,7 +20,7 @@ FLOAT_COMPARISON_TOLERANCE = 1e-5
 )
 def test_concept_constructor_exceptions(depth, boundary, prototype, exception_message):
     with pytest.raises(Exception) as excinfo:
-        Concept("hot", depth=depth, prototype=prototype, boundary=boundary)
+        Concept("hot", Mock(), depth=depth, prototype=prototype, boundary=boundary)
     assert exception_message in str(excinfo.value)
 
 
@@ -40,13 +42,17 @@ def test_concept_constructor_exceptions(depth, boundary, prototype, exception_me
 )
 def test_distance_from(prototype, boundary, distance_metric, candidate, expected):
     concept = Concept(
-        "hot", prototype=prototype, boundary=boundary, distance_metric=distance_metric
+        "hot",
+        Mock(),
+        prototype=prototype,
+        boundary=boundary,
+        distance_metric=distance_metric,
     )
     assert expected == concept.distance_from(candidate)
 
 
 def test_distance_from_raises_exception_if_no_distance_metric():
-    concept = Concept("hot")
+    concept = Concept("hot", Mock())
     with pytest.raises(Exception) as excinfo:
         concept.distance_from([1])
     assert "Concept hot has no distance metric." in str(excinfo.value)
@@ -63,7 +69,7 @@ def test_distance_from_raises_exception_if_no_distance_metric():
     ],
 )
 def test_distance_between(a, b, distance_metric, expected):
-    concept = Concept("hot", distance_metric=distance_metric)
+    concept = Concept("hot", Mock(), distance_metric=distance_metric)
     assert expected == concept.distance_between(a, b)
 
 
@@ -78,7 +84,7 @@ def test_distance_between(a, b, distance_metric, expected):
     ],
 )
 def test_proximity_between(a, b, distance_metric, maximum_distance, expected):
-    concept = Concept("hot", distance_metric=distance_metric)
+    concept = Concept("hot", Mock(), distance_metric=distance_metric)
     assert expected == concept.proximity_between(a, b)
 
 
@@ -86,7 +92,7 @@ def test_proximity_between(a, b, distance_metric, maximum_distance, expected):
     "depth, maximum_depth, expected", [(1, 10, 0.1), (10, 10, 1.0), (13, 10, 1.0)]
 )
 def test_depth_rating(depth, maximum_depth, expected):
-    concept = Concept("hot", depth=depth)
+    concept = Concept("hot", Mock(), depth=depth)
     concept.MAXIMUM_DEPTH = maximum_depth
     assert math.isclose(
         expected, concept.depth_rating, abs_tol=FLOAT_COMPARISON_TOLERANCE
@@ -113,32 +119,11 @@ def test_proximity_to(
     prototype, boundary, distance_metric, candidate, maximum_distance, expected
 ):
     concept = Concept(
-        "hot", prototype=prototype, boundary=boundary, distance_metric=distance_metric
+        "hot",
+        Mock(),
+        prototype=prototype,
+        boundary=boundary,
+        distance_metric=distance_metric,
     )
     concept.MAXIMUM_DISTANCE = maximum_distance
     assert expected == concept.proximity_to(candidate)
-
-
-@pytest.mark.parametrize(
-    "depth,activation,amount,expected",
-    [(2, 0.0, 0.1, 0.05), (2, 0.5, 0.5, 0.75), (2, 0.99, 0.1, 1)],
-)
-def test_boost_activation(depth, activation, amount, expected):
-    concept = Concept("hot", depth=depth, activation=activation)
-    concept.boost_activation(amount)
-    assert math.isclose(
-        expected, concept.activation, abs_tol=FLOAT_COMPARISON_TOLERANCE
-    )
-
-
-@pytest.mark.parametrize(
-    "depth,activation,decay_rate,expected",
-    [(2, 0.6, 0.1, 0.55), (2, 0.05, 0.1, 0.0), (2, 0.01, 0.1, 0.0)],
-)
-def test_decay_activation(depth, activation, decay_rate, expected):
-    Concept.DECAY_RATE = decay_rate
-    concept = Concept("hot", depth=depth, activation=activation)
-    concept.decay_activation()
-    assert math.isclose(
-        expected, concept.activation, abs_tol=FLOAT_COMPARISON_TOLERANCE
-    )
