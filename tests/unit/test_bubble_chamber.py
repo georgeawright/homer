@@ -12,6 +12,15 @@ from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
 
 
+def test_get_random_groups():
+    workspace = Mock()
+    workspace.groups = {Mock() for _ in range(10)}
+    bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+    groups = bubble_chamber.get_random_groups(2)
+    for group in groups:
+        assert group in workspace.groups
+
+
 def test_promote_to_worldview():
     with patch.object(Worldview, "add_perceptlet", return_value=None) as add_perceptlet:
         worldview = Worldview(Mock())
