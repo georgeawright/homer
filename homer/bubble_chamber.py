@@ -1,3 +1,4 @@
+import random
 import statistics
 from typing import List, Set, Union
 
@@ -45,6 +46,9 @@ class BubbleChamber:
     def select_target_perceptlet(self) -> Perceptlet:
         """Return a target for a codelet"""
         pass
+
+    def get_random_groups(self, amount: int) -> List[Group]:
+        return random.sample(self.workspace.groups, amount)
 
     def promote_to_worldview(self, perceptlet: Perceptlet) -> None:
         self.worldview.add_perceptlet(perceptlet)
