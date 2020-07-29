@@ -11,4 +11,4 @@ class RawPerceptletFieldSequence(Perceptlet):
         location = None
         time = None
         neighbours = set()
-        Perceptlet.__init__(value, location, time, neighbours)
+        Perceptlet.__init__(self, value, location, time, neighbours)

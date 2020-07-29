@@ -5,6 +5,7 @@ from homer.perceptlet import Perceptlet
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
 from homer.perceptlets.correspondence import Correspondence
+from homer.perceptlets.raw_perceptlet_field_sequence import RawPerceptletFieldSequence
 from homer.perceptlets.relation import Relation
 from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
@@ -12,10 +13,11 @@ from homer.perceptlets.word import Word
 
 class Workspace:
     def __init__(
-        self, event_trace: EventTrace, perceptlets: Set[Perceptlet],
+        self, event_trace: EventTrace, input_sequence: RawPerceptletFieldSequence
     ):
         self.event_trace = event_trace
-        self.perceptlets = perceptlets
+        self.input_sequence = input_sequence
+        self.perceptlets = {input_sequence}
         self.labels = set()
         self.groups = set()
         self.correspondences = set()

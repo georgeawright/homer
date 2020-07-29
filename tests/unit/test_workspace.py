@@ -3,7 +3,7 @@ from homer.workspace import Workspace
 
 
 def test_add_label():
-    workspace = Workspace(Mock(), set())
+    workspace = Workspace(Mock(), Mock())
     assert set() == workspace.labels
     label = Mock()
     workspace.add_label(label)
@@ -12,7 +12,7 @@ def test_add_label():
 
 
 def test_add_group():
-    workspace = Workspace(Mock(), set())
+    workspace = Workspace(Mock(), Mock())
     assert set() == workspace.groups
     group = Mock()
     workspace.add_group(group)
@@ -21,7 +21,7 @@ def test_add_group():
 
 
 def test_add_correspondence():
-    workspace = Workspace(Mock(), set())
+    workspace = Workspace(Mock(), Mock())
     assert set() == workspace.correspondences
     correspondence = Mock()
     workspace.add_correspondence(correspondence)
@@ -30,7 +30,7 @@ def test_add_correspondence():
 
 
 def test_add_relation():
-    workspace = Workspace(Mock(), set())
+    workspace = Workspace(Mock(), Mock())
     assert set() == workspace.relations
     relation = Mock()
     workspace.add_relation(relation)
@@ -39,7 +39,7 @@ def test_add_relation():
 
 
 def test_add_word():
-    workspace = Workspace(Mock(), set())
+    workspace = Workspace(Mock(), Mock())
     assert set() == workspace.words
     word = Mock()
     workspace.add_word(word)
@@ -48,7 +48,7 @@ def test_add_word():
 
 
 def test_add_textlet():
-    workspace = Workspace(Mock(), set())
+    workspace = Workspace(Mock(), Mock())
     assert set() == workspace.textlets
     textlet = Mock()
     workspace.add_textlet(textlet)
