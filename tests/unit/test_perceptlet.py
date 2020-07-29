@@ -1,8 +1,9 @@
 import math
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from homer.perceptlet import Perceptlet
+from homer.perceptlets.correspondence import Correspondence
 
 
 FLOAT_COMPARISON_TOLERANCE = 1e-3
@@ -137,6 +138,27 @@ def test_add_label(label):
     assert set() == perceptlet.labels
     perceptlet.add_label(label)
     assert {label} == perceptlet.labels
+
+
+@pytest.mark.parametrize(
+    "is_between, is_in_space, expected",
+    [
+        (True, True, True),
+        (True, False, False),
+        (False, True, False),
+        (False, False, False),
+    ],
+)
+def test_has_correspondence(is_between, is_in_space, expected):
+    second_perceptlet = Mock()
+    space = Mock()
+    with patch.object(Correspondence, "is_between", return_value=is_between):
+        correspondence = Correspondence(Mock(), Mock(), Mock(), Mock(), Mock())
+        if is_in_space:
+            correspondence.parent_concept = space
+        perceptlet = Perceptlet("value", Mock(), Mock(), set())
+        perceptlet.correspondences = {correspondence}
+        assert expected == perceptlet.has_correspondence(second_perceptlet, space)
 
 
 def test_add_neighbour():

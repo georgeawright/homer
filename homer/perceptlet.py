@@ -26,6 +26,7 @@ class Perceptlet(ABC):
         self.time = time
         self.neighbours = neighbours
         self.labels = set()
+        self.correspondences = set()
 
     @property
     def size(self) -> int:
@@ -98,6 +99,15 @@ class Perceptlet(ABC):
 
     def add_label(self, label: Perceptlet) -> None:
         self.labels.add(label)
+
+    def has_correspondence(self, second_perceptlet: Perceptlet, space: Concept) -> bool:
+        for correspondence in self.correspondences:
+            if (
+                correspondence.is_between(self, second_perceptlet)
+                and correspondence.parent_concept == space
+            ):
+                return True
+        return False
 
     def add_neighbour(self, neighbour: Perceptlet) -> None:
         self.neighbours.add(neighbour)

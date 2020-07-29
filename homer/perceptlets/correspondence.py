@@ -39,7 +39,12 @@ class Correspondence(Perceptlet):
     @property
     def unhappiness(self) -> float:
         # TODO: this might not be an appropriate measure of unhappiness for relations
-        return self._unhappiness_based_on_connections(self.relations)
+        return self._unhappiness_based_on_connections(self.correspondences)
 
-    def add_relation(self, correspondence: Correspondence):
+    def add_correspondence(self, correspondence: Correspondence):
         self.correspondences.add(correspondence)
+
+    def is_between(self, a: Perceptlet, b: Perceptlet):
+        return (self.first_argument == a and self.second_argument == b) or (
+            self.first_argument == b and self.second_argument == a
+        )
