@@ -17,7 +17,7 @@ class Workspace:
     ):
         self.event_trace = event_trace
         self.input_sequence = input_sequence
-        self.perceptlets = {
+        self.raw_perceptlets = {
             raw_perceptlet
             for field in input_sequence
             for row in field
@@ -29,6 +29,15 @@ class Workspace:
         self.relations = set()
         self.words = set()
         self.textlets = set()
+        self.perceptlets = set.union(
+            self.raw_perceptlets,
+            self.labels,
+            self.groups,
+            self.correspondences,
+            self.relations,
+            self.words,
+            self.textlets,
+        )
 
     def add_label(self, label: Label):
         self.labels.add(label)

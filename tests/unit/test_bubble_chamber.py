@@ -12,6 +12,14 @@ from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
 
 
+def test_get_raw_perceptlet():
+    workspace = Mock()
+    workspace.raw_perceptlets = {Mock() for _ in range(10)}
+    bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+    raw_perceptlet = bubble_chamber.get_raw_perceptlet()
+    assert raw_perceptlet in workspace.raw_perceptlets
+
+
 def test_get_random_groups():
     workspace = Mock()
     workspace.groups = {Mock() for _ in range(10)}

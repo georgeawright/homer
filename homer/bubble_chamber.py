@@ -6,6 +6,7 @@ from homer.concept import Concept
 from homer.concept_space import ConceptSpace
 from homer.event_trace import EventTrace
 from homer.perceptlet import Perceptlet
+from homer.perceptlets.raw_perceptlet import RawPerceptlet
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
 from homer.perceptlets.correspondence import Correspondence
@@ -43,9 +44,8 @@ class BubbleChamber:
     def update_activations(self) -> None:
         pass
 
-    def select_target_perceptlet(self) -> Perceptlet:
-        """Return a target for a codelet"""
-        pass
+    def get_raw_perceptlet(self) -> RawPerceptlet:
+        return random.sample(self.workspace.raw_perceptlets, 1)[0]
 
     def get_random_groups(self, amount: int) -> List[Group]:
         return random.sample(self.workspace.groups, amount)
