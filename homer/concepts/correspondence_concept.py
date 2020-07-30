@@ -1,5 +1,8 @@
 from typing import Callable, List, Optional, Union
 
+from homer.activation_patterns.workspace_activation_pattern import (
+    WorkspaceActivationPattern,
+)
 from homer.concept import Concept
 
 
@@ -15,11 +18,13 @@ class CorrespondenceConcept(Concept):
         boundary: Optional[Union[List[int], List[float]]] = None,
         distance_metric: Optional[Callable] = None,
     ):
+        activation_coefficient = 1 / depth
+        activation_pattern = WorkspaceActivationPattern(activation_coefficient)
         Concept.__init__(
             self,
             name,
+            activation_pattern,
             depth=depth,
-            activation=activation,
             space=space,
             prototype=prototype,
             boundary=boundary,
@@ -28,4 +33,5 @@ class CorrespondenceConcept(Concept):
         self.affinity_calculation = affinity_calculation
 
     def calculate_affinity(self, number_of_same_labels: int, proximity: float):
-        self.affinity_calculation(number_of_same_labels, proximity)
+        raw_affinity = self.affinity_calculation(number_of_same_labels, proximity)
+        return max(min(raw_affinity, 1.0), 0.0)
