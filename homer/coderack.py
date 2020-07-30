@@ -8,7 +8,7 @@ class Coderack:
     def __init__(self, bubble_chamber: BubbleChamber):
         self.bubble_chamber = bubble_chamber
         self.codelets = []
-        self.codelts_run = 0
+        self.codelets_run = 0
 
     def select_and_run_codelet(self):
         self.calculate_randomness()
