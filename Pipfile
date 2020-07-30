@@ -9,6 +9,7 @@ verify_ssl = true
 matplotlib = "*"
 flake8 = "*"
 pytest = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.8"
