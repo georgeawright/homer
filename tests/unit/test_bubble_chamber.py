@@ -20,6 +20,14 @@ def test_get_raw_perceptlet():
     assert raw_perceptlet in workspace.raw_perceptlets
 
 
+def test_get_random_workspace_concept():
+    concept_space = Mock()
+    concept_space.workspace_concepts = {Mock() for _ in range(10)}
+    bubble_chamber = BubbleChamber(concept_space, Mock(), Mock(), Mock())
+    concept = bubble_chamber.get_random_workspace_concept()
+    assert concept in concept_space.workspace_concepts
+
+
 def test_get_random_groups():
     workspace = Mock()
     workspace.groups = {Mock() for _ in range(10)}

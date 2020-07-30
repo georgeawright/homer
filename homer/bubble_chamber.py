@@ -50,6 +50,9 @@ class BubbleChamber:
     def get_random_groups(self, amount: int) -> List[Group]:
         return random.sample(self.workspace.groups, amount)
 
+    def get_random_workspace_concept(self) -> Concept:
+        return random.sample(self.concept_space.workspace_concepts, 1)[0]
+
     def promote_to_worldview(self, perceptlet: Perceptlet) -> None:
         self.worldview.add_perceptlet(perceptlet)
 
