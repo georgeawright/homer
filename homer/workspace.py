@@ -17,7 +17,12 @@ class Workspace:
     ):
         self.event_trace = event_trace
         self.input_sequence = input_sequence
-        self.perceptlets = {input_sequence}
+        self.perceptlets = {
+            raw_perceptlet
+            for field in input_sequence
+            for row in field
+            for raw_perceptlet in row
+        }
         self.labels = set()
         self.groups = set()
         self.correspondences = set()
