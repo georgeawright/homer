@@ -43,7 +43,8 @@ def test_demote_from_worldview():
 
 def test_create_label_returns_label():
     with patch.object(Workspace, "add_label", return_value=None) as add_label:
-        workspace = Workspace(Mock(), Mock())
+        raw_inp = [[[Mock()]]]
+        workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
         label = bubble_chamber.create_label(Mock(), Mock(), Mock(), Mock())
         assert Label == type(label)
@@ -52,7 +53,8 @@ def test_create_label_returns_label():
 
 def test_create_group_returns_group():
     with patch.object(Workspace, "add_group", return_value=None) as add_group:
-        workspace = Workspace(Mock(), Mock())
+        raw_inp = [[[Mock()]]]
+        workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
         perceptlet_1 = Perceptlet("value", [1, 2], 3, set())
         perceptlet_2 = Perceptlet("value", [1, 3], 3, set())
@@ -63,7 +65,8 @@ def test_create_group_returns_group():
 
 def test_create_relation_returns_relation():
     with patch.object(Workspace, "add_relation", return_value=None) as add_relation:
-        workspace = Workspace(Mock(), Mock())
+        raw_inp = [[[Mock()]]]
+        workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
         relation = bubble_chamber.create_relation(
             Mock(), Mock(), Mock(), Mock(), Mock()
@@ -74,7 +77,8 @@ def test_create_relation_returns_relation():
 
 def test_create_word_returns_word():
     with patch.object(Workspace, "add_word", return_value=None) as add_word:
-        workspace = Workspace(Mock(), Mock())
+        raw_inp = [[[Mock()]]]
+        workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
         word = bubble_chamber.create_word(Mock(), Mock(), Mock())
         assert Word == type(word)
@@ -83,7 +87,8 @@ def test_create_word_returns_word():
 
 def test_create_text_returns_textlet():
     with patch.object(Workspace, "add_textlet", return_value=None) as add_text:
-        workspace = Workspace(Mock(), Mock())
+        raw_inp = [[[Mock()]]]
+        workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
         textlet = bubble_chamber.create_textlet(Mock(), Mock(), Mock(), Mock())
         assert Textlet == type(textlet)
