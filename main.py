@@ -1,7 +1,109 @@
-class Homer:
-    def __init__(self, concept_net, coderack, trace, workspace, worldview):
-        self.concept_net = concept_net
-        self.coderack = coderack
-        self.trace = trace
-        self.workspace = workspace
-        self.woldview = worldview
+import yaml
+
+from homer import fuzzy
+from homer.bubble_chamber import BubbleChamber
+from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
+from homer.coderack import Coderack
+from homer.concepts.correspondence_concept import CorrespondenceConcept
+from homer.concepts.euclidean_concept import EuclideanConcept
+from homer.concepts.euclidean_space import EuclideanSpace
+from homer.concept_space import ConceptSpace
+from homer.event_trace import EventTrace
+from homer.homer import Homer
+from homer.hyper_parameters import HyperParameters
+from homer.perceptlets.raw_perceptlet import RawPerceptlet
+from homer.perceptlets.raw_perceptlet_field import RawPerceptletField
+from homer.perceptlets.raw_perceptlet_field_sequence import RawPerceptletFieldSequence
+from homer.workspace import Workspace
+from homer.worldview import Worldview
+
+path_to_problem_file = "problems/temperature_problem_1.yaml"
+
+with open(path_to_problem_file) as f:
+    model_input = yaml.load(f)
+    print(model_input)
+
+raw_perceptlets = [
+    [RawPerceptlet(cell_value, [i, j], 0, set()) for j, cell_value in enumerate(row)]
+    for i, row in enumerate(model_input)
+]
+
+neighbour_relative_coordinates = [
+    (-1, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+    (1, 0),
+    (1, -1),
+    (0, -1),
+    (-1, -1),
+]
+
+for i, row in enumerate(raw_perceptlets):
+    for j, perceptlet in enumerate(row):
+        for x, y in neighbour_relative_coordinates:
+            if (
+                i + x >= 0
+                and i + x < len(raw_perceptlets)
+                and j + y >= 0
+                and j + y < len(row)
+            ):
+                perceptlet.neighbours.add(raw_perceptlets[i + x][j + y])
+
+for neighbour in raw_perceptlets[0][0].neighbours:
+    print(neighbour.value)
+
+raw_perceptlet_field = RawPerceptletField(raw_perceptlets, 0, set())
+raw_perceptlet_field_sequence = RawPerceptletFieldSequence([raw_perceptlet_field])
+event_trace = EventTrace([])
+workspace = Workspace(event_trace, raw_perceptlet_field_sequence)
+worldview = Worldview(set())
+
+temperature_space = EuclideanSpace("temperature", 5)
+location_space = EuclideanSpace("location", 5)
+spaces = {temperature_space, location_space}
+workspace_concepts = {
+    EuclideanConcept("cold", [4], temperature_space, depth=1, boundary=[7]),
+    EuclideanConcept("mild", [10], temperature_space, depth=1),
+    EuclideanConcept("warm", [16], temperature_space, depth=1),
+    EuclideanConcept("hot", [22], temperature_space, depth=1, boundary=[19]),
+    EuclideanConcept("north", [1, 2], location_space, depth=1),
+    EuclideanConcept("south", [4, 2], location_space, depth=1),
+    EuclideanConcept("east", [2.5, 3], location_space, depth=1),
+    EuclideanConcept("west", [2.5, 1], location_space, depth=1),
+    EuclideanConcept("northwest", [0.5, 0.5], location_space, depth=2),
+    EuclideanConcept("northeast", [0.5, 3.5], location_space, depth=2),
+    EuclideanConcept("southwest", [0.5, 0.5], location_space, depth=2),
+    EuclideanConcept("southeast", [4.5, 3.5], location_space, depth=2),
+    EuclideanConcept("midlands", [2.5, 2], location_space, depth=2),
+}
+correspondence_concepts = {
+    CorrespondenceConcept(
+        "sameness", lambda same_labels, proximity: fuzzy.AND(same_labels, proximity)
+    ),
+    CorrespondenceConcept(
+        "oppositeness",
+        lambda same_labels, proximity: fuzzy.AND(
+            fuzzy.NOT(same_labels), fuzzy.NOT(proximity)
+        ),
+    ),
+    CorrespondenceConcept(
+        "extremeness",
+        lambda same_labels, proximity: fuzzy.AND(same_labels, fuzzy.NOT(proximity)),
+    ),
+}
+concept_space = ConceptSpace(spaces, workspace_concepts, correspondence_concepts)
+
+bubble_chamber = BubbleChamber(concept_space, event_trace, workspace, worldview)
+coderack = Coderack(bubble_chamber)
+coderack.codelets = [
+    BottomUpRawPerceptletLabeler(
+        bubble_chamber,
+        bubble_chamber.get_raw_perceptlet(),
+        HyperParameters.STARTER_CODELET_URGENCY,
+    )
+    for _ in range(HyperParameters.NO_OF_STARTER_CODELETS)
+]
+
+homer = Homer(bubble_chamber, coderack)
+homer.run()
