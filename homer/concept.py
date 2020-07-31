@@ -20,6 +20,7 @@ class Concept:
         space: Optional[Concept] = None,
         prototype: Optional[Union[List[int], List[float], str]] = None,
         boundary: Optional[Union[List[int], List[float]]] = None,
+        relevant_value: Optional[str] = "value",
         distance_metric: Optional[Callable] = None,
     ):
         if depth < 1:
@@ -55,6 +56,7 @@ class Concept:
         self.activation_coefficient = 1 / depth
         self.prototype = prototype
         self.boundary = boundary
+        self.relevant_value = relevant_value
         self.distance_metric = distance_metric
 
     @property

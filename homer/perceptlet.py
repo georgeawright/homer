@@ -75,7 +75,9 @@ class Perceptlet(ABC):
             return 1.0
 
     def get_value(self, concept: Concept) -> Any:
-        return self.__getattr__(concept.relevant_value)
+        print(concept.name)
+        print(concept.relevant_value)
+        return getattr(self, concept.relevant_value)
 
     def get_random_neighbour(self) -> Perceptlet:
         return random.choice(self.neighbours)

@@ -28,7 +28,9 @@ class RawPerceptletLabeler(Codelet):
         confidence_of_class_membership = self._calculate_confidence(
             self.parent_concept.activation,
             self.parent_concept.depth_rating,
-            self.parent_concept.distance_rating(self.target_perceptlet.value),
+            self.parent_concept.distance_rating(
+                self.target_perceptlet.get_value(self.parent_concept)
+            ),
             self.target_perceptlet.proportion_of_neighbours_with_label(
                 self.parent_concept
             ),

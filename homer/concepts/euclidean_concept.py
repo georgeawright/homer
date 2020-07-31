@@ -15,6 +15,7 @@ class EuclideanConcept(Concept):
         space: Concept,
         depth: int = 1,
         boundary: Optional[List[int]] = None,
+        relevant_value: Optional[str] = "value",
     ):
         activation_coefficient = 1 / depth
         activation_pattern = WorkspaceActivationPattern(activation_coefficient)
@@ -27,5 +28,6 @@ class EuclideanConcept(Concept):
             space=space,
             prototype=prototype,
             boundary=boundary,
+            relevant_value=relevant_value,
             distance_metric=distance_metric,
         )
