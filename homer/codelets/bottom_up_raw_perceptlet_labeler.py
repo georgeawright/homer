@@ -22,7 +22,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
 
     def run(self):
         concept = self.bubble_chamber.get_random_workspace_concept()
-        confidence_of_class_membership = concept.proximity_to(self.target)
+        confidence_of_class_membership = concept.proximity_to(self.target_perceptlet)
         if confidence_of_class_membership > self.CONFIDENCE_THRESHOLD:
             concept.boost_activation(
                 confidence_of_class_membership, self.target_perceptlet.location
