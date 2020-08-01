@@ -80,7 +80,7 @@ class Perceptlet(ABC):
         }[concept.relevant_value]
 
     def get_random_neighbour(self) -> Perceptlet:
-        return random.choice(self.neighbours)
+        return random.sample(self.neighbours, 1)[0]
 
     def proportion_of_neighbours_with_label(self, concept: Concept) -> float:
         return self.number_of_neighbours_with_label(concept) / len(self.neighbours)
