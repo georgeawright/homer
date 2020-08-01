@@ -47,7 +47,7 @@ class GroupBuilder(Codelet):
         common_concepts = {
             label.parent_concept for label in perceptlet_a.labels
         }.intersection({label.parent_concept for label in perceptlet_b.labels})
-        print(self.parent_concept)
+        print(common_concepts)
         distances = [
             concept.proximity_between(
                 perceptlet_a.get_value(concept), perceptlet_b.get_value(concept),

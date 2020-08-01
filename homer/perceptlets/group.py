@@ -19,12 +19,11 @@ class Group(Perceptlet):
         self,
         value: Any,
         location: List[float],
-        time: float,
         neighbours: Set[Perceptlet],
         members: Set[Perceptlet],
         strength: float,
     ):
-        Perceptlet.__init__(self, value, location, time, neighbours)
+        Perceptlet.__init__(self, value, location, neighbours)
         self.members = members
         self.strength = strength
         self.groups = set()

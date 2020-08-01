@@ -24,7 +24,7 @@ with open(path_to_problem_file) as f:
     print(model_input)
 
 raw_perceptlets = [
-    [RawPerceptlet(cell_value, [i, j], 0, set()) for j, cell_value in enumerate(row)]
+    [RawPerceptlet(cell_value, [0, i, j], set()) for j, cell_value in enumerate(row)]
     for i, row in enumerate(model_input)
 ]
 

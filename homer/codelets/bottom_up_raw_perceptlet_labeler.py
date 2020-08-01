@@ -30,10 +30,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
                 confidence_of_class_membership, self.target_perceptlet.location
             )
             label = self.bubble_chamber.create_label(
-                concept,
-                self.target_perceptlet.location,
-                self.target_perceptlet.time,
-                self.target_perceptlet.strength,
+                concept, self.target_perceptlet.location, confidence_of_class_membership
             )
             self.target_perceptlet.add_label(label)
             return self._engender_follow_up(concept, confidence_of_class_membership)

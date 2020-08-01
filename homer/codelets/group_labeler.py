@@ -33,7 +33,6 @@ class GroupLabeler(Codelet):
             label = self.bubble_chamber.create_label(
                 target_concept,
                 self.target_group.location,
-                self.target_group.time,
                 confidence_of_class_affinity,
             )
             self.target_group.add_label(label)

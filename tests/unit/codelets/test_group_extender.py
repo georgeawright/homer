@@ -12,11 +12,11 @@ def test_calculate_confidence():
     expected = 0.5
     with patch.object(Concept, "proximity_between", return_value=distance):
         common_concept = Concept(Mock(), Mock())
-        label_1 = Label(common_concept, Mock(), Mock(), Mock())
-        label_2 = Label(common_concept, Mock(), Mock(), Mock())
-        group = Group(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+        label_1 = Label(common_concept, Mock(), Mock())
+        label_2 = Label(common_concept, Mock(), Mock())
+        group = Group(Mock(), [0, 1, 2], Mock(), Mock(), Mock())
         group.add_label(label_1)
-        candidate = Perceptlet(Mock(), Mock(), Mock(), Mock())
+        candidate = Perceptlet(Mock(), [0, 1, 3], Mock())
         candidate.add_label(label_2)
         codelet = GroupExtender(Mock(), group, Mock())
         confidence = codelet._calculate_confidence(candidate)
@@ -25,8 +25,8 @@ def test_calculate_confidence():
 
 def test_calculate_confidence_with_no_common_concepts():
     expected = 0.0
-    group = Group(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    candidate = Perceptlet(Mock(), Mock(), Mock(), Mock())
+    group = Group(Mock(), [0, 1, 2], Mock(), Mock(), Mock())
+    candidate = Perceptlet(Mock(), [0, 1, 3], Mock())
     codelet = GroupExtender(Mock(), group, Mock())
     confidence = codelet._calculate_confidence(candidate)
     assert expected == confidence

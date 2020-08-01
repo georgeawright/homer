@@ -40,7 +40,6 @@ class RawPerceptletLabeler(Codelet):
             label = self.bubble_chamber.create_label(
                 self.parent_concept,
                 self.target_perceptlet.location,
-                self.target_perceptlet.time,
                 confidence_of_class_membership,
             )
             self.target_perceptlet.add_label(label)

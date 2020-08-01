@@ -33,7 +33,6 @@ class TopDownGroupLabeler(Codelet):
             label = self.bubble_chamber.create_label(
                 self.parent_concept,
                 self.target_group.location,
-                self.target_group.time,
                 confidence_of_class_membership,
             )
             self.target_group.add_label(label)

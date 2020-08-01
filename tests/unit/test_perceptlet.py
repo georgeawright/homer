@@ -30,7 +30,7 @@ def label(concept):
 
 
 def test_exigency_raises_not_implemented_error():
-    perceptlet = Perceptlet("value", Mock(), Mock(), set())
+    perceptlet = Perceptlet("value", Mock(), set())
     with pytest.raises(NotImplementedError):
         perceptlet.exigency
 
@@ -46,7 +46,7 @@ def test_exigency_raises_not_implemented_error():
     ],
 )
 def test_label_based_importance(label_strengths, expected_importance):
-    perceptlet = Perceptlet("value", Mock(), Mock(), set())
+    perceptlet = Perceptlet("value", Mock(), set())
     for label_strength in label_strengths:
         label = Mock()
         label.strength = label_strength
@@ -67,7 +67,7 @@ def test_most_exigent_neighbour(neighbour_exigencies):
         neighbour = Mock()
         neighbour.exigency = exigency
         neighbours.add(neighbour)
-    perceptlet = Perceptlet("value", Mock(), Mock(), neighbours)
+    perceptlet = Perceptlet("value", Mock(), neighbours)
     assert max(neighbour_exigencies) == perceptlet.most_exigent_neighbour().exigency
 
 
@@ -76,7 +76,7 @@ def test_most_exigent_neighbour(neighbour_exigencies):
     [(0, 1.0), (1, 1.0), (3, 0.333), (5, 0.2)],
 )
 def test_unhappiness_based_on_connections(number_of_connections, expected_unhappiness):
-    perceptlet = Perceptlet("value", Mock(), Mock(), set())
+    perceptlet = Perceptlet("value", Mock(), set())
     connections = {Mock() for _ in range(number_of_connections)}
     actual_unhappiness = perceptlet._unhappiness_based_on_connections(connections)
     assert math.isclose(
@@ -95,14 +95,14 @@ def test_number_and_proportion_of_neighbours_with_label(
     no_of_invalid_neighbours,
     expected_proportion,
 ):
-    valid_neighbour = Perceptlet("value", Mock(), Mock(), set())
+    valid_neighbour = Perceptlet("value", Mock(), set())
     valid_neighbour.labels.add(label)
-    invalid_neighbour = Perceptlet("value", Mock(), Mock(), set())
+    invalid_neighbour = Perceptlet("value", Mock(), set())
     valid_neighbours = [valid_neighbour for i in range(no_of_valid_neighbours)]
     invalid_neighbours = [invalid_neighbour for i in range(no_of_invalid_neighbours)]
     neighbours = valid_neighbours + invalid_neighbours
     print(neighbours)
-    perceptlet = Perceptlet("value", Mock(), Mock(), neighbours)
+    perceptlet = Perceptlet("value", Mock(), neighbours)
     assert no_of_valid_neighbours == perceptlet.number_of_neighbours_with_label(concept)
     actual_proportion = perceptlet.proportion_of_neighbours_with_label(concept)
     assert math.isclose(
@@ -111,30 +111,30 @@ def test_number_and_proportion_of_neighbours_with_label(
 
 
 def test_get_random_neighbour():
-    perceptlet = Perceptlet("value", Mock(), Mock(), [Mock(), Mock(), Mock()])
+    perceptlet = Perceptlet("value", Mock(), [Mock(), Mock(), Mock()])
     assert perceptlet.get_random_neighbour() in perceptlet.neighbours
 
 
 def test_has_label(concept, label):
-    perceptlet = Perceptlet("value", Mock(), Mock(), set())
+    perceptlet = Perceptlet("value", Mock(), set())
     perceptlet.labels.add(label)
     assert perceptlet.has_label(concept)
 
 
 def test_labels_in_space(space, label):
-    perceptlet = Perceptlet("value", Mock(), Mock(), set())
+    perceptlet = Perceptlet("value", Mock(), set())
     perceptlet.labels.add(label)
     assert {label} == perceptlet.labels_in_space(space)
 
 
 def has_label_in_space(space, label):
-    perceptlet = Perceptlet("value", Mock(), Mock(), set())
+    perceptlet = Perceptlet("value", Mock(), set())
     perceptlet.labels.add(label)
     assert perceptlet.has_label_in_space(space)
 
 
 def test_add_label(label):
-    perceptlet = Perceptlet("value", Mock(), Mock(), set())
+    perceptlet = Perceptlet("value", Mock(), set())
     assert set() == perceptlet.labels
     perceptlet.add_label(label)
     assert {label} == perceptlet.labels
@@ -156,13 +156,13 @@ def test_has_correspondence(is_between, is_in_space, expected):
         correspondence = Correspondence(Mock(), Mock(), Mock(), Mock(), Mock())
         if is_in_space:
             correspondence.parent_concept = space
-        perceptlet = Perceptlet("value", Mock(), Mock(), set())
+        perceptlet = Perceptlet("value", Mock(), set())
         perceptlet.correspondences = {correspondence}
         assert expected == perceptlet.has_correspondence(second_perceptlet, space)
 
 
 def test_add_neighbour():
-    perceptlet = Perceptlet("value", Mock(), Mock(), set())
+    perceptlet = Perceptlet("value", Mock(), set())
     assert set() == perceptlet.neighbours
     neighbour = Mock()
     perceptlet.add_neighbour(neighbour)
@@ -171,7 +171,7 @@ def test_add_neighbour():
 
 def test_remove_neighbour():
     neighbour = Mock()
-    perceptlet = Perceptlet("value", Mock(), Mock(), {neighbour})
+    perceptlet = Perceptlet("value", Mock(), {neighbour})
     assert {neighbour} == perceptlet.neighbours
     perceptlet.remove_neighbour(neighbour)
     assert set() == perceptlet.neighbours

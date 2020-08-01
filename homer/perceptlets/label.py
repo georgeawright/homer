@@ -7,11 +7,9 @@ from homer.perceptlet import Perceptlet
 class Label(Perceptlet):
     """A label for any perceptlet."""
 
-    def __init__(
-        self, concept: Concept, location: List[int], time: int, strength: float
-    ):
+    def __init__(self, concept: Concept, location: List[int], strength: float):
         neighbours = set()
-        Perceptlet.__init__(self, concept.name, location, time, neighbours)
+        Perceptlet.__init__(self, concept.name, location, neighbours)
         self.parent_concept = concept
         self.strength = strength
 

@@ -13,10 +13,9 @@ class RawPerceptlet(Perceptlet):
         self,
         value: Union[str, int, float],
         location: List[int],
-        time: int,
         neighbours: Set[RawPerceptlet],
     ):
-        Perceptlet.__init__(self, value, location, time, neighbours)
+        Perceptlet.__init__(self, value, location, neighbours)
         self.groups = set()
         self.relations = set()
 

@@ -62,7 +62,7 @@ def test_create_label_returns_label():
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        label = bubble_chamber.create_label(Mock(), Mock(), Mock(), Mock())
+        label = bubble_chamber.create_label(Mock(), Mock(), Mock())
         assert Label == type(label)
     add_label.assert_called_once_with(label)
 
@@ -72,8 +72,8 @@ def test_create_group_returns_group():
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        perceptlet_1 = Perceptlet("value", [1, 2], 3, set())
-        perceptlet_2 = Perceptlet("value", [1, 3], 3, set())
+        perceptlet_1 = Perceptlet("value", [1, 2, 2], set())
+        perceptlet_2 = Perceptlet("value", [1, 2, 3], set())
         group = bubble_chamber.create_group([perceptlet_1, perceptlet_2], Mock())
         assert Group == type(group)
     add_group.assert_called_once_with(group)

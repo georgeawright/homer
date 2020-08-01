@@ -18,12 +18,10 @@ class Perceptlet(ABC):
         self,
         value: Any,
         location: Optional[List[Union[float, int]]],
-        time: Optional[Union[float, int]],
         neighbours: Set[Perceptlet],
     ):
         self.value = value
         self.location = location
-        self.time = time
         self.neighbours = neighbours
         self.labels = set()
         self.correspondences = set()
@@ -75,9 +73,11 @@ class Perceptlet(ABC):
             return 1.0
 
     def get_value(self, concept: Concept) -> Any:
-        print(concept.name)
-        print(concept.relevant_value)
-        return getattr(self, concept.relevant_value)
+        return {
+            "location": self.location[1:],
+            "time": self.location[0],
+            "value": self.value,
+        }[concept.relevant_value]
 
     def get_random_neighbour(self) -> Perceptlet:
         return random.choice(self.neighbours)
