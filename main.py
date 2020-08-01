@@ -20,7 +20,7 @@ from homer.worldview import Worldview
 path_to_problem_file = "problems/temperature_problem_1.yaml"
 
 with open(path_to_problem_file) as f:
-    model_input = yaml.load(f)
+    model_input = yaml.load(f, Loader=yaml.FullLoader)
     print(model_input)
 
 raw_perceptlets = [
