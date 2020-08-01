@@ -37,7 +37,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
         return self._engender_alternative_follow_up(confidence_of_class_membership)
 
     def _engender_follow_up(self, concept: Concept, urgency: float) -> Codelet:
-        new_target_perceptlet = self.target_perceptlet.get_random_neighbour
+        new_target_perceptlet = self.target_perceptlet.get_random_neighbour()
         return RawPerceptletLabeler(
             self.bubble_chamber, concept, new_target_perceptlet, urgency
         )
