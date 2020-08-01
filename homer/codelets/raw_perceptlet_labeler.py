@@ -28,7 +28,7 @@ class RawPerceptletLabeler(Codelet):
         confidence_of_class_membership = self._calculate_confidence(
             self.parent_concept.get_activation(self.target_perceptlet.location),
             self.parent_concept.depth_rating,
-            self.parent_concept.distance_rating(
+            self.parent_concept.proximity_to(
                 self.target_perceptlet.get_value(self.parent_concept)
             ),
             self.target_perceptlet.proportion_of_neighbours_with_label(
@@ -36,7 +36,9 @@ class RawPerceptletLabeler(Codelet):
             ),
         )
         if confidence_of_class_membership > self.CONFIDENCE_THRESHOLD:
-            self.parent_concept.boost_activation(confidence_of_class_membership)
+            self.parent_concept.boost_activation(
+                confidence_of_class_membership, self.target_perceptlet.location
+            )
             label = self.bubble_chamber.create_label(
                 self.parent_concept,
                 self.target_perceptlet.location,
