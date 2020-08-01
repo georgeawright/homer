@@ -24,6 +24,10 @@ class WorkspaceActivationPattern(ActivationPattern):
         self.height_divisor = workspace_height / height
         self.width_divisor = workspace_width / width
 
+    def get_activation(self, location: List[Union[float, int]]):
+        depth, height, width = self._depth_height_width(location)
+        return self.activation_matrix[depth][height][width]
+
     def boost_activation(self, amount: float, location: List[Union[float, int]]):
         depth, height, width = self._depth_height_width(location)
         current_activation = self.activation_matrix[depth][height][width]

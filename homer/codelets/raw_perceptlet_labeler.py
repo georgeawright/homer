@@ -26,7 +26,7 @@ class RawPerceptletLabeler(Codelet):
 
     def run(self) -> Optional[Codelet]:
         confidence_of_class_membership = self._calculate_confidence(
-            self.parent_concept.activation,
+            self.parent_concept.get_activation(self.target_perceptlet.location),
             self.parent_concept.depth_rating,
             self.parent_concept.distance_rating(
                 self.target_perceptlet.get_value(self.parent_concept)

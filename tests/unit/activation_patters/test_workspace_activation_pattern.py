@@ -58,6 +58,67 @@ def test_constructor(
 
 
 @pytest.mark.parametrize(
+    "depth, height, width, workspace_depth, workspace_height, workspace_width, "
+    + "activation_matrix, location, expected_activation",
+    [
+        (
+            3,
+            3,
+            3,
+            30,
+            30,
+            30,
+            [
+                [[0.7, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+            ],
+            [1, 1, 1],
+            0.7,
+        ),
+        (
+            3,
+            3,
+            3,
+            30,
+            30,
+            30,
+            [
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 0.6, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+            ],
+            [11, 11, 11],
+            0.6,
+        ),
+    ],
+)
+def test_get_activation(
+    depth,
+    height,
+    width,
+    workspace_depth,
+    workspace_height,
+    workspace_width,
+    activation_matrix,
+    location,
+    expected_activation,
+):
+    activation_pattern = WorkspaceActivationPattern(
+        Mock(),
+        depth,
+        height,
+        width,
+        workspace_depth=workspace_depth,
+        workspace_height=workspace_height,
+        workspace_width=workspace_width,
+    )
+    activation_pattern.activation_matrix = activation_matrix
+    activation = activation_pattern.get_activation(location)
+    assert expected_activation == activation
+
+
+@pytest.mark.parametrize(
     "activation_coefficient, depth, height, width, workspace_depth, "
     + "workspace_height, workspace_width, amount, location, expected_matrix",
     [
