@@ -63,6 +63,9 @@ class Concept:
     def depth_rating(self) -> float:
         return self._value_as_decimal(self.depth, self.MAXIMUM_DEPTH)
 
+    def get_activation(self, location: List[Union[float, int]]) -> float:
+        return self.activation_pattern.get_activation(location)
+
     def distance_from(self, candidate_instance: Any) -> float:
         """Return distance from prototype to candidate instance."""
         raw_distance = self.distance_between(self.prototype, candidate_instance)
