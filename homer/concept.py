@@ -71,6 +71,9 @@ class Concept:
     def get_activation_as_scalar(self) -> float:
         return self.activation_pattern.get_activation_as_scalar()
 
+    def update_activation(self) -> None:
+        self.activation_pattern.update_activation()
+
     def spread_activation(self) -> None:
         for connection in self.connections:
             connection.boost_activation_evenly(
