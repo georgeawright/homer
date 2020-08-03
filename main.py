@@ -4,9 +4,14 @@ from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
 from homer.coderack import Coderack
-from homer.concepts.correspondence_concept import CorrespondenceConcept
+from homer.concepts.correspondence_type import CorrespondenceType
 from homer.concepts.euclidean_concept import EuclideanConcept
 from homer.concepts.euclidean_space import EuclideanSpace
+from homer.concepts.perceptlet_types import (
+    CorrespondenceConcept,
+    GroupConcept,
+    LabelConcept,
+)
 from homer.concept_space import ConceptSpace
 from homer.event_trace import EventTrace
 from homer.homer import Homer
@@ -59,6 +64,22 @@ event_trace = EventTrace([])
 workspace = Workspace(event_trace, raw_perceptlet_field_sequence)
 worldview = Worldview(set())
 
+perceptlet_types = {CorrespondenceConcept(), GroupConcept(), LabelConcept()}
+correspondence_types = {
+    CorrespondenceType(
+        "sameness", lambda same_labels, proximity: fuzzy.AND(same_labels, proximity)
+    ),
+    CorrespondenceType(
+        "oppositeness",
+        lambda same_labels, proximity: fuzzy.AND(
+            fuzzy.NOT(same_labels), fuzzy.NOT(proximity)
+        ),
+    ),
+    CorrespondenceType(
+        "extremeness",
+        lambda same_labels, proximity: fuzzy.AND(same_labels, fuzzy.NOT(proximity)),
+    ),
+}
 temperature_space = EuclideanSpace("temperature", 5)
 location_space = EuclideanSpace("location", 5)
 spaces = {temperature_space, location_space}
@@ -95,22 +116,10 @@ workspace_concepts = {
         "midlands", [2.5, 2], location_space, depth=2, relevant_value="location"
     ),
 }
-correspondence_concepts = {
-    CorrespondenceConcept(
-        "sameness", lambda same_labels, proximity: fuzzy.AND(same_labels, proximity)
-    ),
-    CorrespondenceConcept(
-        "oppositeness",
-        lambda same_labels, proximity: fuzzy.AND(
-            fuzzy.NOT(same_labels), fuzzy.NOT(proximity)
-        ),
-    ),
-    CorrespondenceConcept(
-        "extremeness",
-        lambda same_labels, proximity: fuzzy.AND(same_labels, fuzzy.NOT(proximity)),
-    ),
-}
-concept_space = ConceptSpace(spaces, workspace_concepts, correspondence_concepts)
+
+concept_space = ConceptSpace(
+    perceptlet_types, correspondence_types, spaces, workspace_concepts,
+)
 
 bubble_chamber = BubbleChamber(concept_space, event_trace, workspace, worldview)
 coderack = Coderack(bubble_chamber)
