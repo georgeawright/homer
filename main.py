@@ -64,6 +64,11 @@ event_trace = EventTrace([])
 workspace = Workspace(event_trace, raw_perceptlet_field_sequence)
 worldview = Worldview(set())
 
+correspondence_concept = CorrespondenceConcept()
+group_concept = GroupConcept()
+group_concept.connections.add(correspondence_concept)
+label_concept = LabelConcept()
+label_concept.connections.add(group_concept)
 perceptlet_types = {CorrespondenceConcept(), GroupConcept(), LabelConcept()}
 correspondence_types = {
     CorrespondenceType(
@@ -126,6 +131,7 @@ coderack = Coderack(bubble_chamber)
 coderack.codelets = [
     BottomUpRawPerceptletLabeler(
         bubble_chamber,
+        concept_space.get_perceptlet_type_by_name("label"),
         bubble_chamber.get_raw_perceptlet(),
         HyperParameters.STARTER_CODELET_URGENCY,
     )
