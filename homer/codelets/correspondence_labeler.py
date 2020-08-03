@@ -1,5 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
+from homer.concepts.perceptlet_type import PerceptletType
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlets.correspondence import Correspondence
 
@@ -11,10 +12,12 @@ class CorrespondenceLabeler(Codelet):
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
+        perceptlet_type: PerceptletType,
         target_correspondence: Correspondence,
         urgency: float,
     ):
         self.bubble_chamber = bubble_chamber
+        self.perceptlet_type = perceptlet_type
         self.target_correspondence = target_correspondence
         self.urgency = urgency
 
@@ -26,6 +29,7 @@ class CorrespondenceLabeler(Codelet):
                 self.target_correspondence.target_group_b,
             )
             if confidence_of_affinity > self.CONFIDENCE_THRESHOLD:
+                self.perceptlet_type.boost_activation(confidence_of_affinity, [])
                 self.bubble_chamber.add_label(
                     concept, self.target_correspondence, confidence_of_affinity
                 )
@@ -38,6 +42,9 @@ class CorrespondenceLabeler(Codelet):
 
         return CorrespondenceBuilder(
             self.bubble_chamber,
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "correspondence"
+            ),
             None,
             self.target_correspondence.target_group_a,
             self.target_correspondence.target_group_b,

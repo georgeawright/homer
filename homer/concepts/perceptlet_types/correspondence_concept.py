@@ -15,4 +15,6 @@ class CorrespondenceConcept(PerceptletType):
         if activation > random.random():
             target_groups = bubble_chamber.get_random_groups(2)
             urgency = statistics.fmean((group.exigency for group in target_groups))
-            return CorrespondenceSuggester(bubble_chamber, *target_groups, urgency)
+            return CorrespondenceSuggester(
+                bubble_chamber, self, *target_groups, urgency
+            )

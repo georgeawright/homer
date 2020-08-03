@@ -26,14 +26,14 @@ def test_calculate_confidence(
         target_group_b = Group(Mock(), Mock(), Mock(), Mock(), Mock())
         parent_space = Concept(Mock(), Mock())
         correspondence_builder = CorrespondenceBuilder(
-            Mock(), parent_space, target_group_a, target_group_b, Mock()
+            Mock(), Mock(), parent_space, target_group_a, target_group_b, Mock()
         )
         assert expected == correspondence_builder._calculate_confidence()
 
 
 def test_engender_follow_up():
     correspondence_builder = CorrespondenceBuilder(
-        Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
     follow_up = correspondence_builder._engender_follow_up(Mock(), Mock())
     assert CorrespondenceLabeler == type(follow_up)

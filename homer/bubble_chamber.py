@@ -47,6 +47,9 @@ class BubbleChamber:
     def get_raw_perceptlet(self) -> RawPerceptlet:
         return random.sample(self.workspace.raw_perceptlets, 1)[0]
 
+    def get_random_correspondence(self) -> Correspondence:
+        return random.sample(self.workspace.correspondences, 1)[0]
+
     def get_random_groups(self, amount: int) -> List[Group]:
         return random.sample(self.workspace.groups, amount)
 

@@ -4,6 +4,7 @@ from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.concept import Concept
+from homer.concepts.perceptlet_type import PerceptletType
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 
@@ -15,12 +16,14 @@ class RawPerceptletLabeler(Codelet):
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
+        perceptlet_type: PerceptletType,
         parent_concept: Concept,
         target_perceptlet: Optional[Perceptlet],
         urgency: float,
     ):
         Codelet.__init__(self, bubble_chamber)
         self.parent_concept = parent_concept
+        self.perceptlet_type = perceptlet_type
         self.target_perceptlet = target_perceptlet
         self.urgency = urgency
 
@@ -37,6 +40,9 @@ class RawPerceptletLabeler(Codelet):
         )
         if confidence_of_class_membership > self.CONFIDENCE_THRESHOLD:
             self.parent_concept.boost_activation(
+                confidence_of_class_membership, self.target_perceptlet.location
+            )
+            self.perceptlet_type.boost_activation(
                 confidence_of_class_membership, self.target_perceptlet.location
             )
             label = self.bubble_chamber.create_label(
@@ -63,5 +69,9 @@ class RawPerceptletLabeler(Codelet):
     def engender_follow_up(self, confidence: float) -> Codelet:
         new_target = self.target_perceptlet.most_exigent_neighbour()
         return RawPerceptletLabeler(
-            self.bubble_chamber, self.parent_concept, new_target, confidence,
+            self.bubble_chamber,
+            self.perceptlet_type,
+            self.parent_concept,
+            new_target,
+            confidence,
         )

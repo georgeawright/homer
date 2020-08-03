@@ -3,7 +3,7 @@ from typing import Optional
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
-from homer.concept import Concept
+from homer.concepts.perceptlet_type import PerceptletType
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 
@@ -18,12 +18,12 @@ class GroupBuilder(Codelet):
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
-        parent_concept: Concept,
+        perceptlet_type: PerceptletType,
         target_perceptlet: Optional[Perceptlet],
         urgency: float,
     ):
         Codelet.__init__(self, bubble_chamber)
-        self.parent_concept = parent_concept
+        self.perceptlet_type = perceptlet_type
         self.target_perceptlet = target_perceptlet
         self.urgency = urgency
 
@@ -33,6 +33,9 @@ class GroupBuilder(Codelet):
             self.target_perceptlet, neighbour
         )
         if confidence_of_group_affinity > self.CONFIDENCE_THRESHOLD:
+            self.perceptlet_type.boost_activation(
+                confidence_of_group_affinity, self.target_perceptlet.location
+            )
             group = self.bubble_chamber.create_group(
                 [self.target_perceptlet, neighbour], confidence_of_group_affinity
             )
@@ -59,4 +62,11 @@ class GroupBuilder(Codelet):
         return fuzzy.OR(*distances)
 
     def _engender_follow_up(self, group: Group, confidence: float) -> Codelet:
-        return GroupLabeler(self.bubble_chamber, group, confidence)
+        return GroupLabeler(
+            self.bubble_chamber,
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "group-label"
+            ),
+            group,
+            confidence,
+        )

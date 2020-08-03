@@ -4,6 +4,7 @@ from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.concept import Concept
+from homer.concepts.perceptlet_type import PerceptletType
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlets.correspondence import Correspondence
 from homer.perceptlets.group import Group
@@ -16,12 +17,14 @@ class CorrespondenceBuilder(Codelet):
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
+        perceptlet_type: PerceptletType,
         parent_space: Concept,
         target_group_a: Group,
         target_group_b: Group,
         urgency: float,
     ):
         self.bubble_chamber = bubble_chamber
+        self.perceptlet_type = perceptlet_type
         self.parent_space = parent_space
         self.target_group_a = target_group_a
         self.target_group_b = target_group_b
@@ -33,6 +36,9 @@ class CorrespondenceBuilder(Codelet):
             confidence_of_correspondence > self.CONFIDENCE_THRESHOLD
             or confidence_of_correspondence < 1 - self.CONFIDENCE_THRESHOLD
         ):
+            self.perceptlet_type.boost_activation(
+                confidence_of_correspondence, self.target_group_a.location
+            )
             correspondence = self.bubble_chamber.add_correspondence(
                 self.parent_space, self.target_group_a, self.target_group_b
             )
@@ -63,4 +69,11 @@ class CorrespondenceBuilder(Codelet):
     ) -> Codelet:
         from homer.codelets.correspondence_labeler import CorrespondenceLabeler
 
-        return CorrespondenceLabeler(self.bubble_chamber, correspondence, urgency)
+        return CorrespondenceLabeler(
+            self.bubble_chamber,
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "correspondence-label"
+            ),
+            correspondence,
+            urgency,
+        )

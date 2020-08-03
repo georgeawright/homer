@@ -3,6 +3,7 @@ from typing import Optional
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
+from homer.concepts.perceptlet_type import PerceptletType
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 
@@ -14,9 +15,14 @@ class GroupExtender(Codelet):
     CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
 
     def __init__(
-        self, bubble_chamber: BubbleChamber, target_group: Group, urgency: float
+        self,
+        bubble_chamber: BubbleChamber,
+        perceptlet_type: PerceptletType,
+        target_group: Group,
+        urgency: float,
     ):
         Codelet.__init__(self, bubble_chamber)
+        self.perceptlet_type = perceptlet_type
         self.target_group = target_group
         self.urgency = urgency
 
@@ -24,6 +30,9 @@ class GroupExtender(Codelet):
         neighbour = self.target_group.get_random_neighbour()
         confidence_of_group_membership = self._calculate_confidence(neighbour)
         if confidence_of_group_membership > self.CONFIDENCE_THRESHOLD:
+            self.perceptlet_type.boost_activation(
+                confidence_of_group_membership, self.target_group.location
+            )
             self.group.add_member(neighbour)
             self.neighbour.add_group(self.target_group)
         return self.engender_follow_up(confidence_of_group_membership)
@@ -43,4 +52,6 @@ class GroupExtender(Codelet):
         return fuzzy.OR(*distances)
 
     def engender_follow_up(self, urgency: float):
-        return GroupExtender(self.bubble_chamber, self.target_group, urgency)
+        return GroupExtender(
+            self.bubble_chamber, self.perceptlet_type, self.target_group, urgency
+        )
