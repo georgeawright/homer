@@ -3,9 +3,7 @@ from unittest.mock import Mock, patch
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.correspondence_suggester import CorrespondenceSuggester
-from homer.concepts.perceptlet_concepts.correspondence_concept import (
-    CorrespondenceConcept,
-)
+from homer.concepts.perceptlet_types.correspondence_concept import CorrespondenceConcept
 
 
 def test_spawn_codelet():

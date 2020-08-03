@@ -2,12 +2,12 @@ import random
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
-from homer.concepts.perceptlet_concept import PerceptletConcept
+from homer.concepts.perceptlet_type import PerceptletType
 
 
-class LabelConcept(PerceptletConcept):
+class LabelConcept(PerceptletType):
     def __init__(self, name: str = "label"):
-        PerceptletConcept.__init__(self, name)
+        PerceptletType.__init__(self, name)
 
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
         activation = self.get_activation_as_scalar()

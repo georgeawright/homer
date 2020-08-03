@@ -3,12 +3,12 @@ import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.correspondence_suggester import CorrespondenceSuggester
-from homer.concepts.perceptlet_concept import PerceptletConcept
+from homer.concepts.perceptlet_type import PerceptletType
 
 
-class CorrespondenceConcept(PerceptletConcept):
+class CorrespondenceConcept(PerceptletType):
     def __init__(self, name: str = "correspondence"):
-        PerceptletConcept.__init__(self, name)
+        PerceptletType.__init__(self, name)
 
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
         activation = self.get_activation_as_scalar()
