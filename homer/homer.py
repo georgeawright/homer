@@ -26,6 +26,7 @@ class Homer:
         while self.bubble_chamber.result is None:
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.bubble_chamber.update_activations()
+                self.coderack.get_more_codelets()
             self.coderack.select_and_run_codelet()
         return {
             "result": self.bubble_chamber.result,
