@@ -69,7 +69,7 @@ group_concept = GroupConcept()
 group_concept.connections.add(correspondence_concept)
 label_concept = LabelConcept()
 label_concept.connections.add(group_concept)
-perceptlet_types = {CorrespondenceConcept(), GroupConcept(), LabelConcept()}
+perceptlet_types = {correspondence_concept, group_concept, label_concept}
 correspondence_types = {
     CorrespondenceType(
         "sameness", lambda same_labels, proximity: fuzzy.AND(same_labels, proximity)
