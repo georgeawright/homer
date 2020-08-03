@@ -42,7 +42,7 @@ class BubbleChamber:
         )
 
     def update_activations(self) -> None:
-        pass
+        self.concept_space.update_activations()
 
     def get_raw_perceptlet(self) -> RawPerceptlet:
         return random.sample(self.workspace.raw_perceptlets, 1)[0]
