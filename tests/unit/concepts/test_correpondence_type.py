@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.concepts.correspondence_concept import CorrespondenceConcept
+from homer.concepts.correspondence_type import CorrespondenceType
 
 
 @pytest.mark.parametrize(
@@ -36,7 +36,7 @@ from homer.concepts.correspondence_concept import CorrespondenceConcept
 def test_calculate_affinity(
     affinity_calculation, number_of_same_labels, proximity, expected_affinity
 ):
-    correspondence_concept = CorrespondenceConcept(Mock(), affinity_calculation)
+    correspondence_concept = CorrespondenceType(Mock(), affinity_calculation)
     actual_affinity = correspondence_concept.calculate_affinity(
         number_of_same_labels, proximity
     )

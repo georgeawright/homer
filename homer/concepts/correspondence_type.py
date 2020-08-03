@@ -6,7 +6,7 @@ from homer.activation_patterns.workspace_activation_pattern import (
 from homer.concept import Concept
 
 
-class CorrespondenceConcept(Concept):
+class CorrespondenceType(Concept):
     def __init__(
         self,
         name: str,
