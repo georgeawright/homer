@@ -20,9 +20,9 @@ class Concept:
         space: Optional[Concept] = None,
         prototype: Optional[Union[List[int], List[float], str]] = None,
         boundary: Optional[Union[List[int], List[float]]] = None,
-        relevant_value: Optional[str] = "value",
+        relevant_value: Optional[str] = None,
         distance_metric: Optional[Callable] = None,
-        connections: Set[Concept] = set(),
+        connections: Optional[Set[Concept]] = None,
     ):
         if depth < 1:
             raise Exception(
@@ -57,9 +57,9 @@ class Concept:
         self.activation_coefficient = 1 / depth
         self.prototype = prototype
         self.boundary = boundary
-        self.relevant_value = relevant_value
+        self.relevant_value = "value" if relevant_value is None else relevant_value
         self.distance_metric = distance_metric
-        self.connections = connections
+        self.connections = set() if connections is None else connections
 
     @property
     def depth_rating(self) -> float:
@@ -76,6 +76,7 @@ class Concept:
 
     def spread_activation(self) -> None:
         for connection in self.connections:
+            print(f"{self.name} spreading to {connection.name}")
             connection.boost_activation_evenly(
                 self.activation_pattern.get_activation_as_scalar()
             )
