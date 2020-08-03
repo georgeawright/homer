@@ -18,7 +18,8 @@ class ConceptSpace:
         self.conceptual_spaces = conceptual_spaces
         self.workspace_concepts = workspace_concepts
         self.concepts = set.union(
+            self.perceptlet_types,
+            self.correspondence_types,
             self.conceptual_spaces,
             self.workspace_concepts,
-            self.correspondence_concepts,
         )
