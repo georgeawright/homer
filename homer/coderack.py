@@ -27,5 +27,11 @@ class Coderack:
                 codelet_choice = codelet
         return codelet_choice
 
+    def get_more_codelets(self):
+        for concept in self.bubble_chamber.concept_space:
+            codelet = concept.spawn_codelet()
+            if codelet is not None:
+                self.codelets.append(codelet)
+
     def _randomness(self) -> float:
         return 1 - self.bubble_chamber.satisfaction
