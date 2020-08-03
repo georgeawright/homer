@@ -18,6 +18,8 @@ class Coderack:
             self.codelets.append(follow_up)
 
     def select_codelet(self) -> Codelet:
+        if len(self.codelets) < 1:
+            self.get_more_codelets()
         codelet_choice = None
         highest_weight = 0
         for codelet in self.codelets:
@@ -25,11 +27,12 @@ class Coderack:
             if weight > highest_weight:
                 highest_weight = weight
                 codelet_choice = codelet
+        self.codelets.remove(codelet_choice)
         return codelet_choice
 
     def get_more_codelets(self):
-        for concept in self.bubble_chamber.concept_space:
-            codelet = concept.spawn_codelet()
+        for concept in self.bubble_chamber.concept_space.perceptlet_types:
+            codelet = concept.spawn_codelet(self.bubble_chamber)
             if codelet is not None:
                 self.codelets.append(codelet)
 
