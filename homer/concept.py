@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, List, Optional, Union
+from typing import Any, Callable, List, Optional, Union, Set
 
 from homer.activation_pattern import ActivationPattern
 from homer.hyper_parameters import HyperParameters
@@ -22,6 +22,7 @@ class Concept:
         boundary: Optional[Union[List[int], List[float]]] = None,
         relevant_value: Optional[str] = "value",
         distance_metric: Optional[Callable] = None,
+        connections: Set[Concept] = set(),
     ):
         if depth < 1:
             raise Exception(
@@ -58,6 +59,7 @@ class Concept:
         self.boundary = boundary
         self.relevant_value = relevant_value
         self.distance_metric = distance_metric
+        self.connections = connections
 
     @property
     def depth_rating(self) -> float:
@@ -65,6 +67,15 @@ class Concept:
 
     def get_activation(self, location: List[Union[float, int]]) -> float:
         return self.activation_pattern.get_activation(location)
+
+    def get_activation_as_scalar(self) -> float:
+        return self.activation_pattern.get_activation_as_scalar()
+
+    def spread_activation(self) -> None:
+        for connection in self.connections:
+            connection.boost_activation_evenly(
+                self.activation_pattern.get_activation_as_scalar()
+            )
 
     def distance_from(self, candidate_instance: Any) -> float:
         """Return distance from prototype to candidate instance."""
@@ -96,7 +107,13 @@ class Concept:
     def boost_activation(self, amount: float, location):
         self.activation_pattern.boost_activation(amount, location)
 
+    def boost_activation_evenly(self, amount: float):
+        self.activation_pattern.boost_activation_evenly(amount)
+
     def decay_activation(self, location):
         self.activation_pattern.decay_activation(location)
         # raw_activation = self.activation - self.DECAY_RATE * self.activation_coefficient
         # self.activation = 0.0 if raw_activation < 0.0 else raw_activation
+
+    def spawn_codelet(self):
+        raise NotImplementedError
