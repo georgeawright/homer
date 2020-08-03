@@ -1,9 +1,13 @@
+import math
 import pytest
 from unittest.mock import Mock
 
 from homer.activation_patterns.workspace_activation_pattern import (
     WorkspaceActivationPattern,
 )
+
+
+FLOAT_COMPARISON_TOLERANCE = 1e-5
 
 
 @pytest.mark.parametrize(
@@ -116,6 +120,23 @@ def test_get_activation(
     activation_pattern.activation_matrix = activation_matrix
     activation = activation_pattern.get_activation(location)
     assert expected_activation == activation
+
+
+@pytest.mark.parametrize(
+    "activation_matrix, expected_activation",
+    [
+        ([[[0.6, 0.4], [0.5, 0.4], [0.6, 0.5]]], 0.5),
+        ([[[0.0, 1.0], [1.0, 0.0], [1.0, 0.0]]], 0.5),
+        ([[[0.5, 0.0], [0.25, 0.25], [0.2, 0.3]]], 0.25),
+    ],
+)
+def test_activation_as_scalar(activation_matrix, expected_activation):
+    activation_pattern = WorkspaceActivationPattern(Mock())
+    activation_pattern.activation_matrix = activation_matrix
+    actual_activation = activation_pattern.get_activation_as_scalar()
+    assert math.isclose(
+        expected_activation, actual_activation, abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
 
 
 @pytest.mark.parametrize(

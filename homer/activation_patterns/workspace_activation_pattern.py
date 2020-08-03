@@ -1,4 +1,5 @@
 import math
+import statistics
 from typing import List, Tuple, Union
 
 from homer.hyper_parameters import HyperParameters
@@ -27,6 +28,16 @@ class WorkspaceActivationPattern(ActivationPattern):
     def get_activation(self, location: List[Union[float, int]]):
         depth, height, width = self._depth_height_width(location)
         return self.activation_matrix[depth][height][width]
+
+    def get_activation_as_scalar(self):
+        return statistics.fmean(
+            (
+                activation
+                for layer in self.activation_matrix
+                for row in layer
+                for activation in row
+            )
+        )
 
     def boost_activation(self, amount: float, location: List[Union[float, int]]):
         depth, height, width = self._depth_height_width(location)
