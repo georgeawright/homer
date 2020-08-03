@@ -24,7 +24,7 @@ class Homer:
 
     def run(self):
         while self.bubble_chamber.result is None:
-            print(self.coderack.codelets)
+            self.print_status_update()
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.bubble_chamber.update_activations()
                 self.coderack.get_more_codelets()
@@ -34,3 +34,18 @@ class Homer:
             "satisfaction": self.bubble_chamber.satisfaction,
             "codelets_run": self.coderack.codelets_run,
         }
+
+    def print_status_update(self):
+        codelets_run = self.coderack.codelets_run
+        label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+            "label"
+        ).activation_pattern.activation
+        group_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+            "group"
+        ).activation_pattern.activation
+        correspondence_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+            "correspondence"
+        ).activation_pattern.activation
+        print(
+            f"codelets run: {codelets_run}; label: {label_activation}; group: {group_activation}; corresp: {correspondence_activation}"
+        )
