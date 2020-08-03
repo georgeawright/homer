@@ -25,3 +25,7 @@ class ActivationPattern(ABC):
     @abstractmethod
     def decay_activation(self, location: List[Union[float, int]]):
         pass
+
+    @abstractmethod
+    def update_activation(self):
+        pass

@@ -29,4 +29,4 @@ class ConceptSpace:
         )
 
     def get_perceptlet_type_by_name(self, name: str) -> PerceptletType:
-        return self.percepetlet_types_dictionary[name]
+        return self.perceptlet_types_dictionary[name]

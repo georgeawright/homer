@@ -199,6 +199,7 @@ def test_boost_activation(
         workspace_width=workspace_width,
     )
     activation_pattern.boost_activation(amount, location)
+    activation_pattern.update_activation()
     assert expected_matrix == activation_pattern.activation_matrix
 
 
@@ -216,4 +217,5 @@ def test_boost_activation_evenly(activation_matrix, amount, expected_activation)
     activation_pattern = WorkspaceActivationPattern(0.5)
     activation_pattern.activation_matrix = activation_matrix
     activation_pattern.boost_activation_evenly(amount)
+    activation_pattern.update_activation()
     assert expected_activation == activation_pattern.activation_matrix

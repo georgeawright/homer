@@ -18,4 +18,5 @@ def test_boost_activation(
     activation_pattern = ScalarActivationPattern(activation_coefficient)
     activation_pattern.activation = prior_activation
     activation_pattern.boost_activation_evenly(amount)
+    activation_pattern.update_activation()
     assert expected_activation == activation_pattern.activation

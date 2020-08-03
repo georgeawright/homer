@@ -21,6 +21,9 @@ class WorkspaceActivationPattern(ActivationPattern):
         self.activation_matrix = [
             [[0.0 for _ in range(width)] for _ in range(height)] for _ in range(depth)
         ]
+        self.activation_buffer = [
+            [[0.0 for _ in range(width)] for _ in range(height)] for _ in range(depth)
+        ]
         self.depth_divisor = workspace_depth / depth
         self.height_divisor = workspace_height / height
         self.width_divisor = workspace_width / width
@@ -42,30 +45,34 @@ class WorkspaceActivationPattern(ActivationPattern):
     def boost_activation(self, amount: float, location: List[Union[float, int]]):
         depth, height, width = self._depth_height_width(location)
         current_activation = self.activation_matrix[depth][height][width]
-        raw_activation = current_activation + amount * self.activation_coefficient
-        new_activation = 1.0 if raw_activation > 1.0 else raw_activation
-        self.activation_matrix[depth][height][width] = new_activation
+        self.activation_buffer[depth][height][width] += (
+            current_activation + amount * self.activation_coefficient
+        )
 
     def boost_activation_evenly(self, amount: float):
-        for i, layer in enumerate(self.activation_matrix):
+        for i, layer in enumerate(self.activation_buffer):
             for j, row in enumerate(layer):
-                for k, activation in enumerate(row):
-                    raw_activation = activation + amount * self.activation_coefficient
-                    self.activation_matrix[i][j][k] = (
-                        1.0 if raw_activation > 1.0 else raw_activation
+                for k, _ in enumerate(row):
+                    self.activation_buffer[i][j][k] += (
+                        amount * self.activation_coefficient
                     )
 
     def decay_activation(self, location: List[Union[float, int]]):
         depth, height, width = self._depth_height_width(location)
-        current_activation = self.activation_matrix[depth][height][width]
-        raw_activation = (
-            current_activation - self.DECAY_RATE * self.activation_coefficient
+        self.activation_buffer[depth][height][width] -= (
+            self.DECAY_RATE * self.activation_coefficient
         )
-        new_activation = 0.0 if raw_activation < 0.0 else raw_activation
-        self.activation_matrix[depth][height][width] = new_activation
 
     def _depth_height_width(self, location: List[Union[float, int]]) -> Tuple[int]:
         depth = math.floor(location[0] / self.depth_divisor)
         height = math.floor(location[1] / self.height_divisor)
         width = math.floor(location[2] / self.width_divisor)
         return (depth, height, width)
+
+    def update_activation(self):
+        for i, layer in enumerate(self.activation_matrix):
+            for j, row in enumerate(layer):
+                for k, cell in enumerate(row):
+                    self.activation_matrix[i][j][k] = min(
+                        max(cell + self.activation_buffer[i][j][k], 0.0), 1.0
+                    )

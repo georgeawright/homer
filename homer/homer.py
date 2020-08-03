@@ -24,6 +24,7 @@ class Homer:
 
     def run(self):
         while self.bubble_chamber.result is None:
+            print(self.coderack.codelets)
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.bubble_chamber.update_activations()
                 self.coderack.get_more_codelets()
