@@ -205,14 +205,15 @@ def test_boost_activation(
 @pytest.mark.parametrize(
     "activation_matrix, amount, expected_activation",
     [
-        ([[[0.6, 0.4], [0.5, 0.4], [0.6, 0.5]]], 0.5, [[[0.85, 0.65]),
+        (
+            [[[0.6, 0.4], [0.5, 0.4], [0.6, 0.5]]],
+            0.5,
+            [[[0.85, 0.65], [0.75, 0.65], [0.85, 0.75]]],
+        ),
     ],
 )
 def test_boost_activation_evenly(activation_matrix, amount, expected_activation):
     activation_pattern = WorkspaceActivationPattern(0.5)
     activation_pattern.activation_matrix = activation_matrix
     activation_pattern.boost_activation_evenly(amount)
-    actual_activation = activation_pattern.get_activation_as_scalar()
-    assert math.isclose(
-        expected_activation, actual_activation, abs_tol=FLOAT_COMPARISON_TOLERANCE
-    )
+    assert expected_activation == activation_pattern.activation_matrix
