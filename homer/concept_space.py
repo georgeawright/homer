@@ -30,3 +30,12 @@ class ConceptSpace:
 
     def get_perceptlet_type_by_name(self, name: str) -> PerceptletType:
         return self.perceptlet_types_dictionary[name]
+
+    def update_activations(self):
+        self.spread_activations()
+        for concept in self.concepts:
+            concept.update_activation()
+
+    def spread_activations(self):
+        for concept in self.concepts:
+            concept.spread_activation()
