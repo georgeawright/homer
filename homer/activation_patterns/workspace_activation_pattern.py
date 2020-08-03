@@ -76,3 +76,4 @@ class WorkspaceActivationPattern(ActivationPattern):
                     self.activation_matrix[i][j][k] = min(
                         max(cell + self.activation_buffer[i][j][k], 0.0), 1.0
                     )
+                    self.activation_buffer[i][j][k] = 0.0

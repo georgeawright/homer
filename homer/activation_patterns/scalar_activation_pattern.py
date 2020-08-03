@@ -17,6 +17,7 @@ class ScalarActivationPattern(ActivationPattern):
 
     def boost_activation(self, amount: float, location: List[Union[float, int]]):
         self.activation_buffer += self.activation + amount * self.activation_coefficient
+        print(self.activation_buffer)
 
     def boost_activation_evenly(self, amount: float):
         self.activation_buffer += self.activation + amount * self.activation_coefficient
@@ -28,3 +29,4 @@ class ScalarActivationPattern(ActivationPattern):
 
     def update_activation(self):
         self.activation = min(max(self.activation + self.activation_buffer, 0.0), 1.0)
+        self.activation_buffer = 0.0
