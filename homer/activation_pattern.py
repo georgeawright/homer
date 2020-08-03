@@ -19,5 +19,9 @@ class ActivationPattern(ABC):
         pass
 
     @abstractmethod
+    def boost_activation_evenly(self, amount: float):
+        pass
+
+    @abstractmethod
     def decay_activation(self, location: List[Union[float, int]]):
         pass

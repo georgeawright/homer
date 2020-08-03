@@ -46,6 +46,13 @@ class WorkspaceActivationPattern(ActivationPattern):
         new_activation = 1.0 if raw_activation > 1.0 else raw_activation
         self.activation_matrix[depth][height][width] = new_activation
 
+    def boost_activation_evenly(self, amount: float):
+        for layer in self.activation_matrix:
+            for row in layer:
+                for activation in row:
+                    raw_activation = activation + amount * self.activation_coefficient
+                    activation = 1.0 if raw_activation > 1.0 else raw_activation
+
     def decay_activation(self, location: List[Union[float, int]]):
         depth, height, width = self._depth_height_width(location)
         current_activation = self.activation_matrix[depth][height][width]
