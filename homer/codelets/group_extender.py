@@ -33,14 +33,15 @@ class GroupExtender(Codelet):
             self.perceptlet_type.boost_activation(
                 confidence_of_group_membership, self.target_group.location
             )
-            self.group.add_member(neighbour)
+            self.target_group.add_member(neighbour)
             self.neighbour.add_group(self.target_group)
         return self.engender_follow_up(confidence_of_group_membership)
 
     def _calculate_confidence(self, candidate: Perceptlet) -> float:
-        common_concepts = {
-            label.parent_concept for label in candidate.labels
-        }.intersection({label.parent_concept for label in self.target_group.labels})
+        common_concepts = set.intersection(
+            {label.parent_concept for label in candidate.labels},
+            {label.parent_concept for label in self.target_group.labels},
+        )
         distances = [
             concept.proximity_between(
                 candidate.get_value(concept), self.target_group.get_value(concept)
