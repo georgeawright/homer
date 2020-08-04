@@ -46,6 +46,9 @@ class CorrespondenceBuilder(Codelet):
                 self.target_group_b,
                 confidence_of_correspondence,
             )
+            print(
+                f"CORRESPONDENCE: {self.target_group_a.value} at {self.target_group_a.location} and {self.target_group_b.value} at {self.target_group_b.location} in space {self.parent_space.name}"
+            )
             self._engender_follow_up(correspondence, confidence_of_correspondence)
         return None
 
