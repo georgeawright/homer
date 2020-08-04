@@ -29,7 +29,8 @@ class Coderack:
                 highest_weight = weight
                 codelet_choice = codelet
         if codelet_choice is None:
-            raise NoMoreCodelets
+            print("No more codelets")
+            exit()
         self.codelets.remove(codelet_choice)
         return codelet_choice
 
