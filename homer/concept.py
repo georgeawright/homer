@@ -10,7 +10,7 @@ class Concept:
 
     DECAY_RATE = HyperParameters.DECAY_RATE
     MAXIMUM_DEPTH = HyperParameters.MAXIMUM_CONCEPT_DEPTH
-    MAXIMUM_DISTANCE = HyperParameters.MAXIMUM_DISTANCE_FROM_PROTOTYPE
+    DISTANCE_TO_PROXIMITY_WEIGHT = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT
 
     def __init__(
         self,
@@ -63,7 +63,7 @@ class Concept:
 
     @property
     def depth_rating(self) -> float:
-        return self._value_as_decimal(self.depth, self.MAXIMUM_DEPTH)
+        return 1 / self.depth
 
     def get_activation(self, location: List[Union[float, int]]) -> float:
         return self.activation_pattern.get_activation(location)
@@ -80,7 +80,6 @@ class Concept:
     def spread_activation(self) -> None:
         if self.is_fully_activated():
             for connection in self.connections:
-                print(f"{self.name} spreading to {connection.name}")
                 connection.boost_activation_evenly(
                     self.activation_pattern.get_activation_as_scalar()
                 )
@@ -102,15 +101,19 @@ class Concept:
     def proximity_to(self, candidate_instance: Any) -> float:
         """returns a score of proximity: 0 is far, 1 is close"""
         distance = self.distance_from(candidate_instance)
-        return self._value_as_decimal(distance, self.MAXIMUM_DISTANCE)
+        return self._distance_to_proximity(distance)
 
     def proximity_between(self, a: Any, b: Any) -> float:
         """returns a score of proximity: 0 is far, 1 is close"""
         distance = self.distance_between(a, b)
-        return self._value_as_decimal(distance, self.MAXIMUM_DISTANCE)
+        return self._distance_to_proximity(distance)
 
-    def _value_as_decimal(self, value, maximum) -> float:
-        return min(value / maximum, 1.0)
+    def _distance_to_proximity(self, value) -> float:
+        if value == 0:
+            return 1.0
+        inverse = 1.0 / value
+        proximity = inverse * self.DISTANCE_TO_PROXIMITY_WEIGHT
+        return min(proximity, 1.0)
 
     def boost_activation(self, amount: float, location):
         self.activation_pattern.boost_activation(amount, location)

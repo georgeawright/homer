@@ -74,49 +74,56 @@ def test_distance_between(a, b, distance_metric, expected):
 
 
 @pytest.mark.parametrize(
-    "a, b, distance_metric, maximum_distance, expected",
+    "a, b, distance_metric, distance_to_proximity_weight, expected",
     [
-        ([22], [20], math.dist, 10, 0.2),
-        ([10], [10], math.dist, 10, 0.0),
-        ([0], [10], math.dist, 10, 1.0),
-        ("hot", "hot", lambda a, b: 0 if a == b else math.inf, 10, 0.0),
-        ("hot", "cold", lambda a, b: 0 if a == b else math.inf, 10, 1.0),
+        ([22], [20], math.dist, 1.5, 0.75),
+        ([10], [10], math.dist, 1.5, 1.0),
+        ([0], [10], math.dist, 1.5, 0.15),
+        ("hot", "hot", lambda a, b: 0 if a == b else math.inf, 1.5, 1.0),
+        ("hot", "cold", lambda a, b: 0 if a == b else math.inf, 1.5, 0.0),
     ],
 )
-def test_proximity_between(a, b, distance_metric, maximum_distance, expected):
+def test_proximity_between(
+    a, b, distance_metric, distance_to_proximity_weight, expected
+):
     concept = Concept("hot", Mock(), distance_metric=distance_metric)
-    assert expected == concept.proximity_between(a, b)
+    concept.DISTANCE_TO_PROXIMITY_WEIGHT = 1.5
+    assert math.isclose(
+        expected, concept.proximity_between(a, b), abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
 
 
-@pytest.mark.parametrize(
-    "depth, maximum_depth, expected", [(1, 10, 0.1), (10, 10, 1.0), (13, 10, 1.0)]
-)
-def test_depth_rating(depth, maximum_depth, expected):
+@pytest.mark.parametrize("depth, expected", [(1, 1.0), (10, 0.1), (5, 0.2)])
+def test_depth_rating(depth, expected):
     concept = Concept("hot", Mock(), depth=depth)
-    concept.MAXIMUM_DEPTH = maximum_depth
     assert math.isclose(
         expected, concept.depth_rating, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )
 
 
 @pytest.mark.parametrize(
-    "prototype,boundary,distance_metric,candidate,maximum_distance,expected",
+    "prototype,boundary,distance_metric,candidate,distance_to_proximity_weight,expected",
     [
-        ([22], [19], math.dist, [20], 10, 0.2),
-        ([22], [19], math.dist, [21], 10, 0.1),
-        ([22], [19], math.dist, [22], 10, 0.0),
-        ([22], [19], math.dist, [23], 10, 0.0),
-        ([16], None, math.dist, [16], 10, 0.0),
-        ([16], None, math.dist, [10], 10, 0.6),
-        ([16], None, math.dist, [26], 10, 1.0),
-        ([4], [7], math.dist, [7], 10, 0.3),
-        ([4], [7], math.dist, [-20], 10, 0.0),
-        ("hot", None, lambda a, b: 0 if a == b else math.inf, "hot", 10, 0.0),
-        ("cold", None, lambda a, b: 0 if a == b else math.inf, "hot", 10, 1.0),
+        ([22], [19], math.dist, [20], 1.5, 0.75),
+        ([22], [19], math.dist, [21], 1.5, 1.0),
+        ([22], [19], math.dist, [22], 1.5, 1.0),
+        ([22], [19], math.dist, [23], 1.5, 1.0),
+        ([16], None, math.dist, [16], 1.5, 1.0),
+        ([16], None, math.dist, [10], 1.5, 0.25),
+        ([16], None, math.dist, [26], 1.5, 0.15),
+        ([4], [7], math.dist, [7], 1.5, 0.5),
+        ([4], [7], math.dist, [-20], 1.5, 1.0),
+        ("hot", None, lambda a, b: 0 if a == b else math.inf, "hot", 1.5, 1.0),
+        ("cold", None, lambda a, b: 0 if a == b else math.inf, "hot", 1.5, 0.0),
     ],
 )
 def test_proximity_to(
-    prototype, boundary, distance_metric, candidate, maximum_distance, expected
+    prototype,
+    boundary,
+    distance_metric,
+    candidate,
+    distance_to_proximity_weight,
+    expected,
 ):
     concept = Concept(
         "hot",
@@ -125,5 +132,7 @@ def test_proximity_to(
         boundary=boundary,
         distance_metric=distance_metric,
     )
-    concept.MAXIMUM_DISTANCE = maximum_distance
-    assert expected == concept.proximity_to(candidate)
+    concept.DISTANCE_TO_PROXIMITY_WEIGHT = distance_to_proximity_weight
+    assert math.isclose(
+        expected, concept.proximity_to(candidate), abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
