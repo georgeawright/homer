@@ -72,13 +72,13 @@ def test_get_random_member_returns_member(no_of_members):
 @pytest.mark.parametrize("original_value, member_values", [(1, [2, 3, 4, 0])])
 def test_add_member_maintains_average(original_value, member_values):
     original_member = Mock()
-    original_member.value = original_value
+    original_member.value = [original_value]
     original_member.size = 1
-    group = Group(original_value, Mock(), set(), {original_member}, Mock())
+    group = Group([original_value], Mock(), set(), {original_member}, Mock())
     for member_value in member_values:
         new_member = Mock()
-        new_member.value = member_value
+        new_member.value = [member_value]
         new_member.size = 1
         new_member.neighbours = set()
         group.add_member(new_member)
-        assert group.value == statistics.fmean(member.value for member in group.members)
+    assert group.value == [statistics.fmean(member_values + [original_value])]
