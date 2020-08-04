@@ -4,6 +4,7 @@ from typing import List, Set, Union
 
 from homer.concept import Concept
 from homer.concept_space import ConceptSpace
+from homer.errors import MissingPerceptletError
 from homer.event_trace import EventTrace
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.raw_perceptlet import RawPerceptlet
@@ -45,12 +46,22 @@ class BubbleChamber:
         self.concept_space.update_activations()
 
     def get_raw_perceptlet(self) -> RawPerceptlet:
+        if len(self.workspace.raw_perceptlets) < 1:
+            raise MissingPerceptletError(
+                "There are no raw perceptlets in the worksapce"
+            )
         return random.sample(self.workspace.raw_perceptlets, 1)[0]
 
     def get_random_correspondence(self) -> Correspondence:
+        if len(self.workspace.correspondences) < 1:
+            raise MissingPerceptletError(
+                "There are no correspondences in the worksapce"
+            )
         return random.sample(self.workspace.correspondences, 1)[0]
 
     def get_random_groups(self, amount: int) -> List[Group]:
+        if len(self.workspace.groups) < amount:
+            raise MissingPerceptletError("There are not enough groups in the workspace")
         return random.sample(self.workspace.groups, amount)
 
     def get_random_workspace_concept(self) -> Concept:
@@ -76,9 +87,12 @@ class BubbleChamber:
         value = (
             members[0].value
             if type(members[0].value) == str
-            else statistics.fmean(member.value for member in members)
+            else [
+                statistics.fmean([member.value[i] for member in members])
+                for i in range(len(members[0].value))
+            ]
         )
-        time = statistics.fmean(member.location[0] for member in members)
+        time = statistics.fmean([member.location[0] for member in members])
         latitude = statistics.fmean([member.location[1] for member in members])
         longitude = statistics.fmean([member.location[2] for member in members])
         location = [time, latitude, longitude]

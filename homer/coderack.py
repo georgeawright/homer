@@ -2,6 +2,7 @@ import random
 
 from homer.codelet import BubbleChamber
 from homer.codelet import Codelet
+from homer.errors import NoMoreCodelets
 
 
 class Coderack:
@@ -27,6 +28,8 @@ class Coderack:
             if weight > highest_weight:
                 highest_weight = weight
                 codelet_choice = codelet
+        if codelet_choice is None:
+            raise NoMoreCodelets
         self.codelets.remove(codelet_choice)
         return codelet_choice
 
