@@ -28,11 +28,11 @@ class WorkspaceActivationPattern(ActivationPattern):
         self.height_divisor = workspace_height / height
         self.width_divisor = workspace_width / width
 
-    def get_activation(self, location: List[Union[float, int]]):
+    def get_activation(self, location: List[Union[float, int]]) -> float:
         depth, height, width = self._depth_height_width(location)
         return self.activation_matrix[depth][height][width]
 
-    def get_activation_as_scalar(self):
+    def get_activation_as_scalar(self) -> float:
         return statistics.fmean(
             (
                 activation
@@ -41,6 +41,9 @@ class WorkspaceActivationPattern(ActivationPattern):
                 for activation in row
             )
         )
+
+    def is_fully_activated(self) -> bool:
+        return self.get_activation_as_scalar() >= 1.0
 
     def boost_activation(self, amount: float, location: List[Union[float, int]]):
         depth, height, width = self._depth_height_width(location)

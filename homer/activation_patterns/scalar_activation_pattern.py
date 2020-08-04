@@ -9,11 +9,14 @@ class ScalarActivationPattern(ActivationPattern):
         self.activation = activation
         self.activation_buffer = 0
 
-    def get_activation(self, location: List[Union[float, int]]):
+    def get_activation(self, location: List[Union[float, int]]) -> float:
         return self.activation
 
-    def get_activation_as_scalar(self):
+    def get_activation_as_scalar(self) -> float:
         return self.activation
+
+    def is_fully_activated(self) -> bool:
+        return self.activation >= 1.0
 
     def boost_activation(self, amount: float, location: List[Union[float, int]]):
         self.activation_buffer += self.activation + amount * self.activation_coefficient

@@ -15,6 +15,10 @@ class ActivationPattern(ABC):
         pass
 
     @abstractmethod
+    def is_fully_activated(self) -> bool:
+        pass
+
+    @abstractmethod
     def boost_activation(self, amount: float, location: List):
         pass
 
