@@ -39,8 +39,12 @@ class CorrespondenceBuilder(Codelet):
             self.perceptlet_type.boost_activation(
                 confidence_of_correspondence, self.target_group_a.location
             )
-            correspondence = self.bubble_chamber.add_correspondence(
-                self.parent_space, self.target_group_a, self.target_group_b
+            correspondence = self.bubble_chamber.create_correspondence(
+                "correspondence",
+                self.parent_space,
+                self.target_group_a,
+                self.target_group_b,
+                confidence_of_correspondence,
             )
             self._engender_follow_up(correspondence, confidence_of_correspondence)
         return None
