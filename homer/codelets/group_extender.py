@@ -35,6 +35,9 @@ class GroupExtender(Codelet):
             )
             self.target_group.add_member(neighbour)
             neighbour.add_group(self.target_group)
+            print(
+                f"GROUP EXTENDED: {self.target_group.value} at {self.target_group.location} and {neighbour.value} at {neighbour.location}, confidence: {confidence_of_group_membership}"
+            )
         return self.engender_follow_up(confidence_of_group_membership)
 
     def _calculate_confidence(self, candidate: Perceptlet) -> float:

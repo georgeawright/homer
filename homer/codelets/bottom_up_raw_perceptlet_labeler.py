@@ -46,7 +46,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
                 )
                 self.target_perceptlet.add_label(label)
                 print(
-                    f"bottom_up: {self.target_perceptlet.value} at {self.target_perceptlet.location} labeled with {concept.name}, strength: {label.strength}"
+                    f"LABEL (bottom_up): {self.target_perceptlet.value} at {self.target_perceptlet.location} with {concept.name}, confidence: {label.strength}"
                 )
                 return self._engender_follow_up(concept, confidence_of_class_membership)
         return self._engender_alternative_follow_up(confidence_of_class_membership)

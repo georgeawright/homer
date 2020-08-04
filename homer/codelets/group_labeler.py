@@ -42,6 +42,9 @@ class GroupLabeler(Codelet):
                 confidence_of_class_affinity,
             )
             self.target_group.add_label(label)
+            print(
+                f"GROUP LABEL: {self.target_group.value} at {self.target_group.location} with {label.parent_concept.name}; confidence: {confidence_of_class_affinity}"
+            )
             return self._engender_follow_up(confidence_of_class_affinity)
         return self._engender_alternative_follow_up(confidence_of_class_affinity)
 

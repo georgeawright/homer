@@ -30,6 +30,9 @@ class CorrespondenceSuggester(Codelet):
             space
         ) and not self.target_group_a.has_correspondence(self.target_group_b, space):
             self.perceptlet_type.boost_activation(0.1, self.target_group_a.location)
+            print(
+                f"CORRESPONDENCE SUGGESTED: {self.target_group_a.value} at {self.target_group_a.location} and {self.target_group_b.value} at {self.target_group_b.location} in space {space.name}"
+            )
             return self._engender_follow_up(space, self.urgency)
         return self._engender_alternative_follow_up()
 
@@ -50,5 +53,5 @@ class CorrespondenceSuggester(Codelet):
             self.bubble_chamber,
             self.perceptlet_type,
             *self.bubble_chamber.get_random_groups(2),
-            self.urgency
+            self.urgency,
         )

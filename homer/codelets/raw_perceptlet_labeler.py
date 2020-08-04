@@ -53,7 +53,7 @@ class RawPerceptletLabeler(Codelet):
                 )
                 self.target_perceptlet.add_label(label)
                 print(
-                    f"top_down: {self.target_perceptlet.value} at {self.target_perceptlet.location} labeled with {self.parent_concept.name}, strength: {label.strength}"
+                    f"LABEL (top_down): {self.target_perceptlet.value} at {self.target_perceptlet.location} with {self.parent_concept.name}, confidence: {label.strength}"
                 )
                 return self.engender_follow_up(confidence_of_class_membership)
         self.perceptlet_type.decay_activation([])
