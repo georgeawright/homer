@@ -37,7 +37,7 @@ class GroupBuilder(Codelet):
                 confidence_of_group_affinity, self.target_perceptlet.location
             )
             group = self.bubble_chamber.create_group(
-                [self.target_perceptlet, neighbour], confidence_of_group_affinity
+                {self.target_perceptlet, neighbour}, confidence_of_group_affinity
             )
             self.target_perceptlet.add_group(group)
             neighbour.add_group(group)

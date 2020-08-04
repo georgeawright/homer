@@ -83,7 +83,7 @@ class BubbleChamber:
         self.workspace.add_label(label)
         return label
 
-    def create_group(self, members: List[Perceptlet], strength: float) -> Group:
+    def create_group(self, members: Set[Perceptlet], strength: float) -> Group:
         value = (
             members[0].value
             if type(members[0].value) == str
