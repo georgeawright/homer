@@ -62,13 +62,15 @@ class RawPerceptletLabeler(Codelet):
     def _calculate_confidence(
         self,
         concept_activation: float,
-        concept_depth: float,
-        distance_from_prototype: float,
+        concept_depth_rating: float,
+        proximity_to_prototype: float,
         proportion_of_neighbours: float,
     ) -> float:
-        return fuzzy.AND(
-            fuzzy.NAND(concept_depth, distance_from_prototype),
-            fuzzy.OR(concept_activation, proportion_of_neighbours),
+        return fuzzy.OR(
+            # concept_depth_rating,
+            proximity_to_prototype,
+            # concept_activation,
+            proportion_of_neighbours,
         )
 
     def engender_follow_up(self, confidence: float) -> Codelet:
