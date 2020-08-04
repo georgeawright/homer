@@ -85,11 +85,11 @@ class BubbleChamber:
 
     def create_group(self, members: Set[Perceptlet], strength: float) -> Group:
         value = (
-            members[0].value
-            if type(members[0].value) == str
+            list(members)[0].value
+            if type(list(members)[0].value) == str
             else [
                 statistics.fmean([member.value[i] for member in members])
-                for i in range(len(members[0].value))
+                for i in range(len(list(members)[0].value))
             ]
         )
         time = statistics.fmean([member.location[0] for member in members])
