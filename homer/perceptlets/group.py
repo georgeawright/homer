@@ -57,9 +57,11 @@ class Group(Perceptlet):
 
     def add_member(self, new_member: Perceptlet):
         if type(self.value) != str:
-            self.value = (self.value * self.size + new_member.value) / (
-                self.size + new_member.size
-            )
+            self.value = [
+                (self.value[i] * self.size + new_member.value[i])
+                / (self.size + new_member.size)
+                for i in range(len(self.value))
+            ]
         self.members.add(new_member)
         try:
             self.remove_neighbour(new_member)
