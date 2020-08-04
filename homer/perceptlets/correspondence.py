@@ -3,11 +3,17 @@ from __future__ import annotations
 import statistics
 
 from homer.concept import Concept
+from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 
 
 class Correspondence(Perceptlet):
     """A perceived relationship between two perceptlets."""
+
+    IMPORTANCE_LABEL_WEIGHT = HyperParameters.CORRESPONDENCE_IMPORTANCE_LABEL_WEIGHT
+    IMPORTANCE_STRENGTH_WEIGHT = (
+        HyperParameters.CORRESPONDENCE_IMPORTANCE_STRENGTH_WEIGHT
+    )
 
     def __init__(
         self,
@@ -30,8 +36,8 @@ class Correspondence(Perceptlet):
     def importance(self) -> float:
         return statistics.fmean(
             [
-                self._label_based_importance * self.LABEL_IMPORTANCE_WEIGHT,
-                self.strength * self.STRENGTH_IMPORTANCE_WEIGHT,
+                self._label_based_importance * self.IMPORTANCE_LABEL_WEIGHT,
+                self.strength * self.IMPORTANCE_STRENGTH_WEIGHT,
             ]
         )
 
