@@ -53,7 +53,8 @@ class CorrespondenceBuilder(Codelet):
             fuzzy.OR(
                 len(self._common_labels_in_space()) > 1,
                 self.parent_space.proximity_between(
-                    self.target_group_a, self.target_group_b
+                    self.target_group_a.get_value(self.parent_space),
+                    self.target_group_b.get_value(self.parent_space),
                 ),
             ),
         )
