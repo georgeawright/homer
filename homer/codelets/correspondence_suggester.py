@@ -25,7 +25,7 @@ class CorrespondenceSuggester(Codelet):
         self.urgency = urgency
 
     def run(self):
-        space = self.target_group_a.get_random_label().parent_concept.parent_space
+        space = self.target_group_a.get_random_label().parent_concept.space
         if self.target_group_b.has_label_in_space(
             space
         ) and not self.target_group_a.has_correspondence(self.target_group_b, space):
