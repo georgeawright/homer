@@ -9,7 +9,9 @@ from homer.concepts.euclidean_concept import EuclideanConcept
 from homer.concepts.euclidean_space import EuclideanSpace
 from homer.concepts.perceptlet_types import (
     CorrespondenceConcept,
+    CorrespondenceLabelConcept,
     GroupConcept,
+    GroupLabelConcept,
     LabelConcept,
 )
 from homer.concept_space import ConceptSpace
@@ -65,11 +67,19 @@ workspace = Workspace(event_trace, raw_perceptlet_field_sequence)
 worldview = Worldview(set())
 
 correspondence_concept = CorrespondenceConcept()
+correspondence_label_concept = CorrespondenceLabelConcept()
 group_concept = GroupConcept()
 group_concept.connections.add(correspondence_concept)
+group_label_concept = GroupLabelConcept()
 label_concept = LabelConcept()
 label_concept.connections.add(group_concept)
-perceptlet_types = {correspondence_concept, group_concept, label_concept}
+perceptlet_types = {
+    correspondence_concept,
+    correspondence_label_concept,
+    group_concept,
+    group_label_concept,
+    label_concept,
+}
 correspondence_types = {
     CorrespondenceType(
         "sameness", lambda same_labels, proximity: fuzzy.AND(same_labels, proximity)
