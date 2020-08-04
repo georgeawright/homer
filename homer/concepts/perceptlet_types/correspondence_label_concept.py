@@ -6,7 +6,7 @@ from homer.concepts.perceptlet_type import PerceptletType
 
 
 class CorrespondenceLabelConcept(PerceptletType):
-    def __init__(self, name: str = "group-label"):
+    def __init__(self, name: str = "correspondence-label"):
         PerceptletType.__init__(self, name)
 
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
