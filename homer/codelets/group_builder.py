@@ -40,8 +40,8 @@ class GroupBuilder(Codelet):
                 [self.target_perceptlet, neighbour], confidence_of_group_affinity
             )
             self.target_perceptlet.add_group(group)
-            self.neighbour.add_group(group)
-            return self.engender_follow_up(confidence_of_group_affinity)
+            neighbour.add_group(group)
+            return self._engender_follow_up(group, confidence_of_group_affinity)
         return None
 
     def _calculate_confidence(
