@@ -33,6 +33,9 @@ class CorrespondenceLabeler(Codelet):
                 self.bubble_chamber.add_label(
                     concept, self.target_correspondence, confidence_of_affinity
                 )
+                print(
+                    f"CORRESPONDENCE LABELED: {self.target_correspondence.target_group_a.location} to {self.target_correspondence.target_group_b.location} with {concept.name}"
+                )
                 confidence = max(confidence, confidence_of_affinity)
         if confidence > self.CONFIDENCE_THRESHOLD:
             self._engender_follow_up(confidence)
