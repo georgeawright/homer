@@ -50,7 +50,7 @@ class GroupBuilder(Codelet):
     def _calculate_confidence(
         self, perceptlet_a: Perceptlet, perceptlet_b: Perceptlet,
     ) -> float:
-        common_concepts = set.union(
+        common_concepts = set.intersection(
             {label.parent_concept for label in perceptlet_a.labels},
             {label.parent_concept for label in perceptlet_b.labels},
         )
