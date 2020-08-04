@@ -27,7 +27,7 @@ class GroupLabeler(Codelet):
         self.urgency = urgency
 
     def run(self) -> Optional[Codelet]:
-        target_concept = self._get_target_label()
+        target_concept = self._get_target_concept()
         confidence_of_class_affinity = self._calculate_confidence(target_concept)
         if confidence_of_class_affinity > self.CONFIDENCE_THRESHOLD:
             target_concept.boost_activation(
@@ -50,7 +50,7 @@ class GroupLabeler(Codelet):
         labels = [
             label
             for label in group_member.labels
-            if label.strengh > self.CONFIDENCE_THRESHOLD
+            if label.strength > self.CONFIDENCE_THRESHOLD
         ]
         target_label = random.choice(labels)
         return target_label.parent_concept
