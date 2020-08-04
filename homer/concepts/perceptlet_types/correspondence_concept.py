@@ -14,8 +14,6 @@ class CorrespondenceConcept(PerceptletType):
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
         activation = self.get_activation_as_scalar()
         randomness = random.random()
-        print(f"correspondence activation: {activation}")
-        print(f"randomness: {randomness}")
         if activation > randomness:
             try:
                 target_groups = bubble_chamber.get_random_groups(2)

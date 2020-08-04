@@ -41,6 +41,9 @@ class GroupBuilder(Codelet):
             )
             self.target_perceptlet.add_group(group)
             neighbour.add_group(group)
+            print(
+                f"{self.target_perceptlet.value} at {self.target_perceptlet.location} grouped with {neighbour.value} at {neighbour.location}, strength: {group.strength}"
+            )
             return self._engender_follow_up(group, confidence_of_group_affinity)
         return None
 

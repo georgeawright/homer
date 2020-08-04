@@ -6,6 +6,9 @@ from homer.hyper_parameters import HyperParameters
 
 
 class ActivationPattern(ABC):
+
+    DECAY_RATE = HyperParameters.DECAY_RATE
+
     @abstractmethod
     def get_activation(self, location: List[Union[float, int]]) -> float:
         pass

@@ -101,7 +101,6 @@ def test_number_and_proportion_of_neighbours_with_label(
     valid_neighbours = [valid_neighbour for i in range(no_of_valid_neighbours)]
     invalid_neighbours = [invalid_neighbour for i in range(no_of_invalid_neighbours)]
     neighbours = valid_neighbours + invalid_neighbours
-    print(neighbours)
     perceptlet = Perceptlet("value", Mock(), neighbours)
     assert no_of_valid_neighbours == perceptlet.number_of_neighbours_with_label(concept)
     actual_proportion = perceptlet.proportion_of_neighbours_with_label(concept)

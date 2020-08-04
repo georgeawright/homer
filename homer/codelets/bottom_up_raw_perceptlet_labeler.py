@@ -25,21 +25,30 @@ class BottomUpRawPerceptletLabeler(Codelet):
 
     def run(self):
         concept = self.bubble_chamber.get_random_workspace_concept()
-        confidence_of_class_membership = concept.proximity_to(
-            self.target_perceptlet.get_value(concept)
-        )
-        if confidence_of_class_membership > self.CONFIDENCE_THRESHOLD:
-            concept.boost_activation(
-                confidence_of_class_membership, self.target_perceptlet.location
+        if self.target_perceptlet.has_label(concept):
+            self.perceptlet_type.decay_activation([])
+            return None
+        else:
+            confidence_of_class_membership = concept.proximity_to(
+                self.target_perceptlet.get_value(concept)
             )
-            self.perceptlet_type.boost_activation(
-                confidence_of_class_membership, self.target_perceptlet.location
-            )
-            label = self.bubble_chamber.create_label(
-                concept, self.target_perceptlet.location, confidence_of_class_membership
-            )
-            self.target_perceptlet.add_label(label)
-            return self._engender_follow_up(concept, confidence_of_class_membership)
+            if confidence_of_class_membership > self.CONFIDENCE_THRESHOLD:
+                concept.boost_activation(
+                    confidence_of_class_membership, self.target_perceptlet.location
+                )
+                self.perceptlet_type.boost_activation(
+                    confidence_of_class_membership, self.target_perceptlet.location
+                )
+                label = self.bubble_chamber.create_label(
+                    concept,
+                    self.target_perceptlet.location,
+                    confidence_of_class_membership,
+                )
+                self.target_perceptlet.add_label(label)
+                print(
+                    f"bottom_up: {self.target_perceptlet.value} at {self.target_perceptlet.location} labeled with {concept.name}, strength: {label.strength}"
+                )
+                return self._engender_follow_up(concept, confidence_of_class_membership)
         return self._engender_alternative_follow_up(confidence_of_class_membership)
 
     def _engender_follow_up(self, concept: Concept, urgency: float) -> Codelet:
