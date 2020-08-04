@@ -43,9 +43,21 @@ class Homer:
         group_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "group"
         ).activation_pattern.activation
+        group_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+            "group-label"
+        ).activation_pattern.activation
         correspondence_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "correspondence"
         ).activation_pattern.activation
+        correspondence_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+            "correspondence-label"
+        ).activation_pattern.activation
         print(
-            f"codelets run: {codelets_run}; label: {label_activation}; group: {group_activation}; corresp: {correspondence_activation}"
+            "================================================================================"
+        )
+        print(
+            f"codelets run: {codelets_run}; label: {label_activation}; group: {group_activation}; gr_label: {group_label_activation}; corresp: {correspondence_activation}; co_label: {correspondence_label_activation}"
+        )
+        print(
+            "================================================================================"
         )
