@@ -80,9 +80,7 @@ class Concept:
     def spread_activation(self) -> None:
         if self.is_fully_activated():
             for connection in self.connections:
-                connection.boost_activation_evenly(
-                    self.activation_pattern.get_activation_as_scalar()
-                )
+                connection.boost_activation_evenly(0.1)
 
     def distance_from(self, candidate_instance: Any) -> float:
         """Return distance from prototype to candidate instance."""
