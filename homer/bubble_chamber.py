@@ -50,7 +50,16 @@ class BubbleChamber:
             raise MissingPerceptletError(
                 "There are no raw perceptlets in the worksapce"
             )
-        return random.sample(self.workspace.raw_perceptlets, 1)[0]
+        perceptlet_choice = None
+        highest_weight = 0
+        for perceptlet in self.workspace.raw_perceptlets:
+            weight = perceptlet.importance
+            if weight > highest_weight:
+                highest_weight = weight
+                perceptlet_choice = perceptlet
+        if perceptlet_choice is None:
+            perceptlet_choice = random.sample(self.workspace.raw_perceptlets, 1)[0]
+        return perceptlet_choice
 
     def get_random_correspondence(self) -> Correspondence:
         if len(self.workspace.correspondences) < 1:

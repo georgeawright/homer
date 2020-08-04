@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import Mock, patch
 
 from homer.bubble_chamber import BubbleChamber
@@ -14,7 +13,12 @@ from homer.perceptlets.word import Word
 
 def test_get_raw_perceptlet():
     workspace = Mock()
-    workspace.raw_perceptlets = {Mock() for _ in range(10)}
+    raw_perceptlets = set()
+    for _ in range(10):
+        raw_perceptlet = Mock()
+        raw_perceptlet.importance = 0.5
+        raw_perceptlets.add(raw_perceptlet)
+    workspace.raw_perceptlets = raw_perceptlets
     bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
     raw_perceptlet = bubble_chamber.get_raw_perceptlet()
     assert raw_perceptlet in workspace.raw_perceptlets
