@@ -3,6 +3,7 @@ import statistics
 import random
 from typing import Any, List, Set
 
+from homer.errors import MissingPerceptletError
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.relation import Relation
@@ -70,6 +71,11 @@ class Group(Perceptlet):
         for new_neighbour in new_member.neighbours:
             if new_neighbour not in self.members:
                 self.add_neighbour(new_neighbour)
+
+    def get_random_label(self):
+        if len(self.labels) < 1:
+            raise MissingPerceptletError("Group has no labels")
+        return random.sample(self.labels, 1)[0]
 
     def add_group(self, group: Group):
         self.groups.add(group)
