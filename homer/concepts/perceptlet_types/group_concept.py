@@ -13,6 +13,8 @@ class GroupConcept(PerceptletType):
         activation = self.get_activation_as_scalar()
         if activation > random.random():
             target_perceptlet = bubble_chamber.get_raw_perceptlet()
+            if target_perceptlet is None:
+                return None
             return GroupBuilder(
                 bubble_chamber, self, target_perceptlet, target_perceptlet.exigency
             )

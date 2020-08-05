@@ -31,3 +31,4 @@ class EuclideanConcept(Concept):
             relevant_value=relevant_value,
             distance_metric=distance_metric,
         )
+        self.DISTANCE_TO_PROXIMITY_WEIGHT = self.space.DISTANCE_TO_PROXIMITY_WEIGHT
