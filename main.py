@@ -95,8 +95,8 @@ correspondence_types = {
         lambda same_labels, proximity: fuzzy.AND(same_labels, fuzzy.NOT(proximity)),
     ),
 }
-temperature_space = EuclideanSpace("temperature", 5)
-location_space = EuclideanSpace("location", 5)
+temperature_space = EuclideanSpace("temperature", 5, 1.5)
+location_space = EuclideanSpace("location", 5, 1)
 spaces = {temperature_space, location_space}
 workspace_concepts = {
     EuclideanConcept("cold", [4], temperature_space, depth=1, boundary=[7]),
@@ -104,16 +104,16 @@ workspace_concepts = {
     EuclideanConcept("warm", [16], temperature_space, depth=1),
     EuclideanConcept("hot", [22], temperature_space, depth=1, boundary=[19]),
     EuclideanConcept(
-        "north", [1, 2], location_space, depth=1, relevant_value="location"
+        "north", [1, 2], location_space, depth=2, relevant_value="location"
     ),
     EuclideanConcept(
-        "south", [4, 2], location_space, depth=1, relevant_value="location"
+        "south", [4, 2], location_space, depth=2, relevant_value="location"
     ),
     EuclideanConcept(
-        "east", [2.5, 3], location_space, depth=1, relevant_value="location"
+        "east", [2.5, 3], location_space, depth=2, relevant_value="location"
     ),
     EuclideanConcept(
-        "west", [2.5, 1], location_space, depth=1, relevant_value="location"
+        "west", [2.5, 1], location_space, depth=2, relevant_value="location"
     ),
     EuclideanConcept(
         "northwest", [0.5, 0.5], location_space, depth=2, relevant_value="location"
