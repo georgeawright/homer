@@ -1,6 +1,6 @@
 import random
 import statistics
-from typing import List, Set, Union
+from typing import List, Optional, Set, Union
 
 from homer.concept import Concept
 from homer.concept_space import ConceptSpace
@@ -61,6 +61,15 @@ class BubbleChamber:
             perceptlet_choice = random.sample(self.workspace.raw_perceptlets, 1)[0]
         return perceptlet_choice
 
+    def get_unhappy_raw_perceptlet(self) -> Optional[RawPerceptlet]:
+        perceptlet_choice = None
+        unhappiness = 0.5
+        for perceptlet in self.workspace.raw_perceptlets:
+            if perceptlet.unhappiness > 0.1 and perceptlet.unhappiness < unhappiness:
+                perceptlet_choice = perceptlet
+                unhappiness = perceptlet.unhappiness
+        return perceptlet_choice
+
     def get_random_correspondence(self) -> Correspondence:
         if len(self.workspace.correspondences) < 1:
             raise MissingPerceptletError(
@@ -74,7 +83,24 @@ class BubbleChamber:
         return random.sample(self.workspace.groups, amount)
 
     def get_random_workspace_concept(self) -> Concept:
-        return random.sample(self.concept_space.workspace_concepts, 1)[0]
+        randomness = random.random()
+        if randomness > 0.67:
+            return random.sample(
+                {
+                    concept
+                    for concept in self.concept_space.workspace_concepts
+                    if concept.depth == 2
+                },
+                1,
+            )[0]
+        return random.sample(
+            {
+                concept
+                for concept in self.concept_space.workspace_concepts
+                if concept.depth == 1
+            },
+            1,
+        )[0]
 
     def promote_to_worldview(self, perceptlet: Perceptlet) -> None:
         self.worldview.add_perceptlet(perceptlet)
