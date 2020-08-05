@@ -38,6 +38,8 @@ class GroupExtender(Codelet):
             print(
                 f"GROUP EXTENDED: {self.target_group.value} at {self.target_group.location} and {neighbour.value} at {neighbour.location}, confidence: {confidence_of_group_membership}"
             )
+        else:
+            self.perceptlet_type.decay_activation([])
         return self.engender_follow_up(confidence_of_group_membership)
 
     def _calculate_confidence(self, candidate: Perceptlet) -> float:
