@@ -83,17 +83,28 @@ class Logger:
         perceptlets_file = self.log_directory + "/perceptlets.csv"
         with open(perceptlets_file, "a") as f:
             perceptlet_id = "PerceptletID"
+            parent_id = "ParentID"
             perceptlet_type = "PerceptletType"
             birth_time = "BirthTime"
             location = "Location"
             value = "Value"
             size = "Size"
             writer = csv.DictWriter(
-                f, [perceptlet_id, perceptlet_type, birth_time, location, value, size]
+                f,
+                [
+                    perceptlet_id,
+                    parent_id,
+                    perceptlet_type,
+                    birth_time,
+                    location,
+                    value,
+                    size,
+                ],
             )
             writer.writerow(
                 {
                     perceptlet_id: perceptlet.perceptlet_id,
+                    parent_id: perceptlet.parent_id,
                     perceptlet_type: type(perceptlet),
                     birth_time: self.codelets_run,
                     location: perceptlet.location,
