@@ -160,7 +160,7 @@ bubble_chamber = BubbleChamber(
     concept_space, event_trace, workspace, worldview, logger,
 )
 coderack = Coderack(bubble_chamber, logger)
-coderack.codelets = [
+codelets = [
     BottomUpRawPerceptletLabeler(
         bubble_chamber,
         concept_space.get_perceptlet_type_by_name("label"),
@@ -170,6 +170,8 @@ coderack.codelets = [
     )
     for _ in range(HyperParameters.NO_OF_STARTER_CODELETS)
 ]
+for codelet in codelets:
+    coderack.add_codelet(codelet)
 
 homer = Homer(bubble_chamber, coderack, logger)
 homer.run()
