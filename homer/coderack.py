@@ -7,18 +7,22 @@ from homer.logger import Logger
 
 
 class Coderack:
-    def __init__(self, bubble_chamber: BubbleChamber):
+    def __init__(self, bubble_chamber: BubbleChamber, logger: Logger):
         self.bubble_chamber = bubble_chamber
-        self.codelets = []
+        self._codelets = []
         self.codelets_run = 0
-        self.logger = Logger()
+        self.logger = logger
+
+    def add_codelet(self, codelet: Codelet):
+        self.logger.log(codelet)
+        self._codelets.append(codelet)
 
     def select_and_run_codelet(self):
         codelet = self.select_codelet()
         follow_up = codelet.run()
         self.codelets_run += 1
         if follow_up is not None:
-            self.codelets.append(follow_up)
+            self.add_codelet(follow_up)
 
     def select_codelet(self) -> Codelet:
         if len(self.codelets) < 1:
@@ -40,7 +44,7 @@ class Coderack:
         for concept in self.bubble_chamber.concept_space.perceptlet_types:
             codelet = concept.spawn_codelet(self.bubble_chamber)
             if codelet is not None:
-                self.codelets.append(codelet)
+                self.add_codelet(codelet)
 
     def _randomness(self) -> float:
         return 1 - self.bubble_chamber.satisfaction
