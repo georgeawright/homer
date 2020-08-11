@@ -60,7 +60,7 @@ class Logger:
             writer.writerow(
                 {
                     codelets_run: self.codelets_run,
-                    coderack_population: len(coderack.codelets),
+                    coderack_population: len(coderack._codelets),
                 }
             )
 
