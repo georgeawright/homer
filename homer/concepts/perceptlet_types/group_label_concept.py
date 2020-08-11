@@ -14,5 +14,9 @@ class GroupLabelConcept(PerceptletType):
         if activation > random.random():
             target_group = bubble_chamber.get_random_groups(1)[0]
             return GroupLabeler(
-                bubble_chamber, self, target_group, target_group.exigency
+                bubble_chamber,
+                self,
+                target_group,
+                target_group.exigency,
+                self.concept_id,
             )

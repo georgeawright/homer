@@ -15,7 +15,7 @@ class RawPerceptletField(Perceptlet):
         neighbours: Set[RawPerceptletField],
     ):
         location = None
-        Perceptlet.__init__(self, value, location, neighbours)
+        Perceptlet.__init__(self, value, location, neighbours, "")
         self.time = time
 
     def __iter__(self):

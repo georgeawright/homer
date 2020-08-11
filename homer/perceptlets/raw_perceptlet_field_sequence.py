@@ -10,7 +10,7 @@ class RawPerceptletFieldSequence(Perceptlet):
     def __init__(self, value: List[RawPerceptletField]):
         location = None
         neighbours = set()
-        Perceptlet.__init__(self, value, location, neighbours)
+        Perceptlet.__init__(self, value, location, neighbours, "")
 
     def __iter__(self):
         return RawPerceptletFieldSequenceIterator(self)

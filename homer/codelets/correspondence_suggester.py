@@ -17,8 +17,9 @@ class CorrespondenceSuggester(Codelet):
         target_group_a: Group,
         target_group_b: Group,
         urgency: float,
+        parent_id: str,
     ):
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, bubble_chamber, parent_id)
         self.perceptlet_type = perceptlet_type
         self.target_group_a = target_group_a
         self.target_group_b = target_group_b
@@ -46,6 +47,7 @@ class CorrespondenceSuggester(Codelet):
             self.target_group_a,
             self.target_group_b,
             urgency,
+            self.codelet_id,
         )
 
     def _engender_alternative_follow_up(self):
@@ -54,4 +56,5 @@ class CorrespondenceSuggester(Codelet):
             self.perceptlet_type,
             *self.bubble_chamber.get_random_groups(2),
             self.urgency,
+            self.codelet_id,
         )

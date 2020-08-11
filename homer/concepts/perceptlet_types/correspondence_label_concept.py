@@ -18,4 +18,5 @@ class CorrespondenceLabelConcept(PerceptletType):
                 self,
                 target_correspondence,
                 target_correspondence.exigency,
+                self.concept_id,
             )

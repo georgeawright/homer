@@ -4,6 +4,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.perceptlet import Perceptlet
 from homer.workspace import Workspace
 from homer.worldview import Worldview
+from homer.perceptlets.correspondence import Correspondence
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
 from homer.perceptlets.relation import Relation
@@ -66,7 +67,7 @@ def test_create_label_returns_label():
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        label = bubble_chamber.create_label(Mock(), Mock(), Mock())
+        label = bubble_chamber.create_label(Mock(), Mock(), Mock(), Mock())
         assert Label == type(label)
     add_label.assert_called_once_with(label)
 
@@ -76,11 +77,27 @@ def test_create_group_returns_group():
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        perceptlet_1 = Perceptlet("value", [1, 2, 2], set())
-        perceptlet_2 = Perceptlet("value", [1, 2, 3], set())
-        group = bubble_chamber.create_group([perceptlet_1, perceptlet_2], Mock())
+        perceptlet_1 = Perceptlet("value", [1, 2, 2], set(), Mock())
+        perceptlet_2 = Perceptlet("value", [1, 2, 3], set(), Mock())
+        group = bubble_chamber.create_group(
+            [perceptlet_1, perceptlet_2], Mock(), Mock()
+        )
         assert Group == type(group)
     add_group.assert_called_once_with(group)
+
+
+def test_create_correspondence_returns_correspondence():
+    with patch.object(
+        Workspace, "add_correspondence", return_value=None
+    ) as add_correspondence:
+        raw_inp = [[[Mock()]]]
+        workspace = Workspace(Mock(), raw_inp)
+        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+        correspondence = bubble_chamber.create_correspondence(
+            Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        )
+        assert Correspondence == type(correspondence)
+    add_correspondence.assert_called_once_with(correspondence)
 
 
 def test_create_relation_returns_relation():
@@ -89,7 +106,7 @@ def test_create_relation_returns_relation():
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
         relation = bubble_chamber.create_relation(
-            Mock(), Mock(), Mock(), Mock(), Mock()
+            Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
         )
         assert Relation == type(relation)
     add_relation.assert_called_once_with(relation)
@@ -100,16 +117,16 @@ def test_create_word_returns_word():
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        word = bubble_chamber.create_word(Mock(), Mock(), Mock())
+        word = bubble_chamber.create_word(Mock(), Mock(), Mock(), Mock())
         assert Word == type(word)
     add_word.assert_called_once_with(word)
 
 
-def test_create_text_returns_textlet():
+def test_create_textlet_returns_textlet():
     with patch.object(Workspace, "add_textlet", return_value=None) as add_text:
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
-        textlet = bubble_chamber.create_textlet(Mock(), Mock(), Mock(), Mock())
+        textlet = bubble_chamber.create_textlet(Mock(), Mock(), Mock(), Mock(), Mock())
         assert Textlet == type(textlet)
     add_text.assert_called_once_with(textlet)

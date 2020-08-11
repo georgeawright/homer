@@ -22,10 +22,11 @@ class Correspondence(Perceptlet):
         first_argument: Perceptlet,
         second_argument: Perceptlet,
         strength: float,
+        parent_id: str,
     ):
         location = None
         neighbours = set()
-        Perceptlet.__init__(self, name, location, neighbours)
+        Perceptlet.__init__(self, name, location, neighbours, parent_id)
         self.parent_concept = parent_concept
         self.first_argument = first_argument
         self.second_argument = second_argument

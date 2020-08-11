@@ -15,7 +15,7 @@ class RawPerceptlet(Perceptlet):
         location: List[int],
         neighbours: Set[RawPerceptlet],
     ):
-        Perceptlet.__init__(self, value, location, neighbours)
+        Perceptlet.__init__(self, value, location, neighbours, "")
         self.groups = set()
         self.relations = set()
 

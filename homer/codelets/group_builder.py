@@ -21,8 +21,9 @@ class GroupBuilder(Codelet):
         perceptlet_type: PerceptletType,
         target_perceptlet: Optional[Perceptlet],
         urgency: float,
+        parent_id: str,
     ):
-        Codelet.__init__(self, bubble_chamber)
+        Codelet.__init__(self, bubble_chamber, parent_id)
         self.perceptlet_type = perceptlet_type
         self.target_perceptlet = target_perceptlet
         self.urgency = urgency
@@ -39,7 +40,9 @@ class GroupBuilder(Codelet):
                 confidence_of_group_affinity, self.target_perceptlet.location
             )
             group = self.bubble_chamber.create_group(
-                {self.target_perceptlet, neighbour}, confidence_of_group_affinity
+                {self.target_perceptlet, neighbour},
+                confidence_of_group_affinity,
+                self.codelet_id,
             )
             self.target_perceptlet.add_group(group)
             neighbour.add_group(group)
@@ -74,4 +77,5 @@ class GroupBuilder(Codelet):
             ),
             group,
             confidence,
+            self.codelet_id,
         )

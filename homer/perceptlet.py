@@ -1,8 +1,9 @@
 from __future__ import annotations
-from abc import ABC
-from typing import Any, List, Optional, Set, Union
 import random
 import statistics
+import uuid
+from abc import ABC
+from typing import Any, List, Optional, Set, Union
 
 from homer.concept import Concept
 from homer.hyper_parameters import HyperParameters
@@ -19,9 +20,12 @@ class Perceptlet(ABC):
         value: Any,
         location: Optional[List[Union[float, int]]],
         neighbours: Set[Perceptlet],
+        parent_id: str,
     ):
         self.value = value
         self.location = location
+        self.percpetlet_id = "perceptlet_" + uuid.uuid4().hex
+        self.parent_id = parent_id
         self.neighbours = neighbours
         self.labels = set()
         self.correspondences = set()

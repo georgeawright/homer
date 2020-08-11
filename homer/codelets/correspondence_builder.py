@@ -22,8 +22,9 @@ class CorrespondenceBuilder(Codelet):
         target_group_a: Group,
         target_group_b: Group,
         urgency: float,
+        parent_id: str,
     ):
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, bubble_chamber, parent_id)
         self.perceptlet_type = perceptlet_type
         self.parent_space = parent_space
         self.target_group_a = target_group_a
@@ -45,6 +46,7 @@ class CorrespondenceBuilder(Codelet):
                 self.target_group_a,
                 self.target_group_b,
                 confidence_of_correspondence,
+                self.codelet_id,
             )
             print(
                 f"CORRESPONDENCE: {self.target_group_a.value} at {self.target_group_a.location} and {self.target_group_b.value} at {self.target_group_b.location} in space {self.parent_space.name}"
@@ -84,4 +86,5 @@ class CorrespondenceBuilder(Codelet):
             ),
             correspondence,
             urgency,
+            self.codelet_id,
         )

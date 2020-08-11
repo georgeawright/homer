@@ -14,5 +14,9 @@ class LabelConcept(PerceptletType):
         if activation > random.random():
             target_perceptlet = bubble_chamber.get_raw_perceptlet()
             return BottomUpRawPerceptletLabeler(
-                bubble_chamber, self, target_perceptlet, target_perceptlet.exigency
+                bubble_chamber,
+                self,
+                target_perceptlet,
+                target_perceptlet.exigency,
+                self.concept_id,
             )

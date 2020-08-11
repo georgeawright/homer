@@ -20,8 +20,9 @@ class RawPerceptletLabeler(Codelet):
         parent_concept: Concept,
         target_perceptlet: Optional[Perceptlet],
         urgency: float,
+        parent_id: str,
     ):
-        Codelet.__init__(self, bubble_chamber)
+        Codelet.__init__(self, bubble_chamber, parent_id)
         self.parent_concept = parent_concept
         self.perceptlet_type = perceptlet_type
         self.target_perceptlet = target_perceptlet
@@ -50,6 +51,7 @@ class RawPerceptletLabeler(Codelet):
                     self.parent_concept,
                     self.target_perceptlet.location,
                     confidence_of_class_membership,
+                    self.codelet_id,
                 )
                 self.target_perceptlet.add_label(label)
                 print(
@@ -81,4 +83,5 @@ class RawPerceptletLabeler(Codelet):
             self.parent_concept,
             new_target,
             confidence,
+            self.codelet_id,
         )

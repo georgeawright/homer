@@ -20,8 +20,9 @@ class GroupLabeler(Codelet):
         perceptlet_type: PerceptletType,
         target_group: Optional[Group],
         urgency: float,
+        parent_id: str,
     ):
-        Codelet.__init__(self, bubble_chamber)
+        Codelet.__init__(self, bubble_chamber, parent_id)
         self.perceptlet_type = perceptlet_type
         self.target_group = target_group
         self.urgency = urgency
@@ -43,6 +44,7 @@ class GroupLabeler(Codelet):
                 target_concept,
                 self.target_group.location,
                 confidence_of_class_affinity,
+                self.codelet_id,
             )
             self.target_group.add_label(label)
             print(
@@ -76,9 +78,14 @@ class GroupLabeler(Codelet):
             self.bubble_chamber.concept_space.get_perceptlet_type_by_name("group"),
             self.target_group,
             urgency,
+            self.codelet_id,
         )
 
     def _engender_alternative_follow_up(self, urgency: float) -> Codelet:
         return GroupLabeler(
-            self.bubble_chamber, self.perceptlet_type, self.target_group, urgency
+            self.bubble_chamber,
+            self.perceptlet_type,
+            self.target_group,
+            urgency,
+            self.codelet_id,
         )

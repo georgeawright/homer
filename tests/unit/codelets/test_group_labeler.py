@@ -24,18 +24,18 @@ def test_calculate_confidence(label_strengths, group_size, expected):
         member = Mock()
         member.labels = {label}
         group.members.add(member)
-    codelet = GroupLabeler(Mock(), Mock(), group, Mock())
+    codelet = GroupLabeler(Mock(), Mock(), group, Mock(), Mock())
     confidence = codelet._calculate_confidence(concept)
     assert math.isclose(expected, confidence, abs_tol=FLOAT_COMPARISON_TOLERANCE)
 
 
 def test_engender_follow_up():
-    codelet = GroupLabeler(Mock(), Mock(), Mock(), Mock())
+    codelet = GroupLabeler(Mock(), Mock(), Mock(), Mock(), Mock())
     follow_up = codelet._engender_follow_up(Mock())
     assert GroupExtender == type(follow_up)
 
 
 def test_engender_alternative_follow_up():
-    codelet = GroupLabeler(Mock(), Mock(), Mock(), Mock())
+    codelet = GroupLabeler(Mock(), Mock(), Mock(), Mock(), Mock())
     follow_up = codelet._engender_alternative_follow_up(Mock())
     assert GroupLabeler == type(follow_up)

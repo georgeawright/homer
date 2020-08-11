@@ -8,10 +8,12 @@ from homer.perceptlets.relation import Relation
 class Word(Perceptlet):
     """A word for use in text."""
 
-    def __init__(self, text: str, parent_concept: Concept, strength: float):
+    def __init__(
+        self, text: str, parent_concept: Concept, strength: float, parent_id: str,
+    ):
         location = None
         neighbours = set()
-        Perceptlet.__init__(self, text, location, neighbours)
+        Perceptlet.__init__(self, text, location, neighbours, parent_id)
         self.parent_concept = parent_concept
         self.strength = strength
         self.relations = set()

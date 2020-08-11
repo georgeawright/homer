@@ -15,7 +15,9 @@ class CorrespondenceLabeler(Codelet):
         perceptlet_type: PerceptletType,
         target_correspondence: Correspondence,
         urgency: float,
+        parent_id: str,
     ):
+        Codelet.__init__(self, bubble_chamber, parent_id)
         self.bubble_chamber = bubble_chamber
         self.perceptlet_type = perceptlet_type
         self.target_correspondence = target_correspondence
@@ -30,9 +32,13 @@ class CorrespondenceLabeler(Codelet):
             )
             if confidence_of_affinity > self.CONFIDENCE_THRESHOLD:
                 self.perceptlet_type.boost_activation(confidence_of_affinity, [])
-                self.bubble_chamber.add_label(
-                    concept, self.target_correspondence, confidence_of_affinity
+                label = self.bubble_chamber.create_label(
+                    concept,
+                    self.target_correspondence.location,
+                    confidence_of_affinity,
+                    self.codelet_id,
                 )
+                self.target_correspondence.add_label(label)
                 print(
                     f"CORRESPONDENCE LABELED: {self.target_correspondence.target_group_a.location} to {self.target_correspondence.target_group_b.location} with {concept.name}"
                 )
@@ -52,4 +58,5 @@ class CorrespondenceLabeler(Codelet):
             self.target_correspondence.target_group_a,
             self.target_correspondence.target_group_b,
             urgency,
+            self.codelet_id,
         )

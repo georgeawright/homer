@@ -7,7 +7,7 @@ from homer.codelets.correspondence_suggester import CorrespondenceSuggester
 
 def test_engender_follow_up():
     correspondence_suggester = CorrespondenceSuggester(
-        Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(),
     )
     follow_up = correspondence_suggester._engender_follow_up(Mock(), Mock())
     assert CorrespondenceBuilder == type(follow_up)
@@ -19,7 +19,7 @@ def test_engender_alternative_follow_up():
     ):
         bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), Mock())
         correspondence_suggester = CorrespondenceSuggester(
-            bubble_chamber, Mock(), Mock(), Mock(), Mock()
+            bubble_chamber, Mock(), Mock(), Mock(), Mock(), Mock()
         )
         alternative_follow_up = (
             correspondence_suggester._engender_alternative_follow_up()

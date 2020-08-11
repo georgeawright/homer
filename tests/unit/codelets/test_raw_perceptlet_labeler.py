@@ -31,7 +31,7 @@ def test_calculate_confidence(
     proportion_of_neighbours,
     expected,
 ):
-    codelet = RawPerceptletLabeler(Mock(), Mock(), Mock(), Mock(), Mock())
+    codelet = RawPerceptletLabeler(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     result = codelet._calculate_confidence(
         concept_activation,
         concept_depth,
@@ -42,6 +42,6 @@ def test_calculate_confidence(
 
 
 def test_engender_follow_up():
-    codelet = RawPerceptletLabeler(Mock(), Mock(), Mock(), Mock(), Mock())
+    codelet = RawPerceptletLabeler(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     follow_up = codelet.engender_follow_up(Mock())
     assert RawPerceptletLabeler == type(follow_up)

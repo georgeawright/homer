@@ -113,12 +113,15 @@ class BubbleChamber:
         parent_concept: Concept,
         location: List[Union[float, int]],
         strength: float,
+        parent_id: str,
     ) -> Label:
-        label = Label(parent_concept, location, strength)
+        label = Label(parent_concept, location, strength, parent_id)
         self.workspace.add_label(label)
         return label
 
-    def create_group(self, members: Set[Perceptlet], strength: float) -> Group:
+    def create_group(
+        self, members: Set[Perceptlet], strength: float, parent_id: str,
+    ) -> Group:
         value = (
             list(members)[0].value
             if type(list(members)[0].value) == str
@@ -139,7 +142,7 @@ class BubbleChamber:
                 neighbours.remove(member)
             except KeyError:
                 pass
-        group = Group(value, location, neighbours, members, strength)
+        group = Group(value, location, neighbours, members, strength, parent_id)
         self.workspace.add_group(group)
         return group
 
@@ -150,9 +153,10 @@ class BubbleChamber:
         first_argument: Perceptlet,
         second_argument: Perceptlet,
         strength: float,
+        parent_id: str,
     ) -> Correspondence:
         correspondence = Correspondence(
-            name, parent_concept, first_argument, second_argument, strength
+            name, parent_concept, first_argument, second_argument, strength, parent_id,
         )
         self.workspace.add_correspondence(correspondence)
         return correspondence
@@ -164,15 +168,18 @@ class BubbleChamber:
         first_argument: Perceptlet,
         second_argument: Perceptlet,
         strength: float,
+        parent_id: str,
     ) -> Relation:
         relation = Relation(
-            name, parent_concept, first_argument, second_argument, strength
+            name, parent_concept, first_argument, second_argument, strength, parent_id,
         )
         self.workspace.add_relation(relation)
         return relation
 
-    def create_word(self, text: str, parent_concept: Concept, strength: float) -> Word:
-        word = Word(text, parent_concept, strength)
+    def create_word(
+        self, text: str, parent_concept: Concept, strength: float, parent_id: str,
+    ) -> Word:
+        word = Word(text, parent_concept, strength, parent_id)
         self.workspace.add_word(word)
         return word
 
@@ -182,7 +189,8 @@ class BubbleChamber:
         constituents: List[Union[Textlet, Word]],
         relations: Set[Relation],
         strength: float,
+        parent_id: str,
     ) -> Textlet:
-        textlet = Textlet(text, constituents, relations, strength)
+        textlet = Textlet(text, constituents, relations, strength, parent_id)
         self.workspace.add_textlet(textlet)
         return textlet

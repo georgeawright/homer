@@ -16,5 +16,9 @@ class GroupConcept(PerceptletType):
             if target_perceptlet is None:
                 return None
             return GroupBuilder(
-                bubble_chamber, self, target_perceptlet, target_perceptlet.exigency
+                bubble_chamber,
+                self,
+                target_perceptlet,
+                target_perceptlet.exigency,
+                self.concept_id,
             )

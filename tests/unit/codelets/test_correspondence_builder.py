@@ -22,18 +22,24 @@ def test_calculate_confidence(
     ), patch.object(
         Concept, "proximity_between", return_value=proximity
     ):
-        target_group_a = Group(Mock(), [0, 0, 0], Mock(), Mock(), Mock())
-        target_group_b = Group(Mock(), [1, 1, 1], Mock(), Mock(), Mock())
-        parent_space = Concept(Mock(), Mock())
+        target_group_a = Group(Mock(), [0, 0, 0], Mock(), Mock(), Mock(), Mock())
+        target_group_b = Group(Mock(), [1, 1, 1], Mock(), Mock(), Mock(), Mock())
+        parent_space = Concept("concept", Mock())
         correspondence_builder = CorrespondenceBuilder(
-            Mock(), Mock(), parent_space, target_group_a, target_group_b, Mock()
+            Mock(),
+            Mock(),
+            parent_space,
+            target_group_a,
+            target_group_b,
+            Mock(),
+            Mock(),
         )
         assert expected == correspondence_builder._calculate_confidence()
 
 
 def test_engender_follow_up():
     correspondence_builder = CorrespondenceBuilder(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
     follow_up = correspondence_builder._engender_follow_up(Mock(), Mock())
     assert CorrespondenceLabeler == type(follow_up)

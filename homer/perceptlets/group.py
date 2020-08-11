@@ -23,8 +23,9 @@ class Group(Perceptlet):
         neighbours: Set[Perceptlet],
         members: Set[Perceptlet],
         strength: float,
+        parent_id: str,
     ):
-        Perceptlet.__init__(self, value, location, neighbours)
+        Perceptlet.__init__(self, value, location, neighbours, parent_id)
         self.members = members
         self.strength = strength
         self.groups = set()

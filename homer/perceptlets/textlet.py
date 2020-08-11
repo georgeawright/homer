@@ -25,11 +25,12 @@ class Textlet(Perceptlet):
         constituents: List[Union[Textlet, Word]],
         constituent_relations: Set[Relation],
         strength: float,
+        parent_id: str,
     ):
         location = None
         neighbours = set()
         value = text
-        Perceptlet.__init__(self, value, location, neighbours)
+        Perceptlet.__init__(self, value, location, neighbours, parent_id)
         self.constituents = constituents
         self.constituent_relations = constituent_relations
         self.strength = strength

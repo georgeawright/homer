@@ -20,8 +20,9 @@ class GroupExtender(Codelet):
         perceptlet_type: PerceptletType,
         target_group: Group,
         urgency: float,
+        parent_id: str,
     ):
-        Codelet.__init__(self, bubble_chamber)
+        Codelet.__init__(self, bubble_chamber, parent_id)
         self.perceptlet_type = perceptlet_type
         self.target_group = target_group
         self.urgency = urgency
@@ -59,5 +60,9 @@ class GroupExtender(Codelet):
 
     def engender_follow_up(self, urgency: float):
         return GroupExtender(
-            self.bubble_chamber, self.perceptlet_type, self.target_group, urgency
+            self.bubble_chamber,
+            self.perceptlet_type,
+            self.target_group,
+            urgency,
+            self.codelet_id,
         )

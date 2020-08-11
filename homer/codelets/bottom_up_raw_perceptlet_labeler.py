@@ -17,8 +17,9 @@ class BottomUpRawPerceptletLabeler(Codelet):
         perceptlet_type: PerceptletType,
         target_perceptlet: Perceptlet,
         urgency: float,
+        parent_id: str,
     ):
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, bubble_chamber, parent_id)
         self.perceptlet_type = perceptlet_type
         self.target_perceptlet = target_perceptlet
         self.urgency = urgency
@@ -43,6 +44,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
                     concept,
                     self.target_perceptlet.location,
                     confidence_of_class_membership,
+                    self.codelet_id,
                 )
                 self.target_perceptlet.add_label(label)
                 print(
@@ -59,10 +61,15 @@ class BottomUpRawPerceptletLabeler(Codelet):
             concept,
             new_target_perceptlet,
             urgency,
+            self.codelet_id,
         )
 
     def _engender_alternative_follow_up(self, urgency: float) -> Codelet:
         new_target_perceptlet = self.bubble_chamber.get_raw_perceptlet()
         return BottomUpRawPerceptletLabeler(
-            self.bubble_chamber, self.perceptlet_type, new_target_perceptlet, urgency
+            self.bubble_chamber,
+            self.perceptlet_type,
+            new_target_perceptlet,
+            urgency,
+            self.codelet_id,
         )
