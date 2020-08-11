@@ -12,7 +12,7 @@ def test_spawn_codelet():
     with patch.object(
         BubbleChamber, "get_raw_perceptlet", return_value=perceptlet
     ), patch.object(random, "random", return_value=-1):
-        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), Mock())
+        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), Mock(), Mock())
         group_concept = GroupConcept()
         codelet = group_concept.spawn_codelet(bubble_chamber)
         assert GroupBuilder == type(codelet)

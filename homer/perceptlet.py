@@ -24,7 +24,7 @@ class Perceptlet(ABC):
     ):
         self.value = value
         self.location = location
-        self.percpetlet_id = "perceptlet_" + uuid.uuid4().hex
+        self.perceptlet_id = "perceptlet_" + uuid.uuid4().hex
         self.parent_id = parent_id
         self.neighbours = neighbours
         self.labels = set()

@@ -17,7 +17,7 @@ def test_engender_alternative_follow_up():
     with patch.object(
         BubbleChamber, "get_random_groups", return_value=[Mock(), Mock()]
     ):
-        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), Mock())
+        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), Mock(), Mock())
         correspondence_suggester = CorrespondenceSuggester(
             bubble_chamber, Mock(), Mock(), Mock(), Mock(), Mock()
         )

@@ -3,6 +3,7 @@ import random
 from homer.codelet import BubbleChamber
 from homer.codelet import Codelet
 from homer.errors import NoMoreCodelets
+from homer.logger import Logger
 
 
 class Coderack:
@@ -10,6 +11,7 @@ class Coderack:
         self.bubble_chamber = bubble_chamber
         self.codelets = []
         self.codelets_run = 0
+        self.logger = Logger()
 
     def select_and_run_codelet(self):
         codelet = self.select_codelet()

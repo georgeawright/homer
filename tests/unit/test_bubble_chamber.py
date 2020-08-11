@@ -20,7 +20,7 @@ def test_get_raw_perceptlet():
         raw_perceptlet.importance = 0.5
         raw_perceptlets.add(raw_perceptlet)
     workspace.raw_perceptlets = raw_perceptlets
-    bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+    bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
     raw_perceptlet = bubble_chamber.get_raw_perceptlet()
     assert raw_perceptlet in workspace.raw_perceptlets
 
@@ -28,7 +28,7 @@ def test_get_raw_perceptlet():
 def test_get_random_workspace_concept():
     concept_space = Mock()
     concept_space.workspace_concepts = {Mock() for _ in range(10)}
-    bubble_chamber = BubbleChamber(concept_space, Mock(), Mock(), Mock())
+    bubble_chamber = BubbleChamber(concept_space, Mock(), Mock(), Mock(), Mock())
     concept = bubble_chamber.get_random_workspace_concept()
     assert concept in concept_space.workspace_concepts
 
@@ -36,7 +36,7 @@ def test_get_random_workspace_concept():
 def test_get_random_groups():
     workspace = Mock()
     workspace.groups = {Mock() for _ in range(10)}
-    bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+    bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
     groups = bubble_chamber.get_random_groups(2)
     for group in groups:
         assert group in workspace.groups
@@ -45,7 +45,7 @@ def test_get_random_groups():
 def test_promote_to_worldview():
     with patch.object(Worldview, "add_perceptlet", return_value=None) as add_perceptlet:
         worldview = Worldview(Mock())
-        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), worldview)
+        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), worldview, Mock())
         perceptlet = Mock()
         bubble_chamber.promote_to_worldview(perceptlet)
     add_perceptlet.assert_called_once_with(perceptlet)
@@ -57,7 +57,7 @@ def test_demote_from_worldview():
     ) as remove_perceptlet:
         perceptlet = Mock()
         worldview = Worldview({perceptlet})
-        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), worldview)
+        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), worldview, Mock())
         bubble_chamber.demote_from_worldview(perceptlet)
     remove_perceptlet.assert_called_once_with(perceptlet)
 
@@ -66,7 +66,7 @@ def test_create_label_returns_label():
     with patch.object(Workspace, "add_label", return_value=None) as add_label:
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
         label = bubble_chamber.create_label(Mock(), Mock(), Mock(), Mock())
         assert Label == type(label)
     add_label.assert_called_once_with(label)
@@ -76,7 +76,7 @@ def test_create_group_returns_group():
     with patch.object(Workspace, "add_group", return_value=None) as add_group:
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
         perceptlet_1 = Perceptlet("value", [1, 2, 2], set(), Mock())
         perceptlet_2 = Perceptlet("value", [1, 2, 3], set(), Mock())
         group = bubble_chamber.create_group(
@@ -92,7 +92,7 @@ def test_create_correspondence_returns_correspondence():
     ) as add_correspondence:
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
         correspondence = bubble_chamber.create_correspondence(
             Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
         )
@@ -104,7 +104,7 @@ def test_create_relation_returns_relation():
     with patch.object(Workspace, "add_relation", return_value=None) as add_relation:
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
         relation = bubble_chamber.create_relation(
             Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
         )
@@ -116,7 +116,7 @@ def test_create_word_returns_word():
     with patch.object(Workspace, "add_word", return_value=None) as add_word:
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
         word = bubble_chamber.create_word(Mock(), Mock(), Mock(), Mock())
         assert Word == type(word)
     add_word.assert_called_once_with(word)
@@ -126,7 +126,7 @@ def test_create_textlet_returns_textlet():
     with patch.object(Workspace, "add_textlet", return_value=None) as add_text:
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock())
+        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
         textlet = bubble_chamber.create_textlet(Mock(), Mock(), Mock(), Mock(), Mock())
         assert Textlet == type(textlet)
     add_text.assert_called_once_with(textlet)

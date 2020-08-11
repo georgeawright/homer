@@ -6,6 +6,7 @@ from homer.concept import Concept
 from homer.concept_space import ConceptSpace
 from homer.errors import MissingPerceptletError
 from homer.event_trace import EventTrace
+from homer.logger import Logger
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.raw_perceptlet import RawPerceptlet
 from homer.perceptlets.group import Group
@@ -25,12 +26,14 @@ class BubbleChamber:
         event_trace: EventTrace,
         workspace: Workspace,
         worldview: Worldview,
+        logger: Logger,
     ):
         self.concept_space = concept_space
         self.event_trace = event_trace
         self.workspace = workspace
         self.worldview = worldview
         self.result = None
+        self.logger = logger
 
     @property
     def satisfaction(self) -> float:
@@ -120,6 +123,7 @@ class BubbleChamber:
     ) -> Label:
         label = Label(parent_concept, location, strength, parent_id)
         self.workspace.add_label(label)
+        self.logger.log(label)
         return label
 
     def create_group(
@@ -147,6 +151,7 @@ class BubbleChamber:
                 pass
         group = Group(value, location, neighbours, members, strength, parent_id)
         self.workspace.add_group(group)
+        self.logger.log(group)
         return group
 
     def create_correspondence(
@@ -162,6 +167,7 @@ class BubbleChamber:
             name, parent_concept, first_argument, second_argument, strength, parent_id,
         )
         self.workspace.add_correspondence(correspondence)
+        self.logger.log(correspondence)
         return correspondence
 
     def create_relation(
@@ -177,6 +183,7 @@ class BubbleChamber:
             name, parent_concept, first_argument, second_argument, strength, parent_id,
         )
         self.workspace.add_relation(relation)
+        self.logger.log(relation)
         return relation
 
     def create_word(
@@ -184,6 +191,7 @@ class BubbleChamber:
     ) -> Word:
         word = Word(text, parent_concept, strength, parent_id)
         self.workspace.add_word(word)
+        self.logger.log(word)
         return word
 
     def create_textlet(
@@ -196,4 +204,5 @@ class BubbleChamber:
     ) -> Textlet:
         textlet = Textlet(text, constituents, relations, strength, parent_id)
         self.workspace.add_textlet(textlet)
+        self.logger.log(textlet)
         return textlet
