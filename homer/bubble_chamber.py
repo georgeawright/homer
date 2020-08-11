@@ -83,6 +83,9 @@ class BubbleChamber:
         return random.sample(self.workspace.groups, amount)
 
     def get_random_workspace_concept(self) -> Concept:
+        return random.sample(self.concept_space.workspace_concepts, 1)[0]
+
+    def get_random_workspace_concept_by_depth(self) -> Concept:
         randomness = random.random()
         if randomness > 0.67:
             return random.sample(
