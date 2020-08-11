@@ -1,6 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.coderack import Coderack
 from homer.hyper_parameters import HyperParameters
+from homer.logger import Logger
 
 
 class Homer:
@@ -8,10 +9,12 @@ class Homer:
         self,
         bubble_chamber: BubbleChamber,
         coderack: Coderack,
+        logger: Logger,
         activation_update_frequency: int = HyperParameters.ACTIVATION_UPDATE_FREQUENCY,
     ):
         self.bubble_chamber = bubble_chamber
         self.coderack = coderack
+        self.logger = logger
         self.activation_update_frequency = activation_update_frequency
 
     @classmethod
@@ -24,6 +27,7 @@ class Homer:
 
     def run(self):
         while self.bubble_chamber.result is None:
+            self.logger.log(self.coderack)
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.print_status_update()
                 self.bubble_chamber.update_activations()

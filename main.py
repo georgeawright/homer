@@ -18,11 +18,14 @@ from homer.concept_space import ConceptSpace
 from homer.event_trace import EventTrace
 from homer.homer import Homer
 from homer.hyper_parameters import HyperParameters
+from homer.logger import Logger
 from homer.perceptlets.raw_perceptlet import RawPerceptlet
 from homer.perceptlets.raw_perceptlet_field import RawPerceptletField
 from homer.perceptlets.raw_perceptlet_field_sequence import RawPerceptletFieldSequence
 from homer.workspace import Workspace
 from homer.worldview import Worldview
+
+logger = Logger("logs")
 
 path_to_problem_file = "problems/temperature_problem_1.yaml"
 
@@ -133,11 +136,13 @@ workspace_concepts = {
 }
 
 concept_space = ConceptSpace(
-    perceptlet_types, correspondence_types, spaces, workspace_concepts,
+    perceptlet_types, correspondence_types, spaces, workspace_concepts, logger,
 )
 
-bubble_chamber = BubbleChamber(concept_space, event_trace, workspace, worldview)
-coderack = Coderack(bubble_chamber)
+bubble_chamber = BubbleChamber(
+    concept_space, event_trace, workspace, worldview, logger,
+)
+coderack = Coderack(bubble_chamber, logger)
 coderack.codelets = [
     BottomUpRawPerceptletLabeler(
         bubble_chamber,
@@ -149,5 +154,5 @@ coderack.codelets = [
     for _ in range(HyperParameters.NO_OF_STARTER_CODELETS)
 ]
 
-homer = Homer(bubble_chamber, coderack)
+homer = Homer(bubble_chamber, coderack, logger)
 homer.run()
