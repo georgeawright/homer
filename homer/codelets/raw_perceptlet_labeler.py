@@ -68,6 +68,7 @@ class RawPerceptletLabeler(Codelet):
         proximity_to_prototype: float,
         proportion_of_neighbours: float,
     ) -> float:
+        # TODO: tidy this up
         return fuzzy.OR(
             # concept_depth_rating,
             proximity_to_prototype,
