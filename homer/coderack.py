@@ -25,11 +25,11 @@ class Coderack:
             self.add_codelet(follow_up)
 
     def select_codelet(self) -> Codelet:
-        if len(self.codelets) < 1:
+        if len(self._codelets) < 1:
             self.get_more_codelets()
         codelet_choice = None
         highest_weight = 0
-        for codelet in self.codelets:
+        for codelet in self._codelets:
             weight = codelet.urgency + random.random() * self._randomness()
             if weight > highest_weight:
                 highest_weight = weight
@@ -37,7 +37,7 @@ class Coderack:
         if codelet_choice is None:
             print("No more codelets")
             exit()
-        self.codelets.remove(codelet_choice)
+        self._codelets.remove(codelet_choice)
         return codelet_choice
 
     def get_more_codelets(self):
