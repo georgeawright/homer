@@ -1,3 +1,5 @@
+import os
+import time
 import yaml
 
 from homer import fuzzy
@@ -25,7 +27,22 @@ from homer.perceptlets.raw_perceptlet_field_sequence import RawPerceptletFieldSe
 from homer.workspace import Workspace
 from homer.worldview import Worldview
 
-logger = Logger("logs")
+if not os.path.exists("logs"):
+    os.makedirs("logs")
+now = time.localtime()
+logging_directory = (
+    "logs/"
+    + str(now.tm_year)
+    + str(now.tm_mon)
+    + str(now.tm_mday)
+    + str(now.tm_hour)
+    + str(now.tm_min)
+    + str(now.tm_sec)
+)
+os.makedirs(logging_directory)
+os.makedirs(logging_directory + "/concepts")
+
+logger = Logger(logging_directory)
 
 path_to_problem_file = "problems/temperature_problem_1.yaml"
 
