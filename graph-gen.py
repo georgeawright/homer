@@ -45,7 +45,17 @@ def chart_stats(list_of_answers):
     pyplot.show()
 
 
-stats = collect_stats(100)
-chart_stats(stats)
+def line_graph(data):
+    x = [element[0] for element in data]
+    y = [element[1] for element in data]
+    pyplot.plot(x, y)
+    pyplot.show()
+
+
+# stats = collect_stats(100)
+# chart_stats(stats)
 
 # possibly add a scatter graph plotting satisfaction against frequency
+
+data = [[0, 0], [1, 0.5], [2, 1.0], [3, 1.0], [4, 0.8], [5, 0.2], [6, 0]]
+line_graph(data)
