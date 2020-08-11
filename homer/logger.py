@@ -1,4 +1,7 @@
+from __future__ import annotations
 import csv
+import os
+import time
 from typing import Any
 
 
@@ -6,6 +9,26 @@ class Logger:
     def __init__(self, log_directory: str = "logs"):
         self.log_directory = log_directory
         self.codelets_run = 0
+
+    @classmethod
+    def setup(cls, path_to_logs: str) -> Logger:
+        if not os.path.exists(path_to_logs):
+            os.makedirs(path_to_logs)
+        now = time.localtime()
+        logging_directory = (
+            path_to_logs
+            + "/"
+            + str(now.tm_year)
+            + str(now.tm_mon)
+            + str(now.tm_mday)
+            + str(now.tm_hour)
+            + str(now.tm_min)
+            + str(now.tm_sec)
+        )
+        os.makedirs(logging_directory)
+        os.makedirs(logging_directory + "/concepts")
+        logger = Logger(logging_directory)
+        return logger
 
     def log(self, item: Any):
         from homer.codelet import Codelet

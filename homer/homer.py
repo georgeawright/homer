@@ -1,7 +1,24 @@
 from homer.bubble_chamber import BubbleChamber
+from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
 from homer.coderack import Coderack
+from homer.concept_space import ConceptSpace
+from homer.concepts.correspondence_type import CorrespondenceType
+from homer.concepts.euclidean_concept import EuclideanConcept
+from homer.concepts.euclidean_space import EuclideanSpace
+from homer.concepts.perceptlet_types import (
+    CorrespondenceConcept,
+    CorrespondenceLabelConcept,
+    GroupConcept,
+    GroupLabelConcept,
+    LabelConcept,
+)
+from homer.event_trace import EventTrace
+from homer import fuzzy
 from homer.hyper_parameters import HyperParameters
 from homer.logger import Logger
+from homer.problem import Problem
+from homer.workspace import Workspace
+from homer.worldview import Worldview
 
 
 class Homer:
@@ -18,12 +35,121 @@ class Homer:
         self.activation_update_frequency = activation_update_frequency
 
     @classmethod
-    def setup(cls):
+    def setup(cls, path_to_logs: str, path_to_problem: str):
         """Set up every component and sub-component from a configuration file"""
-        # include
-        # codelet classifier weights
-        # concepts, including depths, prototypes, distance metrics
-        # workspace with raw perceptlets
+        logger = Logger.setup(path_to_logs)
+        problem = Problem(path_to_problem)
+        event_trace = EventTrace([])
+        workspace = Workspace(event_trace, problem.as_raw_perceptlet_field_sequence())
+        worldview = Worldview(set())
+
+        correspondence_concept = CorrespondenceConcept()
+        correspondence_label_concept = CorrespondenceLabelConcept()
+        group_concept = GroupConcept()
+        group_concept.connections.add(correspondence_concept)
+        group_label_concept = GroupLabelConcept()
+        label_concept = LabelConcept()
+        label_concept.connections.add(group_concept)
+        perceptlet_types = {
+            correspondence_concept,
+            correspondence_label_concept,
+            group_concept,
+            group_label_concept,
+            label_concept,
+        }
+        correspondence_types = {
+            CorrespondenceType(
+                "sameness",
+                lambda same_labels, proximity: fuzzy.AND(same_labels, proximity),
+            ),
+            CorrespondenceType(
+                "oppositeness",
+                lambda same_labels, proximity: fuzzy.AND(
+                    fuzzy.NOT(same_labels), fuzzy.NOT(proximity)
+                ),
+            ),
+            CorrespondenceType(
+                "extremeness",
+                lambda same_labels, proximity: fuzzy.AND(
+                    same_labels, fuzzy.NOT(proximity)
+                ),
+            ),
+        }
+        temperature_space = EuclideanSpace("temperature", 5, 1.5)
+        location_space = EuclideanSpace("location", 5, 1)
+        spaces = {temperature_space, location_space}
+        workspace_concepts = {
+            EuclideanConcept("cold", [4], temperature_space, depth=1, boundary=[7]),
+            EuclideanConcept("mild", [10], temperature_space, depth=1),
+            EuclideanConcept("warm", [16], temperature_space, depth=1),
+            EuclideanConcept("hot", [22], temperature_space, depth=1, boundary=[19]),
+            EuclideanConcept(
+                "north", [1, 2], location_space, depth=2, relevant_value="location"
+            ),
+            EuclideanConcept(
+                "south", [4, 2], location_space, depth=2, relevant_value="location"
+            ),
+            EuclideanConcept(
+                "east", [2.5, 3], location_space, depth=2, relevant_value="location"
+            ),
+            EuclideanConcept(
+                "west", [2.5, 1], location_space, depth=2, relevant_value="location"
+            ),
+            EuclideanConcept(
+                "northwest",
+                [0.5, 0.5],
+                location_space,
+                depth=2,
+                relevant_value="location",
+            ),
+            EuclideanConcept(
+                "northeast",
+                [0.5, 3.5],
+                location_space,
+                depth=2,
+                relevant_value="location",
+            ),
+            EuclideanConcept(
+                "southwest",
+                [0.5, 0.5],
+                location_space,
+                depth=2,
+                relevant_value="location",
+            ),
+            EuclideanConcept(
+                "southeast",
+                [4.5, 3.5],
+                location_space,
+                depth=2,
+                relevant_value="location",
+            ),
+            EuclideanConcept(
+                "midlands", [2.5, 2], location_space, depth=2, relevant_value="location"
+            ),
+        }
+
+        concept_space = ConceptSpace(
+            perceptlet_types, correspondence_types, spaces, workspace_concepts, logger,
+        )
+
+        bubble_chamber = BubbleChamber(
+            concept_space, event_trace, workspace, worldview, logger,
+        )
+        coderack = Coderack(bubble_chamber, logger)
+        codelets = [
+            BottomUpRawPerceptletLabeler(
+                bubble_chamber,
+                concept_space.get_perceptlet_type_by_name("label"),
+                bubble_chamber.get_raw_perceptlet(),
+                HyperParameters.STARTER_CODELET_URGENCY,
+                "",
+            )
+            for _ in range(HyperParameters.NO_OF_STARTER_CODELETS)
+        ]
+        for codelet in codelets:
+            coderack.add_codelet(codelet)
+
+        return Homer(bubble_chamber, coderack, logger)
 
     def run(self):
         while self.bubble_chamber.result is None:
