@@ -144,6 +144,7 @@ coderack.codelets = [
         concept_space.get_perceptlet_type_by_name("label"),
         bubble_chamber.get_raw_perceptlet(),
         HyperParameters.STARTER_CODELET_URGENCY,
+        "",
     )
     for _ in range(HyperParameters.NO_OF_STARTER_CODELETS)
 ]
