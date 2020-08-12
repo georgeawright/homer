@@ -27,7 +27,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
     def run(self):
         concept = self.bubble_chamber.get_random_workspace_concept()
         if self.target_perceptlet.has_label(concept):
-            self.perceptlet_type.decay_activation([])
+            self.perceptlet_type.decay_activation(self.target_perceptlet.location)
             return None
         else:
             confidence_of_class_membership = concept.proximity_to(

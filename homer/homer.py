@@ -177,19 +177,19 @@ class Homer:
         codelets_run = self.coderack.codelets_run
         label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "label"
-        ).activation_pattern.activation
+        ).activation_pattern.get_activation_as_scalar()
         group_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "group"
-        ).activation_pattern.activation
+        ).activation_pattern.get_activation_as_scalar()
         group_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "group-label"
-        ).activation_pattern.activation
+        ).activation_pattern.get_activation_as_scalar()
         correspondence_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "correspondence"
-        ).activation_pattern.activation
+        ).activation_pattern.get_activation_as_scalar()
         correspondence_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "correspondence-label"
-        ).activation_pattern.activation
+        ).activation_pattern.get_activation_as_scalar()
         print(
             "================================================================================"
         )
