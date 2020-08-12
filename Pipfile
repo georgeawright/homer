@@ -10,6 +10,7 @@ matplotlib = "*"
 flake8 = "*"
 pytest = "*"
 pyyaml = "*"
+graphviz = "*"
 
 [requires]
 python_version = "3.8"
