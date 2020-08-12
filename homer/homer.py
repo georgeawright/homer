@@ -158,7 +158,11 @@ class Homer:
                 self.print_status_update()
                 self.bubble_chamber.update_activations()
                 self.coderack.get_more_codelets()
-            self.coderack.select_and_run_codelet()
+            try:
+                self.coderack.select_and_run_codelet()
+            except NoMoreCodelets:
+                self.logger.log("no more codelets")
+                break
         return {
             "result": self.bubble_chamber.result,
             "satisfaction": self.bubble_chamber.satisfaction,
