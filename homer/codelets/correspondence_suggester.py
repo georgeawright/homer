@@ -26,6 +26,9 @@ class CorrespondenceSuggester(Codelet):
         self.urgency = urgency
 
     def run(self):
+        if len(self.target_group_a.labels) == 0 or len(self.target_group_b.labels) == 0:
+            self.perceptlet_type.decay_activation(self.target_group_a.location)
+            return self._engender_alternative_follow_up()
         space = self.target_group_a.get_random_label().parent_concept.space
         if self.target_group_b.has_label_in_space(
             space
