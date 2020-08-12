@@ -20,6 +20,9 @@ class WorkspaceActivationPattern(ActivationPattern):
         workspace_width: int = HyperParameters.WORKSPACE_WIDTH,
     ):
         self.activation_coefficient = activation_coefficient
+        self.depth = depth
+        self.height = height
+        self.width = width
         self.activation_matrix = numpy.zeros([depth, height, width])
         self.activation_buffer = numpy.zeros([depth, height, width])
         self.depth_divisor = workspace_depth / depth
@@ -76,7 +79,7 @@ class WorkspaceActivationPattern(ActivationPattern):
         self.activation_buffer = numpy.zeros_like(self.activation_buffer)
 
     def _depth_height_width(self, location: List[Union[float, int]]) -> Tuple[int]:
-        depth = math.floor(location[0] / self.depth_divisor)
-        height = math.floor(location[1] / self.height_divisor)
-        width = math.floor(location[2] / self.width_divisor)
+        depth = min(math.floor(location[0] / self.depth_divisor), self.depth - 1)
+        height = min(math.floor(location[1] / self.height_divisor), self.height - 1)
+        width = min(math.floor(location[2] / self.width_divisor), self.width - 1)
         return (depth, height, width)
