@@ -79,9 +79,9 @@ class Concept:
         self.activation_pattern.update_activation()
 
     def spread_activation(self) -> None:
-        if self.is_fully_activated():
-            for connection in self.connections:
-                connection.boost_activation_evenly(0.1)
+        signal = self.activation_pattern.get_spreading_signal()
+        for connection in self.connections:
+            connection.boost_activation_with_signal(signal)
 
     def distance_from(self, candidate_instance: Any) -> float:
         """Return distance from prototype to candidate instance."""
@@ -119,6 +119,9 @@ class Concept:
 
     def boost_activation_evenly(self, amount: float):
         self.activation_pattern.boost_activation_evenly(amount)
+
+    def boost_activation_with_signal(self, signal: Union[float, list]):
+        self.activation_pattern.boost_activation_with_signal(signal)
 
     def decay_activation(self, location):
         self.activation_pattern.decay_activation(location)

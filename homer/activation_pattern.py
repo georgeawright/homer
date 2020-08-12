@@ -18,6 +18,10 @@ class ActivationPattern(ABC):
         pass
 
     @abstractmethod
+    def get_spreading_signal(self) -> Union[float, list]:
+        pass
+
+    @abstractmethod
     def is_fully_activated(self) -> bool:
         pass
 
@@ -27,6 +31,10 @@ class ActivationPattern(ABC):
 
     @abstractmethod
     def boost_activation_evenly(self, amount: float):
+        pass
+
+    @abstractmethod
+    def boost_activation_with_signal(self, signal: Union[float, list]):
         pass
 
     @abstractmethod

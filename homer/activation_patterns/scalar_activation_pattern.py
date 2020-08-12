@@ -15,6 +15,9 @@ class ScalarActivationPattern(ActivationPattern):
     def get_activation_as_scalar(self) -> float:
         return self.activation
 
+    def get_spreading_signal(self) -> float:
+        return 0.1 * self.is_fully_activated()
+
     def is_fully_activated(self) -> bool:
         return self.activation >= 1.0
 
@@ -22,7 +25,10 @@ class ScalarActivationPattern(ActivationPattern):
         self.activation_buffer += self.activation + amount * self.activation_coefficient
 
     def boost_activation_evenly(self, amount: float):
-        self.activation_buffer += self.activation + amount * self.activation_coefficient
+        self.boost_activation(amount, [])
+
+    def boost_activation_with_signal(self, signal: float):
+        self.boost_activation(signal, [])
 
     def decay_activation(self, location: List[Union[float, int]]):
         self.activation_buffer -= (
