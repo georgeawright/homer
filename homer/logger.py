@@ -2,7 +2,9 @@ from __future__ import annotations
 import csv
 import os
 import time
-from typing import Any
+from typing import Any, List
+
+from matplotlib import pyplot
 
 
 class Logger:
@@ -135,3 +137,18 @@ class Logger:
                     size: perceptlet.size,
                 }
             )
+
+    def graph_concepts(self, concept_names: List[str], file_name: str):
+        for concept_name in concept_names:
+            concept_file = self.log_directory + "/concepts/" + concept_name + ".csv"
+            if not os.path.exists(concept_file):
+                raise Exception(f"No activation data for {concept_name}")
+            with open(concept_file, "r") as f:
+                data = list(csv.reader(f))
+                x = [float(element[0]) for element in data]
+                y = [float(element[1]) for element in data]
+                pyplot.plot(x, y, label=concept_name)
+        pyplot.xlabel("Codelets Run")
+        pyplot.ylabel("Activation")
+        pyplot.legend(loc="best")
+        pyplot.savefig(file_name + ".png")
