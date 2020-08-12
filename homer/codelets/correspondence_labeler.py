@@ -43,8 +43,12 @@ class CorrespondenceLabeler(Codelet):
                     f"CORRESPONDENCE LABELED: {self.target_correspondence.target_group_a.location} to {self.target_correspondence.target_group_b.location} with {concept.name}"
                 )
                 confidence = max(confidence, confidence_of_affinity)
+            else:
+                self.perceptlet_type.decay_activation(
+                    self.target_correspondence.location
+                )
         if confidence > self.CONFIDENCE_THRESHOLD:
-            self._engender_follow_up(confidence)
+            return self._engender_follow_up(confidence)
 
     def _engender_follow_up(self, urgency: float) -> Codelet:
         from homer.codelets.correspondence_builder import CorrespondenceBuilder
