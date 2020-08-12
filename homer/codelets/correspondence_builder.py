@@ -48,10 +48,12 @@ class CorrespondenceBuilder(Codelet):
                 confidence_of_correspondence,
                 self.codelet_id,
             )
-            print(
-                f"CORRESPONDENCE: {self.target_group_a.value} at {self.target_group_a.location} and {self.target_group_b.value} at {self.target_group_b.location} in space {self.parent_space.name}"
+            self.print_message()
+            return self._engender_follow_up(
+                correspondence, confidence_of_correspondence
             )
-            self._engender_follow_up(correspondence, confidence_of_correspondence)
+        else:
+            self.perceptlet_type.decay_activation(self.target_group_a.location)
         return None
 
     def _calculate_confidence(self) -> float:
@@ -87,4 +89,9 @@ class CorrespondenceBuilder(Codelet):
             correspondence,
             urgency,
             self.codelet_id,
+        )
+
+    def print_message(self):
+        print(
+            f"CORRESPONDENCE: {self.target_group_a.value} at {self.target_group_a.location} and {self.target_group_b.value} at {self.target_group_b.location} in space {self.parent_space.name}"
         )
