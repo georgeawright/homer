@@ -24,6 +24,6 @@ def test_select_codelet(
         bubble_chamber = Mock()
         bubble_chamber.satisfaction = bubble_chamber_satisfaction
         coderack = Coderack(bubble_chamber, Mock())
-        coderack.codelets = codelets
+        coderack._codelets = codelets
         codelet = coderack.select_codelet()
         assert expected_urgency == codelet.urgency
