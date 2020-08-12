@@ -1,4 +1,5 @@
 import math
+import random
 import statistics
 from typing import List, Tuple, Union
 
@@ -37,13 +38,18 @@ class WorkspaceActivationPattern(ActivationPattern):
         return numpy.mean(self.activation_matrix)
 
     def get_spreading_signal(self) -> numpy.ndarray:
-        return [
-            [[0.1 if activation == 1 else 0 for activation in row] for row in layer]
-            for layer in self.activation_matrix
-        ]
+        return numpy.array(
+            [
+                [[0.1 if activation == 1 else 0 for activation in row] for row in layer]
+                for layer in self.activation_matrix
+            ]
+        )
 
     def is_fully_activated(self) -> bool:
         return self.get_activation_as_scalar() >= 1.0
+
+    def is_high(self) -> bool:
+        return 1.0 in self.activation_matrix
 
     def boost_activation(self, amount: float, location: List[Union[float, int]]):
         depth, height, width = self._depth_height_width(location)
@@ -75,6 +81,18 @@ class WorkspaceActivationPattern(ActivationPattern):
         )
         self.activation_matrix = numpy.minimum(
             self.activation_matrix, numpy.ones_like(self.activation_matrix)
+        )
+        self.activation_matrix = numpy.array(
+            [
+                [
+                    [
+                        1.0 if activation > 0.5 and random.randint(0, 1) else activation
+                        for activation in row
+                    ]
+                    for row in layer
+                ]
+                for layer in self.activation_matrix
+            ]
         )
         self.activation_buffer = numpy.zeros_like(self.activation_buffer)
 

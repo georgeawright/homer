@@ -21,6 +21,9 @@ class ScalarActivationPattern(ActivationPattern):
     def is_fully_activated(self) -> bool:
         return self.activation >= 1.0
 
+    def is_high(self) -> bool:
+        return self.activation >= 1.0
+
     def boost_activation(self, amount: float, location: List[Union[float, int]]):
         self.activation_buffer += self.activation + amount * self.activation_coefficient
 

@@ -10,9 +10,8 @@ class LabelConcept(PerceptletType):
         PerceptletType.__init__(self, name)
 
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
-        activation = self.get_activation_as_scalar()
-        if activation > random.random():
-            target_perceptlet = bubble_chamber.get_raw_perceptlet()
+        if self.activation_pattern.is_high():
+            target_perceptlet = bubble_chamber.get_unhappy_raw_perceptlet()
             return BottomUpRawPerceptletLabeler(
                 bubble_chamber,
                 self,

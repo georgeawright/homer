@@ -1,6 +1,7 @@
 import math
 import pytest
-from unittest.mock import Mock
+import random
+from unittest.mock import Mock, patch
 
 import numpy
 
@@ -211,9 +212,10 @@ def test_boost_activation(
         workspace_height=workspace_height,
         workspace_width=workspace_width,
     )
-    activation_pattern.boost_activation(amount, location)
-    activation_pattern.update_activation()
-    assert numpy.array_equal(expected_matrix, activation_pattern.activation_matrix)
+    with patch.object(random, "randint", return_value=0):
+        activation_pattern.boost_activation(amount, location)
+        activation_pattern.update_activation()
+        assert numpy.array_equal(expected_matrix, activation_pattern.activation_matrix)
 
 
 @pytest.mark.parametrize(
@@ -227,11 +229,14 @@ def test_boost_activation(
     ],
 )
 def test_boost_activation_evenly(activation_matrix, amount, expected_activation):
-    activation_pattern = WorkspaceActivationPattern(0.5, depth=1, height=3, width=2)
-    activation_pattern.activation_matrix = numpy.array(activation_matrix)
-    activation_pattern.boost_activation_evenly(amount)
-    activation_pattern.update_activation()
-    assert numpy.array_equal(expected_activation, activation_pattern.activation_matrix)
+    with patch.object(random, "randint", return_value=0):
+        activation_pattern = WorkspaceActivationPattern(0.5, depth=1, height=3, width=2)
+        activation_pattern.activation_matrix = numpy.array(activation_matrix)
+        activation_pattern.boost_activation_evenly(amount)
+        activation_pattern.update_activation()
+        assert numpy.array_equal(
+            expected_activation, activation_pattern.activation_matrix
+        )
 
 
 @pytest.mark.parametrize(
@@ -245,8 +250,11 @@ def test_boost_activation_evenly(activation_matrix, amount, expected_activation)
     ],
 )
 def test_boost_activation_with_signal(activation_matrix, signal, expected_activation):
-    activation_pattern = WorkspaceActivationPattern(0.5, depth=1, height=3, width=2)
-    activation_pattern.activation_matrix = numpy.array(activation_matrix)
-    activation_pattern.boost_activation_with_signal(signal)
-    activation_pattern.update_activation()
-    assert numpy.array_equal(expected_activation, activation_pattern.activation_matrix)
+    with patch.object(random, "randint", return_value=0):
+        activation_pattern = WorkspaceActivationPattern(0.5, depth=1, height=3, width=2)
+        activation_pattern.activation_matrix = numpy.array(activation_matrix)
+        activation_pattern.boost_activation_with_signal(signal)
+        activation_pattern.update_activation()
+        assert numpy.array_equal(
+            expected_activation, activation_pattern.activation_matrix
+        )

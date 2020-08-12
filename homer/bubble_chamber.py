@@ -65,12 +65,11 @@ class BubbleChamber:
         return perceptlet_choice
 
     def get_unhappy_raw_perceptlet(self) -> Optional[RawPerceptlet]:
-        perceptlet_choice = None
-        unhappiness = 0.5
-        for perceptlet in self.workspace.raw_perceptlets:
-            if perceptlet.unhappiness > 0.1 and perceptlet.unhappiness < unhappiness:
+        perceptlets = random.sample(self.workspace.raw_perceptlets, 10)
+        perceptlet_choice = perceptlets[0]
+        for perceptlet in perceptlets:
+            if perceptlet.unhappiness < perceptlet_choice.unhappiness:
                 perceptlet_choice = perceptlet
-                unhappiness = perceptlet.unhappiness
         return perceptlet_choice
 
     def get_random_correspondence(self) -> Correspondence:

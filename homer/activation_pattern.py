@@ -26,6 +26,10 @@ class ActivationPattern(ABC):
         pass
 
     @abstractmethod
+    def is_high(self) -> bool:
+        pass
+
+    @abstractmethod
     def boost_activation(self, amount: float, location: List):
         pass
 
