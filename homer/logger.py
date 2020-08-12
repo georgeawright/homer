@@ -4,6 +4,7 @@ import os
 import time
 from typing import Any, List
 
+from graphviz import Digraph
 from matplotlib import pyplot
 
 
@@ -152,3 +153,17 @@ class Logger:
         pyplot.ylabel("Activation")
         pyplot.legend(loc="best")
         pyplot.savefig(file_name + ".png")
+
+    def graph_codelets(self, file_name: str):
+        family_tree = Digraph(
+            "Codelets",
+            filename=file_name,
+            node_attr={"color": "lightblue2", "style": "filled"},
+        )
+        family_tree.attr(size="6, 6")
+        codelets_file = self.log_directory + "/codelets.csv"
+        with open(codelets_file, "r") as f:
+            data = list(csv.reader(f))
+            for row in data:
+                family_tree.edge(row[0], row[1])
+        family_tree.view()

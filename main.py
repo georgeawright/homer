@@ -14,3 +14,5 @@ homer.logger.graph_concepts(
     ["label", "group", "group_label", "correspondence", "correspondence_label"],
     "perceptlet_types",
 )
+
+homer.logger.graph_codelets("codelets_family_tree")
