@@ -32,7 +32,9 @@ class CorrespondenceLabeler(Codelet):
         for concept in self.bubble_chamber.concept_space.correspondence_types:
             confidence_of_affinity = self._calculate_confidence(concept)
             if confidence_of_affinity > self.CONFIDENCE_THRESHOLD:
-                self.perceptlet_type.boost_activation(confidence_of_affinity, [])
+                self.perceptlet_type.boost_activation(
+                    confidence_of_affinity, self.target_correspondence.location
+                )
                 label = self.bubble_chamber.create_label(
                     concept,
                     self.target_correspondence.location,
