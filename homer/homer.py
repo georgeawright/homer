@@ -12,6 +12,7 @@ from homer.concepts.perceptlet_types import (
     GroupLabelConcept,
     LabelConcept,
 )
+from homer.errors import NoMoreCodelets
 from homer.event_trace import EventTrace
 from homer import fuzzy
 from homer.hyper_parameters import HyperParameters
@@ -161,8 +162,11 @@ class Homer:
             try:
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
+                print("no more codelets")
                 self.logger.log("no more codelets")
                 break
+            except Exception as e:
+                raise e
         return {
             "result": self.bubble_chamber.result,
             "satisfaction": self.bubble_chamber.satisfaction,

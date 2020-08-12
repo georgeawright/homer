@@ -30,7 +30,7 @@ class GroupLabeler(Codelet):
     def run(self) -> Optional[Codelet]:
         target_concept = self._get_target_concept()
         if self.target_group.has_label(target_concept):
-            self.perceptlet_type.decay_activation([])
+            self.perceptlet_type.decay_activation(self.target_group.location)
             return None
         confidence_of_class_affinity = self._calculate_confidence(target_concept)
         if confidence_of_class_affinity > self.CONFIDENCE_THRESHOLD:

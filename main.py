@@ -5,10 +5,7 @@ path_to_problem = "problems/temperature_problem_1.yaml"
 
 homer = Homer.setup(path_to_logs, path_to_problem)
 
-try:
-    homer.run()
-except Exception:
-    pass
+homer.run()
 
 homer.logger.graph_concepts(
     ["label", "group", "group_label", "correspondence", "correspondence_label"],

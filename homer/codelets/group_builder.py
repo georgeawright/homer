@@ -30,7 +30,7 @@ class GroupBuilder(Codelet):
 
     def run(self) -> Optional[Codelet]:
         for _ in range(len(self.target_perceptlet.groups)):
-            self.perceptlet_type.decay_activation([])
+            self.perceptlet_type.decay_activation(self.target_perceptlet.location)
         neighbour = self.target_perceptlet.get_random_neighbour()
         confidence_of_group_affinity = self._calculate_confidence(
             self.target_perceptlet, neighbour

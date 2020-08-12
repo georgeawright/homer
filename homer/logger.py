@@ -51,6 +51,7 @@ class Logger:
             return self._log_perceptlet(item)
 
     def _log_message(self, message):
+        print(message)
         messages_file = self.log_directory + "/messages.txt"
         with open(messages_file, "a") as f:
             f.write(message + "\n")
@@ -143,7 +144,8 @@ class Logger:
         for concept_name in concept_names:
             concept_file = self.log_directory + "/concepts/" + concept_name + ".csv"
             if not os.path.exists(concept_file):
-                raise Exception(f"No activation data for {concept_name}")
+                print(f"No activation data for {concept_name}")
+                continue
             with open(concept_file, "r") as f:
                 data = list(csv.reader(f))
                 x = [float(element[0]) for element in data]
@@ -152,7 +154,7 @@ class Logger:
         pyplot.xlabel("Codelets Run")
         pyplot.ylabel("Activation")
         pyplot.legend(loc="best")
-        pyplot.savefig(file_name + ".png")
+        pyplot.savefig(f"{self.log_directory}/{file_name}.png")
 
     def graph_codelets(self, file_name: str):
         family_tree = Digraph(

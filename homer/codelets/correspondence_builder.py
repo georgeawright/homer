@@ -86,6 +86,7 @@ class CorrespondenceBuilder(Codelet):
             self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
                 "correspondence-label"
             ),
+            self.parent_space,
             correspondence,
             urgency,
             self.codelet_id,
