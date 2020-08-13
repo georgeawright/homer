@@ -4,17 +4,12 @@ from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.concepts.perceptlet_type import PerceptletType
-from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
 
 from homer.codelets.group_labeler import GroupLabeler
-from homer.perceptlets.group import Group
 
 
 class GroupBuilder(Codelet):
-
-    CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
-
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
@@ -27,55 +22,48 @@ class GroupBuilder(Codelet):
         self.perceptlet_type = perceptlet_type
         self.target_perceptlet = target_perceptlet
         self.urgency = urgency
+        self.parent_concept = None
 
-    def run(self) -> Optional[Codelet]:
+    def _passes_preliminary_checks(self) -> bool:
         for _ in range(len(self.target_perceptlet.groups)):
             self.perceptlet_type.decay_activation(self.target_perceptlet.location)
-        neighbour = self.target_perceptlet.get_random_neighbour()
-        confidence_of_group_affinity = self._calculate_confidence(
-            self.target_perceptlet, neighbour
-        )
-        if confidence_of_group_affinity > self.CONFIDENCE_THRESHOLD:
-            self.perceptlet_type.boost_activation(
-                confidence_of_group_affinity, self.target_perceptlet.location
-            )
-            group = self.bubble_chamber.create_group(
-                {self.target_perceptlet, neighbour},
-                confidence_of_group_affinity,
-                self.codelet_id,
-            )
-            self.target_perceptlet.add_group(group)
-            neighbour.add_group(group)
-            print(
-                f"GROUP BUILT: {self.target_perceptlet.value} at {self.target_perceptlet.location} and {neighbour.value} at {neighbour.location}, confidence: {group.strength}"
-            )
-            return self._engender_follow_up(group, confidence_of_group_affinity)
+        return True
+
+    def _fizzle(self):
+        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
         return None
 
-    def _calculate_confidence(
-        self, perceptlet_a: Perceptlet, perceptlet_b: Perceptlet,
-    ) -> float:
+    def _calculate_confidence(self):
+        self.second_target_perceptlet = self.target_perceptlet.get_random_neighbour()
         common_concepts = set.intersection(
-            {label.parent_concept for label in perceptlet_a.labels},
-            {label.parent_concept for label in perceptlet_b.labels},
+            {label.parent_concept for label in self.target_perceptlet.labels},
+            {label.parent_concept for label in self.second_target_perceptlet.labels},
         )
         distances = [
             concept.proximity_between(
-                perceptlet_a.get_value(concept), perceptlet_b.get_value(concept),
+                self.target_perceptlet.get_value(concept),
+                self.second_target_perceptlet.get_value(concept),
             )
             for concept in common_concepts
         ]
-        if distances == []:
-            return 0.0
-        return fuzzy.OR(*distances)
+        self.confidence = 0.0 if distances == [] else fuzzy.OR(*distances)
 
-    def _engender_follow_up(self, group: Group, confidence: float) -> Codelet:
+    def _process_perceptlet(self):
+        self.group = self.bubble_chamber.create_group(
+            {self.target_perceptlet, self.second_target_perceptlet},
+            self.confidence,
+            self.codelet_id,
+        )
+        self.target_perceptlet.add_group(self.group)
+        self.second_target_perceptlet.add_group(self.group)
+
+    def _engender_follow_up(self) -> GroupLabeler:
         return GroupLabeler(
             self.bubble_chamber,
             self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
                 "group-label"
             ),
-            group,
-            confidence,
+            self.group,
+            self.confidence,
             self.codelet_id,
         )

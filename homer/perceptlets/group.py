@@ -6,6 +6,7 @@ from typing import Any, List, Set
 from homer.errors import MissingPerceptletError
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
+from homer.perceptlets.correspondence import Correspondence
 from homer.perceptlets.relation import Relation
 
 
@@ -80,6 +81,9 @@ class Group(Perceptlet):
 
     def add_group(self, group: Group):
         self.groups.add(group)
+
+    def add_correspondence(self, correspondence: Correspondence):
+        self.correspondences.add(correspondence)
 
     def add_relation(self, relation: Relation):
         self.relations.add(relation)

@@ -53,6 +53,12 @@ class CorrespondenceLabeler(Codelet):
         if confidence > self.CONFIDENCE_THRESHOLD:
             return self._engender_follow_up(confidence)
 
+    def _passes_preliminary_checks(self) -> bool:
+        return True
+
+    def _fizzle(self):
+        return None
+
     def _calculate_confidence(self, correspondence_type: CorrespondenceType) -> float:
         number_of_shared_labels = len(
             set.intersection(
