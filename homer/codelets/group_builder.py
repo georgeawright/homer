@@ -4,6 +4,7 @@ from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.concepts.perceptlet_type import PerceptletType
+from homer.errors import MissingPerceptletError
 from homer.perceptlet import Perceptlet
 
 from homer.codelets.group_labeler import GroupLabeler
@@ -27,6 +28,12 @@ class GroupBuilder(Codelet):
     def _passes_preliminary_checks(self) -> bool:
         for _ in range(len(self.target_perceptlet.groups)):
             self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        try:
+            self.second_target_perceptlet = (
+                self.target_perceptlet.get_random_neighbour()
+            )
+        except MissingPerceptletError:
+            return False
         return True
 
     def _fizzle(self):
@@ -34,7 +41,6 @@ class GroupBuilder(Codelet):
         return None
 
     def _calculate_confidence(self):
-        self.second_target_perceptlet = self.target_perceptlet.get_random_neighbour()
         common_concepts = set.intersection(
             {label.parent_concept for label in self.target_perceptlet.labels},
             {label.parent_concept for label in self.second_target_perceptlet.labels},

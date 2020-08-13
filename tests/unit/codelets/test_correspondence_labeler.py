@@ -8,5 +8,6 @@ def test_engender_follow_up():
     correspondence_labeler = CorrespondenceLabeler(
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
-    follow_up = correspondence_labeler._engender_follow_up(Mock())
+    correspondence_labeler.confidence = Mock()
+    follow_up = correspondence_labeler._engender_follow_up()
     assert CorrespondenceBuilder == type(follow_up)

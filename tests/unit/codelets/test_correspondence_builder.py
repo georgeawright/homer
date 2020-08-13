@@ -9,7 +9,7 @@ from homer.perceptlets.group import Group
 
 @pytest.mark.parametrize(
     "both_have_labels_in_space, proximity, number_of_common_labels, expected",
-    [(True, 1.0, 1, 1.0), (False, 1.0, 0, 0.0), (True, 0.5, 1, 0.5)],
+    [(True, 1.0, 1, 1.0), (False, 1.0, 0, 1.0), (True, 0.5, 1, 0.5)],
 )
 def test_calculate_confidence(
     both_have_labels_in_space, proximity, number_of_common_labels, expected
@@ -34,12 +34,15 @@ def test_calculate_confidence(
             Mock(),
             Mock(),
         )
-        assert expected == correspondence_builder._calculate_confidence()
+        correspondence_builder._calculate_confidence()
+        assert expected == correspondence_builder.confidence
 
 
 def test_engender_follow_up():
     correspondence_builder = CorrespondenceBuilder(
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
-    follow_up = correspondence_builder._engender_follow_up(Mock(), Mock())
+    correspondence_builder.correspondence = Mock()
+    correspondence_builder.confidence = Mock()
+    follow_up = correspondence_builder._engender_follow_up()
     assert CorrespondenceLabeler == type(follow_up)

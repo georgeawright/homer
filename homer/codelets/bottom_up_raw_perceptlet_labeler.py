@@ -56,7 +56,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
         )
 
     def _engender_alternative_follow_up(self) -> BottomUpRawPerceptletLabeler:
-        new_target_perceptlet = self.bubble_chamber.get_raw_perceptlet()
+        new_target_perceptlet = self.bubble_chamber.get_unhappy_raw_perceptlet()
         perceptlet_type_activation = self.perceptlet_type.get_activation(
             new_target_perceptlet.location
         )

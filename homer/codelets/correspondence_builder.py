@@ -1,4 +1,4 @@
-from homer import fuzzy
+rom homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.concept import Concept

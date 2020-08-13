@@ -19,8 +19,9 @@ def test_calculate_confidence():
         candidate = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock())
         candidate.add_label(label_2)
         codelet = GroupExtender(Mock(), Mock(), group, Mock(), Mock())
-        confidence = codelet._calculate_confidence(candidate)
-        assert expected == confidence
+        codelet.second_target_perceptlet = candidate
+        codelet._calculate_confidence()
+        assert expected == codelet.confidence
 
 
 def test_calculate_confidence_with_no_common_concepts():
@@ -28,11 +29,13 @@ def test_calculate_confidence_with_no_common_concepts():
     group = Group(Mock(), [0, 1, 2], Mock(), Mock(), Mock(), Mock())
     candidate = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock())
     codelet = GroupExtender(Mock(), Mock(), group, Mock(), Mock())
-    confidence = codelet._calculate_confidence(candidate)
-    assert expected == confidence
+    codelet.second_target_perceptlet = candidate
+    codelet._calculate_confidence()
+    assert expected == codelet.confidence
 
 
 def test_engender_follow_up():
     codelet = GroupExtender(Mock(), Mock(), Mock(), Mock(), Mock())
-    follow_up = codelet.engender_follow_up(Mock())
+    codelet.confidence = Mock()
+    follow_up = codelet._engender_follow_up()
     assert GroupExtender == type(follow_up)
