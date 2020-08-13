@@ -58,6 +58,10 @@ class Logger:
 
     def _log_codelet(self, codelet):
         """log the birth of a codelet"""
+        codelet_type_name = type(codelet).__name__
+        self._log_message(
+            f"    + {codelet_type_name} spawned - urgency: {codelet.urgency}"
+        )
         codelets_file = self.log_directory + "/codelets.csv"
         with open(codelets_file, "a") as f:
             codelet_id = "CodeletID"
@@ -107,6 +111,11 @@ class Logger:
 
     def _log_perceptlet(self, perceptlet):
         """log the creation of a perceptlet"""
+        perceptlet_type_name = type(perceptlet).__name__
+        self._log_message(
+            f"{perceptlet_type_name} created - value: {perceptlet.value} "
+            + f"location: {perceptlet.location}; strength: {perceptlet.strength}"
+        )
         perceptlets_file = self.log_directory + "/perceptlets.csv"
         with open(perceptlets_file, "a") as f:
             perceptlet_id = "PerceptletID"
@@ -132,7 +141,7 @@ class Logger:
                 {
                     perceptlet_id: perceptlet.perceptlet_id,
                     parent_id: perceptlet.parent_id,
-                    perceptlet_type: type(perceptlet),
+                    perceptlet_type: perceptlet_type_name,
                     birth_time: self.codelets_run,
                     location: perceptlet.location,
                     value: perceptlet.value,
