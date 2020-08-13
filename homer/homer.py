@@ -1,3 +1,5 @@
+import time
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
 from homer.coderack import Coderack
@@ -138,6 +140,7 @@ class Homer:
 
     def run(self):
         while self.bubble_chamber.result is None:
+            time.sleep(2)
             self.logger.log(self.coderack)
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.print_status_update()
