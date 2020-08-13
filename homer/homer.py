@@ -85,44 +85,28 @@ class Homer:
             EuclideanConcept("warm", [16], temperature_space, depth=1),
             EuclideanConcept("hot", [22], temperature_space, depth=1, boundary=[19]),
             EuclideanConcept(
-                "north", [1, 2], location_space, depth=2, relevant_value="location"
+                "north", [0, 2], location_space, depth=2, relevant_value="location"
             ),
             EuclideanConcept(
-                "south", [4, 2], location_space, depth=2, relevant_value="location"
+                "south", [5, 2], location_space, depth=2, relevant_value="location"
             ),
             EuclideanConcept(
-                "east", [2.5, 3], location_space, depth=2, relevant_value="location"
+                "east", [2.5, 4], location_space, depth=2, relevant_value="location"
             ),
             EuclideanConcept(
-                "west", [2.5, 1], location_space, depth=2, relevant_value="location"
+                "west", [2.5, 0], location_space, depth=2, relevant_value="location"
             ),
             EuclideanConcept(
-                "northwest",
-                [0.5, 0.5],
-                location_space,
-                depth=2,
-                relevant_value="location",
+                "northwest", [0, 0], location_space, depth=2, relevant_value="location",
             ),
             EuclideanConcept(
-                "northeast",
-                [0.5, 3.5],
-                location_space,
-                depth=2,
-                relevant_value="location",
+                "northeast", [0, 4], location_space, depth=2, relevant_value="location",
             ),
             EuclideanConcept(
-                "southwest",
-                [0.5, 0.5],
-                location_space,
-                depth=2,
-                relevant_value="location",
+                "southwest", [5, 0], location_space, depth=2, relevant_value="location",
             ),
             EuclideanConcept(
-                "southeast",
-                [4.5, 3.5],
-                location_space,
-                depth=2,
-                relevant_value="location",
+                "southeast", [5, 4], location_space, depth=2, relevant_value="location",
             ),
             EuclideanConcept(
                 "midlands", [2.5, 2], location_space, depth=2, relevant_value="location"
