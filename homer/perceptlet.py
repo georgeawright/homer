@@ -86,6 +86,14 @@ class Perceptlet(ABC):
     def get_random_neighbour(self) -> Perceptlet:
         return random.sample(self.neighbours, 1)[0]
 
+    def get_unhappy_neighbour(self) -> Perceptlet:
+        perceptlets = random.sample(self.neighbours, len(self.neighbours) // 2)
+        perceptlet_choice = perceptlets[0]
+        for perceptlet in perceptlets:
+            if perceptlet.unhappiness < perceptlet_choice.unhappiness:
+                perceptlet_choice = perceptlet
+        return perceptlet_choice
+
     def proportion_of_neighbours_with_label(self, concept: Concept) -> float:
         return self.number_of_neighbours_with_label(concept) / len(self.neighbours)
 

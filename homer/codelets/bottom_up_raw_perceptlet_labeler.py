@@ -45,7 +45,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
         self.target_perceptlet.add_label(label)
 
     def _engender_follow_up(self) -> RawPerceptletLabeler:
-        new_target_perceptlet = self.target_perceptlet.get_random_neighbour()
+        new_target_perceptlet = self.target_perceptlet.get_unhappy_neighbour()
         return RawPerceptletLabeler(
             self.bubble_chamber,
             self.perceptlet_type,
