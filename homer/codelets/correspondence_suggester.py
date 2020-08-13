@@ -23,7 +23,7 @@ class CorrespondenceSuggester(Codelet):
     def _passes_preliminary_checks(self) -> bool:
         if (
             len(self.target_perceptlet.labels) == 0
-            and len(self.second_target_perceptlet.labels) == 0
+            or len(self.second_target_perceptlet.labels) == 0
         ):
             return False
         self.parent_concept = (

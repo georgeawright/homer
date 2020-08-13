@@ -84,6 +84,9 @@ class BubbleChamber:
             raise MissingPerceptletError("There are not enough groups in the workspace")
         return random.sample(self.workspace.groups, amount)
 
+    def get_random_correspondence_type(self) -> Concept:
+        return random.sample(self.concept_space.correspondence_types, 1)[0]
+
     def get_random_conceptual_space(self) -> Concept:
         return random.sample(self.concept_space.conceptual_spaces, 1)[0]
 
