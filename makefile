@@ -1,4 +1,7 @@
-.PHONY: lint unit run
+.PHONY: integration lint unit run
+
+integration:
+	pipenv run python -m pytest tests/integration
 
 lint:
 	pipenv run flake8 .

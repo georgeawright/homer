@@ -23,11 +23,9 @@ class PerceptletCollection:
         self.perceptlets.add(perceptlet)
         if self.perceptlets_by_location is not None:
             self._add_at_location(perceptlet, perceptlet.location)
-            try:
-                for member in perceptlet.member:
+            if hasattr(perceptlet, "members"):
+                for member in perceptlet.members:
                     self._add_at_location(perceptlet, member.location)
-            except AttributeError:
-                pass
 
     def remove(self, perceptlet: Perceptlet):
         self.perceptlets.remove(perceptlet)
@@ -35,7 +33,7 @@ class PerceptletCollection:
             return
         for i, layer in enumerate(self.perceptlets_by_location):
             for j, row in enumerate(layer):
-                for k, cell in enumerate(layer):
+                for k, cell in enumerate(row):
                     if perceptlet in cell:
                         self.perceptlets_by_location[i][j][k].remove(perceptlet)
 
@@ -70,9 +68,8 @@ class PerceptletCollection:
     def _add_at_location(
         self, perceptlet: Perceptlet, coordinates: List[Union[float, int]]
     ):
-
         loc = WorkspaceLocation.from_workspace_coordinates(coordinates)
-        self.perceptlets_by_location[loc.i][loc.j][loc.k]
+        self.perceptlets_by_location[loc.i][loc.j][loc.k].add(perceptlet)
 
     def _get_perceptlet_according_to(self, attribute: str) -> Perceptlet:
         """Returns a perceptlet probabilistically according to attribute."""
