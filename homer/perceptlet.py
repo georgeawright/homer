@@ -7,6 +7,7 @@ from typing import Any, List, Optional, Set, Union
 
 from homer.concept import Concept
 from homer.hyper_parameters import HyperParameters
+from homer.id import ID
 
 
 class Perceptlet(ABC):
@@ -24,7 +25,7 @@ class Perceptlet(ABC):
     ):
         self.value = value
         self.location = location
-        self.perceptlet_id = "perceptlet_" + uuid.uuid4().hex
+        self.perceptlet_id = ID.new(self)
         self.parent_id = parent_id
         self.neighbours = neighbours
         self.labels = set()

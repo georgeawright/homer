@@ -51,7 +51,7 @@ class Concept:
                 + f" prototype and boundary are equal {prototype}."
             )
         self.name = name
-        self.concept_id = "concept_" + name
+        self.concept_id = ("concept_" + name).upper()
         self.activation_pattern = activation_pattern
         self.space = space
         self.depth = depth

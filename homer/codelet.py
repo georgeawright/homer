@@ -5,6 +5,7 @@ from typing import Optional
 
 from homer.bubble_chamber import BubbleChamber
 from homer.hyper_parameters import HyperParameters
+from homer.id import ID
 
 
 class Codelet(ABC):
@@ -13,7 +14,7 @@ class Codelet(ABC):
 
     def __init__(self, bubble_chamber: BubbleChamber, parent_id: str):
         self.bubble_chamber = bubble_chamber
-        self.codelet_id = "codelet_" + uuid.uuid4().hex
+        self.codelet_id = ID.new(self)
         self.parent_id = parent_id
 
     def run(self) -> Optional[Codelet]:
