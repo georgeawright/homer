@@ -11,6 +11,9 @@ class PerceptletCollection:
         self.perceptlets = set() if perceptlets is None else perceptlets
         self.perceptlets_by_location = None
 
+    def __len__(self):
+        return len(self.perceptlets)
+
     def __iter__(self):
         return (perceptlet for perceptlet in self.perceptlets)
 
