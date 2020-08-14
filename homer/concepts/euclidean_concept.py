@@ -45,4 +45,6 @@ class EuclideanConcept(Concept):
                 bubble_chamber.concept_space.get_perceptlet_type_by_name("group-label"),
                 location=location,
             )
-            return perceptlet_type.spawn_top_down_codelet(bubble_chamber, location)
+            return perceptlet_type.spawn_top_down_codelet(
+                bubble_chamber, location, self.concept_id
+            )

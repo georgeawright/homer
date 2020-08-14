@@ -25,6 +25,6 @@ class GroupConcept(PerceptletType):
             )
 
     def spawn_top_down_codelet(
-        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation
+        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation, parent_id: str
     ):
         raise NotImplementedError

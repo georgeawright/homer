@@ -21,6 +21,6 @@ class PerceptletType(Concept):
 
     @abstractmethod
     def spawn_top_down_codelet(
-        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation
+        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation, parent_id: str
     ):
         pass
