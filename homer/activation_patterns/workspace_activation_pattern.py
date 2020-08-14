@@ -1,12 +1,12 @@
 import math
 import random
-import statistics
 from typing import List, Tuple, Union
 
 import numpy
 
-from homer.hyper_parameters import HyperParameters
 from homer.activation_pattern import ActivationPattern
+from homer.hyper_parameters import HyperParameters
+from homer.workspace_location import WorkspaceLocation
 
 
 class WorkspaceActivationPattern(ActivationPattern):
@@ -34,8 +34,22 @@ class WorkspaceActivationPattern(ActivationPattern):
         depth, height, width = self._depth_height_width(location)
         return self.activation_matrix[depth][height][width]
 
+    def get_activation_at(self, location: WorkspaceLocation) -> float:
+        return self.activation_matrix[location.i][location.j][location.k]
+
     def get_activation_as_scalar(self) -> float:
         return numpy.mean(self.activation_matrix)
+
+    def get_high_location(self) -> WorkspaceLocation:
+        i_s, j_s, k_s = (list(range(l)) for l in [self.depth, self.height, self.width])
+        [random.shuffle(l) for l in [i_s, j_s, k_s]]
+        for i in i_s:
+            for j in j_s:
+                for k in k_s:
+                    print(i, j, k, self.activation_matrix[i][j][k])
+                    if self.activation_matrix[i][j][k] == 1.0:
+                        return WorkspaceLocation(i, j, k)
+        raise ValueError("There is no highly activated cell in the activation pattern.")
 
     def get_spreading_signal(self) -> numpy.ndarray:
         return numpy.array(

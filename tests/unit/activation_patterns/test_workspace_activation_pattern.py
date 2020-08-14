@@ -65,6 +65,57 @@ def test_constructor(
 
 
 @pytest.mark.parametrize(
+    "activation_matrix, i, j, k, expected_activation",
+    [
+        (
+            [
+                [[1.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+            ],
+            0,
+            0,
+            0,
+            1.0,
+        ),
+        (
+            [
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+            ],
+            1,
+            1,
+            1,
+            1.0,
+        ),
+        (
+            [
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 0.0]],
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]],
+            ],
+            2,
+            2,
+            2,
+            1.0,
+        ),
+    ],
+)
+def test_get_activation_at(activation_matrix, i, j, k, expected_activation):
+    workspace_activation_pattern = WorkspaceActivationPattern(Mock())
+    workspace_activation_pattern.activation_matrix = activation_matrix
+    workspace_location = Mock()
+    workspace_location.i = i
+    workspace_location.j = j
+    workspace_location.k = k
+    actual_activation = workspace_activation_pattern.get_activation_at(
+        workspace_location
+    )
+    assert expected_activation == actual_activation
+
+
+@pytest.mark.parametrize(
     "depth, height, width, workspace_depth, workspace_height, workspace_width, "
     + "activation_matrix, location, expected_activation",
     [
@@ -151,6 +202,21 @@ def test_activation_as_scalar(activation_matrix, expected_activation):
     assert math.isclose(
         expected_activation, actual_activation, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )
+
+
+@pytest.mark.parametrize(
+    "activation_matrix, expected_i, expected_j, expected_k",
+    [
+        ([[[1.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]], 0, 0, 0,),
+        ([[[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 0.0]]], 0, 1, 1,),
+        ([[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]]], 0, 2, 2,),
+    ],
+)
+def test_get_high_location(activation_matrix, expected_i, expected_j, expected_k):
+    activation_pattern = WorkspaceActivationPattern(Mock())
+    activation_pattern.activation_matrix = activation_matrix
+    location = activation_pattern.get_high_location()
+    assert (expected_i, expected_j, expected_k) == (location.i, location.j, location.k)
 
 
 @pytest.mark.parametrize(
