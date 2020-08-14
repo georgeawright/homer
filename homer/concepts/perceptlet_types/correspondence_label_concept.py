@@ -3,6 +3,7 @@ import random
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.correspondence_labeler import CorrespondenceLabeler
 from homer.concepts.perceptlet_type import PerceptletType
+from homer.workspace_location import WorkspaceLocation
 
 
 class CorrespondenceLabelConcept(PerceptletType):
@@ -22,3 +23,6 @@ class CorrespondenceLabelConcept(PerceptletType):
                 target_correspondence.exigency,
                 self.concept_id,
             )
+
+    def spawn_top_down_codelet(self, location: WorkspaceLocation):
+        raise NotImplementedError

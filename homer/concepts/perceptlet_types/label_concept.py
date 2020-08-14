@@ -4,6 +4,7 @@ from typing import Optional
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
 from homer.concepts.perceptlet_type import PerceptletType
+from homer.workspace_location import WorkspaceLocation
 
 
 class LabelConcept(PerceptletType):
@@ -22,3 +23,6 @@ class LabelConcept(PerceptletType):
                 target_perceptlet.exigency,
                 self.concept_id,
             )
+
+    def spawn_top_down_codelet(self, location: WorkspaceLocation):
+        raise NotImplementedError

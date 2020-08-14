@@ -5,6 +5,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.correspondence_suggester import CorrespondenceSuggester
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.errors import MissingPerceptletError
+from homer.workspace_location import WorkspaceLocation
 
 
 class CorrespondenceConcept(PerceptletType):
@@ -23,3 +24,6 @@ class CorrespondenceConcept(PerceptletType):
             return CorrespondenceSuggester(
                 bubble_chamber, self, *target_groups, urgency, self.concept_id,
             )
+
+    def spawn_top_down_codelet(self, location: WorkspaceLocation):
+        raise NotImplementedError
