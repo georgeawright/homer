@@ -15,9 +15,9 @@ def test_calculate_confidence():
         label_1 = Label(common_concept, Mock(), Mock(), Mock())
         label_2 = Label(common_concept, Mock(), Mock(), Mock())
         group = Group(Mock(), [0, 1, 2], Mock(), Mock(), Mock(), Mock())
-        group.add_label(label_1)
+        group.labels.add(label_1)
         candidate = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock())
-        candidate.add_label(label_2)
+        candidate.labels.add(label_2)
         codelet = GroupExtender(Mock(), Mock(), group, Mock(), Mock())
         codelet.second_target_perceptlet = candidate
         codelet._calculate_confidence()

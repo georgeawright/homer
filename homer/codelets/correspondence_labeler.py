@@ -6,6 +6,7 @@ from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlets.correspondence import Correspondence
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class CorrespondenceLabeler(Codelet):
@@ -38,7 +39,7 @@ class CorrespondenceLabeler(Codelet):
 
     def _calculate_confidence(self):
         number_of_shared_labels = len(
-            set.intersection(
+            PerceptletCollection.intersection(
                 self.target_perceptlet.first_argument.labels,
                 self.target_perceptlet.second_argument.labels,
             )
@@ -58,7 +59,7 @@ class CorrespondenceLabeler(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.add_label(label)
+        self.target_perceptlet.labels.add(label)
 
     def _engender_follow_up(self) -> Codelet:
         from homer.codelets.correspondence_builder import CorrespondenceBuilder

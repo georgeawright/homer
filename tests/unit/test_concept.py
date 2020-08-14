@@ -1,12 +1,8 @@
 import math
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from homer.concept import Concept
-from homer.activation_pattern import ActivationPattern
-from homer.activation_patterns.workspace_activation_pattern import (
-    WorkspaceActivationPattern,
-)
 
 FLOAT_COMPARISON_TOLERANCE = 1e-5
 

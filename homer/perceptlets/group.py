@@ -1,13 +1,10 @@
 from __future__ import annotations
 import statistics
-import random
-from typing import Any, List, Set
+from typing import Any, List
 
-from homer.errors import MissingPerceptletError
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
-from homer.perceptlets.correspondence import Correspondence
-from homer.perceptlets.relation import Relation
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class Group(Perceptlet):
@@ -21,16 +18,16 @@ class Group(Perceptlet):
         self,
         value: Any,
         location: List[float],
-        neighbours: Set[Perceptlet],
-        members: Set[Perceptlet],
+        neighbours: PerceptletCollection,
+        members: PerceptletCollection,
         strength: float,
         parent_id: str,
     ):
         Perceptlet.__init__(self, value, location, neighbours, parent_id)
         self.members = members
         self.strength = strength
-        self.groups = set()
-        self.relations = set()
+        self.groups = PerceptletCollection()
+        self.correspondences = PerceptletCollection()
 
     @property
     def size(self) -> int:
@@ -52,11 +49,10 @@ class Group(Perceptlet):
 
     @property
     def unhappiness(self) -> float:
-        connections = self.labels | self.groups | self.relations
+        connections = PerceptletCollection.union(
+            self.labels, self.groups, self.correspondences
+        )
         return self._unhappiness_based_on_connections(connections)
-
-    def get_random_member(self) -> Perceptlet:
-        return random.sample(self.members, 1)[0]
 
     def add_member(self, new_member: Perceptlet):
         if type(self.value) != str:
@@ -67,23 +63,9 @@ class Group(Perceptlet):
             ]
         self.members.add(new_member)
         try:
-            self.remove_neighbour(new_member)
+            self.neighbours.remove(new_member)
         except KeyError:
             pass
         for new_neighbour in new_member.neighbours:
             if new_neighbour not in self.members:
                 self.add_neighbour(new_neighbour)
-
-    def get_random_label(self):
-        if len(self.labels) < 1:
-            raise MissingPerceptletError("Group has no labels")
-        return random.sample(self.labels, 1)[0]
-
-    def add_group(self, group: Group):
-        self.groups.add(group)
-
-    def add_correspondence(self, correspondence: Correspondence):
-        self.correspondences.add(correspondence)
-
-    def add_relation(self, relation: Relation):
-        self.relations.add(relation)

@@ -14,7 +14,7 @@ class GroupConcept(PerceptletType):
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
         activation = self.get_activation_as_scalar()
         if activation > random.random():
-            target_perceptlet = bubble_chamber.get_raw_perceptlet()
+            target_perceptlet = bubble_chamber.workspace.raw_perceptlets.get_important()
             if target_perceptlet is None:
                 return None
             return GroupBuilder(

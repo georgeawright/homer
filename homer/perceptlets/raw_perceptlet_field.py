@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import List, Set
+from typing import List
 
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.raw_perceptlet import RawPerceptlet
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class RawPerceptletField(Perceptlet):
@@ -12,7 +13,7 @@ class RawPerceptletField(Perceptlet):
         self,
         value: List[List[RawPerceptlet]],
         time: int,
-        neighbours: Set[RawPerceptletField],
+        neighbours: PerceptletCollection,
     ):
         location = None
         Perceptlet.__init__(self, value, location, neighbours, "")

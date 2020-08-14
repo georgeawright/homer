@@ -25,7 +25,7 @@ def test_importance(strength, concept_activation, expected_importance):
 def test_unhappiness(number_of_relations, expected_unhappiness):
     word = Word("value", Mock(), Mock(), Mock())
     for i in range(number_of_relations):
-        word.add_relation(Mock())
+        word.relations.add(Mock())
     assert math.isclose(
         expected_unhappiness, word.unhappiness, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )

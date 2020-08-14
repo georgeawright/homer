@@ -4,6 +4,7 @@ from homer.codelet import Codelet
 from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.perceptlets.group import Group
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class CorrespondenceBuilder(Codelet):
@@ -51,7 +52,7 @@ class CorrespondenceBuilder(Codelet):
         )
 
     def _common_labels_in_space(self):
-        return set.intersection(
+        return PerceptletCollection.intersection(
             self.target_perceptlet.labels_in_space(self.parent_concept),
             self.second_target_perceptlet.labels_in_space(self.parent_concept),
         )
@@ -65,7 +66,7 @@ class CorrespondenceBuilder(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.add_correspondence(self.correspondence)
+        self.target_perceptlet.correspondences.add(self.correspondence)
 
     def _engender_follow_up(self):
         from homer.codelets.correspondence_labeler import CorrespondenceLabeler

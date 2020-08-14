@@ -51,9 +51,9 @@ def test_size_based_importance(textlet_size, expected_importance):
 def test_unhappiness(number_of_labels, number_of_relations, expected_unhappiness):
     textlet = Textlet("value", Mock(), Mock(), Mock(), Mock())
     for i in range(number_of_labels):
-        textlet.add_label(Mock())
+        textlet.labels.add(Mock())
     for i in range(number_of_relations):
-        textlet.add_relation(Mock())
+        textlet.relations.add(Mock())
     assert math.isclose(
         expected_unhappiness, textlet.unhappiness, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )

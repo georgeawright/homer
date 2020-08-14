@@ -42,10 +42,10 @@ class BottomUpRawPerceptletLabeler(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.add_label(label)
+        self.target_perceptlet.labels.add(label)
 
     def _engender_follow_up(self) -> RawPerceptletLabeler:
-        new_target_perceptlet = self.target_perceptlet.get_unhappy_neighbour()
+        new_target_perceptlet = self.target_perceptlet.neighbours.get_unhappy()
         return RawPerceptletLabeler(
             self.bubble_chamber,
             self.perceptlet_type,
@@ -56,7 +56,9 @@ class BottomUpRawPerceptletLabeler(Codelet):
         )
 
     def _engender_alternative_follow_up(self) -> BottomUpRawPerceptletLabeler:
-        new_target_perceptlet = self.bubble_chamber.get_unhappy_raw_perceptlet()
+        new_target_perceptlet = (
+            self.bubble_chamber.workspace.raw_perceptlets.get_unhappy()
+        )
         perceptlet_type_activation = self.perceptlet_type.get_activation(
             new_target_perceptlet.location
         )

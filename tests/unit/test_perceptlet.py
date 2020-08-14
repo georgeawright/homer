@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.correspondence import Correspondence
+from homer.perceptlet_collection import PerceptletCollection
 
 
 FLOAT_COMPARISON_TOLERANCE = 1e-3
@@ -50,25 +51,11 @@ def test_label_based_importance(label_strengths, expected_importance):
     for label_strength in label_strengths:
         label = Mock()
         label.strength = label_strength
-        perceptlet.add_label(label)
+        perceptlet.labels.add(label)
     actual_importance = perceptlet._label_based_importance
     assert math.isclose(
         expected_importance, actual_importance, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )
-
-
-@pytest.mark.parametrize(
-    "neighbour_exigencies",
-    [([0, 0.4, 1.0]), ([0.9, 0.4, 0.3]), ([0.4, 0.9, 0.4]), ([0.0, 0.0])],
-)
-def test_most_exigent_neighbour(neighbour_exigencies):
-    neighbours = set()
-    for exigency in neighbour_exigencies:
-        neighbour = Mock()
-        neighbour.exigency = exigency
-        neighbours.add(neighbour)
-    perceptlet = Perceptlet("value", Mock(), neighbours, Mock())
-    assert max(neighbour_exigencies) == perceptlet.most_exigent_neighbour().exigency
 
 
 @pytest.mark.parametrize(
@@ -109,11 +96,6 @@ def test_number_and_proportion_of_neighbours_with_label(
     )
 
 
-def test_get_random_neighbour():
-    perceptlet = Perceptlet("value", Mock(), {Mock(), Mock(), Mock()}, Mock())
-    assert perceptlet.get_random_neighbour() in perceptlet.neighbours
-
-
 def test_has_label(concept, label):
     perceptlet = Perceptlet("value", Mock(), set(), Mock())
     perceptlet.labels.add(label)
@@ -123,20 +105,13 @@ def test_has_label(concept, label):
 def test_labels_in_space(space, label):
     perceptlet = Perceptlet("value", Mock(), set(), Mock())
     perceptlet.labels.add(label)
-    assert {label} == perceptlet.labels_in_space(space)
+    assert {label} == perceptlet.labels_in_space(space).perceptlets
 
 
 def has_label_in_space(space, label):
     perceptlet = Perceptlet("value", Mock(), set(), Mock())
     perceptlet.labels.add(label)
     assert perceptlet.has_label_in_space(space)
-
-
-def test_add_label(label):
-    perceptlet = Perceptlet("value", Mock(), set(), Mock())
-    assert set() == perceptlet.labels
-    perceptlet.add_label(label)
-    assert {label} == perceptlet.labels
 
 
 @pytest.mark.parametrize(
@@ -158,19 +133,3 @@ def test_has_correspondence(is_between, is_in_space, expected):
         perceptlet = Perceptlet("value", Mock(), set(), Mock())
         perceptlet.correspondences = {correspondence}
         assert expected == perceptlet.has_correspondence(second_perceptlet, space)
-
-
-def test_add_neighbour():
-    perceptlet = Perceptlet("value", Mock(), set(), Mock())
-    assert set() == perceptlet.neighbours
-    neighbour = Mock()
-    perceptlet.add_neighbour(neighbour)
-    assert {neighbour} == perceptlet.neighbours
-
-
-def test_remove_neighbour():
-    neighbour = Mock()
-    perceptlet = Perceptlet("value", Mock(), {neighbour}, Mock())
-    assert {neighbour} == perceptlet.neighbours
-    perceptlet.remove_neighbour(neighbour)
-    assert set() == perceptlet.neighbours

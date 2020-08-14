@@ -1,6 +1,6 @@
 import random
 import statistics
-from typing import List, Optional, Set, Union
+from typing import List, Union
 
 from homer.concept import Concept
 from homer.concept_space import ConceptSpace
@@ -8,13 +8,13 @@ from homer.errors import MissingPerceptletError
 from homer.event_trace import EventTrace
 from homer.logger import Logger
 from homer.perceptlet import Perceptlet
-from homer.perceptlets.raw_perceptlet import RawPerceptlet
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
 from homer.perceptlets.correspondence import Correspondence
 from homer.perceptlets.relation import Relation
 from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
+from homer.perceptlet_collection import PerceptletCollection
 from homer.workspace import Workspace
 from homer.worldview import Worldview
 
@@ -48,41 +48,10 @@ class BubbleChamber:
     def update_activations(self) -> None:
         self.concept_space.update_activations()
 
-    def get_raw_perceptlet(self) -> RawPerceptlet:
-        if len(self.workspace.raw_perceptlets) < 1:
-            raise MissingPerceptletError(
-                "There are no raw perceptlets in the worksapce"
-            )
-        perceptlet_choice = None
-        highest_weight = 0
-        for perceptlet in self.workspace.raw_perceptlets:
-            weight = perceptlet.importance
-            if weight > highest_weight:
-                highest_weight = weight
-                perceptlet_choice = perceptlet
-        if perceptlet_choice is None:
-            perceptlet_choice = random.sample(self.workspace.raw_perceptlets, 1)[0]
-        return perceptlet_choice
-
-    def get_unhappy_raw_perceptlet(self) -> Optional[RawPerceptlet]:
-        perceptlets = random.sample(self.workspace.raw_perceptlets, 10)
-        perceptlet_choice = perceptlets[0]
-        for perceptlet in perceptlets:
-            if perceptlet.unhappiness < perceptlet_choice.unhappiness:
-                perceptlet_choice = perceptlet
-        return perceptlet_choice
-
-    def get_random_correspondence(self) -> Correspondence:
-        if len(self.workspace.correspondences) < 1:
-            raise MissingPerceptletError(
-                "There are no correspondences in the worksapce"
-            )
-        return random.sample(self.workspace.correspondences, 1)[0]
-
     def get_random_groups(self, amount: int) -> List[Group]:
         if len(self.workspace.groups) < amount:
             raise MissingPerceptletError("There are not enough groups in the workspace")
-        return random.sample(self.workspace.groups, amount)
+        return random.sample(self.workspace.groups.perceptlets, amount)
 
     def get_random_correspondence_type(self) -> Concept:
         return random.sample(self.concept_space.correspondence_types, 1)[0]
@@ -132,7 +101,7 @@ class BubbleChamber:
         return label
 
     def create_group(
-        self, members: Set[Perceptlet], strength: float, parent_id: str,
+        self, members: PerceptletCollection, strength: float, parent_id: str,
     ) -> Group:
         value = (
             list(members)[0].value
@@ -146,9 +115,9 @@ class BubbleChamber:
         latitude = statistics.fmean([member.location[1] for member in members])
         longitude = statistics.fmean([member.location[2] for member in members])
         location = [time, latitude, longitude]
-        neighbours = set()
+        neighbours = PerceptletCollection()
         for member in members:
-            neighbours |= member.neighbours
+            neighbours = PerceptletCollection.union(neighbours, member.neighbours)
         for member in members:
             try:
                 neighbours.remove(member)
@@ -203,7 +172,7 @@ class BubbleChamber:
         self,
         text: str,
         constituents: List[Union[Textlet, Word]],
-        relations: Set[Relation],
+        relations: PerceptletCollection,
         strength: float,
         parent_id: str,
     ) -> Textlet:

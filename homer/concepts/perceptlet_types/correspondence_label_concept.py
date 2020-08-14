@@ -15,7 +15,9 @@ class CorrespondenceLabelConcept(PerceptletType):
         activation = self.get_activation_as_scalar()
         if activation > random.random():
             target_conceptual_space = bubble_chamber.get_random_conceptual_space()
-            target_correspondence = bubble_chamber.get_random_correspondence()
+            target_correspondence = (
+                bubble_chamber.workspace.correspondences.get_random()
+            )
             return CorrespondenceLabeler(
                 bubble_chamber,
                 self,

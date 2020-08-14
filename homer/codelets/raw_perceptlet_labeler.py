@@ -48,10 +48,10 @@ class RawPerceptletLabeler(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.add_label(label)
+        self.target_perceptlet.labels.add(label)
 
     def _engender_follow_up(self) -> RawPerceptletLabeler:
-        new_target = self.target_perceptlet.get_unhappy_neighbour()
+        new_target = self.target_perceptlet.neighbours.get_unhappy()
         return RawPerceptletLabeler(
             self.bubble_chamber,
             self.perceptlet_type,

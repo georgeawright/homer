@@ -3,11 +3,11 @@ from typing import Optional
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
+from homer.codelets.group_labeler import GroupLabeler
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.errors import MissingPerceptletError
 from homer.perceptlet import Perceptlet
-
-from homer.codelets.group_labeler import GroupLabeler
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class GroupBuilder(Codelet):
@@ -30,7 +30,7 @@ class GroupBuilder(Codelet):
             self.perceptlet_type.decay_activation(self.target_perceptlet.location)
         try:
             self.second_target_perceptlet = (
-                self.target_perceptlet.get_random_neighbour()
+                self.target_perceptlet.neighbours.get_random()
             )
         except MissingPerceptletError:
             return False
@@ -56,12 +56,14 @@ class GroupBuilder(Codelet):
 
     def _process_perceptlet(self):
         self.group = self.bubble_chamber.create_group(
-            {self.target_perceptlet, self.second_target_perceptlet},
+            PerceptletCollection(
+                {self.target_perceptlet, self.second_target_perceptlet}
+            ),
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.add_group(self.group)
-        self.second_target_perceptlet.add_group(self.group)
+        self.target_perceptlet.groups.add(self.group)
+        self.second_target_perceptlet.groups.add(self.group)
 
     def _engender_follow_up(self) -> GroupLabeler:
         return GroupLabeler(

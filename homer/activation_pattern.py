@@ -1,6 +1,5 @@
-import math
 from abc import ABC, abstractmethod
-from typing import Any, List, Union
+from typing import List, Union
 
 from homer.hyper_parameters import HyperParameters
 

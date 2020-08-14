@@ -1,5 +1,5 @@
 class MissingPerceptletError(Exception):
-    def __init__(self, message):
+    def __init__(self, message=None):
         Exception.__init__(self, message)
 
 

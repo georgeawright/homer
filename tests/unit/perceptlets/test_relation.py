@@ -14,7 +14,7 @@ FLOAT_COMPARISON_TOLERANCE = 1e-3
 def test_unhappiness(number_of_relations, expected_unhappiness):
     relation = Relation("value", Mock(), Mock(), Mock(), Mock(), Mock())
     for i in range(number_of_relations):
-        relation.add_relation(Mock())
+        relation.relations.add(Mock())
     assert math.isclose(
         expected_unhappiness, relation.unhappiness, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )

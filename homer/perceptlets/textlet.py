@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import statistics
-from typing import List, Set, Union
 
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
-from homer.perceptlets.relation import Relation
-from homer.perceptlets.word import Word
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class Textlet(Perceptlet):
@@ -22,19 +20,19 @@ class Textlet(Perceptlet):
     def __init__(
         self,
         text: str,
-        constituents: List[Union[Textlet, Word]],
-        constituent_relations: Set[Relation],
+        constituents: PerceptletCollection,
+        constituent_relations: PerceptletCollection,
         strength: float,
         parent_id: str,
     ):
         location = None
-        neighbours = set()
+        neighbours = PerceptletCollection()
         value = text
         Perceptlet.__init__(self, value, location, neighbours, parent_id)
         self.constituents = constituents
         self.constituent_relations = constituent_relations
         self.strength = strength
-        self.relations = set()
+        self.relations = PerceptletCollection()
 
     def __str__(self) -> str:
         return self.text
@@ -64,8 +62,5 @@ class Textlet(Perceptlet):
 
     @property
     def unhappiness(self) -> float:
-        connections = self.labels | self.relations
+        connections = PerceptletCollection.union(self.labels, self.relations)
         return self._unhappiness_based_on_connections(connections)
-
-    def add_relation(self, relation: Relation):
-        self.relations.add(relation)

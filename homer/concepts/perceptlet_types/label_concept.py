@@ -15,7 +15,7 @@ class LabelConcept(PerceptletType):
         self, bubble_chamber: BubbleChamber
     ) -> Optional[BottomUpRawPerceptletLabeler]:
         if self.activation_pattern.is_high():
-            target_perceptlet = bubble_chamber.get_unhappy_raw_perceptlet()
+            target_perceptlet = bubble_chamber.workspace.raw_perceptlets.get_unhappy()
             return BottomUpRawPerceptletLabeler(
                 bubble_chamber,
                 self,
@@ -30,7 +30,7 @@ class LabelConcept(PerceptletType):
         location: WorkspaceLocation,
         parent_concept: Concept,
     ):
-        target_perceptlet = bubble_chamber.workspace.raw_perceptlet_collection.at(
+        target_perceptlet = bubble_chamber.workspace.raw_perceptlets.at(
             location
         ).get_unhappy()
         return RawPerceptletLabeler(

@@ -1,6 +1,7 @@
 import yaml
 
 from .perceptlets import RawPerceptlet, RawPerceptletField, RawPerceptletFieldSequence
+from .perceptlet_collection import PerceptletCollection
 
 
 class Problem:
@@ -24,7 +25,7 @@ class Problem:
             model_input = yaml.load(f, Loader=yaml.FullLoader)
             raw_perceptlets = [
                 [
-                    RawPerceptlet(cell_value, [0, i, j], set())
+                    RawPerceptlet(cell_value, [0, i, j], PerceptletCollection())
                     for j, cell_value in enumerate(row)
                 ]
                 for i, row in enumerate(model_input)

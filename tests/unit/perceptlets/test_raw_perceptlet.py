@@ -17,11 +17,11 @@ def test_unhappiness(
 ):
     perceptlet = RawPerceptlet("value", Mock(), set())
     for i in range(number_of_labels):
-        perceptlet.add_label(Mock())
+        perceptlet.labels.add(Mock())
     for i in range(number_of_groups):
-        perceptlet.add_group(Mock())
+        perceptlet.groups.add(Mock())
     for i in range(number_of_relations):
-        perceptlet.add_relation(Mock())
+        perceptlet.relations.add(Mock())
     assert math.isclose(
         expected_unhappiness, perceptlet.unhappiness, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )

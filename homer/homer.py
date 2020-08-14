@@ -127,7 +127,7 @@ class Homer:
             BottomUpRawPerceptletLabeler(
                 bubble_chamber,
                 concept_space.get_perceptlet_type_by_name("label"),
-                bubble_chamber.get_raw_perceptlet(),
+                bubble_chamber.workspace.raw_perceptlets.get_random(),
                 HyperParameters.STARTER_CODELET_URGENCY,
                 "",
             )
@@ -140,7 +140,7 @@ class Homer:
 
     def run(self):
         while self.bubble_chamber.result is None:
-            time.sleep(2)
+            # time.sleep(1)
             self.logger.log(self.coderack)
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.print_status_update()

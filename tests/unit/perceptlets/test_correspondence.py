@@ -14,7 +14,7 @@ FLOAT_COMPARISON_TOLERANCE = 1e-3
 def test_unhappiness(number_of_correspondences, expected_unhappiness):
     correspondence = Correspondence("value", Mock(), Mock(), Mock(), Mock(), Mock())
     for i in range(number_of_correspondences):
-        correspondence.add_correspondence(Mock())
+        correspondence.correspondences.add(Mock())
     assert math.isclose(
         expected_unhappiness,
         correspondence.unhappiness,

@@ -78,6 +78,8 @@ class PerceptletCollection:
         """Returns a perceptlet probabilistically according to attribute."""
         if len(self.perceptlets) < 1:
             raise MissingPerceptletError
+        if len(self.perceptlets) == 1:
+            return list(self.perceptlets)[0]
         perceptlets = random.sample(self.perceptlets, len(self.perceptlets) // 2)
         perceptlet_choice = perceptlets[0]
         for perceptlet in perceptlets[1:]:

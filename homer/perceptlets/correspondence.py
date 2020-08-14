@@ -5,6 +5,7 @@ import statistics
 from homer.concept import Concept
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class Correspondence(Perceptlet):
@@ -25,13 +26,13 @@ class Correspondence(Perceptlet):
         parent_id: str,
     ):
         location = first_argument.location
-        neighbours = set()
+        neighbours = PerceptletCollection()
         Perceptlet.__init__(self, name, location, neighbours, parent_id)
         self.parent_concept = parent_concept
         self.first_argument = first_argument
         self.second_argument = second_argument
         self.strength = strength
-        self.correpsondences = set()
+        self.correpsondences = PerceptletCollection()
 
     @property
     def importance(self) -> float:
@@ -46,9 +47,6 @@ class Correspondence(Perceptlet):
     def unhappiness(self) -> float:
         # TODO: this might not be an appropriate measure of unhappiness for relations
         return self._unhappiness_based_on_connections(self.correspondences)
-
-    def add_correspondence(self, correspondence: Correspondence):
-        self.correspondences.add(correspondence)
 
     def is_between(self, a: Perceptlet, b: Perceptlet):
         return (self.first_argument == a and self.second_argument == b) or (

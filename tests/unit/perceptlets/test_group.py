@@ -4,6 +4,7 @@ import statistics
 from unittest.mock import Mock
 
 from homer.perceptlets.group import Group
+from homer.perceptlet_collection import PerceptletCollection
 
 
 FLOAT_COMPARISON_TOLERANCE = 1e-3
@@ -52,11 +53,11 @@ def test_unhappiness(
 ):
     group = Group(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     for i in range(number_of_labels):
-        group.add_label(Mock())
+        group.labels.add(Mock())
     for i in range(number_of_groups):
-        group.add_group(Mock())
+        group.groups.add(Mock())
     for i in range(number_of_relations):
-        group.add_relation(Mock())
+        group.correspondences.add(Mock())
     assert math.isclose(
         expected_unhappiness, group.unhappiness, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )
@@ -64,9 +65,9 @@ def test_unhappiness(
 
 @pytest.mark.parametrize("no_of_members", [(10)])
 def test_get_random_member_returns_member(no_of_members):
-    members = {Mock() for _ in range(no_of_members)}
+    members = PerceptletCollection({Mock() for _ in range(no_of_members)})
     group = Group(Mock(), Mock(), Mock(), members, Mock(), Mock())
-    assert group.get_random_member() in members
+    assert group.members.get_random() in members
 
 
 @pytest.mark.parametrize("original_value, member_values", [(1, [2, 3, 4, 0])])
@@ -74,11 +75,18 @@ def test_add_member_maintains_average(original_value, member_values):
     original_member = Mock()
     original_member.value = [original_value]
     original_member.size = 1
-    group = Group([original_value], Mock(), set(), {original_member}, Mock(), Mock())
+    group = Group(
+        [original_value],
+        Mock(),
+        PerceptletCollection(),
+        PerceptletCollection({original_member}),
+        Mock(),
+        Mock(),
+    )
     for member_value in member_values:
         new_member = Mock()
         new_member.value = [member_value]
         new_member.size = 1
-        new_member.neighbours = set()
+        new_member.neighbours = PerceptletCollection()
         group.add_member(new_member)
-    assert group.value == [statistics.fmean(member_values + [original_value])]
+    assert [statistics.fmean(member_values + [original_value])] == group.value

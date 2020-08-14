@@ -4,6 +4,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets import GroupLabeler, TopDownGroupLabeler
 from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
+from homer.errors import MissingPerceptletError
 from homer.workspace_location import WorkspaceLocation
 
 
@@ -14,7 +15,7 @@ class GroupLabelConcept(PerceptletType):
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
         activation = self.get_activation_as_scalar()
         if activation > random.random():
-            target_group = bubble_chamber.get_random_groups(1)[0]
+            target_group = bubble_chamber.workspace.groups.get_random()
             return GroupLabeler(
                 bubble_chamber,
                 self,
@@ -29,9 +30,12 @@ class GroupLabelConcept(PerceptletType):
         location: WorkspaceLocation,
         parent_concept: Concept,
     ):
-        target_perceptlet = bubble_chamber.workspace.groups_collection.at(
-            location
-        ).get_unhappy()
+        try:
+            target_perceptlet = bubble_chamber.workspace.groups.at(
+                location
+            ).get_unhappy()
+        except MissingPerceptletError:
+            return None
         return TopDownGroupLabeler(
             bubble_chamber,
             self,

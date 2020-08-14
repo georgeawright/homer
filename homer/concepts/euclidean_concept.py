@@ -6,8 +6,6 @@ from homer.activation_patterns.workspace_activation_pattern import (
 )
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
-from homer.codelets.group_labeler import GroupLabeler
-from homer.codelets.raw_perceptlet_labeler import RawPerceptletLabeler
 from homer.concept import Concept
 
 

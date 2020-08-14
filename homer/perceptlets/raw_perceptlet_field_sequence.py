@@ -2,6 +2,7 @@ from typing import List
 
 from homer.perceptlet import Perceptlet
 from homer.perceptlets.raw_perceptlet_field import RawPerceptletField
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class RawPerceptletFieldSequence(Perceptlet):
@@ -9,7 +10,7 @@ class RawPerceptletFieldSequence(Perceptlet):
 
     def __init__(self, value: List[RawPerceptletField]):
         location = None
-        neighbours = set()
+        neighbours = PerceptletCollection()
         Perceptlet.__init__(self, value, location, neighbours, "")
 
     def __iter__(self):

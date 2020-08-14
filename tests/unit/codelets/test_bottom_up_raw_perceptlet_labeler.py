@@ -1,9 +1,9 @@
 from unittest.mock import Mock, patch
 
-from homer.bubble_chamber import BubbleChamber
 from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
 from homer.codelets.raw_perceptlet_labeler import RawPerceptletLabeler
 from homer.concepts.perceptlet_type import PerceptletType
+from homer.perceptlet_collection import PerceptletCollection
 
 
 def test_engender_follow_up():
@@ -19,9 +19,13 @@ def test_engender_follow_up():
 def test_engender_alternative_follow_up():
     raw_perceptlet = Mock()
     with patch.object(
-        BubbleChamber, "get_unhappy_raw_perceptlet", return_value=raw_perceptlet
+        PerceptletCollection, "get_unhappy", return_value=raw_perceptlet
     ), patch.object(PerceptletType, "get_activation", return_value=1):
-        bubble_chamber = BubbleChamber(Mock(), Mock(), Mock(), Mock(), Mock())
+        raw_perceptlets = PerceptletCollection
+        workspace = Mock()
+        workspace.raw_perceptlets = raw_perceptlets
+        bubble_chamber = Mock()
+        bubble_chamber.workspace = workspace
         perceptlet_type = PerceptletType("name", 1)
         bottom_up_raw_perceptlet_labeler = BottomUpRawPerceptletLabeler(
             bubble_chamber, perceptlet_type, raw_perceptlet, 1, Mock()

@@ -47,7 +47,7 @@ class GroupLabeler(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.add_label(label)
+        self.target_perceptlet.labels.add(label)
 
     def _engender_follow_up(self) -> GroupExtender:
         return GroupExtender(
@@ -68,7 +68,7 @@ class GroupLabeler(Codelet):
         )
 
     def _get_target_concept(self) -> Concept:
-        group_member = self.target_perceptlet.get_random_member()
+        group_member = self.target_perceptlet.members.get_random()
         labels = [
             label
             for label in group_member.labels

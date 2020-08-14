@@ -1,6 +1,4 @@
-import math
 import pytest
-from unittest.mock import Mock
 
 from homer.activation_patterns.scalar_activation_pattern import ScalarActivationPattern
 

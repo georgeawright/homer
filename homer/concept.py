@@ -32,7 +32,7 @@ class Concept:
         if boundary is not None and type(prototype) == str:
             raise Exception(
                 f"Creating concept {name} failed because "
-                + f"a concept with a symbolic prototype cannot have a boundary."
+                + "a concept with a symbolic prototype cannot have a boundary."
             )
         if boundary is not None and len(boundary) > 1:
             raise Exception(
@@ -43,7 +43,7 @@ class Concept:
             raise Exception(
                 f"Creating concept {name} failed because "
                 + f"prototype {prototype} and boundary {boundary} "
-                + f"have different dimensionality."
+                + "have different dimensionality."
             )
         if boundary == prototype and prototype is not None:
             raise Exception(

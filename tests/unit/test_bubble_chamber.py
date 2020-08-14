@@ -10,19 +10,7 @@ from homer.perceptlets.label import Label
 from homer.perceptlets.relation import Relation
 from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
-
-
-def test_get_raw_perceptlet():
-    workspace = Mock()
-    raw_perceptlets = set()
-    for _ in range(10):
-        raw_perceptlet = Mock()
-        raw_perceptlet.importance = 0.5
-        raw_perceptlets.add(raw_perceptlet)
-    workspace.raw_perceptlets = raw_perceptlets
-    bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
-    raw_perceptlet = bubble_chamber.get_raw_perceptlet()
-    assert raw_perceptlet in workspace.raw_perceptlets
+from homer.perceptlet_collection import PerceptletCollection
 
 
 def test_get_random_workspace_concept():
@@ -35,7 +23,7 @@ def test_get_random_workspace_concept():
 
 def test_get_random_groups():
     workspace = Mock()
-    workspace.groups = {Mock() for _ in range(10)}
+    workspace.groups = PerceptletCollection({Mock() for _ in range(10)})
     bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
     groups = bubble_chamber.get_random_groups(2)
     for group in groups:
@@ -77,8 +65,8 @@ def test_create_group_returns_group():
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
-        perceptlet_1 = Perceptlet("value", [1, 2, 2], set(), Mock())
-        perceptlet_2 = Perceptlet("value", [1, 2, 3], set(), Mock())
+        perceptlet_1 = Perceptlet("value", [1, 2, 2], PerceptletCollection(), Mock())
+        perceptlet_2 = Perceptlet("value", [1, 2, 3], PerceptletCollection(), Mock())
         group = bubble_chamber.create_group(
             [perceptlet_1, perceptlet_2], Mock(), Mock()
         )

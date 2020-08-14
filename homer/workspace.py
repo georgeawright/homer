@@ -1,7 +1,4 @@
-from typing import Set
-
 from homer.event_trace import EventTrace
-from homer.perceptlet import Perceptlet
 from homer.perceptlets.group import Group
 from homer.perceptlets.label import Label
 from homer.perceptlets.correspondence import Correspondence
@@ -18,21 +15,21 @@ class Workspace:
     ):
         self.event_trace = event_trace
         self.input_sequence = input_sequence
-        self.raw_perceptlets = {
-            raw_perceptlet
-            for field in input_sequence
-            for row in field
-            for raw_perceptlet in row
-        }
-        self.raw_perceptlet_collection = PerceptletCollection(self.raw_perceptlets)
-        self.labels = set()
-        self.groups = set()
-        self.group_collection = PerceptletCollection(self.groups)
-        self.correspondences = set()
-        self.relations = set()
-        self.words = set()
-        self.textlets = set()
-        self.perceptlets = set.union(
+        self.raw_perceptlets = PerceptletCollection(
+            {
+                raw_perceptlet
+                for field in input_sequence
+                for row in field
+                for raw_perceptlet in row
+            }
+        )
+        self.labels = PerceptletCollection()
+        self.groups = PerceptletCollection()
+        self.correspondences = PerceptletCollection()
+        self.relations = PerceptletCollection()
+        self.words = PerceptletCollection()
+        self.textlets = PerceptletCollection()
+        self.perceptlets = PerceptletCollection.union(
             self.raw_perceptlets,
             self.labels,
             self.groups,

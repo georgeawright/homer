@@ -1,9 +1,8 @@
 from __future__ import annotations
-from typing import List, Union, Set
+from typing import List, Union
 
 from homer.perceptlet import Perceptlet
-from homer.perceptlets.group import Group
-from homer.perceptlets.relation import Relation
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class RawPerceptlet(Perceptlet):
@@ -13,11 +12,11 @@ class RawPerceptlet(Perceptlet):
         self,
         value: Union[str, int, float],
         location: List[int],
-        neighbours: Set[RawPerceptlet],
+        neighbours: PerceptletCollection,
     ):
         Perceptlet.__init__(self, value, location, neighbours, "")
-        self.groups = set()
-        self.relations = set()
+        self.groups = PerceptletCollection()
+        self.relations = PerceptletCollection()
 
     @property
     def importance(self) -> float:
@@ -25,11 +24,7 @@ class RawPerceptlet(Perceptlet):
 
     @property
     def unhappiness(self) -> float:
-        connections = self.labels | self.groups | self.relations
+        connections = PerceptletCollection.union(
+            self.labels, self.groups, self.relations
+        )
         return self._unhappiness_based_on_connections(connections)
-
-    def add_group(self, group: Group):
-        self.groups.add(group)
-
-    def add_relation(self, relation: Relation):
-        self.relations.add(relation)

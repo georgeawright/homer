@@ -44,7 +44,7 @@ class TopDownGroupLabeler(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.add_label(label)
+        self.target_perceptlet.labels.add(label)
 
     def _engender_follow_up(self) -> GroupExtender:
         return GroupExtender(

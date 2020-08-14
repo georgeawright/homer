@@ -27,7 +27,7 @@ class CorrespondenceSuggester(Codelet):
         ):
             return False
         self.parent_concept = (
-            self.target_perceptlet.get_random_label().parent_concept.space
+            self.target_perceptlet.labels.get_random().parent_concept.space
         )
         return True
 

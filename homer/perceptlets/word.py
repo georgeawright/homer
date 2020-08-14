@@ -2,7 +2,7 @@ import statistics
 
 from homer.concept import Concept
 from homer.perceptlet import Perceptlet
-from homer.perceptlets.relation import Relation
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class Word(Perceptlet):
@@ -12,11 +12,11 @@ class Word(Perceptlet):
         self, text: str, parent_concept: Concept, strength: float, parent_id: str,
     ):
         location = None
-        neighbours = set()
+        neighbours = PerceptletCollection()
         Perceptlet.__init__(self, text, location, neighbours, parent_id)
         self.parent_concept = parent_concept
         self.strength = strength
-        self.relations = set()
+        self.relations = PerceptletCollection()
 
     @property
     def importance(self) -> float:
@@ -25,6 +25,3 @@ class Word(Perceptlet):
     @property
     def unhappiness(self) -> float:
         return self._unhappiness_based_on_connections(self.relations)
-
-    def add_relation(self, relation: Relation):
-        self.relations.add(relation)

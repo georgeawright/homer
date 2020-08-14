@@ -41,8 +41,8 @@ class WorkspaceActivationPattern(ActivationPattern):
         return numpy.mean(self.activation_matrix)
 
     def get_high_location(self) -> WorkspaceLocation:
-        i_s, j_s, k_s = (list(range(l)) for l in [self.depth, self.height, self.width])
-        [random.shuffle(l) for l in [i_s, j_s, k_s]]
+        i_s, j_s, k_s = (list(range(x)) for x in [self.depth, self.height, self.width])
+        [random.shuffle(coordinates) for coordinates in [i_s, j_s, k_s]]
         for i in i_s:
             for j in j_s:
                 for k in k_s:

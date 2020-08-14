@@ -5,6 +5,7 @@ from homer.concept import Concept
 from homer.codelets.correspondence_builder import CorrespondenceBuilder
 from homer.codelets.correspondence_labeler import CorrespondenceLabeler
 from homer.perceptlets.group import Group
+from homer.perceptlet_collection import PerceptletCollection
 
 
 @pytest.mark.parametrize(
@@ -14,7 +15,9 @@ from homer.perceptlets.group import Group
 def test_calculate_confidence(
     both_have_labels_in_space, proximity, number_of_common_labels, expected
 ):
-    set_of_common_labels = {Mock() for _ in range(number_of_common_labels)}
+    set_of_common_labels = PerceptletCollection(
+        {Mock() for _ in range(number_of_common_labels)}
+    )
     with patch.object(
         Group, "has_label_in_space", return_value=both_have_labels_in_space
     ), patch.object(

@@ -58,7 +58,6 @@ class Logger:
 
     def _log_codelet(self, codelet):
         """log the birth of a codelet"""
-        codelet_type_name = type(codelet).__name__
         self._log_message(
             f"    + {codelet.codelet_id} spawned by "
             + f"{codelet.parent_id} - urgency: {codelet.urgency}"
@@ -77,7 +76,7 @@ class Logger:
                     codelet_id: codelet.codelet_id,
                     parent_id: codelet.parent_id,
                     birth_time: self.codelets_run,
-                    codelet_type: type(codelet),
+                    codelet_type: type(codelet).__name__,
                 }
             )
 
