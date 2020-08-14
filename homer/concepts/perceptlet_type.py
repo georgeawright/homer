@@ -2,7 +2,6 @@ from abc import abstractmethod
 from homer.activation_patterns.workspace_activation_pattern import (
     WorkspaceActivationPattern,
 )
-from homer.bubble_chamber import BubbleChamber
 from homer.concept import Concept
 from homer.workspace_location import WorkspaceLocation
 
@@ -16,11 +15,11 @@ class PerceptletType(Concept):
         )
 
     @abstractmethod
-    def spawn_codelet(self, bubble_chamber: BubbleChamber):
+    def spawn_codelet(self, bubble_chamber):
         pass
 
     @abstractmethod
     def spawn_top_down_codelet(
-        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation, parent_id: str
+        self, bubble_chamber, location: WorkspaceLocation, parent_id: str,
     ):
         pass
