@@ -9,6 +9,7 @@ from homer.perceptlets.raw_perceptlet_field_sequence import RawPerceptletFieldSe
 from homer.perceptlets.relation import Relation
 from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class Workspace:
@@ -23,8 +24,10 @@ class Workspace:
             for row in field
             for raw_perceptlet in row
         }
+        self.raw_perceptlet_collection = PerceptletCollection(self.raw_perceptlets)
         self.labels = set()
         self.groups = set()
+        self.group_collection = PerceptletCollection(self.groups)
         self.correspondences = set()
         self.relations = set()
         self.words = set()
