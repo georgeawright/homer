@@ -4,6 +4,9 @@ from unittest.mock import Mock, patch
 
 from homer.concept import Concept
 from homer.activation_pattern import ActivationPattern
+from homer.activation_patterns.workspace_activation_pattern import (
+    WorkspaceActivationPattern,
+)
 
 FLOAT_COMPARISON_TOLERANCE = 1e-5
 
@@ -136,3 +139,17 @@ def test_proximity_to(
     assert math.isclose(
         expected, concept.proximity_to(candidate), abs_tol=FLOAT_COMPARISON_TOLERANCE
     )
+
+
+@pytest.mark.parametrize("a_activation, b_activation, expected", [(1.0, 0.0, 1.0)])
+def test_most_active(a_activation, b_activation, expected):
+    a_activation_pattern = Mock()
+    a_activation_pattern.get_activation_as_scalar = Mock()
+    a_activation_pattern.get_activation_as_scalar.side_effect = [a_activation]
+    b_activation_pattern = Mock()
+    b_activation_pattern.get_activation_as_scalar = Mock()
+    b_activation_pattern.get_activation_as_scalar.side_effect = [b_activation]
+    a = Concept("a", a_activation_pattern)
+    b = Concept("b", b_activation_pattern)
+    result = Concept.most_active(a, b)
+    assert a == result

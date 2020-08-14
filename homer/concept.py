@@ -1,9 +1,9 @@
 from __future__ import annotations
-
 from typing import Any, Callable, List, Optional, Union, Set
 
 from homer.activation_pattern import ActivationPattern
 from homer.hyper_parameters import HyperParameters
+from homer.workspace_location import WorkspaceLocation
 
 
 class Concept:
@@ -130,3 +130,21 @@ class Concept:
 
     def spawn_codelet(self):
         raise NotImplementedError
+
+    @staticmethod
+    def most_active(
+        a: Concept, b: Concept, location: Optional[WorkspaceLocation] = None
+    ):
+        if location is None:
+            return (
+                a
+                if a.activation_pattern.get_activation_as_scalar()
+                > b.activation_pattern.get_activation_as_scalar()
+                else b
+            )
+        return (
+            a
+            if a.activation_pattern.get_activation_at(location)
+            > b.activation_pattern.get_activation_at(location)
+            else b
+        )
