@@ -23,6 +23,12 @@ def perceptlet():
     return perceptlet
 
 
+def test_iterate(perceptlet):
+    collection = PerceptletCollection({perceptlet})
+    for perceptlet in collection:
+        assert True
+
+
 def test_at(perceptlet):
     collection = PerceptletCollection({perceptlet})
     location = WorkspaceLocation(0, 0, 0)

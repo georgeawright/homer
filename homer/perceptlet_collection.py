@@ -12,6 +12,9 @@ class PerceptletCollection:
         self.perceptlets = set() if perceptlets is None else perceptlets
         self.perceptlets_by_location = None
 
+    def __iter__(self):
+        return (perceptlet for perceptlet in self.perceptlets)
+
     def at(self, location: WorkspaceLocation) -> PerceptletCollection:
         if self.perceptlets_by_location is None:
             self._arrange_perceptlets_by_location()
