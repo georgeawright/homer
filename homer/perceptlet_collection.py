@@ -1,6 +1,6 @@
 from __future__ import annotations
 import random
-from typing import List, Set, Union
+from typing import List, Optional, Set, Union
 
 from .errors import MissingPerceptletError
 from .perceptlet import Perceptlet
@@ -8,8 +8,8 @@ from .workspace_location import WorkspaceLocation
 
 
 class PerceptletCollection:
-    def __init__(self, perceptlets: Set[Perceptlet]):
-        self.perceptlets = perceptlets
+    def __init__(self, perceptlets: Optional[Set[Perceptlet]] = None):
+        self.perceptlets = set() if perceptlets is None else perceptlets
         self.perceptlets_by_location = None
 
     def at(self, location: WorkspaceLocation) -> PerceptletCollection:
