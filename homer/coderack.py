@@ -40,7 +40,7 @@ class Coderack:
         return codelet_choice
 
     def get_more_codelets(self):
-        for concept in self.bubble_chamber.concept_space.perceptlet_types:
+        for concept in self.bubble_chamber.concept_space.spawning_concepts:
             codelet = concept.spawn_codelet(self.bubble_chamber)
             if codelet is not None:
                 self.add_codelet(codelet)

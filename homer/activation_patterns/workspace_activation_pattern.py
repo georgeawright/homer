@@ -46,7 +46,6 @@ class WorkspaceActivationPattern(ActivationPattern):
         for i in i_s:
             for j in j_s:
                 for k in k_s:
-                    print(i, j, k, self.activation_matrix[i][j][k])
                     if self.activation_matrix[i][j][k] == 1.0:
                         return WorkspaceLocation(i, j, k)
         raise ValueError("There is no highly activated cell in the activation pattern.")

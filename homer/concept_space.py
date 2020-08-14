@@ -29,6 +29,7 @@ class ConceptSpace:
             self.conceptual_spaces,
             self.workspace_concepts,
         )
+        self.spawning_concepts = set.union(perceptlet_types, workspace_concepts)
         self.logger = logger
 
     def get_perceptlet_type_by_name(self, name: str) -> PerceptletType:
