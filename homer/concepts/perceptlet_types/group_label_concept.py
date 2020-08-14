@@ -1,7 +1,7 @@
 import random
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.group_labeler import GroupLabeler
+from homer.codelets import GroupLabeler, TopDownGroupLabeler
 from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.workspace_location import WorkspaceLocation
@@ -29,4 +29,14 @@ class GroupLabelConcept(PerceptletType):
         location: WorkspaceLocation,
         parent_concept: Concept,
     ):
-        raise NotImplementedError
+        target_perceptlet = bubble_chamber.workspace.groups_collection.at(
+            location
+        ).get_unhappy()
+        return TopDownGroupLabeler(
+            bubble_chamber,
+            self,
+            parent_concept,
+            target_perceptlet,
+            target_perceptlet.exigency,
+            parent_concept.concept_id,
+        )

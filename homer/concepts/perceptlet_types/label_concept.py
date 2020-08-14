@@ -1,8 +1,7 @@
-import random
 from typing import Optional
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
+from homer.codelets import BottomUpRawPerceptletLabeler, RawPerceptletLabeler
 from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.workspace_location import WorkspaceLocation
@@ -31,4 +30,14 @@ class LabelConcept(PerceptletType):
         location: WorkspaceLocation,
         parent_concept: Concept,
     ):
-        raise NotImplementedError
+        target_perceptlet = bubble_chamber.workspace.raw_perceptlet_collection.at(
+            location
+        ).get_unhappy()
+        return RawPerceptletLabeler(
+            bubble_chamber,
+            self,
+            parent_concept,
+            target_perceptlet,
+            target_perceptlet.exigency,
+            parent_concept.concept_id,
+        )
