@@ -3,12 +3,11 @@ import random
 from typing import List, Optional, Set, Union
 
 from .errors import MissingPerceptletError
-from .perceptlet import Perceptlet
 from .workspace_location import WorkspaceLocation
 
 
 class PerceptletCollection:
-    def __init__(self, perceptlets: Optional[Set[Perceptlet]] = None):
+    def __init__(self, perceptlets: Optional[Set] = None):
         self.perceptlets = set() if perceptlets is None else perceptlets
         self.perceptlets_by_location = None
 
@@ -22,7 +21,7 @@ class PerceptletCollection:
             self.perceptlets_by_location[location.i][location.j][location.k]
         )
 
-    def add(self, perceptlet: Perceptlet):
+    def add(self, perceptlet):
         self.perceptlets.add(perceptlet)
         if self.perceptlets_by_location is not None:
             self._add_at_location(perceptlet, perceptlet.location)
@@ -30,7 +29,7 @@ class PerceptletCollection:
                 for member in perceptlet.members:
                     self._add_at_location(perceptlet, member.location)
 
-    def remove(self, perceptlet: Perceptlet):
+    def remove(self, perceptlet):
         self.perceptlets.remove(perceptlet)
         if self.perceptlets_by_location is None:
             return
@@ -52,29 +51,27 @@ class PerceptletCollection:
             set.intersection(*[collection.perceptlets for collection in collections])
         )
 
-    def get_random(self) -> Perceptlet:
+    def get_random(self):
         """Returns a random perceptlet"""
         return random.sample(self.perceptlets, 1)[0]
 
-    def get_exigent(self) -> Perceptlet:
+    def get_exigent(self):
         """Returns a perceptlet probabilistically according to exigency."""
         return self._get_perceptlet_according_to("exigency")
 
-    def get_important(self) -> Perceptlet:
+    def get_important(self):
         """Returns a perceptlet probabilistically according to importance."""
         return self._get_perceptlet_according_to("importance")
 
-    def get_unhappy(self) -> Perceptlet:
+    def get_unhappy(self):
         """Returns a perceptlet probabilistically according to unhappiness."""
         return self._get_perceptlet_according_to("unhappiness")
 
-    def _add_at_location(
-        self, perceptlet: Perceptlet, coordinates: List[Union[float, int]]
-    ):
+    def _add_at_location(self, perceptlet, coordinates: List[Union[float, int]]):
         loc = WorkspaceLocation.from_workspace_coordinates(coordinates)
         self.perceptlets_by_location[loc.i][loc.j][loc.k].add(perceptlet)
 
-    def _get_perceptlet_according_to(self, attribute: str) -> Perceptlet:
+    def _get_perceptlet_according_to(self, attribute: str):
         """Returns a perceptlet probabilistically according to attribute."""
         if len(self.perceptlets) < 1:
             raise MissingPerceptletError
