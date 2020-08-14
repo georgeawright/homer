@@ -3,6 +3,7 @@ from typing import Optional
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
+from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.workspace_location import WorkspaceLocation
 
@@ -25,6 +26,9 @@ class LabelConcept(PerceptletType):
             )
 
     def spawn_top_down_codelet(
-        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation, parent_id: str
+        self,
+        bubble_chamber: BubbleChamber,
+        location: WorkspaceLocation,
+        parent_concept: Concept,
     ):
         raise NotImplementedError

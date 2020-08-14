@@ -2,6 +2,7 @@ import random
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.group_labeler import GroupLabeler
+from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.workspace_location import WorkspaceLocation
 
@@ -23,6 +24,9 @@ class GroupLabelConcept(PerceptletType):
             )
 
     def spawn_top_down_codelet(
-        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation, parent_id: str
+        self,
+        bubble_chamber: BubbleChamber,
+        location: WorkspaceLocation,
+        parent_concept: Concept,
     ):
         raise NotImplementedError

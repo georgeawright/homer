@@ -2,6 +2,7 @@ import random
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.group_builder import GroupBuilder
+from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.workspace_location import WorkspaceLocation
 
@@ -25,6 +26,9 @@ class GroupConcept(PerceptletType):
             )
 
     def spawn_top_down_codelet(
-        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation, parent_id: str
+        self,
+        bubble_chamber: BubbleChamber,
+        location: WorkspaceLocation,
+        parent_concept: Concept,
     ):
         raise NotImplementedError

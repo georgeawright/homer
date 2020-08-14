@@ -46,5 +46,5 @@ class EuclideanConcept(Concept):
                 location=location,
             )
             return perceptlet_type.spawn_top_down_codelet(
-                bubble_chamber, location, self.concept_id
+                bubble_chamber, location, self
             )

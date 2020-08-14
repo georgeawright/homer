@@ -3,6 +3,7 @@ import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.correspondence_suggester import CorrespondenceSuggester
+from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.errors import MissingPerceptletError
 from homer.workspace_location import WorkspaceLocation
@@ -26,6 +27,9 @@ class CorrespondenceConcept(PerceptletType):
             )
 
     def spawn_top_down_codelet(
-        self, bubble_chamber: BubbleChamber, location: WorkspaceLocation, parent_id: str
+        self,
+        bubble_chamber: BubbleChamber,
+        location: WorkspaceLocation,
+        parent_concept: Concept,
     ):
         raise NotImplementedError
