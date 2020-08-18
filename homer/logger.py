@@ -162,6 +162,7 @@ class Logger:
                 x = [float(element[0]) for element in data]
                 y = [float(element[1]) for element in data]
                 pyplot.plot(x, y, label=concept_name)
+        pyplot.title("Concept Activations")
         pyplot.xlabel("Codelets Run")
         pyplot.ylabel("Activation")
         pyplot.legend(loc="best")
@@ -190,6 +191,7 @@ class Logger:
             codelets_run = [int(element[0]) for element in data]
             codelets_on_rack = [int(element[1]) for element in data]
             pyplot.plot(codelets_run, codelets_on_rack)
+        pyplot.title("Coderack Population")
         pyplot.xlabel("Codelets Run")
         pyplot.ylabel("Codelets on Rack")
         pyplot.savefig(f"{self.log_directory}/{file_name}.png")
