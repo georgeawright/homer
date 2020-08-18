@@ -55,9 +55,10 @@ class Homer:
         correspondence_concept = CorrespondenceConcept()
         correspondence_concept.connections.add(textlet_concept)
         correspondence_label_concept = CorrespondenceLabelConcept()
+        group_label_concept = GroupLabelConcept()
         group_concept = GroupConcept()
         group_concept.connections.add(correspondence_concept)
-        group_label_concept = GroupLabelConcept()
+        group_concept.connections.add(group_label_concept)
         label_concept = LabelConcept()
         label_concept.connections.add(group_concept)
         perceptlet_types = {

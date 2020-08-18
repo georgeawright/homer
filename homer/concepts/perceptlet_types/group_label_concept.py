@@ -15,7 +15,10 @@ class GroupLabelConcept(PerceptletType):
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
         activation = self.get_activation_as_scalar()
         if activation > random.random():
-            target_group = bubble_chamber.workspace.groups.get_random()
+            try:
+                target_group = bubble_chamber.workspace.groups.get_important()
+            except MissingPerceptletError:
+                return None
             return GroupLabeler(
                 bubble_chamber,
                 self,
