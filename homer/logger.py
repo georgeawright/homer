@@ -151,6 +151,7 @@ class Logger:
             )
 
     def graph_concepts(self, concept_names: List[str], file_name: str):
+        pyplot.clf()
         for concept_name in concept_names:
             concept_file = self.log_directory + "/concepts/" + concept_name + ".csv"
             if not os.path.exists(concept_file):
@@ -179,3 +180,16 @@ class Logger:
             for row in data:
                 family_tree.edge(row[0], row[1])
         family_tree.view()
+
+    def graph_coderack(self, file_name: str):
+        pyplot.clf()
+        print("graphing coderack")
+        coderack_file = self.log_directory + "/coderack.csv"
+        with open(coderack_file, "r") as f:
+            data = list(csv.reader(f))
+            codelets_run = [int(element[0]) for element in data]
+            codelets_on_rack = [int(element[1]) for element in data]
+            pyplot.plot(codelets_run, codelets_on_rack)
+        pyplot.xlabel("Codelets Run")
+        pyplot.ylabel("Codelets on Rack")
+        pyplot.savefig(f"{self.log_directory}/{file_name}.png")
