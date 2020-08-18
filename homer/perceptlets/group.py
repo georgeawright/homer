@@ -28,6 +28,7 @@ class Group(Perceptlet):
         self.strength = strength
         self.groups = PerceptletCollection()
         self.correspondences = PerceptletCollection()
+        self.textlets = PerceptletCollection()
 
     @property
     def size(self) -> int:
