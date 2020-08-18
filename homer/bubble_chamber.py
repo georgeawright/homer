@@ -15,6 +15,7 @@ from homer.perceptlets.relation import Relation
 from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
 from homer.perceptlet_collection import PerceptletCollection
+from homer.template import Template
 from homer.workspace import Workspace
 from homer.worldview import Worldview
 
@@ -169,14 +170,11 @@ class BubbleChamber:
         return word
 
     def create_textlet(
-        self,
-        text: str,
-        constituents: List[Union[Textlet, Word]],
-        relations: PerceptletCollection,
-        strength: float,
-        parent_id: str,
+        self, template: Template, label: Label, strength: float, parent_id: str,
     ) -> Textlet:
-        textlet = Textlet(text, constituents, relations, strength, parent_id)
+        concept = label.parent_concept
+        text, words = template.get_text_and_words(concept)
+        textlet = Textlet(text, template, concept, words, None, strength, parent_id,)
         self.workspace.add_textlet(textlet)
         self.logger.log(textlet)
         return textlet

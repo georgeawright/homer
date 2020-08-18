@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import statistics
+from typing import List, Optional
 
+from homer.concept import Concept
+from homer.template import Template
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet import Perceptlet
+from homer.perceptlets.word import Word
 from homer.perceptlet_collection import PerceptletCollection
 
 
@@ -19,23 +23,32 @@ class Textlet(Perceptlet):
 
     def __init__(
         self,
-        text: str,
-        constituents: PerceptletCollection,
+        value: str,
+        parent_template: Template,
+        parent_concept: Concept,
+        constituents: List[Word],
         constituent_relations: PerceptletCollection,
         strength: float,
         parent_id: str,
     ):
         location = None
         neighbours = PerceptletCollection()
-        value = text
         Perceptlet.__init__(self, value, location, neighbours, parent_id)
-        self.constituents = constituents
-        self.constituent_relations = constituent_relations
+        self.parent_template = parent_template
+        self.parent_concept = parent_concept
+        self.constituents = (
+            constituents if constituents is not None else PerceptletCollection()
+        )
+        self.constituent_relations = (
+            constituent_relations
+            if constituent_relations is not None
+            else PerceptletCollection()
+        )
         self.strength = strength
         self.relations = PerceptletCollection()
 
     def __str__(self) -> str:
-        return self.text
+        return " ".join([word.value for word in self.constituents])
 
     @property
     def size(self) -> int:

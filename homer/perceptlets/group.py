@@ -70,3 +70,12 @@ class Group(Perceptlet):
         for new_neighbour in new_member.neighbours:
             if new_neighbour not in self.members:
                 self.add_neighbour(new_neighbour)
+
+    def has_textlet(self, template, label):
+        for textlet in self.textlets:
+            if (
+                textlet.parent_concept == label.parent_concept
+                and textlet.parent_template == template
+            ):
+                return True
+        return False

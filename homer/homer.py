@@ -13,6 +13,7 @@ from homer.concepts.perceptlet_types import (
     GroupConcept,
     GroupLabelConcept,
     LabelConcept,
+    TextletConcept,
 )
 from homer.errors import NoMoreCodelets
 from homer.event_trace import EventTrace
@@ -20,6 +21,7 @@ from homer import fuzzy
 from homer.hyper_parameters import HyperParameters
 from homer.logger import Logger
 from homer.problem import Problem
+from homer.template import Template
 from homer.workspace import Workspace
 from homer.worldview import Worldview
 
@@ -46,7 +48,12 @@ class Homer:
         workspace = Workspace(event_trace, problem.as_raw_perceptlet_field_sequence())
         worldview = Worldview(set())
 
+        temperature_templates = [Template(["it", "will", "be", None])]
+        location_templates = [Template(["in", "the", None])]
+
+        textlet_concept = TextletConcept()
         correspondence_concept = CorrespondenceConcept()
+        correspondence_concept.connections.add(textlet_concept)
         correspondence_label_concept = CorrespondenceLabelConcept()
         group_concept = GroupConcept()
         group_concept.connections.add(correspondence_concept)
@@ -54,6 +61,7 @@ class Homer:
         label_concept = LabelConcept()
         label_concept.connections.add(group_concept)
         perceptlet_types = {
+            textlet_concept,
             correspondence_concept,
             correspondence_label_concept,
             group_concept,
@@ -78,8 +86,8 @@ class Homer:
                 ),
             ),
         }
-        temperature_space = EuclideanSpace("temperature", 5, 1.5)
-        location_space = EuclideanSpace("location", 5, 1)
+        temperature_space = EuclideanSpace("temperature", 5, 1.5, temperature_templates)
+        location_space = EuclideanSpace("location", 5, 1, location_templates)
         spaces = {temperature_space, location_space}
         workspace_concepts = {
             EuclideanConcept("cold", [4], temperature_space, depth=1, boundary=[7]),
@@ -150,6 +158,8 @@ class Homer:
             except NoMoreCodelets:
                 print("no more codelets")
                 self.logger.log("no more codelets")
+                for textlet in self.bubble_chamber.workspace.textlets:
+                    print(textlet)
                 break
             except Exception as e:
                 raise e
@@ -176,11 +186,14 @@ class Homer:
         correspondence_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "correspondence-label"
         ).activation_pattern.get_activation_as_scalar()
+        textlet_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+            "textlet"
+        ).activation_pattern.get_activation_as_scalar()
         print(
             "================================================================================"
         )
         print(
-            f"codelets run: {codelets_run}; label: {label_activation}; group: {group_activation}; gr_label: {group_label_activation}; corresp: {correspondence_activation}; co_label: {correspondence_label_activation}"
+            f"codelets run: {codelets_run}; label: {label_activation}; group: {group_activation}; gr_label: {group_label_activation}; corresp: {correspondence_activation}; co_label: {correspondence_label_activation}; textlet: {textlet_activation}"
         )
         print(
             "================================================================================"

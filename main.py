@@ -8,7 +8,14 @@ homer = Homer.setup(path_to_logs, path_to_problem)
 homer.run()
 
 homer.logger.graph_concepts(
-    ["label", "group", "group-label", "correspondence", "correspondence-label"],
+    [
+        "label",
+        "group",
+        "group-label",
+        "correspondence",
+        "correspondence-label",
+        "textlet",
+    ],
     "perceptlet_types",
 )
 

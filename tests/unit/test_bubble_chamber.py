@@ -11,6 +11,7 @@ from homer.perceptlets.relation import Relation
 from homer.perceptlets.textlet import Textlet
 from homer.perceptlets.word import Word
 from homer.perceptlet_collection import PerceptletCollection
+from homer.template import Template
 
 
 def test_get_random_workspace_concept():
@@ -111,10 +112,15 @@ def test_create_word_returns_word():
 
 
 def test_create_textlet_returns_textlet():
-    with patch.object(Workspace, "add_textlet", return_value=None) as add_text:
+    with patch.object(
+        Workspace, "add_textlet", return_value=None
+    ) as add_text, patch.object(
+        Template, "get_text_and_words", return_value=(Mock(), Mock())
+    ):
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
-        textlet = bubble_chamber.create_textlet(Mock(), Mock(), Mock(), Mock(), Mock())
+        template = Template(Mock())
+        textlet = bubble_chamber.create_textlet(template, Mock(), Mock(), Mock())
         assert Textlet == type(textlet)
     add_text.assert_called_once_with(textlet)
