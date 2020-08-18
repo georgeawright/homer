@@ -1,7 +1,8 @@
 import math
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+from homer.activation_patterns import WorkspaceActivationPattern
 from homer.perceptlets.word import Word
 
 FLOAT_COMPARISON_TOLERANCE = 1e-3
@@ -12,10 +13,16 @@ FLOAT_COMPARISON_TOLERANCE = 1e-3
     [(0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (1.0, 0, 0.5)],
 )
 def test_importance(strength, concept_activation, expected_importance):
-    parent_concept = Mock()
-    parent_concept.activation = concept_activation
-    word = Word("value", parent_concept, strength, Mock())
-    assert expected_importance == word.importance
+    with patch.object(
+        WorkspaceActivationPattern,
+        "get_activation_as_scalar",
+        return_value=concept_activation,
+    ):
+        activation_pattern = WorkspaceActivationPattern(Mock())
+        parent_concept = Mock()
+        parent_concept.activation_pattern = activation_pattern
+        word = Word("value", parent_concept, strength, Mock())
+        assert expected_importance == word.importance
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,2 @@
+from .scalar_activation_pattern import ScalarActivationPattern
+from .workspace_activation_pattern import WorkspaceActivationPattern
