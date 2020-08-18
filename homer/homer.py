@@ -145,7 +145,6 @@ class Homer:
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.print_status_update()
                 self.bubble_chamber.update_activations()
-                self.coderack.get_more_codelets()
             try:
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
