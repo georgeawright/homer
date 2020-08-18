@@ -12,6 +12,7 @@ class Group(Perceptlet):
 
     IMPORTANCE_SIZE_WEIGHT = HyperParameters.GROUP_IMPORTANCE_SIZE_WEIGHT
     IMPORTANCE_LABEL_WEIGHT = HyperParameters.GROUP_IMPORTANCE_LABEL_WEIGHT
+    IMPORTANCE_TEXTLET_WEIGHT = HyperParameters.GROUP_IMPORTANCE_TEXTLET_WEIGHT
     IMPORTANCE_STRENGTH_WEIGHT = HyperParameters.GROUP_IMPORTANCE_STRENGTH_WEIGHT
 
     def __init__(
@@ -40,6 +41,7 @@ class Group(Perceptlet):
             [
                 self._size_based_importance * self.IMPORTANCE_SIZE_WEIGHT,
                 self._label_based_importance * self.IMPORTANCE_LABEL_WEIGHT,
+                self._textlet_based_importance * self.IMPORTANCE_TEXTLET_WEIGHT,
                 self.strength * self.IMPORTANCE_STRENGTH_WEIGHT,
             ]
         )
@@ -54,6 +56,12 @@ class Group(Perceptlet):
             self.labels, self.groups, self.correspondences
         )
         return self._unhappiness_based_on_connections(connections)
+
+    @property
+    def _textlet_based_importance(self) -> float:
+        total_textlet_strengths = sum(textlet.strength for textlet in self.textlets)
+        total_textlet_strengths_inverse = 1.0 / (1.0 + total_textlet_strengths)
+        return 1.0 - total_textlet_strengths_inverse
 
     def add_member(self, new_member: Perceptlet):
         if type(self.value) != str:
