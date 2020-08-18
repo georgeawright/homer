@@ -159,8 +159,8 @@ class Homer:
             except NoMoreCodelets:
                 print("no more codelets")
                 self.logger.log("no more codelets")
-                for textlet in self.bubble_chamber.workspace.textlets:
-                    print(textlet)
+                for group in self.bubble_chamber.workspace.groups:
+                    print([textlet.value for textlet in group.textlets])
                 break
             except Exception as e:
                 raise e
