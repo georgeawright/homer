@@ -1,4 +1,7 @@
-.PHONY: integration lint unit run
+.PHONY: clear-logs integration lint unit run
+
+clear-logs:
+	rm -rf logs/
 
 integration:
 	pipenv run python -m pytest tests/integration
