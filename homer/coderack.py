@@ -3,10 +3,14 @@ import random
 from homer.codelet import BubbleChamber
 from homer.codelet import Codelet
 from homer.errors import NoMoreCodelets
+from homer.hyper_parameters import HyperParameters
 from homer.logger import Logger
 
 
 class Coderack:
+
+    IDEAL_POPULATION = HyperParameters.IDEAL_CODERACK_POPULATION
+
     def __init__(self, bubble_chamber: BubbleChamber, logger: Logger):
         self.bubble_chamber = bubble_chamber
         self._codelets = []
@@ -25,7 +29,7 @@ class Coderack:
             self.add_codelet(follow_up)
 
     def select_codelet(self) -> Codelet:
-        if len(self._codelets) < 1:
+        if len(self._codelets) < self.IDEAL_POPULATION:
             self.get_more_codelets()
         codelet_choice = None
         highest_weight = 0
