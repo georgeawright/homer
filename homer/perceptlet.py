@@ -28,6 +28,7 @@ class Perceptlet(ABC):
         self.parent_id = parent_id
         self.neighbours = neighbours
         self.labels = PerceptletCollection()
+        self.groups = PerceptletCollection()
         self.correspondences = PerceptletCollection()
 
     @property
@@ -93,6 +94,14 @@ class Perceptlet(ABC):
 
     def has_label_in_space(self, space: Concept) -> bool:
         return len(self.labels_in_space(space)) > 0
+
+    def makes_group_with(self, other_members: PerceptletCollection) -> bool:
+        for group in self.groups:
+            if group.members == PerceptletCollection.union(
+                other_members, PerceptletCollection({self}),
+            ):
+                return True
+        return False
 
     def has_correspondence(self, second_perceptlet: Perceptlet, space: Concept) -> bool:
         for correspondence in self.correspondences:

@@ -36,6 +36,7 @@ def test_calculate_confidence_with_no_common_concepts():
 
 def test_engender_follow_up():
     codelet = GroupExtender(Mock(), Mock(), Mock(), Mock(), Mock())
+    codelet.group = Mock()
     codelet.confidence = Mock()
     follow_up = codelet._engender_follow_up()
     assert GroupExtender == type(follow_up)

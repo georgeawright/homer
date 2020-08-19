@@ -108,10 +108,21 @@ def test_labels_in_space(space, label):
     assert {label} == perceptlet.labels_in_space(space).perceptlets
 
 
-def has_label_in_space(space, label):
+def test_has_label_in_space(space, label):
     perceptlet = Perceptlet("value", Mock(), set(), Mock())
     perceptlet.labels.add(label)
     assert perceptlet.has_label_in_space(space)
+
+
+def test_makes_group_with():
+    member_1 = Perceptlet("value", Mock(), set(), Mock())
+    member_2 = Mock()
+    member_3 = Mock()
+    other_members = PerceptletCollection({member_2, member_3})
+    group = Mock()
+    group.members = PerceptletCollection({member_1, member_2, member_3})
+    member_1.groups.add(group)
+    assert member_1.makes_group_with(other_members)
 
 
 @pytest.mark.parametrize(

@@ -3,6 +3,20 @@ from unittest.mock import Mock
 from homer.perceptlet_collection import PerceptletCollection
 
 
+def test_eq():
+    assert PerceptletCollection(set()) == PerceptletCollection(set())
+    perceptlet = Mock()
+    assert PerceptletCollection({perceptlet}) == PerceptletCollection({perceptlet})
+    assert not PerceptletCollection(set()) == PerceptletCollection({perceptlet})
+
+
+def test_ne():
+    perceptlet = Mock()
+    assert PerceptletCollection(set()) != PerceptletCollection({perceptlet})
+    assert not PerceptletCollection(set()) != PerceptletCollection(set())
+    assert not PerceptletCollection({perceptlet}) != PerceptletCollection({perceptlet})
+
+
 def test_add():
     collection = PerceptletCollection(set())
     assert collection.perceptlets == set()

@@ -26,13 +26,15 @@ class GroupBuilder(Codelet):
         self.parent_concept = None
 
     def _passes_preliminary_checks(self) -> bool:
-        for _ in range(len(self.target_perceptlet.groups)):
-            self.perceptlet_type.decay_activation(self.target_perceptlet.location)
         try:
             self.second_target_perceptlet = (
                 self.target_perceptlet.neighbours.get_random()
             )
         except MissingPerceptletError:
+            return False
+        if self.target_perceptlet.makes_group_with(
+            PerceptletCollection({self.second_target_perceptlet})
+        ):
             return False
         return True
 

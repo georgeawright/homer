@@ -27,6 +27,10 @@ class GroupExtender(Codelet):
         if len(self.target_perceptlet.neighbours) == 0:
             return False
         self.second_target_perceptlet = self.target_perceptlet.neighbours.get_random()
+        if self.second_target_perceptlet.makes_group_with(
+            self.target_perceptlet.members
+        ):
+            return False
         return True
 
     def _fizzle(self):
@@ -48,14 +52,21 @@ class GroupExtender(Codelet):
         self.confidence = 0.0 if distances == [] else fuzzy.OR(*distances)
 
     def _process_perceptlet(self):
-        self.target_perceptlet.members.add(self.second_target_perceptlet)
-        self.second_target_perceptlet.groups.add(self.target_perceptlet)
+        self.group = self.bubble_chamber.create_extended_group(
+            self.target_perceptlet,
+            self.second_target_perceptlet,
+            self.confidence,
+            self.codelet_id,
+        )
+        for member in self.target_perceptlet.members:
+            member.groups.add(self.group)
+        self.second_target_perceptlet.groups.add(self.group)
 
     def _engender_follow_up(self) -> GroupExtender:
         return GroupExtender(
             self.bubble_chamber,
             self.perceptlet_type,
-            self.target_perceptlet,
+            self.group,
             self.confidence,
             self.codelet_id,
         )

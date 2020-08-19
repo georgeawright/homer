@@ -129,6 +129,18 @@ class BubbleChamber:
         self.logger.log(group)
         return group
 
+    def create_extended_group(
+        self,
+        original_group: Group,
+        new_member: Perceptlet,
+        strength: float,
+        parent_id: str,
+    ) -> Group:
+        members = PerceptletCollection.union(
+            original_group.members, PerceptletCollection({new_member})
+        )
+        return self.create_group(members, strength, parent_id)
+
     def create_correspondence(
         self,
         name: str,

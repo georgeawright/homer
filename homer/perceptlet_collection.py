@@ -14,6 +14,17 @@ class PerceptletCollection:
     def __len__(self):
         return len(self.perceptlets)
 
+    def __eq__(self, other: PerceptletCollection) -> bool:
+        if len(self) != len(other):
+            return False
+        for perceptlet in self:
+            if perceptlet not in other:
+                return False
+        return True
+
+    def __ne__(self, other: PerceptletCollection) -> bool:
+        return not self == other
+
     def __iter__(self):
         return (perceptlet for perceptlet in self.perceptlets)
 
