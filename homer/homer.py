@@ -221,3 +221,9 @@ class Homer:
             print("labels:", [(label.value, label.strength) for label in group.labels])
             print("textlets:", [textlet.value for textlet in group.textlets])
             print("\n")
+        for correspondence in self.bubble_chamber.workspace.correspondences:
+            print(
+                f"{correspondence.perceptlet_id} from {correspondence.first_argument.perceptlet_id} to {correspondence.second_argument.perceptlet_id} in {correspondence.parent_concept.name}"
+            )
+            print(" ".join([label.value for label in correspondence.labels]))
+            print("\n")
