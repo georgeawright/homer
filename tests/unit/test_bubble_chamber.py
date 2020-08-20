@@ -75,27 +75,6 @@ def test_create_group_returns_group():
     add_group.assert_called_once_with(group)
 
 
-def test_create_extended_group_returns_group():
-    with patch.object(Workspace, "add_group", return_value=None) as add_group:
-        raw_inp = [[[Mock()]]]
-        workspace = Workspace(Mock(), raw_inp)
-        bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
-        original_group = Group(
-            "value",
-            [1, 2, 2],
-            PerceptletCollection(),
-            PerceptletCollection(),
-            Mock(),
-            Mock(),
-        )
-        new_member = Perceptlet("value", [1, 2, 3], PerceptletCollection(), Mock())
-        group = bubble_chamber.create_extended_group(
-            original_group, new_member, Mock(), Mock()
-        )
-        assert Group == type(group)
-    add_group.assert_called_once_with(group)
-
-
 def test_create_correspondence_returns_correspondence():
     with patch.object(
         Workspace, "add_correspondence", return_value=None

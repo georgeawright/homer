@@ -61,21 +61,14 @@ class GroupExtender(Codelet):
         self.confidence = 0.0 if distances == [] else fuzzy.OR(*distances)
 
     def _process_perceptlet(self):
-        self.group = self.bubble_chamber.create_extended_group(
-            self.target_perceptlet,
-            self.second_target_perceptlet,
-            self.confidence,
-            self.codelet_id,
-        )
-        for member in self.target_perceptlet.members:
-            member.groups.add(self.group)
-        self.second_target_perceptlet.groups.add(self.group)
+        self.target_perceptlet.add_member(self.second_target_perceptlet)
+        self.second_target_perceptlet.groups.add(self.target_perceptlet)
 
     def _engender_follow_up(self) -> GroupExtender:
         return GroupExtender(
             self.bubble_chamber,
             self.perceptlet_type,
-            self.group,
+            self.target_perceptlet,
             self.confidence,
             self.codelet_id,
         )

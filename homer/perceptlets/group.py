@@ -77,7 +77,7 @@ class Group(Perceptlet):
             pass
         for new_neighbour in new_member.neighbours:
             if new_neighbour not in self.members:
-                self.add_neighbour(new_neighbour)
+                self.neighbours.add(new_neighbour)
 
     def has_textlet(self, template, label):
         for textlet in self.textlets:
