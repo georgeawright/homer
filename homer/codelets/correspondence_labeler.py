@@ -39,7 +39,7 @@ class CorrespondenceLabeler(Codelet):
         return not self.target_perceptlet.has_label(self.parent_concept)
 
     def _fizzle(self):
-        pass
+        return self._fail()
 
     def _fail(self) -> CorrespondenceLabeler:
         self.perceptlet_type.decay_activation(self.target_perceptlet.location)
