@@ -158,10 +158,8 @@ class Homer:
             try:
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
-                print("no more codelets")
                 self.logger.log("no more codelets")
-                for group in self.bubble_chamber.workspace.groups:
-                    print([textlet.value for textlet in group.textlets])
+                self.print_results()
                 break
             except Exception as e:
                 raise e
@@ -200,3 +198,26 @@ class Homer:
         print(
             "================================================================================"
         )
+
+    def print_results(self):
+        for raw_perceptlet_field in self.bubble_chamber.workspace.input_sequence:
+            for row in raw_perceptlet_field:
+                for raw_perceptlet in row:
+                    print(
+                        ",".join(
+                            [
+                                label.parent_concept.name
+                                for label in raw_perceptlet.labels
+                            ]
+                        ),
+                        end="|",
+                    )
+                print("\n")
+        for group in self.bubble_chamber.workspace.groups:
+            print(
+                f"{group.perceptlet_id} - location: {group.location}; size: {group.size}, strength: {group.strength}"
+            )
+            print([(member.value, member.location) for member in group.members])
+            print("labels:", [(label.value, label.strength) for label in group.labels])
+            print("textlets:", [textlet.value for textlet in group.textlets])
+            print("\n")
