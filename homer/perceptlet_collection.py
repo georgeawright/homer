@@ -67,6 +67,8 @@ class PerceptletCollection:
 
     def get_random(self):
         """Returns a random perceptlet"""
+        if len(self.perceptlets) < 1:
+            raise MissingPerceptletError
         return random.sample(self.perceptlets, 1)[0]
 
     def get_exigent(self):

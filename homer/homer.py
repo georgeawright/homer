@@ -52,9 +52,10 @@ class Homer:
         location_templates = [Template(["in", "the", None])]
 
         textlet_concept = TextletConcept()
+        correspondence_label_concept = CorrespondenceLabelConcept()
         correspondence_concept = CorrespondenceConcept()
         correspondence_concept.connections.add(textlet_concept)
-        correspondence_label_concept = CorrespondenceLabelConcept()
+        correspondence_concept.connections.add(correspondence_label_concept)
         group_label_concept = GroupLabelConcept()
         group_concept = GroupConcept()
         group_concept.connections.add(correspondence_concept)
