@@ -19,11 +19,16 @@ class GroupBuilder(Codelet):
         urgency: float,
         parent_id: str,
     ):
-        Codelet.__init__(self, bubble_chamber, parent_id)
-        self.perceptlet_type = perceptlet_type
-        self.target_perceptlet = target_perceptlet
-        self.urgency = urgency
-        self.parent_concept = None
+        parent_concept = None
+        Codelet.__init__(
+            self,
+            bubble_chamber,
+            perceptlet_type,
+            parent_concept,
+            target_perceptlet,
+            urgency,
+            parent_id,
+        )
 
     def _passes_preliminary_checks(self) -> bool:
         try:

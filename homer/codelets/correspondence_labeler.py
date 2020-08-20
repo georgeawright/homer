@@ -22,12 +22,17 @@ class CorrespondenceLabeler(Codelet):
         urgency: float,
         parent_id: str,
     ):
-        Codelet.__init__(self, bubble_chamber, parent_id)
-        self.bubble_chamber = bubble_chamber
-        self.perceptlet_type = perceptlet_type
+        parent_concept = None
+        Codelet.__init__(
+            self,
+            bubble_chamber,
+            perceptlet_type,
+            parent_concept,
+            target_correspondence,
+            urgency,
+            parent_id,
+        )
         self.relevant_space = relevant_space
-        self.target_perceptlet = target_correspondence
-        self.urgency = urgency
 
     def _passes_preliminary_checks(self) -> bool:
         self.parent_concept = self.bubble_chamber.get_random_correspondence_type()

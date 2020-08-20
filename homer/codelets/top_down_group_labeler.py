@@ -16,11 +16,15 @@ class TopDownGroupLabeler(Codelet):
         urgency: float,
         parent_id: str,
     ):
-        Codelet.__init__(self, bubble_chamber, parent_id)
-        self.perceptlet_type = perceptlet_type
-        self.parent_concept = parent_concept
-        self.target_perceptlet = target_group
-        self.urgency = urgency
+        Codelet.__init__(
+            self,
+            bubble_chamber,
+            perceptlet_type,
+            parent_concept,
+            target_group,
+            urgency,
+            parent_id,
+        )
 
     def _passes_preliminary_checks(self) -> bool:
         return not self.target_perceptlet.has_label(self.parent_concept)

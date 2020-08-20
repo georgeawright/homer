@@ -3,7 +3,10 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from homer.bubble_chamber import BubbleChamber
+from homer.concept import Concept
+from homer.concepts.perceptlet_type import PerceptletType
 from homer.hyper_parameters import HyperParameters
+from homer.perceptlet import Perceptlet
 from homer.id import ID
 
 
@@ -11,8 +14,20 @@ class Codelet(ABC):
 
     CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
 
-    def __init__(self, bubble_chamber: BubbleChamber, parent_id: str):
+    def __init__(
+        self,
+        bubble_chamber: BubbleChamber,
+        perceptlet_type: PerceptletType,
+        parent_concept: Optional[Concept],
+        target_perceptlet: Perceptlet,
+        urgency: float,
+        parent_id: str,
+    ):
         self.bubble_chamber = bubble_chamber
+        self.perceptlet_type = perceptlet_type
+        self.parent_concept = parent_concept
+        self.target_perceptlet = target_perceptlet
+        self.urgency = urgency
         self.codelet_id = ID.new(self)
         self.parent_id = parent_id
 
