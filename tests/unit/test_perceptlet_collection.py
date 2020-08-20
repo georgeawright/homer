@@ -17,6 +17,16 @@ def test_ne():
     assert not PerceptletCollection({perceptlet}) != PerceptletCollection({perceptlet})
 
 
+def test_copy():
+    perceptlets = {Mock(), Mock(), Mock()}
+    original_collection = PerceptletCollection(perceptlets)
+    new_collection = original_collection.copy()
+    assert new_collection.perceptlets == perceptlets
+    assert new_collection == original_collection
+    original_collection.add(Mock())
+    assert new_collection != original_collection
+
+
 def test_add():
     collection = PerceptletCollection(set())
     assert collection.perceptlets == set()
