@@ -30,7 +30,9 @@ class CorrespondenceBuilder(Codelet):
         self.second_target_perceptlet = target_group_b
 
     def _passes_preliminary_checks(self) -> bool:
-        return True
+        return not self.target_perceptlet.has_correspondence(
+            self.second_target_perceptlet, self.parent_concept
+        )
 
     def _fizzle(self):
         return self._fail()
