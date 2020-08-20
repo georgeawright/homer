@@ -38,7 +38,10 @@ class CorrespondenceLabeler(Codelet):
         self.parent_concept = self.bubble_chamber.get_random_correspondence_type()
         return True
 
-    def _fizzle(self) -> CorrespondenceLabeler:
+    def _fizzle(self):
+        pass
+
+    def _fail(self) -> CorrespondenceLabeler:
         self.perceptlet_type.decay_activation(self.target_perceptlet.location)
         return self._engender_alternative_follow_up()
 

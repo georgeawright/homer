@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
+from homer.codelets.group_labeler import GroupLabeler
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.perceptlets.group import Group
 
@@ -37,9 +40,21 @@ class CorrespondenceSuggester(Codelet):
         )
         return True
 
-    def _fizzle(self):
+    def _fizzle(self) -> GroupLabeler:
         self.perceptlet_type.decay_activation(self.target_perceptlet.location)
-        return self._engender_alternative_follow_up()
+        if len(self.target_perceptlet.labels) == 0:
+            return self._engender_group_labeler(self.target_perceptlet)
+        return self._engender_group_labeler(self.second_target_perceptlet)
+
+    def _fail(self) -> CorrespondenceSuggester:
+        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        return CorrespondenceSuggester(
+            self.bubble_chamber,
+            self.perceptlet_type,
+            *self.bubble_chamber.get_random_groups(2),
+            self.urgency / 2,
+            self.codelet_id,
+        )
 
     def _calculate_confidence(self):
         self.confidence = float(
@@ -65,11 +80,13 @@ class CorrespondenceSuggester(Codelet):
             self.codelet_id,
         )
 
-    def _engender_alternative_follow_up(self):
-        return CorrespondenceSuggester(
+    def _engender_group_labeler(self, target_group: Group):
+        return GroupLabeler(
             self.bubble_chamber,
-            self.perceptlet_type,
-            *self.bubble_chamber.get_random_groups(2),
-            self.urgency / 2,
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "group-label"
+            ),
+            target_group,
+            self.urgency,
             self.codelet_id,
         )

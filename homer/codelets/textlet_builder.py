@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
+from homer.codelets.group_labeler import GroupLabeler
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.perceptlets import Group
 
@@ -34,9 +35,22 @@ class TextletBuilder(Codelet):
         self.template = self.parent_concept.get_template()
         return not self.target_perceptlet.has_textlet(self.template, self.target_label)
 
-    def _fizzle(self):
+    def _fizzle(self) -> GroupLabeler:
         self.perceptlet_type.decay_activation(self.target_perceptlet.location)
-        return self._engender_alternative_follow_up()
+        return GroupLabeler(
+            self.bubble_chamber,
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "group-label"
+            ),
+            self.target_perceptlet,
+            self.urgency,
+            self.parent_id,
+        )
+
+    def _fail(self) -> TextletBuilder:
+        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self.urgency /= 2
+        return self._engender_follow_up()
 
     def _calculate_confidence(self):
         self.confidence = self.target_label.strength

@@ -1,6 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelets.group_extender import GroupExtender
+from homer.codelets.raw_perceptlet_labeler import RawPerceptletLabeler
 from homer.concept import Concept
 from homer.concepts.perceptlet_type import PerceptletType
 from homer.perceptlets.group import Group
@@ -32,6 +33,17 @@ class TopDownGroupLabeler(Codelet):
     def _fizzle(self):
         self.perceptlet_type.decay_activation(self.target_perceptlet.location)
         return None
+
+    def _fail(self) -> RawPerceptletLabeler:
+        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        return RawPerceptletLabeler(
+            self.bubble_chamber,
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name("label"),
+            self.parent_concept,
+            self.target_perceptlet.members.get_unhappy(),
+            self.urgency,
+            self.codelet_id,
+        )
 
     def _calculate_confidence(self):
         total_strength = 0.0

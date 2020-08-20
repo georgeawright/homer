@@ -32,13 +32,14 @@ class Codelet(ABC):
         self.parent_id = parent_id
 
     def run(self) -> Optional[Codelet]:
-        if self._passes_preliminary_checks():
-            self._calculate_confidence()
-            if self.confidence > self.CONFIDENCE_THRESHOLD:
-                self._boost_activations()
-                self._process_perceptlet()
-                return self._engender_follow_up()
-        return self._fizzle()
+        if not self._passes_preliminary_checks():
+            return self._fizzle()
+        self._calculate_confidence()
+        if self.confidence > self.CONFIDENCE_THRESHOLD:
+            self._boost_activations()
+            self._process_perceptlet()
+            return self._engender_follow_up()
+        return self._fail()
 
     def _boost_activations(self):
         if self.parent_concept is not None:
@@ -67,4 +68,8 @@ class Codelet(ABC):
 
     @abstractmethod
     def _engender_follow_up(self) -> Codelet:
+        pass
+
+    @abstractmethod
+    def _fail(self) -> Optional[Codelet]:
         pass

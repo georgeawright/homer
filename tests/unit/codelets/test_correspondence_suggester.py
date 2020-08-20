@@ -14,7 +14,7 @@ def test_engender_follow_up():
     assert CorrespondenceBuilder == type(follow_up)
 
 
-def test_engender_alternative_follow_up():
+def test_engender_fail():
     with patch.object(
         BubbleChamber, "get_random_groups", return_value=[Mock(), Mock()]
     ):
@@ -22,7 +22,5 @@ def test_engender_alternative_follow_up():
         correspondence_suggester = CorrespondenceSuggester(
             bubble_chamber, Mock(), Mock(), Mock(), 1, Mock()
         )
-        alternative_follow_up = (
-            correspondence_suggester._engender_alternative_follow_up()
-        )
+        alternative_follow_up = correspondence_suggester._fail()
         assert CorrespondenceSuggester == type(alternative_follow_up)

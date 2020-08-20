@@ -38,7 +38,11 @@ class GroupExtender(Codelet):
             return False
         return True
 
-    def _fizzle(self):
+    def _fizzle(self) -> GroupExtender:
+        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        return self._engender_alternative_follow_up()
+
+    def _fail(self):
         self.perceptlet_type.decay_activation(self.target_perceptlet.location)
         return None
 
@@ -73,5 +77,14 @@ class GroupExtender(Codelet):
             self.perceptlet_type,
             self.group,
             self.confidence,
+            self.codelet_id,
+        )
+
+    def _engender_alternative_follow_up(self) -> GroupExtender:
+        return GroupExtender(
+            self.bubble_chamber,
+            self.perceptlet_type,
+            self.target_perceptlet,
+            self.urgency / 2,
             self.codelet_id,
         )

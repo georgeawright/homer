@@ -44,6 +44,9 @@ class GroupBuilder(Codelet):
         return True
 
     def _fizzle(self):
+        return self._fail()
+
+    def _fail(self):
         self.perceptlet_type.decay_activation(self.target_perceptlet.location)
         return None
 
