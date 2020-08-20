@@ -36,7 +36,7 @@ class CorrespondenceLabeler(Codelet):
 
     def _passes_preliminary_checks(self) -> bool:
         self.parent_concept = self.bubble_chamber.get_random_correspondence_type()
-        return True
+        return not self.target_perceptlet.has_label(self.parent_concept)
 
     def _fizzle(self):
         pass
