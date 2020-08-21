@@ -1,10 +1,9 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from homer.concept import Concept
-from homer.codelets.correspondence_builder import CorrespondenceBuilder
-from homer.codelets.correspondence_labeler import CorrespondenceLabeler
-from homer.perceptlets.group import Group
+from homer.bubbles import Concept
+from homer.bubbles.perceptlets import Group
+from homer.codelets import CorrespondenceBuilder, CorrespondenceLabeler
 from homer.perceptlet_collection import PerceptletCollection
 
 

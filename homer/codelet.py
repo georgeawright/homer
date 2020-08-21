@@ -2,12 +2,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from homer.bubble_chamber import BubbleChamber
-from homer.concept import Concept
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.hyper_parameters import HyperParameters
-from homer.perceptlet import Perceptlet
-from homer.id import ID
+from .bubble_chamber import BubbleChamber
+from .bubbles.concept import Concept
+from .bubbles.concepts.perceptlet_type import PerceptletType
+from .bubbles.perceptlet import Perceptlet
+from .hyper_parameters import HyperParameters
+from .id import ID
 
 
 class Codelet(ABC):

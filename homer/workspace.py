@@ -1,12 +1,14 @@
-from homer.event_trace import EventTrace
-from homer.perceptlets.group import Group
-from homer.perceptlets.label import Label
-from homer.perceptlets.correspondence import Correspondence
-from homer.perceptlets.raw_perceptlet_field_sequence import RawPerceptletFieldSequence
-from homer.perceptlets.relation import Relation
-from homer.perceptlets.textlet import Textlet
-from homer.perceptlets.word import Word
-from homer.perceptlet_collection import PerceptletCollection
+from .bubbles.perceptlets import (
+    Correspondence,
+    Group,
+    Label,
+    RawPerceptletFieldSequence,
+    Relation,
+    Textlet,
+    Word,
+)
+from .event_trace import EventTrace
+from .perceptlet_collection import PerceptletCollection
 
 
 class Workspace:

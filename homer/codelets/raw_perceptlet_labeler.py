@@ -3,10 +3,9 @@ from typing import Optional
 
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles import Concept, Perceptlet
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelet import Codelet
-from homer.concept import Concept
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.perceptlet import Perceptlet
 
 
 class RawPerceptletLabeler(Codelet):

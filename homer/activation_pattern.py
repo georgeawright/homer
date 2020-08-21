@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Union
 
-from homer.hyper_parameters import HyperParameters
+from .hyper_parameters import HyperParameters
 
 
 class ActivationPattern(ABC):
@@ -9,11 +9,11 @@ class ActivationPattern(ABC):
     DECAY_RATE = HyperParameters.DECAY_RATE
 
     @abstractmethod
-    def get_activation(self, location: List[Union[float, int]]) -> float:
+    def at(self, location: List[Union[float, int]]) -> float:
         pass
 
     @abstractmethod
-    def get_activation_as_scalar(self) -> float:
+    def as_scalar(self) -> float:
         pass
 
     @abstractmethod

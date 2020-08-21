@@ -1,10 +1,8 @@
 from unittest.mock import Mock, patch
 
 from homer.codelets.group_extender import GroupExtender
-from homer.concept import Concept
-from homer.perceptlet import Perceptlet
-from homer.perceptlets.group import Group
-from homer.perceptlets.label import Label
+from homer.bubbles import Concept, Perceptlet
+from homer.bubbles.perceptlets import Group, Label
 
 
 def test_calculate_confidence():
@@ -16,7 +14,7 @@ def test_calculate_confidence():
         label_2 = Label(common_concept, Mock(), Mock(), Mock())
         group = Group(Mock(), [0, 1, 2], Mock(), Mock(), Mock(), Mock())
         group.labels.add(label_1)
-        candidate = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock())
+        candidate = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock(), Mock())
         candidate.labels.add(label_2)
         codelet = GroupExtender(Mock(), Mock(), group, Mock(), Mock())
         codelet.second_target_perceptlet = candidate
@@ -27,7 +25,7 @@ def test_calculate_confidence():
 def test_calculate_confidence_with_no_common_concepts():
     expected = 0.0
     group = Group(Mock(), [0, 1, 2], Mock(), Mock(), Mock(), Mock())
-    candidate = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock())
+    candidate = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock(), Mock())
     codelet = GroupExtender(Mock(), Mock(), group, Mock(), Mock())
     codelet.second_target_perceptlet = candidate
     codelet._calculate_confidence()

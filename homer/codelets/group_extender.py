@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
+from homer.bubbles.perceptlets import Group
 from homer.codelet import Codelet
-from homer.concepts.perceptlet_type import PerceptletType
-
-from homer.perceptlets.group import Group
 
 
 class GroupExtender(Codelet):

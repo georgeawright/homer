@@ -2,7 +2,7 @@ from __future__ import annotations
 import math
 from typing import List, Union
 
-from homer.hyper_parameters import HyperParameters
+from .hyper_parameters import HyperParameters
 
 
 class WorkspaceLocation:

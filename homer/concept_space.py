@@ -1,9 +1,9 @@
 from typing import Set
 
-from homer.concept import Concept
-from homer.concepts.correspondence_type import CorrespondenceType
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.logger import Logger
+from .bubbles.concept import Concept
+from .bubbles.concepts.correspondence_type import CorrespondenceType
+from .bubbles.concepts.perceptlet_type import PerceptletType
+from .logger import Logger
 
 
 class ConceptSpace:

@@ -2,8 +2,7 @@ import math
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.group_labeler import GroupLabeler
-from homer.codelets.group_extender import GroupExtender
+from homer.codelets import GroupExtender, GroupLabeler
 
 FLOAT_COMPARISON_TOLERANCE = 1e-1
 

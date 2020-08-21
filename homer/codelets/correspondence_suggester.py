@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
+from homer.bubbles.perceptlets import Group
 from homer.codelet import Codelet
-from homer.codelets.group_labeler import GroupLabeler
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.perceptlets.group import Group
+
+from .group_labeler import GroupLabeler
 
 
 class CorrespondenceSuggester(Codelet):

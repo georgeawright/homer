@@ -151,7 +151,7 @@ def test_get_activation_at(activation_matrix, i, j, k, expected_activation):
         ),
     ],
 )
-def test_get_activation(
+def test_at(
     depth,
     height,
     width,
@@ -172,7 +172,7 @@ def test_get_activation(
         workspace_width=workspace_width,
     )
     activation_pattern.activation_matrix = activation_matrix
-    activation = activation_pattern.get_activation(location)
+    activation = activation_pattern.at(location)
     assert expected_activation == activation
 
 
@@ -195,10 +195,10 @@ def test_get_spreading_signal(activation_matrix, expected_signal):
         ([[[0.5, 0.0], [0.25, 0.25], [0.2, 0.3]]], 0.25),
     ],
 )
-def test_activation_as_scalar(activation_matrix, expected_activation):
+def test_as_scalar(activation_matrix, expected_activation):
     activation_pattern = WorkspaceActivationPattern(Mock())
     activation_pattern.activation_matrix = activation_matrix
-    actual_activation = activation_pattern.get_activation_as_scalar()
+    actual_activation = activation_pattern.as_scalar()
     assert math.isclose(
         expected_activation, actual_activation, abs_tol=FLOAT_COMPARISON_TOLERANCE
     )

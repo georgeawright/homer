@@ -1,7 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles.concepts import PerceptletType
+from homer.bubbles.perceptlets import Group
 from homer.codelets.evaluator import Evaluator
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.perceptlets import Group
 
 
 class GroupEvaluator(Evaluator):

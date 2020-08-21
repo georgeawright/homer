@@ -1,8 +1,7 @@
 from unittest.mock import Mock, patch
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.correspondence_builder import CorrespondenceBuilder
-from homer.codelets.correspondence_suggester import CorrespondenceSuggester
+from homer.codelets import CorrespondenceBuilder, CorrespondenceSuggester
 
 
 def test_engender_follow_up():

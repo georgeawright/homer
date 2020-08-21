@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from homer.codelets.textlet_builder import TextletBuilder
+from homer.codelets import TextletBuilder
 
 
 def test_engender_follow_up():

@@ -8,8 +8,9 @@ class HyperParameters:
     DECAY_RATE = 0.1
     CONFIDENCE_THRESHOLD = 0.5
 
-    IMPORTANCE_WEIGHT = 0.4
-    UNHAPPINESS_WEIGHT = 0.6
+    # why are these uneven?
+    EXIGENCY_ACTIVATION_WEIGHT = 0.4
+    EXIGENCY_UNHAPPINESS_WEIGHT = 0.6
 
     # larger groups tend to have lower strength
     # so size has greatest weight to compensate

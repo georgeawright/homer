@@ -3,11 +3,12 @@ import random
 from typing import Optional
 
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles import Concept
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
+from homer.bubbles.perceptlets import Group
 from homer.codelet import Codelet
-from homer.codelets.group_extender import GroupExtender
-from homer.concept import Concept
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.perceptlets.group import Group
+
+from .group_extender import GroupExtender
 
 
 class GroupLabeler(Codelet):

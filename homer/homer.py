@@ -1,13 +1,9 @@
 import time
 
-from homer.bubble_chamber import BubbleChamber
-from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
-from homer.coderack import Coderack
-from homer.concept_space import ConceptSpace
-from homer.concepts.correspondence_type import CorrespondenceType
-from homer.concepts.euclidean_concept import EuclideanConcept
-from homer.concepts.euclidean_space import EuclideanSpace
-from homer.concepts.perceptlet_types import (
+from homer import fuzzy
+from .bubble_chamber import BubbleChamber
+from .bubbles.concepts import CorrespondenceType, EuclideanConcept, EuclideanSpace
+from .bubbles.concepts.perceptlet_types import (
     CorrespondenceConcept,
     CorrespondenceLabelConcept,
     GroupConcept,
@@ -15,15 +11,17 @@ from homer.concepts.perceptlet_types import (
     LabelConcept,
     TextletConcept,
 )
-from homer.errors import NoMoreCodelets
-from homer.event_trace import EventTrace
-from homer import fuzzy
-from homer.hyper_parameters import HyperParameters
-from homer.logger import Logger
-from homer.problem import Problem
-from homer.template import Template
-from homer.workspace import Workspace
-from homer.worldview import Worldview
+from .codelets import BottomUpRawPerceptletLabeler
+from .coderack import Coderack
+from .concept_space import ConceptSpace
+from .errors import NoMoreCodelets
+from .event_trace import EventTrace
+from .hyper_parameters import HyperParameters
+from .logger import Logger
+from .problem import Problem
+from .template import Template
+from .workspace import Workspace
+from .worldview import Worldview
 
 
 class Homer:

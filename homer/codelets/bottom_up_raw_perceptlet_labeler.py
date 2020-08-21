@@ -2,10 +2,11 @@ from __future__ import annotations
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles import Perceptlet
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelet import Codelet
-from homer.codelets.raw_perceptlet_labeler import RawPerceptletLabeler
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.perceptlet import Perceptlet
+
+from .raw_perceptlet_labeler import RawPerceptletLabeler
 
 
 class BottomUpRawPerceptletLabeler(Codelet):
@@ -68,7 +69,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
         new_target_perceptlet = (
             self.bubble_chamber.workspace.raw_perceptlets.get_unhappy()
         )
-        perceptlet_type_activation = self.perceptlet_type.get_activation(
+        perceptlet_type_activation = self.perceptlet_type.activation.at(
             new_target_perceptlet.location
         )
         new_urgency = statistics.fmean([self.urgency, perceptlet_type_activation])

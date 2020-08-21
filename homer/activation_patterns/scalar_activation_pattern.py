@@ -9,10 +9,10 @@ class ScalarActivationPattern(ActivationPattern):
         self.activation = activation
         self.activation_buffer = 0
 
-    def get_activation(self, location: List[Union[float, int]]) -> float:
+    def at(self, location: List[Union[float, int]]) -> float:
         return self.activation
 
-    def get_activation_as_scalar(self) -> float:
+    def as_scalar(self) -> float:
         return self.activation
 
     def get_spreading_signal(self) -> float:

@@ -1,9 +1,9 @@
 from abc import abstractmethod
 
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles import Perceptlet
+from homer.bubbles.concepts import PerceptletType
 from homer.codelet import Codelet
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.perceptlet import Perceptlet
 
 
 class Evaluator(Codelet):

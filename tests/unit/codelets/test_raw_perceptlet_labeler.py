@@ -2,9 +2,8 @@ import math
 import pytest
 from unittest.mock import Mock, patch
 
-from homer.concept import Concept
-from homer.perceptlet import Perceptlet
-from homer.codelets.raw_perceptlet_labeler import RawPerceptletLabeler
+from homer.bubbles import Concept, Perceptlet
+from homer.codelets import RawPerceptletLabeler
 
 FLOAT_COMPARISON_TOLERANCE = 1e-1
 
@@ -32,7 +31,7 @@ def test_calculate_confidence(
         Perceptlet, "get_value", return_value=Mock()
     ):
         parent_concept = Concept("concept_name", Mock())
-        target_perceptlet = Perceptlet(Mock(), Mock(), Mock(), Mock())
+        target_perceptlet = Perceptlet(Mock(), Mock(), Mock(), Mock(), Mock())
         codelet = RawPerceptletLabeler(
             Mock(), Mock(), parent_concept, target_perceptlet, Mock(), Mock()
         )

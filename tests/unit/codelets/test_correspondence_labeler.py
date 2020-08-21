@@ -1,7 +1,6 @@
 from unittest.mock import Mock
 
-from homer.codelets.correspondence_builder import CorrespondenceBuilder
-from homer.codelets.correspondence_labeler import CorrespondenceLabeler
+from homer.codelets import CorrespondenceBuilder, CorrespondenceLabeler
 
 
 def test_engender_follow_up():

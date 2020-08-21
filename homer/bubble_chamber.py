@@ -2,22 +2,23 @@ import random
 import statistics
 from typing import List, Union
 
-from homer.concept import Concept
-from homer.concept_space import ConceptSpace
-from homer.errors import MissingPerceptletError
-from homer.event_trace import EventTrace
-from homer.logger import Logger
-from homer.perceptlet import Perceptlet
-from homer.perceptlets.group import Group
-from homer.perceptlets.label import Label
-from homer.perceptlets.correspondence import Correspondence
-from homer.perceptlets.relation import Relation
-from homer.perceptlets.textlet import Textlet
-from homer.perceptlets.word import Word
-from homer.perceptlet_collection import PerceptletCollection
-from homer.template import Template
-from homer.workspace import Workspace
-from homer.worldview import Worldview
+from .bubbles import Concept, Perceptlet
+from .bubbles.perceptlets import (
+    Correspondence,
+    Group,
+    Label,
+    Relation,
+    Textlet,
+    Word,
+)
+from .concept_space import ConceptSpace
+from .errors import MissingPerceptletError
+from .event_trace import EventTrace
+from .logger import Logger
+from .perceptlet_collection import PerceptletCollection
+from .template import Template
+from .workspace import Workspace
+from .worldview import Worldview
 
 
 class BubbleChamber:
