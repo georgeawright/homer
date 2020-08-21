@@ -8,6 +8,8 @@ class HyperParameters:
     DECAY_RATE = 0.1
     CONFIDENCE_THRESHOLD = 0.5
 
+    PERCEPTLET_ACTIVATION_COEFFICIENT = 1
+
     # why are these uneven?
     EXIGENCY_ACTIVATION_WEIGHT = 0.4
     EXIGENCY_UNHAPPINESS_WEIGHT = 0.6

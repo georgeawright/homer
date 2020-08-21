@@ -37,7 +37,7 @@ class TextletBuilder(Codelet):
         return not self.target_perceptlet.has_textlet(self.template, self.target_label)
 
     def _fizzle(self) -> GroupLabeler:
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return GroupLabeler(
             self.bubble_chamber,
             self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
@@ -49,12 +49,13 @@ class TextletBuilder(Codelet):
         )
 
     def _fail(self) -> TextletBuilder:
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
+        self._decay_concept(self.parent_concept)
         self.urgency /= 2
         return self._engender_follow_up()
 
     def _calculate_confidence(self):
-        self.confidence = self.target_label.strength
+        self.confidence = self.target_label.activation.as_scalar()
 
     def _process_perceptlet(self):
         textlet = self.bubble_chamber.create_textlet(

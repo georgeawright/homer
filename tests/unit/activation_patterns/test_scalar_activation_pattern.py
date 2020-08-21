@@ -10,11 +10,11 @@ FLOAT_COMPARISON_TOLERANCE = 1e-5
     "activation_coefficient, amount, prior_activation, expected_activation",
     [(0.5, 0.5, 0, 0.25), (0.5, 0.5, 0.9, 1.0)],
 )
-def test_boost_activation(
+def test_boost(
     activation_coefficient, amount, prior_activation, expected_activation,
 ):
     activation_pattern = ScalarActivationPattern(activation_coefficient)
     activation_pattern.activation = prior_activation
-    activation_pattern.boost_activation_evenly(amount)
-    activation_pattern.update_activation()
+    activation_pattern.boost(amount, None)
+    activation_pattern.update()
     assert expected_activation == activation_pattern.activation

@@ -78,9 +78,9 @@ class PerceptletCollection:
         """Returns a perceptlet probabilistically according to exigency."""
         return self._get_perceptlet_according_to("exigency")
 
-    def get_important(self):
-        """Returns a perceptlet probabilistically according to importance."""
-        return self._get_perceptlet_according_to("importance")
+    def get_active(self):
+        """Returns a perceptlet probabilistically according to activation."""
+        return self._get_perceptlet_according_to("activation")
 
     def get_unhappy(self):
         """Returns a perceptlet probabilistically according to unhappiness."""

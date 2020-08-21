@@ -38,7 +38,7 @@ class ConceptSpace:
     def update_activations(self):
         self.spread_activations()
         for concept in self.concepts:
-            concept.update_activation()
+            concept.activation.update()
             self.logger.log(concept)
 
     def spread_activations(self):

@@ -32,11 +32,11 @@ class TopDownGroupLabeler(Codelet):
         return not self.target_perceptlet.has_label(self.parent_concept)
 
     def _fizzle(self):
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.target_perceptlet)
         return None
 
     def _fail(self) -> RawPerceptletLabeler:
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.target_perceptlet)
         return RawPerceptletLabeler(
             self.bubble_chamber,
             self.bubble_chamber.concept_space.get_perceptlet_type_by_name("label"),
@@ -47,12 +47,12 @@ class TopDownGroupLabeler(Codelet):
         )
 
     def _calculate_confidence(self):
-        total_strength = 0.0
+        total_activation = 0.0
         for member in self.target_perceptlet.members:
             for label in member.labels:
                 if label.parent_concept == self.parent_concept:
-                    total_strength += label.strength
-        self.confidence = total_strength / self.target_perceptlet.size
+                    total_activation += label.activation.as_scalar()
+        self.confidence = total_activation / self.target_perceptlet.size
 
     def _process_perceptlet(self):
         label = self.bubble_chamber.create_label(

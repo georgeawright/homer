@@ -42,13 +42,13 @@ class CorrespondenceSuggester(Codelet):
         return True
 
     def _fizzle(self) -> GroupLabeler:
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         if len(self.target_perceptlet.labels) == 0:
             return self._engender_group_labeler(self.target_perceptlet)
         return self._engender_group_labeler(self.second_target_perceptlet)
 
     def _fail(self) -> CorrespondenceSuggester:
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return CorrespondenceSuggester(
             self.bubble_chamber,
             self.perceptlet_type,

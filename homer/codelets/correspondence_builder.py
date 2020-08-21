@@ -38,7 +38,7 @@ class CorrespondenceBuilder(Codelet):
         return self._fail()
 
     def _fail(self):
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return None
 
     def _calculate_confidence(self):

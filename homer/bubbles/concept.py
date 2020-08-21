@@ -106,4 +106,4 @@ class Concept(Bubble):
     ):
         if location is None:
             return a if a.activation.as_scalar() > b.activation.as_scalar() else b
-        return a if a.activation.value_at(location) > b.value_at(location) else b
+        return a if a.activation.at(location) > b.activation.at(location) else b

@@ -2,7 +2,9 @@ import time
 
 from homer import fuzzy
 from .bubble_chamber import BubbleChamber
-from .bubbles.concepts import CorrespondenceType, EuclideanConcept, EuclideanSpace
+from .bubbles.concepts.correspondence_type import CorrespondenceType
+from .bubbles.concepts.euclidean_concept import EuclideanConcept
+from .bubbles.concepts.euclidean_space import EuclideanSpace
 from .bubbles.concepts.perceptlet_types import (
     CorrespondenceConcept,
     CorrespondenceLabelConcept,
@@ -171,22 +173,22 @@ class Homer:
         codelets_run = self.coderack.codelets_run
         label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "label"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         group_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "group"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         group_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "group-label"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         correspondence_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "correspondence"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         correspondence_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "correspondence-label"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         textlet_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "textlet"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         print(
             "================================================================================"
         )
@@ -213,10 +215,13 @@ class Homer:
                 print("\n")
         for group in self.bubble_chamber.workspace.groups:
             print(
-                f"{group.perceptlet_id} - location: {group.location}; size: {group.size}, strength: {group.strength}"
+                f"{group.perceptlet_id} - location: {group.location}; size: {group.size}, activation: {group.activation.activation}"
             )
             print([(member.value, member.location) for member in group.members])
-            print("labels:", [(label.value, label.strength) for label in group.labels])
+            print(
+                "labels:",
+                [(label.value, label.activation.activation) for label in group.labels],
+            )
             print("textlets:", [textlet.value for textlet in group.textlets])
             print("\n")
         for correspondence in self.bubble_chamber.workspace.correspondences:

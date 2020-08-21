@@ -34,10 +34,10 @@ class Logger:
         return logger
 
     def log(self, item: Any):
+        from homer.bubbles.concept import Concept
+        from homer.bubbles.perceptlet import Perceptlet
         from homer.codelet import Codelet
         from homer.coderack import Coderack
-        from homer.concept import Concept
-        from homer.perceptlet import Perceptlet
 
         if isinstance(item, str):
             return self._log_message(item)
@@ -115,7 +115,7 @@ class Logger:
             writer.writerow(
                 {
                     codelets_run: self.codelets_run,
-                    activation: concept.get_activation_as_scalar(),
+                    activation: concept.activation.as_scalar(),
                 }
             )
 
@@ -125,7 +125,7 @@ class Logger:
         self._log_message(
             f"{perceptlet.perceptlet_id} created "
             + f" by {perceptlet.parent_id} - value: {perceptlet.value}; "
-            + f"location: {perceptlet.location}; strength: {perceptlet.strength}"
+            + f"location: {perceptlet.location}; activation: {perceptlet.activation.activation}"
         )
         perceptlets_file = self.log_directory + "/perceptlets.csv"
         with open(perceptlets_file, "a") as f:

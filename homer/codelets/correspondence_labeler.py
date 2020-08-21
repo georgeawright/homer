@@ -42,7 +42,7 @@ class CorrespondenceLabeler(Codelet):
         return self._fail()
 
     def _fail(self) -> CorrespondenceLabeler:
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return self._engender_alternative_follow_up()
 
     def _calculate_confidence(self):

@@ -15,7 +15,7 @@ class TextletConcept(PerceptletType):
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
         if self.activation.as_scalar() > random.random():
             try:
-                target_perceptlet = bubble_chamber.workspace.groups.get_important()
+                target_perceptlet = bubble_chamber.workspace.groups.get_active()
             except MissingPerceptletError:
                 return None
             if target_perceptlet is None:
