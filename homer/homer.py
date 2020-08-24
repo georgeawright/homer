@@ -3,6 +3,7 @@ import time
 from homer import fuzzy
 from .bubble_chamber import BubbleChamber
 from .bubbles.concepts.correspondence_type import CorrespondenceType
+from .bubbles.concepts.emotion import Emotion
 from .bubbles.concepts.euclidean_concept import EuclideanConcept
 from .bubbles.concepts.euclidean_space import EuclideanSpace
 from .bubbles.concepts.perceptlet_types import (
@@ -47,6 +48,9 @@ class Homer:
         event_trace = EventTrace([])
         workspace = Workspace(event_trace, problem.as_raw_perceptlet_field_sequence())
         worldview = Worldview(set())
+
+        satisfaction = Emotion("satisfaction")
+        emotions = {satisfaction}
 
         temperature_templates = [Template(["it", "will", "be", None])]
         location_templates = [Template(["in", "the", None])]
@@ -126,7 +130,12 @@ class Homer:
         }
 
         concept_space = ConceptSpace(
-            perceptlet_types, correspondence_types, spaces, workspace_concepts, logger,
+            emotions,
+            perceptlet_types,
+            correspondence_types,
+            spaces,
+            workspace_concepts,
+            logger,
         )
 
         bubble_chamber = BubbleChamber(
