@@ -2,8 +2,7 @@ import math
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.group_labeler import GroupLabeler
-from homer.codelets.group_extender import GroupExtender
+from homer.codelets import GroupExtender, GroupLabeler
 
 FLOAT_COMPARISON_TOLERANCE = 1e-1
 
@@ -15,12 +14,13 @@ FLOAT_COMPARISON_TOLERANCE = 1e-1
 def test_calculate_confidence(label_strengths, group_size, expected):
     concept = Mock()
     group = Mock()
+    group.location = [0, 0, 0]
     group.size = group_size
     group.members = set()
     for label_strength in label_strengths:
         label = Mock()
         label.parent_concept = concept
-        label.strength = label_strength
+        label.activation.as_scalar.side_effect = [label_strength]
         member = Mock()
         member.labels = {label}
         group.members.add(member)
@@ -32,14 +32,14 @@ def test_calculate_confidence(label_strengths, group_size, expected):
     )
 
 
-def test_engender_follow_up():
-    codelet = GroupLabeler(Mock(), Mock(), Mock(), Mock(), Mock())
+def test_engender_follow_up(target_perceptlet):
+    codelet = GroupLabeler(Mock(), Mock(), target_perceptlet, Mock(), Mock())
     codelet.confidence = Mock()
     follow_up = codelet._engender_follow_up()
     assert GroupExtender == type(follow_up)
 
 
-def test_engender_alternative_follow_up():
-    codelet = GroupLabeler(Mock(), Mock(), Mock(), 1, Mock())
+def test_engender_alternative_follow_up(target_perceptlet):
+    codelet = GroupLabeler(Mock(), Mock(), target_perceptlet, 1, Mock())
     follow_up = codelet._engender_alternative_follow_up()
     assert GroupLabeler == type(follow_up)

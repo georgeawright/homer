@@ -1,8 +1,5 @@
-import math
-import random
-from typing import List, Tuple, Union
-
 import numpy
+import random
 
 from homer.activation_pattern import ActivationPattern
 from homer.hyper_parameters import HyperParameters
@@ -30,14 +27,10 @@ class WorkspaceActivationPattern(ActivationPattern):
         self.height_divisor = workspace_height / height
         self.width_divisor = workspace_width / width
 
-    def get_activation(self, location: List[Union[float, int]]) -> float:
-        depth, height, width = self._depth_height_width(location)
-        return self.activation_matrix[depth][height][width]
-
-    def get_activation_at(self, location: WorkspaceLocation) -> float:
+    def at(self, location: WorkspaceLocation) -> float:
         return self.activation_matrix[location.i][location.j][location.k]
 
-    def get_activation_as_scalar(self) -> float:
+    def as_scalar(self) -> float:
         return numpy.mean(self.activation_matrix)
 
     def get_high_location(self) -> WorkspaceLocation:
@@ -58,34 +51,32 @@ class WorkspaceActivationPattern(ActivationPattern):
             ]
         )
 
-    def is_fully_activated(self) -> bool:
-        return self.get_activation_as_scalar() >= 1.0
+    def is_full(self) -> bool:
+        return self.as_scalar() >= 1.0
 
     def is_high(self) -> bool:
         return 1.0 in self.activation_matrix
 
-    def boost_activation(self, amount: float, location: List[Union[float, int]]):
-        depth, height, width = self._depth_height_width(location)
-        current_activation = self.activation_matrix[depth][height][width]
-        self.activation_buffer[depth][height][width] += (
+    def boost(self, amount: float, location: WorkspaceLocation):
+        current_activation = self.activation_matrix[location.i][location.j][location.k]
+        self.activation_buffer[location.i][location.j][location.k] += (
             current_activation + amount * self.activation_coefficient
         )
 
-    def boost_activation_evenly(self, amount: float):
+    def boost_evenly(self, amount: float):
         self.activation_buffer = numpy.add(
             self.activation_buffer, amount * self.activation_coefficient
         )
 
-    def boost_activation_with_signal(self, signal: numpy.ndarray):
+    def boost_with_signal(self, signal: numpy.ndarray):
         self.activation_buffer = numpy.add(self.activation_buffer, signal)
 
-    def decay_activation(self, location: List[Union[float, int]]):
-        depth, height, width = self._depth_height_width(location)
-        self.activation_buffer[depth][height][width] -= (
+    def decay(self, location: WorkspaceLocation):
+        self.activation_buffer[location.i][location.j][location.k] -= (
             self.DECAY_RATE * self.activation_coefficient
         )
 
-    def update_activation(self):
+    def update(self):
         self.activation_matrix = numpy.add(
             self.activation_matrix, self.activation_buffer
         )
@@ -108,9 +99,3 @@ class WorkspaceActivationPattern(ActivationPattern):
             ]
         )
         self.activation_buffer = numpy.zeros_like(self.activation_buffer)
-
-    def _depth_height_width(self, location: List[Union[float, int]]) -> Tuple[int]:
-        depth = min(math.floor(location[0] / self.depth_divisor), self.depth - 1)
-        height = min(math.floor(location[1] / self.height_divisor), self.height - 1)
-        width = min(math.floor(location[2] / self.width_divisor), self.width - 1)
-        return (depth, height, width)

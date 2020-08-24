@@ -1,10 +1,9 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from homer.concept import Concept
-from homer.codelets.correspondence_builder import CorrespondenceBuilder
-from homer.codelets.correspondence_labeler import CorrespondenceLabeler
-from homer.perceptlets.group import Group
+from homer.bubbles import Concept
+from homer.bubbles.perceptlets import Group
+from homer.codelets import CorrespondenceBuilder, CorrespondenceLabeler
 from homer.perceptlet_collection import PerceptletCollection
 
 
@@ -41,11 +40,11 @@ def test_calculate_confidence(
         assert expected == correspondence_builder.confidence
 
 
-def test_engender_follow_up():
+def test_engender_follow_up(target_perceptlet):
     correspondence_builder = CorrespondenceBuilder(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), Mock(), target_perceptlet, target_perceptlet, Mock(), Mock()
     )
-    correspondence_builder.correspondence = Mock()
+    correspondence_builder.correspondence = target_perceptlet
     correspondence_builder.confidence = Mock()
     follow_up = correspondence_builder._engender_follow_up()
     assert CorrespondenceLabeler == type(follow_up)

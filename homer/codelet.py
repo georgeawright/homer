@@ -2,12 +2,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from homer.bubble_chamber import BubbleChamber
-from homer.concept import Concept
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.hyper_parameters import HyperParameters
-from homer.perceptlet import Perceptlet
-from homer.id import ID
+from .bubble_chamber import BubbleChamber
+from .bubbles.concept import Concept
+from .bubbles.concepts.perceptlet_type import PerceptletType
+from .bubbles.perceptlet import Perceptlet
+from .hyper_parameters import HyperParameters
+from .id import ID
+from .workspace_location import WorkspaceLocation
 
 
 class Codelet(ABC):
@@ -28,6 +29,9 @@ class Codelet(ABC):
         self.parent_concept = parent_concept
         self.target_perceptlet = target_perceptlet
         self.urgency = urgency
+        self.location = WorkspaceLocation.from_workspace_coordinates(
+            self.target_perceptlet.location
+        )
         self.codelet_id = ID.new(self)
         self.parent_id = parent_id
 
@@ -43,12 +47,11 @@ class Codelet(ABC):
 
     def _boost_activations(self):
         if self.parent_concept is not None:
-            self.parent_concept.boost_activation(
-                self.confidence, self.target_perceptlet.location
-            )
-        self.perceptlet_type.boost_activation(
-            self.confidence, self.target_perceptlet.location
-        )
+            self.parent_concept.activation.boost(self.confidence, self.location)
+        self.perceptlet_type.activation.boost(self.confidence, self.location)
+
+    def _decay_concept(self, concept: Concept):
+        concept.activation.decay(self.location)
 
     @abstractmethod
     def _passes_preliminary_checks(self) -> bool:

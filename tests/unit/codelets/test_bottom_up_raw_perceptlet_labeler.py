@@ -1,34 +1,38 @@
 from unittest.mock import Mock, patch
 
-from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
-from homer.codelets.raw_perceptlet_labeler import RawPerceptletLabeler
-from homer.concepts.perceptlet_type import PerceptletType
+from homer.activation_patterns import WorkspaceActivationPattern
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
+from homer.codelets import BottomUpRawPerceptletLabeler
+from homer.codelets import RawPerceptletLabeler
 from homer.perceptlet_collection import PerceptletCollection
 
 
-def test_engender_follow_up():
-    bottom_up_raw_perceptlet_labeler = BottomUpRawPerceptletLabeler(
-        Mock(), Mock(), Mock(), Mock(), Mock()
-    )
-    bottom_up_raw_perceptlet_labeler.parent_concept = Mock()
-    bottom_up_raw_perceptlet_labeler.confidence = Mock()
-    follow_up = bottom_up_raw_perceptlet_labeler._engender_follow_up()
-    assert RawPerceptletLabeler == type(follow_up)
-
-
-def test_engender_alternative_follow_up():
-    raw_perceptlet = Mock()
+def test_engender_follow_up(target_perceptlet):
     with patch.object(
-        PerceptletCollection, "get_unhappy", return_value=raw_perceptlet
-    ), patch.object(PerceptletType, "get_activation", return_value=1):
-        raw_perceptlets = PerceptletCollection
-        workspace = Mock()
-        workspace.raw_perceptlets = raw_perceptlets
-        bubble_chamber = Mock()
-        bubble_chamber.workspace = workspace
-        perceptlet_type = PerceptletType("name", 1)
+        PerceptletCollection, "get_unhappy", return_value=target_perceptlet
+    ):
+        target_perceptlet.neighbours = PerceptletCollection()
         bottom_up_raw_perceptlet_labeler = BottomUpRawPerceptletLabeler(
-            bubble_chamber, perceptlet_type, raw_perceptlet, 1, Mock()
+            Mock(), Mock(), target_perceptlet, Mock(), Mock()
+        )
+        bottom_up_raw_perceptlet_labeler.parent_concept = Mock()
+        bottom_up_raw_perceptlet_labeler.confidence = Mock()
+        follow_up = bottom_up_raw_perceptlet_labeler._engender_follow_up()
+        assert RawPerceptletLabeler == type(follow_up)
+
+
+def test_engender_alternative_follow_up(target_perceptlet):
+    with patch.object(
+        PerceptletCollection, "get_unhappy", return_value=target_perceptlet
+    ), patch.object(WorkspaceActivationPattern, "at", return_value=1):
+        raw_perceptlets = PerceptletCollection
+        bubble_chamber = Mock()
+        bubble_chamber.workspace.raw_perceptlets = raw_perceptlets
+        activation_pattern = WorkspaceActivationPattern(Mock())
+        perceptlet_type = PerceptletType("name", 1)
+        perceptlet_type.activation = activation_pattern
+        bottom_up_raw_perceptlet_labeler = BottomUpRawPerceptletLabeler(
+            bubble_chamber, perceptlet_type, target_perceptlet, 1, Mock()
         )
         alternative_follow_up = (
             bottom_up_raw_perceptlet_labeler._engender_alternative_follow_up()

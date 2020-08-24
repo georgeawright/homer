@@ -1,6 +1,6 @@
 from typing import List
 
-from homer.perceptlet import Perceptlet
+from .bubbles.perceptlet import Perceptlet
 
 
 class EventTrace:

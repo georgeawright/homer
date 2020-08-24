@@ -1,13 +1,11 @@
 import time
 
-from homer.bubble_chamber import BubbleChamber
-from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
-from homer.coderack import Coderack
-from homer.concept_space import ConceptSpace
-from homer.concepts.correspondence_type import CorrespondenceType
-from homer.concepts.euclidean_concept import EuclideanConcept
-from homer.concepts.euclidean_space import EuclideanSpace
-from homer.concepts.perceptlet_types import (
+from homer import fuzzy
+from .bubble_chamber import BubbleChamber
+from .bubbles.concepts.correspondence_type import CorrespondenceType
+from .bubbles.concepts.euclidean_concept import EuclideanConcept
+from .bubbles.concepts.euclidean_space import EuclideanSpace
+from .bubbles.concepts.perceptlet_types import (
     CorrespondenceConcept,
     CorrespondenceLabelConcept,
     GroupConcept,
@@ -15,15 +13,17 @@ from homer.concepts.perceptlet_types import (
     LabelConcept,
     TextletConcept,
 )
-from homer.errors import NoMoreCodelets
-from homer.event_trace import EventTrace
-from homer import fuzzy
-from homer.hyper_parameters import HyperParameters
-from homer.logger import Logger
-from homer.problem import Problem
-from homer.template import Template
-from homer.workspace import Workspace
-from homer.worldview import Worldview
+from .codelets import BottomUpRawPerceptletLabeler
+from .coderack import Coderack
+from .concept_space import ConceptSpace
+from .errors import NoMoreCodelets
+from .event_trace import EventTrace
+from .hyper_parameters import HyperParameters
+from .logger import Logger
+from .problem import Problem
+from .template import Template
+from .workspace import Workspace
+from .worldview import Worldview
 
 
 class Homer:
@@ -173,22 +173,22 @@ class Homer:
         codelets_run = self.coderack.codelets_run
         label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "label"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         group_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "group"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         group_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "group-label"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         correspondence_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "correspondence"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         correspondence_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "correspondence-label"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         textlet_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
             "textlet"
-        ).activation_pattern.get_activation_as_scalar()
+        ).activation.as_scalar()
         print(
             "================================================================================"
         )
@@ -215,10 +215,13 @@ class Homer:
                 print("\n")
         for group in self.bubble_chamber.workspace.groups:
             print(
-                f"{group.perceptlet_id} - location: {group.location}; size: {group.size}, strength: {group.strength}"
+                f"{group.perceptlet_id} - location: {group.location}; size: {group.size}, activation: {group.activation.activation}"
             )
             print([(member.value, member.location) for member in group.members])
-            print("labels:", [(label.value, label.strength) for label in group.labels])
+            print(
+                "labels:",
+                [(label.value, label.activation.activation) for label in group.labels],
+            )
             print("textlets:", [textlet.value for textlet in group.textlets])
             print("\n")
         for correspondence in self.bubble_chamber.workspace.correspondences:

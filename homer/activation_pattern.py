@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Union
 
-from homer.hyper_parameters import HyperParameters
+from .hyper_parameters import HyperParameters
+from .workspace_location import WorkspaceLocation
 
 
 class ActivationPattern(ABC):
@@ -9,11 +10,11 @@ class ActivationPattern(ABC):
     DECAY_RATE = HyperParameters.DECAY_RATE
 
     @abstractmethod
-    def get_activation(self, location: List[Union[float, int]]) -> float:
+    def at(self, location: WorkspaceLocation) -> float:
         pass
 
     @abstractmethod
-    def get_activation_as_scalar(self) -> float:
+    def as_scalar(self) -> float:
         pass
 
     @abstractmethod
@@ -21,7 +22,7 @@ class ActivationPattern(ABC):
         pass
 
     @abstractmethod
-    def is_fully_activated(self) -> bool:
+    def is_full(self) -> bool:
         pass
 
     @abstractmethod
@@ -29,21 +30,21 @@ class ActivationPattern(ABC):
         pass
 
     @abstractmethod
-    def boost_activation(self, amount: float, location: List):
+    def boost(self, amount: float, location: WorkspaceLocation):
         pass
 
     @abstractmethod
-    def boost_activation_evenly(self, amount: float):
+    def boost_evenly(self, amount: float):
         pass
 
     @abstractmethod
-    def boost_activation_with_signal(self, signal: Union[float, list]):
+    def boost_with_signal(self, signal: Union[float, list]):
         pass
 
     @abstractmethod
-    def decay_activation(self, location: List[Union[float, int]]):
+    def decay(self, location: WorkspaceLocation):
         pass
 
     @abstractmethod
-    def update_activation(self):
+    def update(self):
         pass

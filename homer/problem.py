@@ -1,6 +1,10 @@
 import yaml
 
-from .perceptlets import RawPerceptlet, RawPerceptletField, RawPerceptletFieldSequence
+from .bubbles.perceptlets import (
+    RawPerceptlet,
+    RawPerceptletField,
+    RawPerceptletFieldSequence,
+)
 from .perceptlet_collection import PerceptletCollection
 
 

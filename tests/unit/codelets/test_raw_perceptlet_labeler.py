@@ -2,9 +2,9 @@ import math
 import pytest
 from unittest.mock import Mock, patch
 
-from homer.concept import Concept
-from homer.perceptlet import Perceptlet
-from homer.codelets.raw_perceptlet_labeler import RawPerceptletLabeler
+from homer.bubbles import Concept, Perceptlet
+from homer.codelets import RawPerceptletLabeler
+from homer.perceptlet_collection import PerceptletCollection
 
 FLOAT_COMPARISON_TOLERANCE = 1e-1
 
@@ -32,7 +32,7 @@ def test_calculate_confidence(
         Perceptlet, "get_value", return_value=Mock()
     ):
         parent_concept = Concept("concept_name", Mock())
-        target_perceptlet = Perceptlet(Mock(), Mock(), Mock(), Mock())
+        target_perceptlet = Perceptlet(Mock(), [0, 0, 0], Mock(), Mock(), Mock())
         codelet = RawPerceptletLabeler(
             Mock(), Mock(), parent_concept, target_perceptlet, Mock(), Mock()
         )
@@ -42,8 +42,15 @@ def test_calculate_confidence(
     )
 
 
-def test_engender_follow_up():
-    codelet = RawPerceptletLabeler(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    codelet.confidence = Mock()
-    follow_up = codelet._engender_follow_up()
-    assert RawPerceptletLabeler == type(follow_up)
+def test_engender_follow_up(target_perceptlet):
+    with patch.object(
+        PerceptletCollection, "get_unhappy", return_value=target_perceptlet
+    ):
+        neighbours = PerceptletCollection()
+        target_perceptlet.neighbours = neighbours
+        codelet = RawPerceptletLabeler(
+            Mock(), Mock(), Mock(), target_perceptlet, Mock(), Mock()
+        )
+        codelet.confidence = Mock()
+        follow_up = codelet._engender_follow_up()
+        assert RawPerceptletLabeler == type(follow_up)

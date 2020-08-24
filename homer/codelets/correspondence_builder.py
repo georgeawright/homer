@@ -1,9 +1,9 @@
 from homer import fuzzy
+from homer.bubbles import Concept
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
+from homer.bubbles.perceptlets import Group
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
-from homer.concept import Concept
-from homer.concepts.perceptlet_type import PerceptletType
-from homer.perceptlets.group import Group
 from homer.perceptlet_collection import PerceptletCollection
 
 
@@ -38,7 +38,7 @@ class CorrespondenceBuilder(Codelet):
         return self._fail()
 
     def _fail(self):
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return None
 
     def _calculate_confidence(self):

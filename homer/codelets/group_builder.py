@@ -2,12 +2,13 @@ from typing import Optional
 
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles import Perceptlet
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelet import Codelet
-from homer.codelets.group_labeler import GroupLabeler
-from homer.concepts.perceptlet_type import PerceptletType
 from homer.errors import MissingPerceptletError
-from homer.perceptlet import Perceptlet
 from homer.perceptlet_collection import PerceptletCollection
+
+from .group_labeler import GroupLabeler
 
 
 class GroupBuilder(Codelet):
@@ -47,7 +48,7 @@ class GroupBuilder(Codelet):
         return self._fail()
 
     def _fail(self):
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return None
 
     def _calculate_confidence(self):

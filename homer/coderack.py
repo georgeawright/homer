@@ -1,10 +1,10 @@
 import random
 
-from homer.codelet import BubbleChamber
-from homer.codelet import Codelet
-from homer.errors import NoMoreCodelets
-from homer.hyper_parameters import HyperParameters
-from homer.logger import Logger
+from .bubble_chamber import BubbleChamber
+from .codelet import Codelet
+from .errors import NoMoreCodelets
+from .hyper_parameters import HyperParameters
+from .logger import Logger
 
 
 class Coderack:

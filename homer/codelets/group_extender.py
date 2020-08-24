@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
+from homer.bubbles.perceptlets import Group
 from homer.codelet import Codelet
-from homer.concepts.perceptlet_type import PerceptletType
-
-from homer.perceptlets.group import Group
 
 
 class GroupExtender(Codelet):
@@ -39,11 +38,11 @@ class GroupExtender(Codelet):
         return True
 
     def _fizzle(self) -> GroupExtender:
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return self._engender_alternative_follow_up()
 
     def _fail(self):
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return None
 
     def _calculate_confidence(self):

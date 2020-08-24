@@ -1,15 +1,17 @@
 from unittest.mock import Mock, patch
 
 from homer.bubble_chamber import BubbleChamber
-from homer.perceptlet import Perceptlet
+from homer.bubbles import Perceptlet
+from homer.bubbles.perceptlets import (
+    Correspondence,
+    Group,
+    Label,
+    Relation,
+    Textlet,
+    Word,
+)
 from homer.workspace import Workspace
 from homer.worldview import Worldview
-from homer.perceptlets.correspondence import Correspondence
-from homer.perceptlets.group import Group
-from homer.perceptlets.label import Label
-from homer.perceptlets.relation import Relation
-from homer.perceptlets.textlet import Textlet
-from homer.perceptlets.word import Word
 from homer.perceptlet_collection import PerceptletCollection
 from homer.template import Template
 
@@ -66,8 +68,12 @@ def test_create_group_returns_group():
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
-        perceptlet_1 = Perceptlet("value", [1, 2, 2], PerceptletCollection(), Mock())
-        perceptlet_2 = Perceptlet("value", [1, 2, 3], PerceptletCollection(), Mock())
+        perceptlet_1 = Perceptlet(
+            "value", [1, 2, 2], Mock(), PerceptletCollection(), Mock()
+        )
+        perceptlet_2 = Perceptlet(
+            "value", [1, 2, 3], Mock(), PerceptletCollection(), Mock()
+        )
         group = bubble_chamber.create_group(
             [perceptlet_1, perceptlet_2], Mock(), Mock()
         )

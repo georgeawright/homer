@@ -9,3 +9,5 @@ from .top_down_group_labeler import TopDownGroupLabeler
 from .correspondence_suggester import CorrespondenceSuggester
 from .correspondence_builder import CorrespondenceBuilder
 from .correspondence_labeler import CorrespondenceLabeler
+
+from .textlet_builder import TextletBuilder

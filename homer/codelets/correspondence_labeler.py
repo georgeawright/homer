@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from homer.bubble_chamber import BubbleChamber
+from homer.bubbles import Concept
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
+from homer.bubbles.perceptlets import Correspondence
 from homer.codelet import Codelet
-from homer.concept import Concept
-from homer.concepts.perceptlet_type import PerceptletType
 from homer.hyper_parameters import HyperParameters
-from homer.perceptlets.correspondence import Correspondence
 from homer.perceptlet_collection import PerceptletCollection
 
 
@@ -42,7 +42,7 @@ class CorrespondenceLabeler(Codelet):
         return self._fail()
 
     def _fail(self) -> CorrespondenceLabeler:
-        self.perceptlet_type.decay_activation(self.target_perceptlet.location)
+        self._decay_concept(self.perceptlet_type)
         return self._engender_alternative_follow_up()
 
     def _calculate_confidence(self):

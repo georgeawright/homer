@@ -1,7 +1,7 @@
 from typing import List, Tuple, Union
 
-from .concept import Concept
-from .perceptlets.word import Word
+from .bubbles.concept import Concept
+from .bubbles.perceptlets.word import Word
 
 
 class Template:
