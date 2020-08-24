@@ -46,16 +46,13 @@ class GroupExtender(Codelet):
         return None
 
     def _calculate_confidence(self):
-        common_concepts = set.intersection(
-            {label.parent_concept for label in self.target_perceptlet.labels},
-            {label.parent_concept for label in self.second_target_perceptlet.labels},
-        )
+        spaces = {label.parent_concept.space for label in self.target_perceptlet.labels}
         distances = [
-            concept.proximity_between(
-                self.target_perceptlet.get_value(concept),
-                self.second_target_perceptlet.get_value(concept),
+            space.proximity_between(
+                self.target_perceptlet.get_value(space),
+                self.second_target_perceptlet.get_value(space),
             )
-            for concept in common_concepts
+            for space in spaces
         ]
         self.confidence = 0.0 if distances == [] else fuzzy.OR(*distances)
 

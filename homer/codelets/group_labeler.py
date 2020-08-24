@@ -32,7 +32,10 @@ class GroupLabeler(Codelet):
         )
 
     def _passes_preliminary_checks(self) -> bool:
-        self.parent_concept = self._get_target_concept()
+        try:
+            self.parent_concept = self._get_target_concept()
+        except IndexError:
+            return False
         return not self.target_perceptlet.has_label(self.parent_concept)
 
     def _fizzle(self) -> GroupLabeler:
