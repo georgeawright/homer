@@ -2,6 +2,7 @@ from typing import Set
 
 from .bubbles.concept import Concept
 from .bubbles.concepts.correspondence_type import CorrespondenceType
+from .bubbles.concepts.emotion import Emotion
 from .bubbles.concepts.perceptlet_type import PerceptletType
 from .logger import Logger
 
@@ -9,12 +10,14 @@ from .logger import Logger
 class ConceptSpace:
     def __init__(
         self,
+        emotions: Set[Emotion],
         perceptlet_types: Set[PerceptletType],
         correspondence_types: Set[CorrespondenceType],
         conceptual_spaces: Set[Concept],
         workspace_concepts: Set[Concept],
         logger: Logger,
     ):
+        self.emotions = emotions
         self.perceptlet_types = perceptlet_types
         self.perceptlet_types_dictionary = {
             perceptlet_type.name: perceptlet_type
@@ -24,6 +27,7 @@ class ConceptSpace:
         self.conceptual_spaces = conceptual_spaces
         self.workspace_concepts = workspace_concepts
         self.concepts = set.union(
+            self.emotions,
             self.perceptlet_types,
             self.correspondence_types,
             self.conceptual_spaces,
