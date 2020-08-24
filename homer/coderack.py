@@ -10,6 +10,7 @@ from .logger import Logger
 class Coderack:
 
     IDEAL_POPULATION = HyperParameters.IDEAL_CODERACK_POPULATION
+    MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
     def __init__(self, bubble_chamber: BubbleChamber, logger: Logger):
         self.bubble_chamber = bubble_chamber
@@ -18,8 +19,9 @@ class Coderack:
         self.logger = logger
 
     def add_codelet(self, codelet: Codelet):
-        self.logger.log(codelet)
-        self._codelets.append(codelet)
+        if codelet.urgency > self.MINIMUM_CODELET_URGENCY:
+            self.logger.log(codelet)
+            self._codelets.append(codelet)
 
     def select_and_run_codelet(self):
         codelet = self.select_codelet()
