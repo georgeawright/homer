@@ -12,8 +12,8 @@ class Evaluator(Codelet):
         bubble_chamber: BubbleChamber,
         perceptlet_type: PerceptletType,
         target_type: PerceptletType,
-        challenger_one: Perceptlet,
-        challenger_two: Perceptlet,
+        champion: Perceptlet,
+        challenger: Perceptlet,
         urgency: float,
         parent_id: str,
     ):
@@ -23,30 +23,30 @@ class Evaluator(Codelet):
             bubble_chamber,
             perceptlet_type,
             parent_concept,
-            challenger_one,
+            champion,
             urgency,
             parent_id,
         )
         self.target_type = target_type
-        self.challenger_one = challenger_one
-        self.challenger_two = challenger_two
+        self.champion = champion
+        self.challenger = challenger
 
     def _passes_preliminary_checks(self) -> bool:
         return True
 
     def _fizzle(self):
-        self.perceptlet_type.decay_activation(self.challenger_one.location)
+        self.perceptlet_type.decay_activation(self.champion.location)
         return None
 
     def _fail(self):
         pass
 
     def _calculate_confidence(self):
-        self.confidence = self._run_competition()
+        self.competition_result = self._run_competition()
 
     def _process_perceptlet(self):
-        self.winner.strength += self.confidence
-        self.loser.strength -= self.confidence
+        self.champion.activation.boost(self.competition_result)
+        self.challenger.activation.decay(self.competition_result)
 
     def _engender_follow_up(self):
         pass
