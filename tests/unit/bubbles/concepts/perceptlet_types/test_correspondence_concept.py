@@ -6,12 +6,8 @@ from homer.bubbles.concepts.perceptlet_types import CorrespondenceConcept
 from homer.codelets.correspondence_suggester import CorrespondenceSuggester
 
 
-def test_spawn_codelet():
-    perceptlet_a = Mock()
-    perceptlet_a.exigency = 0.5
-    perceptlet_b = Mock()
-    perceptlet_b.exigency = 0.5
-    groups = [perceptlet_a, perceptlet_b]
+def test_spawn_codelet(target_perceptlet):
+    groups = [target_perceptlet, target_perceptlet]
     with patch.object(
         BubbleChamber, "get_random_groups", return_value=groups
     ), patch.object(random, "random", return_value=-1):

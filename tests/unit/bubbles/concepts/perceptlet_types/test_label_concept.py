@@ -8,11 +8,9 @@ from homer.bubbles.concepts.perceptlet_types import LabelConcept
 from homer.perceptlet_collection import PerceptletCollection
 
 
-def test_spawn_codelet():
-    perceptlet = Mock()
-    perceptlet.exigency = 0.5
+def test_spawn_codelet(target_perceptlet):
     with patch.object(
-        PerceptletCollection, "get_unhappy", return_value=perceptlet
+        PerceptletCollection, "get_unhappy", return_value=target_perceptlet
     ), patch.object(WorkspaceActivationPattern, "is_high", return_value=True):
         activation_pattern = WorkspaceActivationPattern(Mock())
         raw_perceptlets = PerceptletCollection()
