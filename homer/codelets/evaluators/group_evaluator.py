@@ -1,5 +1,4 @@
 import statistics
-from typing import Union
 
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
@@ -53,7 +52,3 @@ class GroupEvaluator(Evaluator):
                 self._difference_score(connection_activations_difference),
             ]
         )
-
-    def _difference_score(self, difference: Union[float, int]):
-        score = 1 - 1 / abs(difference)
-        return score if difference > 0 else -score

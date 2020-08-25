@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Union
 
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
@@ -55,3 +56,7 @@ class Evaluator(Codelet):
     @abstractmethod
     def _run_competition(self) -> float:
         pass
+
+    def _difference_score(self, difference: Union[float, int]):
+        score = 1 - 1 / (1 + abs(difference))
+        return score if difference > 0 else -score
