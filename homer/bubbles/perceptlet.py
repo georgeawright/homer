@@ -61,12 +61,6 @@ class Perceptlet(Bubble):
             "size": lambda: self.size,
         }[concept.relevant_value]()
 
-    def proportion_of_neighbours_with_label(self, concept: Concept) -> float:
-        return self.number_of_neighbours_with_label(concept) / len(self.neighbours)
-
-    def number_of_neighbours_with_label(self, concept: Concept) -> int:
-        return sum(1 for neighbour in self.neighbours if neighbour.has_label(concept))
-
     def has_label(self, concept: Concept) -> bool:
         return True in (
             True for label in self.labels if label.parent_concept == concept

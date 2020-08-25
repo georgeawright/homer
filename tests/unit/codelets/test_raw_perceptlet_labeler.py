@@ -25,14 +25,16 @@ def test_calculate_confidence(
     with patch.object(
         Concept, "proximity_to", return_value=proximity_to_prototype
     ), patch.object(
-        Perceptlet,
-        "proportion_of_neighbours_with_label",
+        PerceptletCollection,
+        "proportion_with_label",
         return_value=proportion_of_neighbours,
     ), patch.object(
         Perceptlet, "get_value", return_value=Mock()
     ):
         parent_concept = Concept("concept_name", Mock())
-        target_perceptlet = Perceptlet(Mock(), [0, 0, 0], Mock(), Mock(), Mock())
+        target_perceptlet = Perceptlet(
+            Mock(), [0, 0, 0], Mock(), PerceptletCollection(), Mock()
+        )
         codelet = RawPerceptletLabeler(
             Mock(), Mock(), parent_concept, target_perceptlet, Mock(), Mock()
         )

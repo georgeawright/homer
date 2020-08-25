@@ -2,6 +2,7 @@ from __future__ import annotations
 import random
 from typing import List, Optional, Set, Union
 
+from .bubbles.concept import Concept
 from .errors import MissingPerceptletError
 from .workspace_location import WorkspaceLocation
 
@@ -66,6 +67,15 @@ class PerceptletCollection:
     def intersection(*collections: List[PerceptletCollection]) -> PerceptletCollection:
         return PerceptletCollection(
             set.intersection(*[collection.perceptlets for collection in collections])
+        )
+
+    def proportion_with_label(self, concept: Concept):
+        return self.number_with_label(concept) / len(self)
+
+    def number_with_label(self, concept: Concept):
+        print(len(self))
+        return sum(
+            1 for perceptlet in self.perceptlets if perceptlet.has_label(concept)
         )
 
     def get_random(self):

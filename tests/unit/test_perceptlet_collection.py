@@ -1,6 +1,10 @@
+import math
+import pytest
 from unittest.mock import Mock
 
 from homer.perceptlet_collection import PerceptletCollection
+
+FLOAT_COMPARISON_TOLERANCE = 1e-3
 
 
 def test_eq():
@@ -60,6 +64,31 @@ def test_intersection():
     collection_2 = PerceptletCollection({perceptlet_2, perceptlet_3})
     intersection = PerceptletCollection.intersection(collection_1, collection_2)
     assert intersection.perceptlets == {perceptlet_2}
+
+
+@pytest.mark.parametrize(
+    "no_of_valid_members, no_of_invalid_members, expected_proportion",
+    [(1, 1, 0.5), (1, 2, 0.33333), (0, 1, 0.0)],
+)
+def test_number_and_proportion_with_label(
+    no_of_valid_members, no_of_invalid_members, expected_proportion,
+):
+    concept = Mock()
+    valid_members = set()
+    for _ in range(no_of_valid_members):
+        member = Mock()
+        member.has_label.side_effect = [True]
+        valid_members.add(member)
+    invalid_members = set()
+    for _ in range(no_of_invalid_members):
+        member = Mock()
+        member.has_label.side_effect = [False]
+        invalid_members.add(member)
+    collection = PerceptletCollection(set.union(valid_members, invalid_members))
+    actual_proportion = collection.proportion_with_label(concept)
+    assert math.isclose(
+        expected_proportion, actual_proportion, abs_tol=FLOAT_COMPARISON_TOLERANCE
+    )
 
 
 def test_get_random():
