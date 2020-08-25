@@ -7,7 +7,13 @@ from homer.codelets.evaluators import GroupLabelEvaluator
 @pytest.mark.parametrize(
     "champion_proportion, challenger_proportion, "
     + "champion_proximity, challenger_proximity, expected",
-    [(1.0, 0.0, 1.0, 0.0, 1.0)],
+    [
+        (1.0, 0.0, 1.0, 0.0, 1.0),
+        (0.0, 1.0, 0.0, 1.0, -1.0),
+        (0.5, 0.5, 0.5, 0.5, 0.0),
+        (1.0, 0.0, 0.0, 1.0, 0.0),
+        (1.0, 0.0, 0.5, 0.5, 0.5),
+    ],
 )
 def test_run_competition(
     champion_proportion,
