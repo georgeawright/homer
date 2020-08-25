@@ -35,7 +35,7 @@ class Evaluator(Codelet):
         return True
 
     def _fizzle(self):
-        self.perceptlet_type.decay_activation(self.champion.location)
+        self.perceptlet_type.activation.decay(self.champion.location)
         return None
 
     def _fail(self):
@@ -47,6 +47,7 @@ class Evaluator(Codelet):
     def _process_perceptlet(self):
         self.champion.activation.boost(self.competition_result)
         self.challenger.activation.decay(self.competition_result)
+        self.target_type.activation.decay(self.champion.location)
 
     def _engender_follow_up(self):
         pass

@@ -1,7 +1,11 @@
+import statistics
+from typing import Union
+
 from homer.bubble_chamber import BubbleChamber
-from homer.bubbles.concepts import PerceptletType
+from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Group
 from homer.codelets.evaluator import Evaluator
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class GroupEvaluator(Evaluator):
@@ -10,8 +14,8 @@ class GroupEvaluator(Evaluator):
         bubble_chamber: BubbleChamber,
         perceptlet_type: PerceptletType,
         target_type: PerceptletType,
-        challenger_one: Group,
-        challenger_two: Group,
+        champion: Group,
+        challenger: Group,
         urgency: float,
         parent_id: str,
     ):
@@ -20,14 +24,36 @@ class GroupEvaluator(Evaluator):
             bubble_chamber,
             perceptlet_type,
             target_type,
-            challenger_one,
-            challenger_two,
+            champion,
+            challenger,
             urgency,
             parent_id,
         )
 
+    def _passes_preliminary_checks(self) -> bool:
+        shared_members = PerceptletCollection.union(
+            self.champion.members, self.challenger.members
+        )
+        shared_champion_ratio = len(shared_members) / len(self.champion.members)
+        shared_challenger_ratio = len(shared_members) / len(self.challenger.members)
+        return (
+            shared_champion_ratio > self.CONFIDENCE_THRESHOLD
+            and shared_challenger_ratio > self.CONFIDENCE_THRESHOLD
+        )
+
     def _run_competition(self) -> float:
-        # compare two groups
-        # increase strength of the best
-        # decrease strength of the worst
-        pass
+        size_difference = self.champion.size - self.challenger.size
+        connection_activations_difference = (
+            self.champion.total_connection_activations()
+            - self.challenger.total_connection_activations()
+        )
+        return statistics.fmean(
+            [
+                self._difference_score(size_difference),
+                self._difference_score(connection_activations_difference),
+            ]
+        )
+
+    def _difference_score(self, difference: Union[float, int]):
+        score = 1 - 1 / abs(difference)
+        return score if difference > 0 else -score

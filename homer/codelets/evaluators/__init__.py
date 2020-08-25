@@ -1,1 +1,2 @@
+from .group_evaluator import GroupEvaluator
 from .group_label_evaluator import GroupLabelEvaluator
