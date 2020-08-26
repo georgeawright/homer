@@ -38,18 +38,6 @@ class BubbleChamber:
         self.result = None
         self.logger = logger
 
-    @property
-    def satisfaction(self) -> float:
-        """Calculate and return overall satisfaction with perceptual structures"""
-        satisfaction = statistics.fmean(
-            [
-                perceptlet.unhappiness.as_scalar() * perceptlet.activation.as_scalar()
-                for perceptlet in self.workspace.perceptlets
-            ]
-        )
-        self.logger.log_satisfaction(satisfaction)
-        return satisfaction
-
     def update_activations(self) -> None:
         self.concept_space.update_activations()
 

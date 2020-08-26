@@ -178,7 +178,9 @@ class Homer:
                 raise e
         return {
             "result": self.bubble_chamber.result,
-            "satisfaction": self.bubble_chamber.satisfaction,
+            "satisfaction": self.bubble_chamber.concept_space[
+                "satisfaction"
+            ].activation.as_scalar(),
             "codelets_run": self.coderack.codelets_run,
         }
 

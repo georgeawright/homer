@@ -54,4 +54,6 @@ class Coderack:
                 self.add_codelet(codelet)
 
     def _randomness(self) -> float:
-        return 1 - self.bubble_chamber.satisfaction
+        return (
+            1 - self.bubble_chamber.concept_space["satisfaction"].activation.as_scalar()
+        )

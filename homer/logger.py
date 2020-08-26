@@ -50,16 +50,6 @@ class Logger:
         if isinstance(item, Perceptlet):
             return self._log_perceptlet(item)
 
-    def log_satisfaction(self, satisfaction: float):
-        satisfaction_file = self.log_directory + "/satisfaction.csv"
-        with open(satisfaction_file, "a") as f:
-            codelets_run = "CodeletsRun"
-            satisfaction_heading = "Satisfaction"
-            writer = csv.DictWriter(f, [codelets_run, satisfaction_heading])
-            writer.writerow(
-                {codelets_run: self.codelets_run, satisfaction_heading: satisfaction}
-            )
-
     def _log_message(self, message):
         print(message)
         messages_file = self.log_directory + "/messages.txt"
@@ -203,17 +193,4 @@ class Logger:
         pyplot.title("Coderack Population")
         pyplot.xlabel("Codelets Run")
         pyplot.ylabel("Codelets on Rack")
-        pyplot.savefig(f"{self.log_directory}/{file_name}.png")
-
-    def graph_satisfaction(self, file_name: str):
-        pyplot.clf()
-        satisfaction_file = self.log_directory + "/satisfaction.csv"
-        with open(satisfaction_file, "r") as f:
-            data = list(csv.reader(f))
-            codelets_run = [int(element[0]) for element in data]
-            satisfaction = [float(element[1]) for element in data]
-            pyplot.plot(codelets_run, satisfaction)
-        pyplot.title("Satisfaction")
-        pyplot.xlabel("Codelets Run")
-        pyplot.ylabel("Satisfaction")
         pyplot.savefig(f"{self.log_directory}/{file_name}.png")

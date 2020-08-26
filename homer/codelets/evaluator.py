@@ -53,9 +53,9 @@ class Evaluator(Codelet):
         self.champion.boost_activation(self.confidence)
         self.challenger.decay_activation(self.confidence)
         self.target_type.activation.decay(self.location)
-        if self.confidence > 0:
+        if abs(self.confidence) > 0:
             self.bubble_chamber.concept_space["satisfaction"].activation.boost(
-                self.confidence, self.location
+                abs(self.confidence), self.location
             )
 
     @abstractmethod
