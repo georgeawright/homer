@@ -11,6 +11,7 @@ homer.logger.graph_concepts(
     [
         "label",
         "group",
+        "group-evaluation",
         "group-label",
         "correspondence",
         "correspondence-label",

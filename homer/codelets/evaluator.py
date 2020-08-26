@@ -5,9 +5,14 @@ from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelet import Codelet
+from homer.hyper_parameters import HyperParameters
+from homer.workspace_location import WorkspaceLocation
 
 
 class Evaluator(Codelet):
+
+    CONFIDENCE_THRESHOLD = HyperParameters.EVALUATOR_CONFIDENCE_THRESHOLD
+
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
@@ -46,12 +51,12 @@ class Evaluator(Codelet):
         self.confidence = self._run_competition()
 
     def _process_perceptlet(self):
-        self.champion.activation.boost(self.confidence)
-        self.challenger.activation.decay(self.confidence)
-        self.target_type.activation.decay(self.champion.location)
+        self.champion.boost_activation(self.confidence)
+        self.challenger.decay_activation(self.confidence)
+        self.target_type.activation.decay(self.location)
         if self.confidence > 0:
             self.bubble_chamber.concept_space["satisfaction"].activation.boost(
-                self.confidence, self.champion.location
+                self.confidence, self.location
             )
 
     @abstractmethod

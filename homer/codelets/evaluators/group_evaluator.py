@@ -5,10 +5,14 @@ from homer.bubble_chamber import BubbleChamber
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Group
 from homer.codelets.evaluator import Evaluator
+from homer.hyper_parameters import HyperParameters
 from homer.perceptlet_collection import PerceptletCollection
 
 
 class GroupEvaluator(Evaluator):
+
+    PROPORTION_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
+
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
@@ -37,8 +41,8 @@ class GroupEvaluator(Evaluator):
         shared_champion_ratio = len(shared_members) / len(self.champion.members)
         shared_challenger_ratio = len(shared_members) / len(self.challenger.members)
         return (
-            shared_champion_ratio > self.CONFIDENCE_THRESHOLD
-            and shared_challenger_ratio > self.CONFIDENCE_THRESHOLD
+            shared_champion_ratio > self.PROPORTION_THRESHOLD
+            and shared_challenger_ratio > self.PROPORTION_THRESHOLD
         )
 
     def _run_competition(self) -> float:

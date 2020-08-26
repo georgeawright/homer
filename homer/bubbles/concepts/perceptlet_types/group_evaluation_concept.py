@@ -14,7 +14,10 @@ class GroupEvaluationConcept(PerceptletType):
 
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
         if self.activation.as_scalar() > random.random():
-            location = self.activation.get_high_location()
+            try:
+                location = self.activation.get_high_location()
+            except ValueError:
+                return None
             try:
                 champion = bubble_chamber.workspace.groups.at(location).get_active()
                 challenger = bubble_chamber.workspace.groups.at(location).get_random()

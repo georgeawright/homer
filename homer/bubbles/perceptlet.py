@@ -102,3 +102,13 @@ class Perceptlet(Bubble):
             ):
                 return True
         return False
+
+    def boost_activation(self, amount: float):
+        self.activation.boost_by_amount(amount)
+        for connection in self.connections:
+            connection.boost_activation(amount)
+
+    def decay_activation(self, amount: float):
+        self.activation.decay_by_amount(amount)
+        for connection in self.connections:
+            connection.decay_activation(amount)
