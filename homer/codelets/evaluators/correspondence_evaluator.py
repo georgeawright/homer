@@ -39,3 +39,6 @@ class CorrespondenceEvaluator(Evaluator):
             - self.challenger.total_connection_activations()
         )
         return self._difference_score(connection_activations_difference)
+
+    def _engender_follow_up(self):
+        pass

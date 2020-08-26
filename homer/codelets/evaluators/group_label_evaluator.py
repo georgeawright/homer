@@ -67,3 +67,6 @@ class GroupLabelEvaluator(Evaluator):
         return statistics.fmean(
             [proximity_difference, proportion_with_label_difference]
         )
+
+    def _engender_follow_up(self):
+        pass

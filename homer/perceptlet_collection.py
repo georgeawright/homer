@@ -73,7 +73,6 @@ class PerceptletCollection:
         return self.number_with_label(concept) / len(self)
 
     def number_with_label(self, concept: Concept):
-        print(len(self))
         return sum(
             1 for perceptlet in self.perceptlets if perceptlet.has_label(concept)
         )

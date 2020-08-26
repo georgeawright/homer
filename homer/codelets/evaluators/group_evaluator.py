@@ -71,6 +71,6 @@ class GroupEvaluator(Evaluator):
             self.target_type,
             winner,
             loser,
-            1 - abs(self.confidence),
+            loser.exigency,
             self.codelet_id,
         )
