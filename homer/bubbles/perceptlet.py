@@ -61,6 +61,9 @@ class Perceptlet(Bubble):
             "size": lambda: self.size,
         }[concept.relevant_value]()
 
+    def total_connection_activations(self) -> float:
+        return sum(connection.activation.as_scalar() for connection in self.connections)
+
     def has_label(self, concept: Concept) -> bool:
         return True in (
             True for label in self.labels if label.parent_concept == concept

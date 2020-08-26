@@ -43,11 +43,11 @@ class Evaluator(Codelet):
         pass
 
     def _calculate_confidence(self):
-        self.competition_result = self._run_competition()
+        self.confidence = self._run_competition()
 
     def _process_perceptlet(self):
-        self.champion.activation.boost(self.competition_result)
-        self.challenger.activation.decay(self.competition_result)
+        self.champion.activation.boost(self.confidence)
+        self.challenger.activation.decay(self.confidence)
         self.target_type.activation.decay(self.champion.location)
 
     def _engender_follow_up(self):
