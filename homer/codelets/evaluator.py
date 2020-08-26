@@ -6,7 +6,6 @@ from homer.bubbles import Perceptlet
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelet import Codelet
 from homer.hyper_parameters import HyperParameters
-from homer.workspace_location import WorkspaceLocation
 
 
 class Evaluator(Codelet):
