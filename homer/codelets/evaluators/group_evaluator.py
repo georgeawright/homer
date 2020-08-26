@@ -1,3 +1,4 @@
+from __future__ import annotations
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
@@ -51,4 +52,21 @@ class GroupEvaluator(Evaluator):
                 self._difference_score(size_difference),
                 self._difference_score(connection_activations_difference),
             ]
+        )
+
+    def _engender_follow_up(self) -> GroupEvaluator:
+        winner, loser = (
+            (self.champion, self.challenger)
+            if self.champion.activation.as_scalar()
+            > self.challenger.activation.as_scalar()
+            else (self.challenger, self.champion)
+        )
+        return GroupEvaluator(
+            self.bubble_chamber,
+            self.perceptlet_type,
+            self.target_type,
+            winner,
+            loser,
+            1 - abs(self.confidence),
+            self.codelet_id,
         )

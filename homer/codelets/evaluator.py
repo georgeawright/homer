@@ -49,9 +49,10 @@ class Evaluator(Codelet):
         self.champion.activation.boost(self.confidence)
         self.challenger.activation.decay(self.confidence)
         self.target_type.activation.decay(self.champion.location)
-
-    def _engender_follow_up(self):
-        pass
+        if self.confidence > 0:
+            self.bubble_chamber.concept_space["satisfaction"].activation.boost(
+                self.confidence, self.champion.location
+            )
 
     @abstractmethod
     def _run_competition(self) -> float:
