@@ -58,9 +58,8 @@ class WorkspaceActivationPattern(ActivationPattern):
         return 1.0 in self.activation_matrix
 
     def boost(self, amount: float, location: WorkspaceLocation):
-        current_activation = self.activation_matrix[location.i][location.j][location.k]
         self.activation_buffer[location.i][location.j][location.k] += (
-            current_activation + amount * self.activation_coefficient
+            amount * self.activation_coefficient
         )
 
     def boost_evenly(self, amount: float):
