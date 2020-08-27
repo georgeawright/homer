@@ -23,3 +23,5 @@ homer.logger.graph_concepts(
 # homer.logger.graph_codelets("codelets_family_tree")
 homer.logger.graph_coderack("coderack_population")
 homer.logger.graph_concepts(["satisfaction"], "satisfaction_concept")
+
+homer.logger.graph_processes("processes")

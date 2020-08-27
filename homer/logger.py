@@ -50,6 +50,21 @@ class Logger:
         if isinstance(item, Perceptlet):
             return self._log_perceptlet(item)
 
+    def log_codelet_run(self, codelet):
+        processes_file = f"{self.log_directory}/processes.csv"
+        with open(processes_file, "a") as f:
+            codelets_run = "CodeletsRun"
+            codelet_id = "CodeletID"
+            parent_id = "ParentID"
+            writer = csv.DictWriter(f, [codelets_run, codelet_id, parent_id])
+            writer.writerow(
+                {
+                    codelets_run: self.codelets_run,
+                    codelet_id: codelet.codelet_id,
+                    parent_id: codelet.parent_id,
+                }
+            )
+
     def _log_message(self, message):
         print(message)
         messages_file = self.log_directory + "/messages.txt"
@@ -194,3 +209,46 @@ class Logger:
         pyplot.xlabel("Codelets Run")
         pyplot.ylabel("Codelets on Rack")
         pyplot.savefig(f"{self.log_directory}/{file_name}.png")
+
+    def graph_processes(self, file_name: str):
+        processes_file = f"{self.log_directory}/processes.csv"
+        processes = []
+        with open(processes_file, "r") as f:
+            for row in csv.reader(f):
+                new_codelet = {
+                    "codelets_run": row[0],
+                    "codelet_id": row[1],
+                    "parent_id": row[2],
+                }
+                process_found = False
+                for process in processes:
+                    if process[-1]["codelet_id"] == new_codelet["parent_id"]:
+                        process.append(new_codelet)
+                        process_found = True
+                        break
+                if not process_found:
+                    processes.append([new_codelet])
+        processes_matrix = []
+        for process in processes:
+            process_start = int(process[0]["codelets_run"])
+            process_length = int(process[-1]["codelets_run"]) + 2
+            process_row = ["-" for _ in range(process_length)]
+            for codelet in process:
+                process_row[int(codelet["codelets_run"])] = codelet["codelet_id"]
+            process_row[-1] = "END"
+            process_added = False
+            for row in processes_matrix:
+                row_length = len(row)
+                if row_length <= process_start:
+                    distance_from_last_process = process_start - row_length
+                    for _ in range(distance_from_last_process):
+                        row.append("")
+                    row += process_row
+                    process_added = True
+                    break
+            if not process_added:
+                processes_matrix.append(process_row)
+        processes_output = f"{self.log_directory}/{file_name}.txt"
+        with open(processes_output, "w") as f:
+            f.write(str(processes_matrix))
+        print(len(processes_matrix))
