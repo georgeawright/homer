@@ -43,7 +43,7 @@ class Coderack:
                 codelet_choice = codelet
         if codelet_choice is None:
             raise NoMoreCodelets
-        if self.codelets_run > 5000:
+        if self.codelets_run > 10000:
             raise NoMoreCodelets
         self._codelets.remove(codelet_choice)
         return codelet_choice
