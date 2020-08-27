@@ -13,6 +13,7 @@ homer.logger.graph_concepts(
         "group",
         "group-evaluation",
         "group-label",
+        "group-label-evaluation",
         "correspondence",
         "correspondence-label",
         "textlet",

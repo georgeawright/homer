@@ -23,15 +23,22 @@ def test_run_competition(
     expected,
 ):
     target_group = Mock()
+    target_group.location = [0, 0, 0]
     champion = Mock()
-    champion.location = [0, 0, 0]
     champion.parent_concept.proximity_to.side_effect = [champion_proximity]
     challenger = Mock()
     challenger.parent_concept.proximity_to.side_effect = [challenger_proximity]
     evaluator = GroupLabelEvaluator(
-        Mock(), Mock(), Mock(), target_group, champion, Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        target_group,
+        Mock(),
+        Mock(),
+        champion=champion,
+        challenger=challenger,
     )
-    evaluator.challenger = challenger
+    evaluator.target_space = Mock()
     evaluator.champion_proportion = champion_proportion
     evaluator.challenger_proportion = challenger_proportion
     assert expected == evaluator._run_competition()

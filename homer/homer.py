@@ -12,6 +12,7 @@ from .bubbles.concepts.perceptlet_types import (
     GroupConcept,
     GroupEvaluationConcept,
     GroupLabelConcept,
+    GroupLabelEvaluationConcept,
     LabelConcept,
     TextletConcept,
 )
@@ -62,7 +63,9 @@ class Homer:
         correspondence_concept.connections.add(textlet_concept)
         correspondence_concept.connections.add(correspondence_label_concept)
         group_evaluation_concept = GroupEvaluationConcept()
+        group_label_evaluation_concept = GroupLabelEvaluationConcept()
         group_label_concept = GroupLabelConcept()
+        group_label_concept.connections.add(group_label_evaluation_concept)
         group_concept = GroupConcept()
         group_concept.connections.add(correspondence_concept)
         group_concept.connections.add(group_label_concept)
@@ -76,6 +79,7 @@ class Homer:
             group_concept,
             group_evaluation_concept,
             group_label_concept,
+            group_label_evaluation_concept,
             label_concept,
         }
         correspondence_types = {
@@ -97,7 +101,9 @@ class Homer:
             ),
         }
         temperature_space = EuclideanSpace("temperature", 5, 1.5, temperature_templates)
-        location_space = EuclideanSpace("location", 5, 1, location_templates)
+        location_space = EuclideanSpace(
+            "location", 5, 1, location_templates, relevant_value="location"
+        )
         spaces = {temperature_space, location_space}
         workspace_concepts = {
             EuclideanConcept("cold", [4], temperature_space, depth=1, boundary=[7]),
