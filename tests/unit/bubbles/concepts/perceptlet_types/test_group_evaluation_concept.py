@@ -12,7 +12,7 @@ def test_spawn_codelet():
     champion.location = [0, 0, 0]
     challenger = Mock()
     with patch.object(random, "random", return_value=-1), patch.object(
-        PerceptletCollection, "get_active", return_value=champion
+        PerceptletCollection, "get_most_active", return_value=champion
     ), patch.object(PerceptletCollection, "get_random", return_value=challenger):
         at = PerceptletCollection()
         with patch.object(

@@ -19,7 +19,9 @@ class GroupEvaluationConcept(PerceptletType):
             except ValueError:
                 return None
             try:
-                champion = bubble_chamber.workspace.groups.at(location).get_active()
+                champion = bubble_chamber.workspace.groups.at(
+                    location
+                ).get_most_active()
                 challenger = bubble_chamber.workspace.groups.at(location).get_random()
                 if champion == challenger:
                     return None

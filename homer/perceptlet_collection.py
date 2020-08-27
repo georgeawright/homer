@@ -91,6 +91,9 @@ class PerceptletCollection:
         """Returns a perceptlet probabilistically according to activation."""
         return self._get_perceptlet_according_to("activation")
 
+    def get_most_active(self):
+        return self._get_perceptlet_with_highest("activation")
+
     def get_unhappy(self):
         """Returns a perceptlet probabilistically according to unhappiness."""
         return self._get_perceptlet_according_to("unhappiness")
@@ -108,6 +111,13 @@ class PerceptletCollection:
         perceptlets = random.sample(self.perceptlets, len(self.perceptlets) // 2)
         perceptlet_choice = perceptlets[0]
         for perceptlet in perceptlets[1:]:
+            if getattr(perceptlet, attribute) > getattr(perceptlet_choice, attribute):
+                perceptlet_choice = perceptlet
+        return perceptlet_choice
+
+    def _get_perceptlet_with_highest(self, attribute: str):
+        perceptlet_choice = self.get_random()
+        for perceptlet in self.perceptlets:
             if getattr(perceptlet, attribute) > getattr(perceptlet_choice, attribute):
                 perceptlet_choice = perceptlet
         return perceptlet_choice
