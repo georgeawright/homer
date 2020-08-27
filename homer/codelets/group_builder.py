@@ -63,7 +63,7 @@ class GroupBuilder(Codelet):
             )
             for concept in common_concepts
         ]
-        self.confidence = 0.0 if distances == [] else fuzzy.OR(*distances)
+        self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
 
     def _process_perceptlet(self):
         self.group = self.bubble_chamber.create_group(
