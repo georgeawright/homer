@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections import defaultdict
 import csv
 import os
 import time
@@ -252,3 +253,18 @@ class Logger:
         with open(processes_output, "w") as f:
             f.write(str(processes_matrix))
         print(len(processes_matrix))
+
+    def graph_codelet_types(self, file_name: str):
+        pyplot.clf()
+        codelets_file = f"{self.log_directory}/codelets.csv"
+        codelet_counts = defaultdict(int)
+        with open(codelets_file, "r") as f:
+            for row in csv.reader(f):
+                codelet_counts[row[3]] += 1
+        print(codelet_counts)
+        pyplot.barh(range(len(codelet_counts)), list(codelet_counts.values()))
+        pyplot.yticks(range(len(codelet_counts)), list(codelet_counts.keys()))
+        pyplot.title("Number of Codelets Run by Type")
+        pyplot.ylabel("Codelet Type")
+        pyplot.xlabel("Quantity Run")
+        pyplot.savefig(f"{self.log_directory}/{file_name}.png")
