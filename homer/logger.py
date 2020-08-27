@@ -19,16 +19,19 @@ class Logger:
         if not os.path.exists(path_to_logs):
             os.makedirs(path_to_logs)
         now = time.localtime()
-        logging_directory = (
-            path_to_logs
-            + "/"
-            + str(now.tm_year)
-            + str(now.tm_mon)
-            + str(now.tm_mday)
-            + str(now.tm_hour)
-            + str(now.tm_min)
-            + str(now.tm_sec)
+        year = str(now.tm_year)
+        month = str(now.tm_mon)
+        day = str(now.tm_mday)
+        hour = str(now.tm_hour)
+        minute = str(now.tm_min)
+        second = str(now.tm_sec)
+        date = "-".join(
+            [
+                value if len(value) >= 2 else "0" + value
+                for value in [year, month, day, hour, minute, second]
+            ]
         )
+        logging_directory = f"{path_to_logs}/{date}"
         os.makedirs(logging_directory)
         os.makedirs(logging_directory + "/concepts")
         logger = Logger(logging_directory)
