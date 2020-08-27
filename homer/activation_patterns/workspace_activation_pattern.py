@@ -76,6 +76,10 @@ class WorkspaceActivationPattern(ActivationPattern):
         )
 
     def update(self):
+        if numpy.array_equal(
+            self.activation_buffer, numpy.zeros_like(self.activation_buffer)
+        ):
+            self.boost_evenly(-self.DECAY_RATE)
         self.activation_matrix = numpy.add(
             self.activation_matrix, self.activation_buffer
         )

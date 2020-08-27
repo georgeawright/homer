@@ -36,7 +36,7 @@ class ScalarActivationPattern(ActivationPattern):
         return self.activation >= 1.0
 
     def boost(self, amount: float, location: WorkspaceLocation):
-        self.activation_buffer += self.activation + amount * self.activation_coefficient
+        self.activation_buffer += amount * self.activation_coefficient
 
     def boost_evenly(self, amount: float):
         self.boost(amount, None)
@@ -45,10 +45,10 @@ class ScalarActivationPattern(ActivationPattern):
         self.boost(signal, None)
 
     def decay(self, location: WorkspaceLocation):
-        self.activation_buffer -= (
-            self.activation - self.DECAY_RATE * self.activation_coefficient
-        )
+        self.activation_buffer -= self.DECAY_RATE * self.activation_coefficient
 
     def update(self):
+        if self.activation_buffer == 0.0:
+            self.boost_evenly(-self.DECAY_RATE)
         self.activation = min(max(self.activation + self.activation_buffer, 0.0), 1.0)
         self.activation_buffer = 0.0
