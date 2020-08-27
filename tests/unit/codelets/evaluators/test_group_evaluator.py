@@ -26,8 +26,7 @@ def test_run_competition(
     challenger = Mock()
     challenger.size = challenger_size
     challenger.total_connection_activations.side_effect = [challenger_connections]
-    evaluator = GroupEvaluator(
-        Mock(), Mock(), Mock(), champion, challenger, Mock(), Mock()
-    )
+    evaluator = GroupEvaluator(Mock(), Mock(), Mock(), champion, Mock(), Mock())
+    evaluator.challenger = challenger
     actual = evaluator._run_competition()
     assert math.isclose(expected, actual, abs_tol=FLOAT_COMPARISON_TOLERANCE)

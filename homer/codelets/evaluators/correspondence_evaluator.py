@@ -11,7 +11,6 @@ class CorrespondenceEvaluator(Evaluator):
         perceptlet_type: PerceptletType,
         target_type: PerceptletType,
         champion: Correspondence,
-        challenger: Correspondence,
         urgency: float,
         parent_id: str,
     ):
@@ -21,12 +20,16 @@ class CorrespondenceEvaluator(Evaluator):
             perceptlet_type,
             target_type,
             champion,
-            challenger,
             urgency,
             parent_id,
         )
 
     def _passes_preliminary_checks(self) -> bool:
+        self.challenger = self.bubble_chamber.correspondences.at(
+            self.location
+        ).get_random()
+        if self.challenger == self.champion:
+            return False
         return (
             self.champion.first_argument == self.challenger.first_argument
             and self.champion.second_argument == self.challenger.second_argument

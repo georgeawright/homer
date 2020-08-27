@@ -1,8 +1,9 @@
 import math
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from homer.codelets.evaluators import CorrespondenceEvaluator
+from homer.perceptlet_collection import PerceptletCollection
 
 FLOAT_COMPARISON_TOLERANCE = 1e-3
 
@@ -20,13 +21,20 @@ def test_passes_preliminary_checks():
     challenger.first_argument = first_argument
     challenger.second_argument = second_argument
     challenger.parent_concept = parent_concept
-    evaluator = CorrespondenceEvaluator(
-        Mock(), Mock(), Mock(), champion, challenger, Mock(), Mock()
-    )
-    assert evaluator._passes_preliminary_checks() is True
-    champion.first_argument = second_argument
-    champion.second_argument = first_argument
-    assert evaluator._passes_preliminary_checks() is False
+    with patch.object(PerceptletCollection, "get_random", return_value=challenger):
+        bubble_chamber = Mock()
+        bubble_chamber.correspondences.at.side_effect = [
+            PerceptletCollection(),
+            PerceptletCollection(),
+        ]
+        evaluator = CorrespondenceEvaluator(
+            bubble_chamber, Mock(), Mock(), champion, Mock(), Mock()
+        )
+        evaluator.challenger = challenger
+        assert evaluator._passes_preliminary_checks() is True
+        champion.first_argument = second_argument
+        champion.second_argument = first_argument
+        assert evaluator._passes_preliminary_checks() is False
 
 
 @pytest.mark.parametrize(
@@ -40,7 +48,8 @@ def test_run_competition(champion_connections, challenger_connections, expected)
     challenger = Mock()
     challenger.total_connection_activations.side_effect = [challenger_connections]
     evaluator = CorrespondenceEvaluator(
-        Mock(), Mock(), Mock(), champion, challenger, Mock(), Mock()
+        Mock(), Mock(), Mock(), champion, Mock(), Mock()
     )
+    evaluator.challenger = challenger
     actual = evaluator._run_competition()
     assert math.isclose(expected, actual, abs_tol=FLOAT_COMPARISON_TOLERANCE)

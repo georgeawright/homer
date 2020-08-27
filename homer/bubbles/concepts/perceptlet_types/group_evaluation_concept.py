@@ -22,9 +22,6 @@ class GroupEvaluationConcept(PerceptletType):
                 champion = bubble_chamber.workspace.groups.at(
                     location
                 ).get_most_active()
-                challenger = bubble_chamber.workspace.groups.at(location).get_random()
-                if champion == challenger:
-                    return None
             except MissingPerceptletError:
                 return None
             return GroupEvaluator(
@@ -32,8 +29,7 @@ class GroupEvaluationConcept(PerceptletType):
                 self,
                 bubble_chamber.concept_space.get_perceptlet_type_by_name("group"),
                 champion,
-                challenger,
-                challenger.exigency,
+                self.activation.at(location),
                 self.concept_id,
             )
 

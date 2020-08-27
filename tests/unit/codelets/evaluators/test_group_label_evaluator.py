@@ -29,8 +29,9 @@ def test_run_competition(
     challenger = Mock()
     challenger.parent_concept.proximity_to.side_effect = [challenger_proximity]
     evaluator = GroupLabelEvaluator(
-        Mock(), Mock(), Mock(), target_group, champion, challenger, Mock(), Mock()
+        Mock(), Mock(), Mock(), target_group, champion, Mock(), Mock()
     )
+    evaluator.challenger = challenger
     evaluator.champion_proportion = champion_proportion
     evaluator.challenger_proportion = challenger_proportion
     assert expected == evaluator._run_competition()

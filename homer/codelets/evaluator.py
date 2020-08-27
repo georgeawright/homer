@@ -18,7 +18,6 @@ class Evaluator(Codelet):
         perceptlet_type: PerceptletType,
         target_type: PerceptletType,
         champion: Perceptlet,
-        challenger: Perceptlet,
         urgency: float,
         parent_id: str,
     ):
@@ -34,10 +33,6 @@ class Evaluator(Codelet):
         )
         self.target_type = target_type
         self.champion = champion
-        self.challenger = challenger
-
-    def _passes_preliminary_checks(self) -> bool:
-        return True
 
     def _fizzle(self):
         self.perceptlet_type.activation.decay(self.champion.location)

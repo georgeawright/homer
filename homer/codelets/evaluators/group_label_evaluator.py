@@ -15,7 +15,6 @@ class GroupLabelEvaluator(Evaluator):
         target_type: PerceptletType,
         target_group: Group,
         champion: Label,
-        challenger: Label,
         urgency: float,
         parent_id: str,
     ):
@@ -25,7 +24,6 @@ class GroupLabelEvaluator(Evaluator):
             perceptlet_type,
             target_type,
             champion,
-            challenger,
             urgency,
             parent_id,
         )
@@ -33,6 +31,9 @@ class GroupLabelEvaluator(Evaluator):
         self.target_space = champion.parent_concept.space
 
     def _passes_preliminary_checks(self) -> bool:
+        self.challenger = self.target_group.labels.get_random()
+        if self.challenger == self.champion:
+            return False
         self.champion_proportion = self.target_group.members.proportion_with_label(
             self.champion
         )

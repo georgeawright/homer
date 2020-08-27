@@ -5,6 +5,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Group
 from homer.codelets.evaluator import Evaluator
+from homer.codelets.group_builder import GroupBuilder
 from homer.hyper_parameters import HyperParameters
 from homer.perceptlet_collection import PerceptletCollection
 
@@ -19,7 +20,6 @@ class GroupEvaluator(Evaluator):
         perceptlet_type: PerceptletType,
         target_type: PerceptletType,
         champion: Group,
-        challenger: Group,
         urgency: float,
         parent_id: str,
     ):
@@ -29,12 +29,16 @@ class GroupEvaluator(Evaluator):
             perceptlet_type,
             target_type,
             champion,
-            challenger,
             urgency,
             parent_id,
         )
 
     def _passes_preliminary_checks(self) -> bool:
+        self.challenger = self.bubble_chamber.workspace.groups.at(
+            self.location
+        ).get_random()
+        if self.challenger == self.champion:
+            return False
         shared_members = PerceptletCollection.union(
             self.champion.members, self.challenger.members
         )
@@ -43,6 +47,18 @@ class GroupEvaluator(Evaluator):
         return (
             shared_champion_ratio > self.PROPORTION_THRESHOLD
             and shared_challenger_ratio > self.PROPORTION_THRESHOLD
+        )
+
+    def _fizzle(self) -> GroupBuilder:
+        self.perceptlet_type.activation.decay(self.champion.location)
+        return GroupBuilder(
+            self.bubble_chamber,
+            self.target_type,
+            self.bubble_chamber.workspace.raw_perceptlets.at(
+                self.location
+            ).get_random(),
+            self.urgency,
+            self.codelet_id,
         )
 
     def _run_competition(self) -> float:
