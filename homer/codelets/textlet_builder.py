@@ -61,7 +61,7 @@ class TextletBuilder(Codelet):
         textlet = self.bubble_chamber.create_textlet(
             self.template, self.target_label, self.confidence, self.codelet_id,
         )
-        self.target_perceptlet.textlets.add(textlet)
+        self.target_perceptlet.add_textlet(textlet)
 
     def _engender_follow_up(self) -> TextletBuilder:
         return TextletBuilder(

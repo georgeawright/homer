@@ -64,6 +64,26 @@ class Perceptlet(Bubble):
     def total_connection_activations(self) -> float:
         return sum(connection.activation.as_scalar() for connection in self.connections)
 
+    def add_label(self, label: Perceptlet):
+        self.labels.add(label)
+        self.connections.add(label)
+        self.unhappiness.decay_by_amount(label.activation.as_scalar())
+
+    def add_group(self, group: Perceptlet):
+        self.groups.add(group)
+        self.connections.add(group)
+        self.unhappiness.decay_by_amount(group.activation.as_scalar())
+
+    def add_correspondence(self, correspondence: Perceptlet):
+        self.correspondences.add(correspondence)
+        self.connections.add(correspondence)
+        self.unhappiness.decay_by_amount(correspondence.activation.as_scalar())
+
+    def add_textlet(self, textlet: Perceptlet):
+        self.textlets.add(textlet)
+        self.connections.add(textlet)
+        self.unhappiness.decay_by_amount(textlet.activation.as_scalar())
+
     def has_label(self, concept: Concept) -> bool:
         return True in (
             True for label in self.labels if label.parent_concept == concept
