@@ -1,5 +1,6 @@
 from __future__ import annotations
 import statistics
+from typing import Optional
 
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
@@ -22,6 +23,7 @@ class GroupEvaluator(Evaluator):
         champion: Group,
         urgency: float,
         parent_id: str,
+        challenger: Optional[Group] = None,
     ):
         Evaluator.__init__(
             self,
@@ -32,11 +34,13 @@ class GroupEvaluator(Evaluator):
             urgency,
             parent_id,
         )
+        self.challenger = challenger
 
     def _passes_preliminary_checks(self) -> bool:
-        self.challenger = self.bubble_chamber.workspace.groups.at(
-            self.location
-        ).get_random()
+        if self.challenger is None:
+            self.challenger = self.bubble_chamber.workspace.groups.at(
+                self.location
+            ).get_random()
         if self.challenger == self.champion:
             return False
         shared_members = PerceptletCollection.union(
@@ -50,7 +54,7 @@ class GroupEvaluator(Evaluator):
         )
 
     def _fizzle(self) -> GroupBuilder:
-        self.perceptlet_type.activation.decay(self.champion.location)
+        self.perceptlet_type.activation.decay(self.location)
         return GroupBuilder(
             self.bubble_chamber,
             self.target_type,
@@ -86,7 +90,7 @@ class GroupEvaluator(Evaluator):
             self.perceptlet_type,
             self.target_type,
             winner,
-            loser,
             loser.exigency,
             self.codelet_id,
+            challenger=loser,
         )
