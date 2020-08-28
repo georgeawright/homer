@@ -63,6 +63,7 @@ class GroupLabelSelector(Selector):
         )
 
     def _fizzle(self) -> BottomUpRawPerceptletLabeler:
+        self.perceptlet_type.activation.decay(self.location)
         return BottomUpRawPerceptletLabeler(
             self.bubble_chamber,
             self.bubble_chamber.concept_space.get_perceptlet_type_by_name("label"),
