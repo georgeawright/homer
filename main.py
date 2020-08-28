@@ -16,6 +16,7 @@ homer.logger.graph_concepts(
         "group-label-selection",
         "correspondence",
         "correspondence-label",
+        "correspondence-selection",
         "textlet",
     ],
     "perceptlet_types",
