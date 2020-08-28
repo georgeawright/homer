@@ -9,6 +9,7 @@ from .bubbles.concepts.euclidean_space import EuclideanSpace
 from .bubbles.concepts.perceptlet_types import (
     CorrespondenceConcept,
     CorrespondenceLabelConcept,
+    CorrespondenceSelectionConcept,
     GroupConcept,
     GroupSelectionConcept,
     GroupLabelConcept,
@@ -58,10 +59,12 @@ class Homer:
         location_templates = [Template(["in", "the", None])]
 
         textlet_concept = TextletConcept()
+        correspondence_selection_concept = CorrespondenceSelectionConcept()
         correspondence_label_concept = CorrespondenceLabelConcept()
         correspondence_concept = CorrespondenceConcept()
         correspondence_concept.connections.add(textlet_concept)
         correspondence_concept.connections.add(correspondence_label_concept)
+        correspondence_concept.connections.add(correspondence_selection_concept)
         group_selection_concept = GroupSelectionConcept()
         group_label_selection_concept = GroupLabelSelectionConcept()
         group_label_concept = GroupLabelConcept()
@@ -76,6 +79,7 @@ class Homer:
             textlet_concept,
             correspondence_concept,
             correspondence_label_concept,
+            correspondence_selection_concept,
             group_concept,
             group_selection_concept,
             group_label_concept,

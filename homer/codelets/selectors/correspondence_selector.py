@@ -31,7 +31,7 @@ class CorrespondenceSelector(Selector):
 
     def _passes_preliminary_checks(self) -> bool:
         if self.challenger is None:
-            self.challenger = self.bubble_chamber.correspondences.at(
+            self.challenger = self.bubble_chamber.workspace.correspondences.at(
                 self.location
             ).get_random()
         if self.challenger == self.champion:

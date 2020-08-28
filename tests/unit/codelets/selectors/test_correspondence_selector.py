@@ -23,7 +23,7 @@ def test_passes_preliminary_checks():
     challenger.parent_concept = parent_concept
     with patch.object(PerceptletCollection, "get_random", return_value=challenger):
         bubble_chamber = Mock()
-        bubble_chamber.correspondences.at.side_effect = [
+        bubble_chamber.workspace.correspondences.at.side_effect = [
             PerceptletCollection(),
             PerceptletCollection(),
         ]

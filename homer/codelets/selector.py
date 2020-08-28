@@ -35,7 +35,7 @@ class Selector(Codelet):
         self.champion = champion
 
     def _fizzle(self):
-        self.perceptlet_type.activation.decay(self.champion.location)
+        self.perceptlet_type.activation.decay(self.location)
         return None
 
     def _fail(self):
