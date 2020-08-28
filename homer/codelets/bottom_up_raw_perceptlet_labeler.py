@@ -1,9 +1,9 @@
 from __future__ import annotations
-import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
+from homer.classifiers import LabelClassifier
 from homer.codelet import Codelet
 
 from .raw_perceptlet_labeler import RawPerceptletLabeler
@@ -28,6 +28,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
             urgency,
             parent_id,
         )
+        self.classifier = LabelClassifier()
 
     def _passes_preliminary_checks(self) -> bool:
         self.parent_concept = self.bubble_chamber.get_random_workspace_concept()
@@ -43,8 +44,8 @@ class BottomUpRawPerceptletLabeler(Codelet):
         return self._engender_alternative_follow_up()
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.proximity_to(
-            self.target_perceptlet.get_value(self.parent_concept)
+        self.confidence = self.classifier.confidence(
+            self.target_perceptlet, self.parent_concept
         )
 
     def _process_perceptlet(self):
