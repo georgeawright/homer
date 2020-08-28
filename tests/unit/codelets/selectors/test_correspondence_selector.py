@@ -51,3 +51,16 @@ def test_run_competition(champion_connections, challenger_connections, expected)
     selector.challenger = challenger
     actual = selector._run_competition()
     assert math.isclose(expected, actual, abs_tol=FLOAT_COMPARISON_TOLERANCE)
+
+
+def test_engender_follow_up():
+    champion = Mock()
+    champion.location = [0, 0, 0]
+    champion.activation.as_scalar.side_effect = [0.6]
+    challenger = Mock()
+    challenger.activation.as_scalar.side_effect = [0.5]
+    selector = CorrespondenceSelector(
+        Mock(), Mock(), Mock(), champion, Mock(), Mock(), challenger
+    )
+    follow_up = selector._engender_follow_up()
+    assert CorrespondenceSelector == type(follow_up)
