@@ -13,6 +13,7 @@ class Label(Perceptlet):
         self,
         concept: Concept,
         location: List[Union[int, float]],
+        target: Perceptlet,
         activation: PerceptletActivationPattern,
         parent_id,
     ):
@@ -21,3 +22,4 @@ class Label(Perceptlet):
             self, concept.name, location, activation, neighbours, parent_id
         )
         self.parent_concept = concept
+        self.target = target

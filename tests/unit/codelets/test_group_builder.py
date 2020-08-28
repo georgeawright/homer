@@ -13,8 +13,8 @@ def test_calculate_confidence():
     with patch.object(Concept, "proximity_between", return_value=distance):
         common_concept = Concept("concept", Mock())
         common_concept.relevant_value = "value"
-        label_1 = Label(common_concept, [0, 0, 0], Mock(), Mock())
-        label_2 = Label(common_concept, [0, 0, 0], Mock(), Mock())
+        label_1 = Label(common_concept, [0, 0, 0], Mock(), Mock(), Mock())
+        label_2 = Label(common_concept, [0, 0, 0], Mock(), Mock(), Mock())
         perceptlet_1 = Perceptlet(Mock(), [0, 1, 2], Mock(), Mock(), Mock())
         perceptlet_1.labels.add(label_1)
         perceptlet_2 = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock(), Mock())

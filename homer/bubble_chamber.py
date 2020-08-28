@@ -85,11 +85,12 @@ class BubbleChamber:
         self,
         parent_concept: Concept,
         location: List[Union[float, int]],
+        target: Perceptlet,
         confidence: float,
         parent_id: str,
     ) -> Label:
         activation = PerceptletActivationPattern(confidence)
-        label = Label(parent_concept, location, activation, parent_id)
+        label = Label(parent_concept, location, target, activation, parent_id)
         self.workspace.add_label(label)
         self.logger.log(label)
         return label

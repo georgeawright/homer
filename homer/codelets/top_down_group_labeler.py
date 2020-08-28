@@ -58,6 +58,7 @@ class TopDownGroupLabeler(Codelet):
         label = self.bubble_chamber.create_label(
             self.parent_concept,
             self.target_perceptlet.location,
+            self.target_perceptlet,
             self.confidence,
             self.codelet_id,
         )
