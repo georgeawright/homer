@@ -6,6 +6,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Concept
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Group
+from homer.classifiers import GroupLabelClassifier
 from homer.codelet import Codelet
 
 from .group_extender import GroupExtender
@@ -30,6 +31,7 @@ class GroupLabeler(Codelet):
             urgency,
             parent_id,
         )
+        self.classifier = GroupLabelClassifier()
 
     def _passes_preliminary_checks(self) -> bool:
         try:
@@ -48,12 +50,9 @@ class GroupLabeler(Codelet):
         return self._engender_alternative_follow_up()
 
     def _calculate_confidence(self):
-        total_activation = 0.0
-        for member in self.target_perceptlet.members:
-            for label in member.labels:
-                if label.parent_concept == self.parent_concept:
-                    total_activation += label.activation.as_scalar()
-        self.confidence = total_activation / self.target_perceptlet.size
+        self.confidence = self.classifier.confidence(
+            self.target_perceptlet, self.parent_concept
+        )
 
     def _process_perceptlet(self):
         label = self.bubble_chamber.create_label(
