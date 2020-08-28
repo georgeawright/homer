@@ -30,6 +30,7 @@ class Perceptlet(Bubble):
         self.location = location
         self.neighbours = neighbours
         self.parent_id = parent_id
+        self.quality = activation.as_scalar()
         self.unhappiness = PerceptletActivationPattern(activation=1.0)
         self.labels = PerceptletCollection()
         self.groups = PerceptletCollection()

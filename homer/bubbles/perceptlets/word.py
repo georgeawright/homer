@@ -25,8 +25,8 @@ class Word(Perceptlet):
 
     @classmethod
     def from_concept(cls, concept: Concept) -> Word:
-        return cls(concept.name, concept, 0.0, "")
+        return cls(concept.name, concept, PerceptletActivationPattern(0.0), "")
 
     @classmethod
     def from_string(cls, word: str) -> Word:
-        return cls(word, None, 0.0, "")
+        return cls(word, None, PerceptletActivationPattern(0.0), "")
