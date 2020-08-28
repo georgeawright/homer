@@ -2,8 +2,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.activation_patterns import WorkspaceActivationPattern
-from homer.bubbles.concepts.perceptlet_types import GroupLabelEvaluationConcept
-from homer.codelets.evaluators import GroupLabelEvaluator
+from homer.bubbles.concepts.perceptlet_types import GroupLabelSelectionConcept
+from homer.codelets.selectors import GroupLabelSelector
 from homer.perceptlet_collection import PerceptletCollection
 from homer.workspace_location import WorkspaceLocation
 
@@ -23,6 +23,6 @@ def test_spawn_codelet():
             bubble_chamber = Mock()
             bubble_chamber.concept_space = {"group-label": Mock()}
             bubble_chamber.workspace.groups = PerceptletCollection()
-            group_label_evaluation_concept = GroupLabelEvaluationConcept()
-            codelet = group_label_evaluation_concept.spawn_codelet(bubble_chamber)
-            assert GroupLabelEvaluator == type(codelet)
+            group_label_selection_concept = GroupLabelSelectionConcept()
+            codelet = group_label_selection_concept.spawn_codelet(bubble_chamber)
+            assert GroupLabelSelector == type(codelet)

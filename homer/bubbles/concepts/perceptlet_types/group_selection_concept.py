@@ -3,16 +3,16 @@ import random
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Concept
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
-from homer.codelets.evaluators import GroupEvaluator
+from homer.codelets.selectors import GroupSelector
 from homer.errors import MissingPerceptletError
 from homer.workspace_location import WorkspaceLocation
 
 
-class GroupEvaluationConcept(PerceptletType):
-    def __init__(self, name: str = "group-evaluation"):
+class GroupSelectionConcept(PerceptletType):
+    def __init__(self, name: str = "group-selection"):
         PerceptletType.__init__(self, name)
 
-    def spawn_codelet(self, bubble_chamber: BubbleChamber):
+    def spawn_codelet(self, bubble_chamber: BubbleChamber) -> GroupSelector:
         if self.activation.as_scalar() > random.random():
             try:
                 location = self.activation.get_high_location()
@@ -24,7 +24,7 @@ class GroupEvaluationConcept(PerceptletType):
                 ).get_most_active()
             except MissingPerceptletError:
                 return None
-            return GroupEvaluator(
+            return GroupSelector(
                 bubble_chamber,
                 self,
                 bubble_chamber.concept_space.get_perceptlet_type_by_name("group"),

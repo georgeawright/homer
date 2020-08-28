@@ -2,7 +2,7 @@ import math
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators import GroupEvaluator
+from homer.codelets.selectors import GroupSelector
 
 FLOAT_COMPARISON_TOLERANCE = 1e-3
 
@@ -26,7 +26,7 @@ def test_run_competition(
     challenger = Mock()
     challenger.size = challenger_size
     challenger.total_connection_activations.side_effect = [challenger_connections]
-    evaluator = GroupEvaluator(Mock(), Mock(), Mock(), champion, Mock(), Mock())
-    evaluator.challenger = challenger
-    actual = evaluator._run_competition()
+    selector = GroupSelector(Mock(), Mock(), Mock(), champion, Mock(), Mock())
+    selector.challenger = challenger
+    actual = selector._run_competition()
     assert math.isclose(expected, actual, abs_tol=FLOAT_COMPARISON_TOLERANCE)

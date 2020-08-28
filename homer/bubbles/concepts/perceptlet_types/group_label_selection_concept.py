@@ -3,13 +3,13 @@ import random
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Concept
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
-from homer.codelets.evaluators import GroupLabelEvaluator
+from homer.codelets.selectors import GroupLabelSelector
 from homer.errors import MissingPerceptletError
 from homer.workspace_location import WorkspaceLocation
 
 
-class GroupLabelEvaluationConcept(PerceptletType):
-    def __init__(self, name: str = "group-label-evaluation"):
+class GroupLabelSelectionConcept(PerceptletType):
+    def __init__(self, name: str = "group-label-selection"):
         PerceptletType.__init__(self, name)
 
     def spawn_codelet(self, bubble_chamber: BubbleChamber):
@@ -22,7 +22,7 @@ class GroupLabelEvaluationConcept(PerceptletType):
                 target_group = bubble_chamber.workspace.groups.at(location).get_active()
             except MissingPerceptletError:
                 return None
-            return GroupLabelEvaluator(
+            return GroupLabelSelector(
                 bubble_chamber,
                 self,
                 bubble_chamber.concept_space["group-label"],

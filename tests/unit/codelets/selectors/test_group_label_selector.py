@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators import GroupLabelEvaluator
+from homer.codelets.selectors import GroupLabelSelector
 
 
 @pytest.mark.parametrize(
@@ -28,7 +28,7 @@ def test_run_competition(
     champion.parent_concept.proximity_to.side_effect = [champion_proximity]
     challenger = Mock()
     challenger.parent_concept.proximity_to.side_effect = [challenger_proximity]
-    evaluator = GroupLabelEvaluator(
+    selector = GroupLabelSelector(
         Mock(),
         Mock(),
         Mock(),
@@ -38,7 +38,7 @@ def test_run_competition(
         champion=champion,
         challenger=challenger,
     )
-    evaluator.target_space = Mock()
-    evaluator.champion_proportion = champion_proportion
-    evaluator.challenger_proportion = challenger_proportion
-    assert expected == evaluator._run_competition()
+    selector.target_space = Mock()
+    selector.champion_proportion = champion_proportion
+    selector.challenger_proportion = challenger_proportion
+    assert expected == selector._run_competition()

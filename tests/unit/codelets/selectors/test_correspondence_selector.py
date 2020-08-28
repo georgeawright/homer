@@ -2,7 +2,7 @@ import math
 import pytest
 from unittest.mock import Mock, patch
 
-from homer.codelets.evaluators import CorrespondenceEvaluator
+from homer.codelets.selectors import CorrespondenceSelector
 from homer.perceptlet_collection import PerceptletCollection
 
 FLOAT_COMPARISON_TOLERANCE = 1e-3
@@ -27,14 +27,14 @@ def test_passes_preliminary_checks():
             PerceptletCollection(),
             PerceptletCollection(),
         ]
-        evaluator = CorrespondenceEvaluator(
+        selector = CorrespondenceSelector(
             bubble_chamber, Mock(), Mock(), champion, Mock(), Mock()
         )
-        evaluator.challenger = challenger
-        assert evaluator._passes_preliminary_checks() is True
+        selector.challenger = challenger
+        assert selector._passes_preliminary_checks() is True
         champion.first_argument = second_argument
         champion.second_argument = first_argument
-        assert evaluator._passes_preliminary_checks() is False
+        assert selector._passes_preliminary_checks() is False
 
 
 @pytest.mark.parametrize(
@@ -47,9 +47,7 @@ def test_run_competition(champion_connections, challenger_connections, expected)
     champion.total_connection_activations.side_effect = [champion_connections]
     challenger = Mock()
     challenger.total_connection_activations.side_effect = [challenger_connections]
-    evaluator = CorrespondenceEvaluator(
-        Mock(), Mock(), Mock(), champion, Mock(), Mock()
-    )
-    evaluator.challenger = challenger
-    actual = evaluator._run_competition()
+    selector = CorrespondenceSelector(Mock(), Mock(), Mock(), champion, Mock(), Mock())
+    selector.challenger = challenger
+    actual = selector._run_competition()
     assert math.isclose(expected, actual, abs_tol=FLOAT_COMPARISON_TOLERANCE)

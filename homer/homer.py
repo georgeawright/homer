@@ -10,9 +10,9 @@ from .bubbles.concepts.perceptlet_types import (
     CorrespondenceConcept,
     CorrespondenceLabelConcept,
     GroupConcept,
-    GroupEvaluationConcept,
+    GroupSelectionConcept,
     GroupLabelConcept,
-    GroupLabelEvaluationConcept,
+    GroupLabelSelectionConcept,
     LabelConcept,
     TextletConcept,
 )
@@ -62,14 +62,14 @@ class Homer:
         correspondence_concept = CorrespondenceConcept()
         correspondence_concept.connections.add(textlet_concept)
         correspondence_concept.connections.add(correspondence_label_concept)
-        group_evaluation_concept = GroupEvaluationConcept()
-        group_label_evaluation_concept = GroupLabelEvaluationConcept()
+        group_selection_concept = GroupSelectionConcept()
+        group_label_selection_concept = GroupLabelSelectionConcept()
         group_label_concept = GroupLabelConcept()
-        group_label_concept.connections.add(group_label_evaluation_concept)
+        group_label_concept.connections.add(group_label_selection_concept)
         group_concept = GroupConcept()
         group_concept.connections.add(correspondence_concept)
         group_concept.connections.add(group_label_concept)
-        group_concept.connections.add(group_evaluation_concept)
+        group_concept.connections.add(group_selection_concept)
         label_concept = LabelConcept()
         label_concept.connections.add(group_concept)
         perceptlet_types = {
@@ -77,9 +77,9 @@ class Homer:
             correspondence_concept,
             correspondence_label_concept,
             group_concept,
-            group_evaluation_concept,
+            group_selection_concept,
             group_label_concept,
-            group_label_evaluation_concept,
+            group_label_selection_concept,
             label_concept,
         }
         correspondence_types = {

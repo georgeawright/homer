@@ -8,7 +8,7 @@ from homer.codelet import Codelet
 from homer.hyper_parameters import HyperParameters
 
 
-class Evaluator(Codelet):
+class Selector(Codelet):
 
     CONFIDENCE_THRESHOLD = HyperParameters.EVALUATOR_CONFIDENCE_THRESHOLD
 

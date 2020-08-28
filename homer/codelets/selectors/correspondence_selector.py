@@ -1,10 +1,10 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Correspondence
-from homer.codelets.evaluator import Evaluator
+from homer.codelets.selector import Selector
 
 
-class CorrespondenceEvaluator(Evaluator):
+class CorrespondenceSelector(Selector):
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
@@ -14,7 +14,7 @@ class CorrespondenceEvaluator(Evaluator):
         urgency: float,
         parent_id: str,
     ):
-        Evaluator.__init__(
+        Selector.__init__(
             self,
             bubble_chamber,
             perceptlet_type,

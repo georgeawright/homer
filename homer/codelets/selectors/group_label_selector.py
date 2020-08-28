@@ -6,11 +6,11 @@ from homer.bubble_chamber import BubbleChamber
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Group, Label
 from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
-from homer.codelets.evaluator import Evaluator
+from homer.codelets.selector import Selector
 from homer.errors import MissingPerceptletError
 
 
-class GroupLabelEvaluator(Evaluator):
+class GroupLabelSelector(Selector):
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
@@ -22,7 +22,7 @@ class GroupLabelEvaluator(Evaluator):
         champion: Optional[Label] = None,
         challenger: Optional[Label] = None,
     ):
-        Evaluator.__init__(
+        Selector.__init__(
             self,
             bubble_chamber,
             perceptlet_type,
@@ -86,14 +86,14 @@ class GroupLabelEvaluator(Evaluator):
             [proximity_difference, proportion_with_label_difference]
         )
 
-    def _engender_follow_up(self) -> GroupLabelEvaluator:
+    def _engender_follow_up(self) -> GroupLabelSelector:
         winner, loser = (
             (self.champion, self.challenger)
             if self.champion.activation.as_scalar()
             > self.challenger.activation.as_scalar()
             else (self.challenger, self.champion)
         )
-        return GroupLabelEvaluator(
+        return GroupLabelSelector(
             self.bubble_chamber,
             self.perceptlet_type,
             self.target_type,
