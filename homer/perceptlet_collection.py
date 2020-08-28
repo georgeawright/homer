@@ -2,6 +2,7 @@ from __future__ import annotations
 import random
 from typing import List, Optional, Set, Union
 
+from .bubbles.concept import Concept
 from .errors import MissingPerceptletError
 from .workspace_location import WorkspaceLocation
 
@@ -68,6 +69,14 @@ class PerceptletCollection:
             set.intersection(*[collection.perceptlets for collection in collections])
         )
 
+    def proportion_with_label(self, concept: Concept):
+        return self.number_with_label(concept) / len(self)
+
+    def number_with_label(self, concept: Concept):
+        return sum(
+            1 for perceptlet in self.perceptlets if perceptlet.has_label(concept)
+        )
+
     def get_random(self):
         """Returns a random perceptlet"""
         if len(self.perceptlets) < 1:
@@ -81,6 +90,9 @@ class PerceptletCollection:
     def get_active(self):
         """Returns a perceptlet probabilistically according to activation."""
         return self._get_perceptlet_according_to("activation")
+
+    def get_most_active(self):
+        return self._get_perceptlet_with_highest("activation")
 
     def get_unhappy(self):
         """Returns a perceptlet probabilistically according to unhappiness."""
@@ -99,6 +111,13 @@ class PerceptletCollection:
         perceptlets = random.sample(self.perceptlets, len(self.perceptlets) // 2)
         perceptlet_choice = perceptlets[0]
         for perceptlet in perceptlets[1:]:
+            if getattr(perceptlet, attribute) > getattr(perceptlet_choice, attribute):
+                perceptlet_choice = perceptlet
+        return perceptlet_choice
+
+    def _get_perceptlet_with_highest(self, attribute: str):
+        perceptlet_choice = self.get_random()
+        for perceptlet in self.perceptlets:
             if getattr(perceptlet, attribute) > getattr(perceptlet_choice, attribute):
                 perceptlet_choice = perceptlet
         return perceptlet_choice

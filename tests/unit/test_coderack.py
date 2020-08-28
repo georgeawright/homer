@@ -22,7 +22,11 @@ def test_select_codelet(
             codelet.urgency = urgency_value
             codelets.append(codelet)
         bubble_chamber = Mock()
-        bubble_chamber.satisfaction = bubble_chamber_satisfaction
+        satisfaction = Mock()
+        satisfaction.activation.as_scalar.side_effect = [
+            bubble_chamber_satisfaction for _ in random_numbers
+        ]
+        bubble_chamber.concept_space = {"satisfaction": satisfaction}
         coderack = Coderack(bubble_chamber, Mock())
         coderack.IDEAL_POPULATION = 1
         coderack._codelets = codelets

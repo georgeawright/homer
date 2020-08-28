@@ -75,7 +75,7 @@ class CorrespondenceBuilder(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.correspondences.add(self.correspondence)
+        self.target_perceptlet.add_correspondence(self.correspondence)
 
     def _engender_follow_up(self):
         from homer.codelets.correspondence_labeler import CorrespondenceLabeler

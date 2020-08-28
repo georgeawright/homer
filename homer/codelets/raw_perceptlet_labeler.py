@@ -44,7 +44,7 @@ class RawPerceptletLabeler(Codelet):
         proximity = self.parent_concept.proximity_to(
             self.target_perceptlet.get_value(self.parent_concept)
         )
-        neighbours = self.target_perceptlet.proportion_of_neighbours_with_label(
+        neighbours = self.target_perceptlet.neighbours.proportion_with_label(
             self.parent_concept
         )
         self.confidence = fuzzy.OR(proximity, neighbours)
@@ -56,7 +56,7 @@ class RawPerceptletLabeler(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.labels.add(label)
+        self.target_perceptlet.add_label(label)
 
     def _engender_follow_up(self) -> RawPerceptletLabeler:
         new_target = self.target_perceptlet.neighbours.get_unhappy()

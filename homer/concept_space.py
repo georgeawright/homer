@@ -33,8 +33,12 @@ class ConceptSpace:
             self.conceptual_spaces,
             self.workspace_concepts,
         )
+        self.concept_dictionary = {concept.name: concept for concept in self.concepts}
         self.spawning_concepts = set.union(perceptlet_types, workspace_concepts)
         self.logger = logger
+
+    def __getitem__(self, key: str):
+        return self.concept_dictionary[key]
 
     def get_perceptlet_type_by_name(self, name: str) -> PerceptletType:
         return self.perceptlet_types_dictionary[name]

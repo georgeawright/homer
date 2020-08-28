@@ -61,11 +61,25 @@ class Perceptlet(Bubble):
             "size": lambda: self.size,
         }[concept.relevant_value]()
 
-    def proportion_of_neighbours_with_label(self, concept: Concept) -> float:
-        return self.number_of_neighbours_with_label(concept) / len(self.neighbours)
+    def total_connection_activations(self) -> float:
+        return sum(connection.activation.as_scalar() for connection in self.connections)
 
-    def number_of_neighbours_with_label(self, concept: Concept) -> int:
-        return sum(1 for neighbour in self.neighbours if neighbour.has_label(concept))
+    def add_label(self, label: Perceptlet):
+        self._add_connection("labels", label)
+
+    def add_group(self, group: Perceptlet):
+        self._add_connection("groups", group)
+
+    def add_correspondence(self, correspondence: Perceptlet):
+        self._add_connection("correspondences", correspondence)
+
+    def add_textlet(self, textlet: Perceptlet):
+        self._add_connection("textlets", textlet)
+
+    def _add_connection(self, collection: str, perceptlet: Perceptlet):
+        getattr(self, collection).add(perceptlet)
+        self.connections.add(perceptlet)
+        self.unhappiness.decay_by_amount(perceptlet.activation.as_scalar())
 
     def has_label(self, concept: Concept) -> bool:
         return True in (
@@ -105,3 +119,13 @@ class Perceptlet(Bubble):
             ):
                 return True
         return False
+
+    def boost_activation(self, amount: float):
+        self.activation.boost_by_amount(amount)
+        for connection in self.connections:
+            connection.boost_activation(amount)
+
+    def decay_activation(self, amount: float):
+        self.activation.decay_by_amount(amount)
+        for connection in self.connections:
+            connection.decay_activation(amount)

@@ -25,6 +25,7 @@ class Coderack:
 
     def select_and_run_codelet(self):
         codelet = self.select_codelet()
+        self.logger.log_codelet_run(codelet)
         follow_up = codelet.run()
         self.codelets_run += 1
         if follow_up is not None:
@@ -42,7 +43,7 @@ class Coderack:
                 codelet_choice = codelet
         if codelet_choice is None:
             raise NoMoreCodelets
-        if self.codelets_run > 5000:
+        if self.codelets_run > 10000:
             raise NoMoreCodelets
         self._codelets.remove(codelet_choice)
         return codelet_choice
@@ -54,4 +55,6 @@ class Coderack:
                 self.add_codelet(codelet)
 
     def _randomness(self) -> float:
-        return 1 - self.bubble_chamber.satisfaction
+        return (
+            1 - self.bubble_chamber.concept_space["satisfaction"].activation.as_scalar()
+        )

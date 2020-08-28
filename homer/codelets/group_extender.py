@@ -58,7 +58,7 @@ class GroupExtender(Codelet):
 
     def _process_perceptlet(self):
         self.target_perceptlet.add_member(self.second_target_perceptlet)
-        self.second_target_perceptlet.groups.add(self.target_perceptlet)
+        self.second_target_perceptlet.add_group(self.target_perceptlet)
 
     def _engender_follow_up(self) -> GroupExtender:
         return GroupExtender(

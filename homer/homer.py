@@ -9,8 +9,11 @@ from .bubbles.concepts.euclidean_space import EuclideanSpace
 from .bubbles.concepts.perceptlet_types import (
     CorrespondenceConcept,
     CorrespondenceLabelConcept,
+    CorrespondenceSelectionConcept,
     GroupConcept,
+    GroupSelectionConcept,
     GroupLabelConcept,
+    GroupLabelSelectionConcept,
     LabelConcept,
     TextletConcept,
 )
@@ -56,22 +59,31 @@ class Homer:
         location_templates = [Template(["in", "the", None])]
 
         textlet_concept = TextletConcept()
+        correspondence_selection_concept = CorrespondenceSelectionConcept()
         correspondence_label_concept = CorrespondenceLabelConcept()
         correspondence_concept = CorrespondenceConcept()
         correspondence_concept.connections.add(textlet_concept)
         correspondence_concept.connections.add(correspondence_label_concept)
+        correspondence_concept.connections.add(correspondence_selection_concept)
+        group_selection_concept = GroupSelectionConcept()
+        group_label_selection_concept = GroupLabelSelectionConcept()
         group_label_concept = GroupLabelConcept()
+        group_label_concept.connections.add(group_label_selection_concept)
         group_concept = GroupConcept()
         group_concept.connections.add(correspondence_concept)
         group_concept.connections.add(group_label_concept)
+        group_concept.connections.add(group_selection_concept)
         label_concept = LabelConcept()
         label_concept.connections.add(group_concept)
         perceptlet_types = {
             textlet_concept,
             correspondence_concept,
             correspondence_label_concept,
+            correspondence_selection_concept,
             group_concept,
+            group_selection_concept,
             group_label_concept,
+            group_label_selection_concept,
             label_concept,
         }
         correspondence_types = {
@@ -93,7 +105,9 @@ class Homer:
             ),
         }
         temperature_space = EuclideanSpace("temperature", 5, 1.5, temperature_templates)
-        location_space = EuclideanSpace("location", 5, 1, location_templates)
+        location_space = EuclideanSpace(
+            "location", 5, 1, location_templates, relevant_value="location"
+        )
         spaces = {temperature_space, location_space}
         workspace_concepts = {
             EuclideanConcept("cold", [4], temperature_space, depth=1, boundary=[7]),
@@ -174,7 +188,9 @@ class Homer:
                 raise e
         return {
             "result": self.bubble_chamber.result,
-            "satisfaction": self.bubble_chamber.satisfaction,
+            "satisfaction": self.bubble_chamber.concept_space[
+                "satisfaction"
+            ].activation.as_scalar(),
             "codelets_run": self.coderack.codelets_run,
         }
 

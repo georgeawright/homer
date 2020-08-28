@@ -11,9 +11,12 @@ homer.logger.graph_concepts(
     [
         "label",
         "group",
+        "group-selection",
         "group-label",
+        "group-label-selection",
         "correspondence",
         "correspondence-label",
+        "correspondence-selection",
         "textlet",
     ],
     "perceptlet_types",
@@ -21,5 +24,7 @@ homer.logger.graph_concepts(
 
 # homer.logger.graph_codelets("codelets_family_tree")
 homer.logger.graph_coderack("coderack_population")
-homer.logger.graph_satisfaction("satisfaction")
 homer.logger.graph_concepts(["satisfaction"], "satisfaction_concept")
+
+homer.logger.graph_processes("processes")
+homer.logger.graph_codelet_types("codelets_by_type")

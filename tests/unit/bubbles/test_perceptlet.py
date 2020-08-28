@@ -30,31 +30,6 @@ def label(concept):
     return mock_label
 
 
-@pytest.mark.parametrize(
-    "no_of_valid_neighbours, no_of_invalid_neighbours, expected_proportion",
-    [(1, 1, 0.5), (1, 2, 0.33333), (0, 1, 0.0)],
-)
-def test_number_and_proportion_of_neighbours_with_label(
-    concept,
-    label,
-    no_of_valid_neighbours,
-    no_of_invalid_neighbours,
-    expected_proportion,
-):
-    valid_neighbour = Perceptlet("value", Mock(), Mock(), Mock(), Mock())
-    valid_neighbour.labels.add(label)
-    invalid_neighbour = Perceptlet("value", Mock(), Mock(), Mock(), Mock())
-    valid_neighbours = [valid_neighbour for i in range(no_of_valid_neighbours)]
-    invalid_neighbours = [invalid_neighbour for i in range(no_of_invalid_neighbours)]
-    neighbours = valid_neighbours + invalid_neighbours
-    perceptlet = Perceptlet("value", Mock(), Mock(), neighbours, Mock())
-    assert no_of_valid_neighbours == perceptlet.number_of_neighbours_with_label(concept)
-    actual_proportion = perceptlet.proportion_of_neighbours_with_label(concept)
-    assert math.isclose(
-        expected_proportion, actual_proportion, abs_tol=FLOAT_COMPARISON_TOLERANCE
-    )
-
-
 def test_has_label(concept, label):
     perceptlet = Perceptlet("value", Mock(), Mock(), Mock(), Mock())
     perceptlet.labels.add(label)

@@ -45,7 +45,7 @@ class Concept(Bubble):
                 f"Creating concept {name} failed because "
                 + f" prototype and boundary are equal {prototype}."
             )
-        self.concept_id = "concept" + name.upper()
+        self.concept_id = "concept_" + name.upper()
         Bubble.__init__(self, activation, self.concept_id)
         self.name = name
         self.space = space

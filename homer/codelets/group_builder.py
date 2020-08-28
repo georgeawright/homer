@@ -63,7 +63,7 @@ class GroupBuilder(Codelet):
             )
             for concept in common_concepts
         ]
-        self.confidence = 0.0 if distances == [] else fuzzy.OR(*distances)
+        self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
 
     def _process_perceptlet(self):
         self.group = self.bubble_chamber.create_group(
@@ -73,8 +73,8 @@ class GroupBuilder(Codelet):
             self.confidence,
             self.codelet_id,
         )
-        self.target_perceptlet.groups.add(self.group)
-        self.second_target_perceptlet.groups.add(self.group)
+        self.target_perceptlet.add_group(self.group)
+        self.second_target_perceptlet.add_group(self.group)
 
     def _engender_follow_up(self) -> GroupLabeler:
         return GroupLabeler(

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections import defaultdict
 import csv
 import os
 import time
@@ -18,16 +19,19 @@ class Logger:
         if not os.path.exists(path_to_logs):
             os.makedirs(path_to_logs)
         now = time.localtime()
-        logging_directory = (
-            path_to_logs
-            + "/"
-            + str(now.tm_year)
-            + str(now.tm_mon)
-            + str(now.tm_mday)
-            + str(now.tm_hour)
-            + str(now.tm_min)
-            + str(now.tm_sec)
+        year = str(now.tm_year)
+        month = str(now.tm_mon)
+        day = str(now.tm_mday)
+        hour = str(now.tm_hour)
+        minute = str(now.tm_min)
+        second = str(now.tm_sec)
+        date = "-".join(
+            [
+                value if len(value) >= 2 else "0" + value
+                for value in [year, month, day, hour, minute, second]
+            ]
         )
+        logging_directory = f"{path_to_logs}/{date}"
         os.makedirs(logging_directory)
         os.makedirs(logging_directory + "/concepts")
         logger = Logger(logging_directory)
@@ -50,14 +54,19 @@ class Logger:
         if isinstance(item, Perceptlet):
             return self._log_perceptlet(item)
 
-    def log_satisfaction(self, satisfaction: float):
-        satisfaction_file = self.log_directory + "/satisfaction.csv"
-        with open(satisfaction_file, "a") as f:
+    def log_codelet_run(self, codelet):
+        processes_file = f"{self.log_directory}/processes.csv"
+        with open(processes_file, "a") as f:
             codelets_run = "CodeletsRun"
-            satisfaction_heading = "Satisfaction"
-            writer = csv.DictWriter(f, [codelets_run, satisfaction_heading])
+            codelet_id = "CodeletID"
+            parent_id = "ParentID"
+            writer = csv.DictWriter(f, [codelets_run, codelet_id, parent_id])
             writer.writerow(
-                {codelets_run: self.codelets_run, satisfaction_heading: satisfaction}
+                {
+                    codelets_run: self.codelets_run,
+                    codelet_id: codelet.codelet_id,
+                    parent_id: codelet.parent_id,
+                }
             )
 
     def _log_message(self, message):
@@ -205,15 +214,60 @@ class Logger:
         pyplot.ylabel("Codelets on Rack")
         pyplot.savefig(f"{self.log_directory}/{file_name}.png")
 
-    def graph_satisfaction(self, file_name: str):
+    def graph_processes(self, file_name: str):
+        processes_file = f"{self.log_directory}/processes.csv"
+        processes = []
+        with open(processes_file, "r") as f:
+            for row in csv.reader(f):
+                new_codelet = {
+                    "codelets_run": row[0],
+                    "codelet_id": row[1],
+                    "parent_id": row[2],
+                }
+                process_found = False
+                for process in processes:
+                    if process[-1]["codelet_id"] == new_codelet["parent_id"]:
+                        process.append(new_codelet)
+                        process_found = True
+                        break
+                if not process_found:
+                    processes.append([new_codelet])
+        processes_matrix = []
+        for process in processes:
+            process_start = int(process[0]["codelets_run"])
+            process_length = int(process[-1]["codelets_run"]) + 2
+            process_row = ["-" for _ in range(process_length)]
+            for codelet in process:
+                process_row[int(codelet["codelets_run"])] = codelet["codelet_id"]
+            process_row[-1] = "END"
+            process_added = False
+            for row in processes_matrix:
+                row_length = len(row)
+                if row_length <= process_start:
+                    distance_from_last_process = process_start - row_length
+                    for _ in range(distance_from_last_process):
+                        row.append("")
+                    row += process_row
+                    process_added = True
+                    break
+            if not process_added:
+                processes_matrix.append(process_row)
+        processes_output = f"{self.log_directory}/{file_name}.txt"
+        with open(processes_output, "w") as f:
+            f.write(str(processes_matrix))
+        print(len(processes_matrix))
+
+    def graph_codelet_types(self, file_name: str):
         pyplot.clf()
-        satisfaction_file = self.log_directory + "/satisfaction.csv"
-        with open(satisfaction_file, "r") as f:
-            data = list(csv.reader(f))
-            codelets_run = [int(element[0]) for element in data]
-            satisfaction = [float(element[1]) for element in data]
-            pyplot.plot(codelets_run, satisfaction)
-        pyplot.title("Satisfaction")
-        pyplot.xlabel("Codelets Run")
-        pyplot.ylabel("Satisfaction")
+        codelets_file = f"{self.log_directory}/codelets.csv"
+        codelet_counts = defaultdict(int)
+        with open(codelets_file, "r") as f:
+            for row in csv.reader(f):
+                codelet_counts[row[3]] += 1
+        print(codelet_counts)
+        pyplot.barh(range(len(codelet_counts)), list(codelet_counts.values()))
+        pyplot.yticks(range(len(codelet_counts)), list(codelet_counts.keys()))
+        pyplot.title("Number of Codelets Run by Type")
+        pyplot.ylabel("Codelet Type")
+        pyplot.xlabel("Quantity Run")
         pyplot.savefig(f"{self.log_directory}/{file_name}.png")
