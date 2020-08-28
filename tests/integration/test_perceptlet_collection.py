@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.hyper_parameters import HyperParameters
-from homer.perceptlet import Perceptlet
+from homer.bubbles import Perceptlet
 from homer.perceptlet_collection import PerceptletCollection
 from homer.workspace_location import WorkspaceLocation
 
@@ -36,7 +36,7 @@ def test_at(perceptlet):
 
 
 def test_add():
-    perceptlet = Perceptlet(Mock(), [0, 0, 0], Mock(), Mock())
+    perceptlet = Perceptlet(Mock(), [0, 0, 0], Mock(), Mock(), Mock())
     collection = PerceptletCollection(set())
     collection._arrange_perceptlets_by_location()
     collection.add(perceptlet)
