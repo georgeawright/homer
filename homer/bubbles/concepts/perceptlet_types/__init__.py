@@ -1,5 +1,6 @@
 from .correspondence_concept import CorrespondenceConcept
 from .correspondence_label_concept import CorrespondenceLabelConcept
+from .correspondence_selection_concept import CorrespondenceSelectionConcept
 from .group_concept import GroupConcept
 from .group_selection_concept import GroupSelectionConcept
 from .group_label_concept import GroupLabelConcept
