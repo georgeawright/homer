@@ -11,6 +11,7 @@ FLOATING_POINT_TOLERANCE = 1e-1
 @pytest.mark.parametrize("group_value, member_values, expected", [(10, [10, 9], 0.9)])
 def test_calculate_confidence(group_value, member_values, expected):
     target_group = Mock()
+    target_group.quality = 0.0
     target_group.location = [0, 0, 0]
     target_group.get_value.side_effect = [[group_value] for _ in member_values]
     target_group.members = []

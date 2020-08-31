@@ -41,8 +41,9 @@ class GroupEvaluator(Evaluator):
             for space in conceptual_spaces
             for member in self.target_group.members
         ]
-        self.confidence = statistics.fmean(proximities)
+        quality_estimate = statistics.fmean(proximities)
         # or fuzzy.AND?
+        self.confidence = quality_estimate - self.target_group.quality
 
     def _engender_follow_up(self):
         # engender group selector
