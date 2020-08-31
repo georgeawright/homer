@@ -1,6 +1,5 @@
 import statistics
 
-from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
@@ -43,6 +42,7 @@ class GroupEvaluator(Evaluator):
             for member in self.target_group.members
         ]
         self.confidence = statistics.fmean(proximities)
+        # or fuzzy.AND?
 
     def _engender_follow_up(self):
         # engender group selector
