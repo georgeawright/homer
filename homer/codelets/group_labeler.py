@@ -78,7 +78,7 @@ class GroupLabeler(Codelet):
             self.bubble_chamber,
             self.perceptlet_type,
             self.target_perceptlet,
-            self.urgency / 2,
+            self.perceptlet_type.activation.at(self.location),
             self.codelet_id,
         )
 

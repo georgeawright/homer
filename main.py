@@ -26,6 +26,11 @@ homer.logger.graph_concepts(
     "perceptlet_types",
 )
 
+homer.logger.graph_concepts(
+    ["group-label", "group-label-evaluation", "group-label-selection"],
+    "group-label-concepts",
+)
+
 # homer.logger.graph_codelets("codelets_family_tree")
 homer.logger.graph_coderack("coderack_population")
 homer.logger.graph_concepts(["satisfaction"], "satisfaction_concept")

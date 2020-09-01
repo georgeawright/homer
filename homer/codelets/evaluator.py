@@ -42,4 +42,4 @@ class Evaluator(Codelet):
         if self.confidence > 0:
             self.target_type.activation.decay(self.location)
         if self.confidence < 0:
-            self.target_type.activation.boost(self.location)
+            self.target_type.activation.boost(abs(self.confidence), self.location)

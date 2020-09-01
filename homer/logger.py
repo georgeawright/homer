@@ -171,6 +171,7 @@ class Logger:
 
     def graph_concepts(self, concept_names: List[str], file_name: str):
         pyplot.clf()
+        pyplot.figure(figsize=(15, 9))
         for concept_name in concept_names:
             concept_file = self.log_directory + "/concepts/" + concept_name + ".csv"
             if not os.path.exists(concept_file):

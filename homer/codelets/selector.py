@@ -10,7 +10,7 @@ from homer.hyper_parameters import HyperParameters
 
 class Selector(Codelet):
 
-    CONFIDENCE_THRESHOLD = HyperParameters.EVALUATOR_CONFIDENCE_THRESHOLD
+    CONFIDENCE_THRESHOLD = HyperParameters.SELECTOR_CONFIDENCE_THRESHOLD
     SELECTION_RANDOMNESS = HyperParameters.SELECTION_RANDOMNESS
 
     def __init__(
@@ -40,7 +40,8 @@ class Selector(Codelet):
         return None
 
     def _fail(self):
-        pass
+        self.perceptlet_type.activation.decay(self.location)
+        return None
 
     def _calculate_confidence(self):
         champion_score = (

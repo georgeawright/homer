@@ -39,7 +39,7 @@ class Codelet(ABC):
         if not self._passes_preliminary_checks():
             return self._fizzle()
         self._calculate_confidence()
-        if self.confidence > self.CONFIDENCE_THRESHOLD:
+        if abs(self.confidence) > self.CONFIDENCE_THRESHOLD:
             self._boost_activations()
             self._process_perceptlet()
             return self._engender_follow_up()

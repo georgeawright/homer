@@ -91,6 +91,6 @@ class CorrespondenceLabeler(Codelet):
             self.perceptlet_type,
             self.relevant_space,
             self.target_perceptlet,
-            self.urgency / 2,
+            self.perceptlet_type.activation.at(self.location),
             self.parent_id,
         )
