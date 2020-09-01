@@ -1,4 +1,3 @@
-from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
@@ -37,7 +36,3 @@ class LabelEvaluator(Evaluator):
             self.target_label.target, self.parent_concept
         )
         self.confidence = quality_estimate - self.target_label.quality
-
-    def _engender_follow_up(self):
-        # engender label selector
-        pass
