@@ -1,4 +1,5 @@
 import random
+import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
@@ -56,7 +57,12 @@ class Selector(Codelet):
         self.champion.boost_activation(self.confidence)
         self.challenger.decay_activation(self.confidence)
         self.target_type.activation.decay(self.location)
-        if abs(self.confidence) > 0:
-            self.bubble_chamber.concept_space["satisfaction"].activation.boost(
-                abs(self.confidence), self.location
-            )
+        satisfaction = statistics.fmean(
+            [
+                self.champion.activation.as_scalar() * self.champion.quality,
+                self.challenger.activation.as_scalar() * self.challenger.quality,
+            ]
+        )
+        self.bubble_chamber.concept_space["satisfaction"].activation.boost(
+            satisfaction, self.location
+        )
