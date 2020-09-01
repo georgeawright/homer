@@ -10,11 +10,15 @@ homer.run()
 homer.logger.graph_concepts(
     [
         "label",
+        "label-evaluation",
         "group",
+        "group-evaluation",
         "group-selection",
         "group-label",
+        "group-label-evaluation",
         "group-label-selection",
         "correspondence",
+        "correspondence-evaluation",
         "correspondence-label",
         "correspondence-selection",
         "textlet",
