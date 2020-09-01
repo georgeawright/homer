@@ -1,5 +1,4 @@
-from abc import abstractmethod
-from typing import Union
+import random
 
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
@@ -11,6 +10,7 @@ from homer.hyper_parameters import HyperParameters
 class Selector(Codelet):
 
     CONFIDENCE_THRESHOLD = HyperParameters.EVALUATOR_CONFIDENCE_THRESHOLD
+    SELECTION_RANDOMNESS = HyperParameters.SELECTION_RANDOMNESS
 
     def __init__(
         self,
@@ -42,7 +42,15 @@ class Selector(Codelet):
         pass
 
     def _calculate_confidence(self):
-        self.confidence = self._run_competition()
+        champion_score = (
+            self.champion.quality * (1 - self.SELECTION_RANDOMNESS)
+            + random.random() * self.SELECTION_RANDOMNESS
+        )
+        challenger_score = (
+            self.challenger.quality * (1 - self.SELECTION_RANDOMNESS)
+            + random.random() * self.SELECTION_RANDOMNESS
+        )
+        self.confidence = champion_score - challenger_score
 
     def _process_perceptlet(self):
         self.champion.boost_activation(self.confidence)
@@ -52,11 +60,3 @@ class Selector(Codelet):
             self.bubble_chamber.concept_space["satisfaction"].activation.boost(
                 abs(self.confidence), self.location
             )
-
-    @abstractmethod
-    def _run_competition(self) -> float:
-        pass
-
-    def _difference_score(self, difference: Union[float, int]):
-        score = 1 - 1 / (1 + abs(difference))
-        return score if difference > 0 else -score

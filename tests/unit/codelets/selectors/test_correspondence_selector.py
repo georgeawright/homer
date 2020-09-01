@@ -1,5 +1,3 @@
-import math
-import pytest
 from unittest.mock import Mock, patch
 
 from homer.codelets.selectors import CorrespondenceSelector
@@ -35,22 +33,6 @@ def test_passes_preliminary_checks():
         champion.first_argument = second_argument
         champion.second_argument = first_argument
         assert selector._passes_preliminary_checks() is False
-
-
-@pytest.mark.parametrize(
-    "champion_connections, challenger_connections, expected",
-    [(1.0, 0.9, 0.09), (0.9, 1.0, -0.09)],
-)
-def test_run_competition(champion_connections, challenger_connections, expected):
-    champion = Mock()
-    champion.location = [0, 0, 0]
-    champion.total_connection_activations.side_effect = [champion_connections]
-    challenger = Mock()
-    challenger.total_connection_activations.side_effect = [challenger_connections]
-    selector = CorrespondenceSelector(Mock(), Mock(), Mock(), champion, Mock(), Mock())
-    selector.challenger = challenger
-    actual = selector._run_competition()
-    assert math.isclose(expected, actual, abs_tol=FLOAT_COMPARISON_TOLERANCE)
 
 
 def test_engender_follow_up():
