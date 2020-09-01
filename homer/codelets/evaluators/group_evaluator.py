@@ -4,6 +4,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelets.evaluator import Evaluator
+from homer.codelets.selectors.group_selector import GroupSelector
 
 
 class GroupEvaluator(Evaluator):
@@ -45,6 +46,12 @@ class GroupEvaluator(Evaluator):
         # or fuzzy.AND?
         self.confidence = quality_estimate - self.target_group.quality
 
-    def _engender_follow_up(self):
-        # engender group selector
-        pass
+    def _engender_follow_up(self) -> GroupSelector:
+        return GroupSelector(
+            self.bubble_chamber,
+            self.bubble_chamber.concept_space["group-selection"],
+            self.target_type,
+            self.bubble_chamber.workspace.groups.at(self.location).get_most_active(),
+            self.urgency,
+            self.codelet_id,
+        )
