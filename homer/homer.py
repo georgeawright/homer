@@ -76,7 +76,7 @@ class Homer:
         group_evaluation_concept.connections.add(group_selection_concept)
         group_label_selection_concept = GroupLabelSelectionConcept()
         group_label_evaluation_concept = GroupLabelEvaluationConcept()
-        group_label_evaluation_concept.connections.add(group_selection_concept)
+        group_label_evaluation_concept.connections.add(group_label_selection_concept)
         group_label_concept = GroupLabelConcept()
         group_label_concept.connections.add(group_label_evaluation_concept)
         group_concept = GroupConcept()
