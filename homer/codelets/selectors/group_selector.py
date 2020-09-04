@@ -1,5 +1,4 @@
 from __future__ import annotations
-import statistics
 from typing import Optional
 
 from homer.bubble_chamber import BubbleChamber
@@ -63,19 +62,6 @@ class GroupSelector(Selector):
             ).get_random(),
             self.urgency,
             self.codelet_id,
-        )
-
-    def _run_competition(self) -> float:
-        size_difference = self.champion.size - self.challenger.size
-        connection_activations_difference = (
-            self.champion.total_connection_activations()
-            - self.challenger.total_connection_activations()
-        )
-        return statistics.fmean(
-            [
-                self._difference_score(size_difference),
-                self._difference_score(connection_activations_difference),
-            ]
         )
 
     def _engender_follow_up(self) -> GroupSelector:

@@ -1,5 +1,3 @@
-import math
-import pytest
 from unittest.mock import Mock
 
 from homer.codelets.selectors import GroupSelector
@@ -7,26 +5,14 @@ from homer.codelets.selectors import GroupSelector
 FLOAT_COMPARISON_TOLERANCE = 1e-3
 
 
-@pytest.mark.parametrize(
-    "champion_size, challenger_size, "
-    + "champion_connections, challenger_connections, expected",
-    [(10, 5, 5, 3, 0.75), (5, 10, 3, 5, -0.75)],
-)
-def test_run_competition(
-    champion_size,
-    challenger_size,
-    champion_connections,
-    challenger_connections,
-    expected,
-):
+def test_engender_follow_up():
     champion = Mock()
     champion.location = [0, 0, 0]
-    champion.size = champion_size
-    champion.total_connection_activations.side_effect = [champion_connections]
+    champion.activation.as_scalar.side_effect = [0.6]
     challenger = Mock()
-    challenger.size = challenger_size
-    challenger.total_connection_activations.side_effect = [challenger_connections]
-    selector = GroupSelector(Mock(), Mock(), Mock(), champion, Mock(), Mock())
-    selector.challenger = challenger
-    actual = selector._run_competition()
-    assert math.isclose(expected, actual, abs_tol=FLOAT_COMPARISON_TOLERANCE)
+    challenger.activation.as_scalar.side_effect = [0.5]
+    selector = GroupSelector(
+        Mock(), Mock(), Mock(), champion, Mock(), Mock(), challenger
+    )
+    follow_up = selector._engender_follow_up()
+    assert GroupSelector == type(follow_up)

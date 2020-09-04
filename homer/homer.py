@@ -1,5 +1,3 @@
-import time
-
 from homer import fuzzy
 from .bubble_chamber import BubbleChamber
 from .bubbles.concepts.correspondence_type import CorrespondenceType
@@ -8,13 +6,17 @@ from .bubbles.concepts.euclidean_concept import EuclideanConcept
 from .bubbles.concepts.euclidean_space import EuclideanSpace
 from .bubbles.concepts.perceptlet_types import (
     CorrespondenceConcept,
+    CorrespondenceEvaluationConcept,
     CorrespondenceLabelConcept,
     CorrespondenceSelectionConcept,
     GroupConcept,
+    GroupEvaluationConcept,
     GroupSelectionConcept,
     GroupLabelConcept,
+    GroupLabelEvaluationConcept,
     GroupLabelSelectionConcept,
     LabelConcept,
+    LabelEvaluationConcept,
     TextletConcept,
 )
 from .codelets import BottomUpRawPerceptletLabeler
@@ -60,31 +62,45 @@ class Homer:
 
         textlet_concept = TextletConcept()
         correspondence_selection_concept = CorrespondenceSelectionConcept()
+        correspondence_evaluation_concept = CorrespondenceEvaluationConcept()
+        correspondence_evaluation_concept.connections.add(
+            correspondence_selection_concept
+        )
         correspondence_label_concept = CorrespondenceLabelConcept()
         correspondence_concept = CorrespondenceConcept()
         correspondence_concept.connections.add(textlet_concept)
         correspondence_concept.connections.add(correspondence_label_concept)
-        correspondence_concept.connections.add(correspondence_selection_concept)
+        correspondence_concept.connections.add(correspondence_evaluation_concept)
         group_selection_concept = GroupSelectionConcept()
+        group_evaluation_concept = GroupEvaluationConcept()
+        group_evaluation_concept.connections.add(group_selection_concept)
         group_label_selection_concept = GroupLabelSelectionConcept()
+        group_label_evaluation_concept = GroupLabelEvaluationConcept()
+        group_label_evaluation_concept.connections.add(group_label_selection_concept)
         group_label_concept = GroupLabelConcept()
-        group_label_concept.connections.add(group_label_selection_concept)
+        group_label_concept.connections.add(group_label_evaluation_concept)
         group_concept = GroupConcept()
         group_concept.connections.add(correspondence_concept)
         group_concept.connections.add(group_label_concept)
-        group_concept.connections.add(group_selection_concept)
+        group_concept.connections.add(group_evaluation_concept)
+        label_evaluation_concept = LabelEvaluationConcept()
         label_concept = LabelConcept()
+        label_concept.connections.add(label_evaluation_concept)
         label_concept.connections.add(group_concept)
         perceptlet_types = {
             textlet_concept,
             correspondence_concept,
             correspondence_label_concept,
+            correspondence_evaluation_concept,
             correspondence_selection_concept,
             group_concept,
+            group_evaluation_concept,
             group_selection_concept,
             group_label_concept,
+            group_label_evaluation_concept,
             group_label_selection_concept,
             label_concept,
+            label_evaluation_concept,
         }
         correspondence_types = {
             CorrespondenceType(

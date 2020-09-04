@@ -58,7 +58,7 @@ def test_create_label_returns_label():
         raw_inp = [[[Mock()]]]
         workspace = Workspace(Mock(), raw_inp)
         bubble_chamber = BubbleChamber(Mock(), Mock(), workspace, Mock(), Mock())
-        label = bubble_chamber.create_label(Mock(), Mock(), Mock(), Mock())
+        label = bubble_chamber.create_label(Mock(), Mock(), Mock(), Mock(), Mock())
         assert Label == type(label)
     add_label.assert_called_once_with(label)
 

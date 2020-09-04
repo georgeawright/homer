@@ -42,13 +42,6 @@ class CorrespondenceSelector(Selector):
             and self.champion.parent_concept == self.challenger.parent_concept
         )
 
-    def _run_competition(self) -> float:
-        connection_activations_difference = (
-            self.champion.total_connection_activations()
-            - self.challenger.total_connection_activations()
-        )
-        return self._difference_score(connection_activations_difference)
-
     def _engender_follow_up(self) -> CorrespondenceSelector:
         winner, loser = (
             (self.champion, self.challenger)

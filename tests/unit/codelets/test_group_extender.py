@@ -12,8 +12,8 @@ def test_calculate_confidence():
         space = Concept("concept", Mock())
         label_concept = Mock()
         label_concept.space = space
-        label_1 = Label(label_concept, Mock(), Mock(), Mock())
-        label_2 = Label(label_concept, Mock(), Mock(), Mock())
+        label_1 = Label(label_concept, Mock(), Mock(), Mock(), Mock())
+        label_2 = Label(label_concept, Mock(), Mock(), Mock(), Mock())
         group = Group(Mock(), [0, 1, 2], Mock(), Mock(), Mock(), Mock())
         group.labels.add(label_1)
         candidate = Perceptlet(Mock(), [0, 1, 3], Mock(), Mock(), Mock())

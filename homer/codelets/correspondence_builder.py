@@ -3,6 +3,7 @@ from homer.bubbles import Concept
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Group
 from homer.bubble_chamber import BubbleChamber
+from homer.classifiers import CorrespondenceClassifier
 from homer.codelet import Codelet
 from homer.perceptlet_collection import PerceptletCollection
 
@@ -28,6 +29,7 @@ class CorrespondenceBuilder(Codelet):
             parent_id,
         )
         self.second_target_perceptlet = target_group_b
+        self.classifier = CorrespondenceClassifier()
 
     def _passes_preliminary_checks(self) -> bool:
         return not self.target_perceptlet.has_correspondence(
@@ -42,28 +44,8 @@ class CorrespondenceBuilder(Codelet):
         return None
 
     def _calculate_confidence(self):
-        self.confidence = max(
-            self._confidence_of_proximity(), 1 - self._confidence_of_proximity()
-        )
-
-    def _confidence_of_proximity(self) -> float:
-        """Returns a high value for groups labeled with a proximate concept."""
-        return fuzzy.AND(
-            self.target_perceptlet.has_label_in_space(self.parent_concept),
-            self.second_target_perceptlet.has_label_in_space(self.parent_concept),
-            fuzzy.OR(
-                len(self._common_labels_in_space()) > 1,
-                self.parent_concept.proximity_between(
-                    self.target_perceptlet.get_value(self.parent_concept),
-                    self.second_target_perceptlet.get_value(self.parent_concept),
-                ),
-            ),
-        )
-
-    def _common_labels_in_space(self):
-        return PerceptletCollection.intersection(
-            self.target_perceptlet.labels_in_space(self.parent_concept),
-            self.second_target_perceptlet.labels_in_space(self.parent_concept),
+        self.confidence = self.classifier.confidence(
+            self.target_perceptlet, self.second_target_perceptlet, self.parent_concept
         )
 
     def _process_perceptlet(self):

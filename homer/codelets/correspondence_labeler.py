@@ -64,6 +64,7 @@ class CorrespondenceLabeler(Codelet):
         label = self.bubble_chamber.create_label(
             self.parent_concept,
             self.target_perceptlet.location,
+            self.target_perceptlet,
             self.confidence,
             self.codelet_id,
         )
@@ -90,6 +91,6 @@ class CorrespondenceLabeler(Codelet):
             self.perceptlet_type,
             self.relevant_space,
             self.target_perceptlet,
-            self.urgency / 2,
+            self.perceptlet_type.activation.at(self.location),
             self.parent_id,
         )

@@ -11,3 +11,6 @@ from .correspondence_builder import CorrespondenceBuilder
 from .correspondence_labeler import CorrespondenceLabeler
 
 from .textlet_builder import TextletBuilder
+
+from .evaluator import Evaluator
+from .selector import Selector

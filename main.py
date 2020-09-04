@@ -10,16 +10,25 @@ homer.run()
 homer.logger.graph_concepts(
     [
         "label",
+        "label-evaluation",
         "group",
+        "group-evaluation",
         "group-selection",
         "group-label",
+        "group-label-evaluation",
         "group-label-selection",
         "correspondence",
+        "correspondence-evaluation",
         "correspondence-label",
         "correspondence-selection",
         "textlet",
     ],
     "perceptlet_types",
+)
+
+homer.logger.graph_concepts(
+    ["group-label", "group-label-evaluation", "group-label-selection"],
+    "group-label-concepts",
 )
 
 # homer.logger.graph_codelets("codelets_family_tree")

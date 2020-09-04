@@ -1,5 +1,4 @@
 from __future__ import annotations
-import statistics
 from typing import Optional
 
 from homer.bubble_chamber import BubbleChamber
@@ -70,21 +69,6 @@ class GroupLabelSelector(Selector):
             self.target_group.members.get_unhappy(),
             self.urgency,
             self.codelet_id,
-        )
-
-    def _run_competition(self) -> float:
-        champion_proximity = self.champion.parent_concept.proximity_to(
-            self.target_group.get_value(self.target_space)
-        )
-        challenger_proximity = self.challenger.parent_concept.proximity_to(
-            self.target_group.get_value(self.target_space)
-        )
-        proximity_difference = champion_proximity - challenger_proximity
-        proportion_with_label_difference = (
-            self.champion_proportion - self.challenger_proportion
-        )
-        return statistics.fmean(
-            [proximity_difference, proportion_with_label_difference]
         )
 
     def _engender_follow_up(self) -> GroupLabelSelector:

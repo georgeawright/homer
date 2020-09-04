@@ -80,25 +80,20 @@ class WorkspaceActivationPattern(ActivationPattern):
             self.activation_buffer, numpy.zeros_like(self.activation_buffer)
         ):
             self.boost_evenly(-self.DECAY_RATE)
-        self.activation_matrix = numpy.add(
-            self.activation_matrix, self.activation_buffer
-        )
-        self.activation_matrix = numpy.maximum(
-            self.activation_matrix, numpy.zeros_like(self.activation_matrix)
-        )
-        self.activation_matrix = numpy.minimum(
-            self.activation_matrix, numpy.ones_like(self.activation_matrix)
-        )
-        self.activation_matrix = numpy.array(
-            [
-                [
-                    [
-                        1.0 if activation > 0.5 and random.randint(0, 1) else activation
-                        for activation in row
-                    ]
-                    for row in layer
-                ]
-                for layer in self.activation_matrix
-            ]
-        )
+        for i, layer in enumerate(self.activation_matrix):
+            for j, row in enumerate(layer):
+                for k, cell in enumerate(row):
+                    raw_new_activation = cell + self.activation_buffer[i][j][k]
+                    if (
+                        raw_new_activation > 0.5
+                        and random.randint(0, 1)
+                        and self.activation_buffer[i][j][k] > 0
+                    ):
+                        self.activation_matrix[i][j][k] = 1.0
+                    elif raw_new_activation > 1.0:
+                        self.activation_matrix[i][j][k] = 1.0
+                    elif raw_new_activation < 0.0:
+                        self.activation_matrix[i][j][k] = 0.0
+                    else:
+                        self.activation_matrix[i][j][k] = raw_new_activation
         self.activation_buffer = numpy.zeros_like(self.activation_buffer)
