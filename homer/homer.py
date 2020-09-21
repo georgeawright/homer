@@ -26,6 +26,7 @@ from .errors import NoMoreCodelets
 from .event_trace import EventTrace
 from .hyper_parameters import HyperParameters
 from .logger import Logger
+from .loggers import DjangoLogger
 from .problem import Problem
 from .template import Template
 from .workspace import Workspace
@@ -48,7 +49,7 @@ class Homer:
     @classmethod
     def setup(cls, path_to_logs: str, path_to_problem: str):
         """Set up every component and sub-component from a configuration file"""
-        logger = Logger.setup(path_to_logs)
+        logger = DjangoLogger.setup(path_to_logs)
         problem = Problem(path_to_problem)
         event_trace = EventTrace([])
         workspace = Workspace(event_trace, problem.as_raw_perceptlet_field_sequence())
