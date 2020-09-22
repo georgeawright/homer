@@ -45,7 +45,7 @@ class TextletBuilder(Codelet):
             ),
             self.target_perceptlet,
             self.urgency,
-            self.parent_id,
+            self.codelet_id,
         )
 
     def _fail(self) -> TextletBuilder:
@@ -69,14 +69,5 @@ class TextletBuilder(Codelet):
             self.perceptlet_type,
             self.bubble_chamber.workspace.groups.get_exigent(),
             self.confidence,
-            self.codelet_id,
-        )
-
-    def _engender_alternative_follow_up(self) -> TextletBuilder:
-        return TextletBuilder(
-            self.bubble_chamber,
-            self.perceptlet_type,
-            self.bubble_chamber.workspace.groups.get_exigent(),
-            self.urgency / 2,
             self.codelet_id,
         )
