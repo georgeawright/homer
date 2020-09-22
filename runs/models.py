@@ -9,7 +9,7 @@ class RunRecord(models.Model):
 
 class CodeletRecord(models.Model):
     codelet_id = models.CharField("Codelet ID", max_length=MAX_STRING_LENGTH)
-    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE, unique=True)
+    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
     codelet_type = models.CharField("Codelet ID", max_length=MAX_STRING_LENGTH)
     birth_time = models.IntegerField("Birth Time")
     time_run = models.IntegerField("Time Run", blank=True, null=True)
@@ -43,22 +43,27 @@ class CoderackRecord(models.Model):
 
 
 class ConceptRecord(models.Model):
-    # TODO: update or create
     concept_id = models.CharField("Concept ID", max_length=MAX_STRING_LENGTH)
-    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE, unique=True)
+    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
     name = models.CharField("Name", max_length=MAX_STRING_LENGTH)
     activation = models.JSONField("Activation")
 
 
 class PerceptletRecord(models.Model):
     perceptlet_id = models.CharField("Perceptlet ID", max_length=MAX_STRING_LENGTH)
-    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE, unique=True)
+    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
     time_created = models.IntegerField("Time Created")
     value = models.CharField("Value", max_length=MAX_STRING_LENGTH)
-    location = models.JSONField("location")
-    connections = models.ForeignKey("self", on_delete=models.CASCADE)
+    location = models.JSONField("location", null=True)
+    connections = models.ForeignKey(
+        "self", on_delete=models.CASCADE, blank=True, null=True
+    )
     activation = models.JSONField("Activation")
     unhappiness = models.JSONField("Unhappiness")
     quality = models.FloatField("quality")
-    parent_concept = models.ForeignKey("ConceptRecord", on_delete=models.CASCADE)
-    parent_codelet = models.ForeignKey("CodeletRecord", on_delete=models.CASCADE)
+    parent_concept = models.ForeignKey(
+        "ConceptRecord", on_delete=models.CASCADE, blank=True, null=True
+    )
+    parent_codelet = models.ForeignKey(
+        "CodeletRecord", on_delete=models.CASCADE, blank=True, null=True
+    )

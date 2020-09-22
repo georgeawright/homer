@@ -57,14 +57,16 @@ class DjangoLogger(Logger):
         if isinstance(item, Coderack):
             return self._log_coderack(item)
         if isinstance(item, Concept):
-            return ConceptRecord.from_concept(item).save()
+            return self._log_concept(item)
         if isinstance(item, Perceptlet):
-            return PerceptletRecord.from_perceptlet(item).save()
+            return self._log_perceptlet(item)
 
     def log_codelet_run(self, codelet: Codelet):
-        CodeletRecord.objects.get(codelet_id=codelet.codelet_id).update(
-            time_run=self.codelets_run
+        codelet_record = CodeletRecord.objects.get(
+            codelet_id=codelet.codelet_id, run_id=self.run
         )
+        codelet_record.time_run = self.codelets_run
+        codelet_record.save()
 
     def _log_message(self, message):
         print(message)
@@ -84,26 +86,46 @@ class DjangoLogger(Logger):
             birth_time=self.codelets_run,
             urgency=codelet.urgency,
         )
-        codelet_record.perceptlet_types.set(
-            ConceptRecord.objects.get(concept_id=codelet.perceptlet_type.concept_id)
-        )
-        if codelet.parent_id != "":
-            codelet_record.parent = CodeletRecord.objects.get(
-                codelet_id=codelet.parent_id
+        codelet_record.perceptlet_types.add(
+            ConceptRecord.objects.get(
+                concept_id=codelet.perceptlet_type.concept_id, run_id=self.run
             )
-            codelet_record.save()
+        )
+        if codelet.parent_id == "" or codelet.parent_id[2] == "n":
+            return
+        codelet_record.parent = CodeletRecord.objects.get(
+            codelet_id=codelet.parent_id, run_id=self.run
+        )
+        codelet_record.save()
 
     def _log_concept(self, concept: Concept):
-        ConceptRecord.objects.get(concept_id=concept.concept_id).update(
-            activation=concept.activation.activation_matrix
-        )
+        try:
+            concept_record = ConceptRecord.objects.get(
+                concept_id=concept.concept_id, run_id=self.run
+            )
+            concept_record.activation = concept.activation.activation_matrix.tolist()
+            concept_record.save()
+        except ConceptRecord.DoesNotExist:
+            ConceptRecord.objects.create(
+                concept_id=concept.concept_id,
+                run_id=self.run,
+                name=concept.name,
+                activation=concept.activation.activation_matrix.tolist(),
+            )
 
     def _log_coderack(self, coderack: Coderack):
         self.codelets_run = coderack.codelets_run
-        coderack_record = CoderackRecord.objects.get(run_id=self.run)
-        coderack_record.codelets_run = coderack.codelets_run
-        coderack_record.population = len(coderack._codelets)
-        coderack_record.save()
+        try:
+            coderack_record = CoderackRecord.objects.get(run_id=self.run)
+            coderack_record.codelets_run = self.codelets_run
+            coderack_record.population = len(coderack._codelets)
+            coderack_record.save()
+        except CoderackRecord.DoesNotExist:
+            CoderackRecord.objects.create(
+                run_id=self.run,
+                codelets_run=self.codelets_run,
+                population=len(coderack._codelets),
+            )
 
     def _log_perceptlet(self, perceptlet: Perceptlet):
         self._log_message(
@@ -117,20 +139,18 @@ class DjangoLogger(Logger):
             time_created=self.codelets_run,
             value=perceptlet.value,
             location=perceptlet.location,
-            activation=perceptlet.activation,
-            unhappiness=perceptlet.unhappiness,
+            activation=perceptlet.activation.activation,
+            unhappiness=perceptlet.unhappiness.activation,
             quality=perceptlet.quality,
-            parent_concept=ConceptRecord.objects.get(
-                concept_id=perceptlet.parent_concept
-            ),
-            parent_codelet=CodeletRecord.objects.get(
-                codelet_id=perceptlet.parent_codelet
-            ),
         )
+        if hasattr(perceptlet, "parent_concept"):
+            perceptlet_record.parent_concept = ConceptRecord.objects.get(
+                concept_id=perceptlet.parent_concept.concept_id, run_id=self.run
+            )
         perceptlet_record.save()
         for connection in perceptlet.connections:
             connection_record = PerceptletRecord.objects.get(
-                perceptlet_id=connection.perceptlet_id
+                perceptlet_id=connection.perceptlet_id, run_id=self.run
             )
             perceptlet_record.connections.add(connection_record)
 

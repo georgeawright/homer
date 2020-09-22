@@ -169,10 +169,14 @@ class Homer:
             logger,
         )
 
+        for concept in concept_space:
+            logger.log(concept)
+
         bubble_chamber = BubbleChamber(
             concept_space, event_trace, workspace, worldview, logger,
         )
         coderack = Coderack(bubble_chamber, logger)
+        logger.log(coderack)
         codelets = [
             BottomUpRawPerceptletLabeler(
                 bubble_chamber,
