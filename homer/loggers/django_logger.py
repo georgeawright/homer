@@ -166,5 +166,5 @@ class DjangoLogger(Logger):
     def graph_processes(self, file_name):
         pass
 
-    def graph_codelet_type(self, file_name):
+    def graph_codelet_types(self, file_name):
         pass
