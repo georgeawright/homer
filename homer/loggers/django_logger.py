@@ -104,28 +104,30 @@ class DjangoLogger(Logger):
             concept_record = ConceptRecord.objects.get(
                 concept_id=concept.concept_id, run_id=self.run
             )
-            concept_record.activation = concept.activation.activation_matrix.tolist()
+            concept_record.activation.append(
+                concept.activation.activation_matrix.tolist()
+            )
             concept_record.save()
         except ConceptRecord.DoesNotExist:
             ConceptRecord.objects.create(
                 concept_id=concept.concept_id,
                 run_id=self.run,
                 name=concept.name,
-                activation=concept.activation.activation_matrix.tolist(),
+                activation=[concept.activation.activation_matrix.tolist()],
             )
 
     def _log_coderack(self, coderack: Coderack):
         self.codelets_run = coderack.codelets_run
         try:
             coderack_record = CoderackRecord.objects.get(run_id=self.run)
-            coderack_record.codelets_run = self.codelets_run
-            coderack_record.population = len(coderack._codelets)
+            coderack_record.codelets_run.append(self.codelets_run)
+            coderack_record.population.append(len(coderack._codelets))
             coderack_record.save()
         except CoderackRecord.DoesNotExist:
             CoderackRecord.objects.create(
                 run_id=self.run,
-                codelets_run=self.codelets_run,
-                population=len(coderack._codelets),
+                codelets_run=[self.codelets_run],
+                population=[len(coderack._codelets)],
             )
 
     def _log_perceptlet(self, perceptlet: Perceptlet):
@@ -140,9 +142,9 @@ class DjangoLogger(Logger):
             time_created=self.codelets_run,
             value=perceptlet.value,
             location=perceptlet.location,
-            activation=perceptlet.activation.activation,
-            unhappiness=perceptlet.unhappiness.activation,
-            quality=perceptlet.quality,
+            activation=[perceptlet.activation.activation],
+            unhappiness=[perceptlet.unhappiness.activation],
+            quality=[perceptlet.quality],
             parent_codelet=CodeletRecord.objects.get(
                 codelet_id=perceptlet.parent_id, run_id=self.run
             ),

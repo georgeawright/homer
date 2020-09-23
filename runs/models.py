@@ -38,8 +38,8 @@ class CodeletRecord(models.Model):
 
 class CoderackRecord(models.Model):
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE, unique=True)
-    codelets_run = models.IntegerField("Codelets Run")
-    population = models.IntegerField("Population")
+    codelets_run = models.JSONField("Codelets Run")
+    population = models.JSONField("Population")
 
 
 class ConceptRecord(models.Model):
@@ -60,7 +60,7 @@ class PerceptletRecord(models.Model):
     )
     activation = models.JSONField("Activation")
     unhappiness = models.JSONField("Unhappiness")
-    quality = models.FloatField("quality")
+    quality = models.JSONField("quality")
     parent_concept = models.ForeignKey(
         "ConceptRecord", on_delete=models.CASCADE, blank=True, null=True
     )

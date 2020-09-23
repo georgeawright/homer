@@ -26,7 +26,7 @@ def run_view(request, run_id):
     coderack_record = CoderackRecord.objects.get(run_id=run_id)
     output = "<h1>Basic Run information:</h1>"
     output += "<ul>"
-    output += "<li>Codelets Run: " + str(coderack_record.codelets_run)
+    output += "<li>Codelets Run: " + str(coderack_record.codelets_run[-1])
     output += "</ul>"
     output += '<p><a href="codelets">Codelets</a></p>'
     return HttpResponse(output)
@@ -60,6 +60,7 @@ def codelet_view(request, run_id, codelet_id):
     output += "<ul>"
     output += "<li>Birth Time: " + str(codelet_record.birth_time) + "</li>"
     output += "<li>Time Run: " + str(codelet_record.time_run) + "</li>"
+    output += "<li>Urgency: " + str(codelet_record.urgency) + "</li>"
     output += "<li>Parent Codelet: "
     if codelet_record.parent is not None:
         output += (
