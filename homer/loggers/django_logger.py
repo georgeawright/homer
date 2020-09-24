@@ -105,7 +105,7 @@ class DjangoLogger(Logger):
                 concept_id=concept.concept_id, run_id=self.run
             )
             concept_record.activation.append(
-                concept.activation.activation_matrix.tolist()
+                [self.codelets_run, concept.activation.activation_matrix.tolist()]
             )
             concept_record.save()
         except ConceptRecord.DoesNotExist:
@@ -113,7 +113,9 @@ class DjangoLogger(Logger):
                 concept_id=concept.concept_id,
                 run_id=self.run,
                 name=concept.name,
-                activation=[concept.activation.activation_matrix.tolist()],
+                activation=[
+                    [self.codelets_run, concept.activation.activation_matrix.tolist()]
+                ],
             )
 
     def _log_coderack(self, coderack: Coderack):
