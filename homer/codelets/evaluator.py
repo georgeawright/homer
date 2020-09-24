@@ -43,3 +43,4 @@ class Evaluator(Codelet):
             self.target_type.activation.decay(self.location)
         if self.confidence < 0:
             self.target_type.activation.boost(abs(self.confidence), self.location)
+        self.bubble_chamber.logger.log(self.target_perceptlet)

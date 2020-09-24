@@ -136,29 +136,38 @@ class DjangoLogger(Logger):
             + f" by {perceptlet.parent_id} - value: {perceptlet.value}; "
             + f"location: {perceptlet.location}; activation: {perceptlet.activation.activation}"
         )
-        perceptlet_record = PerceptletRecord.objects.create(
-            perceptlet_id=perceptlet.perceptlet_id,
-            run_id=self.run,
-            time_created=self.codelets_run,
-            value=perceptlet.value,
-            location=perceptlet.location,
-            activation=[perceptlet.activation.activation],
-            unhappiness=[perceptlet.unhappiness.activation],
-            quality=[perceptlet.quality],
-            parent_codelet=CodeletRecord.objects.get(
-                codelet_id=perceptlet.parent_id, run_id=self.run
-            ),
-        )
-        if hasattr(perceptlet, "parent_concept"):
-            perceptlet_record.parent_concept = ConceptRecord.objects.get(
-                concept_id=perceptlet.parent_concept.concept_id, run_id=self.run
+        try:
+            perceptlet_record = PerceptletRecord.objects.get(
+                run_id=self.run, perceptlet_id=perceptlet.perceptlet_id
             )
-        for connection in perceptlet.connections:
-            connection_record = PerceptletRecord.objects.get(
-                perceptlet_id=connection.perceptlet_id, run_id=self.run
+            perceptlet_record.activation.append(perceptlet.activation.activation)
+            perceptlet_record.unhappiness.append(perceptlet.unhappiness.activation)
+            perceptlet_record.quality.append(perceptlet.quality)
+            perceptlet_record.save()
+        except PerceptletRecord.DoesNotExist:
+            perceptlet_record = PerceptletRecord.objects.create(
+                perceptlet_id=perceptlet.perceptlet_id,
+                run_id=self.run,
+                time_created=self.codelets_run,
+                value=perceptlet.value,
+                location=perceptlet.location,
+                activation=[perceptlet.activation.activation],
+                unhappiness=[perceptlet.unhappiness.activation],
+                quality=[perceptlet.quality],
+                parent_codelet=CodeletRecord.objects.get(
+                    codelet_id=perceptlet.parent_id, run_id=self.run
+                ),
             )
-            perceptlet_record.connections.add(connection_record)
-        perceptlet_record.save()
+            if hasattr(perceptlet, "parent_concept"):
+                perceptlet_record.parent_concept = ConceptRecord.objects.get(
+                    concept_id=perceptlet.parent_concept.concept_id, run_id=self.run
+                )
+                for connection in perceptlet.connections:
+                    connection_record = PerceptletRecord.objects.get(
+                        perceptlet_id=connection.perceptlet_id, run_id=self.run
+                    )
+                    perceptlet_record.connections.add(connection_record)
+            perceptlet_record.save()
 
     def graph_concepts(self, concept_names, file_name):
         pass
