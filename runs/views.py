@@ -29,6 +29,7 @@ def run_view(request, run_id):
     output += "<li>Codelets Run: " + str(coderack_record.codelets_run[-1])
     output += "</ul>"
     output += '<p><a href="codelets">Codelets</a></p>'
+    output += '<p><a href="concepts">Concepts</a></p>'
     return HttpResponse(output)
 
 
@@ -156,6 +157,20 @@ def perceptlet_view(request, run_id, perceptlet_id):
     output += "<li>Activation: " + str(perceptlet_record.activation) + "</li>"
     output += "<li>Unhappiness : " + str(perceptlet_record.unhappiness) + "</li>"
     output += "<li>Quality: " + str(perceptlet_record.quality) + "</li>"
+    output += "</ul>"
+    return HttpResponse(output)
+
+
+def concepts_view(request, run_id):
+    concept_records = ConceptRecord.objects.filter(run_id=run_id).order_by("name")
+    output = "<h1>Concepts</h1>"
+    output += "<ul>"
+    output += "".join(
+        [
+            '<li><a href="' + concept.concept_id + '">' + concept.name + "</a></li>"
+            for concept in concept_records
+        ]
+    )
     output += "</ul>"
     return HttpResponse(output)
 
