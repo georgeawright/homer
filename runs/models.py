@@ -67,3 +67,11 @@ class PerceptletRecord(models.Model):
     parent_codelet = models.ForeignKey(
         "CodeletRecord", on_delete=models.CASCADE, blank=True, null=True
     )
+
+
+class PerceptletUpdateRecord(models.Model):
+    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
+    time = models.IntegerField("Time")
+    codelet = models.ForeignKey("CodeletRecord", on_delete=models.CASCADE, unique=True)
+    perceptlet = models.ForeignKey("PerceptletRecord", on_delete=models.CASCADE)
+    action = models.CharField("Action", max_length=MAX_STRING_LENGTH)

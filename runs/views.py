@@ -10,6 +10,7 @@ from .models import (
     CoderackRecord,
     ConceptRecord,
     PerceptletRecord,
+    PerceptletUpdateRecord,
     RunRecord,
 )
 
@@ -84,6 +85,19 @@ def codelet_view(request, run_id, codelet_id):
     output += "<li>Birth Time: " + str(codelet_record.birth_time) + "</li>"
     output += "<li>Time Run: " + str(codelet_record.time_run) + "</li>"
     output += "<li>Urgency: " + str(codelet_record.urgency) + "</li>"
+    output += "<li>Target Perceptlet: "
+    if codelet_record.target_perceptlet is not None:
+        output += (
+            '<a href="/runs/'
+            + str(run_id)
+            + "/perceptlets/"
+            + codelet_record.target_perceptlet.perceptlet_id
+            + '/">'
+            + codelet_record.target_perceptlet.perceptlet_id
+            + "</a></li>"
+        )
+    else:
+        output += "None</li>"
     output += "<li>Parent Codelet: "
     if codelet_record.parent is not None:
         output += (
@@ -201,15 +215,18 @@ def perceptlet_view(request, run_id, perceptlet_id):
     output += "<li>Birth Time: " + str(perceptlet_record.time_created) + "</li>"
     output += "<li>Value: " + perceptlet_record.value + "</li>"
     output += "<li>Location: " + str(perceptlet_record.location) + "</li>"
-    output += (
-        '<li>Parent Codelet: <a href="/runs/'
-        + str(run_id)
-        + "/codelets/"
-        + perceptlet_record.parent_codelet.codelet_id
-        + '">'
-        + perceptlet_record.parent_codelet.codelet_id
-        + "</a></li>"
-    )
+    if perceptlet_record.parent_codelet is not None:
+        output += (
+            '<li>Parent Codelet: <a href="/runs/'
+            + str(run_id)
+            + "/codelets/"
+            + perceptlet_record.parent_codelet.codelet_id
+            + '">'
+            + perceptlet_record.parent_codelet.codelet_id
+            + "</a></li>"
+        )
+    else:
+        output += "<li>Parent Codelet: None</li>"
     if perceptlet_record.parent_concept is not None:
         output += (
             '<li>Parent Concept: <a href="/runs/'
@@ -241,4 +258,14 @@ def perceptlet_view(request, run_id, perceptlet_id):
     output += "<li>Unhappiness : " + str(perceptlet_record.unhappiness) + "</li>"
     output += "<li>Quality: " + str(perceptlet_record.quality) + "</li>"
     output += "</ul>"
+    output += "<h2>History</h2>"
+    updates = PerceptletUpdateRecord.objects.filter(
+        run_id=run_id, perceptlet=perceptlet_record
+    ).order_by("time")
+    for update in updates:
+        output += (
+            f"<p>{update.time}: {update.action} by "
+            + f'<a href="/runs/{run_id}/codelets/{update.codelet.codelet_id}">'
+            + f"{update.codelet.codelet_id}</a>.</p>"
+        )
     return HttpResponse(output)

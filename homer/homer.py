@@ -53,6 +53,8 @@ class Homer:
         problem = Problem(path_to_problem)
         event_trace = EventTrace([])
         workspace = Workspace(event_trace, problem.as_raw_perceptlet_field_sequence())
+        for raw_perceptlet in workspace.raw_perceptlets:
+            logger.log(raw_perceptlet)
         worldview = Worldview(set())
 
         satisfaction = Emotion("satisfaction")
