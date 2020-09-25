@@ -59,6 +59,12 @@ class GroupExtender(Codelet):
     def _process_perceptlet(self):
         self.target_perceptlet.add_member(self.second_target_perceptlet)
         self.second_target_perceptlet.add_group(self.target_perceptlet)
+        self.bubble_chamber.logger.log_perceptlet_connection(
+            self, self.second_target_perceptlet, self.target_perceptlet
+        )
+        self.bubble_chamber.logger.log_perceptlet_update(
+            self, self.target_perceptlet, "Extended"
+        )
 
     def _engender_follow_up(self) -> GroupExtender:
         return GroupExtender(

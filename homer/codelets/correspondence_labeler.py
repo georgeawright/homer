@@ -69,6 +69,9 @@ class CorrespondenceLabeler(Codelet):
             self.codelet_id,
         )
         self.target_perceptlet.add_label(label)
+        self.bubble_chamber.logger.log_perceptlet_connection(
+            self, self.target_perceptlet, label
+        )
 
     def _engender_follow_up(self) -> Codelet:
         from homer.codelets.correspondence_builder import CorrespondenceBuilder

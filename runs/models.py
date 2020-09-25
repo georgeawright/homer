@@ -55,9 +55,7 @@ class PerceptletRecord(models.Model):
     time_created = models.IntegerField("Time Created")
     value = models.CharField("Value", max_length=MAX_STRING_LENGTH)
     location = models.JSONField("location", null=True)
-    connections = models.ForeignKey(
-        "self", on_delete=models.CASCADE, blank=True, null=True
-    )
+    connections = models.ManyToManyField("self", blank=True, null=True)
     activation = models.JSONField("Activation")
     unhappiness = models.JSONField("Unhappiness")
     quality = models.JSONField("quality")
@@ -72,6 +70,6 @@ class PerceptletRecord(models.Model):
 class PerceptletUpdateRecord(models.Model):
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
     time = models.IntegerField("Time")
-    codelet = models.ForeignKey("CodeletRecord", on_delete=models.CASCADE, unique=True)
+    codelet = models.ForeignKey("CodeletRecord", on_delete=models.CASCADE)
     perceptlet = models.ForeignKey("PerceptletRecord", on_delete=models.CASCADE)
     action = models.CharField("Action", max_length=MAX_STRING_LENGTH)

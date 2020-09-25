@@ -93,6 +93,21 @@ class DjangoLogger(Logger):
         perceptlet_record.quality.append(perceptlet.quality)
         perceptlet_record.save()
 
+    def log_perceptlet_connection(
+        self, codelet: Codelet, perceptlet: Perceptlet, connection: Perceptlet
+    ):
+        perceptlet_record = PerceptletRecord.objects.get(
+            run_id=self.run, perceptlet_id=perceptlet.perceptlet_id
+        )
+        connection_record = PerceptletRecord.objects.get(
+            run_id=self.run, perceptlet_id=connection.perceptlet_id
+        )
+        perceptlet_record.connections.add(connection_record)
+        perceptlet_record.save()
+        self.log_perceptlet_update(
+            codelet, perceptlet, f"Connected to {connection.perceptlet_id}"
+        )
+
     def _log_message(self, message):
         print(message)
         messages_file = self.log_directory + "/messages.txt"
