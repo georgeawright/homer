@@ -1,4 +1,4 @@
-.PHONY: clear-logs integration lint migrate migrations unit run
+.PHONY: clear-logs integration lint migrate migrations unit run runserver
 
 clear-logs:
 	rm -rf logs/
@@ -21,3 +21,6 @@ unit:
 
 run:
 	pipenv run python main.py
+
+runserver:
+	pipenv run python manage.py runserver
