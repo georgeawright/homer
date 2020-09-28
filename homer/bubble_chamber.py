@@ -17,6 +17,7 @@ from .errors import MissingPerceptletError
 from .event_trace import EventTrace
 from .logger import Logger
 from .perceptlet_collection import PerceptletCollection
+from .perceptlet_collections import NeighbourCollection
 from .template import Template
 from .workspace import Workspace
 from .worldview import Worldview
@@ -112,7 +113,7 @@ class BubbleChamber:
         location = [time, latitude, longitude]
         neighbours = PerceptletCollection()
         for member in members:
-            neighbours = PerceptletCollection.union(neighbours, member.neighbours)
+            neighbours = NeighbourCollection.union(neighbours, member.neighbours)
         for member in members:
             try:
                 neighbours.remove(member)

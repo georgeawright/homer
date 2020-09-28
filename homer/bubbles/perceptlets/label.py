@@ -3,7 +3,7 @@ from typing import List, Union
 from homer.activation_patterns import PerceptletActivationPattern
 from homer.bubbles.concept import Concept
 from homer.bubbles.perceptlet import Perceptlet
-from homer.perceptlet_collection import PerceptletCollection
+from homer.perceptlet_collections import NeighbourCollection
 
 
 class Label(Perceptlet):
@@ -17,7 +17,7 @@ class Label(Perceptlet):
         activation: PerceptletActivationPattern,
         parent_id,
     ):
-        neighbours = PerceptletCollection()
+        neighbours = NeighbourCollection()
         Perceptlet.__init__(
             self, concept.name, location, activation, neighbours, parent_id
         )

@@ -7,6 +7,7 @@ from homer.bubble import Bubble
 from homer.hyper_parameters import HyperParameters
 from homer.id import ID
 from homer.perceptlet_collection import PerceptletCollection
+from homer.perceptlet_collections import NeighbourCollection
 
 from .concept import Concept
 
@@ -21,7 +22,7 @@ class Perceptlet(Bubble):
         value: Any,
         location: Optional[List[Union[float], float[int]]],
         activation: PerceptletActivationPattern,
-        neighbours: PerceptletCollection,
+        neighbours: NeighbourCollection,
         parent_id: str,
     ):
         self.perceptlet_id = ID.new(self)

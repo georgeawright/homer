@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from homer.activation_patterns import PerceptletActivationPattern
 from homer.bubbles import Concept, Perceptlet
-from homer.perceptlet_collection import PerceptletCollection
+from homer.perceptlet_collections import NeighbourCollection
 
 
 class Correspondence(Perceptlet):
@@ -18,7 +18,7 @@ class Correspondence(Perceptlet):
         parent_id: str,
     ):
         location = first_argument.location
-        neighbours = PerceptletCollection()
+        neighbours = NeighbourCollection()
         Perceptlet.__init__(self, name, location, activation, neighbours, parent_id)
         self.parent_concept = parent_concept
         self.first_argument = first_argument

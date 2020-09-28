@@ -4,7 +4,7 @@ import statistics
 
 from homer.activation_patterns import PerceptletActivationPattern
 from homer.bubbles import Concept, Perceptlet
-from homer.perceptlet_collection import PerceptletCollection
+from homer.perceptlet_collections import NeighbourCollection
 
 
 class Relation(Perceptlet):
@@ -20,7 +20,7 @@ class Relation(Perceptlet):
         parent_id: str,
     ):
         location = None
-        neighbours = PerceptletCollection()
+        neighbours = NeighbourCollection()
         Perceptlet.__init__(self, name, location, activation, neighbours, parent_id)
         self.parent_concept = parent_concept
         self.first_argument = first_argument

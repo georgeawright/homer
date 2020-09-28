@@ -4,6 +4,7 @@ from typing import Any, List
 from homer.activation_patterns import PerceptletActivationPattern
 from homer.bubbles.perceptlet import Perceptlet
 from homer.perceptlet_collection import PerceptletCollection
+from homer.perceptlet_collections import NeighbourCollection
 
 
 class Group(Perceptlet):
@@ -13,7 +14,7 @@ class Group(Perceptlet):
         self,
         value: Any,
         location: List[float],
-        neighbours: PerceptletCollection,
+        neighbours: NeighbourCollection,
         members: PerceptletCollection,
         activation: PerceptletActivationPattern,
         parent_id: str,

@@ -5,7 +5,7 @@ from .bubbles.perceptlets import (
     RawPerceptletField,
     RawPerceptletFieldSequence,
 )
-from .perceptlet_collection import PerceptletCollection
+from .perceptlet_collections import NeighbourCollection
 
 
 class Problem:
@@ -29,7 +29,7 @@ class Problem:
             model_input = yaml.load(f, Loader=yaml.FullLoader)
             raw_perceptlets = [
                 [
-                    RawPerceptlet(cell_value, [0, i, j], PerceptletCollection())
+                    RawPerceptlet(cell_value, [0, i, j], NeighbourCollection())
                     for j, cell_value in enumerate(row)
                 ]
                 for i, row in enumerate(model_input)

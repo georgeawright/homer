@@ -5,6 +5,7 @@ from homer.activation_patterns import PerceptletActivationPattern
 from homer.bubbles import Concept, Perceptlet
 from homer.template import Template
 from homer.perceptlet_collection import PerceptletCollection
+from homer.perceptlet_collections import NeighbourCollection
 
 from .word import Word
 
@@ -23,7 +24,7 @@ class Textlet(Perceptlet):
         parent_id: str,
     ):
         location = None
-        neighbours = PerceptletCollection()
+        neighbours = NeighbourCollection()
         Perceptlet.__init__(self, value, location, activation, neighbours, parent_id)
         self.parent_template = parent_template
         self.parent_concept = parent_concept

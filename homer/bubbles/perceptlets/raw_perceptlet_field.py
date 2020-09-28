@@ -3,7 +3,7 @@ from typing import List
 
 from homer.activation_patterns import PerceptletActivationPattern
 from homer.bubbles.perceptlet import Perceptlet
-from homer.perceptlet_collection import PerceptletCollection
+from homer.perceptlet_collections import NeighbourCollection
 
 from .raw_perceptlet import RawPerceptlet
 
@@ -15,7 +15,7 @@ class RawPerceptletField(Perceptlet):
         self,
         value: List[List[RawPerceptlet]],
         time: int,
-        neighbours: PerceptletCollection,
+        neighbours: NeighbourCollection,
     ):
         location = None
         activation = PerceptletActivationPattern()
