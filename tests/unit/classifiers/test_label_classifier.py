@@ -12,11 +12,11 @@ FLOAT_COMPARISON_TOLERANCE = 1e-1
 @pytest.mark.parametrize(
     "proximity_to_prototype, proportion_of_neighbours, expected",
     [
-        (0.0, 1.0, 1.0),
+        (0.0, 1.0, 0.4),
         (1.0, 1.0, 1.0),
         (0.0, 0.0, 0.0),
-        (0.5, 0.5, 0.75),
-        (1.0, 0.0, 1.0),
+        (0.5, 0.5, 0.5),
+        (1.0, 0.0, 0.6),
     ],
 )
 def test_calculate_confidence(
