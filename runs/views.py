@@ -1,4 +1,5 @@
 import io
+import re
 
 from django.db.models import Q
 from django.http import HttpResponse
@@ -37,6 +38,86 @@ def run_view(request, run_id):
     output += '<p><a href="concepts">Concepts</a></p>'
     output += '<p><a href="perceptlets">Perceptlets</a></p>'
     output += f'<img src="/runs/{run_id}/coderack_population">'
+    perceptlet_records = PerceptletRecord.objects.filter(run_id=run_id).all()
+    last_column = 0
+    last_row = 0
+    raw_perceptlets = []
+    for record in perceptlet_records:
+        if not re.match("^RawPerceptlet", record.perceptlet_id):
+            continue
+        raw_perceptlets.append(record)
+        if record.location[1] > last_row:
+            last_row = record.location[1]
+        if record.location[2] > last_column:
+            last_column = record.location[2]
+    raw_perceptlets_matrix = [
+        [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
+    ]
+    for raw_perceptlet in raw_perceptlets:
+        row = raw_perceptlet.location[1]
+        column = raw_perceptlet.location[2]
+        raw_perceptlets_matrix[row][column] = raw_perceptlet
+    output += "<h2>Raw Input</h2>"
+    output += '<table border="1">'
+    for i in range(last_row + 1):
+        output += "<tr>"
+        for j in range(last_column + 1):
+            output += "<td>"
+            output += str(raw_perceptlets_matrix[i][j].value)
+            output += "</td>"
+        output += "</tr>"
+    output += "</table>"
+    output += "<h2>Labels</h2>"
+    output += '<table border="1">'
+    for i in range(last_row + 1):
+        output += "<tr>"
+        for j in range(last_column + 1):
+            output += "<td>"
+            raw_perceptlet = raw_perceptlets_matrix[i][j]
+            output += "".join(
+                [
+                    f"{connection.value} ({connection.quality[-1]})<br>"
+                    for connection in raw_perceptlet.connections.all()
+                    if re.match(r"^Label*", connection.perceptlet_id)
+                ]
+            )
+            output += "</td>"
+        output += "</tr>"
+    output += "</table>"
+    groups = [
+        perceptlet
+        for perceptlet in perceptlet_records
+        if re.match("^Group*", perceptlet.perceptlet_id)
+    ]
+    output += "<h2>Groups</h2>"
+    for group in groups:
+        output += f"<h3>{group.perceptlet_id}</h3>"
+        output += "".join(
+            [
+                f"{connection.value} ({connection.quality[-1]})<br>"
+                for connection in group.connections.all()
+                if re.match(r"^Label*", connection.perceptlet_id)
+            ]
+        )
+        output += "".join(
+            [
+                f"{connection.value} ({connection.quality[-1]})<br>"
+                for connection in group.connections.all()
+                if re.match(r"^Textlet*", connection.perceptlet_id)
+            ]
+        )
+        output += '<table border="1">'
+        for i in range(last_row + 1):
+            output += "<tr>"
+            for j in range(last_column + 1):
+                if group in raw_perceptlets_matrix[i][j].connections.all():
+                    output += '<td style="background-color: coral;">'
+                else:
+                    output += "<td>"
+                output += str(raw_perceptlets_matrix[i][j].value)
+                output += "</td>"
+            output += "</tr>"
+        output += "</table>"
     return HttpResponse(output)
 
 
