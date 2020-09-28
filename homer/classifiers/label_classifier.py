@@ -1,4 +1,3 @@
-from homer import fuzzy
 from homer.bubbles import Concept, Perceptlet
 from homer.classifier import Classifier
 
@@ -8,6 +7,6 @@ class LabelClassifier(Classifier):
         proximity = concept.proximity_to(target_perceptlet.get_value(concept))
         try:
             neighbours = target_perceptlet.neighbours.proportion_with_label(concept)
-            return fuzzy.OR(proximity, neighbours)
+            return sum([0.6 * proximity, 0.4 * neighbours])
         except ZeroDivisionError:
             return proximity
