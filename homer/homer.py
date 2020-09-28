@@ -26,6 +26,7 @@ from .errors import NoMoreCodelets
 from .event_trace import EventTrace
 from .hyper_parameters import HyperParameters
 from .logger import Logger
+from .loggers import DjangoLogger
 from .problem import Problem
 from .template import Template
 from .workspace import Workspace
@@ -48,10 +49,12 @@ class Homer:
     @classmethod
     def setup(cls, path_to_logs: str, path_to_problem: str):
         """Set up every component and sub-component from a configuration file"""
-        logger = Logger.setup(path_to_logs)
+        logger = DjangoLogger.setup(path_to_logs)
         problem = Problem(path_to_problem)
         event_trace = EventTrace([])
         workspace = Workspace(event_trace, problem.as_raw_perceptlet_field_sequence())
+        for raw_perceptlet in workspace.raw_perceptlets:
+            logger.log(raw_perceptlet)
         worldview = Worldview(set())
 
         satisfaction = Emotion("satisfaction")
@@ -168,10 +171,14 @@ class Homer:
             logger,
         )
 
+        for concept in concept_space:
+            logger.log(concept)
+
         bubble_chamber = BubbleChamber(
             concept_space, event_trace, workspace, worldview, logger,
         )
         coderack = Coderack(bubble_chamber, logger)
+        logger.log(coderack)
         codelets = [
             BottomUpRawPerceptletLabeler(
                 bubble_chamber,

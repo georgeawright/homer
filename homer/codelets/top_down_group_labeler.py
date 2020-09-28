@@ -62,6 +62,9 @@ class TopDownGroupLabeler(Codelet):
             self.codelet_id,
         )
         self.target_perceptlet.labels.add(label)
+        self.bubble_chamber.logger.log_perceptlet_connection(
+            self, self.target_perceptlet, label
+        )
 
     def _engender_follow_up(self) -> GroupExtender:
         return GroupExtender(

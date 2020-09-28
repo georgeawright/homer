@@ -57,6 +57,12 @@ class Selector(Codelet):
     def _process_perceptlet(self):
         self.champion.boost_activation(self.confidence)
         self.challenger.decay_activation(self.confidence)
+        self.bubble_chamber.logger.log_perceptlet_update(
+            self, self.champion, "Activation updated"
+        )
+        self.bubble_chamber.logger.log_perceptlet_update(
+            self, self.challenger, "Activation updated"
+        )
         self.target_type.activation.decay(self.location)
         satisfaction = statistics.fmean(
             [

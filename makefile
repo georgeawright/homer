@@ -1,4 +1,4 @@
-.PHONY: clear-logs integration lint unit run
+.PHONY: clear-logs integration lint migrate migrations unit run runserver
 
 clear-logs:
 	rm -rf logs/
@@ -9,8 +9,18 @@ integration:
 lint:
 	pipenv run flake8 .
 
+migrate:
+	pipenv run python manage.py makemigrations
+	pipenv run python manage.py migrate
+
+migrations:
+	pipenv run python manage.py makemigrations
+
 unit:
 	pipenv run python -m pytest tests/unit
 
 run:
 	pipenv run python main.py
+
+runserver:
+	pipenv run python manage.py runserver

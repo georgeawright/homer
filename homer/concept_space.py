@@ -40,6 +40,9 @@ class ConceptSpace:
     def __getitem__(self, key: str):
         return self.concept_dictionary[key]
 
+    def __iter__(self):
+        return (concept for concept in self.concepts)
+
     def get_perceptlet_type_by_name(self, name: str) -> PerceptletType:
         return self.perceptlet_types_dictionary[name]
 
