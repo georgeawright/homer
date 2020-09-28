@@ -65,6 +65,12 @@ class PerceptletRecord(models.Model):
     parent_codelet = models.ForeignKey(
         "CodeletRecord", on_delete=models.CASCADE, blank=True, null=True
     )
+    first_argument = models.CharField(
+        "First Argument", max_length=MAX_STRING_LENGTH, blank=True, null=True
+    )
+    second_argument = models.CharField(
+        "Second Argument", max_length=MAX_STRING_LENGTH, blank=True, null=True
+    )
 
 
 class PerceptletUpdateRecord(models.Model):

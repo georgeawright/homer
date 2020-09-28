@@ -206,6 +206,10 @@ class DjangoLogger(Logger):
             perceptlet_record.parent_concept = ConceptRecord.objects.get(
                 concept_id=perceptlet.parent_concept.concept_id, run_id=self.run
             )
+        if hasattr(perceptlet, "first_argument"):
+            perceptlet_record.first_argument = perceptlet.first_argument.perceptlet_id
+        if hasattr(perceptlet, "second_argument"):
+            perceptlet_record.second_argument = perceptlet.second_argument.perceptlet_id
         for connection in perceptlet.connections:
             connection_record = PerceptletRecord.objects.get(
                 perceptlet_id=connection.perceptlet_id, run_id=self.run

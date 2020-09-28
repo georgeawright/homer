@@ -118,6 +118,22 @@ def run_view(request, run_id):
                 output += "</td>"
             output += "</tr>"
         output += "</table>"
+    correspondences = [
+        perceptlet
+        for perceptlet in perceptlet_records
+        if re.match(r"^Correspondence*", perceptlet.perceptlet_id)
+    ]
+    output += "<h2>Correspondences</h2>"
+    for correspondence in correspondences:
+        output += (
+            f"{correspondence.perceptlet_id}: "
+            + f"{correspondence.first_argument} "
+            + f"--> {correspondence.second_argument} "
+        )
+        for connection in correspondence.connections.all():
+            if re.match(r"^Label*", connection.perceptlet_id):
+                output += f"({connection.value})"
+        output += "<br>"
     return HttpResponse(output)
 
 
