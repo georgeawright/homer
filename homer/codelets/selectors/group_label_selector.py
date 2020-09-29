@@ -4,7 +4,7 @@ from typing import Optional
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Group, Label
-from homer.codelets.bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
+from homer.codelets.group_labeler import GroupLabeler
 from homer.codelets.selector import Selector
 from homer.errors import MissingPerceptletError
 
@@ -61,12 +61,12 @@ class GroupLabelSelector(Selector):
             and self.challenger_proportion > self.CONFIDENCE_THRESHOLD
         )
 
-    def _fizzle(self) -> BottomUpRawPerceptletLabeler:
+    def _fizzle(self) -> GroupLabeler:
         self.perceptlet_type.activation.decay(self.location)
-        return BottomUpRawPerceptletLabeler(
+        return GroupLabeler(
             self.bubble_chamber,
             self.bubble_chamber.concept_space.get_perceptlet_type_by_name("label"),
-            self.target_group.members.get_unhappy(),
+            self.target_group,
             self.urgency,
             self.codelet_id,
         )
