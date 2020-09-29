@@ -34,13 +34,11 @@ class RawPerceptletLabeler(Codelet):
         return not self.target_perceptlet.has_label(self.parent_concept)
 
     def _fizzle(self):
-        self._decay_concept(self.perceptlet_type)
-        return None
+        return self._engender_alternative_follow_up()
 
     def _fail(self):
-        self._decay_concept(self.perceptlet_type)
         self._decay_concept(self.parent_concept)
-        return None
+        return self._engender_alternative_follow_up()
 
     def _calculate_confidence(self):
         self.confidence = self.classifier.confidence(
@@ -68,5 +66,16 @@ class RawPerceptletLabeler(Codelet):
             self.parent_concept,
             new_target,
             self.confidence,
+            self.codelet_id,
+        )
+
+    def _engender_alternative_follow_up(self) -> Codelet:
+        from .bottom_up_raw_perceptlet_labeler import BottomUpRawPerceptletLabeler
+
+        return BottomUpRawPerceptletLabeler(
+            self.bubble_chamber,
+            self.perceptlet_type,
+            self.target_perceptlet,
+            self.target_perceptlet.unhappiness.as_scalar(),
             self.codelet_id,
         )

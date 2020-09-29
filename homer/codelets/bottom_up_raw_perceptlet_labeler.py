@@ -35,11 +35,9 @@ class BottomUpRawPerceptletLabeler(Codelet):
         return not self.target_perceptlet.has_label(self.parent_concept)
 
     def _fizzle(self):
-        self._decay_concept(self.perceptlet_type)
         return self._engender_alternative_follow_up()
 
     def _fail(self):
-        self._decay_concept(self.perceptlet_type)
         self._decay_concept(self.parent_concept)
         return self._engender_alternative_follow_up()
 
@@ -80,6 +78,6 @@ class BottomUpRawPerceptletLabeler(Codelet):
             self.bubble_chamber,
             self.perceptlet_type,
             new_target_perceptlet,
-            new_target_perceptlet.unhappiness.as_scalar(),
+            self.urgency / 2,
             self.codelet_id,
         )
