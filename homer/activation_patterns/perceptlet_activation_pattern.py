@@ -16,4 +16,4 @@ class PerceptletActivationPattern(ScalarActivationPattern):
         self.activation = min(max(raw_activation, 0.0), 1.0)
 
     def decay_by_amount(self, amount: float):
-        self.boost_by_amount(-amount)
+        self.activation *= amount
