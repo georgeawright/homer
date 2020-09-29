@@ -38,12 +38,10 @@ class GroupExtender(Codelet):
         return True
 
     def _fizzle(self) -> GroupExtender:
-        self._decay_concept(self.perceptlet_type)
         return self._engender_alternative_follow_up()
 
     def _fail(self):
-        self._decay_concept(self.perceptlet_type)
-        return None
+        return self._engender_alternative_follow_up()
 
     def _calculate_confidence(self):
         spaces = {label.parent_concept.space for label in self.target_perceptlet.labels}

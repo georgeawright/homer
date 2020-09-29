@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Optional
 
 from homer import fuzzy
@@ -44,12 +45,24 @@ class GroupBuilder(Codelet):
             return False
         return True
 
-    def _fizzle(self):
-        return self._fail()
+    def _fizzle(self) -> GroupBuilder:
+        return GroupBuilder(
+            self.bubble_chamber,
+            self.perceptlet_type,
+            self.target_perceptlet,
+            self.urgency / 2,
+            self.codelet_id,
+        )
 
-    def _fail(self):
-        self._decay_concept(self.perceptlet_type)
-        return None
+    def _fail(self) -> GroupBuilder:
+        new_target = self.bubble_chamber.workspace.raw_perceptlets.get_unhappy()
+        return GroupBuilder(
+            self.bubble_chamber,
+            self.perceptlet_type,
+            new_target,
+            self.perceptlet_type.activation.as_scalar(),
+            self.codelet_id,
+        )
 
     def _calculate_confidence(self):
         common_concepts = set.intersection(
