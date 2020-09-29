@@ -347,10 +347,11 @@ def perceptlet_view(request, run_id, perceptlet_id):
                 + connection.perceptlet_id
                 + '">'
                 + connection.perceptlet_id
-                + "</a></li>"
+                + "</a>"
                 for connection in perceptlet_record.connections.all()
             ]
         )
+        output += "</li>"
     output += "<li>Activation: " + str(perceptlet_record.activation) + "</li>"
     output += "<li>Unhappiness : " + str(perceptlet_record.unhappiness) + "</li>"
     output += "<li>Quality: " + str(perceptlet_record.quality) + "</li>"
