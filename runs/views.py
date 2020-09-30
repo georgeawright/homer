@@ -356,6 +356,38 @@ def perceptlet_view(request, run_id, perceptlet_id):
     output += "<li>Unhappiness : " + str(perceptlet_record.unhappiness) + "</li>"
     output += "<li>Quality: " + str(perceptlet_record.quality) + "</li>"
     output += "</ul>"
+    if re.match(r"^Group*", perceptlet_record.perceptlet_id):
+        perceptlet_records = PerceptletRecord.objects.filter(run_id=run_id).all()
+        last_column = 0
+        last_row = 0
+        raw_perceptlets = []
+        for record in perceptlet_records:
+            if not re.match("^RawPerceptlet", record.perceptlet_id):
+                continue
+            raw_perceptlets.append(record)
+            if record.location[1] > last_row:
+                last_row = record.location[1]
+            if record.location[2] > last_column:
+                last_column = record.location[2]
+        raw_perceptlets_matrix = [
+            [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
+        ]
+        for raw_perceptlet in raw_perceptlets:
+            row = raw_perceptlet.location[1]
+            column = raw_perceptlet.location[2]
+            raw_perceptlets_matrix[row][column] = raw_perceptlet
+        output += '<table border="1">'
+        for i in range(last_row + 1):
+            output += "<tr>"
+            for j in range(last_column + 1):
+                if perceptlet_record in raw_perceptlets_matrix[i][j].connections.all():
+                    output += '<td style="background-color: coral;">'
+                else:
+                    output += "<td>"
+                output += str(raw_perceptlets_matrix[i][j].value)
+                output += "</td>"
+            output += "</tr>"
+        output += "</table>"
     output += "<h2>History</h2>"
     updates = PerceptletUpdateRecord.objects.filter(
         run_id=run_id, perceptlet=perceptlet_record
