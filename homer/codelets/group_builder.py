@@ -94,6 +94,7 @@ class GroupBuilder(Codelet):
         self.bubble_chamber.logger.log_perceptlet_connection(
             self, self.second_target_perceptlet, self.group
         )
+        self.child_perceptlet = self.group
 
     def _engender_follow_up(self) -> GroupLabeler:
         return GroupLabeler(

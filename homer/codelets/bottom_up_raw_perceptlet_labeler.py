@@ -58,6 +58,7 @@ class BottomUpRawPerceptletLabeler(Codelet):
         self.bubble_chamber.logger.log_perceptlet_connection(
             self, self.target_perceptlet, label
         )
+        self.child_perceptlet = label
 
     def _engender_follow_up(self) -> RawPerceptletLabeler:
         new_target_perceptlet = self.target_perceptlet.neighbours.get_unhappy()

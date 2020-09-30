@@ -46,9 +46,13 @@ class Codelet(ABC):
         return self._fail()
 
     def _boost_activations(self):
+        if hasattr(self, "child_perceptlet"):
+            size = self.child_perceptlet.size
+        else:
+            size = self.target_perceptlet.size
         if self.parent_concept is not None:
-            self.parent_concept.activation.boost(self.confidence, self.location)
-        self.perceptlet_type.activation.boost(self.confidence, self.location)
+            self.parent_concept.activation.boost(self.confidence * size, self.location)
+        self.perceptlet_type.activation.boost(self.confidence * size, self.location)
 
     def _decay_concept(self, concept: Concept):
         concept.activation.decay(self.location)

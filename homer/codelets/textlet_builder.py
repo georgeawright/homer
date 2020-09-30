@@ -65,6 +65,7 @@ class TextletBuilder(Codelet):
         self.bubble_chamber.logger.log_perceptlet_connection(
             self, self.target_perceptlet, textlet
         )
+        self.child_perceptlet = textlet
 
     def _engender_follow_up(self) -> TextletBuilder:
         return TextletBuilder(
