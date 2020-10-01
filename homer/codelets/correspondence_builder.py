@@ -1,11 +1,9 @@
-from homer import fuzzy
 from homer.bubbles import Concept
 from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.bubbles.perceptlets import Group
 from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import CorrespondenceClassifier
 from homer.codelet import Codelet
-from homer.perceptlet_collection import PerceptletCollection
 
 
 class CorrespondenceBuilder(Codelet):
