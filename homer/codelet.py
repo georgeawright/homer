@@ -15,6 +15,12 @@ class Codelet(ABC):
         self.urgency = urgency
         self.codelet_id = codelet_id
         self.parent_id = parent_id
+        self.child_codelets = []
+
+    @classmethod
+    @abstractmethod
+    def from_components(cls) -> Codelet:
+        pass
 
     @abstractmethod
     def run(self) -> Optional[Codelet]:
