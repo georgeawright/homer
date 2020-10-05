@@ -31,6 +31,7 @@ class Builder(Codelet):
         child_perceptlet_type: type = None,
     ) -> Builder:
         codelet_id = None
+        strategy = strategy if strategy is not None else Strategy["BottomUp"]
         target_perceptlet = target_perceptlet_type.instances.get_exigent()
         urgency = urgency if urgency is not None else target_perceptlet.exigency()
         return Builder(
