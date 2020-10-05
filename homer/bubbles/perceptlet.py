@@ -1,4 +1,5 @@
 from __future__ import annotations
+from abc import abstractmethod
 import statistics
 from typing import Any, List, Optional, Union
 
@@ -8,6 +9,7 @@ from homer.hyper_parameters import HyperParameters
 from homer.id import ID
 from homer.perceptlet_collection import PerceptletCollection
 from homer.perceptlet_collections import NeighbourCollection
+from homer.strategy import Strategy
 
 from .concept import Concept
 
@@ -40,6 +42,11 @@ class Perceptlet(Bubble):
         self.connections = PerceptletCollection.union(
             self.labels, self.groups, self.correspondences, self.textlets
         )
+
+    @classmethod
+    @abstractmethod
+    def get_requirements(cls, strategy: Strategy, target_perceptlet: type) -> dict:
+        pass
 
     @property
     def size(self) -> int:
