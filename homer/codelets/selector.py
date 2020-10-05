@@ -1,49 +1,78 @@
+from __future__ import annotations
 import random
 import statistics
+from typing import Union
 
 from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
-from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelet import Codelet
+from homer.errors import MissingPerceptletError
 from homer.hyper_parameters import HyperParameters
+from homer.perceptlet_collection import PerceptletCollection
 
 
 class Selector(Codelet):
 
-    CONFIDENCE_THRESHOLD = HyperParameters.SELECTOR_CONFIDENCE_THRESHOLD
     SELECTION_RANDOMNESS = HyperParameters.SELECTION_RANDOMNESS
 
     def __init__(
         self,
-        bubble_chamber: BubbleChamber,
-        perceptlet_type: PerceptletType,
-        target_type: PerceptletType,
-        champion: Perceptlet,
         urgency: float,
+        codelet_id: str,
         parent_id: str,
+        bubble_chamber: BubbleChamber,
+        champion: Perceptlet,
+        challenger: Union[Perceptlet, None],
+        parent_perceptlet_type: type,
     ):
-        parent_concept = None
         Codelet.__init__(
-            self,
-            bubble_chamber,
-            perceptlet_type,
-            parent_concept,
-            champion,
-            urgency,
-            parent_id,
+            self, urgency, codelet_id, parent_id, bubble_chamber,
         )
-        self.target_type = target_type
         self.champion = champion
+        self.challenger = challenger
+        self.parent_perceptlet_type = None
 
-    def _fizzle(self):
-        self.perceptlet_type.activation.decay(self.location)
-        return None
+    @classmethod
+    def from_components(
+        cls,
+        urgency: float = None,
+        parent_id: str = None,
+        target_perceptlet: Perceptlet = None,
+        target_perceptlet_type: type = None,
+        parent_perceptlet_type: type = None,
+    ) -> Selector:
+        codelet_id = None
+        champion = (
+            PerceptletCollection.union(
+                PerceptletCollection(target_perceptlet), target_perceptlet.neighbours
+            ).get_most_active()
+            if target_perceptlet is not None
+            else target_perceptlet_type.instances.get_most_active()
+        )
+        challenger = (
+            target_perceptlet
+            if target_perceptlet is not None and champion != target_perceptlet
+            else None
+        )
+        return Selector(
+            urgency, codelet_id, parent_id, champion, challenger, parent_perceptlet_type
+        )
 
-    def _fail(self):
-        self.perceptlet_type.activation.decay(self.location)
-        return None
+    def run(self):
+        while self.challenger is None:
+            try:
+                self.challenger = self.champion.neighbours.get_random()
+            except MissingPerceptletError:
+                from .builder import Builder
 
-    def _calculate_confidence(self):
+                self.child_codelets.append(
+                    Builder.from_components(
+                        parent_id=self.codelet_id,
+                        target_perceptlet_type=self.parent_perceptlet_type,
+                        child_perceptlet_type=type(self.champion),
+                    )
+                )
+                return
         champion_score = (
             self.champion.quality * (1 - self.SELECTION_RANDOMNESS)
             + random.random() * self.SELECTION_RANDOMNESS
@@ -53,8 +82,6 @@ class Selector(Codelet):
             + random.random() * self.SELECTION_RANDOMNESS
         )
         self.confidence = champion_score - challenger_score
-
-    def _process_perceptlet(self):
         self.champion.boost_activation(self.confidence)
         self.challenger.decay_activation(self.confidence)
         self.bubble_chamber.logger.log_perceptlet_update(
@@ -63,7 +90,6 @@ class Selector(Codelet):
         self.bubble_chamber.logger.log_perceptlet_update(
             self, self.challenger, "Activation updated"
         )
-        self.target_type.activation.decay(self.location)
         satisfaction = statistics.fmean(
             [
                 self.champion.activation.as_scalar() * self.champion.quality,
