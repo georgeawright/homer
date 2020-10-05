@@ -3,5 +3,9 @@ class MissingPerceptletError(Exception):
         Exception.__init__(self, message)
 
 
+class FailedGettingRequirements(Exception):
+    pass
+
+
 class NoMoreCodelets(Exception):
     pass
