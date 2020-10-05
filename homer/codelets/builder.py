@@ -27,7 +27,7 @@ class Builder(Codelet):
         urgency: float = None,
         parent_id: str = None,
         strategy: Strategy = None,
-        target_perceptlet_type: Perceptlet = None,
+        target_perceptlet_type: type = None,
         child_perceptlet_type: type = None,
     ) -> Builder:
         codelet_id = None
