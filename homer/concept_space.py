@@ -1,3 +1,4 @@
+import random
 from typing import Set
 
 from .bubbles.concept import Concept
@@ -42,6 +43,9 @@ class ConceptSpace:
 
     def __iter__(self):
         return (concept for concept in self.concepts)
+
+    def get_random(self):
+        return random.sample(self.concepts, 1)[0]
 
     def get_perceptlet_type_by_name(self, name: str) -> PerceptletType:
         return self.perceptlet_types_dictionary[name]
