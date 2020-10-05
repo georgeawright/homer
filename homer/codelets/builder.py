@@ -4,6 +4,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
 from homer.classifier import Classifier
 from homer.codelet import Codelet
+from homer.errors import FailedGettingRequirements
 from homer.strategy import Strategy
 
 
@@ -46,21 +47,22 @@ class Builder(Codelet):
         )
 
     def run(self):
-        if self._passes_checks():
-            confidence = self.classifier.confidence()
-            if confidence > self.CONFIDENCE_THRESHOLD:
-                self.child_perceptlet = self.child_perceptlet_type.build()
-                self.child_codelets.append(self._reproduce(urgency=confidence))
-            else:
-                self.child_codelets.append(
-                    self._reproduce(strategy=Strategy["BottomUp"])
-                )
-        else:
-            self.child_codelets.append(
+        try:
+            requirements = self.target_perceptlet_type.get_requirements(
+                self.strategy, self.target_perceptlet_type
+            )
+        except FailedGettingRequirements:
+            return self.child_codelets.append(
                 self._reproduce(
                     child_perceptlet_type=self.child_perceptlet_type.previous,
                 )
             )
+        confidence = self.classifier.confidence(requirements)
+        if confidence > self.CONFIDENCE_THRESHOLD:
+            self.child_perceptlet = self.child_perceptlet_type.build()
+            self.child_codelets.append(self._reproduce(urgency=confidence))
+        else:
+            self.child_codelets.append(self._reproduce(strategy=Strategy["BottomUp"]))
 
     def _reproduce(
         self,
