@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from homer.bubble_chamber import BubbleChamber
 from homer.bubbles import Perceptlet
 from homer.classifier import Classifier
 from homer.codelet import Codelet
@@ -12,11 +13,12 @@ class Evaluator(Codelet):
         urgency: float,
         codelet_id: str,
         parent_id: str,
+        bubble_chamber: BubbleChamber,
         target_perceptlet: Perceptlet,
         parent_perceptlet_type: type,
         classifier: Classifier,
     ):
-        Codelet.__init__(self, urgency, codelet_id, parent_id)
+        Codelet.__init__(self, urgency, codelet_id, parent_id, bubble_chamber)
         self.target_perceptlet = target_perceptlet
         self.parent_perceptlet_type = parent_perceptlet_type
         self.classifier = classifier
