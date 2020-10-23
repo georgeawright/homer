@@ -11,12 +11,14 @@ class Chunk(Structure):
         location: Location,
         members: List[Structure],
         neighbours: List[Structure],
+        links_in: List[Link],
+        links_out: List[Link],
     ):
-        links_in = []
-        links_out = []
         Structure.__init__(self, Location, links_in, links_out)
         self.members = members
         self.neighbours = neighbours
+        self.links_in = links_in
+        self.links_out = links_out
 
     @property
     def size(self):
