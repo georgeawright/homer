@@ -71,7 +71,9 @@ def test_intersection():
     [(1, 1, 0.5), (1, 2, 0.33333), (0, 1, 0.0)],
 )
 def test_number_and_proportion_with_label(
-    no_of_valid_members, no_of_invalid_members, expected_proportion,
+    no_of_valid_members,
+    no_of_invalid_members,
+    expected_proportion,
 ):
     concept = Mock()
     valid_members = set()

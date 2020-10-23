@@ -99,7 +99,8 @@ class Perceptlet(Bubble):
     def makes_group_with(self, other_members: PerceptletCollection) -> bool:
         for group in self.groups:
             if group.members == PerceptletCollection.union(
-                other_members, PerceptletCollection({self}),
+                other_members,
+                PerceptletCollection({self}),
             ):
                 return True
         return False

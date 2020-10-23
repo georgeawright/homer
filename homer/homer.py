@@ -146,16 +146,32 @@ class Homer:
                 "west", [2.5, 0], location_space, depth=2, relevant_value="location"
             ),
             EuclideanConcept(
-                "northwest", [0, 0], location_space, depth=2, relevant_value="location",
+                "northwest",
+                [0, 0],
+                location_space,
+                depth=2,
+                relevant_value="location",
             ),
             EuclideanConcept(
-                "northeast", [0, 4], location_space, depth=2, relevant_value="location",
+                "northeast",
+                [0, 4],
+                location_space,
+                depth=2,
+                relevant_value="location",
             ),
             EuclideanConcept(
-                "southwest", [5, 0], location_space, depth=2, relevant_value="location",
+                "southwest",
+                [5, 0],
+                location_space,
+                depth=2,
+                relevant_value="location",
             ),
             EuclideanConcept(
-                "southeast", [5, 4], location_space, depth=2, relevant_value="location",
+                "southeast",
+                [5, 4],
+                location_space,
+                depth=2,
+                relevant_value="location",
             ),
             EuclideanConcept(
                 "midlands", [2.5, 2], location_space, depth=2, relevant_value="location"
@@ -175,7 +191,11 @@ class Homer:
             logger.log(concept)
 
         bubble_chamber = BubbleChamber(
-            concept_space, event_trace, workspace, worldview, logger,
+            concept_space,
+            event_trace,
+            workspace,
+            worldview,
+            logger,
         )
         coderack = Coderack(bubble_chamber, logger)
         logger.log(coderack)
@@ -219,24 +239,36 @@ class Homer:
 
     def print_status_update(self):
         codelets_run = self.coderack.codelets_run
-        label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "label"
-        ).activation.as_scalar()
-        group_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "group"
-        ).activation.as_scalar()
-        group_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "group-label"
-        ).activation.as_scalar()
-        correspondence_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "correspondence"
-        ).activation.as_scalar()
-        correspondence_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "correspondence-label"
-        ).activation.as_scalar()
-        textlet_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "textlet"
-        ).activation.as_scalar()
+        label_activation = (
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "label"
+            ).activation.as_scalar()
+        )
+        group_activation = (
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "group"
+            ).activation.as_scalar()
+        )
+        group_label_activation = (
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "group-label"
+            ).activation.as_scalar()
+        )
+        correspondence_activation = (
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "correspondence"
+            ).activation.as_scalar()
+        )
+        correspondence_label_activation = (
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "correspondence-label"
+            ).activation.as_scalar()
+        )
+        textlet_activation = (
+            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
+                "textlet"
+            ).activation.as_scalar()
+        )
         print(
             "================================================================================"
         )

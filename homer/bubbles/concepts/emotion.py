@@ -14,5 +14,8 @@ class Emotion(Concept):
         activation_coefficient = 1 / depth
         activation_pattern = WorkspaceActivationPattern(activation_coefficient)
         Concept.__init__(
-            self, name, activation_pattern, depth=depth,
+            self,
+            name,
+            activation_pattern,
+            depth=depth,
         )

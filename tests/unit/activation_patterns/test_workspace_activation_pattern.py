@@ -157,9 +157,24 @@ def test_as_scalar(activation_matrix, expected_activation):
 @pytest.mark.parametrize(
     "activation_matrix, expected_i, expected_j, expected_k",
     [
-        ([[[1.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]], 0, 0, 0,),
-        ([[[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 0.0]]], 0, 1, 1,),
-        ([[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]]], 0, 2, 2,),
+        (
+            [[[1.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]],
+            0,
+            0,
+            0,
+        ),
+        (
+            [[[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 0.0]]],
+            0,
+            1,
+            1,
+        ),
+        (
+            [[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]]],
+            0,
+            2,
+            2,
+        ),
     ],
 )
 def test_get_high_location(activation_matrix, expected_i, expected_j, expected_k):

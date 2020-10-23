@@ -97,7 +97,10 @@ class BubbleChamber:
         return label
 
     def create_group(
-        self, members: PerceptletCollection, confidence: float, parent_id: str,
+        self,
+        members: PerceptletCollection,
+        confidence: float,
+        parent_id: str,
     ) -> Group:
         value = (
             list(members)[0].value
@@ -170,7 +173,11 @@ class BubbleChamber:
         return relation
 
     def create_word(
-        self, text: str, parent_concept: Concept, confidence: float, parent_id: str,
+        self,
+        text: str,
+        parent_concept: Concept,
+        confidence: float,
+        parent_id: str,
     ) -> Word:
         activation = PerceptletActivationPattern(confidence)
         word = Word(text, parent_concept, activation, parent_id)
@@ -179,12 +186,24 @@ class BubbleChamber:
         return word
 
     def create_textlet(
-        self, template: Template, label: Label, confidence: float, parent_id: str,
+        self,
+        template: Template,
+        label: Label,
+        confidence: float,
+        parent_id: str,
     ) -> Textlet:
         concept = label.parent_concept
         text, words = template.get_text_and_words(concept)
         activation = PerceptletActivationPattern(confidence)
-        textlet = Textlet(text, template, concept, words, None, activation, parent_id,)
+        textlet = Textlet(
+            text,
+            template,
+            concept,
+            words,
+            None,
+            activation,
+            parent_id,
+        )
         self.workspace.add_textlet(textlet)
         self.logger.log(textlet)
         return textlet

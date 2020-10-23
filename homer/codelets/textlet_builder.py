@@ -59,7 +59,10 @@ class TextletBuilder(Codelet):
 
     def _process_perceptlet(self):
         textlet = self.bubble_chamber.create_textlet(
-            self.template, self.target_label, self.confidence, self.codelet_id,
+            self.template,
+            self.target_label,
+            self.confidence,
+            self.codelet_id,
         )
         self.target_perceptlet.add_textlet(textlet)
         self.bubble_chamber.logger.log_perceptlet_connection(

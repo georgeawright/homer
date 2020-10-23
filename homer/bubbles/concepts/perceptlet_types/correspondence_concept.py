@@ -21,7 +21,11 @@ class CorrespondenceConcept(PerceptletType):
                 return None
             urgency = statistics.fmean((group.exigency for group in target_groups))
             return CorrespondenceSuggester(
-                bubble_chamber, self, *target_groups, urgency, self.concept_id,
+                bubble_chamber,
+                self,
+                *target_groups,
+                urgency,
+                self.concept_id,
             )
 
     def spawn_top_down_codelet(

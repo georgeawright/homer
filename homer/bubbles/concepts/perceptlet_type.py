@@ -10,7 +10,10 @@ class PerceptletType(Concept):
         activation_coefficient = 1 / depth
         activation_pattern = WorkspaceActivationPattern(activation_coefficient)
         Concept.__init__(
-            self, name, activation_pattern, depth=depth,
+            self,
+            name,
+            activation_pattern,
+            depth=depth,
         )
 
     @abstractmethod
@@ -19,6 +22,9 @@ class PerceptletType(Concept):
 
     @abstractmethod
     def spawn_top_down_codelet(
-        self, bubble_chamber, location: WorkspaceLocation, parent_id: str,
+        self,
+        bubble_chamber,
+        location: WorkspaceLocation,
+        parent_id: str,
     ):
         pass

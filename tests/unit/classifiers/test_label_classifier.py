@@ -20,7 +20,9 @@ FLOAT_COMPARISON_TOLERANCE = 1e-1
     ],
 )
 def test_calculate_confidence(
-    proximity_to_prototype, proportion_of_neighbours, expected,
+    proximity_to_prototype,
+    proportion_of_neighbours,
+    expected,
 ):
     with patch.object(
         Concept, "proximity_to", return_value=proximity_to_prototype
