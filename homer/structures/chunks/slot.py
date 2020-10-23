@@ -6,6 +6,5 @@ class Slot(Chunk):
     prototype - a set of concepts which the filler should belong to.
     form - the orm of the lexeme that the word should use."""
 
-    def __init__(self, prototype, form):
+    def __init__(self, prototype):
         self.prototype = prototype
-        self.form = form
