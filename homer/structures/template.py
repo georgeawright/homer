@@ -1,7 +1,7 @@
 from homer.structures.chunk import Chunk
 from homer.structures.slot import Slot
 
-from .chunks.word import Word
+from .word import Word
 
 
 class Template(Chunk):
