@@ -1,10 +1,17 @@
+from homer.location import Location
 from homer.structures.chunk import Chunk
 
 
 class Slot(Chunk):
-    """A slot is a piece of a framelet which needs to be filled in with a word.
-    prototype - a set of concepts which the filler should belong to.
-    form - the orm of the lexeme that the word should use."""
+    """A piece of a frame which acts as a replaceable prototype"""
 
-    def __init__(self, prototype):
-        self.prototype = prototype
+    def __init__(
+        self,
+        value: Any = None,
+        location: Location = None,
+        members: List[Slot] = None,
+        neighbours: List[Slot] = None,
+        links_in: List[Link] = None,
+        links_out: List[Link] = None,
+    ):
+        Chunk.__init__(self, value, location, members, neighbours, links_in, links_out)

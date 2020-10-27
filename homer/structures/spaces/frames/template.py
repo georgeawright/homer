@@ -1,13 +1,12 @@
 from typing import List
 
-from homer.structures.chunk import Chunk
+from homer.structures.chunks.slot import Slot
+from homer.structures.chunks.word import Word
+from homer.structures.spaces.frame import Frame
 from homer.structures.link import Link
 
-from .slot import Slot
-from .word import Word
 
-
-class Template(Chunk):
+class Template(Frame):
     def __init__(
         self,
         members: List[Union[Slot, Word]],
@@ -19,4 +18,4 @@ class Template(Chunk):
         neighbours = []
         links_in = [] if links_in is None else links_in
         links_out = [] if links_out is None else links_out
-        Chunk.__init__(value, members, neighbours, links_in, links_out)
+        Frame.__init__(value, members, neighbours, links_in, links_out)

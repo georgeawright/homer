@@ -26,3 +26,6 @@ class Chunk(Structure):
 
     def nearby(self):
         return self.neighbours
+
+    def add_member(self, new_member: Chunk):
+        pass
