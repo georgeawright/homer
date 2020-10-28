@@ -1,10 +1,12 @@
 from typing import Any, List
 
 from homer.classifier import Classifier
-from homer.float_between_zero_and_one import FloatBetweenZeroAndOne
-from homer.structures.chunk import Chunk
-from homer.structures.link import Link
-from homer.structures.space import Space
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.structure import Structure
+
+from .chunk import Chunk
+from .link import Link
+from .space import Space
 
 
 class Concept(Structure):
@@ -18,7 +20,7 @@ class Concept(Structure):
         links_in: List[Link] = None,
         links_out: List[Link] = None,
         depth: int = 1,
-        activation: FloatBetweenZeroAndOne = FloatBetweenZeroAndOne(0),
+        activation: FloatBetweenOneAndZero = FloatBetweenOneAndZero(0),
     ):
         location = None
         links_in = [] if links_in is None else links_in
@@ -32,5 +34,5 @@ class Concept(Structure):
         self.depth = depth
         self.activation = activation
 
-    def classify_example(self, example: Structure) -> FloatBetweenZeroAndOne:
+    def classify_example(self, example: Structure) -> FloatBetweenOneAndZero:
         return self.classifier.classify(example)

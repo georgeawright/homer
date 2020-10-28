@@ -1,7 +1,8 @@
 from typing import List
 
-from homer.structures.chunk import Chunk
-from homer.structures.link import Link
+from homer.structure import Structure
+
+from .link import Link
 
 
 class Lexeme(Structure):
@@ -16,5 +17,7 @@ class Lexeme(Structure):
         neighbours = []
         links_in = [] if links_in is None else links_in
         links_out = [] if links_out is None else links_out
-        hunk.__init(self, headword, location, members, neighbours, links_in, links_out)
+        Structure.__init(
+            self, headword, location, members, neighbours, links_in, links_out
+        )
         self.headword = headword

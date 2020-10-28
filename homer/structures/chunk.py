@@ -1,7 +1,10 @@
-from typing import Any
+from __future__ import annotations
+from typing import Any, List
 
 from homer.location import Location
 from homer.structure import Structure
+
+from .link import Link
 
 
 class Chunk(Structure):

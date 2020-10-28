@@ -3,7 +3,7 @@ from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.errors import MissingPerceptletError
-from homer.float_between_zero_and_one import FloatBetweenZeroAndOne
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structures import Chunk
 from homer.structures import Concept
 
@@ -16,7 +16,7 @@ class ChunkBuilder(Builder):
         structure_concept: Concept,
         bubble_chamber: BubbleChamber,
         target_chunk: Chunk,
-        urgency: FloatBetweenZeroAndOne,
+        urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(codelet_id, parent_id)
         self.structure_concept = structure_concept
@@ -25,6 +25,7 @@ class ChunkBuilder(Builder):
         self.urgency = urgency
         self.second_target_chunk = None
         self.confidence = 0.0
+        self.child_structure = None
 
     @classmethod
     def spawn(
@@ -32,7 +33,7 @@ class ChunkBuilder(Builder):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         target_chunk: Chunk,
-        urgency: FloatBetweenZeroAndOne,
+        urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ""
         structure_concept = bubble_chamber.concepts["chunk"]

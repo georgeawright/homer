@@ -1,5 +1,6 @@
-from homer.structure.concept import Concept
-from homer.structure.link import Link
+from homer.structure import Structure
+from homer.structures import Concept
+from homer.structures import Link
 
 
 class Correspondence(Link):

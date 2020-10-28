@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC
 
-from .float_between_zero_and_one import FloatBetweenZeroAndOne
+from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .location import Location
 
 
@@ -10,19 +10,19 @@ class Structure(ABC):
         self.location = location
         self.links_in = links_in
         self.links_out = links_out
-        self._activation = FloatBetweenZeroAndOne(0)
-        self._unhappiness = FloatBetweenZeroAndOne(1)
+        self._activation = FloatBetweenOneAndZero(0)
+        self._unhappiness = FloatBetweenOneAndZero(1)
 
     @property
-    def exigency(self) -> FloatBetweenZeroAndOne:
+    def exigency(self) -> FloatBetweenOneAndZero:
         pass
 
     @property
-    def activation(self) -> FloatBetweenZeroAndOne:
+    def activation(self) -> FloatBetweenOneAndZero:
         return self._activation
 
     @property
-    def unhappiness(self) -> FloatBetweenZeroAndOne:
+    def unhappiness(self) -> FloatBetweenOneAndZero:
         return self._unhappiness
 
     def boost_activation(self, amount: float = None):

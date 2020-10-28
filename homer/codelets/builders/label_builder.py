@@ -1,6 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
-from homer.float_between_zero_and_one import FloatBetweenZeroAndOne
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structures.chunk import Chunk
 from homer.structures.concept import Concept
 
@@ -13,7 +13,7 @@ class LabelBuilder(Builder):
         structure_concept: Concept,
         bubble_chamber: BubbleChamber,
         target_chunk: Chunk,
-        urgency: FloatBetweenZeroAndOne,
+        urgency: FloatBetweenOneAndZero,
         parent_concept: Concept = None,
     ):
         Builder.__init__(self, codelet_id, parent_id, urgency)
@@ -22,6 +22,7 @@ class LabelBuilder(Builder):
         self.target_chunk = target_chunk
         self.parent_concept = parent_concept
         self.confidence = 0.0
+        self.child_perceptlet = None
 
     @classmethod
     def spawn(
@@ -29,7 +30,7 @@ class LabelBuilder(Builder):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         target_chunk: Chunk,
-        urgency: FloatBetweenZeroAndOne,
+        urgency: FloatBetweenOneAndZero,
         parent_concept: Concept = None,
     ):
         codelet_id = ""
@@ -56,10 +57,30 @@ class LabelBuilder(Builder):
         pass
 
     def _process_perceptlet(self):
-        pass
+        label = self.bubble_chamber.create_label(
+            self.parent_concept,
+            self.target_perceptlet.location,
+            self.target_perceptlet,
+            self.confidence,
+            self.codelet_id,
+        )
+        self.target_perceptlet.add_label(label)
+        self.bubble_chamber.logger.log_perceptlet_connection(
+            self, self.target_perceptlet, label
+        )
+        self.child_perceptlet = label
 
     def _engender_follow_up(self):
-        pass
+        new_target = self.target_perceptlet.neighbours.get_unhappy()
+        self.child_codelets.append(
+            LabelBuilder.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                new_target,
+                self.confidence,
+                self.parent_concept,
+            )
+        )
 
     def _fizzle(self):
         self._re_engender()
