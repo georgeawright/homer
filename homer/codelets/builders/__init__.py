@@ -1,5 +1,5 @@
 from .chunk_builder import ChunkBuilder
-from .chunk_enlarger import ChunkEnlarge
+from .chunk_enlarger import ChunkEnlarger
 from .correspondence_builder import CorrespondenceBuilder
 from .label_builder import LabelBuilder
 from .projection_builder import ProjectionBuilder

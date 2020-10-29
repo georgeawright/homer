@@ -61,12 +61,9 @@ class ChunkBuilder(Builder):
         )
 
     def _calculate_confidence(self):
-        common_spaces = StructureCollection.intersection(
-            self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
-        )
         distances = [
             space.proximity_between(self.target_chunk, self.second_target_chunk)
-            for space in common_spaces
+            for space in self.target_chunk.parent_spaces
         ]
         self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
 
