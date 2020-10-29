@@ -1,0 +1,2 @@
+from .proximity_classifier import ProximityClassifier
+from .stretchy_proximity_classifier import StretchyProximityClassifier
