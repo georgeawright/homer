@@ -47,14 +47,14 @@ class StructureCollection:
                     self._add_at_location(structure, member.location)
 
     def remove(self, structure):
-        self.structures.remove(structure)
+        self.structures.discard(structure)
         if self.structures_by_location is None:
             return
         for i, layer in enumerate(self.structures_by_location):
             for j, row in enumerate(layer):
                 for k, cell in enumerate(row):
                     if structure in cell:
-                        self.structures_by_location[i][j][k].remove(structure)
+                        self.structures_by_location[i][j][k].discard(structure)
 
     @staticmethod
     def union(*collections: List[StructureCollection]) -> StructureCollection:

@@ -1,11 +1,14 @@
 from __future__ import annotations
+
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structures import Chunk
-from homer.structures import Concept
+from homer.structure_collection import StructureCollection
+from homer.structures import Chunk, Concept
+
+from .chunk_enlarger import ChunkEnlarger
 
 
 class ChunkBuilder(Builder):
@@ -18,11 +21,10 @@ class ChunkBuilder(Builder):
         target_chunk: Chunk,
         urgency: FloatBetweenOneAndZero,
     ):
-        Builder.__init__(codelet_id, parent_id)
+        Builder.__init__(self, codelet_id, parent_id, urgency)
         self.structure_concept = structure_concept
         self.bubble_chamber = bubble_chamber
         self.target_chunk = target_chunk
-        self.urgency = urgency
         self.second_target_chunk = None
         self.confidence = 0.0
         self.child_structure = None
@@ -51,14 +53,15 @@ class ChunkBuilder(Builder):
             self.second_target_chunk = self.target_chunk.nearby.get_random()
         except MissingStructureError:
             return False
-        if self.target_chunk.makes_group_with(
-            StructureCollection({self.second_target_perceptlet})
-        ):
-            return False
-        return True
+        return not self.bubble_chamber.has_chunk(
+            StructureCollection.union(
+                self.target_chunk.members,
+                StructureCollection({self.second_target_chunk}),
+            )
+        )
 
     def _calculate_confidence(self):
-        common_spaces = set.intersection(
+        common_spaces = StructureCollection.intersection(
             self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
         )
         distances = [
@@ -70,11 +73,34 @@ class ChunkBuilder(Builder):
     def _boost_activations(self):
         pass
 
-    def _process_perceptlet(self):
-        pass
+    def _process_structure(self):
+        new_chunk_members = StructureCollection.union(
+            self.target_chunk.members,
+            StructureCollection({self.second_target_chunk}),
+        )
+        new_chunk_neighbours = StructureCollection.union(
+            self.target_chunk.neighbours, self.second_target_chunk.neighbours
+        )
+        new_chunk_neighbours.remove(self.target_chunk)
+        new_chunk_neighbours.remove(self.second_target_chunk)
+        chunk = Chunk(
+            self.target_chunk.value,  # a prototype-centroid should be found
+            self.target_chunk.location,  # likewise
+            new_chunk_members,
+            new_chunk_neighbours,
+        )
+        self.bubble_chamber.add_chunk(chunk)
+        self.child_structure = chunk
 
     def _engender_follow_up(self):
-        return LabelBuilder()
+        self.child_codelets.append(
+            ChunkEnlarger.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.child_structure,
+                self.confidence,
+            )
+        )
 
     def _fizzle(self):
         self.child_codelets.append(
@@ -87,7 +113,7 @@ class ChunkBuilder(Builder):
         )
 
     def _fail(self):
-        new_target = self.workspace.chunks.get_unhappy()
+        new_target = self.bubble_chamber.chunks.get_unhappy()
         self.child_codelets.append(
             ChunkBuilder.spawn(
                 self.codelet_id,

@@ -20,7 +20,7 @@ class Builder(Codelet):
         self._calculate_confidence()
         if abs(self.confidence) > self.CONFIDENCE_THRESHOLD:
             self._boost_activations()
-            self._process_perceptlet()
+            self._process_structure()
             return self._engender_follow_up()
         return self._fail()
 
