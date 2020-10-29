@@ -48,7 +48,7 @@ class ChunkBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         try:
-            self.second_target_chunk = self.target_chunk.neighbours.get_random()
+            self.second_target_chunk = self.target_chunk.nearby.get_random()
         except MissingPerceptletError:
             return False
         if self.target_chunk.makes_group_with(
