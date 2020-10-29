@@ -2,28 +2,28 @@ import math
 import pytest
 from unittest.mock import Mock
 
-from homer.perceptlet_collection import PerceptletCollection
+from homer.structure_collection import StructureCollection
 
 FLOAT_COMPARISON_TOLERANCE = 1e-3
 
 
 def test_eq():
-    assert PerceptletCollection(set()) == PerceptletCollection(set())
+    assert StructureCollection(set()) == StructureCollection(set())
     perceptlet = Mock()
-    assert PerceptletCollection({perceptlet}) == PerceptletCollection({perceptlet})
-    assert not PerceptletCollection(set()) == PerceptletCollection({perceptlet})
+    assert StructureCollection({perceptlet}) == StructureCollection({perceptlet})
+    assert not StructureCollection(set()) == StructureCollection({perceptlet})
 
 
 def test_ne():
     perceptlet = Mock()
-    assert PerceptletCollection(set()) != PerceptletCollection({perceptlet})
-    assert not PerceptletCollection(set()) != PerceptletCollection(set())
-    assert not PerceptletCollection({perceptlet}) != PerceptletCollection({perceptlet})
+    assert StructureCollection(set()) != StructureCollection({perceptlet})
+    assert not StructureCollection(set()) != StructureCollection(set())
+    assert not StructureCollection({perceptlet}) != StructureCollection({perceptlet})
 
 
 def test_copy():
     perceptlets = {Mock(), Mock(), Mock()}
-    original_collection = PerceptletCollection(perceptlets)
+    original_collection = StructureCollection(perceptlets)
     new_collection = original_collection.copy()
     assert new_collection.perceptlets == perceptlets
     assert new_collection == original_collection
@@ -32,7 +32,7 @@ def test_copy():
 
 
 def test_add():
-    collection = PerceptletCollection(set())
+    collection = StructureCollection(set())
     assert collection.perceptlets == set()
     perceptlet = Mock()
     collection.add(perceptlet)
@@ -41,7 +41,7 @@ def test_add():
 
 def test_remove():
     perceptlet = Mock()
-    collection = PerceptletCollection({perceptlet})
+    collection = StructureCollection({perceptlet})
     assert collection.perceptlets == {perceptlet}
     collection.remove(perceptlet)
     assert collection.perceptlets == set()
@@ -50,9 +50,9 @@ def test_remove():
 def test_union():
     perceptlet_1 = Mock()
     perceptlet_2 = Mock()
-    collection_1 = PerceptletCollection({perceptlet_1})
-    collection_2 = PerceptletCollection({perceptlet_2})
-    union = PerceptletCollection.union(collection_1, collection_2)
+    collection_1 = StructureCollection({perceptlet_1})
+    collection_2 = StructureCollection({perceptlet_2})
+    union = StructureCollection.union(collection_1, collection_2)
     assert union.perceptlets == {perceptlet_1, perceptlet_2}
 
 
@@ -60,9 +60,9 @@ def test_intersection():
     perceptlet_1 = Mock()
     perceptlet_2 = Mock()
     perceptlet_3 = Mock()
-    collection_1 = PerceptletCollection({perceptlet_1, perceptlet_2})
-    collection_2 = PerceptletCollection({perceptlet_2, perceptlet_3})
-    intersection = PerceptletCollection.intersection(collection_1, collection_2)
+    collection_1 = StructureCollection({perceptlet_1, perceptlet_2})
+    collection_2 = StructureCollection({perceptlet_2, perceptlet_3})
+    intersection = StructureCollection.intersection(collection_1, collection_2)
     assert intersection.perceptlets == {perceptlet_2}
 
 
@@ -86,7 +86,7 @@ def test_number_and_proportion_with_label(
         member = Mock()
         member.has_label.side_effect = [False]
         invalid_members.add(member)
-    collection = PerceptletCollection(set.union(valid_members, invalid_members))
+    collection = StructureCollection(set.union(valid_members, invalid_members))
     actual_proportion = collection.proportion_with_label(concept)
     assert math.isclose(
         expected_proportion, actual_proportion, abs_tol=FLOAT_COMPARISON_TOLERANCE
@@ -95,6 +95,6 @@ def test_number_and_proportion_with_label(
 
 def test_get_random():
     perceptlets = {Mock() for _ in range(10)}
-    collection = PerceptletCollection(perceptlets)
+    collection = StructureCollection(perceptlets)
     random_perceptlet = collection.get_random()
     assert random_perceptlet in perceptlets
