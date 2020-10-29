@@ -4,6 +4,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.structure_collection import StructureCollection
 from homer.structures import Chunk
 from homer.structures import Concept
 
@@ -49,21 +50,19 @@ class ChunkEnlarger(Builder):
     def _passes_preliminary_checks(self):
         try:
             self.candidate_member = self.target_chunk.nearby.get_random()
-        except MissingPerceptletError:
+        except MissingStructureError:
             return False
-        if self.target_chunk.makes_group_with(
-            PerceptletCollection({self.second_target_perceptlet})
-        ):
-            return False
-        return True
+        return not self.bubble_chamber.has_chunk(
+            StructureCollection.union(
+                self.target_chunk.members,
+                StructureCollection({self.candidate_member}),
+            )
+        )
 
     def _calculate_confidence(self):
-        common_spaces = set.intersection(
-            self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
-        )
         distances = [
-            space.proximity_between(self.target_chunk, self.second_target_chunk)
-            for space in common_spaces
+            space.proximity_between(self.target_chunk, self.candidate_member)
+            for space in self.target_chunk.parent_spaces
         ]
         self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
 
@@ -71,14 +70,21 @@ class ChunkEnlarger(Builder):
         pass
 
     def _process_structure(self):
-        pass
+        self.target_chunk.add_member(self.candidate_member)
 
     def _engender_follow_up(self):
-        return LabelBuilder()
+        self.child_codelets.append(
+            ChunkEnlarger.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_chunk,
+                self.confidence,
+            )
+        )
 
     def _fizzle(self):
         self.child_codelets.append(
-            ChunkBuilder.spawn(
+            ChunkEnlarger.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_chunk,
@@ -87,9 +93,9 @@ class ChunkEnlarger(Builder):
         )
 
     def _fail(self):
-        new_target = self.workspace.chunks.get_unhappy()
+        new_target = self.bubble_chamber.chunks.get_unhappy()
         self.child_codelets.append(
-            ChunkBuilder.spawn(
+            ChunkEnlarger.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 new_target,
