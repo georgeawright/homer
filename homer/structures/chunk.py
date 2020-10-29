@@ -34,4 +34,5 @@ class Chunk(Structure):
         )
 
     def add_member(self, new_member: Chunk):
+        # alter neightbours
         pass
