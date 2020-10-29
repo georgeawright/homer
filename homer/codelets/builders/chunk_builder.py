@@ -2,7 +2,7 @@ from __future__ import annotations
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
-from homer.errors import MissingPerceptletError
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structures import Chunk
 from homer.structures import Concept
@@ -49,10 +49,10 @@ class ChunkBuilder(Builder):
     def _passes_preliminary_checks(self):
         try:
             self.second_target_chunk = self.target_chunk.nearby.get_random()
-        except MissingPerceptletError:
+        except MissingStructureError:
             return False
         if self.target_chunk.makes_group_with(
-            PerceptletCollection({self.second_target_perceptlet})
+            StructureCollection({self.second_target_perceptlet})
         ):
             return False
         return True

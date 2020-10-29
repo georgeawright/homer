@@ -2,8 +2,6 @@ import random
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
-from homer.bubbles import Perceptlet
-from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelet import Codelet
 from homer.hyper_parameters import HyperParameters
 
@@ -13,27 +11,8 @@ class Selector(Codelet):
     CONFIDENCE_THRESHOLD = HyperParameters.SELECTOR_CONFIDENCE_THRESHOLD
     SELECTION_RANDOMNESS = HyperParameters.SELECTION_RANDOMNESS
 
-    def __init__(
-        self,
-        bubble_chamber: BubbleChamber,
-        perceptlet_type: PerceptletType,
-        target_type: PerceptletType,
-        champion: Perceptlet,
-        urgency: float,
-        parent_id: str,
-    ):
-        parent_concept = None
-        Codelet.__init__(
-            self,
-            bubble_chamber,
-            perceptlet_type,
-            parent_concept,
-            champion,
-            urgency,
-            parent_id,
-        )
-        self.target_type = target_type
-        self.champion = champion
+    def __init__(self):
+        pass
 
     def _fizzle(self):
         self.perceptlet_type.activation.decay(self.location)

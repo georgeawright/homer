@@ -1,9 +1,11 @@
+import pytest
 from unittest.mock import Mock
 
 from homer.codelets.builders import ProjectionBuilder
 from homer.structure import Structure
 
 
+@pytest.mark.skip
 def test_successful_creates_projection_and_spawns_follow_up():
     bubble_chamber = Mock()
     target_correspondence = Mock()
@@ -16,6 +18,7 @@ def test_successful_creates_projection_and_spawns_follow_up():
     assert isinstance(projection_builder.child_codelets[0], ProjectionBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_in_unsuitable_conditions():
     bubble_chamber = Mock()
     target_correspondence = Mock()

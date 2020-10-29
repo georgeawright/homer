@@ -2,9 +2,8 @@ from __future__ import annotations
 import random
 from typing import List, Optional, Set, Union
 
-from .bubbles.concept import Concept
 from .errors import MissingStructureError
-from .workspace_location import WorkspaceLocation
+from .location import Location
 
 
 class StructureCollection:
@@ -32,7 +31,7 @@ class StructureCollection:
     def copy(self) -> StructureCollection:
         return StructureCollection({structure for structure in self.structures})
 
-    def at(self, location: WorkspaceLocation) -> StructureCollection:
+    def at(self, location: Location) -> StructureCollection:
         if self.structures_by_location is None:
             self._arrange_structures_by_location()
         return StructureCollection(
@@ -97,7 +96,7 @@ class StructureCollection:
         return self._get_structure_according_to("unhappiness")
 
     def _add_at_location(self, structure, coordinates: List[Union[float, int]]):
-        loc = WorkspaceLocation.from_workspace_coordinates(coordinates)
+        loc = Location.from_workspace_coordinates(coordinates)
         self.structures_by_location[loc.i][loc.j][loc.k].add(structure)
 
     def _get_structure_according_to(self, attribute: str):
@@ -122,12 +121,9 @@ class StructureCollection:
 
     def _arrange_structures_by_location(self):
         self.structures_by_location = [
-            [
-                [set() for _ in range(WorkspaceLocation.WIDTH)]
-                for _ in range(WorkspaceLocation.HEIGHT)
-            ]
-            for _ in range(WorkspaceLocation.DEPTH)
+            [[set() for _ in range(Location.WIDTH)] for _ in range(Location.HEIGHT)]
+            for _ in range(Location.DEPTH)
         ]
         for structure in self.structures:
-            loc = WorkspaceLocation.from_workspace_coordinates(structure.location)
+            loc = Location.from_workspace_coordinates(structure.location)
             self.structures_by_location[loc.i][loc.j][loc.k].add(structure)

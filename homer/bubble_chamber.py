@@ -4,7 +4,7 @@ from typing import List, Union
 
 from .logger import Logger
 from .problem import Problem
-from .structure import Space
+from .structures import Space
 
 
 class BubbleChamber:
