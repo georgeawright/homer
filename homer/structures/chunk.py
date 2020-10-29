@@ -15,6 +15,7 @@ class Chunk(Structure):
         location: Location,
         members: StructureCollection,
         neighbours: StructureCollection,
+        parent_spaces: StructureCollection,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -22,12 +23,15 @@ class Chunk(Structure):
         self.value = value
         self.members = members
         self.neighbours = neighbours
+        self.parent_spaces = parent_spaces
         self.links_in = links_in
         self.links_out = links_out
 
     @property
     def size(self):
-        return 1 if self.members == [] else sum(member.size for member in self.members)
+        return (
+            1 if len(self.members) == 0 else sum(member.size for member in self.members)
+        )
 
     def nearby(self):
         return StructureCollection.intersection(
