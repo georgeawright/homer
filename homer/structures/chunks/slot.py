@@ -1,4 +1,5 @@
 from homer.location import Location
+from homer.structure_collection import StructureCollection
 from homer.structures.chunk import Chunk
 
 
@@ -9,9 +10,9 @@ class Slot(Chunk):
         self,
         value: Any = None,
         location: Location = None,
-        members: List[Slot] = None,
-        neighbours: List[Slot] = None,
-        links_in: List[Link] = None,
-        links_out: List[Link] = None,
+        members: StructureCollection = None,
+        neighbours: StructureCollection = None,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
     ):
         Chunk.__init__(self, value, location, members, neighbours, links_in, links_out)

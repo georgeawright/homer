@@ -3,13 +3,19 @@ from abc import ABC
 
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .location import Location
+from .structure_collection import StructureCollection
 
 
 class Structure(ABC):
-    def __init__(self, location: Location, links_in: list, links_out: list):
+    def __init__(
+        self,
+        location: Location,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
+    ):
         self.location = location
-        self.links_in = links_in
-        self.links_out = links_out
+        self.links_in = StructureCollection() if links_in is None else links_in
+        self.links_out = StructureCollection() if links_out is None else links_out
         self._activation = FloatBetweenOneAndZero(0)
         self._unhappiness = FloatBetweenOneAndZero(1)
 

@@ -3,6 +3,7 @@ from typing import Any, List
 
 from homer.location import Location
 from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 
 from .link import Link
 
@@ -12,12 +13,12 @@ class Chunk(Structure):
         self,
         value: Any,
         location: Location,
-        members: List[Structure],
-        neighbours: List[Structure],
-        links_in: List[Link],
-        links_out: List[Link],
+        members: StructureCollection,
+        neighbours: StructureCollection,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
     ):
-        Structure.__init__(self, Location, links_in, links_out)
+        Structure.__init__(self, location, links_in, links_out)
         self.value = value
         self.members = members
         self.neighbours = neighbours

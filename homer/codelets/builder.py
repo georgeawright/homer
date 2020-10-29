@@ -37,7 +37,7 @@ class Builder(Codelet):
         pass
 
     @abstractmethod
-    def _process_perceptlet(self):
+    def _process_structure(self):
         pass
 
     @abstractmethod

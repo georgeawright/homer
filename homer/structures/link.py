@@ -1,4 +1,5 @@
 from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 
 
 class Link(Structure):
@@ -6,8 +7,8 @@ class Link(Structure):
         self,
         start: Structure,
         end: Structure,
-        links_in: list,
-        links_out: list,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
     ):
         Structure.__init__(self, start.location, links_in, links_out)
         self.start = start
