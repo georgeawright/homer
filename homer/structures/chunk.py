@@ -29,7 +29,9 @@ class Chunk(Structure):
         return 1 if self.members == [] else sum(member.size for member in self.members)
 
     def nearby(self):
-        return StructureCollection.intersection(space.elements_close_to(self.location) for space in self.spaces)
+        return StructureCollection.intersection(
+            space.elements_close_to(self.location) for space in self.spaces
+        )
 
     def add_member(self, new_member: Chunk):
         pass
