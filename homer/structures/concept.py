@@ -35,4 +35,4 @@ class Concept(Structure):
         self.activation = activation
 
     def classify_example(self, example: Structure) -> FloatBetweenOneAndZero:
-        return self.classifier.classify(example)
+        return self.classifier.classify(self, example)
