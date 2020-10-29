@@ -61,8 +61,20 @@ def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common
     assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)
 
 
-def test_fizzles_in_unsuitable_conditions(bubble_chamber, target_chunk):
+def test_fizzles_when_no_second_target(bubble_chamber, target_chunk):
     target_chunk.nearby = StructureCollection()
+    urgency = 1.0
+    chunk_builder = ChunkBuilder(
+        Mock(), Mock(), Mock(), bubble_chamber, target_chunk, urgency
+    )
+    chunk_builder.run()
+    assert chunk_builder.child_structure is None
+    assert len(chunk_builder.child_codelets) == 1
+    assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)
+
+
+def test_fizzles_when_chunk_already_exists(bubble_chamber, target_chunk):
+    bubble_chamber.has_chunk.return_value = True
     urgency = 1.0
     chunk_builder = ChunkBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_chunk, urgency
