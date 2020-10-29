@@ -18,6 +18,7 @@ class Chunk(Structure):
         links_out: List[Link],
     ):
         Structure.__init__(self, Location, links_in, links_out)
+        self.value = value
         self.members = members
         self.neighbours = neighbours
         self.links_in = links_in
@@ -28,7 +29,7 @@ class Chunk(Structure):
         return 1 if self.members == [] else sum(member.size for member in self.members)
 
     def nearby(self):
-        return self.neighbours
+        return StructureCollection.intersection(space.elements_close_to(self.location) for space in self.spaces)
 
     def add_member(self, new_member: Chunk):
         pass
