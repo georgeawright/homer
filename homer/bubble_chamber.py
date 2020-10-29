@@ -3,6 +3,7 @@ import statistics
 from typing import List, Union
 
 from .logger import Logger
+from .problem import Problem
 from .structure import Space
 
 
@@ -17,6 +18,10 @@ class BubbleChamber:
         self.top_level_conceptual_space = top_level_conceptual_space
         self.logger = logger
         self.result = None
+
+    @classmethod
+    def setup(cls, problem: Problem, logger: Logger):
+        pass
 
     def update_activations(self) -> None:
         pass
