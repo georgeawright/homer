@@ -7,73 +7,65 @@ from homer.structure_collection import StructureCollection
 FLOAT_COMPARISON_TOLERANCE = 1e-3
 
 
-@pytest.mark.skip
 def test_eq():
     assert StructureCollection(set()) == StructureCollection(set())
-    perceptlet = Mock()
-    assert StructureCollection({perceptlet}) == StructureCollection({perceptlet})
-    assert not StructureCollection(set()) == StructureCollection({perceptlet})
+    structure = Mock()
+    assert StructureCollection({structure}) == StructureCollection({structure})
+    assert not StructureCollection(set()) == StructureCollection({structure})
 
 
-@pytest.mark.skip
 def test_ne():
-    perceptlet = Mock()
-    assert StructureCollection(set()) != StructureCollection({perceptlet})
+    structure = Mock()
+    assert StructureCollection(set()) != StructureCollection({structure})
     assert not StructureCollection(set()) != StructureCollection(set())
-    assert not StructureCollection({perceptlet}) != StructureCollection({perceptlet})
+    assert not StructureCollection({structure}) != StructureCollection({structure})
 
 
-@pytest.mark.skip
 def test_copy():
-    perceptlets = {Mock(), Mock(), Mock()}
-    original_collection = StructureCollection(perceptlets)
+    structures = {Mock(), Mock(), Mock()}
+    original_collection = StructureCollection(structures)
     new_collection = original_collection.copy()
-    assert new_collection.perceptlets == perceptlets
+    assert new_collection.structures == structures
     assert new_collection == original_collection
     original_collection.add(Mock())
     assert new_collection != original_collection
 
 
-@pytest.mark.skip
 def test_add():
     collection = StructureCollection(set())
-    assert collection.perceptlets == set()
-    perceptlet = Mock()
-    collection.add(perceptlet)
-    assert collection.perceptlets == {perceptlet}
+    assert collection.structures == set()
+    structure = Mock()
+    collection.add(structure)
+    assert collection.structures == {structure}
 
 
-@pytest.mark.skip
 def test_remove():
-    perceptlet = Mock()
-    collection = StructureCollection({perceptlet})
-    assert collection.perceptlets == {perceptlet}
-    collection.remove(perceptlet)
-    assert collection.perceptlets == set()
+    structure = Mock()
+    collection = StructureCollection({structure})
+    assert collection.structures == {structure}
+    collection.remove(structure)
+    assert collection.structures == set()
 
 
-@pytest.mark.skip
 def test_union():
-    perceptlet_1 = Mock()
-    perceptlet_2 = Mock()
-    collection_1 = StructureCollection({perceptlet_1})
-    collection_2 = StructureCollection({perceptlet_2})
+    structure_1 = Mock()
+    structure_2 = Mock()
+    collection_1 = StructureCollection({structure_1})
+    collection_2 = StructureCollection({structure_2})
     union = StructureCollection.union(collection_1, collection_2)
-    assert union.perceptlets == {perceptlet_1, perceptlet_2}
+    assert union.structures == {structure_1, structure_2}
 
 
-@pytest.mark.skip
 def test_intersection():
-    perceptlet_1 = Mock()
-    perceptlet_2 = Mock()
-    perceptlet_3 = Mock()
-    collection_1 = StructureCollection({perceptlet_1, perceptlet_2})
-    collection_2 = StructureCollection({perceptlet_2, perceptlet_3})
+    structure_1 = Mock()
+    structure_2 = Mock()
+    structure_3 = Mock()
+    collection_1 = StructureCollection({structure_1, structure_2})
+    collection_2 = StructureCollection({structure_2, structure_3})
     intersection = StructureCollection.intersection(collection_1, collection_2)
-    assert intersection.perceptlets == {perceptlet_2}
+    assert intersection.structures == {structure_2}
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "no_of_valid_members, no_of_invalid_members, expected_proportion",
     [(1, 1, 0.5), (1, 2, 0.33333), (0, 1, 0.0)],
@@ -101,9 +93,8 @@ def test_number_and_proportion_with_label(
     )
 
 
-@pytest.mark.skip
 def test_get_random():
-    perceptlets = {Mock() for _ in range(10)}
-    collection = StructureCollection(perceptlets)
-    random_perceptlet = collection.get_random()
-    assert random_perceptlet in perceptlets
+    structures = {Mock() for _ in range(10)}
+    collection = StructureCollection(structures)
+    random_structure = collection.get_random()
+    assert random_structure in structures
