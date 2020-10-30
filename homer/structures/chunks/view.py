@@ -10,6 +10,7 @@ class View(Chunk):
         location = None
         neighbours = None
         Chunk.__init__(self, value, location, members, neighbours, parent_space)
+        self.output_space = None
 
     @property
     def size(self):
