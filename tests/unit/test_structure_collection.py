@@ -108,3 +108,10 @@ def test_get_random():
     collection = StructureCollection(structures)
     random_structure = collection.get_random()
     assert random_structure in structures
+
+
+def test_get_random_with_exclude():
+    structure_1 = Mock()
+    structure_2 = Mock()
+    collection = StructureCollection({structure_1, structure_2})
+    assert structure_2 == collection.get_random(exclude=[structure_1])
