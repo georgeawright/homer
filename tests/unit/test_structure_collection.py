@@ -66,6 +66,16 @@ def test_intersection():
     assert intersection.structures == {structure_2}
 
 
+def test_difference():
+    structure_1 = Mock()
+    structure_2 = Mock()
+    structure_3 = Mock()
+    collection_1 = StructureCollection({structure_1, structure_2})
+    collection_2 = StructureCollection({structure_2, structure_3})
+    difference = StructureCollection.difference(collection_1, collection_2)
+    assert difference.structures == {structure_1}
+
+
 @pytest.mark.parametrize(
     "no_of_valid_members, no_of_invalid_members, expected_proportion",
     [(1, 1, 0.5), (1, 2, 0.33333), (0, 1, 0.0)],

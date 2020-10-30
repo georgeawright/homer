@@ -68,41 +68,55 @@ class StructureCollection:
             set.intersection(*[collection.structures for collection in collections])
         )
 
+    @staticmethod
+    def difference(
+        a: StructureCollection, b: StructureCollection
+    ) -> StructureCollection:
+        return StructureCollection(set.difference(a.structures, b.structures))
+
     def proportion_with_label(self, concept: Concept):
         return self.number_with_label(concept) / len(self)
 
     def number_with_label(self, concept: Concept):
         return sum(1 for structure in self.structures if structure.has_label(concept))
 
-    def get_random(self):
+    def get_random(self, exclude: list = None):
         """Returns a random structure"""
         if len(self.structures) < 1:
             raise MissingStructureError
+        if exclude is not None:
+            return StructureCollection.difference(
+                self, StructureCollection(set(exclude))
+            ).get_random()
         return random.sample(self.structures, 1)[0]
 
-    def get_exigent(self):
+    def get_exigent(self, exclude: list = None):
         """Returns a structure probabilistically according to exigency."""
-        return self._get_structure_according_to("exigency")
+        return self._get_structure_according_to("exigency", exclude)
 
-    def get_active(self):
+    def get_active(self, exclude: list = None):
         """Returns a structure probabilistically according to activation."""
-        return self._get_structure_according_to("activation")
+        return self._get_structure_according_to("activation", exclude)
 
-    def get_most_active(self):
-        return self._get_structure_with_highest("activation")
+    def get_most_active(self, exclude: list = None):
+        return self._get_structure_with_highest("activation", exclude)
 
-    def get_unhappy(self):
+    def get_unhappy(self, exclude: list = None):
         """Returns a structure probabilistically according to unhappiness."""
-        return self._get_structure_according_to("unhappiness")
+        return self._get_structure_according_to("unhappiness", exclude)
 
     def _add_at_location(self, structure, coordinates: List[Union[float, int]]):
         loc = Location.from_workspace_coordinates(coordinates)
         self.structures_by_location[loc.i][loc.j][loc.k].add(structure)
 
-    def _get_structure_according_to(self, attribute: str):
+    def _get_structure_according_to(self, attribute: str, exclude: list = None):
         """Returns a structure probabilistically according to attribute."""
         if len(self.structures) < 1:
             raise MissingStructureError
+        if exclude is not None:
+            return StructureCollection.difference(
+                self, StructureCollection(set(exclude))
+            )._get_structure_according_to(attribute)
         if len(self.structures) == 1:
             return list(self.structures)[0]
         structures = random.sample(self.structures, len(self.structures) // 2)
