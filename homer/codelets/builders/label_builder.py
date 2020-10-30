@@ -1,8 +1,8 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structures.chunk import Chunk
-from homer.structures.concept import Concept
+from homer.structures import Chunk, Concept
+from homer.structures.links import Label
 
 
 class LabelBuilder(Builder):
@@ -22,7 +22,7 @@ class LabelBuilder(Builder):
         self.target_chunk = target_chunk
         self.parent_concept = parent_concept
         self.confidence = 0.0
-        self.child_perceptlet = None
+        self.child_structure = None
 
     @classmethod
     def spawn(
@@ -48,7 +48,7 @@ class LabelBuilder(Builder):
     def _passes_preliminary_checks(self):
         if self.parent_concept is None:
             self.parent_concept = self.bubble_chamber.get_random_workspace_concept()
-        return not self.target_perceptlet.has_label(self.parent_concept)
+        return not self.target_chunk.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
         self.confidence = self.parent_concept.classify(self.target_chunk)
@@ -56,22 +56,14 @@ class LabelBuilder(Builder):
     def _boost_activations(self):
         pass
 
-    def _process_perceptlet(self):
-        label = self.bubble_chamber.create_label(
-            self.parent_concept,
-            self.target_perceptlet.location,
-            self.target_perceptlet,
-            self.confidence,
-            self.codelet_id,
-        )
-        self.target_perceptlet.add_label(label)
-        self.bubble_chamber.logger.log_perceptlet_connection(
-            self, self.target_perceptlet, label
-        )
-        self.child_perceptlet = label
+    def _process_structure(self):
+        label = Label(self.target_chunk, self.parent_concept)
+        self.target_chunk.add_label(label)
+        self.bubble_chamber.add_label(label)
+        self.child_structure = label
 
     def _engender_follow_up(self):
-        new_target = self.target_perceptlet.neighbours.get_unhappy()
+        new_target = self.target_chunk.nearby.get_unhappy()
         self.child_codelets.append(
             LabelBuilder.spawn(
                 self.codelet_id,
@@ -86,7 +78,6 @@ class LabelBuilder(Builder):
         self._re_engender()
 
     def _fail(self):
-        self._decay_concept(self.parent_concept)
         self._re_engender()
 
     def _re_engender(self):
