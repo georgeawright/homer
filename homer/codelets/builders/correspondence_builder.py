@@ -64,7 +64,7 @@ class CorrespondenceBuilder(Builder):
     def _passes_preliminary_checks(self):
         if self.target_space_two is None:
             self.target_space_two = self.bubble_chamber.spaces.get_active(
-                exclude=self.target_space_one
+                exclude=[self.target_space_one]
             )
         if self.target_structure_two is None:
             self.target_structure_two = self.target_space_two.contents.get_exigent()
