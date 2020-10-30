@@ -95,19 +95,19 @@ class RelationBuilder(Builder):
         )
 
     def _fizzle(self):
-        new_target = self.target_structure_one.parent_space.contents.get_random()
-        self.child_codelets.append(
-            ChunkBuilder.spawn(
-                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
-            )
-        )
-
-    def _fail(self):
         self.child_codelets.append(
             RelationBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structure_one,
                 self.target_structure_one.unhappiness,
+            )
+        )
+
+    def _fail(self):
+        new_target = self.target_structure_one.parent_space.contents.get_random()
+        self.child_codelets.append(
+            ChunkBuilder.spawn(
+                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
             )
         )
