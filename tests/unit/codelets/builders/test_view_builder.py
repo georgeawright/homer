@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelets.builders import ViewBuilder, ViewEnlarger
 from homer.structure_collection import StructureCollection
-from homer.structures import View
+from homer.structures.chunks import View
 
 
 @pytest.fixture
@@ -31,19 +31,37 @@ def second_target_view(common_space):
 
 
 @pytest.fixture
-def target_view(common_space, second_target_view):
-    view = Mock()
-    view.members = StructureCollection()
-    view.neighbours = StructureCollection()
-    view.parent_spaces = StructureCollection({common_space})
-    view.nearby.get_random.return_value = second_target_view
-    return view
+def second_target_correspondence():
+    correspondence = Mock()
+    correspondence.activation = 1.0
+    return correspondence
 
 
-@pytest.mark.skip
-def test_successful_creates_view_and_spawns_follow_up(bubble_chamber, target_view):
+@pytest.fixture
+def target_correspondence(
+    common_space, second_target_view, second_target_correspondence
+):
+    correspondence = Mock()
+    correspondence.activation = 1.0
+    correspondence.nearby.get_random.return_value = second_target_correspondence
+    correspondence.common_arguments_with.return_value = StructureCollection()
+    return correspondence
+
+
+def test_gets_second_target_correspondence(bubble_chamber, target_correspondence):
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, Mock()
+        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
+    )
+    assert view_builder.second_target_correspondence is None
+    view_builder.run()
+    assert view_builder.second_target_correspondence is not None
+
+
+def test_successful_creates_view_and_spawns_follow_up(
+    bubble_chamber, target_correspondence
+):
+    view_builder = ViewBuilder(
+        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
     view_builder.run()
     assert isinstance(view_builder.child_structure, View)
@@ -51,11 +69,14 @@ def test_successful_creates_view_and_spawns_follow_up(bubble_chamber, target_vie
     assert isinstance(view_builder.child_codelets[0], ViewEnlarger)
 
 
-@pytest.mark.skip
-def test_fails_when_views_are_incompatible(bubble_chamber, target_view, common_space):
-    common_space.proximity_between.return_value = 0.0
+def test_fails_when_correspondences_are_equivalent(
+    bubble_chamber, target_correspondence
+):
+    target_correspondence.common_arguments_with.return_value = StructureCollection(
+        {Mock(), Mock()}
+    )
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, Mock()
+        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
     view_builder.run()
     assert view_builder.child_structure is None
@@ -63,12 +84,30 @@ def test_fails_when_views_are_incompatible(bubble_chamber, target_view, common_s
     assert isinstance(view_builder.child_codelets[0], ViewBuilder)
 
 
-@pytest.mark.skip
-def test_fizzles_when_no_second_target(bubble_chamber, target_view):
-    target_view.nearby = StructureCollection()
+def test_fails_when_correspondences_are_not_transitive(
+    bubble_chamber, target_correspondence, second_target_correspondence
+):
+    common_argument = Mock()
+    target_correspondence.start = common_argument
+    second_target_correspondence.start = common_argument
+    target_correspondence.end.correspondences_with.return_value = StructureCollection()
+    target_correspondence.common_arguments_with.return_value = StructureCollection(
+        {common_argument}
+    )
+    view_builder = ViewBuilder(
+        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
+    )
+    view_builder.run()
+    assert view_builder.child_structure is None
+    assert len(view_builder.child_codelets) == 1
+    assert isinstance(view_builder.child_codelets[0], ViewBuilder)
+
+
+def test_fizzles_when_no_second_target(bubble_chamber, target_correspondence):
+    target_correspondence.nearby = StructureCollection()
     urgency = 1.0
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, urgency
+        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, urgency
     )
     view_builder.run()
     assert view_builder.child_structure is None
@@ -76,12 +115,11 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_view):
     assert isinstance(view_builder.child_codelets[0], ViewBuilder)
 
 
-@pytest.mark.skip
-def test_fizzles_when_view_already_exists(bubble_chamber, target_view):
+def test_fizzles_when_view_already_exists(bubble_chamber, target_correspondence):
     bubble_chamber.has_view.return_value = True
     urgency = 1.0
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, urgency
+        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, urgency
     )
     view_builder.run()
     assert view_builder.child_structure is None

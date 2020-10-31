@@ -1,3 +1,5 @@
+from typing import Any
+
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.chunk import Chunk

@@ -71,12 +71,13 @@ class ViewBuilder(Builder):
         if len(common_arguments) == 1:
             third_target_start = (
                 self.target_correspondence.start
-                if self.target_correspondence.start != common_arguments[0]
+                if self.target_correspondence.start != common_arguments.get_random()
                 else self.target_correspondence.end
             )
             third_target_end = (
                 self.second_target_correspondence.end
-                if self.second_target_correspondence.end != common_arguments[0]
+                if self.second_target_correspondence.end
+                != common_arguments.get_random()
                 else self.target_correspondence.start
             )
             try:
@@ -122,7 +123,7 @@ class ViewBuilder(Builder):
 
     def _engender_follow_up(self):
         self.child_codelets.append(
-            ChunkEnlarger.spawn(
+            ViewEnlarger.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.child_structure,
@@ -131,22 +132,17 @@ class ViewBuilder(Builder):
         )
 
     def _fizzle(self):
+        new_target = self.bubble_chamber.correspondences.get_unhappy()
         self.child_codelets.append(
-            ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_chunk,
-                self.urgency / 2,
+            ViewBuilder.spawn(
+                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
             )
         )
 
     def _fail(self):
-        new_target = self.bubble_chamber.chunks.get_unhappy()
+        new_target = self.bubble_chamber.correspondences.get_unhappy()
         self.child_codelets.append(
-            ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                new_target,
-                self.structure_concept.activation,
+            ViewBuilder.spawn(
+                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
             )
         )
