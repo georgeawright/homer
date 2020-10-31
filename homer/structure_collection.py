@@ -98,8 +98,8 @@ class StructureCollection:
         """Returns a structure probabilistically according to activation."""
         return self._get_structure_according_to("activation", exclude)
 
-    def get_most_active(self, exclude: list = None):
-        return self._get_structure_with_highest("activation", exclude)
+    def get_most_active(self):
+        return self._get_structure_with_highest("activation")
 
     def get_unhappy(self, exclude: list = None):
         """Returns a structure probabilistically according to unhappiness."""
