@@ -1,8 +1,11 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.codelets.builder import Builder
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.errors import MissingStructureError
+from homer.structure_collection import StructureCollection
 from homer.structures import Concept
 from homer.structures.chunks import View
+from homer.structures.links import Correspondence
 
 
 class ViewEnlarger(Builder):
@@ -19,6 +22,9 @@ class ViewEnlarger(Builder):
         self.structure_concept = structure_concept
         self.bubble_chamber = bubble_chamber
         self.target_view = target_view
+        self.candidate_member = None
+        self.confidence = 0.0
+        self.child_structure = None
 
     @classmethod
     def spawn(
@@ -40,22 +46,97 @@ class ViewEnlarger(Builder):
         )
 
     def _passes_preliminary_checks(self):
-        pass
+        try:
+            self.candidate_member = self.target_view.nearby.get_random()
+        except MissingStructureError:
+            return False
+        return not self.bubble_chamber.has_view(
+            StructureCollection.union(
+                self.target_view.members,
+                StructureCollection({self.candidate_member}),
+            )
+        )
 
     def _calculate_confidence(self):
-        pass
+        confidence = float("inf")
+        self.correspondences_to_add = {self.candidate_member}
+        for correspondence in self.target_view.members:
+            (
+                new_confidence,
+                third_correspondence,
+            ) = self._calculate_confidence_based_on_single_correspondence(
+                correspondence
+            )
+            if new_confidence < confidence:
+                confidence = new_confidence
+            self.correspondences_to_add.add(third_correspondence)
+        self.confidence = confidence
+
+    def _calculate_confidence_based_on_single_correspondence(
+        self, correspondence: Correspondence
+    ):
+        common_arguments = correspondence.common_arguments_with(self.candidate_member)
+        if len(common_arguments) == 1:
+            third_target_start = (
+                correspondence.start
+                if correspondence.start != common_arguments.get_random()
+                else correspondence.end
+            )
+            print(third_target_start)
+            third_target_end = (
+                self.candidate_member.end
+                if self.candidate_member.end != common_arguments.get_random()
+                else self.candidate_member.start
+            )
+            print(third_target_end)
+            try:
+                third_correspondence = third_target_start.correspondences_with(
+                    third_target_end
+                ).get_most_active()
+                confidence = min(
+                    correspondence.activation,
+                    self.candidate_member.activation,
+                    third_correspondence,
+                )  # you are only as strong as your weakest link
+                return (confidence, third_correspondence)
+            except MissingStructureError:
+                return (0.0, None)
+        elif len(common_arguments) == 0:
+            confidence = min(
+                correspondence.activation,
+                self.candidate_member.activation,
+            )
+            return (confidence, None)
+        else:  # if there are 2 common arguments, the correspondences are equivalent/competing
+            return (0.0, None)
 
     def _boost_activations(self):
         pass
 
     def _process_structure(self):
-        pass
-
-    def _fizzle(self):
-        pass
-
-    def _fail(self):
-        pass
+        print(self.confidence)
+        self.target_view.add_member(self.candidate_member)
 
     def _engender_follow_up(self):
-        pass
+        self.child_codelets.append(
+            ViewEnlarger.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_view,
+                self.confidence,
+            )
+        )
+
+    def _fizzle(self):
+        self.child_codelets.append(
+            ViewEnlarger.spawn(
+                self.codelet_id, self.bubble_chamber, self.target_view, self.urgency / 2
+            )
+        )
+
+    def _fail(self):
+        self.child_codelets.append(
+            ViewEnlarger.spawn(
+                self.codelet_id, self.bubble_chamber, self.target_view, self.urgency / 2
+            )
+        )

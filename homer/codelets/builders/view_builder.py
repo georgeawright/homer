@@ -78,7 +78,7 @@ class ViewBuilder(Builder):
                 self.second_target_correspondence.end
                 if self.second_target_correspondence.end
                 != common_arguments.get_random()
-                else self.target_correspondence.start
+                else self.second_target_correspondence.start
             )
             try:
                 self.third_target_correspondence = (
