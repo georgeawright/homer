@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
+from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ViewBuilder, ViewEnlarger
 from homer.structure_collection import StructureCollection
 from homer.structures.chunks import View
@@ -69,7 +70,8 @@ def test_successful_adds_to_view_and_spawns_follow_up(
     view_enlarger = ViewEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_view, Mock()
     )
-    view_enlarger.run()
+    result = view_enlarger.run()
+    assert CodeletResult.SUCCESS == result
     target_view.add_member.assert_called_with(candidate_correspondence)
     assert len(view_enlarger.child_codelets) == 1
     assert isinstance(view_enlarger.child_codelets[0], ViewEnlarger)
@@ -84,7 +86,8 @@ def test_fails_when_correspondences_are_equivalent(
     view_enlarger = ViewEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_view, 1.0
     )
-    view_enlarger.run()
+    result = view_enlarger.run()
+    assert CodeletResult.FAIL == result
     assert view_enlarger.child_structure is None
     assert len(view_enlarger.child_codelets) == 1
     assert isinstance(view_enlarger.child_codelets[0], ViewEnlarger)
@@ -105,7 +108,8 @@ def test_fails_when_correspondences_are_not_transitive(
     view_enlarger = ViewEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_view, 1.0
     )
-    view_enlarger.run()
+    result = view_enlarger.run()
+    assert CodeletResult.FAIL == result
     assert view_enlarger.child_structure is None
     assert len(view_enlarger.child_codelets) == 1
     assert isinstance(view_enlarger.child_codelets[0], ViewEnlarger)
@@ -119,7 +123,8 @@ def test_fizzles_when_no_second_target(
     view_enlarger = ViewEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_view, urgency
     )
-    view_enlarger.run()
+    result = view_enlarger.run()
+    assert CodeletResult.FIZZLE == result
     assert view_enlarger.child_structure is None
     assert len(view_enlarger.child_codelets) == 1
     assert isinstance(view_enlarger.child_codelets[0], ViewEnlarger)
@@ -131,7 +136,8 @@ def test_fizzles_when_view_already_exists(bubble_chamber, target_view):
     view_enlarger = ViewEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_view, urgency
     )
-    view_enlarger.run()
+    result = view_enlarger.run()
+    assert CodeletResult.FIZZLE == result
     assert view_enlarger.child_structure is None
     assert len(view_enlarger.child_codelets) == 1
     assert isinstance(view_enlarger.child_codelets[0], ViewEnlarger)

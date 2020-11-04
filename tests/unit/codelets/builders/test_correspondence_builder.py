@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
+from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder, RelationBuilder
 from homer.structure import Structure
 from homer.structures.links import Correspondence
@@ -60,7 +61,8 @@ def test_successful_creates_chunk_and_spawns_follow_up(
         Mock(),
         parent_concept=parent_concept,
     )
-    correspondence_builder.run()
+    result = correspondence_builder.run()
+    assert CodeletResult.SUCCESS == result
     assert isinstance(correspondence_builder.child_structure, Correspondence)
     assert len(correspondence_builder.child_codelets) == 1
     assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceBuilder)
@@ -79,7 +81,8 @@ def test_fails_when_structures_do_not_correspond(bubble_chamber, target_structur
         Mock(),
         parent_concept=concept,
     )
-    correspondence_builder.run()
+    result = correspondence_builder.run()
+    assert CodeletResult.FAIL == result
     assert correspondence_builder.child_structure is None
     assert len(correspondence_builder.child_codelets) == 1
     assert isinstance(correspondence_builder.child_codelets[0], RelationBuilder)
@@ -91,7 +94,8 @@ def test_fizzles_when_correspondence_already_exists(bubble_chamber):
     correspondence_builder = CorrespondenceBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
     )
-    correspondence_builder.run()
+    result = correspondence_builder.run()
+    assert CodeletResult.FIZZLE == result
     assert correspondence_builder.child_structure is None
     assert len(correspondence_builder.child_codelets) == 1
     assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceBuilder)

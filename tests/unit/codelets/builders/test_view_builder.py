@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
+from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ViewBuilder, ViewEnlarger
 from homer.structure_collection import StructureCollection
 from homer.structures.chunks import View
@@ -63,7 +64,8 @@ def test_successful_creates_view_and_spawns_follow_up(
     view_builder = ViewBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
-    view_builder.run()
+    result = view_builder.run()
+    assert CodeletResult.SUCCESS == result
     assert isinstance(view_builder.child_structure, View)
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], ViewEnlarger)
@@ -78,7 +80,8 @@ def test_fails_when_correspondences_are_equivalent(
     view_builder = ViewBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
-    view_builder.run()
+    result = view_builder.run()
+    assert CodeletResult.FAIL == result
     assert view_builder.child_structure is None
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], ViewBuilder)
@@ -97,7 +100,8 @@ def test_fails_when_correspondences_are_not_transitive(
     view_builder = ViewBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
-    view_builder.run()
+    result = view_builder.run()
+    assert CodeletResult.FAIL == result
     assert view_builder.child_structure is None
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], ViewBuilder)
@@ -109,7 +113,8 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_correspondence):
     view_builder = ViewBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, urgency
     )
-    view_builder.run()
+    result = view_builder.run()
+    assert CodeletResult.FIZZLE == result
     assert view_builder.child_structure is None
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], ViewBuilder)
@@ -121,7 +126,8 @@ def test_fizzles_when_view_already_exists(bubble_chamber, target_correspondence)
     view_builder = ViewBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, urgency
     )
-    view_builder.run()
+    result = view_builder.run()
+    assert CodeletResult.FIZZLE == result
     assert view_builder.child_structure is None
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], ViewBuilder)

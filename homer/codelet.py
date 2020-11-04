@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from .codelet_result import CodeletResult
+from .float_between_one_and_zero import FloatBetweenOneAndZero
 
 
 class Codelet(ABC):
@@ -13,7 +14,8 @@ class Codelet(ABC):
         self.parent_id = parent_id
         self.urgency = urgency
         self.child_codelets = []
+        self.result = None
 
     @abstractmethod
-    def run(self):
+    def run(self) -> CodeletResult:
         pass

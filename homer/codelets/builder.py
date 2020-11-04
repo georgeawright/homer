@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 from homer.codelet import Codelet
+from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 
@@ -14,15 +15,21 @@ class Builder(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
 
-    def run(self):
+    def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
-            return self._fizzle()
+            self._fizzle()
+            self.result = CodeletResult.FIZZLE
+            return self.result
         self._calculate_confidence()
         if abs(self.confidence) > self.CONFIDENCE_THRESHOLD:
             self._boost_activations()
             self._process_structure()
-            return self._engender_follow_up()
-        return self._fail()
+            self._engender_follow_up()
+            self.result = CodeletResult.SUCCESS
+            return self.result
+        self._fail()
+        self.result = CodeletResult.FAIL
+        return CodeletResult.FAIL
 
     @abstractmethod
     def _passes_preliminary_checks(self):

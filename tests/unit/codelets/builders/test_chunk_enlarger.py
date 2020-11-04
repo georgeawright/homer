@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
+from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder, ChunkEnlarger
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk
@@ -47,7 +48,8 @@ def test_successful_adds_member_to_chunk_and_spawns_follow_up(
     chunk_enlarger = ChunkEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_chunk, Mock()
     )
-    chunk_enlarger.run()
+    result = chunk_enlarger.run()
+    assert CodeletResult.SUCCESS == result
     target_chunk.add_member.assert_called_with(candidate_chunk)
     assert len(chunk_enlarger.child_codelets) == 1
     assert isinstance(chunk_enlarger.child_codelets[0], ChunkEnlarger)
@@ -58,7 +60,8 @@ def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common
     chunk_enlarger = ChunkEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_chunk, Mock()
     )
-    chunk_enlarger.run()
+    result = chunk_enlarger.run()
+    assert CodeletResult.FAIL == result
     assert chunk_enlarger.child_structure is None
     assert len(chunk_enlarger.child_codelets) == 1
     assert isinstance(chunk_enlarger.child_codelets[0], ChunkEnlarger)
@@ -70,7 +73,8 @@ def test_fizzles_when_no_candidate_found(bubble_chamber, target_chunk):
     chunk_enlarger = ChunkEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_chunk, urgency
     )
-    chunk_enlarger.run()
+    result = chunk_enlarger.run()
+    assert CodeletResult.FIZZLE == result
     assert chunk_enlarger.child_structure is None
     assert len(chunk_enlarger.child_codelets) == 1
     assert isinstance(chunk_enlarger.child_codelets[0], ChunkEnlarger)
@@ -82,7 +86,8 @@ def test_fizzles_when_bigger_chunk_already_exists(bubble_chamber, target_chunk):
     chunk_enlarger = ChunkEnlarger(
         Mock(), Mock(), Mock(), bubble_chamber, target_chunk, urgency
     )
-    chunk_enlarger.run()
+    result = chunk_enlarger.run()
+    assert CodeletResult.FIZZLE == result
     assert chunk_enlarger.child_structure is None
     assert len(chunk_enlarger.child_codelets) == 1
     assert isinstance(chunk_enlarger.child_codelets[0], ChunkEnlarger)

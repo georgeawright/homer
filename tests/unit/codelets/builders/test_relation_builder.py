@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
+from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder, RelationBuilder
 from homer.structures.links import Relation
 
@@ -62,7 +63,8 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     relation_builder = RelationBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_structure_one, Mock()
     )
-    relation_builder.run()
+    result = relation_builder.run()
+    assert CodeletResult.SUCCESS == result
     assert isinstance(relation_builder.child_structure, Relation)
     assert len(relation_builder.child_codelets) == 1
     assert isinstance(relation_builder.child_codelets[0], RelationBuilder)
@@ -75,7 +77,8 @@ def test_fails_when_structures_cannot_be_related(
     relation_builder = RelationBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_structure_one, Mock()
     )
-    relation_builder.run()
+    result = relation_builder.run()
+    assert CodeletResult.FAIL == result
     assert relation_builder.child_structure is None
     assert len(relation_builder.child_codelets) == 1
     assert isinstance(relation_builder.child_codelets[0], ChunkBuilder)
@@ -86,7 +89,8 @@ def test_fizzles_when_relation_already_exists(bubble_chamber, target_structure_o
     relation_builder = RelationBuilder(
         Mock(), Mock(), Mock(), bubble_chamber, target_structure_one, Mock()
     )
-    relation_builder.run()
+    result = relation_builder.run()
+    assert CodeletResult.FIZZLE == result
     assert relation_builder.child_structure is None
     assert len(relation_builder.child_codelets) == 1
     assert isinstance(relation_builder.child_codelets[0], RelationBuilder)
