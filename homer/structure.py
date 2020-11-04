@@ -31,6 +31,14 @@ class Structure(ABC):
     def unhappiness(self) -> FloatBetweenOneAndZero:
         return self._unhappiness
 
+    @property
+    def labels(self) -> StructureCollection:
+        from homer.structures.links import Label
+
+        return StructureCollection(
+            {link for link in self.links_out if isinstance(link, Label)}
+        )
+
     def boost_activation(self, amount: float = None):
         pass
 
