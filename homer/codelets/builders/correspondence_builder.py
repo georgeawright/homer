@@ -88,7 +88,6 @@ class CorrespondenceBuilder(Builder):
         correspondence = Correspondence(
             self.target_structure_one, self.target_structure_two, self.parent_concept
         )
-        print("hello")
         self.target_structure_one.add_correspondence(correspondence)
         self.target_structure_two.add_correspondence(correspondence)
         self.bubble_chamber.add_correspondence(correspondence)
