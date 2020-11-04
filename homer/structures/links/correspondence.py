@@ -18,3 +18,21 @@ class Correspondence(Link):
     def nearby(self):
         """either correspondences in the same spaces as start and end or other correspondences connected to start or end"""
         raise NotImplementedError
+
+    def get_slot_argument(self):
+        from homer.structures.chunks import Slot
+
+        if isinstance(self.start, Slot):
+            return self.start
+        if isinstance(self.end, Slot):
+            return self.end
+        raise Exception("Correspondence has no slot argument")
+
+    def get_non_slot_argument(self):
+        from homer.structures.chunks import Slot
+
+        if not isinstance(self.start, Slot):
+            return self.start
+        if not isinstance(self.end, Slot):
+            return self.end
+        raise Exception("Correspondence has no non slot argument")
