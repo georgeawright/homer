@@ -1,6 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.structure import Structure
 from homer.structures import Concept
 from homer.structures.links import Relation
@@ -39,7 +40,8 @@ class RelationBuilder(Builder):
         target_structure_two: Structure = None,
         parent_concept: Concept = None,
     ):
-        codelet_id = ""
+        qualifier = "TopDown" if parent_concept is not None else "BottomUp"
+        codelet_id = ID.new(cls, qualifier)
         structure_concept = bubble_chamber.concepts["relation"]
         return cls(
             codelet_id,

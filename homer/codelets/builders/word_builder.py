@@ -1,6 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.structures.chunks import Word, Slot, View
 from homer.structures.links import Correspondence
 
@@ -25,6 +26,25 @@ class WordBuilder(Builder):
         self.target_correspondence = target_correspondence
         self.confidence = 0.0
         self.child_structure = None
+
+    @classmethod
+    def spawn(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_view: View,
+        target_correspondence: Correspondence,
+        urgency: FloatBetweenOneAndZero,
+    ):
+        codelet_id = ID.new(cls)
+        return cls(
+            codelet_id,
+            parent_id,
+            bubble_chamber,
+            target_view,
+            target_correspondence,
+            urgency,
+        )
 
     def _passes_preliminary_checks(self):
         self.slot = self.target_correspondence.get_slot_argument()

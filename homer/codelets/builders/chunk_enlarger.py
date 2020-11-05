@@ -4,6 +4,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk
 from homer.structures import Concept
@@ -36,7 +37,7 @@ class ChunkEnlarger(Builder):
         target_chunk: Chunk,
         urgency: FloatBetweenOneAndZero,
     ):
-        codelet_id = ""
+        codelet_id = ID.new(cls)
         structure_concept = bubble_chamber.concepts["chunk"]
         return cls(
             codelet_id,

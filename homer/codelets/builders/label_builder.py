@@ -1,6 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.structures import Chunk, Concept
 from homer.structures.links import Label
 
@@ -33,7 +34,8 @@ class LabelBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
         parent_concept: Concept = None,
     ):
-        codelet_id = ""
+        qualifier = "TopDown" if parent_concept is not None else "BottomUp"
+        codelet_id = ID.new(cls, qualifier)
         structure_concept = bubble_chamber.concepts["label"]
         return cls(
             codelet_id,

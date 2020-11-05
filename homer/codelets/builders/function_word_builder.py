@@ -1,6 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.structures import Space
 from homer.structures.chunks import Word
 from homer.structures.links import Correspondence
@@ -31,7 +32,7 @@ class FunctionWordBuilder(Builder):
         output_space: Space,
         urgency: FloatBetweenOneAndZero,
     ):
-        codelet_id = ""
+        codelet_id = ID.new(cls)
         return cls(
             codelet_id, parent_id, bubble_chamber, input_space, output_space, urgency
         )
