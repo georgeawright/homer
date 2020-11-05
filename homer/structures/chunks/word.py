@@ -14,4 +14,13 @@ class Word(Chunk):
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        Chunk.__init__(self, value, location, members, neighbours, parent_spaces)
+        Chunk.__init__(
+            self,
+            value,
+            location,
+            members,
+            neighbours,
+            parent_spaces,
+            links_in,
+            links_out,
+        )

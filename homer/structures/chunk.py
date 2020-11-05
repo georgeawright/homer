@@ -24,8 +24,6 @@ class Chunk(Structure):
         self.members = members
         self.neighbours = neighbours
         self.parent_spaces = parent_spaces
-        self.links_in = links_in
-        self.links_out = links_out
 
     @property
     def size(self):

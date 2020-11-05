@@ -4,7 +4,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structures.chunks import Word, Slot, View
 from homer.structures.links import Correspondence
 
-from .function_words_builder import FunctionWordsBuilder
+from .function_word_builder import FunctionWordBuilder
 
 
 class WordBuilder(Builder):
@@ -20,7 +20,7 @@ class WordBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = (bubble_chamber,)
+        self.bubble_chamber = bubble_chamber
         self.target_view = target_view
         self.target_correspondence = target_correspondence
         self.confidence = 0.0
@@ -44,18 +44,26 @@ class WordBuilder(Builder):
         word_value = lexeme.get_form(self.slot.form)
         word_location = self.slot.location
         word = Word(word_value, word_location, self.output_space)
-        projection_from_slot = Correspondence(self.slot, word, None)
-        projection_from_non_slot = Correspondence(self.non_slot, word, None)
-        # correspondences need concept
+        projection_from_slot = Correspondence(
+            self.slot, word, self.bubble_chamber.concepts["same"]
+        )
+        self.slot.links_out.add(projection_from_slot)
+        word.links_in.add(projection_from_slot)
         self.target_view.add_correspondence(projection_from_slot)
+        projection_from_non_slot = Correspondence(
+            self.non_slot, word, self.bubble_chamber.concepts["same"]
+        )
+        self.non_slot.links_out.add(projection_from_non_slot)
+        word.links_in.add(projection_from_non_slot)
         self.target_view.add_correspondence(projection_from_non_slot)
         self.output_space.add_word(word)
         self.child_structure = word
 
     def _engender_follow_up(self):
         self.child_codelets.append(
-            FunctionWordsBuilder.spawn(
+            FunctionWordBuilder.spawn(
                 self.codelet_id,
+                self.bubble_chamber,
                 self.slot.parent_space,
                 self.output_space,
                 self.confidence,
