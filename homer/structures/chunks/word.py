@@ -8,9 +8,10 @@ class Word(Chunk):
         self,
         value: str,
         location: Location,
+        parent_spaces: StructureCollection,
         members: StructureCollection = None,
         neighbours: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        Chunk.__init__(self, value, location, members, neighbours)
+        Chunk.__init__(self, value, location, members, neighbours, parent_spaces)
