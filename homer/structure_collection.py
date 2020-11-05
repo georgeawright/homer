@@ -31,6 +31,9 @@ class StructureCollection:
     def copy(self) -> StructureCollection:
         return StructureCollection({structure for structure in self.structures})
 
+    def is_empty(self) -> bool:
+        return len(self) == 0
+
     def at(self, location: Location) -> StructureCollection:
         if self.structures_by_location is None:
             self._arrange_structures_by_location()

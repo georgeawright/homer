@@ -31,6 +31,13 @@ def test_copy():
     assert new_collection != original_collection
 
 
+def test_is_empty():
+    collection = StructureCollection()
+    assert collection.is_empty()
+    collection.add(Mock())
+    assert not collection.is_empty()
+
+
 def test_add():
     collection = StructureCollection(set())
     assert collection.structures == set()
