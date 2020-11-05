@@ -12,5 +12,5 @@ class Lexeme(Structure):
         links_out: StructureCollection = None,
     ):
         location = None
-        Structure.__init(self, location, links_in, links_out)
+        Structure.__init__(self, location, links_in, links_out)
         self.headword = headword

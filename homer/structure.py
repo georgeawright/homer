@@ -39,6 +39,14 @@ class Structure(ABC):
             {link for link in self.links_out if isinstance(link, Label)}
         )
 
+    @property
+    def lexemes(self) -> StructureCollection:
+        from homer.structures import Lexeme
+
+        return StructureCollection(
+            {link.end for link in self.links_out if isinstance(link.end, Lexeme)}
+        )
+
     def boost_activation(self, amount: float = None):
         pass
 
