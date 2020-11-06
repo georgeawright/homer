@@ -2,6 +2,7 @@ from __future__ import annotations
 import statistics
 from typing import Any, List
 
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
@@ -16,11 +17,14 @@ class Chunk(Structure):
         location: Location,
         members: StructureCollection,
         neighbours: StructureCollection,
+        quality: FloatBetweenOneAndZero,
         parent_spaces: StructureCollection,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        Structure.__init__(self, location, links_in, links_out)
+        Structure.__init__(
+            self, location, quality, links_in=links_in, links_out=links_out
+        )
         self.value = value
         self.members = members
         self.neighbours = neighbours

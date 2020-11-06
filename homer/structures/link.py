@@ -1,3 +1,4 @@
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
@@ -7,10 +8,13 @@ class Link(Structure):
         self,
         start: Structure,
         end: Structure,
+        quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        Structure.__init__(self, start.location, links_in, links_out)
+        Structure.__init__(
+            self, start.location, quality, links_in=links_in, links_out=links_out
+        )
         self.start = start
         self.end = end
 

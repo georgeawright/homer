@@ -2,6 +2,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.structure_collection import StructureCollection
 from homer.structures import Space
 from homer.structures.chunks import Word
 from homer.structures.links import Correspondence
@@ -49,11 +50,17 @@ class FunctionWordBuilder(Builder):
     def _process_structure(self):
         template_word = self.input_space.words.get_unhappy()
         output_word = Word(
-            template_word.value, template_word.location, self.output_space
+            template_word.value,
+            template_word.location,
+            StructureCollection({self.output_space}),
+            self.confidence,
         )
         self.output_space.contents.add(output_word)
         correspondence = Correspondence(
-            template_word, output_word, self.bubble_chamber.concepts["same"]
+            template_word,
+            output_word,
+            self.bubble_chamber.concepts["same"],
+            self.confidence,
         )
         template_word.links_out.add(correspondence)
         output_word.links_in.add(correspondence)

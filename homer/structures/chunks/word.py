@@ -1,3 +1,4 @@
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.chunk import Chunk
@@ -9,6 +10,7 @@ class Word(Chunk):
         value: str,
         location: Location,
         parent_spaces: StructureCollection,
+        quality: FloatBetweenOneAndZero,
         members: StructureCollection = None,
         neighbours: StructureCollection = None,
         links_in: StructureCollection = None,
@@ -21,6 +23,7 @@ class Word(Chunk):
             members,
             neighbours,
             parent_spaces,
-            links_in,
-            links_out,
+            quality,
+            links_in=links_in,
+            links_out=links_out,
         )

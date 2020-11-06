@@ -6,7 +6,7 @@ from homer.structures import Chunk
 
 
 def test_size_no_members():
-    chunk = Chunk(Mock(), Mock(), StructureCollection(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock())
     assert chunk.size == 1
 
 
@@ -14,8 +14,10 @@ def test_size_recursive():
     size = 10
     members = StructureCollection()
     for _ in range(size):
-        members.add(Chunk(Mock(), Mock(), StructureCollection(), Mock(), Mock()))
-    chunk = Chunk(Mock(), Mock(), members, Mock(), Mock())
+        members.add(
+            Chunk(Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock())
+        )
+    chunk = Chunk(Mock(), Mock(), members, Mock(), Mock(), Mock())
     assert size == chunk.size
 
 
@@ -32,12 +34,14 @@ def test_add_member():
         StructureCollection(),
         StructureCollection({mutual_neighbour, new_members_neighbour}),
         Mock(),
+        Mock(),
     )
     chunk = Chunk(
         current_member.value,
         current_member.location,
         StructureCollection({current_member}),
         StructureCollection({mutual_neighbour, new_member}),
+        Mock(),
         Mock(),
     )
     chunk.add_member(new_member)

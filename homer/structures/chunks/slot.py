@@ -14,7 +14,18 @@ class Slot(Chunk):
         location: Location = None,
         members: StructureCollection = None,
         neighbours: StructureCollection = None,
+        parent_spaces: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        Chunk.__init__(self, value, location, members, neighbours, links_in, links_out)
+        Chunk.__init__(
+            self,
+            value,
+            location,
+            members,
+            neighbours,
+            None,
+            parent_spaces,
+            links_in=links_in,
+            links_out=links_out,
+        )

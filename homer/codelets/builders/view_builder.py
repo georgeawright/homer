@@ -116,7 +116,11 @@ class ViewBuilder(Builder):
         pass
 
     def _process_structure(self):
-        view = View(self.correspondences, self.bubble_chamber.top_level_work_space)
+        view = View(
+            self.correspondences,
+            self.bubble_chamber.top_level_work_space,
+            self.confidence,
+        )
         for correspondence in self.correspondences:
             correspondence.add_view(view)
         self.bubble_chamber.add_view(view)

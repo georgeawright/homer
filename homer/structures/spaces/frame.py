@@ -9,4 +9,5 @@ class Frame(Space):
         links_in: StructureCollection,
         links_out: StructureCollection,
     ):
-        Space.__init__(self, contents, links_in, links_out)
+        quality = None
+        Space.__init__(self, contents, quality, links_in=links_in, links_out=links_out)

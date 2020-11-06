@@ -59,7 +59,7 @@ class LabelBuilder(Builder):
         pass
 
     def _process_structure(self):
-        label = Label(self.target_chunk, self.parent_concept)
+        label = Label(self.target_chunk, self.parent_concept, self.confidence)
         space = self.parent_concept.parent_space.instance
         if self.target_chunk not in space.contents:
             space.contents.add(self.target_chunk)

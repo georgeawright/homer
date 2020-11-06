@@ -14,7 +14,10 @@ class Lexeme(Structure):
         links_out: StructureCollection = None,
     ):
         location = None
-        Structure.__init__(self, location, links_in, links_out)
+        quality = None
+        Structure.__init__(
+            self, location, quality, links_in=links_in, links_out=links_out
+        )
         self.headword = headword
         self.forms = forms
 

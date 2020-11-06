@@ -88,7 +88,10 @@ class CorrespondenceBuilder(Builder):
 
     def _process_structure(self):
         correspondence = Correspondence(
-            self.target_structure_one, self.target_structure_two, self.parent_concept
+            self.target_structure_one,
+            self.target_structure_two,
+            self.parent_concept,
+            self.confidence,
         )
         self.target_structure_one.links_in.add(correspondence)
         self.target_structure_one.links_out.add(correspondence)

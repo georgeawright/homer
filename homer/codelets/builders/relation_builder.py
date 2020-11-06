@@ -77,7 +77,10 @@ class RelationBuilder(Builder):
 
     def _process_structure(self):
         relation = Relation(
-            self.target_structure_one, self.target_structure_two, self.parent_concept
+            self.target_structure_one,
+            self.target_structure_two,
+            self.parent_concept,
+            self.confidence,
         )
         self.target_structure_one.links_out.add(relation)
         self.target_structure_two.links_in.add(relation)

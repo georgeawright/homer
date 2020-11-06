@@ -2,6 +2,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.structure_collection import StructureCollection
 from homer.structures.chunks import Word, Slot, View
 from homer.structures.links import Correspondence
 
@@ -63,15 +64,20 @@ class WordBuilder(Builder):
         lexeme = concept.lexemes.get_active()
         word_value = lexeme.get_form(self.slot.form)
         word_location = self.slot.location
-        word = Word(word_value, word_location, self.output_space)
+        word = Word(
+            word_value,
+            word_location,
+            StructureCollection({self.output_space}),
+            self.confidence,
+        )
         projection_from_slot = Correspondence(
-            self.slot, word, self.bubble_chamber.concepts["same"]
+            self.slot, word, self.bubble_chamber.concepts["same"], self.confidence
         )
         self.slot.links_out.add(projection_from_slot)
         word.links_in.add(projection_from_slot)
         self.target_view.add_correspondence(projection_from_slot)
         projection_from_non_slot = Correspondence(
-            self.non_slot, word, self.bubble_chamber.concepts["same"]
+            self.non_slot, word, self.bubble_chamber.concepts["same"], self.confidence
         )
         self.non_slot.links_out.add(projection_from_non_slot)
         word.links_in.add(projection_from_non_slot)

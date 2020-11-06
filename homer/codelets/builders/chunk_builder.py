@@ -89,6 +89,7 @@ class ChunkBuilder(Builder):
             new_chunk_members,
             new_chunk_neighbours,
             self.target_chunk.parent_spaces,
+            self.confidence,
         )
         self.bubble_chamber.add_chunk(chunk)
         self.child_structure = chunk
