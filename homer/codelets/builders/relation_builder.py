@@ -79,9 +79,9 @@ class RelationBuilder(Builder):
         relation = Relation(
             self.target_structure_one, self.target_structure_two, self.parent_concept
         )
-        self.target_structure_one.add_relation(relation)
-        self.target_structure_two.add_relation(relation)
-        self.bubble_chamber.add_relation(relation)
+        self.target_structure_one.links_out.add(relation)
+        self.target_structure_two.links_in.add(relation)
+        self.bubble_chamber.relations.add(relation)
         self.child_structure = relation
 
     def _engender_follow_up(self):
