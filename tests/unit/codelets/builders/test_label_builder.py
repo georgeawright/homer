@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import LabelBuilder
+from homer.structure_collection import StructureCollection
 from homer.structures import Concept
 from homer.structures.links import Label
 
@@ -10,6 +11,7 @@ from homer.structures.links import Label
 @pytest.fixture
 def parent_concept():
     concept = Mock()
+    concept.parent_space.instance.contents = StructureCollection()
     concept.classify.return_value = 1.0
     return concept
 
