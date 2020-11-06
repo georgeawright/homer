@@ -90,9 +90,11 @@ class CorrespondenceBuilder(Builder):
         correspondence = Correspondence(
             self.target_structure_one, self.target_structure_two, self.parent_concept
         )
-        self.target_structure_one.add_correspondence(correspondence)
-        self.target_structure_two.add_correspondence(correspondence)
-        self.bubble_chamber.add_correspondence(correspondence)
+        self.target_structure_one.links_in.add(correspondence)
+        self.target_structure_one.links_out.add(correspondence)
+        self.target_structure_two.links_in.add(correspondence)
+        self.target_structure_two.links_out.add(correspondence)
+        self.bubble_chamber.correspondences.add(correspondence)
         self.child_structure = correspondence
 
     def _engender_follow_up(self):
