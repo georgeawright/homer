@@ -1,10 +1,12 @@
 from __future__ import annotations
+import statistics
 
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
@@ -82,14 +84,28 @@ class ChunkBuilder(Builder):
         new_chunk_neighbours.remove(self.target_chunk)
         new_chunk_neighbours.remove(self.second_target_chunk)
         chunk = Chunk(
-            self.target_chunk.value,  # a prototype-centroid should be found
-            self.target_chunk.location,  # likewise
+            self._get_average_value(new_chunk_members),
+            self._get_average_location(new_chunk_members),
             new_chunk_members,
             new_chunk_neighbours,
             self.target_chunk.parent_spaces,
         )
         self.bubble_chamber.add_chunk(chunk)
         self.child_structure = chunk
+
+    def _get_average_value(self, chunks: StructureCollection):
+        values = []
+        for chunk in chunks:
+            for _ in range(chunk.size):
+                values.append(chunk.value)
+        return statistics.median(values)
+
+    def _get_average_location(self, chunks: StructureCollection):
+        locations = []
+        for chunk in chunks:
+            for _ in range(chunk.size):
+                locations.append(chunk.location)
+        return Location.average(locations)
 
     def _engender_follow_up(self):
         self.child_codelets.append(
