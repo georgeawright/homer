@@ -1,4 +1,5 @@
 from __future__ import annotations
+import statistics
 from typing import Any, List
 
 from homer.location import Location
@@ -37,5 +38,25 @@ class Chunk(Structure):
         )
 
     def add_member(self, new_member: Chunk):
-        # alter neightbours
-        pass
+        self.members.add(new_member)
+        new_member.neighbours.remove(self)
+        for neighbour in new_member.neighbours:
+            if neighbour not in self.members:
+                self.neighbours.add(neighbour)
+        self.neighbours.remove(new_member)
+        self.value = self._get_average_value(self.members)
+        self.location = self._get_average_location(self.members)
+
+    def _get_average_value(self, chunks: StructureCollection):
+        values = []
+        for chunk in chunks:
+            for _ in range(chunk.size):
+                values.append(chunk.value)
+        return statistics.median(values)
+
+    def _get_average_location(self, chunks: StructureCollection):
+        locations = []
+        for chunk in chunks:
+            for _ in range(chunk.size):
+                locations.append(chunk.location)
+        return Location.average(locations)
