@@ -1,11 +1,12 @@
 from __future__ import annotations
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
-from homer.structures import Concept, Space
-from homer.structures.links import Correspondence
+from homer.structures import Chunk, Concept, Space
+from homer.structures.links import Correspondence, Label, Relation
 
 from .relation_builder import RelationBuilder
 
@@ -68,8 +69,13 @@ class CorrespondenceBuilder(Builder):
             self.target_space_two = self.bubble_chamber.spaces.get_active(
                 exclude=[self.target_space_one]
             )
-        if self.target_structure_two is None:
-            self.target_structure_two = self.target_space_two.contents.get_exigent()
+        try:
+            if self.target_structure_two is None:
+                self.target_structure_two = self.target_space_two.contents.get_exigent(
+                    type=type(self.target_structure_one)
+                )
+        except MissingStructureError:
+            return False
         if self.parent_concept is None:
             self.parent_concept = (
                 self.bubble_chamber.get_random_correspondence_concept()
@@ -131,6 +137,7 @@ class CorrespondenceBuilder(Builder):
             RelationBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
+                self.target_structure_one.parent_spaces.get_random(),
                 self.target_structure_one,
                 self.target_structure_one.unhappiness,
             )

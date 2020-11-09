@@ -53,6 +53,11 @@ class Structure(ABC):
             {link.end for link in self.links_out if isinstance(link.end, Lexeme)}
         )
 
+    def has_relation(
+        self, space: Structure, concept: Structure, second_argument: Structure
+    ):
+        pass
+
     def boost_activation(self, amount: float = None):
         pass
 

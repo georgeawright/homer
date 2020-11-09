@@ -3,7 +3,7 @@ from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
-from homer.structures import Concept
+from homer.structures import Concept, Space
 from homer.structures.links import Relation
 
 from .chunk_builder import ChunkBuilder
@@ -16,6 +16,7 @@ class RelationBuilder(Builder):
         parent_id: str,
         structure_concept: Concept,
         bubble_chamber: BubbleChamber,
+        target_space: Space,
         target_structure_one: Structure,
         urgency: FloatBetweenOneAndZero,
         target_structure_two: Structure = None,
@@ -24,6 +25,7 @@ class RelationBuilder(Builder):
         Builder.__init__(self, codelet_id, parent_id, urgency)
         self.structure_concept = structure_concept
         self.bubble_chamber = bubble_chamber
+        self.target_space = target_space
         self.target_structure_one = target_structure_one
         self.target_structure_two = target_structure_two
         self.parent_concept = parent_concept
@@ -35,6 +37,7 @@ class RelationBuilder(Builder):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        target_space: Space,
         target_structure_one: Structure,
         urgency: FloatBetweenOneAndZero,
         target_structure_two: Structure = None,
@@ -48,6 +51,7 @@ class RelationBuilder(Builder):
             parent_id,
             structure_concept,
             bubble_chamber,
+            target_space,
             target_structure_one,
             urgency,
             target_structure_two,
@@ -56,18 +60,20 @@ class RelationBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         if self.target_structure_two is None:
-            self.target_structure_two = (
-                self.target_structure_one.parent_spaces.get_random().contents.get_exigent()
+            self.target_structure_two = self.target_space.contents.get_exigent(
+                exclude=self.target_structure_one
             )
         if self.parent_concept is None:
-            self.parent_concept = self.bubble_chamber.get_random_relation_concept()
+            self.parent_concept = self.bubble_chamber.concepts[
+                "relational"
+            ].get_random()
         return not self.target_structure_one.has_relation(
-            self.parent_concept, self.target_structure_two
+            self.target_space, self.parent_concept, self.target_structure_two
         )
 
     def _calculate_confidence(self):
         self.confidence = self.parent_concept.classify(
-            self.target_structure_one, self.target_structure_two
+            self.target_space, self.target_structure_one, self.target_structure_two
         )
 
     def _boost_activations(self):
@@ -80,17 +86,21 @@ class RelationBuilder(Builder):
             self.parent_concept,
             self.confidence,
         )
+        self.target_space.contents.add(relation)
         self.target_structure_one.links_out.add(relation)
         self.target_structure_two.links_in.add(relation)
         self.bubble_chamber.relations.add(relation)
         self.child_structure = relation
 
     def _engender_follow_up(self):
-        new_target = self.target_structure_one.nearby.get_unhappy()
+        new_target = self.target_space.contents_near(
+            self.target_structure_one
+        ).get_unhappy()
         self.child_codelets.append(
             RelationBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
+                self.target_space,
                 new_target,
                 self.confidence,
                 self.parent_concept,
@@ -102,6 +112,7 @@ class RelationBuilder(Builder):
             RelationBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
+                self.target_space,
                 self.target_structure_one,
                 self.target_structure_one.unhappiness,
             )

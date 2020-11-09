@@ -81,8 +81,13 @@ class FactoryCodelet(Codelet):
                     self.bubble_chamber.chunks,
                     self.bubble_chamber.relations,
                 ).get_unhappy()
+                target_space = target.parent_spaces.get_random()
                 follow_up = RelationBuilder.spawn(
-                    self.codelet_id, self.bubble_chamber, target, target.unhappiness
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target_space,
+                    target,
+                    target.unhappiness,
                 )
             elif structure_type == self.bubble_chamber.concepts["view"]:
                 target = self.bubble_chamber.correspondences.get_unhappy()
