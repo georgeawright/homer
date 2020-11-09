@@ -14,17 +14,17 @@ from homer.structure_collection import StructureCollection
 
 
 @pytest.fixture
-def builder_concept():
+def build_concept():
     return Mock()
 
 
 @pytest.fixture
-def evaluator_concept():
+def evaluate_concept():
     return Mock()
 
 
 @pytest.fixture
-def selector_concept():
+def select_concept():
     return Mock()
 
 
@@ -60,9 +60,9 @@ def word_concept():
 
 @pytest.fixture
 def bubble_chamber(
-    builder_concept,
-    evaluator_concept,
-    selector_concept,
+    build_concept,
+    evaluate_concept,
+    select_concept,
     chunk_concept,
     correspondence_concept,
     label_concept,
@@ -74,9 +74,9 @@ def bubble_chamber(
     bubble_chamber.concepts = {
         "actions": Mock(),
         "structures": Mock(),
-        "builder": builder_concept,
-        "evaluator": evaluator_concept,
-        "selector": selector_concept,
+        "build": build_concept,
+        "evaluate": evaluate_concept,
+        "select": select_concept,
         "chunk": chunk_concept,
         "correspondence": correspondence_concept,
         "label": label_concept,
@@ -97,8 +97,8 @@ def bubble_chamber(
     return bubble_chamber
 
 
-def test_engenders_chunk_builder(bubble_chamber, builder_concept, chunk_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = builder_concept
+def test_engenders_chunk_builder(bubble_chamber, build_concept, chunk_concept):
+    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
     bubble_chamber.concepts["structures"].get_active.return_value = chunk_concept
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
@@ -112,9 +112,9 @@ def test_engenders_chunk_builder(bubble_chamber, builder_concept, chunk_concept)
 
 
 def test_engenders_correspondence_builder(
-    bubble_chamber, builder_concept, correspondence_concept
+    bubble_chamber, build_concept, correspondence_concept
 ):
-    bubble_chamber.concepts["actions"].get_active.return_value = builder_concept
+    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
     bubble_chamber.concepts[
         "structures"
     ].get_active.return_value = correspondence_concept
@@ -129,8 +129,8 @@ def test_engenders_correspondence_builder(
     )
 
 
-def test_engenders_label_builder(bubble_chamber, builder_concept, label_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = builder_concept
+def test_engenders_label_builder(bubble_chamber, build_concept, label_concept):
+    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
     bubble_chamber.concepts["structures"].get_active.return_value = label_concept
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
@@ -143,8 +143,8 @@ def test_engenders_label_builder(bubble_chamber, builder_concept, label_concept)
     )
 
 
-def test_engenders_relation_builder(bubble_chamber, builder_concept, relation_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = builder_concept
+def test_engenders_relation_builder(bubble_chamber, build_concept, relation_concept):
+    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
     bubble_chamber.concepts["structures"].get_active.return_value = relation_concept
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
@@ -157,8 +157,8 @@ def test_engenders_relation_builder(bubble_chamber, builder_concept, relation_co
     )
 
 
-def test_engenders_chunk_builder(bubble_chamber, builder_concept, view_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = builder_concept
+def test_engenders_chunk_builder(bubble_chamber, build_concept, view_concept):
+    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
     bubble_chamber.concepts["structures"].get_active.return_value = view_concept
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
@@ -171,8 +171,8 @@ def test_engenders_chunk_builder(bubble_chamber, builder_concept, view_concept):
     )
 
 
-def test_engenders_chunk_builder(bubble_chamber, builder_concept, word_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = builder_concept
+def test_engenders_chunk_builder(bubble_chamber, build_concept, word_concept):
+    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
     bubble_chamber.concepts["structures"].get_active.return_value = word_concept
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()

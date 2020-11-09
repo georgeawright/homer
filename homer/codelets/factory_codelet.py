@@ -51,7 +51,7 @@ class FactoryCodelet(Codelet):
         return self.result
 
     def _engender_follow_up(self, action_type: Concept, structure_type: Concept):
-        if action_type == self.bubble_chamber.concepts["builder"]:
+        if action_type == self.bubble_chamber.concepts["build"]:
             if structure_type == self.bubble_chamber.concepts["chunk"]:
                 target = self.bubble_chamber.chunks.get_unhappy()
                 follow_up = ChunkBuilder.spawn(
@@ -109,8 +109,8 @@ class FactoryCodelet(Codelet):
                     target_correspondence,
                     target_correspondence.unhappiness,
                 )
-        elif action_type == self.bubble_chamber.concepts["evaluator"]:
+        elif action_type == self.bubble_chamber.concepts["evaluate"]:
             pass
-        elif action_type == self.bubble_chamber.concepts["selector"]:
+        elif action_type == self.bubble_chamber.concepts["select"]:
             pass
         self.child_codelets.append(follow_up)
