@@ -8,12 +8,14 @@ from .working_space import WorkingSpace
 class ConceptualSpace(Space):
     def __init__(
         self,
+        name: str,
         contents: StructureCollection,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
     ):
         quality = None
         Space.__init__(self, contents, quality, links_in=links_in, links_out=links_out)
+        self.name = name
         self._instance = None
 
     @property

@@ -4,6 +4,6 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 def test_instance_returns_working_space():
-    conceptual_space = ConceptualSpace(Mock(), Mock(), Mock())
+    conceptual_space = ConceptualSpace(Mock(), Mock())
     instance = conceptual_space.instance
     assert isinstance(instance, WorkingSpace)
