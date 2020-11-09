@@ -1,7 +1,6 @@
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure import Structure
-from homer.structures import Concept
-from homer.structures import Link
+from homer.structures import Concept, Link, Space
 
 
 class Correspondence(Link):
@@ -17,7 +16,7 @@ class Correspondence(Link):
         Link.__init__(self, start, end, quality, links_in=links_in, links_out=links_out)
         self.parent_concept = parent_concept
 
-    def nearby(self):
+    def nearby(self, space: Space = None):
         """either correspondences in the same spaces as start and end or other correspondences connected to start or end"""
         raise NotImplementedError
 

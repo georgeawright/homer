@@ -26,7 +26,7 @@ class View(Chunk):
     def size(self):
         return len(self.members)
 
-    def nearby(self):
+    def nearby(self, space: Space = None):
         raise NotImplementedError
 
     def add_member(self, new_member: Correspondence):

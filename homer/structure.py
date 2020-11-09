@@ -53,6 +53,9 @@ class Structure(ABC):
             {link.end for link in self.links_out if isinstance(link.end, Lexeme)}
         )
 
+    def nearby(self, space: Structure = None):
+        pass
+
     def has_relation(
         self, space: Structure, concept: Structure, second_argument: Structure
     ):

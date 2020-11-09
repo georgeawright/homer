@@ -8,6 +8,7 @@ from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
 from .link import Link
+from .space import Space
 
 
 class Chunk(Structure):
@@ -36,7 +37,7 @@ class Chunk(Structure):
             1 if len(self.members) == 0 else sum(member.size for member in self.members)
         )
 
-    def nearby(self):
+    def nearby(self, space: Space = None):
         return StructureCollection.intersection(
             space.elements_close_to(self.location) for space in self.spaces
         )

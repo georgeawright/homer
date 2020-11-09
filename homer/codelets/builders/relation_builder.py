@@ -93,9 +93,7 @@ class RelationBuilder(Builder):
         self.child_structure = relation
 
     def _engender_follow_up(self):
-        new_target = self.target_space.contents_near(
-            self.target_structure_one
-        ).get_unhappy()
+        new_target = self.target_structure_one.nearby(self.target_space).get_unhappy()
         self.child_codelets.append(
             RelationBuilder.spawn(
                 self.codelet_id,
