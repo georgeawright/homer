@@ -88,9 +88,9 @@ class ViewBuilder(Builder):
                     ).get_most_active()
                 )
                 self.confidence = min(
-                    self.target_correspondence.activation,
-                    self.second_target_correspondence.activation,
-                    self.third_target_correspondence,
+                    self.target_correspondence.quality,
+                    self.second_target_correspondence.quality,
+                    self.third_target_quality,
                 )  # you are only as strong as your weakest link
                 self.correspondences = [
                     self.target_correspondence,
@@ -102,8 +102,8 @@ class ViewBuilder(Builder):
                 return
         elif len(common_arguments) == 0:
             self.confidence = min(
-                self.target_correspondence.activation,
-                self.second_target_correspondence.activation,
+                self.target_correspondence.quality,
+                self.second_target_correspondence.quality,
             )
             self.correspondences = [
                 self.target_correspondence,
