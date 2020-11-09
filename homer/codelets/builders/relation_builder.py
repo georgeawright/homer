@@ -60,9 +60,10 @@ class RelationBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         if self.target_structure_two is None:
-            self.target_structure_two = self.target_space.contents.get_exigent(
-                exclude=self.target_structure_one
-            )
+            self.target_structure_two = self.target_space.contents.of_type(
+                type(self.target_structure_one)
+            ).get_exigent(exclude=self.target_structure_one)
+            print(self.target_structure_two)
         if self.parent_concept is None:
             self.parent_concept = self.bubble_chamber.concepts[
                 "relational"
