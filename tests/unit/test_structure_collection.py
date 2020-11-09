@@ -83,6 +83,20 @@ def test_difference():
     assert difference.structures == {structure_1}
 
 
+def test_of_type():
+    class A:
+        pass
+
+    class B:
+        pass
+
+    structure_1 = A()
+    structure_2 = B()
+    collection = StructureCollection({structure_1, structure_2})
+    assert StructureCollection({structure_1}) == collection.of_type(A)
+    assert StructureCollection({structure_2}) == collection.of_type(B)
+
+
 @pytest.mark.parametrize(
     "no_of_valid_members, no_of_invalid_members, expected_proportion",
     [(1, 1, 0.5), (1, 2, 0.33333), (0, 1, 0.0)],

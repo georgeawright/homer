@@ -77,6 +77,11 @@ class StructureCollection:
     ) -> StructureCollection:
         return StructureCollection(set.difference(a.structures, b.structures))
 
+    def of_type(self, t: type) -> StructureCollection:
+        return StructureCollection(
+            {element for element in self.structures if isinstance(element, t)}
+        )
+
     def proportion_with_label(self, concept: Concept):
         return self.number_with_label(concept) / len(self)
 
