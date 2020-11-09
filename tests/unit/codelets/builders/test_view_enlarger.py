@@ -56,9 +56,7 @@ def target_view(candidate_correspondence, existing_correspondence):
 
 
 def test_gets_candidate_member(bubble_chamber, target_view):
-    view_enlarger = ViewEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, Mock()
-    )
+    view_enlarger = ViewEnlarger(Mock(), Mock(), bubble_chamber, target_view, Mock())
     assert view_enlarger.candidate_member is None
     view_enlarger.run()
     assert view_enlarger.candidate_member is not None
@@ -67,9 +65,7 @@ def test_gets_candidate_member(bubble_chamber, target_view):
 def test_successful_adds_to_view_and_spawns_follow_up(
     bubble_chamber, target_view, candidate_correspondence
 ):
-    view_enlarger = ViewEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, Mock()
-    )
+    view_enlarger = ViewEnlarger(Mock(), Mock(), bubble_chamber, target_view, Mock())
     result = view_enlarger.run()
     assert CodeletResult.SUCCESS == result
     target_view.add_member.assert_called_with(candidate_correspondence)
@@ -83,9 +79,7 @@ def test_fails_when_correspondences_are_equivalent(
     existing_correspondence.common_arguments_with.return_value = StructureCollection(
         {Mock(), Mock()}
     )
-    view_enlarger = ViewEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, 1.0
-    )
+    view_enlarger = ViewEnlarger(Mock(), Mock(), bubble_chamber, target_view, 1.0)
     result = view_enlarger.run()
     assert CodeletResult.FAIL == result
     assert view_enlarger.child_structure is None
@@ -105,9 +99,7 @@ def test_fails_when_correspondences_are_not_transitive(
     existing_correspondence.common_arguments_with.return_value = StructureCollection(
         {common_argument}
     )
-    view_enlarger = ViewEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, 1.0
-    )
+    view_enlarger = ViewEnlarger(Mock(), Mock(), bubble_chamber, target_view, 1.0)
     result = view_enlarger.run()
     assert CodeletResult.FAIL == result
     assert view_enlarger.child_structure is None
@@ -120,9 +112,7 @@ def test_fizzles_when_no_second_target(
 ):
     target_view.nearby = StructureCollection()
     urgency = 1.0
-    view_enlarger = ViewEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, urgency
-    )
+    view_enlarger = ViewEnlarger(Mock(), Mock(), bubble_chamber, target_view, urgency)
     result = view_enlarger.run()
     assert CodeletResult.FIZZLE == result
     assert view_enlarger.child_structure is None
@@ -133,9 +123,7 @@ def test_fizzles_when_no_second_target(
 def test_fizzles_when_view_already_exists(bubble_chamber, target_view):
     bubble_chamber.has_view.return_value = True
     urgency = 1.0
-    view_enlarger = ViewEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_view, urgency
-    )
+    view_enlarger = ViewEnlarger(Mock(), Mock(), bubble_chamber, target_view, urgency)
     result = view_enlarger.run()
     assert CodeletResult.FIZZLE == result
     assert view_enlarger.child_structure is None

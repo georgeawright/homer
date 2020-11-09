@@ -14,13 +14,11 @@ class ViewEnlarger(Builder):
         self,
         codelet_id: str,
         parent_id: str,
-        structure_concept: Concept,
         bubble_chamber: BubbleChamber,
         target_view: View,
         urgency: float,
     ):
         Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.structure_concept = structure_concept
         self.bubble_chamber = bubble_chamber
         self.target_view = target_view
         self.candidate_member = None
@@ -36,11 +34,9 @@ class ViewEnlarger(Builder):
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        structure_concept = bubble_chamber.concepts["view"]
         return cls(
             codelet_id,
             parent_id,
-            structure_concept,
             bubble_chamber,
             target_view,
             urgency,

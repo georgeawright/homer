@@ -17,7 +17,6 @@ def parent_concept():
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
-    chamber.concepts = {"chunk": Mock(), "relation": Mock()}
     return chamber
 
 
@@ -30,7 +29,7 @@ def target_structure_one():
 
 def test_gets_second_target_space_and_structure_if_needed(bubble_chamber):
     correspondence_builder = CorrespondenceBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, Mock(), Mock(), Mock()
+        Mock(), Mock(), bubble_chamber, Mock(), Mock(), Mock()
     )
     assert correspondence_builder.target_space_two is None
     assert correspondence_builder.target_structure_two is None
@@ -41,7 +40,7 @@ def test_gets_second_target_space_and_structure_if_needed(bubble_chamber):
 
 def test_gets_parent_concept_if_needed(bubble_chamber):
     correspondence_builder = CorrespondenceBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, Mock(), Mock(), Mock()
+        Mock(), Mock(), bubble_chamber, Mock(), Mock(), Mock()
     )
     assert correspondence_builder.parent_concept is None
     correspondence_builder.run()
@@ -52,7 +51,6 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber, target_structure_one, parent_concept
 ):
     correspondence_builder = CorrespondenceBuilder(
-        Mock(),
         Mock(),
         Mock(),
         bubble_chamber,
@@ -74,7 +72,6 @@ def test_fails_when_structures_do_not_correspond(bubble_chamber, target_structur
     correspondence_builder = CorrespondenceBuilder(
         Mock(),
         Mock(),
-        Mock(),
         bubble_chamber,
         Mock(),
         target_structure_one,
@@ -92,7 +89,7 @@ def test_fizzles_when_correspondence_already_exists(bubble_chamber):
     target_structure_one = Mock()
     target_structure_one.has_correspondence.return_value = True
     correspondence_builder = CorrespondenceBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
+        Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
     )
     result = correspondence_builder.run()
     assert CodeletResult.FIZZLE == result

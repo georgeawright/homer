@@ -19,13 +19,11 @@ class ChunkBuilder(Builder):
         self,
         codelet_id: str,
         parent_id: str,
-        structure_concept: Concept,
         bubble_chamber: BubbleChamber,
         target_chunk: Chunk,
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.structure_concept = structure_concept
         self.bubble_chamber = bubble_chamber
         self.target_chunk = target_chunk
         self.second_target_chunk = None
@@ -41,11 +39,9 @@ class ChunkBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        structure_concept = bubble_chamber.concepts["chunk"]
         return cls(
             codelet_id,
             parent_id,
-            structure_concept,
             bubble_chamber,
             target_chunk,
             urgency,
@@ -132,9 +128,6 @@ class ChunkBuilder(Builder):
         new_target = self.bubble_chamber.chunks.get_unhappy()
         self.child_codelets.append(
             ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                new_target,
-                self.structure_concept.activation,
+                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
             )
         )

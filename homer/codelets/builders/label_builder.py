@@ -11,14 +11,12 @@ class LabelBuilder(Builder):
         self,
         codelet_id: str,
         parent_id: str,
-        structure_concept: Concept,
         bubble_chamber: BubbleChamber,
         target_chunk: Chunk,
         urgency: FloatBetweenOneAndZero,
         parent_concept: Concept = None,
     ):
         Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.structure_concept = structure_concept
         self.bubble_chamber = bubble_chamber
         self.target_chunk = target_chunk
         self.parent_concept = parent_concept
@@ -36,11 +34,9 @@ class LabelBuilder(Builder):
     ):
         qualifier = "TopDown" if parent_concept is not None else "BottomUp"
         codelet_id = ID.new(cls, qualifier)
-        structure_concept = bubble_chamber.concepts["label"]
         return cls(
             codelet_id,
             parent_id,
-            structure_concept,
             bubble_chamber,
             target_chunk,
             urgency,

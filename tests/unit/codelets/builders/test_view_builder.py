@@ -51,7 +51,7 @@ def target_correspondence(
 
 def test_gets_second_target_correspondence(bubble_chamber, target_correspondence):
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
+        Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
     assert view_builder.second_target_correspondence is None
     view_builder.run()
@@ -62,7 +62,7 @@ def test_successful_creates_view_and_spawns_follow_up(
     bubble_chamber, target_correspondence
 ):
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
+        Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
     result = view_builder.run()
     assert CodeletResult.SUCCESS == result
@@ -78,7 +78,7 @@ def test_fails_when_correspondences_are_equivalent(
         {Mock(), Mock()}
     )
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
+        Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
     result = view_builder.run()
     assert CodeletResult.FAIL == result
@@ -98,7 +98,7 @@ def test_fails_when_correspondences_are_not_transitive(
         {common_argument}
     )
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
+        Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
     )
     result = view_builder.run()
     assert CodeletResult.FAIL == result
@@ -111,7 +111,7 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_correspondence):
     target_correspondence.nearby = StructureCollection()
     urgency = 1.0
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, urgency
+        Mock(), Mock(), bubble_chamber, target_correspondence, urgency
     )
     result = view_builder.run()
     assert CodeletResult.FIZZLE == result
@@ -124,7 +124,7 @@ def test_fizzles_when_view_already_exists(bubble_chamber, target_correspondence)
     bubble_chamber.has_view.return_value = True
     urgency = 1.0
     view_builder = ViewBuilder(
-        Mock(), Mock(), Mock(), bubble_chamber, target_correspondence, urgency
+        Mock(), Mock(), bubble_chamber, target_correspondence, urgency
     )
     result = view_builder.run()
     assert CodeletResult.FIZZLE == result

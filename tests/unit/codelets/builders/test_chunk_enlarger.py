@@ -10,7 +10,6 @@ from homer.structures import Chunk
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
-    chamber.concepts = {"chunk": Mock()}
     chamber.has_chunk.return_value = False
     chamber.chunks.get_unhappy.return_value = Mock()
     return chamber
@@ -45,9 +44,7 @@ def test_successful_adds_member_to_chunk_and_spawns_follow_up(
     bubble_chamber, target_chunk, candidate_chunk
 ):
     original_target_chunk_size = len(target_chunk.members)
-    chunk_enlarger = ChunkEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_chunk, Mock()
-    )
+    chunk_enlarger = ChunkEnlarger(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
     result = chunk_enlarger.run()
     assert CodeletResult.SUCCESS == result
     target_chunk.add_member.assert_called_with(candidate_chunk)
@@ -57,9 +54,7 @@ def test_successful_adds_member_to_chunk_and_spawns_follow_up(
 
 def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common_space):
     common_space.proximity_between.return_value = 0.0
-    chunk_enlarger = ChunkEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_chunk, Mock()
-    )
+    chunk_enlarger = ChunkEnlarger(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
     result = chunk_enlarger.run()
     assert CodeletResult.FAIL == result
     assert chunk_enlarger.child_structure is None
@@ -71,7 +66,7 @@ def test_fizzles_when_no_candidate_found(bubble_chamber, target_chunk):
     target_chunk.nearby = StructureCollection()
     urgency = 1.0
     chunk_enlarger = ChunkEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_chunk, urgency
+        Mock(), Mock(), bubble_chamber, target_chunk, urgency
     )
     result = chunk_enlarger.run()
     assert CodeletResult.FIZZLE == result
@@ -84,7 +79,7 @@ def test_fizzles_when_bigger_chunk_already_exists(bubble_chamber, target_chunk):
     bubble_chamber.has_chunk.return_value = True
     urgency = 1.0
     chunk_enlarger = ChunkEnlarger(
-        Mock(), Mock(), Mock(), bubble_chamber, target_chunk, urgency
+        Mock(), Mock(), bubble_chamber, target_chunk, urgency
     )
     result = chunk_enlarger.run()
     assert CodeletResult.FIZZLE == result
