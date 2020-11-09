@@ -56,12 +56,10 @@ class RelationBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         if self.target_structure_two is None:
-            # parent concept and space need to be compatible
             self.target_structure_two = (
                 self.target_structure_one.parent_spaces.get_random().contents.get_exigent()
             )
         if self.parent_concept is None:
-            # parent concept and space need to be compatible
             self.parent_concept = self.bubble_chamber.get_random_relation_concept()
         return not self.target_structure_one.has_relation(
             self.parent_concept, self.target_structure_two
