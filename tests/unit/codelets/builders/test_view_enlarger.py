@@ -34,7 +34,7 @@ def second_target_view(common_space):
 @pytest.fixture
 def existing_correspondence():
     correspondence = Mock()
-    correspondence.activation = 1.0
+    correspondence.quality = 1.0
     correspondence.common_arguments_with.return_value = StructureCollection()
     return correspondence
 
@@ -42,7 +42,7 @@ def existing_correspondence():
 @pytest.fixture
 def candidate_correspondence(common_space, second_target_view):
     correspondence = Mock()
-    correspondence.activation = 1.0
+    correspondence.quality = 1.0
     correspondence.common_arguments_with.return_value = StructureCollection()
     return correspondence
 

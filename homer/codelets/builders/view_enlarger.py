@@ -95,17 +95,17 @@ class ViewEnlarger(Builder):
                     third_target_end
                 ).get_most_active()
                 confidence = min(
-                    correspondence.activation,
-                    self.candidate_member.activation,
-                    third_correspondence,
+                    correspondence.quality,
+                    self.candidate_member.quality,
+                    third_correspondence.quality,
                 )  # you are only as strong as your weakest link
                 return (confidence, third_correspondence)
             except MissingStructureError:
                 return (0.0, None)
         elif len(common_arguments) == 0:
             confidence = min(
-                correspondence.activation,
-                self.candidate_member.activation,
+                correspondence.quality,
+                self.candidate_member.quality,
             )
             return (confidence, None)
         else:  # if there are 2 common arguments, the correspondences are equivalent/competing
