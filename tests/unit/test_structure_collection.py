@@ -21,6 +21,14 @@ def test_ne():
     assert not StructureCollection({structure}) != StructureCollection({structure})
 
 
+def test_get_item():
+    structure_1 = Mock()
+    structure_2 = Mock()
+    structure_2.name = "structure"
+    collection = StructureCollection({structure_1, structure_2})
+    assert structure_2 == collection["structure"]
+
+
 def test_copy():
     structures = {Mock(), Mock(), Mock()}
     original_collection = StructureCollection(structures)

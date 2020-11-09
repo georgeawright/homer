@@ -9,6 +9,7 @@ from .location import Location
 class StructureCollection:
     def __init__(self, structures: Optional[Set] = None):
         self.structures = set() if structures is None else structures
+        self.structures_by_name = None
         self.structures_by_location = None
 
     def __len__(self):
@@ -28,6 +29,11 @@ class StructureCollection:
     def __iter__(self):
         return (structure for structure in self.structures)
 
+    def __getitem__(self, name: str):
+        if self.structures_by_name is None:
+            self._arrange_structures_by_name()
+        return self.structures_by_name[name]
+
     def copy(self) -> StructureCollection:
         return StructureCollection({structure for structure in self.structures})
 
@@ -43,6 +49,8 @@ class StructureCollection:
 
     def add(self, structure):
         self.structures.add(structure)
+        if self.structures_by_name is not None and hasattr(structure, "name"):
+            self.structures_by_name[structure.name] = structure
         if self.structures_by_location is not None:
             self._add_at_location(structure, structure.location)
             if hasattr(structure, "members"):
@@ -51,6 +59,11 @@ class StructureCollection:
 
     def remove(self, structure):
         self.structures.discard(structure)
+        if self.structures_by_name is not None and hasattr(structure, "name"):
+            try:
+                self.structures_by_name.pop(structure.name)
+            except KeyError:
+                pass
         if self.structures_by_location is None:
             return
         for i, layer in enumerate(self.structures_by_location):
@@ -149,3 +162,9 @@ class StructureCollection:
         for structure in self.structures:
             loc = Location.from_workspace_coordinates(structure.location)
             self.structures_by_location[loc.i][loc.j][loc.k].add(structure)
+
+    def _arrange_structures_by_name(self):
+        self.structures_by_name = {}
+        for item in self.structures:
+            if hasattr(item, "name"):
+                self.structures_by_name[item.name] = item
