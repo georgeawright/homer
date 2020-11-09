@@ -1,21 +1,33 @@
+from abc import abstractmethod
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
-from homer.hyper_parameters import HyperParameters
+from homer.codelet_result import CodeletResult
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
+from homer.structure import Structure
 
 
 class Evaluator(Codelet):
+    """Evaluates the quality of target_structure and adjusts its quality accordingly."""
 
-    CONFIDENCE_THRESHOLD = HyperParameters.EVALUATOR_CONFIDENCE_THRESHOLD
+    def __init__(
+        self,
+        codelet_id: str,
+        parent_id: str,
+        target_structure: Structure,
+        urgency: FloatBetweenOneAndZero,
+    ):
+        Codelet.__init__(self, codelet_id, parent_id, urgency)
+        self.target_structure = target_structure
 
-    def __init__(self):
+    def run(self):
+        self._calculate_confidence()
+        self.target_structure.quality += self.confidence
+        self._engender_follow_up()
+        self.result = CodeletResult.SUCCESS
+        return self.result
+
+    @abstractmethod
+    def _calculate_confidence(self):
         pass
-
-    def _process_perceptlet(self):
-        self.target_perceptlet.quality += self.confidence
-        if self.confidence > 0:
-            self.target_type.activation.decay(self.location)
-        if self.confidence < 0:
-            self.target_type.activation.boost(abs(self.confidence), self.location)
-        self.bubble_chamber.logger.log_perceptlet_update(
-            self, self.target_perceptlet, "Quality updated"
-        )
