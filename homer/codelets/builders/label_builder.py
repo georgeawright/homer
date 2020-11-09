@@ -64,6 +64,7 @@ class LabelBuilder(Builder):
         if self.target_chunk not in space.contents:
             space.contents.add(self.target_chunk)
             self.target_chunk.parent_spaces.add(space)
+        space.contents.add(label)
         self.target_chunk.links_out.add(label)
         self.bubble_chamber.labels.add(label)
         self.bubble_chamber.spaces.add(space)
