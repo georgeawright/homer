@@ -71,9 +71,9 @@ class CorrespondenceBuilder(Builder):
             )
         try:
             if self.target_structure_two is None:
-                self.target_structure_two = self.target_space_two.contents.get_exigent(
-                    type=type(self.target_structure_one)
-                )
+                self.target_structure_two = self.target_space_two.contents.of_type(
+                    type(self.target_structure_one)
+                ).get_exigent()
         except MissingStructureError:
             return False
         if self.parent_concept is None:
