@@ -45,7 +45,7 @@ class LabelSelector(Selector):
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
-        space = self.champion.parent_concept.parent_space
+        space = self.champion.parent_space
         candidates = self.champion.start.labels_in_space(space)
         if len(candidates) == 1:
             return False
