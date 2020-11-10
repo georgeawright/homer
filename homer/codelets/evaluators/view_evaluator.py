@@ -38,4 +38,11 @@ class ViewEvaluator(Evaluator):
         self.confidence = quality_estimate - self.target_structure.quality
 
     def _engender_follow_up(self):
-        self.child_codelets.append(ViewSelector.spawn(self.codelet_id, self.confidence))
+        self.child_codelets.append(
+            ViewSelector.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_structure,
+                self.confidence,
+            )
+        )
