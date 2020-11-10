@@ -37,5 +37,10 @@ class CorrespondenceEvaluator(Evaluator):
 
     def _engender_follow_up(self):
         self.child_codelets.append(
-            CorrespondenceSelector.spawn(self.codelet_id, self.confidence)
+            CorrespondenceSelector.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_structure,
+                self.confidence,
+            )
         )
