@@ -11,6 +11,8 @@ class Selector(Codelet):
         self, codelet_id: str, parent_id: str, urgency: FloatBetweenOneAndZero
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
+        self.champion = None
+        self.challenger = None
         self.winner = None
         self.loser = None
         self.confidence = 0.0
@@ -40,6 +42,10 @@ class Selector(Codelet):
         self.confidence = FloatBetweenOneAndZero(
             self.winner.quality - self.loser.quality
         )
+        if self.challenger.activation > self.champion.activation:
+            tmp = self.champion
+            self.champion = self.challenger
+            self.challenger = tmp
 
     @abstractmethod
     def _passes_preliminary_checks(self):

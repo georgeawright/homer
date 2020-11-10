@@ -85,19 +85,13 @@ class ChunkSelector(Selector):
             )
 
     def _engender_follow_up(self):
-        champion = (
-            self.champion
-            if self.champion.activation > self.challenger.activation
-            else self.challenger
-        )
-        challenger = self.challenger if champion == self.champion else self.champion
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_space,
-                champion,
+                self.champion,
                 abs(self.winner.quality - self.loser.quality),
-                challenger=challenger,
+                challenger=self.challenger,
             )
         )
