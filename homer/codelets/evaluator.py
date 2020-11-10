@@ -20,14 +20,20 @@ class Evaluator(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.target_structure = target_structure
+        self.confidence = 0
 
     def run(self):
         self._calculate_confidence()
         self.target_structure.quality += self.confidence
         self._engender_follow_up()
+        print(type(self.child_codelets[0]))
         self.result = CodeletResult.SUCCESS
         return self.result
 
     @abstractmethod
     def _calculate_confidence(self):
+        pass
+
+    @abstractmethod
+    def _engender_follow_up(self):
         pass
