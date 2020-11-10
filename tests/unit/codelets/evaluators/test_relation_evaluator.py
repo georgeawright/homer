@@ -12,7 +12,7 @@ def test_changes_target_structure_quality(current_quality, classification):
     relation = Mock()
     relation.quality = current_quality
     relation.parent_concept = concept
-    evaluator = RelationEvaluator(Mock(), Mock(), relation, Mock())
+    evaluator = RelationEvaluator(Mock(), Mock(), Mock(), relation, Mock())
     evaluator.run()
     assert classification == relation.quality
     assert 1 == len(evaluator.child_codelets)

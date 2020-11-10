@@ -12,7 +12,7 @@ def test_changes_target_structure_quality(current_quality, classification):
     correspondence = Mock()
     correspondence.quality = current_quality
     correspondence.parent_concept = concept
-    evaluator = CorrespondenceEvaluator(Mock(), Mock(), correspondence, Mock())
+    evaluator = CorrespondenceEvaluator(Mock(), Mock(), Mock(), correspondence, Mock())
     evaluator.run()
     assert classification == correspondence.quality
     assert 1 == len(evaluator.child_codelets)

@@ -12,7 +12,7 @@ def test_changes_target_structure_quality(current_quality, classification):
     label = Mock()
     label.quality = current_quality
     label.parent_concept = concept
-    evaluator = LabelEvaluator(Mock(), Mock(), label, Mock())
+    evaluator = LabelEvaluator(Mock(), Mock(), Mock(), label, Mock())
     evaluator.run()
     assert classification == label.quality
     assert 1 == len(evaluator.child_codelets)

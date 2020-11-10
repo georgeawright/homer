@@ -14,7 +14,7 @@ def test_changes_target_structure_quality(current_quality, classification):
     space.proximity_between.return_value = classification
     chunk.parent_spaces = StructureCollection({space})
     chunk.quality = current_quality
-    evaluator = ChunkEvaluator(Mock(), Mock(), chunk, Mock())
+    evaluator = ChunkEvaluator(Mock(), Mock(), Mock(), chunk, Mock())
     evaluator.run()
     assert classification == chunk.quality
     assert 1 == len(evaluator.child_codelets)
