@@ -39,5 +39,10 @@ class RelationEvaluator(Evaluator):
 
     def _engender_follow_up(self):
         self.child_codelets.append(
-            RelationSelector.spawn(self.codelet_id, self.confidence)
+            RelationSelector.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_structure,
+                self.confidence,
+            )
         )
