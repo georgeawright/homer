@@ -3,6 +3,7 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
+from homer.codelets.builders import LabelBuilder
 from homer.codelets.selectors import LabelSelector
 from homer.structure_collection import StructureCollection
 
@@ -62,3 +63,14 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert champion.decay_activation.is_called()
         assert 1 == len(selector.child_codelets)
         assert isinstance(selector.child_codelets[0], LabelSelector)
+
+
+def test_spawns_builder_when_fizzling():
+    champion = Mock()
+    champion.start.labels_in_space.return_value = StructureCollection({champion})
+    selector = LabelSelector(Mock(), Mock(), Mock(), champion, Mock())
+    selector.run()
+    assert selector.challenger is None
+    assert CodeletResult.FIZZLE == selector.result
+    assert 1 == len(selector.child_codelets)
+    assert isinstance(selector.child_codelets[0], LabelBuilder)
