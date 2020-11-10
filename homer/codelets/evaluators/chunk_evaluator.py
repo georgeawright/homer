@@ -42,5 +42,11 @@ class ChunkEvaluator(Evaluator):
 
     def _engender_follow_up(self):
         self.child_codelets.append(
-            ChunkSelector.spawn(self.codelet_id, self.confidence)
+            ChunkSelector.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_structure.parent_spaces.get_random(),
+                self.target_structure,
+                self.confidence,
+            )
         )

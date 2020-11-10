@@ -1,33 +1,97 @@
+from homer.bubble_chamber import BubbleChamber
+from homer.codelets.builders import ChunkBuilder, ChunkEnlarger
 from homer.codelets.selector import Selector
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.structure_collection import StructureCollection
+from homer.structures import Chunk, Space
 
 
 class ChunkSelector(Selector):
     def __init__(
-        self, codelet_id: str, parent_id: str, urgency: FloatBetweenOneAndZero
+        self,
+        codelet_id: str,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_space: Space,
+        champion: Chunk,
+        urgency: FloatBetweenOneAndZero,
+        challenger: Chunk = None,
     ):
-        pass
+        Selector.__init__(self, codelet_id, parent_id, urgency)
+        self.bubble_chamber = bubble_chamber
+        self.target_space = target_space
+        self.champion = champion
+        self.challenger = challenger
 
     @classmethod
-    def spawn(cls, parent_id: str, urgency: FloatBetweenOneAndZero):
+    def spawn(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_space: Space,
+        champion: Chunk,
+        urgency: FloatBetweenOneAndZero,
+        challenger: Chunk = None,
+    ):
         codelet_id = ID.new(cls)
-        return cls(codelet_id, parent_id, urgency)
+        return cls(
+            codelet_id,
+            parent_id,
+            bubble_chamber,
+            target_space,
+            champion,
+            urgency,
+            challenger=challenger,
+        )
 
     def _passes_preliminary_checks(self):
-        pass
-
-    def _hold_competition(self):
-        pass
+        if self.challenger is not None:
+            return True
+        self.challenger = self.champion.nearby(self.target_space).get_active()
+        members_intersection = StructureCollection.intersection(
+            self.champion.members, self.challenger.members
+        )
+        return len(members_intersection) > 0.5 * len(self.champion.members) and len(
+            members_intersection
+        ) > 0.5 * len(self.challenger.members)
 
     def _boost_winner(self):
-        pass
+        self.winner.boost_activation()
 
     def _decay_loser(self):
-        pass
+        self.loser.decay_activation()
 
     def _fizzle(self):
-        pass
+        new_target = self.champion.nearby(self.target_space).get_unhappy()
+        if new_target.size == 1:
+            self.child_codelets.append(
+                ChunkBuilder.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    new_target,
+                    new_target.unhappiness,
+                )
+            )
+        else:
+            self.child_codelets.append(
+                ChunkEnlarger.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    new_target,
+                    new_target.unhappiness,
+                )
+            )
 
     def _engender_follow_up(self):
-        pass
+        self.child_codelets.append(
+            self.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_space,
+                self.champion,
+                abs(self.winner.quality - self.loser.quality),
+                challenger=self.challenger,
+            )
+        )
