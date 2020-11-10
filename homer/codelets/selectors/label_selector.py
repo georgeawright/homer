@@ -52,20 +52,6 @@ class LabelSelector(Selector):
         self.challenger = candidates.get_active(exclude=[self.champion])
         return True
 
-    def _hold_competition(self):
-        total_quality = self.champion.quality + self.challenger.quality
-        champion_normalized_quality = self.champion.quality / total_quality
-        choice = random.random()
-        if choice < champion_normalized_quality:
-            self.winner = self.champion
-            self.loser = self.challenger
-        else:
-            self.loser = self.champion
-            self.winner = self.challenger
-        self.confidence = FloatBetweenOneAndZero(
-            self.winner.quality - self.loser.quality
-        )
-
     def _boost_winner(self):
         self.winner.boost_activation(self.confidence)
 

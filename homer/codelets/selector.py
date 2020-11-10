@@ -1,4 +1,5 @@
 from abc import abstractmethod
+import random
 
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
@@ -26,12 +27,22 @@ class Selector(Codelet):
         self.result = CodeletResult.SUCCESS
         return self.result
 
-    @abstractmethod
-    def _passes_preliminary_checks(self):
-        pass
+    def _hold_competition(self):
+        total_quality = self.champion.quality + self.challenger.quality
+        champion_normalized_quality = self.champion.quality / total_quality
+        choice = random.random()
+        if choice < champion_normalized_quality:
+            self.winner = self.champion
+            self.loser = self.challenger
+        else:
+            self.loser = self.champion
+            self.winner = self.challenger
+        self.confidence = FloatBetweenOneAndZero(
+            self.winner.quality - self.loser.quality
+        )
 
     @abstractmethod
-    def _hold_competition(self):
+    def _passes_preliminary_checks(self):
         pass
 
     @abstractmethod
