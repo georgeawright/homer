@@ -13,7 +13,7 @@ def parent_concept():
     concept = Mock()
     concept.relevant_value = "value"
     concept.parent_space.instance.contents = StructureCollection()
-    concept.classify.return_value = 1.0
+    concept.classifier.classify.return_value = 1.0
     return concept
 
 
@@ -54,7 +54,7 @@ def test_successful_creates_label_and_spawns_follow_up(bubble_chamber, target_ch
 
 def test_fails_when_chunk_is_bad_example(bubble_chamber, target_chunk):
     parent_concept = Mock()
-    parent_concept.classify.return_value = 0.0
+    parent_concept.classifier.classify.return_value = 0.0
     label_builder = LabelBuilder(
         Mock(),
         Mock(),

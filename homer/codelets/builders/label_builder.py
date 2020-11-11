@@ -52,7 +52,9 @@ class LabelBuilder(Builder):
         return not self.target_chunk.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classify(self.target_chunk)
+        self.confidence = self.parent_concept.classifier.classify(
+            {"concept": self.parent_concept, "start": self.target_chunk}
+        )
 
     def _boost_activations(self):
         pass
