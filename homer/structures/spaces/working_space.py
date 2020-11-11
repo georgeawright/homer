@@ -1,6 +1,6 @@
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection import StructureCollection
-from homer.structures.space import Space
+from homer.structures import Concept, Space
 
 
 class WorkingSpace(Space):
@@ -8,7 +8,15 @@ class WorkingSpace(Space):
         self,
         contents: StructureCollection,
         quality: FloatBetweenOneAndZero,
+        parent_concept: Concept,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        Space.__init__(self, contents, quality, links_in=links_in, links_out=links_out)
+        Space.__init__(
+            self,
+            contents,
+            quality,
+            parent_concept,
+            links_in=links_in,
+            links_out=links_out,
+        )

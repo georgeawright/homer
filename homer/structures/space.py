@@ -8,11 +8,19 @@ class Space(Structure):
         self,
         contents: list,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
+        parent_concept: "Concept",
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
     ):
         location = None
         Structure.__init__(
             self, location, quality, links_in=links_in, links_out=links_out
         )
         self.contents = contents
+        self.parent_concept = parent_concept
+
+    def distance_between(self, a: Structure, b: Structure):
+        return self.parent_concept.distance_between(a, b)
+
+    def proximity_between(self, a: Structure, b: Structure):
+        return self.parent_concept.proximity_between(a, b)
