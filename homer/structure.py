@@ -19,6 +19,7 @@ class Structure(ABC):
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
         self._activation = FloatBetweenOneAndZero(0)
+        self._activation_buffer = 0.0
         self._unhappiness = FloatBetweenOneAndZero(1)
 
     @property
@@ -54,7 +55,7 @@ class Structure(ABC):
         )
 
     def nearby(self, space: Structure = None):
-        pass
+        raise NotImplementedError
 
     def has_relation(
         self, space: Structure, concept: Structure, second_argument: Structure
@@ -62,13 +63,13 @@ class Structure(ABC):
         pass
 
     def boost_activation(self, amount: float = None):
-        pass
+        self._activation_buffer += amount
 
     def decay_activation(self, amount: float = None):
-        pass
+        self._activation_buffer -= amount
 
-    def add_link_in(self, link: Structure):
-        pass
-
-    def add_link_out(self, link: Structure):
-        pass
+    def update_activation(self):
+        self._activation = FloatBetweenOneAndZero(
+            self._activation + self._activation_buffer
+        )
+        self._activation_buffer = 0.0

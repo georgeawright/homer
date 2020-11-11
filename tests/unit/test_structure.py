@@ -32,3 +32,33 @@ def test_lexemes_returns_lexemes():
     assert number_of_lexemes == len(structure.lexemes)
     for lexeme in structure.lexemes:
         assert isinstance(lexeme, Lexeme)
+
+
+def test_boost_and_update_activation():
+    structure = Structure(Mock(), Mock())
+    assert 0.0 == structure.activation
+    structure.boost_activation(0.5)
+    assert 0.0 == structure.activation
+    structure.update_activation()
+    assert 0.5 == structure.activation
+    structure.boost_activation(0.5)
+    structure.update_activation()
+    assert 1.0 == structure.activation
+    structure.boost_activation(0.1)
+    structure.update_activation()
+    assert 1.0 == structure.activation
+
+
+def test_decay_and_update_activation():
+    structure = Structure(Mock(), Mock())
+    assert 0.0 == structure.activation
+    structure.boost_activation(1.0)
+    structure.update_activation()
+    assert 1.0 == structure.activation
+    structure.decay_activation(0.5)
+    assert 1.0 == structure.activation
+    structure.update_activation()
+    assert 0.5 == structure.activation
+    structure.decay_activation(1.0)
+    structure.update_activation()
+    assert 0.0 == structure.activation

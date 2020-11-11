@@ -21,7 +21,6 @@ class Concept(Structure):
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
         depth: int = 1,
-        activation: FloatBetweenOneAndZero = FloatBetweenOneAndZero(0),
     ):
         location = None
         quality = None
@@ -34,7 +33,6 @@ class Concept(Structure):
         self.parent_space = parent_space
         self.child_spaces = child_spaces
         self.depth = depth
-        self.activation = activation
 
     def classify_example(self, example: Structure) -> FloatBetweenOneAndZero:
         return self.classifier.classify(self, example)
