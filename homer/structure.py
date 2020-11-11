@@ -61,9 +61,15 @@ class Structure(ABC):
     def nearby(self, space: Structure = None):
         raise NotImplementedError
 
+    def has_label(self, concept: Structure) -> bool:
+        for link in self.links_out:
+            if link.parent_concept == concept and link.end is None:
+                return True
+        return False
+
     def has_relation(
         self, space: Structure, concept: Structure, second_argument: Structure
-    ):
+    ) -> bool:
         pass
 
     def boost_activation(self, amount: float = None):
