@@ -10,4 +10,4 @@ def test_classify(proximity):
     concept = Mock()
     concept.proximity_to.return_value = proximity
     example = Mock()
-    assert proximity == classifier.classify(concept, example)
+    assert proximity == classifier.classify({"concept": concept, "start": example})
