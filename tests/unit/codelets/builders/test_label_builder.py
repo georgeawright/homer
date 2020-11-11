@@ -11,6 +11,7 @@ from homer.structures.links import Label
 @pytest.fixture
 def parent_concept():
     concept = Mock()
+    concept.relevant_value = "value"
     concept.parent_space.instance.contents = StructureCollection()
     concept.classify.return_value = 1.0
     return concept
@@ -19,7 +20,10 @@ def parent_concept():
 @pytest.fixture
 def bubble_chamber(parent_concept):
     chamber = Mock()
-    chamber.get_random_workspace_concept.return_value = parent_concept
+    space = Mock()
+    space.name = "label concepts"
+    space.contents = StructureCollection({parent_concept})
+    chamber.spaces = StructureCollection({space})
     return chamber
 
 

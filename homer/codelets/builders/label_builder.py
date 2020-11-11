@@ -46,7 +46,9 @@ class LabelBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         if self.parent_concept is None:
-            self.parent_concept = self.bubble_chamber.get_random_workspace_concept()
+            self.parent_concept = self.bubble_chamber.spaces[
+                "label concepts"
+            ].contents.get_random()
         return not self.target_chunk.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
@@ -62,7 +64,10 @@ class LabelBuilder(Builder):
             space.contents.add(self.target_chunk)
             self.target_chunk.parent_spaces.add(space)
             self.target_chunk.locations.append(
-                Location(space.get_value(self.target_chunk), space)
+                Location(
+                    getattr(self.target_chunk, self.parent_concept.relevant_value),
+                    space,
+                )
             )
         space.contents.add(label)
         self.target_chunk.links_out.add(label)
@@ -71,7 +76,7 @@ class LabelBuilder(Builder):
         self.child_structure = label
 
     def _engender_follow_up(self):
-        new_target = self.target_chunk.nearby.get_unhappy()
+        new_target = self.target_chunk.neighbours.get_unhappy()
         self.child_codelets.append(
             LabelBuilder.spawn(
                 self.codelet_id,
