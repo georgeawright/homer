@@ -26,8 +26,7 @@ def common_space():
 def second_target_chunk(common_space):
     chunk = Mock()
     chunk.size = 1
-    chunk.location.x = 1
-    chunk.location.y = 1
+    chunk.location.coordinates = [1, 1]
     chunk.neighbours = StructureCollection()
     chunk.parent_spaces = StructureCollection({common_space})
     return chunk
@@ -37,12 +36,11 @@ def second_target_chunk(common_space):
 def target_chunk(common_space, second_target_chunk):
     chunk = Mock()
     chunk.size = 1
-    chunk.location.x = 2
-    chunk.location.y = 2
+    chunk.location.coordinates = [2, 2]
     chunk.members = StructureCollection()
     chunk.neighbours = StructureCollection()
     chunk.parent_spaces = StructureCollection({common_space})
-    chunk.nearby.get_random.return_value = second_target_chunk
+    chunk.nearby.return_value = StructureCollection({second_target_chunk})
     return chunk
 
 
@@ -66,7 +64,7 @@ def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common
 
 
 def test_fizzles_when_no_second_target(bubble_chamber, target_chunk):
-    target_chunk.nearby = StructureCollection()
+    target_chunk.nearby.return_value = StructureCollection()
     urgency = 1.0
     chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, urgency)
     result = chunk_builder.run()

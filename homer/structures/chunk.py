@@ -39,7 +39,7 @@ class Chunk(Structure):
 
     def nearby(self, space: Space = None):
         return StructureCollection.intersection(
-            space.elements_close_to(self.location) for space in self.spaces
+            space.contents.near(self.location) for space in self.parent_spaces
         )
 
     def add_member(self, new_member: Chunk):

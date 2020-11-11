@@ -49,7 +49,7 @@ class ChunkBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         try:
-            self.second_target_chunk = self.target_chunk.nearby.get_random()
+            self.second_target_chunk = self.target_chunk.nearby().get_random()
         except MissingStructureError:
             return False
         return not self.bubble_chamber.has_chunk(

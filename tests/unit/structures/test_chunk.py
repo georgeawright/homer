@@ -24,13 +24,13 @@ def test_size_recursive():
 def test_add_member():
     current_member = Mock()
     current_member.value = 1
-    current_member.location = Location(1, 1, Mock())
+    current_member.location = Location([1, 1], Mock())
     current_member.size = 1
     mutual_neighbour = Mock()
     new_members_neighbour = Mock()
     new_member = Chunk(
         2,
-        Location(1, 2, Mock()),
+        Location([1, 2], Mock()),
         StructureCollection(),
         StructureCollection({mutual_neighbour, new_members_neighbour}),
         Mock(),
@@ -46,8 +46,7 @@ def test_add_member():
     )
     chunk.add_member(new_member)
     assert 1.5 == chunk.value
-    assert 1 == chunk.location.x
-    assert 1.5 == chunk.location.y
+    assert [1, 1.5] == chunk.location.coordinates
     assert 2 == chunk.size
     assert new_member in chunk.members
     assert new_member not in chunk.neighbours
