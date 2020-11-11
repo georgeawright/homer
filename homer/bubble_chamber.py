@@ -42,3 +42,9 @@ class BubbleChamber:
 
     def update_activations(self) -> None:
         pass
+
+    def has_chunk(self, members: StructureCollection) -> bool:
+        for chunk in self.chunks:
+            if chunk.members == members:
+                return True
+        return False
