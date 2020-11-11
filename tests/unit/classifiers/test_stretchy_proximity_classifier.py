@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.classifiers import StretchyProximityClassifier
+from homer.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize(
@@ -32,6 +33,13 @@ def test_classify(
     concept = Mock()
     concept.proximity_to.return_value = proximity
     example = Mock()
-    example.has_neighbours.return_value = example_has_neighbours
-    example.nearby.proportion_with_label.return_value = proportion_of_neighbours
+    neighbours = StructureCollection()
+    if example_has_neighbours:
+        neighbour = Mock()
+        neighbours.add(neighbour)
+        if proportion_of_neighbours == 1:
+            neighbour.has_label.return_value = True
+        else:
+            neighbour.has_label.return_value = False
+    example.nearby.return_value = neighbours
     assert expected == classifier.classify(concept, example)

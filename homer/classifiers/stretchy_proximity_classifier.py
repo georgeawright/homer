@@ -11,8 +11,8 @@ class StretchyProximityClassifier(Classifier):
 
     def classify(self, concept: Concept, example: Chunk):
         proximity = concept.proximity_to(example)
-        if example.has_neighbours():
-            neighbours = example.nearby.proportion_with_label(concept)
+        if len(example.nearby()) > 0:
+            neighbours = example.nearby().proportion_with_label(concept)
             return sum(
                 [self.proximity_weight * proximity, self.neighbours_weight * neighbours]
             )
