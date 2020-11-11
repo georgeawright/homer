@@ -4,9 +4,8 @@ from typing import List
 
 
 class Location:
-    def __init__(self, x: float, y: float, space: "Space"):
-        self.x = x
-        self.y = y
+    def __init__(self, coordinates: List[float], space: "Space"):
+        self.coordinates = coordinates
         self.space = space
 
     @classmethod
@@ -14,7 +13,9 @@ class Location:
         from .structures import Space
 
         return Location(
-            statistics.fmean([location.x for location in locations]),
-            statistics.fmean([location.y for location in locations]),
+            [
+                statistics.fmean([location.coordinates[i] for location in locations])
+                for i in range(len(locations[0].coordinates))
+            ],
             locations[0].space,
         )

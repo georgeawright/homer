@@ -5,11 +5,17 @@ from homer.location import Location
 
 
 @pytest.mark.parametrize(
-    "xs, ys, expected_x, expected_y",
-    [([1, 2, 3], [4, 5, 6], 2, 5), ([1, 2, 3, 4], [4, 5, 6, 7], 2.5, 5.5)],
+    "sets_of_coordinates, expected_coordinates",
+    [
+        ([[1, 1, 1], [3, 3, 3]], [2, 2, 2]),
+        ([[1, 1, 1, 1], [3, 3, 3, 3]], [2, 2, 2, 2]),
+        ([[1, 1], [2, 2]], [1.5, 1.5]),
+    ],
 )
-def test_average(xs, ys, expected_x, expected_y):
-    locations = [Location(xs[i], ys[i], Mock()) for i in range(len(xs))]
+def test_average(sets_of_coordinates, expected_coordinates):
+    locations = [
+        Location(sets_of_coordinates[i], Mock())
+        for i in range(len(sets_of_coordinates))
+    ]
     average = Location.average(locations)
-    assert expected_x == average.x
-    assert expected_y == average.y
+    assert expected_coordinates == average.coordinates
