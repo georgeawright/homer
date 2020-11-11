@@ -30,6 +30,7 @@ class Chunk(Structure):
         self.members = members
         self.neighbours = neighbours
         self.parent_spaces = parent_spaces
+        self.locations = [location]
 
     @property
     def size(self):
@@ -38,8 +39,13 @@ class Chunk(Structure):
         )
 
     def nearby(self, space: Space = None):
+        if space is not None:
+            location = [
+                location for location in self.locations if location.space == space
+            ][0]
+            return space.contents.near(self.location)
         return StructureCollection.intersection(
-            space.contents.near(self.location) for space in self.parent_spaces
+            *[location.space.contents.near(location) for location in self.locations]
         )
 
     def add_member(self, new_member: Chunk):

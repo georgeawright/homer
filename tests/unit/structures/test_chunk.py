@@ -21,6 +21,32 @@ def test_size_recursive():
     assert size == chunk.size
 
 
+def test_nearby():
+    space_1 = Mock()
+    space_1_object = Mock()
+    space_1.contents.near.return_value = StructureCollection({space_1_object})
+    space_1_location = Mock()
+    space_1_location.space = space_1
+    space_2 = Mock()
+    space_2_object = Mock()
+    space_2.contents.near.return_value = StructureCollection(
+        {space_2_object, space_1_object}
+    )
+    space_2_location = Mock()
+    space_2_location.space = space_2
+    chunk = Chunk(
+        Mock(), space_1_location, Mock(), Mock(), Mock(), StructureCollection({space_1})
+    )
+    chunk.parent_spaces.add(space_2)
+    chunk.locations.append(space_2_location)
+    assert space_1_object in chunk.nearby()
+    assert space_2_object not in chunk.nearby()
+    assert space_1_object in chunk.nearby(space_1)
+    assert space_2_object not in chunk.nearby(space_1)
+    assert space_1_object in chunk.nearby(space_2)
+    assert space_2_object in chunk.nearby(space_2)
+
+
 def test_add_member():
     current_member = Mock()
     current_member.value = 1
