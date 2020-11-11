@@ -42,9 +42,6 @@ class Concept(Structure):
         self.distance_function = distance_function
         self.depth = depth
 
-    def classify(self, example: Structure) -> FloatBetweenOneAndZero:
-        return self.classifier.classify(self, example)
-
     def distance_from(self, other: Structure):
         return self.distance_function(
             self.prototype, getattr(other, self.relevant_value)
