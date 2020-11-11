@@ -23,6 +23,10 @@ class Structure(ABC):
         self._unhappiness = FloatBetweenOneAndZero(1)
 
     @property
+    def coordinates(self) -> list:
+        return self.location.coordinates
+
+    @property
     def exigency(self) -> FloatBetweenOneAndZero:
         pass
 
