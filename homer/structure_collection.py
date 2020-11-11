@@ -93,10 +93,10 @@ class StructureCollection:
             {element for element in self.structures if isinstance(element, t)}
         )
 
-    def proportion_with_label(self, concept: Concept):
+    def proportion_with_label(self, concept):
         return self.number_with_label(concept) / len(self)
 
-    def number_with_label(self, concept: Concept):
+    def number_with_label(self, concept):
         return sum(1 for structure in self.structures if structure.has_label(concept))
 
     def get_random(self, exclude: list = None):
