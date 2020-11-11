@@ -41,5 +41,5 @@ def test_classify(
             neighbour.has_label.return_value = True
         else:
             neighbour.has_label.return_value = False
-    example.nearby.return_value = neighbours
+    example.neighbours = neighbours
     assert expected == classifier.classify(concept, example)
