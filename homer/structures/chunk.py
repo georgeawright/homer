@@ -43,10 +43,14 @@ class Chunk(Structure):
             location = [
                 location for location in self.locations if location.space == space
             ][0]
-            return space.contents.near(self.location)
-        return StructureCollection.intersection(
+            nearby_chunks = space.contents.near(self.location).of_type(type(self))
+            nearby_chunks.remove(self)
+            return nearby_chunks
+        nearby_chunks = StructureCollection.intersection(
             *[location.space.contents.near(location) for location in self.locations]
-        )
+        ).of_type(type(self))
+        nearby_chunks.remove(self)
+        return nearby_chunks
 
     def add_member(self, new_member: Chunk):
         self.members.add(new_member)

@@ -38,8 +38,18 @@ def test_successful_adds_member_to_chunk_and_spawns_follow_up():
         0.0,
         parent_spaces,
     )
+    second_chunk = Chunk(
+        10,
+        Location([0, 1], input_space),
+        StructureCollection(),
+        StructureCollection(),
+        0.0,
+        parent_spaces,
+    )
     bubble_chamber.chunks.add(target_chunk)
+    bubble_chamber.chunks.add(second_chunk)
     input_space.contents.add(target_chunk)
+    input_space.contents.add(second_chunk)
     target_chunk.parent_spaces.add(input_space)
     builder = ChunkBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
     builder.run()

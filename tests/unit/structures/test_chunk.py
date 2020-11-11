@@ -23,12 +23,12 @@ def test_size_recursive():
 
 def test_nearby():
     space_1 = Mock()
-    space_1_object = Mock()
+    space_1_object = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     space_1.contents.near.return_value = StructureCollection({space_1_object})
     space_1_location = Mock()
     space_1_location.space = space_1
     space_2 = Mock()
-    space_2_object = Mock()
+    space_2_object = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     space_2.contents.near.return_value = StructureCollection(
         {space_2_object, space_1_object}
     )
