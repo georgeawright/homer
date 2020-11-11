@@ -10,7 +10,6 @@ class StructureCollection:
     def __init__(self, structures: Optional[Set] = None):
         self.structures = set() if structures is None else structures
         self.structures_by_name = None
-        self.structures_by_location = None
 
     def __len__(self):
         return len(self.structures)
@@ -41,21 +40,27 @@ class StructureCollection:
         return len(self) == 0
 
     def at(self, location: Location) -> StructureCollection:
-        if self.structures_by_location is None:
-            self._arrange_structures_by_location()
         return StructureCollection(
-            self.structures_by_location[location.i][location.j][location.k]
+            {
+                structure
+                for structure in self.structures
+                if structure.location == location
+            }
+        )
+
+    def near(self, location: Location) -> StructureCollection:
+        return StructureCollection(
+            {
+                structure
+                for structure in self.structures
+                if structure.location.is_near(location)
+            }
         )
 
     def add(self, structure):
         self.structures.add(structure)
         if self.structures_by_name is not None and hasattr(structure, "name"):
             self.structures_by_name[structure.name] = structure
-        if self.structures_by_location is not None:
-            self._add_at_location(structure, structure.location)
-            if hasattr(structure, "members"):
-                for member in structure.members:
-                    self._add_at_location(structure, member.location)
 
     def remove(self, structure):
         self.structures.discard(structure)
@@ -64,13 +69,6 @@ class StructureCollection:
                 self.structures_by_name.pop(structure.name)
             except KeyError:
                 pass
-        if self.structures_by_location is None:
-            return
-        for i, layer in enumerate(self.structures_by_location):
-            for j, row in enumerate(layer):
-                for k, cell in enumerate(row):
-                    if structure in cell:
-                        self.structures_by_location[i][j][k].discard(structure)
 
     @staticmethod
     def union(*collections: List[StructureCollection]) -> StructureCollection:
@@ -126,10 +124,6 @@ class StructureCollection:
         """Returns a structure probabilistically according to unhappiness."""
         return self._get_structure_according_to("unhappiness", exclude)
 
-    def _add_at_location(self, structure, coordinates: List[Union[float, int]]):
-        loc = Location.from_workspace_coordinates(coordinates)
-        self.structures_by_location[loc.i][loc.j][loc.k].add(structure)
-
     def _get_structure_according_to(self, attribute: str, exclude: list = None):
         """Returns a structure probabilistically according to attribute."""
         if len(self.structures) < 1:
@@ -153,15 +147,6 @@ class StructureCollection:
             if getattr(structure, attribute) > getattr(structure_choice, attribute):
                 structure_choice = structure
         return structure_choice
-
-    def _arrange_structures_by_location(self):
-        self.structures_by_location = [
-            [[set() for _ in range(Location.WIDTH)] for _ in range(Location.HEIGHT)]
-            for _ in range(Location.DEPTH)
-        ]
-        for structure in self.structures:
-            loc = Location.from_workspace_coordinates(structure.location)
-            self.structures_by_location[loc.i][loc.j][loc.k].add(structure)
 
     def _arrange_structures_by_name(self):
         self.structures_by_name = {}
