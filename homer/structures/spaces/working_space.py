@@ -8,7 +8,7 @@ class WorkingSpace(Space):
         self,
         contents: StructureCollection,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
     ):
         Space.__init__(self, contents, quality, links_in=links_in, links_out=links_out)
