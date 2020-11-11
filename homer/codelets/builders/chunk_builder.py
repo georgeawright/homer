@@ -87,7 +87,7 @@ class ChunkBuilder(Builder):
             self.target_chunk.parent_spaces,
             self.confidence,
         )
-        self.bubble_chamber.add_chunk(chunk)
+        self.bubble_chamber.chunks.add(chunk)
         self.child_structure = chunk
 
     def _get_average_value(self, chunks: StructureCollection):
