@@ -60,6 +60,7 @@ class FunctionWordBuilder(Builder):
             template_word,
             output_word,
             self.bubble_chamber.concepts["same"],
+            self.bubble_chamber.spaces["text"],
             self.confidence,
         )
         template_word.links_out.add(correspondence)

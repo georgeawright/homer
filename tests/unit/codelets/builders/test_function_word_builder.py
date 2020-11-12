@@ -8,6 +8,7 @@ from homer.structures.chunks import Word
 def test_successful_creates_word():
     bubble_chamber = Mock()
     bubble_chamber.concepts = {"same": Mock()}
+    bubble_chamber.spaces = {"text": Mock()}
     target_correspondence = Mock()
     target_correspondence.activation = 1.0
     function_word_builder = FunctionWordBuilder(

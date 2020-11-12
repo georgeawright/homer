@@ -71,13 +71,21 @@ class WordBuilder(Builder):
             self.confidence,
         )
         projection_from_slot = Correspondence(
-            self.slot, word, self.bubble_chamber.concepts["same"], self.confidence
+            self.slot,
+            word,
+            self.bubble_chamber.concepts["same"],
+            concept.parent_space,
+            self.confidence,
         )
         self.slot.links_out.add(projection_from_slot)
         word.links_in.add(projection_from_slot)
         self.target_view.add_correspondence(projection_from_slot)
         projection_from_non_slot = Correspondence(
-            self.non_slot, word, self.bubble_chamber.concepts["same"], self.confidence
+            self.non_slot,
+            word,
+            self.bubble_chamber.concepts["same"],
+            concept.parent_space,
+            self.confidence,
         )
         self.non_slot.links_out.add(projection_from_non_slot)
         word.links_in.add(projection_from_non_slot)
