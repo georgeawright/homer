@@ -17,19 +17,20 @@ class ConceptualSpace(Space):
         quality = None
         Space.__init__(
             self,
+            name,
             contents,
             quality,
             parent_concept,
             links_in=links_in,
             links_out=links_out,
         )
-        self.name = name
         self._instance = None
 
     @property
     def instance(self) -> WorkingSpace:
         if self._instance is None:
             self._instance = WorkingSpace(
+                self.name + " working",
                 StructureCollection(),
                 FloatBetweenOneAndZero(0),
                 self.parent_concept,

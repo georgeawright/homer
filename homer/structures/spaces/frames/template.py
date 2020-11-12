@@ -10,12 +10,14 @@ from homer.structures.link import Link
 class Template(Frame):
     def __init__(
         self,
+        name: str,
         members: List[Union[Slot, Word]],
         parent_concept: Concept,
         links_in: List[Link] = None,
         links_out: List[Link] = None,
     ):
         Frame.__init__(
+            name,
             members,
             parent_concept,
             links_in=links_in,

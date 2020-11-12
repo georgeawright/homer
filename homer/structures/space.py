@@ -6,6 +6,7 @@ from homer.structure_collection import StructureCollection
 class Space(Structure):
     def __init__(
         self,
+        name: str,
         contents: list,
         quality: FloatBetweenOneAndZero,
         parent_concept: "Concept",
@@ -16,6 +17,7 @@ class Space(Structure):
         Structure.__init__(
             self, location, quality, links_in=links_in, links_out=links_out
         )
+        self.name = name
         self.contents = contents
         self.parent_concept = parent_concept
 

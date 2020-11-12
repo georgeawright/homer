@@ -5,6 +5,7 @@ from homer.structures import Concept, Space
 class Frame(Space):
     def __init__(
         self,
+        name: str,
         contents: StructureCollection,
         parent_concept: Concept,
         links_in: StructureCollection = None,
@@ -13,6 +14,7 @@ class Frame(Space):
         quality = None
         Space.__init__(
             self,
+            name,
             contents,
             quality,
             parent_concept,
