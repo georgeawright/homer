@@ -1,7 +1,24 @@
 from unittest.mock import Mock
 
+from homer.structure_collection import StructureCollection
 from homer.structures.chunks import Slot
 from homer.structures.links import Correspondence
+
+
+def test_nearby():
+    start = Mock()
+    start.correspondences = StructureCollection({Mock()})
+    end = Mock()
+    end.correspondences = StructureCollection({Mock()})
+    parent_space = Mock()
+    parent_space.contents = StructureCollection({Mock()})
+    correspondence = Correspondence(
+        start, end, Mock(), Mock(), Mock(), parent_space, Mock(), Mock()
+    )
+    parent_space.contents.add(correspondence)
+    neighbours = correspondence.nearby()
+    assert 3 == len(neighbours)
+    assert correspondence not in neighbours
 
 
 def test_get_slot_argument_returns_slot():
