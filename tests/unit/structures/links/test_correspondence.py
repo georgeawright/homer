@@ -45,3 +45,29 @@ def test_get_non_slot_argument_returns_non_slot():
         non_slot, slot, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
     assert non_slot == correspondence.get_non_slot_argument()
+
+
+def test_common_arguments_with():
+    arg_1 = Mock()
+    arg_2 = Mock()
+    arg_3 = Mock()
+    arg_4 = Mock()
+    correspondence_1 = Correspondence(
+        arg_1, arg_2, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    correspondence_2 = Correspondence(
+        arg_1, arg_2, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    correspondence_3 = Correspondence(
+        arg_1, arg_3, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    correspondence_4 = Correspondence(
+        arg_2, arg_3, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    correspondence_5 = Correspondence(
+        arg_3, arg_4, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    assert 2 == len(correspondence_1.common_arguments_with(correspondence_2))
+    assert 1 == len(correspondence_1.common_arguments_with(correspondence_3))
+    assert 1 == len(correspondence_1.common_arguments_with(correspondence_4))
+    assert 0 == len(correspondence_1.common_arguments_with(correspondence_5))

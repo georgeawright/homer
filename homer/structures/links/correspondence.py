@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
@@ -58,3 +60,8 @@ class Correspondence(Link):
         if not isinstance(self.end, Slot):
             return self.end
         raise Exception("Correspondence has no non slot argument")
+
+    def common_arguments_with(self, other: Correspondence):
+        return StructureCollection(
+            set.intersection({self.start, self.end}, {other.start, other.end})
+        )
