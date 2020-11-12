@@ -50,6 +50,16 @@ class WordBuilder(Builder):
     def _passes_preliminary_checks(self):
         self.slot = self.target_correspondence.get_slot_argument()
         self.non_slot = self.target_correspondence.get_non_slot_argument()
+        self.slot_space = (
+            self.target_correspondence.start_space
+            if self.slot == self.target_correspondence.start
+            else self.target_correspondence.end_space
+        )
+        self.non_slot_space = (
+            self.target_correspondence.end_space
+            if self.slot_space == self.target_correspondence.start_space
+            else self.target_correspondence.start_space
+        )
         self.output_space = self.target_view.output_space
         return True
 
@@ -73,6 +83,8 @@ class WordBuilder(Builder):
         projection_from_slot = Correspondence(
             self.slot,
             word,
+            self.slot_space,
+            self.output_space,
             self.bubble_chamber.concepts["same"],
             concept.parent_space,
             self.confidence,
@@ -83,6 +95,8 @@ class WordBuilder(Builder):
         projection_from_non_slot = Correspondence(
             self.non_slot,
             word,
+            self.non_slot_space,
+            self.output_space,
             self.bubble_chamber.concepts["same"],
             concept.parent_space,
             self.confidence,

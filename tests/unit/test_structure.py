@@ -11,9 +11,13 @@ def test_correspondences_returns_labels():
     links_in = StructureCollection()
     links_out = StructureCollection()
     for _ in range(number_of_correspondences // 2):
-        correspondence = Correspondence(Mock(), Mock(), Mock(), Mock(), Mock())
+        correspondence = Correspondence(
+            Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock()
+        )
         links_out.add(correspondence)
-        correspondence = Correspondence(Mock(), Mock(), Mock(), Mock(), Mock())
+        correspondence = Correspondence(
+            Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock()
+        )
         links_in.add(correspondence)
     for _ in range(number_of_correspondences // 2):
         links_out.add(Mock())

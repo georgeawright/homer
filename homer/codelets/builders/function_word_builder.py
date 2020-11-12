@@ -59,6 +59,8 @@ class FunctionWordBuilder(Builder):
         correspondence = Correspondence(
             template_word,
             output_word,
+            self.input_space,
+            self.output_space,
             self.bubble_chamber.concepts["same"],
             self.bubble_chamber.spaces["text"],
             self.confidence,

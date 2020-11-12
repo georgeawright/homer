@@ -117,6 +117,8 @@ class CorrespondenceBuilder(Builder):
         correspondence = Correspondence(
             self.target_structure_one,
             self.target_structure_two,
+            self.target_space_one,
+            self.target_space_two,
             self.parent_concept,
             self.target_conceptual_space,
             self.confidence,
@@ -125,6 +127,10 @@ class CorrespondenceBuilder(Builder):
         self.target_structure_one.links_out.add(correspondence)
         self.target_structure_two.links_in.add(correspondence)
         self.target_structure_two.links_out.add(correspondence)
+        self.target_space_one.links_in.add(correspondence)
+        self.target_space_one.links_out.add(correspondence)
+        self.target_space_two.links_in.add(correspondence)
+        self.target_space_two.links_out.add(correspondence)
         self.bubble_chamber.correspondences.add(correspondence)
         self.child_structure = correspondence
 
