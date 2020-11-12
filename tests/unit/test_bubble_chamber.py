@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
 from homer.structure_collection import StructureCollection
+from homer.structures import Space
 
 
 @pytest.mark.skip
@@ -28,3 +29,34 @@ def test_has_chunk():
         Mock(),
     )
     assert bubble_chamber.has_chunk(existing_chunk_members)
+
+
+def test_common_parent_space_is_created_if_necessary():
+    bubble_chamber = BubbleChamber(
+        Mock(),
+        Mock(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        Mock(),
+    )
+    space_one = Mock()
+    space_one.name = "one"
+    space_one.parent_spaces = StructureCollection()
+    space_two = Mock()
+    space_two.name = "two"
+    space_two.parent_spaces = StructureCollection()
+    bubble_chamber.spaces.add(space_one)
+    bubble_chamber.spaces.add(space_two)
+    assert 2 == len(bubble_chamber.spaces)
+    parent = bubble_chamber.common_parent_space(space_one, space_two)
+    assert isinstance(parent, Space)
+    assert parent in bubble_chamber.spaces
+    assert 3 == len(bubble_chamber.spaces)
+    parent = bubble_chamber.common_parent_space(space_one, space_two)
+    assert 3 == len(bubble_chamber.spaces)
