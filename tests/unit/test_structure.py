@@ -25,7 +25,7 @@ def test_lexemes_returns_lexemes():
     number_of_lexemes = 10
     for _ in range(number_of_lexemes):
         lexeme = Lexeme(Mock(), Mock())
-        relation = Relation(structure, lexeme, Mock(), Mock())
+        relation = Relation(structure, lexeme, Mock(), Mock(), Mock())
         structure.links_out.add(relation)
     for _ in range(number_of_lexemes):
         structure.links_out.add(Mock())

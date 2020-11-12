@@ -10,16 +10,17 @@ from homer.structures.links import Relation
 @pytest.fixture
 def parent_concept():
     concept = Mock()
-    concept.classify.return_value = 1.0
+    concept.classifier.classify.return_value = 1.0
     return concept
 
 
 @pytest.fixture
 def bubble_chamber(parent_concept):
     chamber = Mock()
-    chamber.concepts = {
-        "relational": StructureCollection({parent_concept}),
-    }
+    space = Mock()
+    space.name = "relational concepts"
+    space.contents = StructureCollection({parent_concept})
+    chamber.spaces = StructureCollection({space})
     return chamber
 
 
@@ -75,7 +76,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
 def test_fails_when_structures_cannot_be_related(
     parent_concept, bubble_chamber, target_structure_one
 ):
-    parent_concept.classify.return_value = 0.0
+    parent_concept.classifier.classify.return_value = 0.0
     relation_builder = RelationBuilder(
         Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
     )

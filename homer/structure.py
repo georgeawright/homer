@@ -70,7 +70,14 @@ class Structure(ABC):
     def has_relation(
         self, space: Structure, concept: Structure, second_argument: Structure
     ) -> bool:
-        pass
+        for link in self.links_out:
+            if (
+                link.parent_concept == concept
+                and link.end == second_argument
+                and link.parent_space == space
+            ):
+                return True
+        return False
 
     def boost_activation(self, amount: float = None):
         self._activation_buffer += amount

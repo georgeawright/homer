@@ -58,19 +58,23 @@ class RelationBuilder(Builder):
         if self.target_structure_two is None:
             self.target_structure_two = self.target_space.contents.of_type(
                 type(self.target_structure_one)
-            ).get_exigent(exclude=self.target_structure_one)
-            print(self.target_structure_two)
+            ).get_exigent(exclude=[self.target_structure_one])
         if self.parent_concept is None:
-            self.parent_concept = self.bubble_chamber.concepts[
-                "relational"
-            ].get_random()
+            self.parent_concept = self.bubble_chamber.spaces[
+                "relational concepts"
+            ].contents.get_random()
         return not self.target_structure_one.has_relation(
             self.target_space, self.parent_concept, self.target_structure_two
         )
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classify(
-            self.target_space, self.target_structure_one, self.target_structure_two
+        self.confidence = self.parent_concept.classifier.classify(
+            {
+                "concept": self.parent_concept,
+                "space": self.target_space,
+                "start": self.target_structure_one,
+                "end": self.target_structure_two,
+            }
         )
 
     def _boost_activations(self):
@@ -81,6 +85,7 @@ class RelationBuilder(Builder):
             self.target_structure_one,
             self.target_structure_two,
             self.parent_concept,
+            self.target_space,
             self.confidence,
         )
         self.target_space.contents.add(relation)
@@ -90,7 +95,7 @@ class RelationBuilder(Builder):
         self.child_structure = relation
 
     def _engender_follow_up(self):
-        new_target = self.target_structure_one.nearby(self.target_space).get_unhappy()
+        new_target = self.target_space.contents.get_unhappy()
         self.child_codelets.append(
             RelationBuilder.spawn(
                 self.codelet_id,
@@ -114,7 +119,7 @@ class RelationBuilder(Builder):
         )
 
     def _fail(self):
-        new_target = self.target_structure_one.parent_space.contents.get_random()
+        new_target = self.target_space.contents.get_unhappy()
         self.child_codelets.append(
             ChunkBuilder.spawn(
                 self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness

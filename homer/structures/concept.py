@@ -43,6 +43,8 @@ class Concept(Structure):
         self.depth = depth
 
     def distance_from(self, other: Structure):
+        print(self.prototype)
+        print(other.value)
         return self.distance_function(
             self.prototype, getattr(other, self.relevant_value)
         )
