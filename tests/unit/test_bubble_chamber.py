@@ -31,6 +31,26 @@ def test_has_chunk():
     assert bubble_chamber.has_chunk(existing_chunk_members)
 
 
+def test_has_view():
+    existing_view_members = StructureCollection({Mock(), Mock()})
+    existing_view = Mock()
+    existing_view.members = existing_view_members
+    bubble_chamber = BubbleChamber(
+        Mock(),
+        Mock(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection({existing_view}),
+        StructureCollection(),
+        Mock(),
+    )
+    assert bubble_chamber.has_view(existing_view_members)
+
+
 def test_common_parent_space_is_created_if_necessary():
     bubble_chamber = BubbleChamber(
         Mock(),

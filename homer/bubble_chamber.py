@@ -51,6 +51,12 @@ class BubbleChamber:
                 return True
         return False
 
+    def has_view(self, members: StructureCollection) -> bool:
+        for view in self.views:
+            if view.members == members:
+                return True
+        return False
+
     def common_parent_space(self, space_one: Space, space_two: Space):
         try:
             parent_space = StructureCollection.intersection(
