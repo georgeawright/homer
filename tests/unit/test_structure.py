@@ -6,17 +6,17 @@ from homer.structures import Lexeme
 from homer.structures.links import Correspondence, Label, Relation
 
 
-def test_correspondences_returns_labels():
+def test_correspondences_returns_correspondences():
     number_of_correspondences = 10
     links_in = StructureCollection()
     links_out = StructureCollection()
     for _ in range(number_of_correspondences // 2):
         correspondence = Correspondence(
-            Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock()
+            Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock(), Mock()
         )
         links_out.add(correspondence)
         correspondence = Correspondence(
-            Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock()
+            Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock(), Mock()
         )
         links_in.add(correspondence)
     for _ in range(number_of_correspondences // 2):

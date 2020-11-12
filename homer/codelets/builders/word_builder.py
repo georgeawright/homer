@@ -80,31 +80,44 @@ class WordBuilder(Builder):
             StructureCollection({self.output_space}),
             self.confidence,
         )
+        slot_to_word_space = self.bubble_chamber.common_parent_space(
+            self.slot_space, self.output_space
+        )
         projection_from_slot = Correspondence(
             self.slot,
             word,
             self.slot_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],
+            slot_to_word_space,
             concept.parent_space,
             self.confidence,
         )
         self.slot.links_out.add(projection_from_slot)
         word.links_in.add(projection_from_slot)
+        slot_to_word_space.contents.add(projection_from_slot)
+        self.bubble_chamber.correspondences.add(projection_from_slot)
         self.target_view.add_correspondence(projection_from_slot)
+        non_slot_to_word_space = self.bubble_chamber.common_parent_space(
+            self.non_slot_space, self.output_space
+        )
         projection_from_non_slot = Correspondence(
             self.non_slot,
             word,
             self.non_slot_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],
+            non_slot_to_word_space,
             concept.parent_space,
             self.confidence,
         )
         self.non_slot.links_out.add(projection_from_non_slot)
         word.links_in.add(projection_from_non_slot)
+        non_slot_to_word_space.contents.add(projection_from_non_slot)
+        self.bubble_chamber.correspondences.add(projection_from_non_slot)
         self.target_view.add_correspondence(projection_from_non_slot)
         self.output_space.add_word(word)
+        self.bubble_chamber.words.add_word(word)
         self.child_structure = word
 
     def _engender_follow_up(self):

@@ -8,7 +8,7 @@ from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept, Space
 from homer.structures.links import Correspondence, Label, Relation
-from homer.structures.spaces import ConceptualSpace
+from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 from .relation_builder import RelationBuilder
 
@@ -68,7 +68,6 @@ class CorrespondenceBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         if self.target_space_two is None:
-            print(self.bubble_chamber.spaces["working spaces"].contents.structures)
             self.target_space_two = self.bubble_chamber.spaces[
                 "working spaces"
             ].contents.get_active(exclude=[self.target_space_one])
@@ -81,9 +80,6 @@ class CorrespondenceBuilder(Builder):
             return False
         if self.target_conceptual_space is None:
             try:
-                print(self.bubble_chamber.spaces["labeling spaces"].contents.structures)
-                print(self.target_structure_one.parent_spaces.structures)
-                print(self.target_structure_two.parent_spaces.structures)
                 self.target_conceptual_space = StructureCollection.intersection(
                     self.bubble_chamber.spaces["labeling spaces"].contents,
                     self.target_structure_one.parent_spaces,
@@ -96,8 +92,11 @@ class CorrespondenceBuilder(Builder):
             self.parent_concept = self.bubble_chamber.spaces[
                 "correspondential concepts"
             ].contents.get_random()
+        self.parent_space = self.bubble_chamber.common_parent_space(
+            self.target_space_one, self.target_space_two
+        )
         return not self.target_structure_one.has_correspondence(
-            self.target_conceptual_space, self.parent_concept, self.target_structure_two
+            self.parent_space, self.parent_concept, self.target_structure_two
         )
 
     def _calculate_confidence(self):
@@ -114,23 +113,24 @@ class CorrespondenceBuilder(Builder):
         pass
 
     def _process_structure(self):
+        parent_space = self.bubble_chamber.common_parent_space(
+            self.target_space_one, self.target_space_two
+        )
         correspondence = Correspondence(
             self.target_structure_one,
             self.target_structure_two,
             self.target_space_one,
             self.target_space_two,
             self.parent_concept,
+            parent_space,
             self.target_conceptual_space,
             self.confidence,
         )
+        parent_space.contents.add(correspondence)
         self.target_structure_one.links_in.add(correspondence)
         self.target_structure_one.links_out.add(correspondence)
         self.target_structure_two.links_in.add(correspondence)
         self.target_structure_two.links_out.add(correspondence)
-        self.target_space_one.links_in.add(correspondence)
-        self.target_space_one.links_out.add(correspondence)
-        self.target_space_two.links_in.add(correspondence)
-        self.target_space_two.links_out.add(correspondence)
         self.bubble_chamber.correspondences.add(correspondence)
         self.child_structure = correspondence
 

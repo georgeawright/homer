@@ -2,7 +2,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept, Link, Space
-from homer.structures.spaces import ConceptualSpace
+from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 class Correspondence(Link):
@@ -13,7 +13,8 @@ class Correspondence(Link):
         start_space: Space,
         end_space: Space,
         parent_concept: Concept,
-        parent_space: ConceptualSpace,
+        parent_space: WorkingSpace,
+        conceptual_space: ConceptualSpace,
         quality: FloatBetweenOneAndZero,
     ):
         Link.__init__(
@@ -28,13 +29,16 @@ class Correspondence(Link):
         )
         self.start_space = start_space
         self.end_space = end_space
+        self.conceptual_space = conceptual_space
 
-    def nearby(self, space: Space = None):
-        """either correspondences in the same spaces as start and end or other correspondences connected to start or end"""
-        return StructureCollection.union(
-            self.start.correspondences,
-            self.end.correspondences,
-            self.start_space.correspondences_with(self.end_space),
+    def nearby(self):
+        return StructureCollection.difference(
+            StructureCollection.union(
+                self.start.correspondences,
+                self.end.correspondences,
+                self.parent_space.contents,
+            ),
+            StructureCollection({self}),
         )
 
     def get_slot_argument(self):

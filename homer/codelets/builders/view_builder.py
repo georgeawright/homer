@@ -53,7 +53,7 @@ class ViewBuilder(Builder):
     def _passes_preliminary_checks(self):
         try:
             self.second_target_correspondence = (
-                self.target_correspondence.nearby.get_random()
+                self.target_correspondence.nearby().get_random()
             )
         except MissingStructureError:
             return False

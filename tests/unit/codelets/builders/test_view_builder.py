@@ -44,7 +44,8 @@ def target_correspondence(
 ):
     correspondence = Mock()
     correspondence.quality = 1.0
-    correspondence.nearby.get_random.return_value = second_target_correspondence
+    nearby_correspondences = StructureCollection({second_target_correspondence})
+    correspondence.nearby.return_value = nearby_correspondences
     correspondence.common_arguments_with.return_value = StructureCollection()
     return correspondence
 
@@ -108,7 +109,7 @@ def test_fails_when_correspondences_are_not_transitive(
 
 
 def test_fizzles_when_no_second_target(bubble_chamber, target_correspondence):
-    target_correspondence.nearby = StructureCollection()
+    target_correspondence.nearby.return_value = StructureCollection()
     urgency = 1.0
     view_builder = ViewBuilder(
         Mock(), Mock(), bubble_chamber, target_correspondence, urgency

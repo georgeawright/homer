@@ -10,6 +10,8 @@ class Space(Structure):
         contents: list,
         quality: FloatBetweenOneAndZero,
         parent_concept: "Concept",
+        parent_spaces: StructureCollection = None,
+        child_spaces: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -20,6 +22,12 @@ class Space(Structure):
         self.name = name
         self.contents = contents
         self.parent_concept = parent_concept
+        self.parent_spaces = (
+            parent_spaces if parent_spaces is not None else StructureCollection()
+        )
+        self.child_spaces = (
+            child_spaces if child_spaces is not None else StructureCollection()
+        )
 
     def distance_between(self, a: Structure, b: Structure):
         return self.parent_concept.distance_between(a, b)

@@ -56,17 +56,22 @@ class FunctionWordBuilder(Builder):
             self.confidence,
         )
         self.output_space.contents.add(output_word)
+        correspondence_space = self.bubble_chamber.common_parent_space(
+            self.input_space, self.output_space
+        )
         correspondence = Correspondence(
             template_word,
             output_word,
             self.input_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],
+            correspondence_space,
             self.bubble_chamber.spaces["text"],
             self.confidence,
         )
         template_word.links_out.add(correspondence)
         output_word.links_in.add(correspondence)
+        correspondence_space.contents.add(correspondence)
         self.bubble_chamber.correspondences.add(correspondence)
         self.child_structure = output_word
 

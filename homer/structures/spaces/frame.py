@@ -8,6 +8,8 @@ class Frame(Space):
         name: str,
         contents: StructureCollection,
         parent_concept: Concept,
+        parent_spaces: StructureCollection = None,
+        child_spaces: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -18,6 +20,8 @@ class Frame(Space):
             contents,
             quality,
             parent_concept,
+            parent_spaces=parent_spaces,
+            child_spaces=child_spaces,
             links_in=links_in,
             links_out=links_out,
         )
