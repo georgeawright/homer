@@ -34,7 +34,7 @@ def target_chunk(bubble_chamber):
     location_concept = Concept(
         Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
-    input_space = WorkingSpace(StructureCollection(), 0, location_concept)
+    input_space = WorkingSpace("input", StructureCollection(), 0, location_concept)
     parent_spaces = StructureCollection({input_space})
     chunk = Chunk(
         [10],
