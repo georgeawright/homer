@@ -12,8 +12,13 @@ class Relation(Link):
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
     ):
-        links_in = []
-        links_out = []
-        Link.__init__(self, start, end, quality, links_in=links_in, links_out=links_out)
-        self.parent_concept = parent_concept
-        self.parent_space = parent_space
+        Link.__init__(
+            self,
+            start,
+            end,
+            parent_concept,
+            parent_space,
+            quality,
+            links_in=None,
+            links_out=None,
+        )

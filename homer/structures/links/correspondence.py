@@ -10,14 +10,19 @@ class Correspondence(Link):
         start: Structure,
         end: Structure,
         parent_concept: Concept,
-        conceptual_space: ConceptualSpace,
+        parent_space: ConceptualSpace,
         quality: FloatBetweenOneAndZero,
     ):
-        links_in = []
-        links_out = []
-        Link.__init__(self, start, end, quality, links_in=links_in, links_out=links_out)
-        self.conceptual_space = conceptual_space
-        self.parent_concept = parent_concept
+        Link.__init__(
+            self,
+            start,
+            end,
+            parent_concept,
+            parent_space,
+            quality,
+            links_in=None,
+            links_out=None,
+        )
 
     def nearby(self, space: Space = None):
         """either correspondences in the same spaces as start and end or other correspondences connected to start or end"""

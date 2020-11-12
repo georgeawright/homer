@@ -10,7 +10,7 @@ def test_labels_returns_labels():
     number_of_labels = 10
     links_out = StructureCollection()
     for _ in range(number_of_labels):
-        label = Label(Mock(), Mock(), Mock())
+        label = Label(Mock(), Mock(), Mock(), Mock())
         links_out.add(label)
     for _ in range(number_of_labels):
         links_out.add(Mock())

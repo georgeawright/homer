@@ -86,7 +86,7 @@ class Structure(ABC):
             if (
                 link.parent_concept == concept
                 and link.end == second_argument
-                and link.conceptual_space == space
+                and link.parent_space == space
             ):
                 return True
         return False
