@@ -3,7 +3,25 @@ from unittest.mock import Mock
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Lexeme
-from homer.structures.links import Label, Relation
+from homer.structures.links import Correspondence, Label, Relation
+
+
+def test_correspondences_returns_labels():
+    number_of_correspondences = 10
+    links_in = StructureCollection()
+    links_out = StructureCollection()
+    for _ in range(number_of_correspondences // 2):
+        correspondence = Correspondence(Mock(), Mock(), Mock(), Mock(), Mock())
+        links_out.add(correspondence)
+        correspondence = Correspondence(Mock(), Mock(), Mock(), Mock(), Mock())
+        links_in.add(correspondence)
+    for _ in range(number_of_correspondences // 2):
+        links_out.add(Mock())
+        links_in.add(Mock())
+    structure = Structure(Mock(), Mock(), links_in=links_in, links_out=links_out)
+    assert number_of_correspondences == len(structure.correspondences)
+    for correspondence in structure.correspondences:
+        assert isinstance(correspondence, Correspondence)
 
 
 def test_labels_returns_labels():

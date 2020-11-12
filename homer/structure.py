@@ -43,6 +43,17 @@ class Structure(ABC):
         return self._unhappiness
 
     @property
+    def correspondences(self) -> StructureCollection:
+        from homer.structures.links import Correspondence
+
+        return StructureCollection(
+            set.union(
+                {link for link in self.links_in if isinstance(link, Correspondence)},
+                {link for link in self.links_out if isinstance(link, Correspondence)},
+            )
+        )
+
+    @property
     def labels(self) -> StructureCollection:
         from homer.structures.links import Label
 
