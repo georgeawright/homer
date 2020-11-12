@@ -58,7 +58,9 @@ class ViewBuilder(Builder):
         except MissingStructureError:
             return False
         return not self.bubble_chamber.has_view(
-            self.target_correspondence, self.second_target_correspondence
+            StructureCollection(
+                {self.target_correspondence, self.second_target_correspondence}
+            )
         )
 
     def _calculate_confidence(self):
@@ -88,11 +90,13 @@ class ViewBuilder(Builder):
                     self.second_target_correspondence.quality,
                     self.third_target_quality,
                 )  # you are only as strong as your weakest link
-                self.correspondences = [
-                    self.target_correspondence,
-                    self.second_target_correspondence,
-                    self.third_target_correspondence,
-                ]
+                self.correspondences = StructureCollection(
+                    {
+                        self.target_correspondence,
+                        self.second_target_correspondence,
+                        self.third_target_correspondence,
+                    }
+                )
             except MissingStructureError:
                 self.confidence = 0.0
                 return
@@ -101,10 +105,12 @@ class ViewBuilder(Builder):
                 self.target_correspondence.quality,
                 self.second_target_correspondence.quality,
             )
-            self.correspondences = [
-                self.target_correspondence,
-                self.second_target_correspondence,
-            ]
+            self.correspondences = StructureCollection(
+                {
+                    self.target_correspondence,
+                    self.second_target_correspondence,
+                }
+            )
         else:  # if there are 2 common arguments, the correspondences are equivalent/competing
             self.confidence = 0.0
 
@@ -114,12 +120,10 @@ class ViewBuilder(Builder):
     def _process_structure(self):
         view = View(
             self.correspondences,
-            self.bubble_chamber.top_level_work_space,
+            self.bubble_chamber.top_level_working_space,
             self.confidence,
         )
-        for correspondence in self.correspondences:
-            correspondence.add_view(view)
-        self.bubble_chamber.add_view(view)
+        self.bubble_chamber.views.add(view)
         self.child_structure = view
 
     def _engender_follow_up(self):
