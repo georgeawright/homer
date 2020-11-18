@@ -61,6 +61,10 @@ class WordBuilder(Builder):
             else self.target_correspondence.start_space
         )
         self.output_space = self.target_view.output_space
+        print(self.target_view)
+        for word in self.output_space.contents:
+            if len(word.correspondences_with(self.slot)) > 0:
+                return False
         return True
 
     def _calculate_confidence(self):
@@ -97,7 +101,7 @@ class WordBuilder(Builder):
         word.links_in.add(projection_from_slot)
         slot_to_word_space.contents.add(projection_from_slot)
         self.bubble_chamber.correspondences.add(projection_from_slot)
-        self.target_view.add_correspondence(projection_from_slot)
+        self.target_view.members.add(projection_from_slot)
         non_slot_to_word_space = self.bubble_chamber.common_parent_space(
             self.non_slot_space, self.output_space
         )
@@ -115,9 +119,9 @@ class WordBuilder(Builder):
         word.links_in.add(projection_from_non_slot)
         non_slot_to_word_space.contents.add(projection_from_non_slot)
         self.bubble_chamber.correspondences.add(projection_from_non_slot)
-        self.target_view.add_correspondence(projection_from_non_slot)
-        self.output_space.add_word(word)
-        self.bubble_chamber.words.add_word(word)
+        self.target_view.members.add(projection_from_non_slot)
+        self.output_space.contents.add(word)
+        self.bubble_chamber.words.add(word)
         self.child_structure = word
 
     def _engender_follow_up(self):
@@ -125,7 +129,7 @@ class WordBuilder(Builder):
             FunctionWordBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.slot.parent_space,
+                self.slot.parent_spaces.get_random(),
                 self.output_space,
                 self.confidence,
             )

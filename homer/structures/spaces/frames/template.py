@@ -18,6 +18,7 @@ class Template(Frame):
         links_out: StructureCollection = None,
     ):
         Frame.__init__(
+            self,
             name,
             members,
             parent_concept,
