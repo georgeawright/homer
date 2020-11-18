@@ -33,4 +33,4 @@ class HyperParameters:
     NO_OF_STARTER_CODELETS = 10
     STARTER_CODELET_URGENCY = 0.5
 
-    HOW_FAR_IS_NEAR = 1
+    HOW_FAR_IS_NEAR = 1.5
