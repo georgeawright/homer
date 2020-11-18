@@ -30,8 +30,11 @@ class LabelEvaluator(Evaluator):
         return cls(codelet_id, parent_id, bubble_chamber, target_structure, urgency)
 
     def _calculate_confidence(self):
-        quality_estimate = self.target_structure.parent_concept.classify(
-            self.target_structure.start
+        quality_estimate = self.target_structure.parent_concept.classifier.classify(
+            {
+                "start": self.target_structure.start,
+                "concept": self.target_structure.parent_concept,
+            }
         )
         self.confidence = quality_estimate - self.target_structure.quality
 

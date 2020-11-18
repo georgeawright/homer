@@ -8,7 +8,7 @@ from homer.codelets.selectors import LabelSelector
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
 def test_changes_target_structure_quality(current_quality, classification):
     concept = Mock()
-    concept.classify.return_value = classification
+    concept.classifier.classify.return_value = classification
     label = Mock()
     label.quality = current_quality
     label.parent_concept = concept
