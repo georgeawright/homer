@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import FunctionWordBuilder
+from homer.structure_collection import StructureCollection
 from homer.structures.chunks import Word
 
 
@@ -9,10 +10,11 @@ def test_successful_creates_word():
     bubble_chamber = Mock()
     bubble_chamber.concepts = {"same": Mock()}
     bubble_chamber.spaces = {"text": Mock()}
-    target_correspondence = Mock()
-    target_correspondence.activation = 1.0
+    template = Mock()
+    output_space = Mock()
+    output_space.contents = StructureCollection()
     function_word_builder = FunctionWordBuilder(
-        Mock(), Mock(), bubble_chamber, Mock(), target_correspondence, Mock()
+        Mock(), Mock(), bubble_chamber, template, output_space, Mock()
     )
     result = function_word_builder.run()
     assert CodeletResult.SUCCESS == result

@@ -39,6 +39,10 @@ class FunctionWordBuilder(Builder):
         )
 
     def _passes_preliminary_checks(self):
+        self.template_word = self.input_space.contents.get_unhappy()
+        for word in self.output_space.contents:
+            if len(word.correspondences_with(self.template_word)) > 0:
+                return False
         return True
 
     def _boost_activations(self):
@@ -48,10 +52,9 @@ class FunctionWordBuilder(Builder):
         self.confidence = 1.0
 
     def _process_structure(self):
-        template_word = self.input_space.words.get_unhappy()
         output_word = Word(
-            template_word.value,
-            template_word.location,
+            self.template_word.value,
+            self.template_word.location,
             StructureCollection({self.output_space}),
             self.confidence,
         )
@@ -60,7 +63,7 @@ class FunctionWordBuilder(Builder):
             self.input_space, self.output_space
         )
         correspondence = Correspondence(
-            template_word,
+            self.template_word,
             output_word,
             self.input_space,
             self.output_space,
@@ -69,7 +72,7 @@ class FunctionWordBuilder(Builder):
             self.bubble_chamber.spaces["text"],
             self.confidence,
         )
-        template_word.links_out.add(correspondence)
+        self.template_word.links_out.add(correspondence)
         output_word.links_in.add(correspondence)
         correspondence_space.contents.add(correspondence)
         self.bubble_chamber.correspondences.add(correspondence)
