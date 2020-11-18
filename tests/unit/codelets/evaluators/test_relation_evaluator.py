@@ -8,7 +8,7 @@ from homer.codelets.selectors import RelationSelector
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
 def test_changes_target_structure_quality(current_quality, classification):
     concept = Mock()
-    concept.classify.return_value = classification
+    concept.classifierclassify.return_value = classification
     relation = Mock()
     relation.quality = current_quality
     relation.parent_concept = concept

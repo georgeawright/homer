@@ -30,10 +30,13 @@ class RelationEvaluator(Evaluator):
         return cls(codelet_id, parent_id, bubble_chamber, target_structure, urgency)
 
     def _calculate_confidence(self):
-        quality_estimate = self.target_structure.parent_concept.classify(
-            self.target_structure.parent_space,
-            self.target_structure.start,
-            self.target_structure.end,
+        quality_estimate = self.target_structure.parent_concept.classifier.classify(
+            {
+                "space": self.target_structure.parent_space,
+                "concept": self.target_structure.parent_concept,
+                "start": self.target_structure.start,
+                "end": self.target_structure.end,
+            }
         )
         self.confidence = quality_estimate - self.target_structure.quality
 
