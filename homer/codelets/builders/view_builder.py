@@ -119,18 +119,20 @@ class ViewBuilder(Builder):
         pass
 
     def _process_structure(self):
+        view_output_space = WorkingSpace(
+            self.codelet_id,
+            StructureCollection(),
+            0.0,
+            self.bubble_chamber.concepts["text"],
+        )
         view = View(
             self.correspondences,
             self.bubble_chamber.top_level_working_space,
-            WorkingSpace(
-                self.codelet_id,
-                StructureCollection(),
-                0.0,
-                self.bubble_chamber.concepts["text"],
-            ),
+            view_output_space,
             self.confidence,
         )
         self.bubble_chamber.views.add(view)
+        self.bubble_chamber.spaces.add(view_output_space)
         self.child_structure = view
 
     def _engender_follow_up(self):
