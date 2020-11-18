@@ -15,7 +15,7 @@ class Structure(ABC):
         links_out: StructureCollection = None,
     ):
         self.location = location
-        self._quality = quality
+        self.quality = quality
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
         self._activation = FloatBetweenOneAndZero(0)
@@ -33,10 +33,6 @@ class Structure(ABC):
     @property
     def activation(self) -> FloatBetweenOneAndZero:
         return self._activation
-
-    @property
-    def quality(self) -> FloatBetweenOneAndZero:
-        return self._quality
 
     @property
     def unhappiness(self) -> FloatBetweenOneAndZero:
