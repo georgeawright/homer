@@ -48,7 +48,6 @@ class ChunkEnlarger(Builder):
         try:
             self.candidate_member = self.target_chunk.nearby().get_random()
         except MissingStructureError:
-            print("missing")
             return False
         return not self.bubble_chamber.has_chunk(
             StructureCollection.union(

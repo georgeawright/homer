@@ -86,7 +86,6 @@ class CorrespondenceBuilder(Builder):
                     self.target_structure_two.parent_spaces,
                 ).get_random()
             except MissingStructureError:
-                print("no target conceptual space")
                 return False
         if self.parent_concept is None:
             self.parent_concept = self.bubble_chamber.spaces[
