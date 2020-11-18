@@ -156,6 +156,7 @@ def target_view(bubble_chamber, first_correspondence, second_correspondence):
     view = View(
         StructureCollection({first_correspondence, second_correspondence}),
         bubble_chamber.top_level_working_space,
+        Mock(),
         0.0,
     )
     return view

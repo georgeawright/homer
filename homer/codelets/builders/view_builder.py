@@ -11,6 +11,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Concept
 from homer.structures.chunks import View
 from homer.structures.links import Correspondence
+from homer.structures.spaces import WorkingSpace
 
 from .view_enlarger import ViewEnlarger
 
@@ -121,6 +122,12 @@ class ViewBuilder(Builder):
         view = View(
             self.correspondences,
             self.bubble_chamber.top_level_working_space,
+            WorkingSpace(
+                self.codelet_id,
+                StructureCollection(),
+                0.0,
+                self.bubble_chamber.concepts["text"],
+            ),
             self.confidence,
         )
         self.bubble_chamber.views.add(view)

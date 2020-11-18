@@ -28,6 +28,10 @@ def bubble_chamber():
         StructureCollection(),
         Mock(),
     )
+    text_concept = Concept(
+        "text", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(text_concept)
     return chamber
 
 

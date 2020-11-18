@@ -3,6 +3,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.chunk import Chunk
 from homer.structures.links.correspondence import Correspondence
 from homer.structures.space import Space
+from homer.structures.spaces import WorkingSpace
 
 
 class View(Chunk):
@@ -12,6 +13,7 @@ class View(Chunk):
         self,
         members: StructureCollection,
         parent_space: Space,
+        output_space: WorkingSpace,
         quality: FloatBetweenOneAndZero,
     ):
         value = None
@@ -20,7 +22,7 @@ class View(Chunk):
         Chunk.__init__(
             self, value, location, members, neighbours, parent_space, quality
         )
-        self.output_space = None
+        self.output_space = output_space
 
     @property
     def size(self):
