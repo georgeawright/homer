@@ -1,5 +1,3 @@
-from typing import List, Union
-
 from homer.structures import Concept
 from homer.structure_collection import StructureCollection
 from homer.structures.chunks.slot import Slot
@@ -12,12 +10,12 @@ class Template(Frame):
     def __init__(
         self,
         name: str,
-        members: List[Union[Slot, Word]],
+        members: StructureCollection,
         parent_concept: Concept,
         parent_spaces: StructureCollection = None,
         child_spaces: StructureCollection = None,
-        links_in: List[Link] = None,
-        links_out: List[Link] = None,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
     ):
         Frame.__init__(
             name,
