@@ -46,8 +46,9 @@ class ChunkEnlarger(Builder):
 
     def _passes_preliminary_checks(self):
         try:
-            self.candidate_member = self.target_chunk.nearby.get_random()
+            self.candidate_member = self.target_chunk.nearby().get_random()
         except MissingStructureError:
+            print("missing")
             return False
         return not self.bubble_chamber.has_chunk(
             StructureCollection.union(

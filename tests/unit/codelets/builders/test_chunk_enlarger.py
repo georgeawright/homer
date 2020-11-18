@@ -36,7 +36,7 @@ def target_chunk(common_space, candidate_chunk):
     chunk.members = StructureCollection()
     chunk.neighbours = StructureCollection()
     chunk.parent_spaces = StructureCollection({common_space})
-    chunk.nearby.get_random.return_value = candidate_chunk
+    chunk.nearby.return_value = StructureCollection({candidate_chunk})
     return chunk
 
 
@@ -63,7 +63,7 @@ def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common
 
 
 def test_fizzles_when_no_candidate_found(bubble_chamber, target_chunk):
-    target_chunk.nearby = StructureCollection()
+    target_chunk.nearby.return_value = StructureCollection()
     urgency = 1.0
     chunk_enlarger = ChunkEnlarger(
         Mock(), Mock(), bubble_chamber, target_chunk, urgency
