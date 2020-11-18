@@ -102,6 +102,18 @@ class Structure(ABC):
                 return True
         return False
 
+    def correspondences_with(self, other: Structure):
+        return StructureCollection(
+            {
+                correspondence
+                for correspondence in self.correspondences
+                if correspondence.start == self
+                and correspondence.end == other
+                or correspondence.start == other
+                and correspondence.end == self
+            }
+        )
+
     def boost_activation(self, amount: float = None):
         self._activation_buffer += amount
 

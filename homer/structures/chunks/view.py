@@ -27,7 +27,7 @@ class View(Chunk):
         return len(self.members)
 
     def nearby(self, space: Space = None):
-        raise NotImplementedError
-
-    def add_member(self, new_member: Correspondence):
-        pass
+        return StructureCollection.difference(
+            StructureCollection.union(*[member.nearby() for member in self.members]),
+            self.members,
+        )

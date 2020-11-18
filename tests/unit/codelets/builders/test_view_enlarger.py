@@ -51,7 +51,7 @@ def candidate_correspondence(common_space, second_target_view):
 def target_view(candidate_correspondence, existing_correspondence):
     view = Mock()
     view.members = StructureCollection({existing_correspondence})
-    view.nearby.get_random.return_value = candidate_correspondence
+    view.nearby.return_value = StructureCollection({candidate_correspondence})
     return view
 
 
@@ -68,7 +68,6 @@ def test_successful_adds_to_view_and_spawns_follow_up(
     view_enlarger = ViewEnlarger(Mock(), Mock(), bubble_chamber, target_view, Mock())
     result = view_enlarger.run()
     assert CodeletResult.SUCCESS == result
-    target_view.add_member.assert_called_with(candidate_correspondence)
     assert len(view_enlarger.child_codelets) == 1
     assert isinstance(view_enlarger.child_codelets[0], ViewEnlarger)
 
@@ -110,7 +109,7 @@ def test_fails_when_correspondences_are_not_transitive(
 def test_fizzles_when_no_second_target(
     bubble_chamber, target_view, existing_correspondence
 ):
-    target_view.nearby = StructureCollection()
+    target_view.nearby.return_value = StructureCollection()
     urgency = 1.0
     view_enlarger = ViewEnlarger(Mock(), Mock(), bubble_chamber, target_view, urgency)
     result = view_enlarger.run()

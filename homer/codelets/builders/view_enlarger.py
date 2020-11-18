@@ -44,7 +44,7 @@ class ViewEnlarger(Builder):
 
     def _passes_preliminary_checks(self):
         try:
-            self.candidate_member = self.target_view.nearby.get_random()
+            self.candidate_member = self.target_view.nearby().get_random()
         except MissingStructureError:
             return False
         return not self.bubble_chamber.has_view(
@@ -79,13 +79,11 @@ class ViewEnlarger(Builder):
                 if correspondence.start != common_arguments.get_random()
                 else correspondence.end
             )
-            print(third_target_start)
             third_target_end = (
                 self.candidate_member.end
                 if self.candidate_member.end != common_arguments.get_random()
                 else self.candidate_member.start
             )
-            print(third_target_end)
             try:
                 third_correspondence = third_target_start.correspondences_with(
                     third_target_end
@@ -111,8 +109,7 @@ class ViewEnlarger(Builder):
         pass
 
     def _process_structure(self):
-        print(self.confidence)
-        self.target_view.add_member(self.candidate_member)
+        self.target_view.members.add(self.candidate_member)
 
     def _engender_follow_up(self):
         self.child_codelets.append(
