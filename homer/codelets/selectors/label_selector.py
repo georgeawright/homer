@@ -46,9 +46,7 @@ class LabelSelector(Selector):
         if self.challenger is not None:
             return True
         space = self.champion.parent_space
-        candidates = self.champion.start.labels_from_space(
-            self.champion.parent_concept.parent_space
-        )
+        candidates = self.champion.start.labels_in_space(self.champion.parent_space)
         if len(candidates) == 1:
             return False
         self.challenger = candidates.get_active(exclude=[self.champion])

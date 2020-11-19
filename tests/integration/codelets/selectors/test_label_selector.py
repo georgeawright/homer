@@ -24,34 +24,44 @@ def conceptual_space():
 
 
 @pytest.fixture
-def chunk():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+def working_space():
+    space = WorkingSpace(Mock(), StructureCollection(), Mock(), Mock())
+    return space
+
+
+@pytest.fixture
+def chunk(working_space):
+    chunk = Chunk(
+        Mock(), Mock(), Mock(), Mock(), Mock(), StructureCollection({working_space})
+    )
     return chunk
 
 
 @pytest.fixture
-def good_label(chunk, conceptual_space):
+def good_label(chunk, conceptual_space, working_space):
     concept = Concept(Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock())
     label = Label(
         chunk,
         concept,
-        Mock(),
+        working_space,
         1.0,
     )
     chunk.links_out.add(label)
+    working_space.contents.add(label)
     return label
 
 
 @pytest.fixture
-def bad_label(chunk, conceptual_space):
+def bad_label(chunk, conceptual_space, working_space):
     concept = Concept(Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock())
     label = Label(
         chunk,
         concept,
-        Mock(),
+        working_space,
         0.0,
     )
     chunk.links_out.add(label)
+    working_space.contents.add(label)
     return label
 
 
