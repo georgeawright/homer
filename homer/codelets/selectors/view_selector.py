@@ -46,7 +46,7 @@ class ViewSelector(Selector):
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
-        self.challenger = self.bubble_chamber.views.get_random()
+        self.challenger = self.bubble_chamber.views.get_random(exclude=[self.champion])
         members_intersection = StructureCollection.intersection(
             self.champion.members, self.challenger.members
         )
@@ -55,10 +55,10 @@ class ViewSelector(Selector):
         ) > 0.5 * len(self.challenger.members)
 
     def _boost_winner(self):
-        self.winner.boost_activation()
+        self.winner.boost_activation(self.confidence)
 
     def _decay_loser(self):
-        self.loser.decay_activation()
+        self.loser.decay_activation(self.confidence)
 
     def _fizzle(self):
         new_target = self.bubble_chamber.correspondences.get_unhappy()
