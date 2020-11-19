@@ -58,6 +58,17 @@ class Structure(ABC):
         )
 
     @property
+    def relations(self) -> StructureCollection:
+        from homer.structures.links import Relation
+
+        return StructureCollection(
+            set.union(
+                {link for link in self.links_in if isinstance(link, Relation)},
+                {link for link in self.links_out if isinstance(link, Relation)},
+            )
+        )
+
+    @property
     def lexemes(self) -> StructureCollection:
         from homer.structures import Lexeme
 
@@ -74,13 +85,9 @@ class Structure(ABC):
                 return True
         return False
 
-    def labels_from_space(self, space: Structure) -> StructureCollection:
+    def labels_in_space(self, space: Structure) -> StructureCollection:
         return StructureCollection(
-            {
-                label
-                for label in self.labels
-                if label.parent_concept.parent_space == space
-            }
+            {label for label in self.labels if label in space.contents}
         )
 
     def has_relation(
@@ -94,6 +101,19 @@ class Structure(ABC):
             ):
                 return True
         return False
+
+    def relations_in_space_with(self, space: Structure, other: Structure) -> bool:
+        return StructureCollection(
+            {
+                relation
+                for relation in self.relations
+                if relation in space.contents
+                and (
+                    (relation.start == self and relation.end == other)
+                    or (relation.start == other and relation.end == self)
+                )
+            }
+        )
 
     def has_correspondence(
         self, space: Structure, concept: Structure, second_argument: Structure

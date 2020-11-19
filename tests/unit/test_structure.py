@@ -56,17 +56,39 @@ def test_lexemes_returns_lexemes():
         assert isinstance(lexeme, Lexeme)
 
 
-def test_labels_from_space():
+def test_labels_in_space():
     structure = Structure(Mock(), Mock(), links_out=StructureCollection())
     space = Mock()
-    label_from_space = Label(Mock(), Mock(), Mock(), Mock())
-    label_from_space.parent_concept.parent_space = space
-    label_not_from_space = Label(Mock(), Mock(), Mock(), Mock())
-    label_not_from_space.parent_concept.parent_space = Mock()
-    structure.links_out.add(label_from_space)
-    structure.links_out.add(label_not_from_space)
-    assert label_from_space in structure.labels_from_space(space)
-    assert label_not_from_space not in structure.labels_from_space(space)
+    space.contents = StructureCollection()
+    label_in_space = Label(Mock(), Mock(), Mock(), Mock())
+    space.contents.add(label_in_space)
+    label_not_in_space = Label(Mock(), Mock(), Mock(), Mock())
+    structure.links_out.add(label_in_space)
+    structure.links_out.add(label_not_in_space)
+    assert label_in_space in structure.labels_in_space(space)
+    assert label_not_in_space not in structure.labels_in_space(space)
+
+
+def test_relations_in_space_with():
+    structure = Structure(Mock(), Mock(), links_out=StructureCollection())
+    end = Mock()
+    space = Mock()
+    space.contents = StructureCollection()
+    relation_in_space_with_end = Relation(structure, end, Mock(), Mock(), Mock())
+    relation_in_space_not_with_end = Relation(structure, Mock(), Mock(), Mock(), Mock())
+    relation_not_in_space_with_end = Relation(structure, end, Mock(), Mock(), Mock())
+    space.contents.add(relation_in_space_with_end)
+    space.contents.add(relation_in_space_not_with_end)
+    structure.links_out.add(relation_in_space_with_end)
+    structure.links_out.add(relation_in_space_not_with_end)
+    structure.links_out.add(relation_not_in_space_with_end)
+    assert relation_in_space_with_end in structure.relations_in_space_with(space, end)
+    assert relation_in_space_not_with_end not in structure.relations_in_space_with(
+        space, end
+    )
+    assert relation_not_in_space_with_end not in structure.relations_in_space_with(
+        space, end
+    )
 
 
 def test_boost_and_update_activation():
