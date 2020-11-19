@@ -1,3 +1,4 @@
 from .difference_classifier import DifferenceClassifier
 from .proximity_classifier import ProximityClassifier
+from .sameness_classifier import SamenessClassifier
 from .stretchy_proximity_classifier import StretchyProximityClassifier
