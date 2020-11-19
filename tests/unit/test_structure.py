@@ -110,10 +110,10 @@ def test_correspondences_to():
     structure.links_out.add(correspondence_2)
     structure.links_out.add(correspondence_3)
     structure.links_out.add(correspondence_4)
-    assert correspondence_1 in structure.correspondences_to(space)
-    assert correspondence_2 in structure.correspondences_to(space)
-    assert correspondence_3 not in structure.correspondences_to(space)
-    assert correspondence_4 not in structure.correspondences_to(space)
+    assert correspondence_1 in structure.correspondences_to_space(space)
+    assert correspondence_2 in structure.correspondences_to_space(space)
+    assert correspondence_3 not in structure.correspondences_to_space(space)
+    assert correspondence_4 not in structure.correspondences_to_space(space)
 
 
 def test_boost_and_update_activation():

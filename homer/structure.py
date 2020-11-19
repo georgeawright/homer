@@ -139,7 +139,7 @@ class Structure(ABC):
             }
         )
 
-    def correspondences_to(self, space: Structure):
+    def correspondences_to_space(self, space: Structure):
         return StructureCollection(
             {
                 correspondence
