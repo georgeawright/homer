@@ -3,7 +3,6 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ChunkBuilder, ChunkEnlarger
 from homer.codelets.selectors import ChunkSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
