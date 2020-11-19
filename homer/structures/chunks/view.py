@@ -20,8 +20,15 @@ class View(Chunk):
         location = None
         neighbours = None
         Chunk.__init__(
-            self, value, location, members, neighbours, parent_space, quality
+            self,
+            value,
+            location,
+            members,
+            neighbours,
+            quality,
+            StructureCollection({parent_space}),
         )
+        self.parent_space = parent_space
         self.output_space = output_space
 
     @property
