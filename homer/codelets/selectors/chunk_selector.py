@@ -58,10 +58,10 @@ class ChunkSelector(Selector):
         ) > 0.5 * len(self.challenger.members)
 
     def _boost_winner(self):
-        self.winner.boost_activation()
+        self.winner.boost_activation(self.confidence)
 
     def _decay_loser(self):
-        self.loser.decay_activation()
+        self.loser.decay_activation(self.confidence)
 
     def _fizzle(self):
         new_target = self.champion.nearby(self.target_space).get_unhappy()
