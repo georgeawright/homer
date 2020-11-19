@@ -56,6 +56,19 @@ def test_lexemes_returns_lexemes():
         assert isinstance(lexeme, Lexeme)
 
 
+def test_labels_from_space():
+    structure = Structure(Mock(), Mock(), links_out=StructureCollection())
+    space = Mock()
+    label_from_space = Label(Mock(), Mock(), Mock(), Mock())
+    label_from_space.parent_concept.parent_space = space
+    label_not_from_space = Label(Mock(), Mock(), Mock(), Mock())
+    label_not_from_space.parent_concept.parent_space = Mock()
+    structure.links_out.add(label_from_space)
+    structure.links_out.add(label_not_from_space)
+    assert label_from_space in structure.labels_from_space(space)
+    assert label_not_from_space not in structure.labels_from_space(space)
+
+
 def test_boost_and_update_activation():
     structure = Structure(Mock(), Mock())
     assert 0.0 == structure.activation

@@ -69,10 +69,19 @@ class Structure(ABC):
         raise NotImplementedError
 
     def has_label(self, concept: Structure) -> bool:
-        for link in self.links_out:
-            if link.parent_concept == concept and link.end is None:
+        for label in self.labels:
+            if label.parent_concept == concept:
                 return True
         return False
+
+    def labels_from_space(self, space: Structure) -> StructureCollection:
+        return StructureCollection(
+            {
+                label
+                for label in self.labels
+                if label.parent_concept.parent_space == space
+            }
+        )
 
     def has_relation(
         self, space: Structure, concept: Structure, second_argument: Structure
