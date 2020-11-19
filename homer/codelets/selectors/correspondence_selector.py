@@ -43,7 +43,9 @@ class CorrespondenceSelector(Selector):
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
-        candidates = self.champion.start.correspondences_with(self.champion.end)
+        candidates = self.champion.start.correspondences_to_space(
+            self.champion.end_space
+        )
         if len(candidates) == 1:
             return False
         self.challenger = candidates.get_active(exclude=[self.champion])
@@ -60,7 +62,7 @@ class CorrespondenceSelector(Selector):
             CorrespondenceBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion.parent_spaces.get_random(),
+                self.champion.start.parent_spaces.get_random(),
                 self.champion.start,
                 self.champion.start.unhappiness,
             )

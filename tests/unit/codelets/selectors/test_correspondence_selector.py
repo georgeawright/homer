@@ -15,7 +15,7 @@ def test_finds_challenger_when_not_given_one():
     champion.activation = 1.0
     challenger.quality = 1.0
     challenger.activation = 1.0
-    champion.start.correspondences_with.return_value = StructureCollection(
+    champion.start.correspondences_to_space.return_value = StructureCollection(
         {champion, challenger}
     )
     selector = CorrespondenceSelector(Mock(), Mock(), Mock(), champion, Mock())
@@ -67,7 +67,9 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
 
 def test_spawns_builder_when_fizzling():
     champion = Mock()
-    champion.start.correspondences_with.return_value = StructureCollection({champion})
+    champion.start.correspondences_to_space.return_value = StructureCollection(
+        {champion}
+    )
     selector = CorrespondenceSelector(Mock(), Mock(), Mock(), champion, Mock())
     selector.run()
     assert selector.challenger is None
