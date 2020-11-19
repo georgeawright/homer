@@ -139,6 +139,18 @@ class Structure(ABC):
             }
         )
 
+    def correspondences_to(self, space: Structure):
+        return StructureCollection(
+            {
+                correspondence
+                for correspondence in self.correspondences
+                if correspondence.start == self
+                and correspondence.end_space == space
+                or correspondence.end == self
+                and correspondence.start_space == space
+            }
+        )
+
     def boost_activation(self, amount: float = None):
         self._activation_buffer += amount
 

@@ -91,6 +91,31 @@ def test_relations_in_space_with():
     )
 
 
+def test_correspondences_to():
+    structure = Structure(Mock(), Mock())
+    space = Mock()
+    correspondence_1 = Correspondence(
+        structure, Mock(), Mock(), space, Mock(), Mock(), Mock(), Mock()
+    )
+    correspondence_2 = Correspondence(
+        Mock(), structure, space, Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    correspondence_3 = Correspondence(
+        structure, Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    correspondence_4 = Correspondence(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    structure.links_out.add(correspondence_1)
+    structure.links_out.add(correspondence_2)
+    structure.links_out.add(correspondence_3)
+    structure.links_out.add(correspondence_4)
+    assert correspondence_1 in structure.correspondences_to(space)
+    assert correspondence_2 in structure.correspondences_to(space)
+    assert correspondence_3 not in structure.correspondences_to(space)
+    assert correspondence_4 not in structure.correspondences_to(space)
+
+
 def test_boost_and_update_activation():
     structure = Structure(Mock(), Mock())
     assert 0.0 == structure.activation
