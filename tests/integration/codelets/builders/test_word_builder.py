@@ -98,8 +98,7 @@ def target_correspondence(template, input_space):
         conceptual_space,
         quality,
     )
-    correspondence.boost_activation(1.0)
-    correspondence.update_activation()
+    correspondence._activation = 1.0
     return correspondence
 
 
