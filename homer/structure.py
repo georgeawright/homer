@@ -157,6 +157,9 @@ class Structure(ABC):
     def decay_activation(self, amount: float = None):
         self._activation_buffer -= amount
 
+    def spread_activation(self):
+        pass
+
     def update_activation(self):
         self._activation = FloatBetweenOneAndZero(
             self._activation + self._activation_buffer

@@ -42,8 +42,26 @@ class BubbleChamber:
     def setup(cls, problem: Problem, logger: Logger):
         pass
 
+    @property
+    def structures(self):
+        return StructureCollection.union(
+            self.chunks,
+            self.concepts,
+            self.correspondences,
+            self.labels,
+            self.relations,
+            self.spaces,
+            self.views,
+            self.words,
+        )
+
+    def spread_activations(self):
+        for structure in self.structures:
+            structure.spread_activation()
+
     def update_activations(self) -> None:
-        pass
+        for structure in self.structures:
+            structure.update_activation()
 
     def has_chunk(self, members: StructureCollection) -> bool:
         for chunk in self.chunks:

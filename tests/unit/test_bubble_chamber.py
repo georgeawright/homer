@@ -6,9 +6,84 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Space
 
 
-@pytest.mark.skip
+def test_structures():
+    chunk = Mock()
+    concept = Mock()
+    label = Mock()
+    relation = Mock()
+    word = Mock()
+    bubble_chamber = BubbleChamber(
+        Mock(),
+        Mock(),
+        StructureCollection({chunk}),
+        StructureCollection({concept}),
+        StructureCollection(),
+        StructureCollection({label}),
+        StructureCollection({relation}),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection({word}),
+        Mock(),
+    )
+    assert chunk in bubble_chamber.structures
+    assert concept in bubble_chamber.structures
+    assert label in bubble_chamber.structures
+    assert relation in bubble_chamber.structures
+    assert word in bubble_chamber.structures
+
+
+def test_spread_activations():
+    chunk = Mock()
+    concept = Mock()
+    label = Mock()
+    relation = Mock()
+    word = Mock()
+    bubble_chamber = BubbleChamber(
+        Mock(),
+        Mock(),
+        StructureCollection({chunk}),
+        StructureCollection({concept}),
+        StructureCollection(),
+        StructureCollection({label}),
+        StructureCollection({relation}),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection({word}),
+        Mock(),
+    )
+    bubble_chamber.spread_activations()
+    chunk.spread_activation.assert_called()
+    concept.spread_activation.assert_called()
+    label.spread_activation.assert_called()
+    relation.spread_activation.assert_called()
+    word.spread_activation.assert_called()
+
+
 def test_update_activations():
-    pass
+    chunk = Mock()
+    concept = Mock()
+    label = Mock()
+    relation = Mock()
+    word = Mock()
+    bubble_chamber = BubbleChamber(
+        Mock(),
+        Mock(),
+        StructureCollection({chunk}),
+        StructureCollection({concept}),
+        StructureCollection(),
+        StructureCollection({label}),
+        StructureCollection({relation}),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection({word}),
+        Mock(),
+    )
+    bubble_chamber.update_activations()
+    chunk.update_activation.assert_called()
+    concept.update_activation.assert_called()
+    label.update_activation.assert_called()
+    relation.update_activation.assert_called()
+    word.update_activation.assert_called()
 
 
 def test_has_chunk():
