@@ -21,15 +21,6 @@ class Homer:
         self.logger = logger
         self.activation_update_frequency = activation_update_frequency
 
-    @classmethod
-    def setup(cls, path_to_logs: str, path_to_problem: str):
-        """Set up every component and sub-component from a configuration file"""
-        problem = Problem(path_to_problem)
-        logger = DjangoLogger.setup(path_to_logs)
-        bubble_chamber = BubbleChamber.setup(problem, logger)
-        coderack = Coderack.setup(BubbleChamber, logger)
-        return Homer(bubble_chamber, coderack, logger)
-
     def run(self):
         while self.bubble_chamber.result is None:
             # time.sleep(1)
