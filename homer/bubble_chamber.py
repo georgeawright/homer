@@ -7,7 +7,7 @@ from .logger import Logger
 from .problem import Problem
 from .structure_collection import StructureCollection
 from .structures import Space
-from .structures.spaces import WorkingSpace
+from .structures.spaces import ConceptualSpace, WorkingSpace
 
 
 class BubbleChamber:
@@ -37,10 +37,6 @@ class BubbleChamber:
         self.words = words
         self.logger = logger
         self.result = None
-
-    @classmethod
-    def setup(cls, problem: Problem, logger: Logger):
-        pass
 
     @property
     def structures(self):
