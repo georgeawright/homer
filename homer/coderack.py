@@ -18,10 +18,6 @@ class Coderack:
         self.codelets_run = 0
         self.logger = logger
 
-    @classmethod
-    def setup(cls, bubble_chamber: BubbleChamber, logger: Logger):
-        pass
-
     def add_codelet(self, codelet: Codelet):
         if codelet.urgency > self.MINIMUM_CODELET_URGENCY:
             self.logger.log(codelet)
