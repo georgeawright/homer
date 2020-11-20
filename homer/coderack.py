@@ -26,10 +26,10 @@ class Coderack:
     def select_and_run_codelet(self):
         codelet = self.select_codelet()
         self.logger.log_codelet_run(codelet)
-        follow_up = codelet.run()
+        codelet.run()
         self.codelets_run += 1
-        if follow_up is not None:
-            self.add_codelet(follow_up)
+        for child_codelet in codelet.child_codelets:
+            self.add_codelet(child_codelet)
 
     def select_codelet(self) -> Codelet:
         if len(self._codelets) < self.IDEAL_POPULATION:
