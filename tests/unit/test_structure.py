@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
@@ -118,6 +118,7 @@ def test_correspondences_to():
 
 def test_boost_and_update_activation():
     structure = Structure(Mock(), Mock())
+    structure._activation_update_coefficient = 1
     assert 0.0 == structure.activation
     structure.boost_activation(0.5)
     assert 0.0 == structure.activation
@@ -133,6 +134,7 @@ def test_boost_and_update_activation():
 
 def test_decay_and_update_activation():
     structure = Structure(Mock(), Mock())
+    structure._activation_update_coefficient = 1
     assert 0.0 == structure.activation
     structure.boost_activation(1.0)
     structure.update_activation()
@@ -144,3 +146,22 @@ def test_decay_and_update_activation():
     structure.decay_activation(1.0)
     structure.update_activation()
     assert 0.0 == structure.activation
+
+
+def test_spread_activations():
+    structure = Structure(Mock(), Mock())
+    structure._activation_update_coefficient = 1
+    structure._activation = 1
+    label = Label(Mock(), Mock(), Mock(), Mock())
+    correspondence_end = Mock()
+    correspondence = Correspondence(
+        Mock(), correspondence_end, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    relation_end = Mock()
+    relation = Relation(Mock(), relation_end, Mock(), Mock(), Mock())
+    structure.links_out.add(label)
+    structure.links_out.add(relation)
+    structure.links_out.add(correspondence)
+    structure.spread_activation()
+    correspondence_end.boost_activation.assert_called()
+    relation_end.boost_activation.assert_called()

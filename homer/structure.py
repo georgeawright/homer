@@ -2,11 +2,16 @@ from __future__ import annotations
 from abc import ABC
 
 from .float_between_one_and_zero import FloatBetweenOneAndZero
+from .hyper_parameters import HyperParameters
 from .location import Location
 from .structure_collection import StructureCollection
 
 
 class Structure(ABC):
+
+    MINIMUM_ACTIVATION_UPDATE = HyperParameters.MINIMUM_ACTIVATION_UPDATE
+    ACTIVATION_UPDATE_COEFFICIENT = HyperParameters.ACTIVATION_UPDATE_COEFFICIENT
+
     def __init__(
         self,
         location: Location,
@@ -20,6 +25,7 @@ class Structure(ABC):
         self.links_out = StructureCollection() if links_out is None else links_out
         self._activation = FloatBetweenOneAndZero(0)
         self._activation_buffer = 0.0
+        self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
         self._unhappiness = FloatBetweenOneAndZero(1)
 
     @property
@@ -151,14 +157,27 @@ class Structure(ABC):
             }
         )
 
+    def is_fully_active(self) -> bool:
+        return self.activation == 1.0
+
     def boost_activation(self, amount: float = None):
-        self._activation_buffer += amount
+        if amount is None:
+            amount = self.MINIMUM_ACTIVATION_UPDATE
+        self._activation_buffer += self._activation_update_coefficient * amount
 
     def decay_activation(self, amount: float = None):
-        self._activation_buffer -= amount
+        if amount is None:
+            amount = self.MINIMUM_ACTIVATION_UPDATE
+        self._activation_buffer -= self._activation_update_coefficient * amount
 
     def spread_activation(self):
-        pass
+        if not self.is_fully_active():
+            return
+        for link in self.links_out:
+            try:
+                link.end.boost_activation(link.activation)
+            except AttributeError:  # labels have no end
+                pass
 
     def update_activation(self):
         self._activation = FloatBetweenOneAndZero(

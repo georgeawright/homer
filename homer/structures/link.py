@@ -24,3 +24,8 @@ class Link(Structure):
 
     def is_between(self, a: Structure, b: Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a
+
+    def spread_activation(self):
+        if not self.is_fully_active():
+            return
+        self.parent_concept.boost_activation()
