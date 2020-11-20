@@ -43,17 +43,24 @@ class Concept(Structure):
         self.depth = depth
 
     def distance_from(self, other: Structure):
-        return self.distance_function(
-            self.prototype, getattr(other, self.relevant_value)
+        other_value = (
+            other.prototype
+            if isinstance(other, Concept)
+            else getattr(other, self.relevant_value)
         )
+        return self.distance_function(self.prototype, other_value)
 
     def proximity_to(self, other: Structure):
         return self._distance_to_proximity(self.distance_from(other))
 
     def distance_between(self, a: Structure, b: Structure):
-        return self.distance_function(
-            getattr(a, self.relevant_value), getattr(b, self.relevant_value)
+        a_value = (
+            a.prototype if isinstance(a, Concept) else getattr(a, self.relevant_value)
         )
+        b_value = (
+            b.prototype if isinstance(b, Concept) else getattr(b, self.relevant_value)
+        )
+        return self.distance_function(a_value, b_value)
 
     def proximity_between(self, a: Structure, b: Structure):
         return self._distance_to_proximity(self.distance_between(a, b))
