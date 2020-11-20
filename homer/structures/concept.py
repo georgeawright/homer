@@ -42,6 +42,35 @@ class Concept(Structure):
         self.distance_function = distance_function
         self.depth = depth
 
+    @classmethod
+    def new(
+        cls,
+        name: str,
+        prototype: Any,
+        classifier: Classifier,
+        parent_space: Space,
+        relevant_value: str,
+        child_spaces: StructureCollection,
+        distance_function: Callable,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
+        depth: int = 1,
+    ):
+        concept = cls(
+            name,
+            prototype,
+            classifier,
+            parent_space,
+            relevant_value,
+            child_spaces,
+            distance_function,
+            links_in=links_in,
+            links_out=links_out,
+            depth=depth,
+        )
+        parent_space.contents.add(concept)
+        return concept
+
     def distance_from(self, other: Structure):
         other_value = (
             other.prototype
