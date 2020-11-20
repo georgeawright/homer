@@ -42,3 +42,6 @@ class ConceptualSpace(Space):
                 links_out=StructureCollection(),
             )
         return self._instance
+
+    def update_activation(self):
+        self._activation = max(item.activation for item in self.contents)

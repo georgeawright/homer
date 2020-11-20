@@ -1,3 +1,5 @@
+import statistics
+
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept, Space
@@ -25,4 +27,9 @@ class WorkingSpace(Space):
             child_spaces=child_spaces,
             links_in=links_in,
             links_out=links_out,
+        )
+
+    def update_activation(self):
+        self._activation = statistics.median(
+            [item.activation for item in self.contents]
         )
