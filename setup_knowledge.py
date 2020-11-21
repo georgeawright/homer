@@ -12,11 +12,86 @@ from homer.structures.spaces import ConceptualSpace
 
 top_level_conceptual_space = ConceptualSpace("top level", StructureCollection(), None)
 
+activity_concept = Concept.new(
+    "activity",
+    None,
+    None,
+    top_level_conceptual_space,
+    None,
+    StructureCollection(),
+    None,
+)
+activities_space = ConceptualSpace("activities", StructureCollection(), None)
+build_concept = Concept.new(
+    "build",
+    None,
+    None,
+    activities_space,
+    None,
+    StructureCollection(),
+    None,
+)
+evaluate_concept = Concept.new(
+    "evaluate",
+    None,
+    None,
+    activities_space,
+    None,
+    StructureCollection(),
+    None,
+)
+select_concept = Concept.new(
+    "select",
+    None,
+    None,
+    activities_space,
+    None,
+    StructureCollection(),
+    None,
+)
+
+structure_concept = Concept.new(
+    "structure",
+    None,
+    None,
+    top_level_conceptual_space,
+    None,
+    StructureCollection(),
+    None,
+)
+structures_space = ConceptualSpace("structures", StructureCollection(), None)
+chunk_concept = Concept.new(
+    "chunk",
+    None,
+    None,
+    structures_space,
+    None,
+    StructureCollection(),
+    None,
+)
+view_concept = Concept.new(
+    "view",
+    None,
+    None,
+    structures_space,
+    None,
+    StructureCollection(),
+    None,
+)
+word_concept = Concept.new(
+    "word",
+    None,
+    None,
+    structures_space,
+    None,
+    StructureCollection(),
+    None,
+)
 label_concept = Concept.new(
     "label",
     None,
     None,
-    top_level_conceptual_space,
+    structures_space,
     None,
     StructureCollection(),
     None,
@@ -28,7 +103,7 @@ relation_concept = Concept.new(
     "relation",
     None,
     None,
-    top_level_conceptual_space,
+    structures_space,
     None,
     StructureCollection(),
     None,
@@ -40,7 +115,7 @@ correspondence_concept = Concept.new(
     "correspondence",
     None,
     None,
-    top_level_conceptual_space,
+    structures_space,
     None,
     StructureCollection(),
     None,
