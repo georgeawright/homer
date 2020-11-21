@@ -1,6 +1,11 @@
 import math
 
-from homer.classifiers import StretchyProximityClassifier
+from homer.classifiers import (
+    DifferenceClassifier,
+    DifferentnessClassifier,
+    SamenessClassifier,
+    StretchyProximityClassifier,
+)
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept
 from homer.structures.spaces import ConceptualSpace
@@ -8,10 +13,40 @@ from homer.structures.spaces import ConceptualSpace
 top_level_conceptual_space = ConceptualSpace("top level", StructureCollection(), None)
 
 label_concept = Concept.new(
-    "label", None, None, top_level_conceptual_space, None, StructureCollection(), None
+    "label",
+    None,
+    None,
+    top_level_conceptual_space,
+    None,
+    StructureCollection(),
+    None,
 )
 label_concepts_space = ConceptualSpace(
     "label concepts", StructureCollection(), label_concept
+)
+relation_concept = Concept.new(
+    "relation",
+    None,
+    None,
+    top_level_conceptual_space,
+    None,
+    StructureCollection(),
+    None,
+)
+relational_concepts_space = ConceptualSpace(
+    "relational concepts", StructureCollection(), relation_concept
+)
+correspondence_concept = Concept.new(
+    "correspondence",
+    None,
+    None,
+    top_level_conceptual_space,
+    None,
+    StructureCollection(),
+    None,
+)
+correspondential_concepts_space = ConceptualSpace(
+    "correspondential concepts", StructureCollection(), correspondence_concept
 )
 
 temperature_concept = Concept.new(
@@ -72,7 +107,7 @@ location_concept = Concept.new(
     StructureCollection(),
     math.dist,
 )
-location_space = ConceptualSpace("location", StructureCollection(), temperature_concept)
+location_space = ConceptualSpace("location", StructureCollection(), location_concept)
 north = Concept.new(
     "north",
     [0, 2],
@@ -151,6 +186,66 @@ midlands = Concept.new(
     StretchyProximityClassifier(),
     location_space,
     "coordinates",
+    StructureCollection(),
+    math.dist,
+)
+
+more_less_concept = Concept.new(
+    "more-less",
+    None,
+    None,
+    relational_concepts_space,
+    "value",
+    StructureCollection(),
+    math.dist,
+)
+more_less_space = ConceptualSpace("more-less", StructureCollection(), more_less_concept)
+more = Concept.new(
+    "more",
+    [4],
+    DifferenceClassifier(StretchyProximityClassifier()),
+    more_less_space,
+    "value",
+    StructureCollection(),
+    math.dist,
+)
+less = Concept.new(
+    "less",
+    [-4],
+    DifferenceClassifier(StretchyProximityClassifier()),
+    more_less_space,
+    "value",
+    StructureCollection(),
+    math.dist,
+)
+
+same_different_concept = Concept.new(
+    "same-different",
+    None,
+    None,
+    correspondential_concepts_space,
+    "value",
+    StructureCollection(),
+    math.dist,
+)
+same_different_space = ConceptualSpace(
+    "same-different", StructureCollection(), same_different_concept
+)
+same = Concept.new(
+    "same",
+    None,
+    SamenessClassifier(),
+    same_different_space,
+    None,
+    StructureCollection(),
+    math.dist,
+)
+different = Concept.new(
+    "different",
+    None,
+    DifferentnessClassifier(),
+    same_different_space,
+    None,
     StructureCollection(),
     math.dist,
 )
