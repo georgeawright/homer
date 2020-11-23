@@ -13,6 +13,7 @@ class Codelet(ABC):
         self.codelet_id = codelet_id
         self.parent_id = parent_id
         self.urgency = urgency
+        self.target_structure = None
         self.child_codelets = []
         self.result = None
 
