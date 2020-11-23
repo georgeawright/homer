@@ -51,6 +51,10 @@ class BubbleChamber:
             self.words,
         )
 
+    @property
+    def satisfaction(self):
+        return self.top_level_working_space.quality
+
     def spread_activations(self):
         for structure in self.structures:
             structure.spread_activation()

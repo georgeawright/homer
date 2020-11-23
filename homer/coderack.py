@@ -58,4 +58,4 @@ class Coderack:
         return codelet_choice
 
     def _randomness(self) -> float:
-        return 1 - self.bubble_chamber.top_level_working_space.quality
+        return 1 - self.bubble_chamber.satisfaction
