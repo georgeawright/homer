@@ -745,7 +745,7 @@ for chunk in input_chunks:
             neighbour_location = Location([i + x, j + y], input_space)
             chunk.neighbours.add(input_chunks.at(neighbour_location).get_random())
 
-coderack = Coderack(bubble_chamber, logger)
+coderack = Coderack.setup(bubble_chamber, logger)
 
 homer = Homer(bubble_chamber, coderack, logger)
 homer.run()
