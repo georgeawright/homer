@@ -29,6 +29,20 @@ class WorkingSpace(Space):
             links_out=links_out,
         )
 
+    @property
+    def quality(self):
+        if len(self.contents) != 0:
+            contents_quality = [
+                statistics.fmean(
+                    [item.quality * item.activation for item in self.contents]
+                )
+            ]
+        else:
+            contents_quality = []
+        return statistics.fmean(
+            [space.quality for space in self.parent_spaces] + contents_quality
+        )
+
     def update_activation(self):
         self._activation = statistics.median(
             [item.activation for item in self.contents]
