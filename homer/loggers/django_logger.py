@@ -85,16 +85,13 @@ class DjangoLogger(Logger):
             codelet_type=type(codelet).__name__,
             birth_time=self.codelets_run,
             urgency=codelet.urgency,
-            target_structure=StructureRecord.objects.get(
+            target_structure=None
+            if codelet.target_structure is None
+            else StructureRecord.objects.get(
                 run_id=self.run, structure_id=codelet.target_structure.structure_id
             ),
         )
-        codelet_record.structure_types.add(
-            ConceptRecord.objects.get(
-                concept_id=codelet.structure_type.concept_id, run_id=self.run
-            )
-        )
-        if codelet.parent_id == "" or codelet.parent_id[2] == "n":
+        if codelet.parent_id == "coderack":
             return
         codelet_record.parent = CodeletRecord.objects.get(
             codelet_id=codelet.parent_id, run_id=self.run
