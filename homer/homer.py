@@ -38,9 +38,7 @@ class Homer:
                 raise e
         return {
             "result": self.bubble_chamber.result,
-            "satisfaction": self.bubble_chamber.concept_space[
-                "satisfaction"
-            ].activation.as_scalar(),
+            "satisfaction": self.bubble_chamber.top_level_working_space.quality,
             "codelets_run": self.coderack.codelets_run,
         }
 
@@ -63,4 +61,4 @@ class Homer:
         )
 
     def print_results(self):
-        "results go here"
+        print("results go here")
