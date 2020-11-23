@@ -61,7 +61,7 @@ input_concept = Concept.new(
     "input",
     None,
     None,
-    top_level_working_space,
+    top_level_conceptual_space,
     None,
     StructureCollection(),
     None,
@@ -69,6 +69,7 @@ input_concept = Concept.new(
 bubble_chamber.concepts.add(input_concept)
 input_space = WorkingSpace("input", StructureCollection(), 0.0, input_concept)
 bubble_chamber.spaces.add(input_space)
+top_level_working_space.child_spaces.add(input_space)
 
 activity_concept = Concept.new(
     "activity",
