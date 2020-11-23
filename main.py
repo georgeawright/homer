@@ -70,6 +70,7 @@ activity_concept = Concept.new(
 )
 bubble_chamber.concepts.add(activity_concept)
 activities_space = ConceptualSpace("activities", StructureCollection(), None)
+bubble_chamber.spaces.add(activities_space)
 build_concept = Concept.new(
     "build",
     None,
@@ -112,6 +113,7 @@ structure_concept = Concept.new(
 )
 bubble_chamber.concepts.add(structure_concept)
 structures_space = ConceptualSpace("structures", StructureCollection(), None)
+bubble_chamber.spaces.add(structures_space)
 chunk_concept = Concept.new(
     "chunk",
     None,
