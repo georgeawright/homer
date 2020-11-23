@@ -8,18 +8,17 @@ import os
 import time
 from typing import Any
 
-from homer.bubbles import Concept, Perceptlet
-from homer.bubbles.perceptlets import RawPerceptlet
 from homer.codelet import Codelet
 from homer.coderack import Coderack
 from homer.logger import Logger
+from homer.structure import Structure
 
 from runs.models import (
     CodeletRecord,
     CoderackRecord,
     ConceptRecord,
-    PerceptletRecord,
-    PerceptletUpdateRecord,
+    StructureRecord,
+    StructureUpdateRecord,
     RunRecord,
 )
 
@@ -59,10 +58,8 @@ class DjangoLogger(Logger):
             return self._log_codelet(item)
         if isinstance(item, Coderack):
             return self._log_coderack(item)
-        if isinstance(item, Concept):
-            return self._log_concept(item)
-        if isinstance(item, Perceptlet):
-            return self._log_perceptlet(item)
+        if isinstance(item, Structure):
+            return self._log_structure(item)
 
     def log_codelet_run(self, codelet: Codelet):
         codelet_record = CodeletRecord.objects.get(
@@ -70,43 +67,6 @@ class DjangoLogger(Logger):
         )
         codelet_record.time_run = self.codelets_run
         codelet_record.save()
-
-    def log_perceptlet_update(
-        self, codelet: Codelet, perceptlet: Perceptlet, action: str
-    ):
-        PerceptletUpdateRecord.objects.create(
-            run_id=self.run,
-            time=self.codelets_run,
-            codelet_id=CodeletRecord.objects.get(
-                run_id=self.run, codelet_id=codelet.codelet_id
-            ).id,
-            perceptlet_id=PerceptletRecord.objects.get(
-                run_id=self.run, perceptlet_id=perceptlet.perceptlet_id
-            ).id,
-            action=action,
-        )
-        perceptlet_record = PerceptletRecord.objects.get(
-            run_id=self.run, perceptlet_id=perceptlet.perceptlet_id
-        )
-        perceptlet_record.activation.append(perceptlet.activation.activation)
-        perceptlet_record.unhappiness.append(perceptlet.unhappiness.activation)
-        perceptlet_record.quality.append(perceptlet.quality)
-        perceptlet_record.save()
-
-    def log_perceptlet_connection(
-        self, codelet: Codelet, perceptlet: Perceptlet, connection: Perceptlet
-    ):
-        perceptlet_record = PerceptletRecord.objects.get(
-            run_id=self.run, perceptlet_id=perceptlet.perceptlet_id
-        )
-        connection_record = PerceptletRecord.objects.get(
-            run_id=self.run, perceptlet_id=connection.perceptlet_id
-        )
-        perceptlet_record.connections.add(connection_record)
-        perceptlet_record.save()
-        self.log_perceptlet_update(
-            codelet, perceptlet, f"Connected to {connection.perceptlet_id}"
-        )
 
     def _log_message(self, message):
         print(message)
@@ -125,13 +85,13 @@ class DjangoLogger(Logger):
             codelet_type=type(codelet).__name__,
             birth_time=self.codelets_run,
             urgency=codelet.urgency,
-            target_perceptlet=PerceptletRecord.objects.get(
-                run_id=self.run, perceptlet_id=codelet.target_perceptlet.perceptlet_id
+            target_structure=StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.target_structure.structure_id
             ),
         )
-        codelet_record.perceptlet_types.add(
+        codelet_record.structure_types.add(
             ConceptRecord.objects.get(
-                concept_id=codelet.perceptlet_type.concept_id, run_id=self.run
+                concept_id=codelet.structure_type.concept_id, run_id=self.run
             )
         )
         if codelet.parent_id == "" or codelet.parent_id[2] == "n":
@@ -174,48 +134,48 @@ class DjangoLogger(Logger):
                 population=[len(coderack._codelets)],
             )
 
-    def _log_perceptlet(self, perceptlet: Perceptlet):
+    def _log_structure(self, structure: Structure):
         self._log_message(
-            f"{perceptlet.perceptlet_id} created "
-            + f" by {perceptlet.parent_id} - value: {perceptlet.value}; "
-            + f"location: {perceptlet.location}; activation: {perceptlet.activation.activation}"
+            f"{structure.structure_id} created "
+            + f" by {structure.parent_id} - value: {structure.value}; "
+            + f"location: {structure.location}; activation: {structure.activation.activation}"
         )
-        perceptlet_record = PerceptletRecord.objects.create(
-            perceptlet_id=perceptlet.perceptlet_id,
+        structure_record = StructureRecord.objects.create(
+            structure_id=structure.structure_id,
             run_id=self.run,
             time_created=self.codelets_run,
-            value=perceptlet.value,
-            location=perceptlet.location,
-            activation=[perceptlet.activation.activation],
-            unhappiness=[perceptlet.unhappiness.activation],
-            quality=[perceptlet.quality],
+            value=structure.value,
+            location=structure.location,
+            activation=[structure.activation.activation],
+            unhappiness=[structure.unhappiness.activation],
+            quality=[structure.quality],
         )
-        if perceptlet.parent_id != "":
+        if structure.parent_id != "":
             parent_codelet = CodeletRecord.objects.get(
-                codelet_id=perceptlet.parent_id, run_id=self.run
+                codelet_id=structure.parent_id, run_id=self.run
             )
-            perceptlet_record.parent_codelet = parent_codelet
-            PerceptletUpdateRecord.objects.create(
+            structure_record.parent_codelet = parent_codelet
+            StructureUpdateRecord.objects.create(
                 run_id=self.run,
                 time=self.codelets_run,
                 codelet_id=parent_codelet.id,
-                perceptlet_id=perceptlet_record.id,
+                structure_id=structure_record.id,
                 action="Created",
             )
-        if hasattr(perceptlet, "parent_concept"):
-            perceptlet_record.parent_concept = ConceptRecord.objects.get(
-                concept_id=perceptlet.parent_concept.concept_id, run_id=self.run
+        if hasattr(structure, "parent_concept"):
+            structure_record.parent_concept = ConceptRecord.objects.get(
+                concept_id=structure.parent_concept.concept_id, run_id=self.run
             )
-        if hasattr(perceptlet, "first_argument"):
-            perceptlet_record.first_argument = perceptlet.first_argument.perceptlet_id
-        if hasattr(perceptlet, "second_argument"):
-            perceptlet_record.second_argument = perceptlet.second_argument.perceptlet_id
-        for connection in perceptlet.connections:
-            connection_record = PerceptletRecord.objects.get(
-                perceptlet_id=connection.perceptlet_id, run_id=self.run
+        if hasattr(structure, "first_argument"):
+            structure_record.first_argument = structure.first_argument.structure_id
+        if hasattr(structure, "second_argument"):
+            structure_record.second_argument = structure.second_argument.structure_id
+        for connection in structure.connections:
+            connection_record = StructureRecord.objects.get(
+                structure_id=connection.structure_id, run_id=self.run
             )
-            perceptlet_record.connections.add(connection_record)
-        perceptlet_record.save()
+            structure_record.connections.add(connection_record)
+        structure_record.save()
 
     def graph_concepts(self, concept_names, file_name):
         pass

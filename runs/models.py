@@ -22,9 +22,9 @@ class CodeletRecord(models.Model):
         blank=True,
         null=True,
     )
-    perceptlet_types = models.ManyToManyField("ConceptRecord")
-    target_perceptlet = models.ForeignKey(
-        "PerceptletRecord", on_delete=models.CASCADE, blank=True, null=True
+    structure_types = models.ManyToManyField("ConceptRecord")
+    target_structure = models.ForeignKey(
+        "StructureRecord", on_delete=models.CASCADE, blank=True, null=True
     )
     follow_up = models.ForeignKey(
         "self",
@@ -49,8 +49,8 @@ class ConceptRecord(models.Model):
     activation = models.JSONField("Activation")
 
 
-class PerceptletRecord(models.Model):
-    perceptlet_id = models.CharField("Perceptlet ID", max_length=MAX_STRING_LENGTH)
+class StructureRecord(models.Model):
+    structure_id = models.CharField("Structure ID", max_length=MAX_STRING_LENGTH)
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
     time_created = models.IntegerField("Time Created")
     value = models.CharField("Value", max_length=MAX_STRING_LENGTH)
@@ -73,9 +73,9 @@ class PerceptletRecord(models.Model):
     )
 
 
-class PerceptletUpdateRecord(models.Model):
+class StructureUpdateRecord(models.Model):
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
     time = models.IntegerField("Time")
     codelet = models.ForeignKey("CodeletRecord", on_delete=models.CASCADE)
-    perceptlet = models.ForeignKey("PerceptletRecord", on_delete=models.CASCADE)
+    structure = models.ForeignKey("StructureRecord", on_delete=models.CASCADE)
     action = models.CharField("Action", max_length=MAX_STRING_LENGTH)
