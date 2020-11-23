@@ -77,11 +77,7 @@ class FactoryCodelet(Codelet):
                 )
             elif structure_type == self.bubble_chamber.concepts["correspondence"]:
                 target_space = self.bubble_chamber.spaces.get_active()
-                target = StructureCollection.union(
-                    target_space.chunks,
-                    target_space.labels,
-                    target_space.relations,
-                ).get_unhappy()
+                target = target_space.contents.get_unhappy()
                 follow_up = CorrespondenceBuilder.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
@@ -127,6 +123,8 @@ class FactoryCodelet(Codelet):
                     target_correspondence,
                     target_correspondence.unhappiness,
                 )
+            else:
+                raise Exception("unknown structure type")
         elif action_type == self.bubble_chamber.concepts["evaluate"]:
             if structure_type == self.bubble_chamber.concepts["chunk"]:
                 target = self.bubble_chamber.chunks.get_active()
@@ -153,6 +151,8 @@ class FactoryCodelet(Codelet):
                 follow_up = ViewEvaluator.spawn(
                     self.codelet_id, self.bubble_chamber, target, target.activation
                 )
+            else:
+                raise Exception("unknown structure type")
         elif action_type == self.bubble_chamber.concepts["select"]:
             if structure_type == self.bubble_chamber.concepts["chunk"]:
                 champion = self.bubble_chamber.chunks.get_active()
@@ -196,4 +196,8 @@ class FactoryCodelet(Codelet):
                     champion,
                     champion.activation,
                 )
+            else:
+                raise Exception("unknown structure type")
+        else:
+            raise Exception("unknown activity type")
         self.child_codelets.append(follow_up)

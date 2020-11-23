@@ -72,8 +72,6 @@ def bubble_chamber(
 ):
     bubble_chamber = Mock()
     bubble_chamber.concepts = {
-        "actions": Mock(),
-        "structures": Mock(),
         "build": build_concept,
         "evaluate": evaluate_concept,
         "select": select_concept,
@@ -89,17 +87,17 @@ def bubble_chamber(
     bubble_chamber.labels = StructureCollection({Mock()})
     bubble_chamber.relations = StructureCollection({Mock()})
     bubble_chamber.views = StructureCollection({Mock()})
-    space = Mock()
-    space.chunks = StructureCollection({Mock()})
-    space.labels = StructureCollection({Mock()})
-    space.relations = StructureCollection({Mock()})
-    bubble_chamber.spaces = StructureCollection({space})
+    activities = Mock()
+    activities.name = "activities"
+    bubble_chamber.spaces = StructureCollection({activities})
     return bubble_chamber
 
 
 def test_engenders_chunk_builder(bubble_chamber, build_concept, chunk_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
-    bubble_chamber.concepts["structures"].get_active.return_value = chunk_concept
+    bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
+    link = Mock()
+    link.end = chunk_concept
+    build_concept.links_out.get_active.return_value = link
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
@@ -114,10 +112,10 @@ def test_engenders_chunk_builder(bubble_chamber, build_concept, chunk_concept):
 def test_engenders_correspondence_builder(
     bubble_chamber, build_concept, correspondence_concept
 ):
-    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
-    bubble_chamber.concepts[
-        "structures"
-    ].get_active.return_value = correspondence_concept
+    bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
+    link = Mock()
+    link.end = correspondence_concept
+    build_concept.links_out.get_active.return_value = link
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
@@ -130,8 +128,10 @@ def test_engenders_correspondence_builder(
 
 
 def test_engenders_label_builder(bubble_chamber, build_concept, label_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
-    bubble_chamber.concepts["structures"].get_active.return_value = label_concept
+    bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
+    link = Mock()
+    link.end = label_concept
+    build_concept.links_out.get_active.return_value = link
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
@@ -144,8 +144,10 @@ def test_engenders_label_builder(bubble_chamber, build_concept, label_concept):
 
 
 def test_engenders_relation_builder(bubble_chamber, build_concept, relation_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
-    bubble_chamber.concepts["structures"].get_active.return_value = relation_concept
+    bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
+    link = Mock()
+    link.end = relation_concept
+    build_concept.links_out.get_active.return_value = link
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
@@ -157,9 +159,11 @@ def test_engenders_relation_builder(bubble_chamber, build_concept, relation_conc
     )
 
 
-def test_engenders_chunk_builder(bubble_chamber, build_concept, view_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
-    bubble_chamber.concepts["structures"].get_active.return_value = view_concept
+def test_engenders_view_builder(bubble_chamber, build_concept, view_concept):
+    bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
+    link = Mock()
+    link.end = view_concept
+    build_concept.links_out.get_active.return_value = link
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
@@ -171,9 +175,11 @@ def test_engenders_chunk_builder(bubble_chamber, build_concept, view_concept):
     )
 
 
-def test_engenders_chunk_builder(bubble_chamber, build_concept, word_concept):
-    bubble_chamber.concepts["actions"].get_active.return_value = build_concept
-    bubble_chamber.concepts["structures"].get_active.return_value = word_concept
+def test_engenders_word_builder(bubble_chamber, build_concept, word_concept):
+    bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
+    link = Mock()
+    link.end = word_concept
+    build_concept.links_out.get_active.return_value = link
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
