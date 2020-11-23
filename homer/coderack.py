@@ -1,7 +1,9 @@
 import random
+from typing import List
 
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
+from .codelets import FactoryCodelet
 from .errors import NoMoreCodelets
 from .hyper_parameters import HyperParameters
 from .logger import Logger
@@ -12,11 +14,18 @@ class Coderack:
     IDEAL_POPULATION = HyperParameters.IDEAL_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
-    def __init__(self, bubble_chamber: BubbleChamber, logger: Logger):
+    def __init__(
+        self, bubble_chamber: BubbleChamber, codelets: List[Codelet], logger: Logger
+    ):
         self.bubble_chamber = bubble_chamber
-        self._codelets = []
+        self._codelets = codelets
         self.codelets_run = 0
         self.logger = logger
+
+    @classmethod
+    def setup(cls, bubble_chamber: BubbleChamber, logger: Logger):
+        codelets = [FactoryCodelet.spawn("coderack", bubble_chamber, 1.0)]
+        return cls(bubble_chamber, codelets, logger)
 
     def add_codelet(self, codelet: Codelet):
         if codelet.urgency > self.MINIMUM_CODELET_URGENCY:
@@ -32,8 +41,6 @@ class Coderack:
             self.add_codelet(child_codelet)
 
     def select_codelet(self) -> Codelet:
-        if len(self._codelets) < self.IDEAL_POPULATION:
-            self.get_more_codelets()
         codelet_choice = None
         highest_weight = 0
         for codelet in self._codelets:
@@ -48,13 +55,5 @@ class Coderack:
         self._codelets.remove(codelet_choice)
         return codelet_choice
 
-    def get_more_codelets(self):
-        for concept in self.bubble_chamber.concept_space.spawning_concepts:
-            codelet = concept.spawn_codelet(self.bubble_chamber)
-            if codelet is not None:
-                self.add_codelet(codelet)
-
     def _randomness(self) -> float:
-        return (
-            1 - self.bubble_chamber.concept_space["satisfaction"].activation.as_scalar()
-        )
+        return 1 - self.bubble_chamber.top_level_working_space.quality
