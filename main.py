@@ -91,6 +91,7 @@ build_concept = Concept.new(
     StructureCollection(),
     None,
 )
+build_concept._activation = 1.0
 bubble_chamber.concepts.add(build_concept)
 evaluate_concept = Concept.new(
     "evaluate",
