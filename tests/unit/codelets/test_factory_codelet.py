@@ -90,6 +90,7 @@ def bubble_chamber(
     activities = Mock()
     activities.name = "activities"
     bubble_chamber.spaces = StructureCollection({activities})
+    bubble_chamber.satisfaction = 0
     return bubble_chamber
 
 
