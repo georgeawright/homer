@@ -17,6 +17,17 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
 from homer.word_form import WordForm
 
+
+def link_concepts(concept_1, concept_2, activation=0.0):
+    relation = Relation(concept_1, concept_2, None, None, 1.0)
+    relation._activation = activation
+    concept_1.links_in.add(relation)
+    concept_1.links_out.add(relation)
+    concept_2.links_in.add(relation)
+    concept_2.links_out.add(relation)
+    return relation
+
+
 problem = [
     [4, 5, 6, 4, 3],
     [10, 10, 7, 4, 4],
@@ -194,6 +205,26 @@ template_concept = Concept.new(
 )
 bubble_chamber.concepts.add(template_concept)
 templates_space = ConceptualSpace("templates", StructureCollection(), template_concept)
+
+link_concepts(build_concept, chunk_concept)
+link_concepts(build_concept, correspondence_concept)
+link_concepts(build_concept, label_concept, activation=1.0)
+link_concepts(build_concept, relation_concept)
+link_concepts(build_concept, view_concept)
+link_concepts(build_concept, word_concept)
+
+link_concepts(evaluate_concept, chunk_concept)
+link_concepts(evaluate_concept, correspondence_concept)
+link_concepts(evaluate_concept, label_concept)
+link_concepts(evaluate_concept, relation_concept)
+link_concepts(evaluate_concept, view_concept)
+
+link_concepts(select_concept, chunk_concept)
+link_concepts(select_concept, correspondence_concept)
+link_concepts(select_concept, label_concept)
+link_concepts(select_concept, relation_concept)
+link_concepts(select_concept, view_concept)
+
 
 temperature_concept = Concept.new(
     "temperature",
