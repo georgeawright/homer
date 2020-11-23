@@ -24,7 +24,9 @@ class Coderack:
 
     @classmethod
     def setup(cls, bubble_chamber: BubbleChamber, logger: Logger):
-        codelets = [FactoryCodelet.spawn("coderack", bubble_chamber, 1.0)]
+        factory_codelet = FactoryCodelet.spawn("coderack", bubble_chamber, 1.0)
+        logger.log(factory_codelet)
+        codelets = [factory_codelet]
         return cls(bubble_chamber, codelets, logger)
 
     def add_codelet(self, codelet: Codelet):
