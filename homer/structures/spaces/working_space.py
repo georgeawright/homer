@@ -40,7 +40,7 @@ class WorkingSpace(Space):
         else:
             contents_quality = []
         return statistics.fmean(
-            [space.quality for space in self.parent_spaces] + contents_quality
+            [space.quality for space in self.child_spaces] + contents_quality
         )
 
     def update_activation(self):
