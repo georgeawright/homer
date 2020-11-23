@@ -46,74 +46,21 @@ class Homer:
 
     def print_status_update(self):
         codelets_run = self.coderack.codelets_run
-        label_activation = (
-            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-                "label"
-            ).activation.as_scalar()
-        )
-        group_activation = (
-            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-                "group"
-            ).activation.as_scalar()
-        )
-        group_label_activation = (
-            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-                "group-label"
-            ).activation.as_scalar()
-        )
-        correspondence_activation = (
-            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-                "correspondence"
-            ).activation.as_scalar()
-        )
-        correspondence_label_activation = (
-            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-                "correspondence-label"
-            ).activation.as_scalar()
-        )
-        textlet_activation = (
-            self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-                "textlet"
-            ).activation.as_scalar()
-        )
+        build_activation = self.bubble_chamber.concepts["build"].activation
+        evaluate_activation = self.bubble_chamber.concepts["evaluate"].activation
+        select_activation = self.bubble_chamber.concepts["select"].activation
         print(
             "================================================================================"
         )
         print(
-            f"codelets run: {codelets_run}; label: {label_activation}; group: {group_activation}; gr_label: {group_label_activation}; corresp: {correspondence_activation}; co_label: {correspondence_label_activation}; textlet: {textlet_activation}"
+            f"codelets run: {codelets_run}; "
+            + f"build: {build_activation}; "
+            + f"evaluate: {evaluate_activation}; "
+            + f"select: {select_activation}; "
         )
         print(
             "================================================================================"
         )
 
     def print_results(self):
-        for raw_perceptlet_field in self.bubble_chamber.workspace.input_sequence:
-            for row in raw_perceptlet_field:
-                for raw_perceptlet in row:
-                    print(
-                        ",".join(
-                            [
-                                label.parent_concept.name
-                                for label in raw_perceptlet.labels
-                            ]
-                        ),
-                        end="|",
-                    )
-                print("\n")
-        for group in self.bubble_chamber.workspace.groups:
-            print(
-                f"{group.perceptlet_id} - location: {group.location}; size: {group.size}, activation: {group.activation.activation}"
-            )
-            print([(member.value, member.location) for member in group.members])
-            print(
-                "labels:",
-                [(label.value, label.activation.activation) for label in group.labels],
-            )
-            print("textlets:", [textlet.value for textlet in group.textlets])
-            print("\n")
-        for correspondence in self.bubble_chamber.workspace.correspondences:
-            print(
-                f"{correspondence.perceptlet_id} from {correspondence.first_argument.perceptlet_id} to {correspondence.second_argument.perceptlet_id} in {correspondence.parent_concept.name}"
-            )
-            print(" ".join([label.value for label in correspondence.labels]))
-            print("\n")
+        "results go here"
