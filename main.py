@@ -731,6 +731,7 @@ for i, row in enumerate(problem):
         chunk = Chunk(value, location, members, neighbours, quality, parent_spaces)
         input_chunks.add(chunk)
         bubble_chamber.chunks.add(chunk)
+        input_space.contents.add(chunk)
 for chunk in input_chunks:
     i = chunk.location.coordinates[0]
     j = chunk.location.coordinates[1]
