@@ -8,6 +8,7 @@ from homer.classifiers import (
     StretchyProximityClassifier,
 )
 from homer.location import Location
+from homer.loggers import DjangoLogger
 from homer.structures import Chunk, Concept, Lexeme
 from homer.structures.chunks import Word
 from homer.structures.chunks.slots import TemplateSlot
@@ -25,7 +26,8 @@ problem = [
     [22, 22, 24, 23, 22],
 ]
 
-logger = None  # TODO
+path_to_logs = "logs"
+logger = DjangoLogger.setup(path_to_logs)
 
 top_level_conceptual_space = ConceptualSpace("top level", StructureCollection(), None)
 top_level_working_space = top_level_conceptual_space.instance
@@ -745,3 +747,4 @@ for chunk in input_chunks:
 coderack = Coderack(bubble_chamber, logger)
 
 homer = Homer(bubble_chamber, coderack, logger)
+homer.run()
