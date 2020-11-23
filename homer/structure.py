@@ -34,7 +34,7 @@ class Structure(ABC):
 
     @property
     def exigency(self) -> FloatBetweenOneAndZero:
-        pass
+        return self.activation * self.unhappiness
 
     @property
     def quality(self) -> FloatBetweenOneAndZero:
