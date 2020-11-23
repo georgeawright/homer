@@ -39,8 +39,8 @@ class FactoryCodelet(Codelet):
         return cls(codelet_id, parent_id, bubble_chamber, urgency)
 
     def run(self) -> CodeletResult:
-        action_type = self.bubble_chamber.concepts["actions"].get_active()
-        structure_type = self.bubble_chamber.concepts["structures"].get_active()
+        action_type = self.bubble_chamber.spaces["activities"].contents.get_active()
+        structure_type = self.bubble_chamber.spaces["structures"].contents.get_active()
         self._engender_follow_up(action_type, structure_type)
         self.child_codelets.append(
             self.spawn(
@@ -98,7 +98,7 @@ class FactoryCodelet(Codelet):
                     target.unhappiness,
                 )
             elif structure_type == self.bubble_chamber.concepts["word"]:
-                target_view = self.bubble_chamber.view.get_unhappy()
+                target_view = self.bubble_chamber.views.get_unhappy()
                 target_correspondence = (
                     self.bubble_chamber.correspondences.get_unhappy()
                 )
