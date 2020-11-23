@@ -60,7 +60,9 @@ class FactoryCodelet(Codelet):
             self.run()
         self.child_codelets.append(
             self.spawn(
-                self.codelet_id, self.bubble_chamber, self.bubble_chamber.satisfaction
+                self.codelet_id,
+                self.bubble_chamber,
+                1 - self.bubble_chamber.satisfaction,
             )
         )
         self.result = CodeletResult.SUCCESS
