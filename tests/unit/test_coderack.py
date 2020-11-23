@@ -22,7 +22,7 @@ def test_select_codelet(
             codelet.urgency = urgency_value
             codelets.append(codelet)
         bubble_chamber = Mock()
-        bubble_chamber.top_level_working_space.quality = bubble_chamber_satisfaction
+        bubble_chamber.satisfaction = bubble_chamber_satisfaction
         coderack = Coderack(bubble_chamber, codelets, Mock())
         coderack.IDEAL_POPULATION = 1
         codelet = coderack.select_codelet()
