@@ -1,1 +1,1 @@
-when using django logger, set environment variable DJANGO_SETTINGS_M0DULE=runrecord.runrecord.settings
+when using django logger, set environment variable DJANGO_SETTINGS_M0DULE=runrecord.settings
