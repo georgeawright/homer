@@ -4,6 +4,7 @@ import statistics
 from typing import List
 
 from .hyper_parameters import HyperParameters
+from .tools import average_vector
 
 
 class Location:
@@ -18,10 +19,7 @@ class Location:
         from .structures import Space
 
         return Location(
-            [
-                statistics.fmean([location.coordinates[i] for location in locations])
-                for i in range(len(locations[0].coordinates))
-            ],
+            average_vector([location.coordinates for location in locations]),
             locations[0].space,
         )
 
