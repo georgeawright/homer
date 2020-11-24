@@ -14,9 +14,36 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 @pytest.fixture
-def mild_concept():
+def label_concepts_space():
+    space = ConceptualSpace("label concepts", StructureCollection(), Mock())
+    return space
+
+
+@pytest.fixture
+def temperature_concept(label_concepts_space):
+    concept = Concept.new(
+        "temperature",
+        None,
+        None,
+        label_concepts_space,
+        "value",
+        StructureCollection(),
+        math.dist,
+    )
+    label_concepts_space.contents.add(concept)
+    return concept
+
+
+@pytest.fixture
+def temperature_space(temperature_concept):
+    space = ConceptualSpace("temperature", StructureCollection(), Mock())
+    temperature_concept.child_spaces.add(space)
+    return space
+
+
+@pytest.fixture
+def mild_concept(temperature_space):
     classifier = StretchyProximityClassifier()
-    temperature_space = ConceptualSpace("temperature", StructureCollection(), Mock())
     mild = Concept(
         "mild",
         [10],
@@ -31,10 +58,7 @@ def mild_concept():
 
 
 @pytest.fixture
-def bubble_chamber(mild_concept):
-    label_concepts_space = ConceptualSpace(
-        "label concepts", StructureCollection({mild_concept}), Mock()
-    )
+def bubble_chamber(mild_concept, label_concepts_space):
     chamber = BubbleChamber(
         Mock(),
         Mock(),
