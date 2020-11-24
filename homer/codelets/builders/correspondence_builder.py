@@ -68,9 +68,12 @@ class CorrespondenceBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         if self.target_space_two is None:
-            self.target_space_two = self.bubble_chamber.spaces[
-                "working spaces"
-            ].contents.get_active(exclude=[self.target_space_one])
+            try:
+                self.target_space_two = self.bubble_chamber.spaces[
+                    "working spaces"
+                ].contents.get_active(exclude=[self.target_space_one])
+            except MissingStructureError:
+                return False
         try:
             if self.target_structure_two is None:
                 self.target_structure_two = self.target_space_two.contents.of_type(
@@ -81,7 +84,7 @@ class CorrespondenceBuilder(Builder):
         if self.target_conceptual_space is None:
             try:
                 self.target_conceptual_space = StructureCollection.intersection(
-                    self.bubble_chamber.spaces["labeling spaces"].contents,
+                    self.bubble_chamber.spaces["label concepts"].child_spaces,
                     self.target_structure_one.parent_spaces,
                     self.target_structure_two.parent_spaces,
                 ).get_random()
@@ -136,7 +139,7 @@ class CorrespondenceBuilder(Builder):
     def _engender_follow_up(self):
         new_target = self.target_structure_one.nearby().get_unhappy()
         new_target_conceptual_space = self.bubble_chamber.spaces[
-            "labeling spaces"
+            "label concepts"
         ].contents.get_random(exclude=[self.target_conceptual_space])
         self.child_codelets.append(
             CorrespondenceBuilder.spawn(
@@ -152,7 +155,10 @@ class CorrespondenceBuilder(Builder):
         )
 
     def _fizzle(self):
-        new_target = self.target_structure_one.nearby().get_unhappy()
+        try:
+            new_target = self.target_structure_one.nearby().get_unhappy()
+        except MissingStructureError:
+            new_target = self.target_structure_one
         self.child_codelets.append(
             CorrespondenceBuilder.spawn(
                 self.codelet_id,

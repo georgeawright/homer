@@ -19,11 +19,11 @@ def parent_concept():
 def bubble_chamber(parent_concept):
     chamber = Mock()
     labeling_spaces = Mock()
-    labeling_spaces.contents = StructureCollection({Mock(), Mock()})
+    labeling_spaces.child_spaces = StructureCollection({Mock(), Mock()})
     correspondential_concepts = Mock()
     correspondential_concepts.contents = StructureCollection({parent_concept})
     target_structure_two = Mock()
-    target_structure_two.parent_spaces = labeling_spaces.contents
+    target_structure_two.parent_spaces = labeling_spaces.child_spaces
     working_spaces = Mock()
     working_space = Mock()
     working_space_contents = Mock()
@@ -31,7 +31,7 @@ def bubble_chamber(parent_concept):
     working_space.contents.of_type.return_value = working_space_contents
     working_spaces.contents.get_active.return_value = working_space
     chamber.spaces = {
-        "labeling spaces": labeling_spaces,
+        "label concepts": labeling_spaces,
         "correspondential concepts": correspondential_concepts,
         "working spaces": working_spaces,
     }
@@ -42,7 +42,7 @@ def bubble_chamber(parent_concept):
 def target_structure_one(bubble_chamber):
     structure = Mock()
     structure.has_correspondence.return_value = False
-    structure.parent_spaces = bubble_chamber.spaces["labeling spaces"].contents
+    structure.parent_spaces = bubble_chamber.spaces["label concepts"].child_spaces
     return structure
 
 
@@ -118,8 +118,8 @@ def test_fizzles_when_correspondence_already_exists(bubble_chamber):
     target_structure_one = Mock()
     target_structure_one.has_correspondence.return_value = True
     target_structure_one.parent_spaces = bubble_chamber.spaces[
-        "labeling spaces"
-    ].contents
+        "label concepts"
+    ].child_spaces
     correspondence_builder = CorrespondenceBuilder(
         Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
     )

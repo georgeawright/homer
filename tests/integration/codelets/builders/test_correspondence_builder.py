@@ -86,9 +86,12 @@ def bubble_chamber(
         "correspondential concepts", StructureCollection({more_concept}), Mock()
     )
     labeling_spaces = ConceptualSpace(
-        "labeling spaces",
-        StructureCollection({target_conceptual_space, location_conceptual_space}),
+        "label concepts",
         Mock(),
+        Mock(),
+        child_spaces=StructureCollection(
+            {target_conceptual_space, location_conceptual_space}
+        ),
     )
     chamber = BubbleChamber(
         Mock(),
@@ -112,7 +115,7 @@ def bubble_chamber(
 
 @pytest.fixture
 def target_chunk(bubble_chamber, target_conceptual_space, input_space, active_frame):
-    parent_spaces = StructureCollection({input_space})
+    parent_spaces = StructureCollection({input_space, target_conceptual_space})
     chunk = Chunk(
         [10],
         Location([0, 0], input_space),
