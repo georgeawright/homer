@@ -52,6 +52,12 @@ class BubbleChamber:
         )
 
     @property
+    def working_spaces(self):
+        return StructureCollection(
+            {space for space in self.spaces if isinstance(space, WorkingSpace)}
+        )
+
+    @property
     def satisfaction(self):
         return self.top_level_working_space.quality
 
