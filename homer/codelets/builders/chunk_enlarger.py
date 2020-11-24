@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder

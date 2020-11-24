@@ -6,6 +6,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
+from homer.tools import average_vector
 
 from .link import Link
 from .space import Space
@@ -67,9 +68,10 @@ class Chunk(Structure):
         for chunk in chunks:
             for _ in range(chunk.size):
                 values.append(chunk.value)
-        return statistics.median(values)
+        return average_vector(values)
 
     def _get_average_location(self, chunks: StructureCollection):
+        # TODO: needs to be for each space
         locations = []
         for chunk in chunks:
             for _ in range(chunk.size):

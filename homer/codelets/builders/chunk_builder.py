@@ -10,6 +10,7 @@ from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
+from homer.tools import average_vector
 
 from .chunk_enlarger import ChunkEnlarger
 
@@ -84,8 +85,8 @@ class ChunkBuilder(Builder):
             self._get_average_location(new_chunk_members),
             new_chunk_members,
             new_chunk_neighbours,
-            self.target_chunk.parent_spaces,
             self.confidence,
+            self.target_chunk.parent_spaces,
         )
         self.bubble_chamber.chunks.add(chunk)
         self.child_structure = chunk
@@ -95,7 +96,7 @@ class ChunkBuilder(Builder):
         for chunk in chunks:
             for _ in range(chunk.size):
                 values.append(chunk.value)
-        return statistics.median(values)
+        return average_vector(values)
 
     def _get_average_location(self, chunks: StructureCollection):
         locations = []

@@ -25,6 +25,7 @@ def common_space():
 @pytest.fixture
 def second_target_chunk(common_space):
     chunk = Mock()
+    chunk.value = [20]
     chunk.size = 1
     chunk.location.coordinates = [1, 1]
     chunk.neighbours = StructureCollection()
@@ -35,6 +36,7 @@ def second_target_chunk(common_space):
 @pytest.fixture
 def target_chunk(common_space, second_target_chunk):
     chunk = Mock()
+    chunk.value = [20]
     chunk.size = 1
     chunk.location.coordinates = [2, 2]
     chunk.members = StructureCollection()
