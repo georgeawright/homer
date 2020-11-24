@@ -50,8 +50,8 @@ class RelationBuilder(Builder):
             target_space,
             target_structure_one,
             urgency,
-            target_structure_two,
-            parent_concept,
+            target_structure_two=target_structure_two,
+            parent_concept=parent_concept,
         )
 
     def _passes_preliminary_checks(self):
@@ -60,9 +60,12 @@ class RelationBuilder(Builder):
                 type(self.target_structure_one)
             ).get_exigent(exclude=[self.target_structure_one])
         if self.parent_concept is None:
-            self.parent_concept = self.bubble_chamber.spaces[
-                "relational concepts"
-            ].contents.get_random()
+            self.parent_concept = (
+                self.bubble_chamber.spaces["relational concepts"]
+                .contents.get_random()
+                .child_spaces.get_random()
+                .contents.get_random()
+            )
         return not self.target_structure_one.has_relation(
             self.target_space, self.parent_concept, self.target_structure_two
         )
@@ -103,7 +106,7 @@ class RelationBuilder(Builder):
                 self.target_space,
                 new_target,
                 self.confidence,
-                self.parent_concept,
+                parent_concept=self.parent_concept,
             )
         )
 
@@ -119,9 +122,14 @@ class RelationBuilder(Builder):
         )
 
     def _fail(self):
-        new_target = self.target_space.contents.get_unhappy()
+        new_target = self.target_space.contents.of_type(
+            type(self.target_structure_one)
+        ).get_unhappy()
         self.child_codelets.append(
             ChunkBuilder.spawn(
-                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
+                self.codelet_id,
+                self.bubble_chamber,
+                new_target,
+                new_target.unhappiness,
             )
         )

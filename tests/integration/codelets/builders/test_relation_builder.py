@@ -14,19 +14,46 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 @pytest.fixture
-def more_concept():
-    classifier = DifferenceClassifier(ProximityClassifier())
-    comparison_space = ConceptualSpace("comparison", StructureCollection(), Mock())
-    more = Concept(
-        "more",
-        [5],
-        classifier,
-        comparison_space,
+def relational_concepts_space():
+    space = ConceptualSpace(
+        "relational concepts", StructureCollection({more_concept}), Mock()
+    )
+    return space
+
+
+@pytest.fixture
+def more_less_concept(relational_concepts_space):
+    return Concept.new(
+        "more-less",
+        None,
+        None,
+        relational_concepts_space,
         "value",
         StructureCollection(),
         math.dist,
     )
-    comparison_space.contents.add(more)
+
+
+@pytest.fixture
+def more_less_space(more_less_concept):
+    space = ConceptualSpace("more-less", StructureCollection(), more_less_concept)
+    more_less_concept.child_spaces.add(space)
+    return space
+
+
+@pytest.fixture
+def more_concept(more_less_space):
+    classifier = DifferenceClassifier(ProximityClassifier())
+    more = Concept(
+        "more",
+        [5],
+        classifier,
+        more_less_space,
+        "value",
+        StructureCollection(),
+        math.dist,
+    )
+    more_less_space.contents.add(more)
     return more
 
 
@@ -48,10 +75,7 @@ def target_space():
 
 
 @pytest.fixture
-def bubble_chamber(more_concept):
-    relational_concepts_space = ConceptualSpace(
-        "relational concepts", StructureCollection({more_concept}), Mock()
-    )
+def bubble_chamber(more_concept, relational_concepts_space):
     chamber = BubbleChamber(
         Mock(),
         Mock(),

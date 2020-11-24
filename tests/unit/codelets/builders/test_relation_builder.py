@@ -17,9 +17,13 @@ def parent_concept():
 @pytest.fixture
 def bubble_chamber(parent_concept):
     chamber = Mock()
+    relational_concept_space = Mock()
+    relational_concept_space.contents = StructureCollection({parent_concept})
+    relational_concept = Mock()
+    relational_concept.child_spaces = StructureCollection({relational_concept_space})
     space = Mock()
     space.name = "relational concepts"
-    space.contents = StructureCollection({parent_concept})
+    space.contents = StructureCollection({relational_concept})
     chamber.spaces = StructureCollection({space})
     return chamber
 
