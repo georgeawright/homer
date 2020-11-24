@@ -15,15 +15,13 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 @pytest.fixture
 def relational_concepts_space():
-    space = ConceptualSpace(
-        "relational concepts", StructureCollection({more_concept}), Mock()
-    )
+    space = ConceptualSpace("relational concepts", StructureCollection(), Mock())
     return space
 
 
 @pytest.fixture
 def more_less_concept(relational_concepts_space):
-    return Concept.new(
+    concept = Concept.new(
         "more-less",
         None,
         None,
@@ -32,6 +30,8 @@ def more_less_concept(relational_concepts_space):
         StructureCollection(),
         math.dist,
     )
+    relational_concepts_space.contents.add(concept)
+    return concept
 
 
 @pytest.fixture
