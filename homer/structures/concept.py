@@ -3,6 +3,7 @@ from typing import Any, Callable, List
 from homer.classifier import Classifier
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
+from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
@@ -65,6 +66,8 @@ class Concept(Structure):
         depth: int = 1,
     ):
         concept = cls(
+            ID.new(cls),
+            "",
             name,
             prototype,
             classifier,
