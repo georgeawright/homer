@@ -21,6 +21,7 @@ class Link(Structure):
         self.end = end
         self.parent_concept = parent_concept
         self.parent_space = parent_space
+        self.parent_spaces = StructureCollection({parent_space})
 
     def is_between(self, a: Structure, b: Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a
