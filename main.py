@@ -8,6 +8,7 @@ from homer.classifiers import (
     StretchyProximityClassifier,
     ProximityClassifier,
 )
+from homer.id import ID
 from homer.location import Location
 from homer.loggers import DjangoLogger
 from homer.structures import Chunk, Concept, Lexeme
@@ -20,7 +21,7 @@ from homer.word_form import WordForm
 
 
 def link_concepts(concept_1, concept_2, activation=0.0):
-    relation = Relation(concept_1, concept_2, None, None, 1.0)
+    relation = Relation(ID.new(Relation), "", concept_1, concept_2, None, None, 1.0)
     relation._activation = activation
     concept_1.links_in.add(relation)
     concept_1.links_out.add(relation)
@@ -41,7 +42,9 @@ problem = [
 path_to_logs = "logs"
 logger = DjangoLogger.setup(path_to_logs)
 
-top_level_conceptual_space = ConceptualSpace("top level", StructureCollection(), None)
+top_level_conceptual_space = ConceptualSpace(
+    "top_level_space", "", "top level", StructureCollection(), None
+)
 top_level_working_space = top_level_conceptual_space.instance
 bubble_chamber = BubbleChamber(
     StructureCollection({top_level_conceptual_space}),
@@ -67,7 +70,9 @@ input_concept = Concept.new(
     math.dist,
 )
 bubble_chamber.concepts.add(input_concept)
-input_space = WorkingSpace("input", StructureCollection(), 0.0, input_concept)
+input_space = WorkingSpace(
+    "input_space", "", "input", StructureCollection(), 0.0, input_concept
+)
 bubble_chamber.working_spaces.add(input_space)
 top_level_working_space.child_spaces.add(input_space)
 
@@ -81,7 +86,9 @@ activity_concept = Concept.new(
     None,
 )
 bubble_chamber.concepts.add(activity_concept)
-activities_space = ConceptualSpace("activities", StructureCollection(), None)
+activities_space = ConceptualSpace(
+    "activities", "", "activities", StructureCollection(), None
+)
 bubble_chamber.conceptual_spaces.add(activities_space)
 build_concept = Concept.new(
     "build",
@@ -125,7 +132,9 @@ structure_concept = Concept.new(
     None,
 )
 bubble_chamber.concepts.add(structure_concept)
-structures_space = ConceptualSpace("structures", StructureCollection(), None)
+structures_space = ConceptualSpace(
+    "structures", "", "structures", StructureCollection(), None
+)
 bubble_chamber.conceptual_spaces.add(structures_space)
 chunk_concept = Concept.new(
     "chunk",
@@ -168,7 +177,7 @@ label_concept = Concept.new(
 )
 bubble_chamber.concepts.add(label_concept)
 label_concepts_space = ConceptualSpace(
-    "label concepts", StructureCollection(), label_concept
+    "label_concept", "", "label concepts", StructureCollection(), label_concept
 )
 bubble_chamber.conceptual_spaces.add(label_concepts_space)
 relation_concept = Concept.new(
@@ -182,7 +191,11 @@ relation_concept = Concept.new(
 )
 bubble_chamber.concepts.add(relation_concept)
 relational_concepts_space = ConceptualSpace(
-    "relational concepts", StructureCollection(), relation_concept
+    "relational_concepts",
+    "",
+    "relational concepts",
+    StructureCollection(),
+    relation_concept,
 )
 bubble_chamber.conceptual_spaces.add(relational_concepts_space)
 correspondence_concept = Concept.new(
@@ -196,7 +209,11 @@ correspondence_concept = Concept.new(
 )
 bubble_chamber.concepts.add(correspondence_concept)
 correspondential_concepts_space = ConceptualSpace(
-    "correspondential concepts", StructureCollection(), correspondence_concept
+    "correspondential_concepts",
+    "",
+    "correspondential concepts",
+    StructureCollection(),
+    correspondence_concept,
 )
 bubble_chamber.conceptual_spaces.add(correspondential_concepts_space)
 template_concept = Concept.new(
@@ -209,7 +226,9 @@ template_concept = Concept.new(
     None,
 )
 bubble_chamber.concepts.add(template_concept)
-templates_space = ConceptualSpace("templates", StructureCollection(), template_concept)
+templates_space = ConceptualSpace(
+    "templates", "", "templates", StructureCollection(), template_concept
+)
 
 link_concepts(build_concept, chunk_concept)
 link_concepts(build_concept, correspondence_concept)
@@ -242,7 +261,7 @@ temperature_concept = Concept.new(
 )
 bubble_chamber.concepts.add(temperature_concept)
 temperature_space = ConceptualSpace(
-    "temperature", StructureCollection(), temperature_concept
+    "temperature", "", "temperature", StructureCollection(), temperature_concept
 )
 label_concepts_space.child_spaces.add(temperature_space)
 bubble_chamber.conceptual_spaces.add(temperature_space)
@@ -338,7 +357,9 @@ location_concept = Concept.new(
     math.dist,
 )
 bubble_chamber.concepts.add(location_concept)
-location_space = ConceptualSpace("location", StructureCollection(), location_concept)
+location_space = ConceptualSpace(
+    "location", "", "location", StructureCollection(), location_concept
+)
 label_concepts_space.child_spaces.add(location_space)
 bubble_chamber.conceptual_spaces.add(location_space)
 location_concept.child_spaces.add(location_space)
@@ -533,7 +554,9 @@ more_less_concept = Concept.new(
     math.dist,
 )
 bubble_chamber.concepts.add(more_less_concept)
-more_less_space = ConceptualSpace("more-less", StructureCollection(), more_less_concept)
+more_less_space = ConceptualSpace(
+    "more-less", "", "more-less", StructureCollection(), more_less_concept
+)
 more_less_concept.child_spaces.add(more_less_space)
 relational_concepts_space.child_spaces.add(more_less_space)
 bubble_chamber.conceptual_spaces.add(more_less_space)
@@ -589,7 +612,11 @@ same_different_concept = Concept.new(
 )
 bubble_chamber.concepts.add(same_different_concept)
 same_different_space = ConceptualSpace(
-    "same-different", StructureCollection(), same_different_concept
+    "same-different",
+    "",
+    "same-different",
+    StructureCollection(),
+    same_different_concept,
 )
 bubble_chamber.conceptual_spaces.add(same_different_space)
 same = Concept.new(
@@ -615,22 +642,40 @@ bubble_chamber.concepts.add(different)
 
 # TEMPLATE 1: the location is temperature
 template_1 = Template(
+    ID.new(Template),
+    "",
     "the [location] is [temperature]",
     StructureCollection(),
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
 word_the = Word(
-    "the", Location([0], template_1), StructureCollection({template_1}), 1.0
+    ID.new(Word),
+    "",
+    "the",
+    Location([0], template_1),
+    StructureCollection({template_1}),
+    1.0,
 )
 slot_location = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     location_concept,
     WordForm.HEADWORD,
     Location([1], template_1),
     StructureCollection({template_1}),
 )
-word_is = Word("is", Location([2], template_1), StructureCollection({template_1}), 1.0)
+word_is = Word(
+    ID.new(Word),
+    "",
+    "is",
+    Location([2], template_1),
+    StructureCollection({template_1}),
+    1.0,
+)
 slot_temperature = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     temperature_concept,
     WordForm.HEADWORD,
     Location([3], template_1),
@@ -644,24 +689,56 @@ bubble_chamber.conceptual_spaces.add(template_1)
 
 # TEMPLATE 2: it is temperature in the location
 template_2 = Template(
+    ID.new(Template),
+    "",
     "it is [temperature] in the [location]",
     StructureCollection(),
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
-word_it = Word("it", Location([0], template_2), StructureCollection({template_2}), 1.0)
-word_is = Word("is", Location([1], template_2), StructureCollection({template_2}), 1.0)
+word_it = Word(
+    ID.new(Word),
+    "",
+    "it",
+    Location([0], template_2),
+    StructureCollection({template_2}),
+    1.0,
+)
+word_is = Word(
+    ID.new(Word),
+    "",
+    "is",
+    Location([1], template_2),
+    StructureCollection({template_2}),
+    1.0,
+)
 slot_temperature = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     temperature_concept,
     WordForm.HEADWORD,
     Location([2], template_2),
     StructureCollection({template_2}),
 )
-word_in = Word("in", Location([3], template_2), StructureCollection({template_2}), 1.0)
+word_in = Word(
+    ID.new(Word),
+    "",
+    "in",
+    Location([3], template_2),
+    StructureCollection({template_2}),
+    1.0,
+)
 word_the = Word(
-    "the", Location([4], template_2), StructureCollection({template_2}), 1.0
+    ID.new(Word),
+    "",
+    "the",
+    Location([4], template_2),
+    StructureCollection({template_2}),
+    1.0,
 )
 slot_location = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     location_concept,
     WordForm.HEADWORD,
     Location([5], template_2),
@@ -678,24 +755,56 @@ bubble_chamber.conceptual_spaces.add(template_2)
 
 # TEMPLATE 3: it is temperature.comparative in the location
 template_3 = Template(
+    ID.new(TemplateSlot),
+    "",
     "it is [temperature.comparative] in the [location]",
     StructureCollection(),
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
-word_it = Word("it", Location([0], template_3), StructureCollection({template_3}), 1.0)
-word_is = Word("is", Location([1], template_3), StructureCollection({template_3}), 1.0)
+word_it = Word(
+    ID.new(Word),
+    "",
+    "it",
+    Location([0], template_3),
+    StructureCollection({template_3}),
+    1.0,
+)
+word_is = Word(
+    ID.new(Word),
+    "",
+    "is",
+    Location([1], template_3),
+    StructureCollection({template_3}),
+    1.0,
+)
 slot_temperature = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     temperature_concept,
     WordForm.COMPARATIVE,
     Location([2], template_3),
     StructureCollection({template_3}),
 )
-word_in = Word("in", Location([3], template_3), StructureCollection({template_3}), 1.0)
+word_in = Word(
+    ID.new(Word),
+    "",
+    "in",
+    Location([3], template_3),
+    StructureCollection({template_3}),
+    1.0,
+)
 word_the = Word(
-    "the", Location([4], template_3), StructureCollection({template_3}), 1.0
+    ID.new(Word),
+    "",
+    "the",
+    Location([4], template_3),
+    StructureCollection({template_3}),
+    1.0,
 )
 slot_location = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     location_concept,
     WordForm.HEADWORD,
     Location([5], template_3),
@@ -712,42 +821,88 @@ bubble_chamber.conceptual_spaces.add(template_3)
 
 # TEMPLATE 4: it is temperature.comparative in the location than the location
 template_4 = Template(
+    ID.new(TemplateSlot),
+    "",
     "it is [temperature.comparative] in the [location] than the [location]",
     StructureCollection(),
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
-word_it = Word("it", Location([0], template_4), StructureCollection({template_4}), 1.0)
-word_is = Word("is", Location([1], template_4), StructureCollection({template_4}), 1.0)
+word_it = Word(
+    ID.new(Word),
+    "",
+    "it",
+    Location([0], template_4),
+    StructureCollection({template_4}),
+    1.0,
+)
+word_is = Word(
+    ID.new(Word),
+    "",
+    "is",
+    Location([1], template_4),
+    StructureCollection({template_4}),
+    1.0,
+)
 slot_temperature = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     temperature_concept,
     WordForm.COMPARATIVE,
     Location([2], template_4),
     StructureCollection({template_4}),
 )
-word_in = Word("in", Location([3], template_4), StructureCollection({template_4}), 1.0)
+word_in = Word(
+    ID.new(Word),
+    "",
+    "in",
+    Location([3], template_4),
+    StructureCollection({template_4}),
+    1.0,
+)
 word_the_1 = Word(
-    "the", Location([4], template_4), StructureCollection({template_4}), 1.0
+    ID.new(Word),
+    "",
+    "the",
+    Location([4], template_4),
+    StructureCollection({template_4}),
+    1.0,
 )
 slot_location_1 = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     location_concept,
     WordForm.HEADWORD,
     Location([5], template_4),
     StructureCollection({template_4}),
 )
 word_than = Word(
-    "than", Location([6], template_4), StructureCollection({template_4}), 1.0
+    ID.new(Word),
+    "",
+    "than",
+    Location([6], template_4),
+    StructureCollection({template_4}),
+    1.0,
 )
 word_the_2 = Word(
-    "the", Location([7], template_4), StructureCollection({template_4}), 1.0
+    ID.new(Word),
+    "",
+    "the",
+    Location([7], template_4),
+    StructureCollection({template_4}),
+    1.0,
 )
 slot_location_2 = TemplateSlot(
+    ID.new(TemplateSlot),
+    "",
     location_concept,
     WordForm.HEADWORD,
     Location([8], template_4),
     StructureCollection({template_4}),
 )
-more_relation = Relation(slot_location_1, slot_location_2, more, temperature_space, 1.0)
+more_relation = Relation(
+    ID.new(Relation), "", slot_location_1, slot_location_2, more, temperature_space, 1.0
+)
 
 template_4.contents.add(word_it)
 template_4.contents.add(word_is)
@@ -780,7 +935,16 @@ for i, row in enumerate(problem):
         members = StructureCollection()
         neighbours = StructureCollection()
         quality = 0.0
-        chunk = Chunk(value, location, members, neighbours, quality, parent_spaces)
+        chunk = Chunk(
+            ID.new(Chunk),
+            "",
+            value,
+            location,
+            members,
+            neighbours,
+            quality,
+            parent_spaces,
+        )
         input_chunks.add(chunk)
         bubble_chamber.chunks.add(chunk)
         input_space.contents.add(chunk)
