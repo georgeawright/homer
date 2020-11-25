@@ -18,7 +18,6 @@ class CodeletRecord(models.Model):
         "self",
         related_name="+",
         on_delete=models.CASCADE,
-        unique=True,
         blank=True,
         null=True,
     )
