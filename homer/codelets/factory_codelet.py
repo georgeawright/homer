@@ -78,7 +78,7 @@ class FactoryCodelet(Codelet):
                     self.codelet_id, self.bubble_chamber, target, target.unhappiness
                 )
             elif structure_type == self.bubble_chamber.concepts["correspondence"]:
-                target_space = self.bubble_chamber.spaces.get_active()
+                target_space = self.bubble_chamber.working_spaces.get_active()
                 target = target_space.contents.get_unhappy()
                 follow_up = CorrespondenceBuilder.spawn(
                     self.codelet_id,
@@ -93,10 +93,7 @@ class FactoryCodelet(Codelet):
                     self.codelet_id, self.bubble_chamber, target, target.unhappiness
                 )
             elif structure_type == self.bubble_chamber.concepts["relation"]:
-                target = StructureCollection.union(
-                    self.bubble_chamber.chunks,
-                    self.bubble_chamber.relations,
-                ).get_unhappy()
+                target = self.bubble_chamber.chunks.get_unhappy()
                 target_space = target.parent_spaces.get_random()
                 follow_up = RelationBuilder.spawn(
                     self.codelet_id,
