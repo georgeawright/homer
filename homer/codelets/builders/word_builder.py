@@ -61,7 +61,6 @@ class WordBuilder(Builder):
             else self.target_correspondence.start_space
         )
         self.output_space = self.target_view.output_space
-        print(self.target_view)
         for word in self.output_space.contents:
             if len(word.correspondences_with(self.slot)) > 0:
                 return False

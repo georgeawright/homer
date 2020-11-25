@@ -55,8 +55,6 @@ class LabelBuilder(Builder):
         return not self.target_chunk.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
-        print(self.parent_concept.name)
-        print(self.parent_concept.classifier)
         self.confidence = self.parent_concept.classifier.classify(
             {"concept": self.parent_concept, "start": self.target_chunk}
         )
