@@ -19,28 +19,39 @@ def bubble_chamber():
 
 @pytest.fixture
 def conceptual_space():
-    space = ConceptualSpace(Mock(), Mock(), Mock())
+    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), Mock())
     return space
 
 
 @pytest.fixture
 def working_space():
-    space = WorkingSpace(Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
     return space
 
 
 @pytest.fixture
 def chunk(working_space):
     chunk = Chunk(
-        Mock(), Mock(), Mock(), Mock(), Mock(), StructureCollection({working_space})
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        StructureCollection({working_space}),
     )
     return chunk
 
 
 @pytest.fixture
 def good_label(chunk, conceptual_space, working_space):
-    concept = Concept(Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock())
+    concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+    )
     label = Label(
+        Mock(),
+        Mock(),
         chunk,
         concept,
         working_space,
@@ -53,8 +64,12 @@ def good_label(chunk, conceptual_space, working_space):
 
 @pytest.fixture
 def bad_label(chunk, conceptual_space, working_space):
-    concept = Concept(Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock())
+    concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+    )
     label = Label(
+        Mock(),
+        Mock(),
         chunk,
         concept,
         working_space,

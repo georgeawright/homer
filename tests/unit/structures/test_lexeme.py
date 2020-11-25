@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import Mock
 
 from homer.word_form import WordForm
 from homer.structures import Lexeme
@@ -40,5 +41,5 @@ from homer.structures import Lexeme
     ],
 )
 def test_get_form(headword, forms, required_form, expected):
-    lexeme = Lexeme(headword, forms)
+    lexeme = Lexeme(Mock(), Mock(), headword, forms)
     assert expected == lexeme.get_form(required_form)

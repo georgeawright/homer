@@ -119,6 +119,8 @@ class CorrespondenceBuilder(Builder):
             self.target_space_one, self.target_space_two
         )
         correspondence = Correspondence(
+            ID.new(Correspondence),
+            self.codelet_id,
             self.target_structure_one,
             self.target_structure_two,
             self.target_space_one,

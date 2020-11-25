@@ -20,37 +20,37 @@ def bubble_chamber():
 
 @pytest.fixture
 def conceptual_space():
-    space = ConceptualSpace(Mock(), Mock(), Mock())
+    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), Mock())
     return space
 
 
 @pytest.fixture
 def working_space():
-    space = WorkingSpace(Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
     return space
 
 
 @pytest.fixture
 def start():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     return chunk
 
 
 @pytest.fixture
 def end():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     return chunk
 
 
 @pytest.fixture
 def start_space():
-    space = WorkingSpace(Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
     return space
 
 
 @pytest.fixture
 def end_space():
-    space = WorkingSpace(Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
     return space
 
 
@@ -58,8 +58,12 @@ def end_space():
 def good_correspondence(
     start, end, start_space, end_space, conceptual_space, working_space
 ):
-    concept = Concept(Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock())
+    concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+    )
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         start,
         end,
         start_space,
@@ -84,8 +88,12 @@ def bad_correspondence(
     conceptual_space,
     working_space,
 ):
-    concept = Concept(Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock())
+    concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+    )
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         start,
         end,
         start_space,

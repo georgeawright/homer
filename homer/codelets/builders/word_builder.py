@@ -78,6 +78,8 @@ class WordBuilder(Builder):
         word_value = lexeme.get_form(self.slot.form)
         word_location = self.slot.location
         word = Word(
+            ID.new(Word),
+            self.codelet_id,
             word_value,
             word_location,
             StructureCollection({self.output_space}),
@@ -87,6 +89,8 @@ class WordBuilder(Builder):
             self.slot_space, self.output_space
         )
         projection_from_slot = Correspondence(
+            ID.new(Correspondence),
+            self.codelet_id,
             self.slot,
             word,
             self.slot_space,
@@ -105,6 +109,8 @@ class WordBuilder(Builder):
             self.non_slot_space, self.output_space
         )
         projection_from_non_slot = Correspondence(
+            ID.new(Correspondence),
+            self.codelet_id,
             self.non_slot,
             word,
             self.non_slot_space,

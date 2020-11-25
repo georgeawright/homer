@@ -11,6 +11,8 @@ class View(Chunk):
 
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         members: StructureCollection,
         parent_space: Space,
         output_space: WorkingSpace,
@@ -21,6 +23,8 @@ class View(Chunk):
         neighbours = None
         Chunk.__init__(
             self,
+            structure_id,
+            parent_id,
             value,
             location,
             members,

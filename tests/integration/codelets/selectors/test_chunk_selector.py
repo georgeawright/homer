@@ -18,7 +18,9 @@ def bubble_chamber():
 
 @pytest.fixture
 def target_space():
-    space = WorkingSpace(Mock(), StructureCollection(), Mock(), Mock(), Mock(), Mock())
+    space = WorkingSpace(
+        Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock(), Mock()
+    )
     return space
 
 
@@ -31,6 +33,8 @@ def chunk_members():
 @pytest.fixture
 def good_chunk(target_space, chunk_members):
     chunk = Chunk(
+        Mock(),
+        Mock(),
         Mock(),
         Location([0, 0], target_space),
         chunk_members,
@@ -45,6 +49,8 @@ def good_chunk(target_space, chunk_members):
 @pytest.fixture
 def bad_chunk(target_space, chunk_members):
     chunk = Chunk(
+        Mock(),
+        Mock(),
         Mock(),
         Location([0, 1], target_space),
         chunk_members,

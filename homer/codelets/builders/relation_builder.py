@@ -85,6 +85,8 @@ class RelationBuilder(Builder):
 
     def _process_structure(self):
         relation = Relation(
+            ID.new(Relation),
+            self.codelet_id,
             self.target_structure_one,
             self.target_structure_two,
             self.parent_concept,

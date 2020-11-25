@@ -10,6 +10,8 @@ class Slot(Chunk):
 
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         value: Any = None,
         location: Location = None,
         members: StructureCollection = None,
@@ -20,6 +22,8 @@ class Slot(Chunk):
     ):
         Chunk.__init__(
             self,
+            structure_id,
+            parent_id,
             value,
             location,
             members,

@@ -30,15 +30,15 @@ def bubble_chamber():
         Mock(),
     )
     text_concept = Concept(
-        "text", None, None, None, "value", StructureCollection(), None
+        Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(text_concept)
     same_concept = Concept(
-        "same", None, None, None, "value", StructureCollection(), None
+        Mock(), Mock(), "same", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(same_concept)
     input_concept = Concept(
-        "input", None, None, None, "value", StructureCollection(), None
+        Mock(), Mock(), "input", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(input_concept)
     return chamber
@@ -49,10 +49,15 @@ def target_view(bubble_chamber):
     members = Mock()
     parent_space = Mock()
     output_space = WorkingSpace(
-        "output_space_name", StructureCollection(), 0.0, bubble_chamber.concepts["text"]
+        Mock(),
+        Mock(),
+        "output_space_name",
+        StructureCollection(),
+        0.0,
+        bubble_chamber.concepts["text"],
     )
     quality = Mock()
-    view = View(members, parent_space, output_space, quality)
+    view = View(Mock(), Mock(), members, parent_space, output_space, quality)
     bubble_chamber.spaces.add(output_space)
     return view
 
@@ -62,7 +67,7 @@ def template(bubble_chamber):
     name = "mock template"
     members = StructureCollection()
     parent_concept = bubble_chamber.concepts["text"]
-    template = Template(name, members, parent_concept)
+    template = Template(Mock(), Mock(), name, members, parent_concept)
     bubble_chamber.spaces.add(template)
     return template
 
@@ -73,13 +78,13 @@ def input_space(bubble_chamber):
     contents = StructureCollection()
     quality = 0.0
     parent_concept = bubble_chamber.concepts["input"]
-    space = WorkingSpace(name, contents, quality, parent_concept)
+    space = WorkingSpace(Mock(), Mock(), name, contents, quality, parent_concept)
     return space
 
 
 @pytest.fixture
 def target_correspondence(template, input_space):
-    start = TemplateSlot(Mock(), Mock(), Mock(), Mock())
+    start = TemplateSlot(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     end = Mock()
     start_space = template
     end_space = input_space
@@ -88,6 +93,8 @@ def target_correspondence(template, input_space):
     conceptual_space = Mock()
     quality = Mock()
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         start,
         end,
         start_space,

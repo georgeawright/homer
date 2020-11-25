@@ -31,7 +31,7 @@ def bubble_chamber():
         Mock(),
     )
     text_concept = Concept(
-        "text", None, None, None, "value", StructureCollection(), None
+        Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(text_concept)
     return chamber
@@ -40,18 +40,29 @@ def bubble_chamber():
 @pytest.fixture
 def good_correspondence(bubble_chamber):
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
     )
     temperature_working_space = WorkingSpace(
-        "temperature working", StructureCollection(), 0, temperature_concept
+        Mock(),
+        Mock(),
+        "temperature working",
+        StructureCollection(),
+        0,
+        temperature_concept,
     )
     temperature_conceptual_space = ConceptualSpace(
-        "temperature", StructureCollection(), temperature_concept
+        Mock(), Mock(), "temperature", StructureCollection(), temperature_concept
     )
-    warm_concept = Concept(Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist)
+    warm_concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+    )
     parent_concept = bubble_chamber.concepts["text"]
-    template = Template("mock template", StructureCollection(), parent_concept)
+    template = Template(
+        Mock(), Mock(), "mock template", StructureCollection(), parent_concept
+    )
     same_concept = Concept(
+        Mock(),
+        Mock(),
         "same",
         None,
         SamenessClassifier(),
@@ -60,13 +71,15 @@ def good_correspondence(bubble_chamber):
         StructureCollection(),
         math.dist,
     )
-    start = Label(Mock(), warm_concept, temperature_working_space, 0.7)
-    end = Label(Mock(), warm_concept, template, 1.0)
+    start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.7)
+    end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
     parent_space = bubble_chamber.common_parent_space(
         temperature_working_space, template
     )
     quality = 0.0
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         start,
         end,
         temperature_working_space,
@@ -82,18 +95,29 @@ def good_correspondence(bubble_chamber):
 @pytest.fixture
 def bad_correspondence(bubble_chamber):
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
     )
     temperature_working_space = WorkingSpace(
-        "temperature working", StructureCollection(), 0, temperature_concept
+        Mock(),
+        Mock(),
+        "temperature working",
+        StructureCollection(),
+        0,
+        temperature_concept,
     )
     temperature_conceptual_space = ConceptualSpace(
-        "temperature", StructureCollection(), temperature_concept
+        Mock(), Mock(), "temperature", StructureCollection(), temperature_concept
     )
-    warm_concept = Concept(Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist)
+    warm_concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+    )
     parent_concept = bubble_chamber.concepts["text"]
-    template = Template("mock template", StructureCollection(), parent_concept)
+    template = Template(
+        Mock(), Mock(), "mock template", StructureCollection(), parent_concept
+    )
     same_concept = Concept(
+        Mock(),
+        Mock(),
         "same",
         None,
         SamenessClassifier(),
@@ -102,13 +126,15 @@ def bad_correspondence(bubble_chamber):
         StructureCollection(),
         math.dist,
     )
-    start = Label(Mock(), warm_concept, temperature_working_space, 0.0)
-    end = Label(Mock(), warm_concept, template, 1.0)
+    start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.0)
+    end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
     parent_space = bubble_chamber.common_parent_space(
         temperature_working_space, template
     )
     quality = 1.0
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         start,
         end,
         temperature_working_space,

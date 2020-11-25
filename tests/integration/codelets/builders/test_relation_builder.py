@@ -15,13 +15,17 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 @pytest.fixture
 def relational_concepts_space():
-    space = ConceptualSpace("relational concepts", StructureCollection(), Mock())
+    space = ConceptualSpace(
+        Mock(), Mock(), "relational concepts", StructureCollection(), Mock()
+    )
     return space
 
 
 @pytest.fixture
 def more_less_concept(relational_concepts_space):
-    concept = Concept.new(
+    concept = Concept(
+        Mock(),
+        Mock(),
         "more-less",
         None,
         None,
@@ -36,7 +40,9 @@ def more_less_concept(relational_concepts_space):
 
 @pytest.fixture
 def more_less_space(more_less_concept):
-    space = ConceptualSpace("more-less", StructureCollection(), more_less_concept)
+    space = ConceptualSpace(
+        Mock(), Mock(), "more-less", StructureCollection(), more_less_concept
+    )
     more_less_concept.child_spaces.add(space)
     return space
 
@@ -45,6 +51,8 @@ def more_less_space(more_less_concept):
 def more_concept(more_less_space):
     classifier = DifferenceClassifier(ProximityClassifier())
     more = Concept(
+        Mock(),
+        Mock(),
         "more",
         [5],
         classifier,
@@ -60,6 +68,8 @@ def more_concept(more_less_space):
 @pytest.fixture
 def target_space():
     temperature = Concept(
+        Mock(),
+        Mock(),
         "temperature",
         None,
         Mock(),
@@ -69,7 +79,7 @@ def target_space():
         math.dist,
     )
     temperature_space = ConceptualSpace(
-        "temperature", StructureCollection(), temperature
+        Mock(), Mock(), "temperature", StructureCollection(), temperature
     )
     return temperature_space
 
@@ -96,11 +106,15 @@ def bubble_chamber(more_concept, relational_concepts_space):
 @pytest.fixture
 def target_chunk(bubble_chamber, target_space):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
-    input_space = WorkingSpace("input", StructureCollection(), 0, location_concept)
+    input_space = WorkingSpace(
+        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    )
     parent_spaces = StructureCollection({input_space})
     chunk = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 0], input_space),
         StructureCollection(),
@@ -109,6 +123,8 @@ def target_chunk(bubble_chamber, target_space):
         parent_spaces,
     )
     second_chunk = Chunk(
+        Mock(),
+        Mock(),
         [5],
         Location([0, 1], input_space),
         StructureCollection(),

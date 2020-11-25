@@ -53,6 +53,8 @@ class FunctionWordBuilder(Builder):
 
     def _process_structure(self):
         output_word = Word(
+            ID.new(Word),
+            self.codelet_id,
             self.template_word.value,
             self.template_word.location,
             StructureCollection({self.output_space}),
@@ -63,6 +65,8 @@ class FunctionWordBuilder(Builder):
             self.input_space, self.output_space
         )
         correspondence = Correspondence(
+            ID.new(Correspondence),
+            self.codelet_id,
             self.template_word,
             output_word,
             self.input_space,

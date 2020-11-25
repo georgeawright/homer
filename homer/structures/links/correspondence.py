@@ -10,6 +10,8 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 class Correspondence(Link):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         start: Structure,
         end: Structure,
         start_space: Space,
@@ -21,6 +23,8 @@ class Correspondence(Link):
     ):
         Link.__init__(
             self,
+            structure_id,
+            parent_id,
             start,
             end,
             parent_concept,

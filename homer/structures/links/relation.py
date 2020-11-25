@@ -7,6 +7,8 @@ from homer.structures import Concept, Link, Space
 class Relation(Link):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         start: Structure,
         end: Structure,
         parent_concept: Concept,
@@ -15,6 +17,8 @@ class Relation(Link):
     ):
         Link.__init__(
             self,
+            structure_id,
+            parent_id,
             start,
             end,
             parent_concept,

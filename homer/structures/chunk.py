@@ -15,6 +15,8 @@ from .space import Space
 class Chunk(Structure):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         value: Any,
         location: Location,
         members: StructureCollection,
@@ -25,7 +27,13 @@ class Chunk(Structure):
         links_out: StructureCollection = None,
     ):
         Structure.__init__(
-            self, location, quality, links_in=links_in, links_out=links_out
+            self,
+            structure_id,
+            parent_id,
+            location,
+            quality,
+            links_in=links_in,
+            links_out=links_out,
         )
         self.value = value
         self.members = members

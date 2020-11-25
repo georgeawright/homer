@@ -16,8 +16,12 @@ from homer.structures.spaces import ConceptualSpace, Frame, WorkingSpace
 @pytest.fixture
 def more_concept():
     classifier = DifferenceClassifier(ProximityClassifier())
-    comparison_space = ConceptualSpace("comparison", StructureCollection(), Mock())
+    comparison_space = ConceptualSpace(
+        Mock(), Mock(), "comparison", StructureCollection(), Mock()
+    )
     more = Concept(
+        Mock(),
+        Mock(),
         "more",
         [5],
         classifier,
@@ -32,19 +36,25 @@ def more_concept():
 
 @pytest.fixture
 def location_concept():
-    concept = Concept(Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist)
+    concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+    )
     return concept
 
 
 @pytest.fixture
 def location_conceptual_space(location_concept):
-    space = ConceptualSpace("location", StructureCollection(), location_concept)
+    space = ConceptualSpace(
+        Mock(), Mock(), "location", StructureCollection(), location_concept
+    )
     return space
 
 
 @pytest.fixture
 def target_conceptual_space():
     temperature = Concept(
+        Mock(),
+        Mock(),
         "temperature",
         None,
         Mock(),
@@ -54,20 +64,22 @@ def target_conceptual_space():
         math.dist,
     )
     temperature_space = ConceptualSpace(
-        "temperature", StructureCollection(), temperature
+        Mock(), Mock(), "temperature", StructureCollection(), temperature
     )
     return temperature_space
 
 
 @pytest.fixture
 def input_space(location_concept):
-    space = WorkingSpace("input", StructureCollection(), 0, location_concept)
+    space = WorkingSpace(
+        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    )
     return space
 
 
 @pytest.fixture
 def active_frame():
-    frame = Frame("frame", StructureCollection(), Mock())
+    frame = Frame(Mock(), Mock(), "frame", StructureCollection(), Mock())
     return frame
 
 
@@ -81,9 +93,15 @@ def bubble_chamber(
 ):
     working_spaces = StructureCollection({input_space, active_frame})
     correspondential_concepts_space = ConceptualSpace(
-        "correspondential concepts", StructureCollection({more_concept}), Mock()
+        Mock(),
+        Mock(),
+        "correspondential concepts",
+        StructureCollection({more_concept}),
+        Mock(),
     )
     labeling_spaces = ConceptualSpace(
+        Mock(),
+        Mock(),
         "label concepts",
         Mock(),
         Mock(),
@@ -113,6 +131,8 @@ def bubble_chamber(
 def target_chunk(bubble_chamber, target_conceptual_space, input_space, active_frame):
     parent_spaces = StructureCollection({input_space, target_conceptual_space})
     chunk = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 0], input_space),
         StructureCollection(),
@@ -121,6 +141,8 @@ def target_chunk(bubble_chamber, target_conceptual_space, input_space, active_fr
         parent_spaces,
     )
     second_chunk = Chunk(
+        Mock(),
+        Mock(),
         [5],
         Location([0, 1], input_space),
         StructureCollection(),
@@ -129,6 +151,8 @@ def target_chunk(bubble_chamber, target_conceptual_space, input_space, active_fr
         parent_spaces,
     )
     neighbouring_chunk = Chunk(
+        Mock(),
+        Mock(),
         [5],
         Location([1, 0], input_space),
         StructureCollection(),

@@ -24,6 +24,8 @@ def test_update_activation(
     structure_3 = Mock()
     structure_3.activation = activation_3
     working_space = WorkingSpace(
+        Mock(),
+        Mock(),
         "name",
         StructureCollection({structure_1, structure_2, structure_3}),
         Mock(),

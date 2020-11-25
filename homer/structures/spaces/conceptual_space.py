@@ -8,6 +8,8 @@ from .working_space import WorkingSpace
 class ConceptualSpace(Space):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         name: str,
         contents: StructureCollection,
         parent_concept: Concept,
@@ -19,6 +21,8 @@ class ConceptualSpace(Space):
         quality = None
         Space.__init__(
             self,
+            structure_id,
+            parent_id,
             name,
             contents,
             quality,
@@ -34,6 +38,8 @@ class ConceptualSpace(Space):
     def instance(self) -> WorkingSpace:
         if self._instance is None:
             self._instance = WorkingSpace(
+                self.structure_id + "_working_space",
+                self.structure_id,
                 self.name + " working",
                 StructureCollection(),
                 FloatBetweenOneAndZero(0),

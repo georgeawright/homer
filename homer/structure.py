@@ -14,11 +14,15 @@ class Structure(ABC):
 
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         location: Location,
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
+        self.structure_id = structure_id
+        self.parent_id = parent_id
         self.location = location
         self._quality = quality
         self.links_in = StructureCollection() if links_in is None else links_in

@@ -28,11 +28,13 @@ def bubble_chamber():
         Mock(),
     )
     text_concept = Concept(
-        "text", None, None, None, "value", StructureCollection(), None
+        Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(text_concept)
     chamber.working_spaces.add(
-        WorkingSpace("top level working", StructureCollection(), Mock(), Mock())
+        WorkingSpace(
+            Mock(), Mock(), "top level working", StructureCollection(), Mock(), Mock()
+        )
     )
     return chamber
 
@@ -40,6 +42,8 @@ def bubble_chamber():
 @pytest.fixture
 def target_start_space():
     space = WorkingSpace(
+        Mock(),
+        Mock(),
         "start",
         StructureCollection(),
         Mock(),
@@ -52,6 +56,8 @@ def target_start_space():
 @pytest.fixture
 def target_end_space():
     space = WorkingSpace(
+        Mock(),
+        Mock(),
         "end",
         StructureCollection(),
         Mock(),
@@ -69,6 +75,8 @@ def target_start(target_start_space):
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
+        Mock(),
         StructureCollection({target_start_space}),
     )
     target_start_space.contents.add(start)
@@ -78,7 +86,14 @@ def target_start(target_start_space):
 @pytest.fixture
 def target_end(target_end_space):
     end = Chunk(
-        Mock(), Mock(), Mock(), Mock(), Mock(), StructureCollection({target_end_space})
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        StructureCollection({target_end_space}),
     )
     target_end_space.contents.add(end)
     return end
@@ -95,6 +110,8 @@ def target_correspondence(
     conceptual_space = Mock()
     quality = 1.0
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         target_start,
         target_end,
         target_start_space,
@@ -124,6 +141,8 @@ def second_target_correspondence(bubble_chamber, target_start_space, target_end_
     conceptual_space = Mock()
     quality = 1.0
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         start,
         end,
         target_start_space,

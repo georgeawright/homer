@@ -81,6 +81,8 @@ class ChunkBuilder(Builder):
         new_chunk_neighbours.remove(self.target_chunk)
         new_chunk_neighbours.remove(self.second_target_chunk)
         chunk = Chunk(
+            ID.new(Chunk),
+            self.codelet_id,
             self._get_average_value(new_chunk_members),
             self._get_average_location(new_chunk_members),
             new_chunk_members,

@@ -6,7 +6,9 @@ from homer.structures import Chunk
 
 
 def test_size_no_members():
-    chunk = Chunk(Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock())
+    chunk = Chunk(
+        Mock(), Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock()
+    )
     assert chunk.size == 1
 
 
@@ -15,27 +17,47 @@ def test_size_recursive():
     members = StructureCollection()
     for _ in range(size):
         members.add(
-            Chunk(Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock())
+            Chunk(
+                Mock(),
+                Mock(),
+                Mock(),
+                Mock(),
+                StructureCollection(),
+                Mock(),
+                Mock(),
+                Mock(),
+            )
         )
-    chunk = Chunk(Mock(), Mock(), members, Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), members, Mock(), Mock(), Mock())
     assert size == chunk.size
 
 
 def test_nearby():
     space_1 = Mock()
-    space_1_object = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    space_1_object = Chunk(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
     space_1.contents.near.return_value = StructureCollection({space_1_object})
     space_1_location = Mock()
     space_1_location.space = space_1
     space_2 = Mock()
-    space_2_object = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    space_2_object = Chunk(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
     space_2.contents.near.return_value = StructureCollection(
         {space_2_object, space_1_object}
     )
     space_2_location = Mock()
     space_2_location.space = space_2
     chunk = Chunk(
-        Mock(), space_1_location, Mock(), Mock(), Mock(), StructureCollection({space_1})
+        Mock(),
+        Mock(),
+        Mock(),
+        space_1_location,
+        Mock(),
+        Mock(),
+        Mock(),
+        StructureCollection({space_1}),
     )
     chunk.parent_spaces.add(space_2)
     chunk.locations.append(space_2_location)
@@ -55,6 +77,8 @@ def test_add_member():
     mutual_neighbour = Mock()
     new_members_neighbour = Mock()
     new_member = Chunk(
+        Mock(),
+        Mock(),
         [2],
         Location([1, 2], Mock()),
         StructureCollection(),
@@ -63,6 +87,8 @@ def test_add_member():
         Mock(),
     )
     chunk = Chunk(
+        Mock(),
+        Mock(),
         current_member.value,
         current_member.location,
         StructureCollection({current_member}),

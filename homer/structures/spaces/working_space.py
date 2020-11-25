@@ -8,6 +8,8 @@ from homer.structures import Concept, Space
 class WorkingSpace(Space):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         name: str,
         contents: StructureCollection,
         quality: FloatBetweenOneAndZero,
@@ -19,6 +21,8 @@ class WorkingSpace(Space):
     ):
         Space.__init__(
             self,
+            structure_id,
+            parent_id,
             name,
             contents,
             quality,

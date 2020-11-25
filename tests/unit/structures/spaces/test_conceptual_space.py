@@ -6,7 +6,7 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 def test_instance_returns_working_space():
-    conceptual_space = ConceptualSpace("name", Mock(), Mock())
+    conceptual_space = ConceptualSpace("id", Mock(), "name", Mock(), Mock())
     instance = conceptual_space.instance
     assert isinstance(instance, WorkingSpace)
 
@@ -25,7 +25,11 @@ def test_update_activation(
     concept_3 = Mock()
     concept_3.activation = activation_3
     conceptual_space = ConceptualSpace(
-        "name", StructureCollection({concept_1, concept_2, concept_3}), Mock()
+        Mock(),
+        Mock(),
+        "name",
+        StructureCollection({concept_1, concept_2, concept_3}),
+        Mock(),
     )
     conceptual_space.update_activation()
     assert expected_activation == conceptual_space.activation

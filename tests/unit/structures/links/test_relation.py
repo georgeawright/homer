@@ -16,7 +16,7 @@ def test_nearby():
     start.nearby.return_value = nearby_chunks
     end = Mock()
     end.nearby.return_value = nearby_chunks
-    relation = Relation(start, end, Mock(), Mock(), Mock())
+    relation = Relation(Mock(), Mock(), start, end, Mock(), Mock(), Mock())
     start.relations = StructureCollection({relation})
     end.relations = StructureCollection({relation})
     assert StructureCollection({relation_1, relation_2}) == relation.nearby()

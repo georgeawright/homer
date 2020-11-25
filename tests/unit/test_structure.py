@@ -12,17 +12,19 @@ def test_correspondences_returns_correspondences():
     links_out = StructureCollection()
     for _ in range(number_of_correspondences // 2):
         correspondence = Correspondence(
-            Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock(), Mock()
+            Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock(), Mock()
         )
         links_out.add(correspondence)
         correspondence = Correspondence(
-            Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock(), Mock()
+            Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock, Mock(), Mock()
         )
         links_in.add(correspondence)
     for _ in range(number_of_correspondences // 2):
         links_out.add(Mock())
         links_in.add(Mock())
-    structure = Structure(Mock(), Mock(), links_in=links_in, links_out=links_out)
+    structure = Structure(
+        Mock(), Mock(), Mock(), Mock(), links_in=links_in, links_out=links_out
+    )
     assert number_of_correspondences == len(structure.correspondences)
     for correspondence in structure.correspondences:
         assert isinstance(correspondence, Correspondence)
@@ -32,22 +34,22 @@ def test_labels_returns_labels():
     number_of_labels = 10
     links_out = StructureCollection()
     for _ in range(number_of_labels):
-        label = Label(Mock(), Mock(), Mock(), Mock())
+        label = Label(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
         links_out.add(label)
     for _ in range(number_of_labels):
         links_out.add(Mock())
-    structure = Structure(Mock(), Mock(), links_out=links_out)
+    structure = Structure(Mock(), Mock(), Mock(), Mock(), links_out=links_out)
     assert number_of_labels == len(structure.labels)
     for label in structure.labels:
         assert isinstance(label, Label)
 
 
 def test_lexemes_returns_lexemes():
-    structure = Structure(Mock(), Mock())
+    structure = Structure(Mock(), Mock(), Mock(), Mock())
     number_of_lexemes = 10
     for _ in range(number_of_lexemes):
-        lexeme = Lexeme(Mock(), Mock())
-        relation = Relation(structure, lexeme, Mock(), Mock(), Mock())
+        lexeme = Lexeme(Mock(), Mock(), Mock(), Mock())
+        relation = Relation(Mock(), Mock(), structure, lexeme, Mock(), Mock(), Mock())
         structure.links_out.add(relation)
     for _ in range(number_of_lexemes):
         structure.links_out.add(Mock())
@@ -57,12 +59,14 @@ def test_lexemes_returns_lexemes():
 
 
 def test_labels_in_space():
-    structure = Structure(Mock(), Mock(), links_out=StructureCollection())
+    structure = Structure(
+        Mock(), Mock(), Mock(), Mock(), links_out=StructureCollection()
+    )
     space = Mock()
     space.contents = StructureCollection()
-    label_in_space = Label(Mock(), Mock(), Mock(), Mock())
+    label_in_space = Label(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     space.contents.add(label_in_space)
-    label_not_in_space = Label(Mock(), Mock(), Mock(), Mock())
+    label_not_in_space = Label(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     structure.links_out.add(label_in_space)
     structure.links_out.add(label_not_in_space)
     assert label_in_space in structure.labels_in_space(space)
@@ -70,13 +74,21 @@ def test_labels_in_space():
 
 
 def test_relations_in_space_with():
-    structure = Structure(Mock(), Mock(), links_out=StructureCollection())
+    structure = Structure(
+        Mock(), Mock(), Mock(), Mock(), links_out=StructureCollection()
+    )
     end = Mock()
     space = Mock()
     space.contents = StructureCollection()
-    relation_in_space_with_end = Relation(structure, end, Mock(), Mock(), Mock())
-    relation_in_space_not_with_end = Relation(structure, Mock(), Mock(), Mock(), Mock())
-    relation_not_in_space_with_end = Relation(structure, end, Mock(), Mock(), Mock())
+    relation_in_space_with_end = Relation(
+        Mock(), Mock(), structure, end, Mock(), Mock(), Mock()
+    )
+    relation_in_space_not_with_end = Relation(
+        Mock(), Mock(), structure, Mock(), Mock(), Mock(), Mock()
+    )
+    relation_not_in_space_with_end = Relation(
+        Mock(), Mock(), structure, end, Mock(), Mock(), Mock()
+    )
     space.contents.add(relation_in_space_with_end)
     space.contents.add(relation_in_space_not_with_end)
     structure.links_out.add(relation_in_space_with_end)
@@ -92,19 +104,28 @@ def test_relations_in_space_with():
 
 
 def test_correspondences_to():
-    structure = Structure(Mock(), Mock())
+    structure = Structure(Mock(), Mock(), Mock(), Mock())
     space = Mock()
     correspondence_1 = Correspondence(
-        structure, Mock(), Mock(), space, Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), structure, Mock(), Mock(), space, Mock(), Mock(), Mock(), Mock()
     )
     correspondence_2 = Correspondence(
-        Mock(), structure, space, Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), Mock(), structure, space, Mock(), Mock(), Mock(), Mock(), Mock()
     )
     correspondence_3 = Correspondence(
-        structure, Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        structure,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     correspondence_4 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
     structure.links_out.add(correspondence_1)
     structure.links_out.add(correspondence_2)
@@ -117,7 +138,7 @@ def test_correspondences_to():
 
 
 def test_boost_and_update_activation():
-    structure = Structure(Mock(), Mock())
+    structure = Structure(Mock(), Mock(), Mock(), Mock())
     structure._activation_update_coefficient = 1
     assert 0.0 == structure.activation
     structure.boost_activation(0.5)
@@ -133,7 +154,7 @@ def test_boost_and_update_activation():
 
 
 def test_decay_and_update_activation():
-    structure = Structure(Mock(), Mock())
+    structure = Structure(Mock(), Mock(), Mock(), Mock())
     structure._activation_update_coefficient = 1
     assert 0.0 == structure.activation
     structure.boost_activation(1.0)
@@ -149,16 +170,25 @@ def test_decay_and_update_activation():
 
 
 def test_spread_activations():
-    structure = Structure(Mock(), Mock())
+    structure = Structure(Mock(), Mock(), Mock(), Mock())
     structure._activation_update_coefficient = 1
     structure._activation = 1
-    label = Label(Mock(), Mock(), Mock(), Mock())
+    label = Label(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     correspondence_end = Mock()
     correspondence = Correspondence(
-        Mock(), correspondence_end, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        correspondence_end,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     relation_end = Mock()
-    relation = Relation(Mock(), relation_end, Mock(), Mock(), Mock())
+    relation = Relation(Mock(), Mock(), Mock(), relation_end, Mock(), Mock(), Mock())
     structure.links_out.add(label)
     structure.links_out.add(relation)
     structure.links_out.add(correspondence)

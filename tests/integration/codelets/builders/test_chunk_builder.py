@@ -31,11 +31,15 @@ def bubble_chamber():
 @pytest.fixture
 def target_chunk(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
-    input_space = WorkingSpace("input", StructureCollection(), 0, location_concept)
+    input_space = WorkingSpace(
+        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    )
     parent_spaces = StructureCollection({input_space})
     chunk = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 0], input_space),
         StructureCollection(),
@@ -44,6 +48,8 @@ def target_chunk(bubble_chamber):
         parent_spaces,
     )
     second_chunk = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 1], input_space),
         StructureCollection(),

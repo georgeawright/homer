@@ -28,7 +28,9 @@ def bubble_chamber():
         Mock(),
     )
     chamber.working_spaces.add(
-        WorkingSpace("top level working", StructureCollection(), Mock(), Mock())
+        WorkingSpace(
+            Mock(), Mock(), "top level working", StructureCollection(), Mock(), Mock()
+        )
     )
     return chamber
 
@@ -36,6 +38,8 @@ def bubble_chamber():
 @pytest.fixture
 def target_start_space():
     space = WorkingSpace(
+        Mock(),
+        Mock(),
         "start",
         StructureCollection(),
         Mock(),
@@ -48,6 +52,8 @@ def target_start_space():
 @pytest.fixture
 def target_end_space():
     space = WorkingSpace(
+        Mock(),
+        Mock(),
         "end",
         StructureCollection(),
         Mock(),
@@ -65,6 +71,8 @@ def target_start(target_start_space):
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
+        Mock(),
         StructureCollection({target_start_space}),
     )
     target_start_space.contents.add(start)
@@ -74,7 +82,14 @@ def target_start(target_start_space):
 @pytest.fixture
 def target_end(target_end_space):
     end = Chunk(
-        Mock(), Mock(), Mock(), Mock(), Mock(), StructureCollection({target_end_space})
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        StructureCollection({target_end_space}),
     )
     target_end_space.contents.add(end)
     return end
@@ -91,6 +106,8 @@ def first_correspondence(
     conceptual_space = Mock()
     quality = 1.0
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         target_start,
         target_end,
         target_start_space,
@@ -111,8 +128,8 @@ def first_correspondence(
 
 @pytest.fixture
 def second_correspondence(bubble_chamber, target_start_space, target_end_space):
-    start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     parent_concept = Mock()
     parent_space = bubble_chamber.common_parent_space(
         target_start_space, target_end_space
@@ -120,6 +137,8 @@ def second_correspondence(bubble_chamber, target_start_space, target_end_space):
     conceptual_space = Mock()
     quality = 1.0
     correspondence = Correspondence(
+        Mock(),
+        Mock(),
         start,
         end,
         target_start_space,
@@ -140,13 +159,13 @@ def second_correspondence(bubble_chamber, target_start_space, target_end_space):
 
 @pytest.fixture
 def nearby_correspondence(bubble_chamber, target_start_space, target_end_space):
-    start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     parent_space = bubble_chamber.common_parent_space(
         target_start_space, target_end_space
     )
     correspondence = Correspondence(
-        start, end, Mock(), Mock(), Mock(), parent_space, Mock(), 1.0
+        Mock(), Mock(), start, end, Mock(), Mock(), Mock(), parent_space, Mock(), 1.0
     )
     parent_space.contents.add(correspondence)
     bubble_chamber.correspondences.add(correspondence)
@@ -156,6 +175,8 @@ def nearby_correspondence(bubble_chamber, target_start_space, target_end_space):
 @pytest.fixture
 def target_view(bubble_chamber, first_correspondence, second_correspondence):
     view = View(
+        Mock(),
+        Mock(),
         StructureCollection({first_correspondence, second_correspondence}),
         bubble_chamber.spaces["top level working"],
         Mock(),

@@ -8,6 +8,8 @@ from homer.structure_collection import StructureCollection
 class Lexeme(Structure):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         headword: str,
         forms: Dict[WordForm, str],
         links_in: StructureCollection = None,
@@ -16,7 +18,13 @@ class Lexeme(Structure):
         location = None
         quality = None
         Structure.__init__(
-            self, location, quality, links_in=links_in, links_out=links_out
+            self,
+            structure_id,
+            parent_id,
+            location,
+            quality,
+            links_in=links_in,
+            links_out=links_out,
         )
         self.headword = headword
         self.forms = forms

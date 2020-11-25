@@ -6,6 +6,8 @@ from homer.structure_collection import StructureCollection
 class Space(Structure):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         name: str,
         contents: list,
         quality: FloatBetweenOneAndZero,
@@ -17,7 +19,13 @@ class Space(Structure):
     ):
         location = None
         Structure.__init__(
-            self, location, quality, links_in=links_in, links_out=links_out
+            self,
+            structure_id,
+            parent_id,
+            location,
+            quality,
+            links_in=links_in,
+            links_out=links_out,
         )
         self.name = name
         self.contents = contents

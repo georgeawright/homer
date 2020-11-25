@@ -9,6 +9,8 @@ from homer.structures.link import Link
 class Template(Frame):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         name: str,
         contents: StructureCollection,
         parent_concept: Concept,
@@ -19,6 +21,8 @@ class Template(Frame):
     ):
         Frame.__init__(
             self,
+            structure_id,
+            parent_id,
             name,
             contents,
             parent_concept,

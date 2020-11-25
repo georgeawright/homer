@@ -34,16 +34,20 @@ def bubble_chamber():
 @pytest.fixture
 def good_label(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
     )
-    input_space = WorkingSpace("input", StructureCollection(), 0, location_concept)
+    input_space = WorkingSpace(
+        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    )
     temperature_space = WorkingSpace(
-        "temperature", StructureCollection(), 0, temperature_concept
+        Mock(), Mock(), "temperature", StructureCollection(), 0, temperature_concept
     )
     warm_concept = Concept(
+        Mock(),
+        Mock(),
         "warm",
         [15],
         StretchyProximityClassifier(),
@@ -54,6 +58,8 @@ def good_label(bubble_chamber):
     )
     parent_spaces = StructureCollection({input_space, temperature_space})
     start = Chunk(
+        Mock(),
+        Mock(),
         [15],
         Location([0, 0], input_space),
         StructureCollection(),
@@ -62,23 +68,27 @@ def good_label(bubble_chamber):
         parent_spaces,
     )
     quality = 0.0
-    label = Label(start, warm_concept, temperature_space, quality)
+    label = Label(Mock(), Mock(), start, warm_concept, temperature_space, quality)
     return label
 
 
 @pytest.fixture
 def bad_label(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
     )
-    input_space = WorkingSpace("input", StructureCollection(), 0, location_concept)
+    input_space = WorkingSpace(
+        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    )
     temperature_space = WorkingSpace(
-        "temperature", StructureCollection(), 0, temperature_concept
+        Mock(), Mock(), "temperature", StructureCollection(), 0, temperature_concept
     )
     warm_concept = Concept(
+        Mock(),
+        Mock(),
         "warm",
         [15],
         StretchyProximityClassifier(),
@@ -89,6 +99,8 @@ def bad_label(bubble_chamber):
     )
     parent_spaces = StructureCollection({input_space, temperature_space})
     start = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 0], input_space),
         StructureCollection(),
@@ -97,7 +109,7 @@ def bad_label(bubble_chamber):
         parent_spaces,
     )
     quality = 1.0
-    label = Label(start, warm_concept, temperature_space, quality)
+    label = Label(Mock(), Mock(), start, warm_concept, temperature_space, quality)
     return label
 
 

@@ -6,6 +6,8 @@ from homer.structure_collection import StructureCollection
 class Link(Structure):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         start: Structure,
         end: Structure,
         parent_concept: "Concept",
@@ -15,7 +17,13 @@ class Link(Structure):
         links_out: StructureCollection = None,
     ):
         Structure.__init__(
-            self, start.location, quality, links_in=links_in, links_out=links_out
+            self,
+            structure_id,
+            parent_id,
+            start.location,
+            quality,
+            links_in=links_in,
+            links_out=links_out,
         )
         self.start = start
         self.end = end

@@ -30,18 +30,20 @@ def bubble_chamber():
         Mock(),
     )
     text_concept = Concept(
-        "text", None, None, None, "value", StructureCollection(), None
+        Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(text_concept)
     same_concept = Concept(
-        "same", None, None, None, "value", StructureCollection(), None
+        Mock(), Mock(), "same", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(same_concept)
     input_concept = Concept(
-        "input", None, None, None, "value", StructureCollection(), None
+        Mock(), Mock(), "input", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(input_concept)
-    text_space = ConceptualSpace("text", StructureCollection(), text_concept)
+    text_space = ConceptualSpace(
+        Mock(), Mock(), "text", StructureCollection(), text_concept
+    )
     chamber.conceptual_spaces.add(text_space)
     return chamber
 
@@ -52,13 +54,13 @@ def output_space(bubble_chamber):
     members = StructureCollection()
     quality = 0.0
     parent_concept = bubble_chamber.concepts["text"]
-    space = WorkingSpace(name, members, quality, parent_concept)
+    space = WorkingSpace(Mock(), Mock(), name, members, quality, parent_concept)
     return space
 
 
 @pytest.fixture
 def template_word():
-    word = Word(Mock(), Mock(), Mock(), Mock())
+    word = Word(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     return word
 
 
@@ -67,7 +69,7 @@ def template(bubble_chamber, template_word):
     name = "mock template"
     members = StructureCollection({template_word})
     parent_concept = bubble_chamber.concepts["text"]
-    template = Template(name, members, parent_concept)
+    template = Template(Mock(), Mock(), name, members, parent_concept)
     bubble_chamber.spaces.add(template)
     return template
 

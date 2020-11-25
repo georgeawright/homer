@@ -7,6 +7,8 @@ from homer.structures.chunk import Chunk
 class Word(Chunk):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         value: str,
         location: Location,
         parent_spaces: StructureCollection,
@@ -18,6 +20,8 @@ class Word(Chunk):
     ):
         Chunk.__init__(
             self,
+            structure_id,
+            parent_id,
             value,
             location,
             members,

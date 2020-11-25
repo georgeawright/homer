@@ -19,32 +19,36 @@ def bubble_chamber():
 
 @pytest.fixture
 def conceptual_space():
-    space = ConceptualSpace(Mock(), Mock(), Mock())
+    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), Mock())
     return space
 
 
 @pytest.fixture
 def working_space():
-    space = WorkingSpace(Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
     return space
 
 
 @pytest.fixture
 def start():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     return chunk
 
 
 @pytest.fixture
 def end():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     return chunk
 
 
 @pytest.fixture
 def good_relation(start, end, conceptual_space, working_space):
-    concept = Concept(Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock())
+    concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+    )
     relation = Relation(
+        Mock(),
+        Mock(),
         start,
         end,
         concept,
@@ -59,8 +63,12 @@ def good_relation(start, end, conceptual_space, working_space):
 
 @pytest.fixture
 def bad_relation(start, end, conceptual_space, working_space):
-    concept = Concept(Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock())
+    concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+    )
     relation = Relation(
+        Mock(),
+        Mock(),
         start,
         end,
         concept,
@@ -73,7 +81,7 @@ def bad_relation(start, end, conceptual_space, working_space):
     return relation
 
 
-def test_good_chunk_is_boosted_bad_chunk_is_decayed(
+def test_good_relation_is_boosted_bad_relation_is_decayed(
     bubble_chamber, good_relation, bad_relation
 ):
     parent_id = ""

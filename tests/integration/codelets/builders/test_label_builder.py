@@ -15,13 +15,17 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 @pytest.fixture
 def label_concepts_space():
-    space = ConceptualSpace("label concepts", StructureCollection(), Mock())
+    space = ConceptualSpace(
+        Mock(), Mock(), "label concepts", StructureCollection(), Mock()
+    )
     return space
 
 
 @pytest.fixture
 def temperature_concept(label_concepts_space):
-    concept = Concept.new(
+    concept = Concept(
+        Mock(),
+        Mock(),
         "temperature",
         None,
         None,
@@ -36,7 +40,9 @@ def temperature_concept(label_concepts_space):
 
 @pytest.fixture
 def temperature_space(temperature_concept):
-    space = ConceptualSpace("temperature", StructureCollection(), Mock())
+    space = ConceptualSpace(
+        "temperature", Mock(), "temperature", StructureCollection(), Mock()
+    )
     temperature_concept.child_spaces.add(space)
     return space
 
@@ -45,6 +51,8 @@ def temperature_space(temperature_concept):
 def mild_concept(temperature_space):
     classifier = StretchyProximityClassifier()
     mild = Concept(
+        Mock(),
+        Mock(),
         "mild",
         [10],
         classifier,
@@ -79,11 +87,15 @@ def bubble_chamber(mild_concept, label_concepts_space):
 @pytest.fixture
 def target_chunk(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
-    input_space = WorkingSpace("input", StructureCollection(), 0, location_concept)
+    input_space = WorkingSpace(
+        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    )
     parent_spaces = StructureCollection({input_space})
     chunk = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 0], input_space),
         StructureCollection(),
@@ -92,6 +104,8 @@ def target_chunk(bubble_chamber):
         parent_spaces,
     )
     second_chunk = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 1], input_space),
         StructureCollection(),

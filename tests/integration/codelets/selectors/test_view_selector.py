@@ -30,7 +30,9 @@ def bubble_chamber():
 
 @pytest.fixture
 def target_space():
-    space = WorkingSpace(Mock(), StructureCollection(), Mock(), Mock(), Mock(), Mock())
+    space = WorkingSpace(
+        Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock(), Mock()
+    )
     return space
 
 
@@ -43,6 +45,8 @@ def view_members():
 @pytest.fixture
 def good_view(bubble_chamber, target_space, view_members):
     view = View(
+        Mock(),
+        Mock(),
         view_members,
         Mock(),
         Mock(),
@@ -56,6 +60,8 @@ def good_view(bubble_chamber, target_space, view_members):
 @pytest.fixture
 def bad_view(bubble_chamber, target_space, view_members):
     view = View(
+        Mock(),
+        Mock(),
         view_members,
         Mock(),
         Mock(),

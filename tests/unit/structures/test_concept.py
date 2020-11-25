@@ -28,7 +28,15 @@ def test_distance_from(
     prototype, relevant_value, distance_function, expected, structure
 ):
     concept = Concept(
-        Mock(), prototype, Mock(), Mock(), relevant_value, Mock(), distance_function
+        Mock(),
+        Mock(),
+        Mock(),
+        prototype,
+        Mock(),
+        Mock(),
+        relevant_value,
+        Mock(),
+        distance_function,
     )
     assert expected == concept.distance_from(structure)
 
@@ -51,7 +59,15 @@ def test_proximity_to(
     structure,
 ):
     concept = Concept(
-        Mock(), prototype, Mock(), Mock(), relevant_value, Mock(), distance_function
+        Mock(),
+        Mock(),
+        Mock(),
+        prototype,
+        Mock(),
+        Mock(),
+        relevant_value,
+        Mock(),
+        distance_function,
     )
     concept.DISTANCE_TO_PROXIMITY_WEIGHT = distance_to_proximity_weight
     assert expected == concept.proximity_to(structure)

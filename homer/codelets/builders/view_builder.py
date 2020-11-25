@@ -120,12 +120,16 @@ class ViewBuilder(Builder):
 
     def _process_structure(self):
         view_output_space = WorkingSpace(
+            ID.new(WorkingSpace),
+            self.codelet_id,
             self.codelet_id,
             StructureCollection(),
             0.0,
             self.bubble_chamber.concepts["text"],
         )
         view = View(
+            ID.new(View),
+            self.codelet_id,
             self.correspondences,
             self.bubble_chamber.spaces["top level working"],
             view_output_space,

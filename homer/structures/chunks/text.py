@@ -10,6 +10,8 @@ from homer.structures.link import Link
 class Text(Chunk):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         location: Location,
         members: StructureCollection,
         neighbours: StructureCollection,
@@ -20,6 +22,8 @@ class Text(Chunk):
         value = " ".join(member.value for member in members)
         location = None
         Chunk.__init__(
+            structure_id,
+            parent_id,
             value,
             location,
             members,

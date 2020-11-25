@@ -32,11 +32,15 @@ def bubble_chamber():
 @pytest.fixture
 def good_chunk(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
-    input_space = WorkingSpace("input", StructureCollection(), 0, location_concept)
+    input_space = WorkingSpace(
+        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    )
     parent_spaces = StructureCollection({input_space})
     member_1 = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 0], input_space),
         StructureCollection(),
@@ -45,6 +49,8 @@ def good_chunk(bubble_chamber):
         parent_spaces,
     )
     member_2 = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 1], input_space),
         StructureCollection(),
@@ -53,6 +59,8 @@ def good_chunk(bubble_chamber):
         parent_spaces,
     )
     chunk = Chunk(
+        Mock(),
+        Mock(),
         [10],
         Location([0, 0], input_space),
         StructureCollection({member_1, member_2}),
@@ -68,17 +76,21 @@ def good_chunk(bubble_chamber):
 @pytest.fixture
 def bad_chunk(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
     )
-    input_space = WorkingSpace("input", StructureCollection(), 0, location_concept)
+    input_space = WorkingSpace(
+        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    )
     temperature_space = WorkingSpace(
-        "temperature", StructureCollection(), 0, temperature_concept
+        Mock(), Mock(), "temperature", StructureCollection(), 0, temperature_concept
     )
     parent_spaces = StructureCollection({input_space, temperature_space})
     member_1 = Chunk(
+        Mock(),
+        Mock(),
         [12],
         Location([0, 0], input_space),
         StructureCollection(),
@@ -87,6 +99,8 @@ def bad_chunk(bubble_chamber):
         parent_spaces,
     )
     member_2 = Chunk(
+        Mock(),
+        Mock(),
         [5],
         Location([0, 1], input_space),
         StructureCollection(),
@@ -95,6 +109,8 @@ def bad_chunk(bubble_chamber):
         parent_spaces,
     )
     chunk = Chunk(
+        Mock(),
+        Mock(),
         [8.5],
         Location([0, 0], input_space),
         StructureCollection({member_1, member_2}),

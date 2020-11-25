@@ -34,24 +34,28 @@ def bubble_chamber():
 @pytest.fixture
 def good_view(bubble_chamber):
     member_1 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0
     )
     member_2 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0
     )
-    view = View(StructureCollection({member_1, member_2}), Mock(), Mock(), 0.5)
+    view = View(
+        Mock(), Mock(), StructureCollection({member_1, member_2}), Mock(), Mock(), 0.5
+    )
     return view
 
 
 @pytest.fixture
 def bad_view(bubble_chamber):
     member_1 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.3
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.3
     )
     member_2 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.4
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.4
     )
-    view = View(StructureCollection({member_1, member_2}), Mock(), Mock(), 0.5)
+    view = View(
+        Mock(), Mock(), StructureCollection({member_1, member_2}), Mock(), Mock(), 0.5
+    )
     return view
 
 

@@ -7,6 +7,8 @@ from homer.structures import Concept, Link, Space
 class Label(Link):
     def __init__(
         self,
+        structure_id: str,
+        parent_id: str,
         start: Structure,
         parent_concept: Concept,
         parent_space: Space,
@@ -15,6 +17,8 @@ class Label(Link):
         end = None
         Link.__init__(
             self,
+            structure_id,
+            parent_id,
             start,
             end,
             parent_concept,

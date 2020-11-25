@@ -3,6 +3,7 @@ import statistics
 from typing import List, Union
 
 from .errors import MissingStructureError
+from .id import ID
 from .logger import Logger
 from .problem import Problem
 from .structure_collection import StructureCollection
@@ -85,6 +86,8 @@ class BubbleChamber:
             ).get_random()
         except MissingStructureError:
             parent_space = WorkingSpace(
+                ID.new(WorkingSpace),
+                "",
                 space_one.name + " x " + space_two.name,
                 StructureCollection(),
                 0,

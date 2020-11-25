@@ -64,7 +64,14 @@ class LabelBuilder(Builder):
 
     def _process_structure(self):
         space = self.parent_concept.parent_space.instance
-        label = Label(self.target_chunk, self.parent_concept, space, self.confidence)
+        label = Label(
+            ID.new(Label),
+            self.codelet_id,
+            self.target_chunk,
+            self.parent_concept,
+            space,
+            self.confidence,
+        )
         if self.target_chunk not in space.contents:
             space.contents.add(self.target_chunk)
             self.target_chunk.parent_spaces.add(space)
@@ -79,6 +86,7 @@ class LabelBuilder(Builder):
         self.bubble_chamber.labels.add(label)
         self.bubble_chamber.spaces.add(space)
         self.child_structure = label
+        self.bubble_chamber.logger.log(self.child_structure)
 
     def _engender_follow_up(self):
         new_target = self.target_chunk.neighbours.get_unhappy()

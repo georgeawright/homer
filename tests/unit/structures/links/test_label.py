@@ -14,6 +14,6 @@ def test_nearby():
     nearby_chunks = StructureCollection({chunk_1, chunk_2})
     start = Mock()
     start.nearby.return_value = nearby_chunks
-    label = Label(start, Mock(), Mock(), Mock())
+    label = Label(Mock(), Mock(), start, Mock(), Mock(), Mock())
     start.labels = StructureCollection({label})
     assert StructureCollection({label_1, label_2}) == label.nearby()
