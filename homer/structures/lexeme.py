@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from homer.id import ID
 from homer.word_form import WordForm
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
@@ -34,8 +35,10 @@ class Lexeme(Structure):
         from homer.structures import Concept
         from homer.structures.links import Relation
 
-        lexeme = cls(headword, forms)
-        link_to_concept = Relation(parent_concept, lexeme, None, None, 0.0)
+        lexeme = cls(ID.new(cls), "", headword, forms)
+        link_to_concept = Relation(
+            ID.new(Relation), "", parent_concept, lexeme, None, None, 0.0
+        )
         link_to_concept._activation = 1.0
         parent_concept.links_out.add(link_to_concept)
         lexeme.links_in.add(link_to_concept)
