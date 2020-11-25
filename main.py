@@ -6,6 +6,7 @@ from homer.classifiers import (
     DifferentnessClassifier,
     SamenessClassifier,
     StretchyProximityClassifier,
+    ProximityClassifier,
 )
 from homer.location import Location
 from homer.loggers import DjangoLogger
@@ -43,9 +44,8 @@ logger = DjangoLogger.setup(path_to_logs)
 top_level_conceptual_space = ConceptualSpace("top level", StructureCollection(), None)
 top_level_working_space = top_level_conceptual_space.instance
 bubble_chamber = BubbleChamber(
-    top_level_working_space,
-    top_level_conceptual_space,
-    StructureCollection(),
+    StructureCollection({top_level_conceptual_space}),
+    StructureCollection({top_level_working_space}),
     StructureCollection(),
     StructureCollection(),
     StructureCollection(),
@@ -62,13 +62,13 @@ input_concept = Concept.new(
     None,
     None,
     top_level_conceptual_space,
-    None,
+    "coordinates",
     StructureCollection(),
-    None,
+    math.dist,
 )
 bubble_chamber.concepts.add(input_concept)
 input_space = WorkingSpace("input", StructureCollection(), 0.0, input_concept)
-bubble_chamber.spaces.add(input_space)
+bubble_chamber.working_spaces.add(input_space)
 top_level_working_space.child_spaces.add(input_space)
 
 activity_concept = Concept.new(
@@ -82,7 +82,7 @@ activity_concept = Concept.new(
 )
 bubble_chamber.concepts.add(activity_concept)
 activities_space = ConceptualSpace("activities", StructureCollection(), None)
-bubble_chamber.spaces.add(activities_space)
+bubble_chamber.conceptual_spaces.add(activities_space)
 build_concept = Concept.new(
     "build",
     None,
@@ -126,7 +126,7 @@ structure_concept = Concept.new(
 )
 bubble_chamber.concepts.add(structure_concept)
 structures_space = ConceptualSpace("structures", StructureCollection(), None)
-bubble_chamber.spaces.add(structures_space)
+bubble_chamber.conceptual_spaces.add(structures_space)
 chunk_concept = Concept.new(
     "chunk",
     None,
@@ -170,6 +170,7 @@ bubble_chamber.concepts.add(label_concept)
 label_concepts_space = ConceptualSpace(
     "label concepts", StructureCollection(), label_concept
 )
+bubble_chamber.conceptual_spaces.add(label_concepts_space)
 relation_concept = Concept.new(
     "relation",
     None,
@@ -183,6 +184,7 @@ bubble_chamber.concepts.add(relation_concept)
 relational_concepts_space = ConceptualSpace(
     "relational concepts", StructureCollection(), relation_concept
 )
+bubble_chamber.conceptual_spaces.add(relational_concepts_space)
 correspondence_concept = Concept.new(
     "correspondence",
     None,
@@ -196,6 +198,7 @@ bubble_chamber.concepts.add(correspondence_concept)
 correspondential_concepts_space = ConceptualSpace(
     "correspondential concepts", StructureCollection(), correspondence_concept
 )
+bubble_chamber.conceptual_spaces.add(correspondential_concepts_space)
 template_concept = Concept.new(
     "template",
     None,
@@ -241,6 +244,9 @@ bubble_chamber.concepts.add(temperature_concept)
 temperature_space = ConceptualSpace(
     "temperature", StructureCollection(), temperature_concept
 )
+label_concepts_space.child_spaces.add(temperature_space)
+bubble_chamber.conceptual_spaces.add(temperature_space)
+temperature_concept.child_spaces.add(temperature_space)
 hot = Concept.new(
     "hot",
     [22],
@@ -333,6 +339,9 @@ location_concept = Concept.new(
 )
 bubble_chamber.concepts.add(location_concept)
 location_space = ConceptualSpace("location", StructureCollection(), location_concept)
+label_concepts_space.child_spaces.add(location_space)
+bubble_chamber.conceptual_spaces.add(location_space)
+location_concept.child_spaces.add(location_space)
 north = Concept.new(
     "north",
     [0, 2],
@@ -525,10 +534,13 @@ more_less_concept = Concept.new(
 )
 bubble_chamber.concepts.add(more_less_concept)
 more_less_space = ConceptualSpace("more-less", StructureCollection(), more_less_concept)
+more_less_concept.child_spaces.add(more_less_space)
+relational_concepts_space.child_spaces.add(more_less_space)
+bubble_chamber.conceptual_spaces.add(more_less_space)
 more = Concept.new(
     "more",
     [4],
-    DifferenceClassifier(StretchyProximityClassifier()),
+    DifferenceClassifier(ProximityClassifier()),
     more_less_space,
     "value",
     StructureCollection(),
@@ -548,7 +560,7 @@ bubble_chamber.lexemes.add(more_lexeme)
 less = Concept.new(
     "less",
     [-4],
-    DifferenceClassifier(StretchyProximityClassifier()),
+    DifferenceClassifier(ProximityClassifier()),
     more_less_space,
     "value",
     StructureCollection(),
@@ -579,6 +591,7 @@ bubble_chamber.concepts.add(same_different_concept)
 same_different_space = ConceptualSpace(
     "same-different", StructureCollection(), same_different_concept
 )
+bubble_chamber.conceptual_spaces.add(same_different_space)
 same = Concept.new(
     "same",
     None,
@@ -627,6 +640,7 @@ template_1.contents.add(word_the)
 template_1.contents.add(slot_location)
 template_1.contents.add(word_is)
 template_1.contents.add(slot_temperature)
+bubble_chamber.conceptual_spaces.add(template_1)
 
 # TEMPLATE 2: it is temperature in the location
 template_2 = Template(
@@ -660,6 +674,7 @@ template_2.contents.add(slot_temperature)
 template_2.contents.add(word_in)
 template_2.contents.add(word_the)
 template_2.contents.add(slot_location)
+bubble_chamber.conceptual_spaces.add(template_2)
 
 # TEMPLATE 3: it is temperature.comparative in the location
 template_3 = Template(
@@ -693,6 +708,7 @@ template_3.contents.add(slot_temperature)
 template_3.contents.add(word_in)
 template_3.contents.add(word_the)
 template_3.contents.add(slot_location)
+bubble_chamber.conceptual_spaces.add(template_3)
 
 # TEMPLATE 4: it is temperature.comparative in the location than the location
 template_4 = Template(
@@ -742,6 +758,7 @@ template_4.contents.add(slot_location_1)
 template_4.contents.add(word_than)
 template_4.contents.add(word_the_2)
 template_4.contents.add(slot_location_2)
+bubble_chamber.conceptual_spaces.add(template_4)
 
 relative_neighbour_coordinates = [
     (-1, 0),
