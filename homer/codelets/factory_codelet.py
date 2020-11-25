@@ -57,7 +57,7 @@ class FactoryCodelet(Codelet):
         try:
             self._engender_follow_up()
         except MissingStructureError:
-            self.run()
+            return self.run()
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
