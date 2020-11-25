@@ -18,8 +18,7 @@ from homer.structures.spaces.frames import Template
 @pytest.fixture
 def bubble_chamber():
     chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -43,7 +42,7 @@ def bubble_chamber():
     )
     chamber.concepts.add(input_concept)
     text_space = ConceptualSpace("text", StructureCollection(), text_concept)
-    chamber.spaces.add(text_space)
+    chamber.conceptual_spaces.add(text_space)
     return chamber
 
 

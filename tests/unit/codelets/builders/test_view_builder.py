@@ -10,6 +10,9 @@ from homer.structures.chunks import View
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
+    top_level_working_space = Mock()
+    top_level_working_space.name = "top level working"
+    chamber.spaces = StructureCollection({top_level_working_space})
     chamber.concepts = {"view": Mock(), "text": Mock()}
     chamber.has_view.return_value = False
     chamber.views.get_unhappy.return_value = Mock()

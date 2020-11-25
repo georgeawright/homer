@@ -16,17 +16,19 @@ from homer.structures.spaces import WorkingSpace
 @pytest.fixture
 def bubble_chamber():
     chamber = BubbleChamber(
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
         Mock(),
-        Mock(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
+    )
+    chamber.working_spaces.add(
+        WorkingSpace("top level working", StructureCollection(), Mock(), Mock())
     )
     return chamber
 
@@ -155,7 +157,7 @@ def nearby_correspondence(bubble_chamber, target_start_space, target_end_space):
 def target_view(bubble_chamber, first_correspondence, second_correspondence):
     view = View(
         StructureCollection({first_correspondence, second_correspondence}),
-        bubble_chamber.top_level_working_space,
+        bubble_chamber.spaces["top level working"],
         Mock(),
         0.0,
     )

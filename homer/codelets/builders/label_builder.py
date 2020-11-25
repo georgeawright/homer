@@ -46,12 +46,17 @@ class LabelBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         if self.parent_concept is None:
-            self.parent_concept = self.bubble_chamber.spaces[
-                "label concepts"
-            ].contents.get_random()
+            self.parent_concept = (
+                self.bubble_chamber.spaces["label concepts"]
+                .contents.get_random()
+                .child_spaces.get_random()
+                .contents.get_random()
+            )
         return not self.target_chunk.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
+        print(self.parent_concept.name)
+        print(self.parent_concept.classifier)
         self.confidence = self.parent_concept.classifier.classify(
             {"concept": self.parent_concept, "start": self.target_chunk}
         )

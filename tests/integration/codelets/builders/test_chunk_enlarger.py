@@ -14,8 +14,7 @@ from homer.structures.spaces import WorkingSpace
 @pytest.fixture
 def bubble_chamber():
     chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),

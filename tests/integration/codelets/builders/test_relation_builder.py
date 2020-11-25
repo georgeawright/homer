@@ -77,8 +77,7 @@ def target_space():
 @pytest.fixture
 def bubble_chamber(more_concept, relational_concepts_space):
     chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -90,7 +89,7 @@ def bubble_chamber(more_concept, relational_concepts_space):
         Mock(),
     )
     chamber.concepts.add(more_concept)
-    chamber.spaces.add(relational_concepts_space)
+    chamber.conceptual_spaces.add(relational_concepts_space)
     return chamber
 
 

@@ -16,8 +16,7 @@ from homer.structures.spaces import WorkingSpace
 @pytest.fixture
 def bubble_chamber():
     chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -32,6 +31,9 @@ def bubble_chamber():
         "text", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(text_concept)
+    chamber.working_spaces.add(
+        WorkingSpace("top level working", StructureCollection(), Mock(), Mock())
+    )
     return chamber
 
 

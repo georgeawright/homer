@@ -127,7 +127,7 @@ class ViewBuilder(Builder):
         )
         view = View(
             self.correspondences,
-            self.bubble_chamber.top_level_working_space,
+            self.bubble_chamber.spaces["top level working"],
             view_output_space,
             self.confidence,
         )

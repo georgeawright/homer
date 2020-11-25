@@ -79,9 +79,7 @@ def bubble_chamber(
     active_frame,
     location_conceptual_space,
 ):
-    working_spaces = WorkingSpace(
-        "working spaces", StructureCollection({input_space, active_frame}), 0, Mock()
-    )
+    working_spaces = StructureCollection({input_space, active_frame})
     correspondential_concepts_space = ConceptualSpace(
         "correspondential concepts", StructureCollection({more_concept}), Mock()
     )
@@ -94,9 +92,8 @@ def bubble_chamber(
         ),
     )
     chamber = BubbleChamber(
-        Mock(),
-        Mock(),
         StructureCollection(),
+        working_spaces,
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -107,9 +104,8 @@ def bubble_chamber(
         Mock(),
     )
     chamber.concepts.add(more_concept)
-    chamber.spaces.add(correspondential_concepts_space)
-    chamber.spaces.add(working_spaces)
-    chamber.spaces.add(labeling_spaces)
+    chamber.conceptual_spaces.add(correspondential_concepts_space)
+    chamber.conceptual_spaces.add(labeling_spaces)
     return chamber
 
 

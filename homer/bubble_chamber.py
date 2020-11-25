@@ -13,53 +13,50 @@ from .structures.spaces import ConceptualSpace, WorkingSpace
 class BubbleChamber:
     def __init__(
         self,
-        top_level_working_space: Space,
-        top_level_conceptual_space: Space,
+        conceptual_spaces: StructureCollection,
+        working_spaces: StructureCollection,
         chunks: StructureCollection,
         concepts: StructureCollection,
         correspondences: StructureCollection,
         labels: StructureCollection,
         relations: StructureCollection,
-        spaces: StructureCollection,
         views: StructureCollection,
         words: StructureCollection,
         logger: Logger,
     ):
-        self.top_level_working_space = top_level_working_space
-        self.top_level_conceptual_space = top_level_conceptual_space
+        self.conceptual_spaces = conceptual_spaces
+        self.working_spaces = working_spaces
         self.chunks = chunks
         self.concepts = concepts
         self.correspondences = correspondences
         self.labels = labels
         self.relations = relations
-        self.spaces = spaces
         self.views = views
         self.words = words
         self.logger = logger
         self.result = None
 
     @property
+    def spaces(self):
+        return StructureCollection.union(self.conceptual_spaces, self.working_spaces)
+
+    @property
     def structures(self):
         return StructureCollection.union(
+            self.conceptual_spaces,
+            self.working_spaces,
             self.chunks,
             self.concepts,
             self.correspondences,
             self.labels,
             self.relations,
-            self.spaces,
             self.views,
             self.words,
         )
 
     @property
-    def working_spaces(self):
-        return StructureCollection(
-            {space for space in self.spaces if isinstance(space, WorkingSpace)}
-        )
-
-    @property
     def satisfaction(self):
-        return self.top_level_working_space.quality
+        return self.working_spaces["top level working"].quality
 
     def spread_activations(self):
         for structure in self.structures:
@@ -94,7 +91,7 @@ class BubbleChamber:
                 None,
                 child_spaces=StructureCollection({space_one, space_two}),
             )
-            self.spaces.add(parent_space)
+            self.working_spaces.add(parent_space)
             space_one.parent_spaces.add(parent_space)
             space_two.parent_spaces.add(parent_space)
         return parent_space

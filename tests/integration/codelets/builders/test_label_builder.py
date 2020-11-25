@@ -60,8 +60,7 @@ def mild_concept(temperature_space):
 @pytest.fixture
 def bubble_chamber(mild_concept, label_concepts_space):
     chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -73,7 +72,7 @@ def bubble_chamber(mild_concept, label_concepts_space):
         Mock(),
     )
     chamber.concepts.add(mild_concept)
-    chamber.spaces.add(label_concepts_space)
+    chamber.conceptual_spaces.add(label_concepts_space)
     return chamber
 
 

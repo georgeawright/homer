@@ -29,12 +29,12 @@ def bubble_chamber(parent_concept):
     working_space_contents = Mock()
     working_space_contents.get_exigent.return_value = target_structure_two
     working_space.contents.of_type.return_value = working_space_contents
-    working_spaces.contents.get_active.return_value = working_space
+    working_spaces.get_active.return_value = working_space
     chamber.spaces = {
         "label concepts": labeling_spaces,
         "correspondential concepts": correspondential_concepts,
-        "working spaces": working_spaces,
     }
+    chamber.working_spaces = working_spaces
     return chamber
 
 

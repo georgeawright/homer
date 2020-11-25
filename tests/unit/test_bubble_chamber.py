@@ -13,14 +13,13 @@ def test_structures():
     relation = Mock()
     word = Mock()
     bubble_chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
         StructureCollection(),
         StructureCollection({label}),
         StructureCollection({relation}),
-        StructureCollection(),
         StructureCollection(),
         StructureCollection({word}),
         Mock(),
@@ -39,14 +38,13 @@ def test_spread_activations():
     relation = Mock()
     word = Mock()
     bubble_chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
         StructureCollection(),
         StructureCollection({label}),
         StructureCollection({relation}),
-        StructureCollection(),
         StructureCollection(),
         StructureCollection({word}),
         Mock(),
@@ -66,14 +64,13 @@ def test_update_activations():
     relation = Mock()
     word = Mock()
     bubble_chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
         StructureCollection(),
         StructureCollection({label}),
         StructureCollection({relation}),
-        StructureCollection(),
         StructureCollection(),
         StructureCollection({word}),
         Mock(),
@@ -91,10 +88,9 @@ def test_has_chunk():
     existing_chunk = Mock()
     existing_chunk.members = existing_chunk_members
     bubble_chamber = BubbleChamber(
-        Mock(),
-        Mock(),
-        StructureCollection({existing_chunk}),
         StructureCollection(),
+        StructureCollection(),
+        StructureCollection({existing_chunk}),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -111,8 +107,7 @@ def test_has_view():
     existing_view = Mock()
     existing_view.members = existing_view_members
     bubble_chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -128,8 +123,7 @@ def test_has_view():
 
 def test_common_parent_space_is_created_if_necessary():
     bubble_chamber = BubbleChamber(
-        Mock(),
-        Mock(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -146,12 +140,12 @@ def test_common_parent_space_is_created_if_necessary():
     space_two = Mock()
     space_two.name = "two"
     space_two.parent_spaces = StructureCollection()
-    bubble_chamber.spaces.add(space_one)
-    bubble_chamber.spaces.add(space_two)
-    assert 2 == len(bubble_chamber.spaces)
+    bubble_chamber.working_spaces.add(space_one)
+    bubble_chamber.working_spaces.add(space_two)
+    assert 2 == len(bubble_chamber.working_spaces)
     parent = bubble_chamber.common_parent_space(space_one, space_two)
     assert isinstance(parent, Space)
-    assert parent in bubble_chamber.spaces
-    assert 3 == len(bubble_chamber.spaces)
+    assert parent in bubble_chamber.working_spaces
+    assert 3 == len(bubble_chamber.working_spaces)
     parent = bubble_chamber.common_parent_space(space_one, space_two)
-    assert 3 == len(bubble_chamber.spaces)
+    assert 3 == len(bubble_chamber.working_spaces)
