@@ -28,6 +28,7 @@ class Space(Structure):
             links_out=links_out,
         )
         self.name = name
+        self.value = name
         self.contents = contents
         self.parent_concept = parent_concept
         self.parent_spaces = (
