@@ -135,16 +135,16 @@ class DjangoLogger(Logger):
         self._log_message(
             f"{structure.structure_id} created "
             + f" by {structure.parent_id} - value: {structure.value}; "
-            + f"location: {structure.location}; activation: {structure.activation.activation}"
+            + f"location: {structure.location.coordinates}, {structure.location.space.name}; activation: {structure.activation}"
         )
         structure_record = StructureRecord.objects.create(
             structure_id=structure.structure_id,
             run_id=self.run,
             time_created=self.codelets_run,
             value=structure.value,
-            location=structure.location,
-            activation=[structure.activation.activation],
-            unhappiness=[structure.unhappiness.activation],
+            location=structure.location.coordinates,
+            activation=[structure.activation],
+            unhappiness=[structure.unhappiness],
             quality=[structure.quality],
         )
         if structure.parent_id != "":
@@ -161,7 +161,7 @@ class DjangoLogger(Logger):
             )
         if hasattr(structure, "parent_concept"):
             structure_record.parent_concept = ConceptRecord.objects.get(
-                concept_id=structure.parent_concept.concept_id, run_id=self.run
+                concept_id=structure.parent_concept.structure_id, run_id=self.run
             )
         if hasattr(structure, "first_argument"):
             structure_record.first_argument = structure.first_argument.structure_id
