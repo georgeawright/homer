@@ -27,6 +27,7 @@ class Label(Link):
             links_in=None,
             links_out=None,
         )
+        self.value = self.parent_concept.name
 
     def nearby(self, space: Space = None) -> StructureCollection:
         nearby_chunks = self.start.nearby(self.parent_space)
