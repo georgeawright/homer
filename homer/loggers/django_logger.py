@@ -135,14 +135,16 @@ class DjangoLogger(Logger):
         self._log_message(
             f"{structure.structure_id} created "
             + f" by {structure.parent_id} - value: {structure.value}; "
-            + f"location: {structure.location.coordinates}, {structure.location.space.name}; activation: {structure.activation}"
+            + f"location: {structure.location}; activation: {structure.activation}"
         )
         structure_record = StructureRecord.objects.create(
             structure_id=structure.structure_id,
             run_id=self.run,
             time_created=self.codelets_run,
             value=structure.value,
-            location=structure.location.coordinates,
+            location=structure.location.coordinates
+            if structure.location is not None
+            else None,
             activation=[structure.activation],
             unhappiness=[structure.unhappiness],
             quality=[structure.quality],
@@ -159,7 +161,10 @@ class DjangoLogger(Logger):
                 structure_id=structure_record.id,
                 action="Created",
             )
-        if hasattr(structure, "parent_concept"):
+        if (
+            hasattr(structure, "parent_concept")
+            and structure.parent_concept is not None
+        ):
             structure_record.parent_concept = ConceptRecord.objects.get(
                 concept_id=structure.parent_concept.structure_id, run_id=self.run
             )
@@ -167,11 +172,7 @@ class DjangoLogger(Logger):
             structure_record.first_argument = structure.first_argument.structure_id
         if hasattr(structure, "second_argument"):
             structure_record.second_argument = structure.second_argument.structure_id
-        for connection in structure.connections:
-            connection_record = StructureRecord.objects.get(
-                structure_id=connection.structure_id, run_id=self.run
-            )
-            structure_record.connections.add(connection_record)
+        # TODO log links too!
         structure_record.save()
 
     def graph_concepts(self, concept_names, file_name):
