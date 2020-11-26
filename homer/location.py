@@ -14,6 +14,9 @@ class Location:
         self.coordinates = coordinates
         self.space = space
 
+    def __repr__(self):
+        return f"({self.coordinates}, {self.space.name})"
+
     @classmethod
     def average(cls, locations: List[Location]) -> Location:
         from .structures import Space
