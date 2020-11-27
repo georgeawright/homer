@@ -97,25 +97,6 @@ class DjangoLogger(Logger):
         )
         codelet_record.save()
 
-    def _log_concept(self, concept: Concept):
-        try:
-            concept_record = ConceptRecord.objects.get(
-                concept_id=concept.concept_id, run_id=self.run
-            )
-            concept_record.activation.append(
-                [self.codelets_run, concept.activation.activation_matrix.tolist()]
-            )
-            concept_record.save()
-        except ConceptRecord.DoesNotExist:
-            ConceptRecord.objects.create(
-                concept_id=concept.concept_id,
-                run_id=self.run,
-                name=concept.name,
-                activation=[
-                    [self.codelets_run, concept.activation.activation_matrix.tolist()]
-                ],
-            )
-
     def _log_coderack(self, coderack: Coderack):
         self.codelets_run = coderack.codelets_run
         try:
