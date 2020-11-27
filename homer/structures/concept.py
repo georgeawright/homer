@@ -43,6 +43,7 @@ class Concept(Structure):
             links_out=links_out,
         )
         self.name = name
+        self.value = name
         self.prototype = prototype
         self.classifier = classifier
         self.parent_space = parent_space

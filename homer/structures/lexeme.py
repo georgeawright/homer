@@ -28,6 +28,7 @@ class Lexeme(Structure):
             links_out=links_out,
         )
         self.headword = headword
+        self.value = headword
         self.forms = forms
 
     @classmethod
