@@ -35,6 +35,8 @@ class WorkingSpace(Space):
 
     @property
     def quality(self):
+        if len(self.contents) == 0 and len(self.child_spaces) == 0:
+            return 0.0
         if len(self.contents) != 0:
             contents_quality = [
                 statistics.fmean(
