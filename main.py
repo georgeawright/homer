@@ -1016,6 +1016,7 @@ for i, row in enumerate(problem):
             quality,
             parent_spaces,
         )
+        logger.log(chunk)
         input_chunks.add(chunk)
         bubble_chamber.chunks.add(chunk)
         input_space.contents.add(chunk)
