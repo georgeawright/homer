@@ -39,7 +39,7 @@ class ConceptualSpace(Space):
         if self._instance is None:
             self._instance = WorkingSpace(
                 self.structure_id + "_working_space",
-                self.structure_id,
+                "",
                 self.name + " working",
                 StructureCollection(),
                 FloatBetweenOneAndZero(0),
