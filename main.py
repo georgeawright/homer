@@ -45,7 +45,9 @@ logger = DjangoLogger.setup(path_to_logs)
 top_level_conceptual_space = ConceptualSpace(
     "top_level_space", "", "top level", StructureCollection(), None
 )
+logger.log(top_level_conceptual_space)
 top_level_working_space = top_level_conceptual_space.instance
+logger.log(top_level_working_space)
 bubble_chamber = BubbleChamber(
     StructureCollection({top_level_conceptual_space}),
     StructureCollection({top_level_working_space}),
@@ -69,10 +71,13 @@ input_concept = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(input_concept)
 bubble_chamber.concepts.add(input_concept)
 input_space = WorkingSpace(
     "input_space", "", "input", StructureCollection(), 0.0, input_concept
 )
+print(input_space.parent_concept.structure_id)
+logger.log(input_space)
 bubble_chamber.working_spaces.add(input_space)
 top_level_working_space.child_spaces.add(input_space)
 
@@ -85,10 +90,12 @@ activity_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(activity_concept)
 bubble_chamber.concepts.add(activity_concept)
 activities_space = ConceptualSpace(
     "activities", "", "activities", StructureCollection(), None
 )
+logger.log(activities_space)
 bubble_chamber.conceptual_spaces.add(activities_space)
 build_concept = Concept.new(
     "build",
@@ -99,6 +106,7 @@ build_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(build_concept)
 build_concept._activation = 1.0
 bubble_chamber.concepts.add(build_concept)
 evaluate_concept = Concept.new(
@@ -110,6 +118,7 @@ evaluate_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(evaluate_concept)
 bubble_chamber.concepts.add(evaluate_concept)
 select_concept = Concept.new(
     "select",
@@ -120,6 +129,7 @@ select_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(select_concept)
 bubble_chamber.concepts.add(select_concept)
 
 structure_concept = Concept.new(
@@ -131,10 +141,12 @@ structure_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(structure_concept)
 bubble_chamber.concepts.add(structure_concept)
 structures_space = ConceptualSpace(
     "structures", "", "structures", StructureCollection(), None
 )
+logger.log(structures_space)
 bubble_chamber.conceptual_spaces.add(structures_space)
 chunk_concept = Concept.new(
     "chunk",
@@ -145,6 +157,7 @@ chunk_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(chunk_concept)
 bubble_chamber.concepts.add(chunk_concept)
 view_concept = Concept.new(
     "view",
@@ -155,6 +168,7 @@ view_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(view_concept)
 bubble_chamber.concepts.add(view_concept)
 word_concept = Concept.new(
     "word",
@@ -165,6 +179,7 @@ word_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(word_concept)
 bubble_chamber.concepts.add(word_concept)
 label_concept = Concept.new(
     "label",
@@ -175,10 +190,12 @@ label_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(label_concept)
 bubble_chamber.concepts.add(label_concept)
 label_concepts_space = ConceptualSpace(
     "label_concept", "", "label concepts", StructureCollection(), label_concept
 )
+logger.log(label_concepts_space)
 bubble_chamber.conceptual_spaces.add(label_concepts_space)
 relation_concept = Concept.new(
     "relation",
@@ -189,6 +206,7 @@ relation_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(relation_concept)
 bubble_chamber.concepts.add(relation_concept)
 relational_concepts_space = ConceptualSpace(
     "relational_concepts",
@@ -197,6 +215,7 @@ relational_concepts_space = ConceptualSpace(
     StructureCollection(),
     relation_concept,
 )
+logger.log(relational_concepts_space)
 bubble_chamber.conceptual_spaces.add(relational_concepts_space)
 correspondence_concept = Concept.new(
     "correspondence",
@@ -207,6 +226,7 @@ correspondence_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(correspondence_concept)
 bubble_chamber.concepts.add(correspondence_concept)
 correspondential_concepts_space = ConceptualSpace(
     "correspondential_concepts",
@@ -215,6 +235,7 @@ correspondential_concepts_space = ConceptualSpace(
     StructureCollection(),
     correspondence_concept,
 )
+logger.log(correspondential_concepts_space)
 bubble_chamber.conceptual_spaces.add(correspondential_concepts_space)
 template_concept = Concept.new(
     "template",
@@ -225,10 +246,12 @@ template_concept = Concept.new(
     StructureCollection(),
     None,
 )
+logger.log(template_concept)
 bubble_chamber.concepts.add(template_concept)
 templates_space = ConceptualSpace(
     "templates", "", "templates", StructureCollection(), template_concept
 )
+logger.log(templates_space)
 
 link_concepts(build_concept, chunk_concept)
 link_concepts(build_concept, correspondence_concept)
@@ -259,10 +282,12 @@ temperature_concept = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(temperature_concept)
 bubble_chamber.concepts.add(temperature_concept)
 temperature_space = ConceptualSpace(
     "temperature", "", "temperature", StructureCollection(), temperature_concept
 )
+logger.log(temperature_space)
 label_concepts_space.child_spaces.add(temperature_space)
 bubble_chamber.conceptual_spaces.add(temperature_space)
 temperature_concept.child_spaces.add(temperature_space)
@@ -275,6 +300,7 @@ hot = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(hot)
 bubble_chamber.concepts.add(hot)
 hot_lexeme = Lexeme.new(
     "hot",
@@ -285,6 +311,7 @@ hot_lexeme = Lexeme.new(
     },
     hot,
 )
+logger.log(hot_lexeme)
 bubble_chamber.lexemes.add(hot_lexeme)
 warm = Concept.new(
     "warm",
@@ -295,6 +322,7 @@ warm = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(warm)
 bubble_chamber.concepts.add(warm)
 warm_lexeme = Lexeme.new(
     "warm",
@@ -305,6 +333,7 @@ warm_lexeme = Lexeme.new(
     },
     warm,
 )
+logger.log(warm_lexeme)
 bubble_chamber.lexemes.add(warm_lexeme)
 mild = Concept.new(
     "mild",
@@ -315,6 +344,7 @@ mild = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(mild)
 bubble_chamber.concepts.add(mild)
 mild_lexeme = Lexeme.new(
     "mild",
@@ -325,6 +355,7 @@ mild_lexeme = Lexeme.new(
     },
     mild,
 )
+logger.log(mild_lexeme)
 bubble_chamber.lexemes.add(mild_lexeme)
 cold = Concept.new(
     "cold",
@@ -335,6 +366,7 @@ cold = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(cold)
 bubble_chamber.concepts.add(cold)
 cold_lexeme = Lexeme.new(
     "cold",
@@ -356,10 +388,12 @@ location_concept = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(location_concept)
 bubble_chamber.concepts.add(location_concept)
 location_space = ConceptualSpace(
     "location", "", "location", StructureCollection(), location_concept
 )
+logger.log(location_space)
 label_concepts_space.child_spaces.add(location_space)
 bubble_chamber.conceptual_spaces.add(location_space)
 location_concept.child_spaces.add(location_space)
@@ -372,6 +406,7 @@ north = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(north)
 bubble_chamber.concepts.add(north)
 north_lexeme = Lexeme.new(
     "north",
@@ -382,6 +417,7 @@ north_lexeme = Lexeme.new(
     },
     north,
 )
+logger.log(north_lexeme)
 bubble_chamber.lexemes.add(north_lexeme)
 south = Concept.new(
     "south",
@@ -392,6 +428,7 @@ south = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(south)
 bubble_chamber.concepts.add(south)
 south_lexeme = Lexeme.new(
     "south",
@@ -402,6 +439,7 @@ south_lexeme = Lexeme.new(
     },
     south,
 )
+logger.log(south_lexeme)
 bubble_chamber.lexemes.add(south_lexeme)
 east = Concept.new(
     "east",
@@ -412,6 +450,7 @@ east = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(east)
 bubble_chamber.concepts.add(east)
 east_lexeme = Lexeme.new(
     "east",
@@ -422,6 +461,7 @@ east_lexeme = Lexeme.new(
     },
     east,
 )
+logger.log(east_lexeme)
 bubble_chamber.lexemes.add(east_lexeme)
 west = Concept.new(
     "west",
@@ -432,6 +472,7 @@ west = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(west)
 bubble_chamber.concepts.add(west)
 west_lexeme = Lexeme.new(
     "west",
@@ -442,6 +483,7 @@ west_lexeme = Lexeme.new(
     },
     west,
 )
+logger.log(west_lexeme)
 bubble_chamber.lexemes.add(west_lexeme)
 northwest = Concept.new(
     "northwest",
@@ -452,6 +494,7 @@ northwest = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(northwest)
 bubble_chamber.concepts.add(northwest)
 northwest_lexeme = Lexeme.new(
     "northwest",
@@ -462,6 +505,7 @@ northwest_lexeme = Lexeme.new(
     },
     northwest,
 )
+logger.log(northwest_lexeme)
 bubble_chamber.lexemes.add(northwest_lexeme)
 northeast = Concept.new(
     "northeast",
@@ -472,6 +516,7 @@ northeast = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(northeast)
 bubble_chamber.concepts.add(northeast)
 northeast_lexeme = Lexeme.new(
     "northeast",
@@ -482,6 +527,7 @@ northeast_lexeme = Lexeme.new(
     },
     northeast,
 )
+logger.log(northeast_lexeme)
 bubble_chamber.lexemes.add(northeast_lexeme)
 southwest = Concept.new(
     "southwest",
@@ -492,6 +538,7 @@ southwest = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(southwest)
 bubble_chamber.concepts.add(southwest)
 southwest_lexeme = Lexeme.new(
     "southwest",
@@ -502,6 +549,7 @@ southwest_lexeme = Lexeme.new(
     },
     southwest,
 )
+logger.log(southwest_lexeme)
 bubble_chamber.lexemes.add(southwest_lexeme)
 southeast = Concept.new(
     "southeast",
@@ -512,6 +560,7 @@ southeast = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(southeast)
 bubble_chamber.concepts.add(southeast)
 southeast_lexeme = Lexeme.new(
     "southeast",
@@ -522,6 +571,7 @@ southeast_lexeme = Lexeme.new(
     },
     southeast,
 )
+logger.log(southeast_lexeme)
 bubble_chamber.lexemes.add(southeast_lexeme)
 midlands = Concept.new(
     "midlands",
@@ -532,6 +582,7 @@ midlands = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(midlands)
 bubble_chamber.concepts.add(midlands)
 midlands_lexeme = Lexeme.new(
     "midlands",
@@ -542,6 +593,7 @@ midlands_lexeme = Lexeme.new(
     },
     midlands,
 )
+logger.log(midlands_lexeme)
 bubble_chamber.lexemes.add(midlands_lexeme)
 
 more_less_concept = Concept.new(
@@ -553,10 +605,12 @@ more_less_concept = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(more_less_concept)
 bubble_chamber.concepts.add(more_less_concept)
 more_less_space = ConceptualSpace(
     "more-less", "", "more-less", StructureCollection(), more_less_concept
 )
+logger.log(more_less_space)
 more_less_concept.child_spaces.add(more_less_space)
 relational_concepts_space.child_spaces.add(more_less_space)
 bubble_chamber.conceptual_spaces.add(more_less_space)
@@ -569,6 +623,7 @@ more = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(more)
 bubble_chamber.concepts.add(more)
 more_lexeme = Lexeme.new(
     "more",
@@ -579,6 +634,7 @@ more_lexeme = Lexeme.new(
     },
     more,
 )
+logger.log(more_lexeme)
 bubble_chamber.lexemes.add(more_lexeme)
 less = Concept.new(
     "less",
@@ -589,6 +645,7 @@ less = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(less)
 bubble_chamber.concepts.add(less)
 less_lexeme = Lexeme.new(
     "less",
@@ -599,6 +656,7 @@ less_lexeme = Lexeme.new(
     },
     less,
 )
+logger.log(less_lexeme)
 bubble_chamber.lexemes.add(less_lexeme)
 
 same_different_concept = Concept.new(
@@ -610,6 +668,7 @@ same_different_concept = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(same_different_concept)
 bubble_chamber.concepts.add(same_different_concept)
 same_different_space = ConceptualSpace(
     "same-different",
@@ -618,6 +677,7 @@ same_different_space = ConceptualSpace(
     StructureCollection(),
     same_different_concept,
 )
+logger.log(same_different_space)
 bubble_chamber.conceptual_spaces.add(same_different_space)
 same = Concept.new(
     "same",
@@ -628,6 +688,7 @@ same = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(same)
 bubble_chamber.concepts.add(same)
 different = Concept.new(
     "different",
@@ -638,6 +699,7 @@ different = Concept.new(
     StructureCollection(),
     math.dist,
 )
+logger.log(different)
 bubble_chamber.concepts.add(different)
 
 # TEMPLATE 1: the location is temperature
@@ -649,6 +711,7 @@ template_1 = Template(
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
+logger.log(template_1)
 word_the = Word(
     ID.new(Word),
     "",
@@ -657,6 +720,7 @@ word_the = Word(
     StructureCollection({template_1}),
     1.0,
 )
+logger.log(word_the)
 slot_location = TemplateSlot(
     ID.new(TemplateSlot),
     "",
@@ -665,6 +729,7 @@ slot_location = TemplateSlot(
     Location([1], template_1),
     StructureCollection({template_1}),
 )
+logger.log(slot_location)
 word_is = Word(
     ID.new(Word),
     "",
@@ -673,6 +738,7 @@ word_is = Word(
     StructureCollection({template_1}),
     1.0,
 )
+logger.log(word_is)
 slot_temperature = TemplateSlot(
     ID.new(TemplateSlot),
     "",
@@ -681,6 +747,7 @@ slot_temperature = TemplateSlot(
     Location([3], template_1),
     StructureCollection({template_1}),
 )
+logger.log(slot_temperature)
 template_1.contents.add(word_the)
 template_1.contents.add(slot_location)
 template_1.contents.add(word_is)
@@ -696,6 +763,7 @@ template_2 = Template(
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
+logger.log(template_2)
 word_it = Word(
     ID.new(Word),
     "",
@@ -704,6 +772,7 @@ word_it = Word(
     StructureCollection({template_2}),
     1.0,
 )
+logger.log(word_it)
 word_is = Word(
     ID.new(Word),
     "",
@@ -762,6 +831,7 @@ template_3 = Template(
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
+logger.log(template_3)
 word_it = Word(
     ID.new(Word),
     "",
@@ -828,6 +898,7 @@ template_4 = Template(
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
+logger.log(template_4)
 word_it = Word(
     ID.new(Word),
     "",
