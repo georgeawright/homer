@@ -30,9 +30,12 @@ class Coderack:
         return cls(bubble_chamber, codelets, logger)
 
     def add_codelet(self, codelet: Codelet):
-        if codelet.urgency > self.MINIMUM_CODELET_URGENCY:
-            self.logger.log(codelet)
-            self._codelets.append(codelet)
+        if codelet.urgency < self.MINIMUM_CODELET_URGENCY:
+            return
+        if isinstance(codelet, FactoryCodelet) and self.has_factory_codelet():
+            return
+        self.logger.log(codelet)
+        self._codelets.append(codelet)
 
     def select_and_run_codelet(self):
         codelet = self.select_codelet()
@@ -56,6 +59,12 @@ class Coderack:
             raise NoMoreCodelets
         self._codelets.remove(codelet_choice)
         return codelet_choice
+
+    def has_factory_codelet(self):
+        for codelet in self._codelets:
+            if isinstance(codelet, FactoryCodelet):
+                return True
+        return False
 
     def _randomness(self) -> float:
         return 1 - self.bubble_chamber.satisfaction
