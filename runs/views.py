@@ -34,38 +34,40 @@ def run_view(request, run_id):
     output += "<li>Codelets Run: " + str(coderack_record.codelets_run[-1])
     output += "</ul>"
     output += '<p><a href="codelets">Codelets</a></p>'
-    output += '<p><a href="concepts">Concepts</a></p>'
     output += '<p><a href="structures">Structures</a></p>'
     output += f'<img src="/runs/{run_id}/coderack_population">'
     structure_records = StructureRecord.objects.filter(run_id=run_id).all()
     last_column = 0
     last_row = 0
-    raw_structures = []
+    original_chunks = []
     for record in structure_records:
-        if not re.match("^RawStructure", record.structure_id):
+        if not re.match("^Chunk", record.structure_id):
             continue
-        raw_structures.append(record)
-        if record.location[1] > last_row:
-            last_row = record.location[1]
-        if record.location[2] > last_column:
-            last_column = record.location[2]
-    raw_structures_matrix = [
+        if record.parent_codelet is not None:
+            continue
+        original_chunks.append(record)
+        if record.location[0] > last_row:
+            last_row = record.location[0]
+        if record.location[1] > last_column:
+            last_column = record.location[1]
+    original_chunks_matrix = [
         [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
     ]
-    for raw_structure in raw_structures:
-        row = raw_structure.location[1]
-        column = raw_structure.location[2]
-        raw_structures_matrix[row][column] = raw_structure
+    for original_chunk in original_chunks:
+        row = original_chunk.location[0]
+        column = original_chunk.location[1]
+        original_chunks_matrix[row][column] = original_chunk
     output += "<h2>Raw Input</h2>"
     output += '<table border="1">'
     for i in range(last_row + 1):
         output += "<tr>"
         for j in range(last_column + 1):
             output += "<td>"
-            output += str(raw_structures_matrix[i][j].value)
+            output += str(original_chunks_matrix[i][j].value)
             output += "</td>"
         output += "</tr>"
     output += "</table>"
+    """
     output += "<h2>Labels</h2>"
     output += '<table border="1">'
     for i in range(last_row + 1):
@@ -133,6 +135,7 @@ def run_view(request, run_id):
             if re.match(r"^Label*", connection.structure_id):
                 output += f"({connection.value})"
         output += "<br>"
+"""
     return HttpResponse(output)
 
 
