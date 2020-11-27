@@ -26,8 +26,8 @@ class Word(Chunk):
             location,
             members,
             neighbours,
-            parent_spaces,
             quality,
+            parent_spaces,
             links_in=links_in,
             links_out=links_out,
         )
