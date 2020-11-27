@@ -46,21 +46,33 @@ class StructureRecord(models.Model):
     time_created = models.IntegerField("Time Created")
     value = models.CharField("Value", max_length=MAX_STRING_LENGTH)
     location = models.JSONField("location", null=True)
-    connections = models.ManyToManyField("self", blank=True, null=True)
+    links = models.ManyToManyField("self", blank=True, null=True)
     activation = models.JSONField("Activation")
     unhappiness = models.JSONField("Unhappiness")
     quality = models.JSONField("quality")
     parent_concept = models.ForeignKey(
-        "StructureRecord", on_delete=models.CASCADE, blank=True, null=True
+        "StructureRecord",
+        related_name="_parent_concept",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     parent_codelet = models.ForeignKey(
         "CodeletRecord", on_delete=models.CASCADE, blank=True, null=True
     )
-    first_argument = models.CharField(
-        "First Argument", max_length=MAX_STRING_LENGTH, blank=True, null=True
+    start = models.ForeignKey(
+        "StructureRecord",
+        related_name="start_arg",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
-    second_argument = models.CharField(
-        "Second Argument", max_length=MAX_STRING_LENGTH, blank=True, null=True
+    end = models.ForeignKey(
+        "StructureRecord",
+        related_name="end_arg",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
 
 

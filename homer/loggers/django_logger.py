@@ -148,11 +148,18 @@ class DjangoLogger(Logger):
             structure_record.parent_concept = StructureRecord.objects.get(
                 structure_id=structure.parent_concept.structure_id, run_id=self.run
             )
-        if hasattr(structure, "first_argument"):
-            structure_record.first_argument = structure.first_argument.structure_id
-        if hasattr(structure, "second_argument"):
-            structure_record.second_argument = structure.second_argument.structure_id
-        # TODO log links too!
+        if hasattr(structure, "start") and structure.start is not None:
+            start_record = StructureRecord.objects.get(
+                structure_id=structure.start.structure_id, run_id=self.run
+            )
+            structure_record.start = start_record
+            start_record.links.add(structure_record)
+        if hasattr(structure, "end") and structure.end is not None:
+            end_record = StructureRecord.objects.get(
+                structure_id=structure.end.structure_id, run_id=self.run
+            )
+            structure_record.end = end_record
+            end_record.links.add(structure_record)
         structure_record.save()
 
     def graph_concepts(self, concept_names, file_name):

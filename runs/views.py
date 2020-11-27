@@ -67,24 +67,24 @@ def run_view(request, run_id):
             output += "</td>"
         output += "</tr>"
     output += "</table>"
-    """
     output += "<h2>Labels</h2>"
     output += '<table border="1">'
     for i in range(last_row + 1):
         output += "<tr>"
         for j in range(last_column + 1):
             output += "<td>"
-            raw_structure = raw_structures_matrix[i][j]
+            original_chunk = original_chunks_matrix[i][j]
             output += "".join(
                 [
-                    f"{connection.value} ({connection.quality[-1]})<br>"
-                    for connection in raw_structure.connections.all()
-                    if re.match(r"^Label*", connection.structure_id)
+                    f"{link.value} ({link.quality})<br>"
+                    for link in original_chunk.links.all()
+                    if re.match(r"^Label*", link.structure_id)
                 ]
             )
             output += "</td>"
         output += "</tr>"
     output += "</table>"
+    """
     groups = [
         structure
         for structure in structure_records
