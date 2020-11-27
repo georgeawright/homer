@@ -136,7 +136,6 @@ class DjangoLogger(Logger):
             + f" by {structure.parent_id} - value: {structure.value}; "
             + f"location: {structure.location}; activation: {structure.activation}"
         )
-        print(structure.unhappiness, structure.quality)
         structure_record = StructureRecord.objects.create(
             structure_id=structure.structure_id,
             run_id=self.run,
