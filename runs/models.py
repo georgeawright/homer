@@ -21,7 +21,6 @@ class CodeletRecord(models.Model):
         blank=True,
         null=True,
     )
-    structure_types = models.ManyToManyField("ConceptRecord")
     target_structure = models.ForeignKey(
         "StructureRecord", on_delete=models.CASCADE, blank=True, null=True
     )
@@ -41,13 +40,6 @@ class CoderackRecord(models.Model):
     population = models.JSONField("Population")
 
 
-class ConceptRecord(models.Model):
-    concept_id = models.CharField("Concept ID", max_length=MAX_STRING_LENGTH)
-    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
-    name = models.CharField("Name", max_length=MAX_STRING_LENGTH)
-    activation = models.JSONField("Activation")
-
-
 class StructureRecord(models.Model):
     structure_id = models.CharField("Structure ID", max_length=MAX_STRING_LENGTH)
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
@@ -59,7 +51,7 @@ class StructureRecord(models.Model):
     unhappiness = models.JSONField("Unhappiness")
     quality = models.JSONField("quality")
     parent_concept = models.ForeignKey(
-        "ConceptRecord", on_delete=models.CASCADE, blank=True, null=True
+        "StructureRecord", on_delete=models.CASCADE, blank=True, null=True
     )
     parent_codelet = models.ForeignKey(
         "CodeletRecord", on_delete=models.CASCADE, blank=True, null=True

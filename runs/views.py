@@ -9,7 +9,6 @@ import numpy
 from .models import (
     CodeletRecord,
     CoderackRecord,
-    ConceptRecord,
     StructureRecord,
     StructureUpdateRecord,
     RunRecord,
@@ -242,47 +241,6 @@ def codelet_view(request, run_id, codelet_id):
     return HttpResponse(output)
 
 
-def concepts_view(request, run_id):
-    concept_records = ConceptRecord.objects.filter(run_id=run_id).order_by("name")
-    output = "<h1>Concepts</h1>"
-    output += "<ul>"
-    output += "".join(
-        [
-            '<li><a href="' + concept.concept_id + '">' + concept.name + "</a></li>"
-            for concept in concept_records
-        ]
-    )
-    output += "</ul>"
-    return HttpResponse(output)
-
-
-def concept_view(request, run_id, concept_id):
-    concept_record = ConceptRecord.objects.get(run_id=run_id, concept_id=concept_id)
-    output = "<h1>" + concept_id + "</h1>"
-    output += f'<img src="/runs/{run_id}/concepts/{concept_id}/activation">'
-    output += "<ul>"
-    output += "<li>Activation: " + str(concept_record.activation) + "</li>"
-    output += "</ul>"
-    return HttpResponse(output)
-
-
-def concept_activation_view(request, run_id, concept_id):
-    concept_record = ConceptRecord.objects.get(run_id=run_id, concept_id=concept_id)
-    x = [i for i, j in concept_record.activation]
-    y = [numpy.mean(numpy.array(j)) for i, j in concept_record.activation]
-    pyplot.clf()
-    name = concept_record.name.upper()
-    pyplot.title(f"{name} activation")
-    pyplot.xlabel("Codelets Run")
-    pyplot.ylabel("Concept Activation")
-    pyplot.plot(x, y)
-    buf = io.BytesIO()
-    pyplot.savefig(buf, format="svg", bbox_inches="tight")
-    svg = buf.getvalue()
-    buf.close()
-    return HttpResponse(svg, content_type="image/svg+xml")
-
-
 def structures_view(request, run_id):
     structure_records = StructureRecord.objects.filter(run_id=run_id).order_by(
         "structure_id"
@@ -329,9 +287,9 @@ def structure_view(request, run_id, structure_id):
             '<li>Parent Concept: <a href="/runs/'
             + str(run_id)
             + "/concepts/"
-            + structure_record.parent_concept.concept_id
+            + structure_record.parent_concept.structure_id
             + '">'
-            + structure_record.parent_concept.concept_id
+            + structure_record.parent_concept.structure_id
             + "</a></li>"
         )
     else:

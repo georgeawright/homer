@@ -16,7 +16,6 @@ from homer.structure import Structure
 from runs.models import (
     CodeletRecord,
     CoderackRecord,
-    ConceptRecord,
     StructureRecord,
     StructureUpdateRecord,
     RunRecord,
@@ -137,6 +136,7 @@ class DjangoLogger(Logger):
             + f" by {structure.parent_id} - value: {structure.value}; "
             + f"location: {structure.location}; activation: {structure.activation}"
         )
+        print(structure.unhappiness, structure.quality)
         structure_record = StructureRecord.objects.create(
             structure_id=structure.structure_id,
             run_id=self.run,
@@ -165,8 +165,8 @@ class DjangoLogger(Logger):
             hasattr(structure, "parent_concept")
             and structure.parent_concept is not None
         ):
-            structure_record.parent_concept = ConceptRecord.objects.get(
-                concept_id=structure.parent_concept.structure_id, run_id=self.run
+            structure_record.parent_concept = StructureRecord.objects.get(
+                structure_id=structure.parent_concept.structure_id, run_id=self.run
             )
         if hasattr(structure, "first_argument"):
             structure_record.first_argument = structure.first_argument.structure_id
