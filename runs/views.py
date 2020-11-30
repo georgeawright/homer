@@ -84,41 +84,36 @@ def run_view(request, run_id):
             output += "</td>"
         output += "</tr>"
     output += "</table>"
-    """
-    groups = [
+    chunks = [
         structure
         for structure in structure_records
-        if re.match("^Group*", structure.structure_id)
+        if re.match("^Chunk*", structure.structure_id)
     ]
-    output += "<h2>Groups</h2>"
-    for group in groups:
-        output += f"<h3>{group.structure_id}</h3>"
+    output += "<h2>Chunks</h2>"
+    for chunk in chunks:
+        if chunk in original_chunks:
+            continue
+        output += f"<h3>{chunk.structure_id}</h3>"
         output += "".join(
             [
-                f"{connection.value} ({connection.quality[-1]})<br>"
-                for connection in group.connections.all()
-                if re.match(r"^Label*", connection.structure_id)
-            ]
-        )
-        output += "".join(
-            [
-                f"{connection.value} ({connection.quality[-1]})<br>"
-                for connection in group.connections.all()
-                if re.match(r"^Textlet*", connection.structure_id)
+                f"{link.value} ({link.quality})<br>"
+                for link in chunk.links.all()
+                if re.match(r"^Label*", link.structure_id)
             ]
         )
         output += '<table border="1">'
         for i in range(last_row + 1):
             output += "<tr>"
             for j in range(last_column + 1):
-                if group in raw_structures_matrix[i][j].connections.all():
+                if original_chunks_matrix[i][j] in chunk.members.all():
                     output += '<td style="background-color: coral;">'
                 else:
                     output += "<td>"
-                output += str(raw_structures_matrix[i][j].value)
+                output += str(original_chunks_matrix[i][j].value)
                 output += "</td>"
             output += "</tr>"
         output += "</table>"
+        """
     correspondences = [
         structure
         for structure in structure_records

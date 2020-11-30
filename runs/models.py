@@ -47,6 +47,7 @@ class StructureRecord(models.Model):
     value = models.CharField("Value", max_length=MAX_STRING_LENGTH)
     location = models.JSONField("location", null=True)
     links = models.ManyToManyField("self", blank=True, null=True)
+    members = models.ManyToManyField("self", blank=True, null=True)
     activation = models.JSONField("Activation")
     unhappiness = models.JSONField("Unhappiness")
     quality = models.JSONField("quality")
