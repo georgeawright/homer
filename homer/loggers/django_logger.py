@@ -112,23 +112,28 @@ class DjangoLogger(Logger):
             )
 
     def _log_structure(self, structure: Structure):
-        self._log_message(
-            f"{structure.structure_id} created "
-            + f" by {structure.parent_id} - value: {structure.value}; "
-            + f"location: {structure.location}; activation: {structure.activation}"
-        )
-        structure_record = StructureRecord.objects.create(
-            structure_id=structure.structure_id,
-            run_id=self.run,
-            time_created=self.codelets_run,
-            value=structure.value,
-            location=structure.location.coordinates
-            if structure.location is not None
-            else None,
-            activation=[structure.activation],
-            unhappiness=[structure.unhappiness],
-            quality=[structure.quality],
-        )
+        try:
+            structure_record = StructureRecord.objects.get(
+                structure_id=structure.structure_id, run_id=self.run
+            )
+        except StructureRecord.DoesNotExist:
+            structure_record = StructureRecord.objects.create(
+                structure_id=structure.structure_id,
+                run_id=self.run,
+                time_created=self.codelets_run,
+                value=structure.value,
+                location=structure.location.coordinates
+                if structure.location is not None
+                else None,
+                activation=[structure.activation],
+                unhappiness=[structure.unhappiness],
+                quality=[structure.quality],
+            )
+            self._log_message(
+                f"{structure.structure_id} created "
+                + f" by {structure.parent_id} - value: {structure.value}; "
+                + f"location: {structure.location}; activation: {structure.activation}"
+            )
         if structure.parent_id != "":
             parent_codelet = CodeletRecord.objects.get(
                 codelet_id=structure.parent_id, run_id=self.run
@@ -148,18 +153,29 @@ class DjangoLogger(Logger):
             structure_record.parent_concept = StructureRecord.objects.get(
                 structure_id=structure.parent_concept.structure_id, run_id=self.run
             )
+        if hasattr(structure, "members") and structure.members is not None:
+            for member in structure.members:
+                member_record = StructureRecord.objects.get(
+                    structure_id=member.structure_id, run_id=self.run
+                )
+                structure_record.members.add(member_record)
+                print(
+                    f"{member.structure_id} added as member to {structure.structure_id}"
+                )
         if hasattr(structure, "start") and structure.start is not None:
             start_record = StructureRecord.objects.get(
                 structure_id=structure.start.structure_id, run_id=self.run
             )
             structure_record.start = start_record
             start_record.links.add(structure_record)
+            print(f"{structure.structure_id} linked to {structure.start.structure_id}")
         if hasattr(structure, "end") and structure.end is not None:
             end_record = StructureRecord.objects.get(
                 structure_id=structure.end.structure_id, run_id=self.run
             )
             structure_record.end = end_record
             end_record.links.add(structure_record)
+            print(f"{structure.structure_id} linked to {structure.end.structure_id}")
         structure_record.save()
 
     def graph_concepts(self, concept_names, file_name):
