@@ -136,16 +136,24 @@ class Structure(ABC):
                 return True
         return False
 
-    def relations_in_space_with(self, space: Structure, other: Structure) -> bool:
+    def relations_in_space_with(
+        self, space: Structure, other: Structure
+    ) -> StructureCollection:
         return StructureCollection(
             {
                 relation
                 for relation in self.relations
                 if relation in space.contents
-                and (
-                    (relation.start == self and relation.end == other)
-                    or (relation.start == other and relation.end == self)
-                )
+                and other in {relation.start, relation.end}
+            }
+        )
+
+    def relations_with(self, other: Structure) -> StructureCollection:
+        return StructureCollection(
+            {
+                relation
+                for relation in self.relations
+                if other in {relation.start, relation.end}
             }
         )
 
