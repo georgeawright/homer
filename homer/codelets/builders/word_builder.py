@@ -47,6 +47,12 @@ class WordBuilder(Builder):
             urgency,
         )
 
+    @property
+    def _parent_link(self):
+        word = self.bubble_chamber.concepts["word"]
+        build = self.bubble_chamber.concepts["build"]
+        return word.relations_with(build).get_random()
+
     def _passes_preliminary_checks(self):
         self.slot = self.target_correspondence.get_slot_argument()
         self.non_slot = self.target_correspondence.get_non_slot_argument()
@@ -68,9 +74,6 @@ class WordBuilder(Builder):
 
     def _calculate_confidence(self):
         self.confidence = self.target_correspondence.activation
-
-    def _boost_activations(self):
-        pass
 
     def _process_structure(self):
         concept = self.non_slot.labels.get_active().parent_concept

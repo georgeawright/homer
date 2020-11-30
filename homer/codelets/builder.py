@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
@@ -17,19 +17,25 @@ class Builder(Codelet):
 
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
+            self._parent_link.decay_activation()
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return self.result
         self._calculate_confidence()
         if abs(self.confidence) > self.CONFIDENCE_THRESHOLD:
-            self._boost_activations()
+            self._parent_link.boost_activation()
             self._process_structure()
             self._engender_follow_up()
             self.result = CodeletResult.SUCCESS
             return self.result
+        self._parent_link.decay_activation()
         self._fail()
         self.result = CodeletResult.FAIL
         return CodeletResult.FAIL
+
+    @abstractproperty
+    def _parent_link(self):
+        pass
 
     @abstractmethod
     def _passes_preliminary_checks(self):
@@ -37,10 +43,6 @@ class Builder(Codelet):
 
     @abstractmethod
     def _calculate_confidence(self):
-        pass
-
-    @abstractmethod
-    def _boost_activations(self):
         pass
 
     @abstractmethod

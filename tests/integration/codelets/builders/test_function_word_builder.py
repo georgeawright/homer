@@ -10,7 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Concept
 from homer.structures.chunks import View, Word
 from homer.structures.chunks.slots import TemplateSlot
-from homer.structures.links import Correspondence
+from homer.structures.links import Correspondence, Relation
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
 
@@ -29,6 +29,17 @@ def bubble_chamber():
         StructureCollection(),
         Mock(),
     )
+    word_concept = Concept(
+        Mock(), Mock(), "word", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(word_concept)
+    build_concept = Concept(
+        Mock(), Mock(), "build", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(build_concept)
+    relation = Relation(Mock(), Mock(), word_concept, build_concept, None, None, 1)
+    word_concept.links_out.add(relation)
+    build_concept.links_in.add(relation)
     text_concept = Concept(
         Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
     )

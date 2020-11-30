@@ -66,6 +66,12 @@ class CorrespondenceBuilder(Builder):
             parent_concept,
         )
 
+    @property
+    def _parent_link(self):
+        correspondence = self.bubble_chamber.concepts["correspondence"]
+        build = self.bubble_chamber.concepts["build"]
+        return correspondence.relations_with(build).get_random()
+
     def _passes_preliminary_checks(self):
         if self.target_space_two is None:
             try:
@@ -110,9 +116,6 @@ class CorrespondenceBuilder(Builder):
                 "end": self.target_structure_two,
             }
         )
-
-    def _boost_activations(self):
-        pass
 
     def _process_structure(self):
         parent_space = self.bubble_chamber.common_parent_space(

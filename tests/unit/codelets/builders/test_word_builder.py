@@ -8,7 +8,7 @@ from homer.structures.chunks import Word
 
 def test_successful_creates_word():
     bubble_chamber = Mock()
-    bubble_chamber.concepts = {"same": Mock()}
+    bubble_chamber.concepts = {"word": Mock(), "build": Mock(), "same": Mock()}
     target_view = Mock()
     target_view.output_space.contents = StructureCollection()
     target_correspondence = Mock()

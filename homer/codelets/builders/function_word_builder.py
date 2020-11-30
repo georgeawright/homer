@@ -38,15 +38,18 @@ class FunctionWordBuilder(Builder):
             codelet_id, parent_id, bubble_chamber, input_space, output_space, urgency
         )
 
+    @property
+    def _parent_link(self):
+        word = self.bubble_chamber.concepts["word"]
+        build = self.bubble_chamber.concepts["build"]
+        return word.relations_with(build).get_random()
+
     def _passes_preliminary_checks(self):
         self.template_word = self.input_space.contents.get_unhappy()
         for word in self.output_space.contents:
             if len(word.correspondences_with(self.template_word)) > 0:
                 return False
         return True
-
-    def _boost_activations(self):
-        pass
 
     def _calculate_confidence(self):
         self.confidence = 1.0

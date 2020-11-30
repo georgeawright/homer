@@ -44,6 +44,12 @@ class LabelBuilder(Builder):
             parent_concept,
         )
 
+    @property
+    def _parent_link(self):
+        label = self.bubble_chamber.concepts["label"]
+        build = self.bubble_chamber.concepts["build"]
+        return label.relations_with(build).get_random()
+
     def _passes_preliminary_checks(self):
         if self.parent_concept is None:
             self.parent_concept = (
@@ -58,9 +64,6 @@ class LabelBuilder(Builder):
         self.confidence = self.parent_concept.classifier.classify(
             {"concept": self.parent_concept, "start": self.target_chunk}
         )
-
-    def _boost_activations(self):
-        pass
 
     def _process_structure(self):
         space = self.parent_concept.parent_space.instance

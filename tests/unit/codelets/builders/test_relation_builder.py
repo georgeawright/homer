@@ -17,6 +17,7 @@ def parent_concept():
 @pytest.fixture
 def bubble_chamber(parent_concept):
     chamber = Mock()
+    chamber.concepts = {"relation": Mock(), "build": Mock()}
     relational_concept_space = Mock()
     relational_concept_space.contents = StructureCollection({parent_concept})
     relational_concept = Mock()

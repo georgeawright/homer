@@ -20,6 +20,7 @@ def parent_concept():
 @pytest.fixture
 def bubble_chamber(parent_concept):
     chamber = Mock()
+    chamber.concepts = {"label": Mock(), "build": Mock()}
     label_concept_space = Mock()
     label_concept_space.contents = StructureCollection({parent_concept})
     label_concept = Mock()

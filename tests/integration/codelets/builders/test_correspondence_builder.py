@@ -9,7 +9,7 @@ from homer.codelets.builders import CorrespondenceBuilder
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
-from homer.structures.links import Correspondence
+from homer.structures.links import Correspondence, Relation
 from homer.structures.spaces import ConceptualSpace, Frame, WorkingSpace
 
 
@@ -124,6 +124,27 @@ def bubble_chamber(
     chamber.concepts.add(more_concept)
     chamber.conceptual_spaces.add(correspondential_concepts_space)
     chamber.conceptual_spaces.add(labeling_spaces)
+    correspondence_concept = Concept(
+        Mock(),
+        Mock(),
+        "correspondence",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(correspondence_concept)
+    build_concept = Concept(
+        Mock(), Mock(), "build", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(build_concept)
+    relation = Relation(
+        Mock(), Mock(), correspondence_concept, build_concept, None, None, 1
+    )
+    correspondence_concept.links_out.add(relation)
+    build_concept.links_in.add(relation)
     return chamber
 
 

@@ -51,6 +51,12 @@ class ViewBuilder(Builder):
             urgency,
         )
 
+    @property
+    def _parent_link(self):
+        view = self.bubble_chamber.concepts["view"]
+        build = self.bubble_chamber.concepts["build"]
+        return view.relations_with(build).get_random()
+
     def _passes_preliminary_checks(self):
         try:
             self.second_target_correspondence = (
@@ -114,9 +120,6 @@ class ViewBuilder(Builder):
             )
         else:  # if there are 2 common arguments, the correspondences are equivalent/competing
             self.confidence = 0.0
-
-    def _boost_activations(self):
-        pass
 
     def _process_structure(self):
         view_output_space = WorkingSpace(

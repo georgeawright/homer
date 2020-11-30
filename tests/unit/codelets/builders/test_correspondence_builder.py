@@ -18,6 +18,7 @@ def parent_concept():
 @pytest.fixture
 def bubble_chamber(parent_concept):
     chamber = Mock()
+    chamber.concepts = {"correspondence": Mock(), "build": Mock()}
     labeling_spaces = Mock()
     labeling_spaces.child_spaces = StructureCollection({Mock(), Mock()})
     correspondential_concepts = Mock()

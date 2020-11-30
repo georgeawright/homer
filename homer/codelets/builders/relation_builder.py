@@ -54,6 +54,12 @@ class RelationBuilder(Builder):
             parent_concept=parent_concept,
         )
 
+    @property
+    def _parent_link(self):
+        relation = self.bubble_chamber.concepts["relation"]
+        build = self.bubble_chamber.concepts["build"]
+        return relation.relations_with(build).get_random()
+
     def _passes_preliminary_checks(self):
         if self.target_structure_two is None:
             self.target_structure_two = self.target_space.contents.of_type(
@@ -79,9 +85,6 @@ class RelationBuilder(Builder):
                 "end": self.target_structure_two,
             }
         )
-
-    def _boost_activations(self):
-        pass
 
     def _process_structure(self):
         relation = Relation(

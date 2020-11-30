@@ -9,7 +9,7 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
 from homer.structures.chunks import View
-from homer.structures.links import Correspondence
+from homer.structures.links import Correspondence, Relation
 from homer.structures.spaces import WorkingSpace
 
 
@@ -32,6 +32,17 @@ def bubble_chamber():
             Mock(), Mock(), "top level working", StructureCollection(), Mock(), Mock()
         )
     )
+    view_concept = Concept(
+        Mock(), Mock(), "view", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(view_concept)
+    build_concept = Concept(
+        Mock(), Mock(), "build", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(build_concept)
+    relation = Relation(Mock(), Mock(), view_concept, build_concept, None, None, 1)
+    view_concept.links_out.add(relation)
+    build_concept.links_in.add(relation)
     return chamber
 
 

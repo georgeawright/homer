@@ -48,6 +48,12 @@ class ChunkBuilder(Builder):
             urgency,
         )
 
+    @property
+    def _parent_link(self):
+        chunk = self.bubble_chamber.concepts["chunk"]
+        build = self.bubble_chamber.concepts["build"]
+        return chunk.relations_with(build).get_random()
+
     def _passes_preliminary_checks(self):
         try:
             self.second_target_chunk = self.target_chunk.nearby().get_random()
@@ -63,9 +69,6 @@ class ChunkBuilder(Builder):
             for space in self.target_chunk.parent_spaces
         ]
         self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
-
-    def _boost_activations(self):
-        pass
 
     def _process_structure(self):
         new_chunk_members = StructureCollection(

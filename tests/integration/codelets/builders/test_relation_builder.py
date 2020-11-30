@@ -100,6 +100,25 @@ def bubble_chamber(more_concept, relational_concepts_space):
     )
     chamber.concepts.add(more_concept)
     chamber.conceptual_spaces.add(relational_concepts_space)
+    relation_concept = Concept(
+        Mock(),
+        Mock(),
+        "relation",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(relation_concept)
+    build_concept = Concept(
+        Mock(), Mock(), "build", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(build_concept)
+    relation = Relation(Mock(), Mock(), relation_concept, build_concept, None, None, 1)
+    relation_concept.links_out.add(relation)
+    build_concept.links_in.add(relation)
     return chamber
 
 

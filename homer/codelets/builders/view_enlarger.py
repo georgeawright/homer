@@ -42,6 +42,12 @@ class ViewEnlarger(Builder):
             urgency,
         )
 
+    @property
+    def _parent_link(self):
+        view = self.bubble_chamber.concepts["view"]
+        build = self.bubble_chamber.concepts["build"]
+        return view.relations_with(build).get_random()
+
     def _passes_preliminary_checks(self):
         try:
             self.candidate_member = self.target_view.nearby().get_random()
@@ -104,9 +110,6 @@ class ViewEnlarger(Builder):
             return (confidence, None)
         else:  # if there are 2 common arguments, the correspondences are equivalent/competing
             return (0.0, None)
-
-    def _boost_activations(self):
-        pass
 
     def _process_structure(self):
         self.target_view.members.add(self.candidate_member)

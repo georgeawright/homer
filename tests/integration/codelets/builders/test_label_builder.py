@@ -9,7 +9,7 @@ from homer.codelets.builders import LabelBuilder
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
-from homer.structures.links import Label
+from homer.structures.links import Label, Relation
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
@@ -81,6 +81,25 @@ def bubble_chamber(mild_concept, label_concepts_space):
     )
     chamber.concepts.add(mild_concept)
     chamber.conceptual_spaces.add(label_concepts_space)
+    label_concept = Concept(
+        Mock(),
+        Mock(),
+        "label",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(label_concept)
+    build_concept = Concept(
+        Mock(), Mock(), "build", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(build_concept)
+    relation = Relation(Mock(), Mock(), label_concept, build_concept, None, None, 1)
+    label_concept.links_out.add(relation)
+    build_concept.links_in.add(relation)
     return chamber
 
 
