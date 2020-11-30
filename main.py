@@ -76,7 +76,6 @@ bubble_chamber.concepts.add(input_concept)
 input_space = WorkingSpace(
     "input_space", "", "input", StructureCollection(), 0.0, input_concept
 )
-print(input_space.parent_concept.structure_id)
 logger.log(input_space)
 bubble_chamber.working_spaces.add(input_space)
 top_level_working_space.child_spaces.add(input_space)
