@@ -69,6 +69,7 @@ class ChunkEnlarger(Builder):
 
     def _process_structure(self):
         self.target_chunk.add_member(self.candidate_member)
+        self.bubble_chamber.logger.log(self.target_chunk)
 
     def _engender_follow_up(self):
         self.child_codelets.append(
