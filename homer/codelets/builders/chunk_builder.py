@@ -54,10 +54,7 @@ class ChunkBuilder(Builder):
         except MissingStructureError:
             return False
         return not self.bubble_chamber.has_chunk(
-            StructureCollection.union(
-                self.target_chunk.members,
-                StructureCollection({self.second_target_chunk}),
-            )
+            StructureCollection({self.target_chunk, self.second_target_chunk})
         )
 
     def _calculate_confidence(self):
@@ -71,9 +68,8 @@ class ChunkBuilder(Builder):
         pass
 
     def _process_structure(self):
-        new_chunk_members = StructureCollection.union(
-            self.target_chunk.members,
-            StructureCollection({self.second_target_chunk}),
+        new_chunk_members = StructureCollection(
+            {self.target_chunk, self.second_target_chunk}
         )
         new_chunk_neighbours = StructureCollection.union(
             self.target_chunk.neighbours, self.second_target_chunk.neighbours
@@ -92,6 +88,7 @@ class ChunkBuilder(Builder):
         )
         self.bubble_chamber.chunks.add(chunk)
         self.child_structure = chunk
+        self.bubble_chamber.logger.log(self.child_structure)
 
     def _get_average_value(self, chunks: StructureCollection):
         values = []
