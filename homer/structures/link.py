@@ -28,6 +28,7 @@ class Link(Structure):
         self.start = start
         self.end = end
         self.parent_concept = parent_concept
+        self.value = parent_concept.name if hasattr(parent_concept, "name") else None
         self.parent_space = parent_space
         self.parent_spaces = StructureCollection({parent_space})
 
