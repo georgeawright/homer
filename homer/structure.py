@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC
+import statistics
 
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
@@ -20,6 +21,7 @@ class Structure(ABC):
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
+        parent_chunks: StructureCollection = None,
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
@@ -27,10 +29,12 @@ class Structure(ABC):
         self._quality = quality
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
+        self.parent_chunks = (
+            StructureCollection() if parent_chunks is None else parent_chunks
+        )
         self._activation = FloatBetweenOneAndZero(0)
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
-        self._unhappiness = FloatBetweenOneAndZero(1)
 
     @property
     def coordinates(self) -> list:
@@ -54,7 +58,19 @@ class Structure(ABC):
 
     @property
     def unhappiness(self) -> FloatBetweenOneAndZero:
-        return self._unhappiness
+        return statistics.fmean([self.unchunkedness, self.unlinkedness])
+
+    @property
+    def unchunkedness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** len(self.parent_chunks)
+
+    @property
+    def unlinkedness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** len(self.links)
+
+    @property
+    def links(self) -> StructureCollection:
+        return StructureCollection.union(self.links_in, self.links_out)
 
     @property
     def correspondences(self) -> StructureCollection:

@@ -6,6 +6,39 @@ from homer.structures import Lexeme
 from homer.structures.links import Correspondence, Label, Relation
 
 
+def test_unchunkedness():
+    structure = Structure(Mock(), Mock(), Mock(), Mock())
+    assert 1 == structure.unchunkedness
+    structure.parent_chunks.add(Mock())
+    assert 0.5 == structure.unchunkedness
+    structure.parent_chunks.add(Mock())
+    assert 0.25 == structure.unchunkedness
+
+
+def test_unlinkedness():
+    structure = Structure(Mock(), Mock(), Mock(), Mock())
+    assert 1 == structure.unlinkedness
+    structure.links_in.add(Mock())
+    assert 0.5 == structure.unlinkedness
+    structure.links_out.add(Mock())
+    assert 0.25 == structure.unlinkedness
+    link = Mock()
+    structure.links_in.add(link)
+    structure.links_out.add(link)
+    assert 0.125 == structure.unlinkedness
+
+
+def test_unhappiness():
+    structure = Structure(Mock(), Mock(), Mock(), Mock())
+    assert 1 == structure.unhappiness
+    structure.parent_chunks.add(Mock())
+    assert 0.75 == structure.unhappiness
+    structure.links_in.add(Mock())
+    assert 0.5 == structure.unhappiness
+    structure.links_out.add(Mock())
+    assert 0.375 == structure.unhappiness
+
+
 def test_correspondences_returns_correspondences():
     number_of_correspondences = 10
     links_in = StructureCollection()
