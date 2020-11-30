@@ -105,7 +105,9 @@ def run_view(request, run_id):
         for i in range(last_row + 1):
             output += "<tr>"
             for j in range(last_column + 1):
-                if original_chunks_matrix[i][j] in chunk.members.all():
+                print(original_chunks_matrix[i][j])
+                print(_chunk_members(chunk))
+                if original_chunks_matrix[i][j] in _chunk_members(chunk):
                     output += '<td style="background-color: coral;">'
                 else:
                     output += "<td>"
@@ -132,6 +134,20 @@ def run_view(request, run_id):
         output += "<br>"
 """
     return HttpResponse(output)
+
+
+def _chunk_members(chunk):
+    members = []
+    uncounted = set(chunk.members.all())
+    counted = set()
+    while len(uncounted) > 0:
+        item = uncounted.pop()
+        if item in counted:
+            continue
+        counted.add(item)
+        for member in item.members.all():
+            uncounted.add(member)
+    return counted
 
 
 def coderack_population_view(request, run_id):
