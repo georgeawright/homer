@@ -86,6 +86,8 @@ class ChunkBuilder(Builder):
             self.confidence,
             self.target_chunk.parent_spaces,
         )
+        for member in new_chunk_members:
+            member.parent_chunks.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         self.child_structure = chunk
         self.bubble_chamber.logger.log(self.child_structure)
