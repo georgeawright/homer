@@ -67,6 +67,7 @@ class LabelBuilder(Builder):
 
     def _process_structure(self):
         space = self.parent_concept.parent_space.instance
+        self.bubble_chamber.logger.log(space)
         label = Label(
             ID.new(Label),
             self.codelet_id,

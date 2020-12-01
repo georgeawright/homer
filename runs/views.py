@@ -76,7 +76,7 @@ def run_view(request, run_id):
             original_chunk = original_chunks_matrix[i][j]
             output += "".join(
                 [
-                    f"{link.value} ({link.quality})<br>"
+                    f"{link.value} ({link.quality[-1]})<br>"
                     for link in original_chunk.links.all()
                     if re.match(r"^Label*", link.structure_id)
                 ]
@@ -96,7 +96,7 @@ def run_view(request, run_id):
         output += f"<h3>{chunk.structure_id}</h3>"
         output += "".join(
             [
-                f"{link.value} ({link.quality})<br>"
+                f"{link.value} ({link.quality[-1]})<br>"
                 for link in chunk.links.all()
                 if re.match(r"^Label*", link.structure_id)
             ]
@@ -122,9 +122,11 @@ def run_view(request, run_id):
     for relation in relations:
         output += (
             f"{relation.structure_id}: "
-            + f"{relation.start.structure_id} "
-            + f"--{relation.value}-->"
-            + f"{relation.end.structure_id} "
+            + f"{relation.value}("
+            + f"{relation.parent_space.structure_id}, "
+            + f"{relation.start.structure_id}, "
+            + f"{relation.end.structure_id}) "
+            + f"({relation.quality[-1]})"
         )
         output += "<br>"
     return HttpResponse(output)

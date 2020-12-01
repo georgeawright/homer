@@ -58,6 +58,13 @@ class StructureRecord(models.Model):
         blank=True,
         null=True,
     )
+    parent_space = models.ForeignKey(
+        "StructureRecord",
+        related_name="_parent_space",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     parent_codelet = models.ForeignKey(
         "CodeletRecord", on_delete=models.CASCADE, blank=True, null=True
     )

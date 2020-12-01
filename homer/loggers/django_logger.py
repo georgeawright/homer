@@ -153,6 +153,11 @@ class DjangoLogger(Logger):
             structure_record.parent_concept = StructureRecord.objects.get(
                 structure_id=structure.parent_concept.structure_id, run_id=self.run
             )
+        if hasattr(structure, "parent_space") and structure.parent_space is not None:
+            print(structure.parent_space.structure_id)
+            structure_record.parent_space = StructureRecord.objects.get(
+                structure_id=structure.parent_space.structure_id, run_id=self.run
+            )
         if hasattr(structure, "members") and structure.members is not None:
             for member in structure.members:
                 member_record = StructureRecord.objects.get(
