@@ -36,6 +36,7 @@ def run_view(request, run_id):
     output += '<p><a href="codelets">Codelets</a></p>'
     output += '<p><a href="structures">Structures</a></p>'
     output += f'<img src="/runs/{run_id}/coderack_population">'
+    output += f'<img src="/runs/{run_id}/bubble_chamber_satisfaction">'
     structure_records = StructureRecord.objects.filter(run_id=run_id).all()
     last_column = 0
     last_row = 0
@@ -154,6 +155,22 @@ def coderack_population_view(request, run_id):
     pyplot.title("Coderack Population")
     pyplot.xlabel("Codelets Run")
     pyplot.ylabel("Codelets on Rack")
+    pyplot.plot(x, y)
+    buf = io.BytesIO()
+    pyplot.savefig(buf, format="svg", bbox_inches="tight")
+    svg = buf.getvalue()
+    buf.close()
+    return HttpResponse(svg, content_type="image/svg+xml")
+
+
+def bubble_chamber_satisfaction_view(request, run_id):
+    coderack_record = CoderackRecord.objects.get(run_id=run_id)
+    x = coderack_record.codelets_run
+    y = coderack_record.satisfaction
+    pyplot.clf()
+    pyplot.title("Bubble Chamber Satisfaction")
+    pyplot.xlabel("Codelets Run")
+    pyplot.ylabel("Satisfaction")
     pyplot.plot(x, y)
     buf = io.BytesIO()
     pyplot.savefig(buf, format="svg", bbox_inches="tight")

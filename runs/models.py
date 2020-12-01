@@ -38,6 +38,7 @@ class CoderackRecord(models.Model):
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE, unique=True)
     codelets_run = models.JSONField("Codelets Run")
     population = models.JSONField("Population")
+    satisfaction = models.JSONField("Satisfaction")
 
 
 class StructureRecord(models.Model):

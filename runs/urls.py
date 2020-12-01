@@ -12,6 +12,11 @@ urlpatterns = [
         views.coderack_population_view,
         name="coderack_population",
     ),
+    path(
+        "<int:run_id>/bubble_chamber_satisfaction",
+        views.bubble_chamber_satisfaction_view,
+        name="bubble_chamber_satisfaction",
+    ),
     path("<int:run_id>/codelets/<str:codelet_id>/", views.codelet_view, name="codelet"),
     path(
         "<int:run_id>/structures/<str:structure_id>/",
