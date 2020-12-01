@@ -105,8 +105,6 @@ def run_view(request, run_id):
         for i in range(last_row + 1):
             output += "<tr>"
             for j in range(last_column + 1):
-                print(original_chunks_matrix[i][j])
-                print(_chunk_members(chunk))
                 if original_chunks_matrix[i][j] in _chunk_members(chunk):
                     output += '<td style="background-color: coral;">'
                 else:
@@ -115,24 +113,20 @@ def run_view(request, run_id):
                 output += "</td>"
             output += "</tr>"
         output += "</table>"
-        """
-    correspondences = [
+    relations = [
         structure
         for structure in structure_records
-        if re.match(r"^Correspondence*", structure.structure_id)
+        if re.match(r"^Relation*", structure.structure_id)
     ]
-    output += "<h2>Correspondences</h2>"
-    for correspondence in correspondences:
+    output += "<h2>Relations</h2>"
+    for relation in relations:
         output += (
-            f"{correspondence.structure_id}: "
-            + f"{correspondence.first_argument} "
-            + f"--> {correspondence.second_argument} "
+            f"{relation.structure_id}: "
+            + f"{relation.start.structure_id} "
+            + f"--{relation.value}-->"
+            + f"{relation.end.structure_id} "
         )
-        for connection in correspondence.connections.all():
-            if re.match(r"^Label*", connection.structure_id):
-                output += f"({connection.value})"
         output += "<br>"
-"""
     return HttpResponse(output)
 
 
