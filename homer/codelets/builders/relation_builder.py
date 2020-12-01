@@ -108,7 +108,7 @@ class RelationBuilder(Builder):
         self.bubble_chamber.logger.log(relation)
 
     def _engender_follow_up(self):
-        new_target = self.target_space.contents.get_unhappy()
+        new_target = self.target_space.contents.of_type(Chunk).get_unhappy()
         self.child_codelets.append(
             RelationBuilder.spawn(
                 self.codelet_id,
