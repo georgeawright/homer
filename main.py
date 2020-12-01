@@ -5,7 +5,6 @@ from homer.classifiers import (
     DifferenceClassifier,
     DifferentnessClassifier,
     SamenessClassifier,
-    StretchyProximityClassifier,
     ProximityClassifier,
 )
 from homer.id import ID
@@ -293,7 +292,7 @@ temperature_concept.child_spaces.add(temperature_space)
 hot = Concept.new(
     "hot",
     [22],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     temperature_space,
     "value",
     StructureCollection(),
@@ -315,7 +314,7 @@ bubble_chamber.lexemes.add(hot_lexeme)
 warm = Concept.new(
     "warm",
     [16],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     temperature_space,
     "value",
     StructureCollection(),
@@ -337,7 +336,7 @@ bubble_chamber.lexemes.add(warm_lexeme)
 mild = Concept.new(
     "mild",
     [10],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     temperature_space,
     "value",
     StructureCollection(),
@@ -359,7 +358,7 @@ bubble_chamber.lexemes.add(mild_lexeme)
 cold = Concept.new(
     "cold",
     [4],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     temperature_space,
     "value",
     StructureCollection(),
@@ -399,7 +398,7 @@ location_concept.child_spaces.add(location_space)
 north = Concept.new(
     "north",
     [0, 2],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
@@ -421,7 +420,7 @@ bubble_chamber.lexemes.add(north_lexeme)
 south = Concept.new(
     "south",
     [5, 2],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
@@ -443,7 +442,7 @@ bubble_chamber.lexemes.add(south_lexeme)
 east = Concept.new(
     "east",
     [2.5, 4],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
@@ -465,7 +464,7 @@ bubble_chamber.lexemes.add(east_lexeme)
 west = Concept.new(
     "west",
     [2.5, 0],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
@@ -487,7 +486,7 @@ bubble_chamber.lexemes.add(west_lexeme)
 northwest = Concept.new(
     "northwest",
     [0, 0],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
@@ -509,7 +508,7 @@ bubble_chamber.lexemes.add(northwest_lexeme)
 northeast = Concept.new(
     "northeast",
     [0, 4],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
@@ -531,7 +530,7 @@ bubble_chamber.lexemes.add(northeast_lexeme)
 southwest = Concept.new(
     "southwest",
     [5, 0],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
@@ -553,7 +552,7 @@ bubble_chamber.lexemes.add(southwest_lexeme)
 southeast = Concept.new(
     "southeast",
     [5, 4],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
@@ -575,7 +574,7 @@ bubble_chamber.lexemes.add(southeast_lexeme)
 midlands = Concept.new(
     "midlands",
     [2.5, 2],
-    StretchyProximityClassifier(),
+    ProximityClassifier(),
     location_space,
     "coordinates",
     StructureCollection(),
