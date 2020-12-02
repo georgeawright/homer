@@ -104,8 +104,8 @@ build_concept = Concept.new(
     StructureCollection(),
     None,
 )
-logger.log(build_concept)
 build_concept._activation = 1.0
+logger.log(build_concept)
 bubble_chamber.concepts.add(build_concept)
 evaluate_concept = Concept.new(
     "evaluate",
