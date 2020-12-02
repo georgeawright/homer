@@ -66,6 +66,7 @@ class BubbleChamber:
     def update_activations(self) -> None:
         for structure in self.structures:
             structure.update_activation()
+            self.logger.log(structure)
 
     def has_chunk(self, members: StructureCollection) -> bool:
         for chunk in self.chunks:
