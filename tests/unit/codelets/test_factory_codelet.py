@@ -89,17 +89,28 @@ def bubble_chamber(
     bubble_chamber.views = StructureCollection({Mock()})
     activities = Mock()
     activities.name = "activities"
-    bubble_chamber.spaces = StructureCollection({activities})
+    structures = Mock()
+    structures.name = "structures"
+    structures.contents = StructureCollection(
+        {
+            chunk_concept,
+            correspondence_concept,
+            label_concept,
+            relation_concept,
+            view_concept,
+            word_concept,
+        }
+    )
+    bubble_chamber.spaces = StructureCollection({activities, structures})
     bubble_chamber.satisfaction = 0
     return bubble_chamber
 
 
-@pytest.mark.skip
 def test_engenders_chunk_builder(bubble_chamber, build_concept, chunk_concept):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = chunk_concept
-    build_concept.links_out.get_active.return_value = link
+    build_concept.links_out = StructureCollection({link})
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
@@ -134,7 +145,7 @@ def test_engenders_label_builder(bubble_chamber, build_concept, label_concept):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = label_concept
-    build_concept.links_out.get_active.return_value = link
+    build_concept.links_out = StructureCollection({link})
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
@@ -146,12 +157,11 @@ def test_engenders_label_builder(bubble_chamber, build_concept, label_concept):
     )
 
 
-@pytest.mark.skip
 def test_engenders_relation_builder(bubble_chamber, build_concept, relation_concept):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = relation_concept
-    build_concept.links_out.get_active.return_value = link
+    build_concept.links_out = StructureCollection({link})
     factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
