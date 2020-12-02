@@ -270,6 +270,10 @@ link_concepts(select_concept, label_concept)
 link_concepts(select_concept, relation_concept)
 link_concepts(select_concept, view_concept)
 
+link_concepts(build_concept, evaluate_concept, activation=1.0)
+link_concepts(evaluate_concept, select_concept, activation=1.0)
+link_concepts(select_concept, build_concept, activation=1.0)
+
 
 temperature_concept = Concept.new(
     "temperature",
