@@ -28,6 +28,9 @@ def index(request):
 
 
 def run_view(request, run_id):
+    def last_value_of_dict(dictionary):
+        return dictionary[max(k for k in dictionary.keys())]
+
     coderack_record = CoderackRecord.objects.get(run_id=run_id)
     output = "<h1>Basic Run information:</h1>"
     output += "<ul>"
@@ -77,7 +80,7 @@ def run_view(request, run_id):
             original_chunk = original_chunks_matrix[i][j]
             output += "".join(
                 [
-                    f"{link.value} ({link.quality[-1]})<br>"
+                    f"{link.value} " + str(last_value_of_dict(link.quality)) + "<br>"
                     for link in original_chunk.links.all()
                     if re.match(r"^Label*", link.structure_id)
                 ]
@@ -97,7 +100,7 @@ def run_view(request, run_id):
         output += f"<h3>{chunk.structure_id}</h3>"
         output += "".join(
             [
-                f"{link.value} ({link.quality[-1]})<br>"
+                f"{link.value} " + str(last_value_of_dict(link.quality)) + "<br>"
                 for link in chunk.links.all()
                 if re.match(r"^Label*", link.structure_id)
             ]
@@ -127,7 +130,7 @@ def run_view(request, run_id):
             + f"{relation.parent_space.structure_id}, "
             + f"{relation.start.structure_id}, "
             + f"{relation.end.structure_id}) "
-            + f"({relation.quality[-1]})"
+            + str(last_value_of_dict(relation.quality))
         )
         output += "<br>"
     return HttpResponse(output)
@@ -172,6 +175,32 @@ def bubble_chamber_satisfaction_view(request, run_id):
     pyplot.xlabel("Codelets Run")
     pyplot.ylabel("Satisfaction")
     pyplot.plot(x, y)
+    buf = io.BytesIO()
+    pyplot.savefig(buf, format="svg", bbox_inches="tight")
+    svg = buf.getvalue()
+    buf.close()
+    return HttpResponse(svg, content_type="image/svg+xml")
+
+
+def activity_and_structure_concepts_view(request, run_id):
+    build_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="build"
+    )
+    evaluate_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="evaluate"
+    )
+    select_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="select"
+    )
+    pyplot.clf()
+    for concept_record in [build_record, evaluate_record, select_record]:
+        x = list(concept_record.activation.keys())  # codelets run
+        y = list(concept_record.activation.values())  # activation
+        pyplot.plot(x, y, label=concept_record.value)
+    pyplot.title("Activity and Structure Concept Activations")
+    pyplot.xlabel("Codelets Run")
+    pyplot.ylabel("Activation")
+    pyplot.legend(loc="best")
     buf = io.BytesIO()
     pyplot.savefig(buf, format="svg", bbox_inches="tight")
     svg = buf.getvalue()

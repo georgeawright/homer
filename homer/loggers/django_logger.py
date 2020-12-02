@@ -127,15 +127,18 @@ class DjangoLogger(Logger):
                 location=structure.location.coordinates
                 if structure.location is not None
                 else None,
-                activation=[structure.activation],
-                unhappiness=[structure.unhappiness],
-                quality=[structure.quality],
+                activation={},
+                unhappiness={},
+                quality={},
             )
             self._log_message(
                 f"{structure.structure_id} created "
                 + f" by {structure.parent_id} - value: {structure.value}; "
                 + f"location: {structure.location}; activation: {structure.activation}"
             )
+        structure_record.activation[self.codelets_run] = structure.activation
+        structure_record.unhappiness[self.codelets_run] = structure.unhappiness
+        structure_record.quality[self.codelets_run] = structure.quality
         if structure.parent_id != "":
             parent_codelet = CodeletRecord.objects.get(
                 codelet_id=structure.parent_id, run_id=self.run
