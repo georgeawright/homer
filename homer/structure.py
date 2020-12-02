@@ -216,6 +216,8 @@ class Structure(ABC):
                 pass
 
     def update_activation(self):
+        if self._activation_buffer == 0.0:
+            self.decay_activation()
         self._activation = FloatBetweenOneAndZero(
             self._activation + self._activation_buffer
         )
