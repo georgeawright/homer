@@ -56,6 +56,7 @@ bubble_chamber = BubbleChamber(
     StructureCollection(),
     StructureCollection(),
     StructureCollection(),
+    StructureCollection(),
     logger,
 )
 bubble_chamber.lexemes = StructureCollection()
@@ -378,6 +379,7 @@ cold_lexeme = Lexeme.new(
     },
     cold,
 )
+logger.log(cold_lexeme)
 bubble_chamber.lexemes.add(cold_lexeme)
 
 location_concept = Concept.new(
@@ -986,6 +988,10 @@ template_4.contents.add(word_than)
 template_4.contents.add(word_the_2)
 template_4.contents.add(slot_location_2)
 bubble_chamber.conceptual_spaces.add(template_4)
+
+for concept in bubble_chamber.concepts:
+    for link in concept.links_out:
+        bubble_chamber.concept_links.add(link)
 
 relative_neighbour_coordinates = [
     (-1, 0),
