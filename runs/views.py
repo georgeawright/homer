@@ -195,7 +195,6 @@ def activity_and_structure_concepts_view(request, run_id):
     select_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="select"
     )
-    print(build_record.links)
     build_relations = (
         build_record.links.filter(~Q(end=evaluate_record))
         .filter(~Q(end=build_record))
@@ -221,9 +220,7 @@ def activity_and_structure_concepts_view(request, run_id):
             (int(codelets_run), activation)
             for codelets_run, activation in concept_record.activation.items()
         ]
-        print(data)
         data.sort()
-        print(data)
         x = [codelets_run for codelets_run, _ in data]
         y = [activation for _, activation in data]
         charts[0, 0].plot(x, y, label=concept_record.value)
@@ -236,9 +233,7 @@ def activity_and_structure_concepts_view(request, run_id):
             (int(codelets_run), activation)
             for codelets_run, activation in relation.activation.items()
         ]
-        print(data)
         data.sort()
-        print(data)
         x = [codelets_run for codelets_run, _ in data]
         y = [activation for _, activation in data]
         charts[0, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
@@ -251,9 +246,7 @@ def activity_and_structure_concepts_view(request, run_id):
             (int(codelets_run), activation)
             for codelets_run, activation in relation.activation.items()
         ]
-        print(data)
         data.sort()
-        print(data)
         x = [codelets_run for codelets_run, _ in data]
         y = [activation for _, activation in data]
         charts[1, 0].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
@@ -266,9 +259,7 @@ def activity_and_structure_concepts_view(request, run_id):
             (int(codelets_run), activation)
             for codelets_run, activation in relation.activation.items()
         ]
-        print(data)
         data.sort()
-        print(data)
         x = [codelets_run for codelets_run, _ in data]
         y = [activation for _, activation in data]
         charts[1, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
