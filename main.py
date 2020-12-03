@@ -18,6 +18,9 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
 from homer.word_form import WordForm
 
+path_to_logs = "logs"
+logger = DjangoLogger.setup(path_to_logs)
+
 
 def link_concepts(concept_1, concept_2, activation=0.0):
     relation = Relation(ID.new(Relation), "", concept_1, concept_2, None, None, 1.0)
@@ -26,6 +29,7 @@ def link_concepts(concept_1, concept_2, activation=0.0):
     concept_1.links_out.add(relation)
     concept_2.links_in.add(relation)
     concept_2.links_out.add(relation)
+    logger.log(relation)
     return relation
 
 
@@ -37,9 +41,6 @@ problem = [
     [13, 20, 22, 19, 21],
     [22, 22, 24, 23, 22],
 ]
-
-path_to_logs = "logs"
-logger = DjangoLogger.setup(path_to_logs)
 
 top_level_conceptual_space = ConceptualSpace(
     "top_level_space", "", "top level", StructureCollection(), None
