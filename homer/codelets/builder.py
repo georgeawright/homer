@@ -14,21 +14,25 @@ class Builder(Codelet):
         self, codelet_id: str, parent_id: str, urgency: FloatBetweenOneAndZero
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
+        self.confidence = 0.0
 
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
-            self._parent_link.decay_activation()
+            self._parent_link.decay_activation(1 - self.confidence)
+            self.bubble_chamber.logger.log(self._parent_link)
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return self.result
         self._calculate_confidence()
         if abs(self.confidence) > self.CONFIDENCE_THRESHOLD:
-            self._parent_link.boost_activation()
+            self._parent_link.boost_activation(self.confidence)
+            self.bubble_chamber.logger.log(self._parent_link)
             self._process_structure()
             self._engender_follow_up()
             self.result = CodeletResult.SUCCESS
             return self.result
-        self._parent_link.decay_activation()
+        self._parent_link.decay_activation(1 - self.confidence)
+        self.bubble_chamber.logger.log(self._parent_link)
         self._fail()
         self.result = CodeletResult.FAIL
         return CodeletResult.FAIL
