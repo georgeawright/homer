@@ -96,6 +96,7 @@ def bubble_chamber(more_concept, relational_concepts_space):
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chamber.concepts.add(more_concept)
