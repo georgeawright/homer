@@ -38,4 +38,5 @@ class Link(Structure):
     def spread_activation(self):
         if not self.is_fully_active():
             return
-        self.parent_concept.boost_activation()
+        if self.parent_concept is not None:
+            self.parent_concept.boost_activation()
