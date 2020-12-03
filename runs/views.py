@@ -217,32 +217,60 @@ def activity_and_structure_concepts_view(request, run_id):
     figure.suptitle("Activity and Structure Concept Activations")
 
     for concept_record in [build_record, evaluate_record, select_record]:
-        x = list(concept_record.activation.keys())  # codelets run
-        y = list(concept_record.activation.values())  # activation
+        data = [
+            (codelets_run, activation)
+            for codelets_run, activation in concept_record.activation.items()
+        ]
+        print(data)
+        data.sort()
+        print(data)
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
         charts[0, 0].plot(x, y, label=concept_record.value)
     charts[0, 0].set_title("Activity Concept Activations")
     charts[0, 0].set(xlabel="Codelets Run", ylabel="Activation")
     charts[0, 0].legend(loc="best")
 
     for relation in build_relations:
-        x = list(relation.activation.keys())
-        y = list(relation.activation.values())
+        data = [
+            (codelets_run, activation)
+            for codelets_run, activation in relation.activation.items()
+        ]
+        print(data)
+        data.sort()
+        print(data)
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
         charts[0, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
     charts[0, 1].set_title("Activations of structure relations with build concept")
     charts[0, 1].set(xlabel="Codelets Run", ylabel="Activation")
     charts[0, 1].legend(loc="best")
 
     for relation in evaluate_relations:
-        x = list(relation.activation.keys())
-        y = list(relation.activation.values())
+        data = [
+            (codelets_run, activation)
+            for codelets_run, activation in relation.activation.items()
+        ]
+        print(data)
+        data.sort()
+        print(data)
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
         charts[1, 0].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
     charts[1, 0].set_title("Activations of structure relations with evaluate concept")
     charts[1, 0].set(xlabel="Codelets Run", ylabel="Activation")
     charts[1, 0].legend(loc="best")
 
     for relation in select_relations:
-        x = list(relation.activation.keys())
-        y = list(relation.activation.values())
+        data = [
+            (codelets_run, activation)
+            for codelets_run, activation in relation.activation.items()
+        ]
+        print(data)
+        data.sort()
+        print(data)
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
         charts[1, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
     charts[1, 1].set_title("Activations of structure relations with select concept")
     charts[1, 1].set(xlabel="Codelets Run", ylabel="Activation")
