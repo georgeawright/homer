@@ -218,7 +218,7 @@ def activity_and_structure_concepts_view(request, run_id):
 
     for concept_record in [build_record, evaluate_record, select_record]:
         data = [
-            (codelets_run, activation)
+            (int(codelets_run), activation)
             for codelets_run, activation in concept_record.activation.items()
         ]
         print(data)
@@ -233,7 +233,7 @@ def activity_and_structure_concepts_view(request, run_id):
 
     for relation in build_relations:
         data = [
-            (codelets_run, activation)
+            (int(codelets_run), activation)
             for codelets_run, activation in relation.activation.items()
         ]
         print(data)
@@ -248,7 +248,7 @@ def activity_and_structure_concepts_view(request, run_id):
 
     for relation in evaluate_relations:
         data = [
-            (codelets_run, activation)
+            (int(codelets_run), activation)
             for codelets_run, activation in relation.activation.items()
         ]
         print(data)
@@ -263,7 +263,7 @@ def activity_and_structure_concepts_view(request, run_id):
 
     for relation in select_relations:
         data = [
-            (codelets_run, activation)
+            (int(codelets_run), activation)
             for codelets_run, activation in relation.activation.items()
         ]
         print(data)
