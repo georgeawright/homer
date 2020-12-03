@@ -45,7 +45,7 @@ class StructureRecord(models.Model):
     structure_id = models.CharField("Structure ID", max_length=MAX_STRING_LENGTH)
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
     time_created = models.IntegerField("Time Created")
-    value = models.CharField("Value", max_length=MAX_STRING_LENGTH)
+    value = models.CharField("Value", max_length=MAX_STRING_LENGTH, null=True)
     location = models.JSONField("location", null=True)
     links = models.ManyToManyField("self", blank=True, null=True)
     members = models.ManyToManyField("self", blank=True, null=True)

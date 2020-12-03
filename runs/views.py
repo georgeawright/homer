@@ -124,15 +124,18 @@ def run_view(request, run_id):
     ]
     output += "<h2>Relations</h2>"
     for relation in relations:
-        output += (
-            f"{relation.structure_id}: "
-            + f"{relation.value}("
-            + f"{relation.parent_space.structure_id}, "
-            + f"{relation.start.structure_id}, "
-            + f"{relation.end.structure_id}) "
-            + str(last_value_of_dict(relation.quality))
-        )
-        output += "<br>"
+        try:
+            output += (
+                f"{relation.structure_id}: "
+                + f"{relation.value}("
+                + f"{relation.parent_space.structure_id}, "
+                + f"{relation.start.structure_id}, "
+                + f"{relation.end.structure_id}) "
+                + str(last_value_of_dict(relation.quality))
+            )
+            output += "<br>"
+        except AttributeError:
+            pass  # relations with no parent space are links between concepts
     return HttpResponse(output)
 
 
@@ -192,17 +195,61 @@ def activity_and_structure_concepts_view(request, run_id):
     select_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="select"
     )
+    print(build_record.links)
+    build_relations = (
+        build_record.links.filter(~Q(end=evaluate_record))
+        .filter(~Q(end=build_record))
+        .all()
+    )
+    evaluate_relations = (
+        evaluate_record.links.filter(~Q(end=select_record))
+        .filter(~Q(end=evaluate_record))
+        .all()
+    )
+    select_relations = (
+        select_record.links.filter(~Q(end=build_record))
+        .filter(~Q(end=select_record))
+        .all()
+    )
+
     pyplot.clf()
+    figure, charts = pyplot.subplots(nrows=2, ncols=2, figsize=(15, 10))
+    figure.suptitle("Activity and Structure Concept Activations")
+
     for concept_record in [build_record, evaluate_record, select_record]:
         x = list(concept_record.activation.keys())  # codelets run
         y = list(concept_record.activation.values())  # activation
-        pyplot.plot(x, y, label=concept_record.value)
-    pyplot.title("Activity and Structure Concept Activations")
-    pyplot.xlabel("Codelets Run")
-    pyplot.ylabel("Activation")
-    pyplot.legend(loc="best")
+        charts[0, 0].plot(x, y, label=concept_record.value)
+    charts[0, 0].set_title("Activity Concept Activations")
+    charts[0, 0].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[0, 0].legend(loc="best")
+
+    for relation in build_relations:
+        x = list(relation.activation.keys())
+        y = list(relation.activation.values())
+        charts[0, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[0, 1].set_title("Activations of structure relations with build concept")
+    charts[0, 1].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[0, 1].legend(loc="best")
+
+    for relation in evaluate_relations:
+        x = list(relation.activation.keys())
+        y = list(relation.activation.values())
+        charts[1, 0].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[1, 0].set_title("Activations of structure relations with evaluate concept")
+    charts[1, 0].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[1, 0].legend(loc="best")
+
+    for relation in select_relations:
+        x = list(relation.activation.keys())
+        y = list(relation.activation.values())
+        charts[1, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[1, 1].set_title("Activations of structure relations with select concept")
+    charts[1, 1].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[1, 1].legend(loc="best")
+
     buf = io.BytesIO()
-    pyplot.savefig(buf, format="svg", bbox_inches="tight")
+    figure.savefig(buf, format="svg", bbox_inches="tight")
     svg = buf.getvalue()
     buf.close()
     return HttpResponse(svg, content_type="image/svg+xml")
