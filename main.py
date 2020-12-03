@@ -25,10 +25,8 @@ logger = DjangoLogger.setup(path_to_logs)
 def link_concepts(concept_1, concept_2, activation=0.0):
     relation = Relation(ID.new(Relation), "", concept_1, concept_2, None, None, 1.0)
     relation._activation = activation
-    concept_1.links_in.add(relation)
     concept_1.links_out.add(relation)
     concept_2.links_in.add(relation)
-    concept_2.links_out.add(relation)
     logger.log(relation)
     return relation
 
