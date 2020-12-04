@@ -7,7 +7,9 @@ from .id import ID
 from .logger import Logger
 from .problem import Problem
 from .structure_collection import StructureCollection
-from .structures import Space
+from .structures import Chunk, Space
+from .structures.chunks import View, Word
+from .structures.links import Correspondence, Label, Relation
 from .structures.spaces import ConceptualSpace, WorkingSpace
 
 
@@ -61,6 +63,17 @@ class BubbleChamber:
     @property
     def satisfaction(self):
         return self.working_spaces["top level working"].quality
+
+    def add_to_collections(self, item):
+        collections = {
+            Chunk: self.chunks,
+            Correspondence: self.correspondences,
+            Label: self.labels,
+            Relation: self.relations,
+            View: self.views,
+            Word: self.words,
+        }
+        collections[type(item)].add(item)
 
     def spread_activations(self):
         for structure in self.structures:

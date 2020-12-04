@@ -3,7 +3,9 @@ from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
 from homer.structure_collection import StructureCollection
-from homer.structures import Space
+from homer.structures import Chunk, Space
+from homer.structures.chunks import View, Word
+from homer.structures.links import Correspondence, Label, Relation
 
 
 def test_structures():
@@ -30,6 +32,89 @@ def test_structures():
     assert label in bubble_chamber.structures
     assert relation in bubble_chamber.structures
     assert word in bubble_chamber.structures
+
+
+def test_add_to_collections():
+    bubble_chamber = BubbleChamber(
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        Mock(),
+    )
+    chunk = Chunk(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    correspondence = Correspondence(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    label = Label(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    relation = Relation(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    view = View(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    word = Word(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    bubble_chamber.add_to_collections(chunk)
+    bubble_chamber.add_to_collections(correspondence)
+    bubble_chamber.add_to_collections(label)
+    bubble_chamber.add_to_collections(relation)
+    bubble_chamber.add_to_collections(view)
+    bubble_chamber.add_to_collections(word)
+    assert chunk in bubble_chamber.chunks
+    assert correspondence in bubble_chamber.correspondences
+    assert label in bubble_chamber.labels
+    assert relation in bubble_chamber.relations
+    assert view in bubble_chamber.views
+    assert word in bubble_chamber.words
 
 
 def test_spread_activations():
