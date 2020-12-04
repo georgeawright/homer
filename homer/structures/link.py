@@ -32,6 +32,11 @@ class Link(Structure):
         self.parent_space = parent_space
         self.parent_spaces = StructureCollection({parent_space})
 
+    def copy(
+        self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
+    ):
+        raise NotImplementedError
+
     def is_between(self, a: Structure, b: Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a
 

@@ -4,6 +4,27 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 
 
+def test_copy():
+    old_start = Mock()
+    old_end = Mock()
+    new_start = Mock()
+    new_end = Mock()
+    parent_id = "id"
+    relation = Relation(Mock(), Mock(), old_start, old_end, Mock(), Mock(), Mock())
+    copy = relation.copy(old_arg=old_start, new_arg=new_start, parent_id=parent_id)
+    assert relation.start == old_start
+    assert relation.end == old_end
+    assert copy.start == new_start
+    assert copy.end == old_end
+    assert copy.parent_id == parent_id
+    copy = relation.copy(old_arg=old_end, new_arg=new_end, parent_id=parent_id)
+    assert relation.start == old_start
+    assert relation.end == old_end
+    assert copy.start == old_start
+    assert copy.end == new_end
+    assert copy.parent_id == parent_id
+
+
 def test_nearby():
     relation_1 = Mock()
     chunk_1 = Mock()

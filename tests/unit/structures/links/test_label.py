@@ -4,6 +4,17 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
 
 
+def test_copy():
+    old_start = Mock()
+    new_start = Mock()
+    parent_id = "id"
+    label = Label(Mock(), Mock(), old_start, Mock(), Mock(), Mock())
+    copy = label.copy(old_arg=old_start, new_arg=new_start, parent_id=parent_id)
+    assert label.start == old_start
+    assert copy.start == new_start
+    assert copy.parent_id == parent_id
+
+
 def test_nearby():
     label_1 = Mock()
     chunk_1 = Mock()

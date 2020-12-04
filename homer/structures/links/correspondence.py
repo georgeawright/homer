@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept, Link, Space
@@ -36,6 +37,25 @@ class Correspondence(Link):
         self.start_space = start_space
         self.end_space = end_space
         self.conceptual_space = conceptual_space
+
+    def copy(
+        self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
+    ) -> Correspondence:
+        start = new_arg if new_arg is not None and old_arg == self.start else self.start
+        end = new_arg if new_arg is not None and old_arg == self.end else self.end
+        new_correspondence = Correspondence(
+            ID.new(Correspondence),
+            parent_id,
+            start,
+            end,
+            self.start_space,
+            self.end_space,
+            self.parent_concept,
+            self.parent_space,
+            self.conceptual_space,
+            self.quality,
+        )
+        return new_correspondence
 
     def nearby(self):
         return StructureCollection.difference(

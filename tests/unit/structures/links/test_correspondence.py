@@ -5,6 +5,40 @@ from homer.structures.chunks import Slot
 from homer.structures.links import Correspondence
 
 
+def test_copy():
+    old_start = Mock()
+    old_end = Mock()
+    new_start = Mock()
+    new_end = Mock()
+    parent_id = "id"
+    correspondence = Correspondence(
+        Mock(),
+        Mock(),
+        old_start,
+        old_end,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    copy = correspondence.copy(
+        old_arg=old_start, new_arg=new_start, parent_id=parent_id
+    )
+    assert correspondence.start == old_start
+    assert correspondence.end == old_end
+    assert copy.start == new_start
+    assert copy.end == old_end
+    assert copy.parent_id == parent_id
+    copy = correspondence.copy(old_arg=old_end, new_arg=new_end, parent_id=parent_id)
+    assert correspondence.start == old_start
+    assert correspondence.end == old_end
+    assert copy.start == old_start
+    assert copy.end == new_end
+    assert copy.parent_id == parent_id
+
+
 def test_nearby():
     start = Mock()
     start.correspondences = StructureCollection({Mock()})
