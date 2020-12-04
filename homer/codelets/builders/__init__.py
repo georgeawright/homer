@@ -1,5 +1,4 @@
 from .chunk_builder import ChunkBuilder
-from .chunk_enlarger import ChunkEnlarger
 from .correspondence_builder import CorrespondenceBuilder
 from .function_word_builder import FunctionWordBuilder
 from .label_builder import LabelBuilder

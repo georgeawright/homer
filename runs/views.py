@@ -29,7 +29,10 @@ def index(request):
 
 def run_view(request, run_id):
     def last_value_of_dict(dictionary):
-        return dictionary[max(k for k in dictionary.keys())]
+        try:
+            return dictionary[max(k for k in dictionary.keys())]
+        except ValueError:
+            return None
 
     coderack_record = CoderackRecord.objects.get(run_id=run_id)
     output = "<h1>Basic Run information:</h1>"
@@ -109,7 +112,7 @@ def run_view(request, run_id):
         for i in range(last_row + 1):
             output += "<tr>"
             for j in range(last_column + 1):
-                if original_chunks_matrix[i][j] in _chunk_members(chunk):
+                if original_chunks_matrix[i][j] in chunk.members.all():
                     output += '<td style="background-color: coral;">'
                 else:
                     output += "<td>"
@@ -137,20 +140,6 @@ def run_view(request, run_id):
         except AttributeError:
             pass  # relations with no parent space are links between concepts
     return HttpResponse(output)
-
-
-def _chunk_members(chunk):
-    members = []
-    uncounted = set(chunk.members.all())
-    counted = set()
-    while len(uncounted) > 0:
-        item = uncounted.pop()
-        if item in counted:
-            continue
-        counted.add(item)
-        for member in item.members.all():
-            uncounted.add(member)
-    return counted
 
 
 def coderack_population_view(request, run_id):

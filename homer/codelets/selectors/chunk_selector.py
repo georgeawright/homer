@@ -1,5 +1,5 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders import ChunkBuilder, ChunkEnlarger
+from homer.codelets.builders import ChunkBuilder
 from homer.codelets.selector import Selector
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -65,24 +65,14 @@ class ChunkSelector(Selector):
 
     def _fizzle(self):
         new_target = self.champion.nearby(self.target_space).get_unhappy()
-        if new_target.size == 1:
-            self.child_codelets.append(
-                ChunkBuilder.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    new_target,
-                    new_target.unhappiness,
-                )
+        self.child_codelets.append(
+            ChunkBuilder.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                new_target,
+                new_target.unhappiness,
             )
-        else:
-            self.child_codelets.append(
-                ChunkEnlarger.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    new_target,
-                    new_target.unhappiness,
-                )
-            )
+        )
 
     def _engender_follow_up(self):
         self.child_codelets.append(

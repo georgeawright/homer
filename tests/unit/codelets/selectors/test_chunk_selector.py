@@ -3,7 +3,7 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ChunkBuilder, ChunkEnlarger
+from homer.codelets.builders import ChunkBuilder
 from homer.codelets.selectors import ChunkSelector
 from homer.structure_collection import StructureCollection
 
@@ -68,11 +68,10 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         assert isinstance(selector.child_codelets[0], ChunkSelector)
 
 
-def test_spawns_builder_when_fizzling_and_nearby_has_no_members():
+def test_spawns_builder_when_fizzling():
     champion = Mock()
     champion.members = StructureCollection({Mock(), Mock()})
     challenger = Mock()
-    challenger.size = 1
     challenger.members = StructureCollection()
     champion.nearby.return_value = StructureCollection({challenger})
     selector = ChunkSelector(Mock(), Mock(), Mock(), Mock(), champion, Mock())
@@ -80,16 +79,3 @@ def test_spawns_builder_when_fizzling_and_nearby_has_no_members():
     assert CodeletResult.FIZZLE == selector.result
     assert 1 == len(selector.child_codelets)
     assert isinstance(selector.child_codelets[0], ChunkBuilder)
-
-
-def test_spawns_enlarger_when_fizzling_and_nearby_has_members():
-    champion = Mock()
-    champion.members = StructureCollection({Mock(), Mock()})
-    challenger = Mock()
-    challenger.members = StructureCollection({Mock(), Mock()})
-    champion.nearby.return_value = StructureCollection({challenger})
-    selector = ChunkSelector(Mock(), Mock(), Mock(), Mock(), champion, Mock())
-    selector.run()
-    assert CodeletResult.FIZZLE == selector.result
-    assert 1 == len(selector.child_codelets)
-    assert isinstance(selector.child_codelets[0], ChunkEnlarger)

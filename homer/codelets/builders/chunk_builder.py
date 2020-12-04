@@ -12,8 +12,6 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
 from homer.tools import average_vector
 
-from .chunk_enlarger import ChunkEnlarger
-
 
 class ChunkBuilder(Builder):
     def __init__(
@@ -58,7 +56,10 @@ class ChunkBuilder(Builder):
         except MissingStructureError:
             return False
         return not self.bubble_chamber.has_chunk(
-            StructureCollection({self.target_chunk, self.second_target_chunk})
+            StructureCollection.union(
+                self._members_from_chunk(self.target_chunk),
+                self._members_from_chunk(self.second_target_chunk),
+            )
         )
 
     def _calculate_confidence(self):
@@ -69,14 +70,16 @@ class ChunkBuilder(Builder):
         self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
 
     def _process_structure(self):
-        new_chunk_members = StructureCollection(
-            {self.target_chunk, self.second_target_chunk}
+        new_chunk_members = StructureCollection.union(
+            self._members_from_chunk(self.target_chunk),
+            self._members_from_chunk(self.second_target_chunk),
         )
-        new_chunk_neighbours = StructureCollection.union(
-            self.target_chunk.neighbours, self.second_target_chunk.neighbours
+        new_chunk_neighbours = StructureCollection.difference(
+            StructureCollection.union(
+                self.target_chunk.neighbours, self.second_target_chunk.neighbours
+            ),
+            new_chunk_members,
         )
-        new_chunk_neighbours.remove(self.target_chunk)
-        new_chunk_neighbours.remove(self.second_target_chunk)
         chunk = Chunk(
             ID.new(Chunk),
             self.codelet_id,
@@ -91,7 +94,28 @@ class ChunkBuilder(Builder):
             member.parent_chunks.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         self.child_structure = chunk
+        self._copy_across_links(self.target_chunk, chunk)
+        self._copy_across_links(self.second_target_chunk, chunk)
         self.bubble_chamber.logger.log(self.child_structure)
+        for link in chunk.links:
+            self.bubble_chamber.add_to_collections(link)
+            self.bubble_chamber.logger.log(link)
+
+    def _members_from_chunk(self, chunk):
+        return StructureCollection({chunk}) if chunk.size == 1 else chunk.members
+
+    def _copy_across_links(self, original_chunk, new_chunk):
+        copy_link = lambda link: link.copy(
+            old_arg=original_chunk, new_arg=new_chunk, parent_id=self.codelet_id
+        )
+        for link in original_chunk.links_in:
+            copy = copy_link(link)
+            if not new_chunk.has_link(copy):
+                new_chunk.links_in.add(copy)
+        for link in original_chunk.links_out:
+            copy = copy_link(link)
+            if not new_chunk.has_link(copy):
+                new_chunk.links_out.add(copy)
 
     def _get_average_value(self, chunks: StructureCollection):
         values = []
@@ -109,7 +133,7 @@ class ChunkBuilder(Builder):
 
     def _engender_follow_up(self):
         self.child_codelets.append(
-            ChunkEnlarger.spawn(
+            ChunkBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.child_structure,
