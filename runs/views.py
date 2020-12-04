@@ -39,6 +39,7 @@ def run_view(request, run_id):
     output += "<ul>"
     output += "<li>Codelets Run: " + str(coderack_record.codelets_run[-1])
     output += "</ul>"
+    output += '<p><a href="activity-and-structure-concepts">Activity and structure concepts</a></p>'
     output += '<p><a href="codelets">Codelets</a></p>'
     output += '<p><a href="structures">Structures</a></p>'
     output += f'<img src="/runs/{run_id}/coderack_population">'
