@@ -25,13 +25,11 @@ class ViewBuilder(Builder):
         target_correspondence: Correspondence,
         urgency: FloatBetweenOneAndZero,
     ):
-        Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_correspondence = target_correspondence
         self.second_target_correspondence = None
         self.third_target_correspondence = None
         self.correspondences = []
-        self.confidence = 0.0
         self.child_structure = None
 
     @classmethod

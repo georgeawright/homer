@@ -22,13 +22,11 @@ class RelationBuilder(Builder):
         target_structure_two: Structure = None,
         parent_concept: Concept = None,
     ):
-        Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_space = target_space
         self.target_structure_one = target_structure_one
         self.target_structure_two = target_structure_two
         self.parent_concept = parent_concept
-        self.confidence = 0.0
         self.child_structure = None
 
     @classmethod

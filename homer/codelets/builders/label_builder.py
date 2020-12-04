@@ -17,11 +17,9 @@ class LabelBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
         parent_concept: Concept = None,
     ):
-        Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_chunk = target_chunk
         self.parent_concept = parent_concept
-        self.confidence = 0.0
         self.child_structure = None
 
     @classmethod

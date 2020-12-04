@@ -27,15 +27,13 @@ class CorrespondenceBuilder(Builder):
         target_conceptual_space: ConceptualSpace = None,
         parent_concept: Concept = None,
     ):
-        Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_space_one = target_space_one
         self.target_structure_one = target_structure_one
         self.target_space_two = target_space_two
         self.target_structure_two = target_structure_two
         self.target_conceptual_space = target_conceptual_space
         self.parent_concept = parent_concept
-        self.confidence = 0.0
         self.child_structure = None
 
     @classmethod

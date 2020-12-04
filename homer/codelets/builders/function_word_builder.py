@@ -18,8 +18,7 @@ class FunctionWordBuilder(Builder):
         output_space: Space,
         urgency: FloatBetweenOneAndZero,
     ):
-        Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.input_space = input_space
         self.output_space = output_space
         self.child_structure = None

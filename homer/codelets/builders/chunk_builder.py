@@ -24,11 +24,9 @@ class ChunkBuilder(Builder):
         target_chunk: Chunk,
         urgency: FloatBetweenOneAndZero,
     ):
-        Builder.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_chunk = target_chunk
         self.second_target_chunk = None
-        self.confidence = 0.0
         self.child_structure = None
 
     @classmethod
