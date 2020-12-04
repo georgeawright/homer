@@ -136,56 +136,63 @@ class DjangoLogger(Logger):
                 + f" by {structure.parent_id} - value: {structure.value}; "
                 + f"location: {structure.location}; activation: {structure.activation}"
             )
+            if structure.parent_id != "":
+                parent_codelet = CodeletRecord.objects.get(
+                    codelet_id=structure.parent_id, run_id=self.run
+                )
+                structure_record.parent_codelet = parent_codelet
+                StructureUpdateRecord.objects.create(
+                    run_id=self.run,
+                    time=self.codelets_run,
+                    codelet_id=parent_codelet.id,
+                    structure_id=structure_record.id,
+                    action="Created",
+                )
+            if (
+                hasattr(structure, "parent_concept")
+                and structure.parent_concept is not None
+            ):
+                structure_record.parent_concept = StructureRecord.objects.get(
+                    structure_id=structure.parent_concept.structure_id, run_id=self.run
+                )
+            if (
+                hasattr(structure, "parent_space")
+                and structure.parent_space is not None
+            ):
+                print(structure.parent_space.structure_id)
+                structure_record.parent_space = StructureRecord.objects.get(
+                    structure_id=structure.parent_space.structure_id, run_id=self.run
+                )
+            if hasattr(structure, "members") and structure.members is not None:
+                for member in structure.members:
+                    member_record = StructureRecord.objects.get(
+                        structure_id=member.structure_id, run_id=self.run
+                    )
+                    structure_record.members.add(member_record)
+                    print(
+                        f"{member.structure_id} added as member to {structure.structure_id}"
+                    )
+            if hasattr(structure, "start") and structure.start is not None:
+                start_record = StructureRecord.objects.get(
+                    structure_id=structure.start.structure_id, run_id=self.run
+                )
+                structure_record.start = start_record
+                start_record.links.add(structure_record)
+                print(
+                    f"{structure.structure_id} linked to {structure.start.structure_id}"
+                )
+            if hasattr(structure, "end") and structure.end is not None:
+                end_record = StructureRecord.objects.get(
+                    structure_id=structure.end.structure_id, run_id=self.run
+                )
+                structure_record.end = end_record
+                end_record.links.add(structure_record)
+                print(
+                    f"{structure.structure_id} linked to {structure.end.structure_id}"
+                )
         structure_record.activation[self.codelets_run] = structure.activation
         structure_record.unhappiness[self.codelets_run] = structure.unhappiness
         structure_record.quality[self.codelets_run] = structure.quality
-        if structure.parent_id != "":
-            parent_codelet = CodeletRecord.objects.get(
-                codelet_id=structure.parent_id, run_id=self.run
-            )
-            structure_record.parent_codelet = parent_codelet
-            StructureUpdateRecord.objects.create(
-                run_id=self.run,
-                time=self.codelets_run,
-                codelet_id=parent_codelet.id,
-                structure_id=structure_record.id,
-                action="Created",
-            )
-        if (
-            hasattr(structure, "parent_concept")
-            and structure.parent_concept is not None
-        ):
-            structure_record.parent_concept = StructureRecord.objects.get(
-                structure_id=structure.parent_concept.structure_id, run_id=self.run
-            )
-        if hasattr(structure, "parent_space") and structure.parent_space is not None:
-            print(structure.parent_space.structure_id)
-            structure_record.parent_space = StructureRecord.objects.get(
-                structure_id=structure.parent_space.structure_id, run_id=self.run
-            )
-        if hasattr(structure, "members") and structure.members is not None:
-            for member in structure.members:
-                member_record = StructureRecord.objects.get(
-                    structure_id=member.structure_id, run_id=self.run
-                )
-                structure_record.members.add(member_record)
-                print(
-                    f"{member.structure_id} added as member to {structure.structure_id}"
-                )
-        if hasattr(structure, "start") and structure.start is not None:
-            start_record = StructureRecord.objects.get(
-                structure_id=structure.start.structure_id, run_id=self.run
-            )
-            structure_record.start = start_record
-            start_record.links.add(structure_record)
-            print(f"{structure.structure_id} linked to {structure.start.structure_id}")
-        if hasattr(structure, "end") and structure.end is not None:
-            end_record = StructureRecord.objects.get(
-                structure_id=structure.end.structure_id, run_id=self.run
-            )
-            structure_record.end = end_record
-            end_record.links.add(structure_record)
-            print(f"{structure.structure_id} linked to {structure.end.structure_id}")
         structure_record.save()
 
     def graph_concepts(self, concept_names, file_name):
