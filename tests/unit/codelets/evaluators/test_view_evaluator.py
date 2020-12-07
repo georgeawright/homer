@@ -8,6 +8,8 @@ from homer.structure_collection import StructureCollection
 
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
 def test_changes_target_structure_quality(current_quality, classification):
+    bubble_chamber = Mock()
+    bubble_chamber.concepts = {"evaluate": Mock(), "view": Mock()}
     view = Mock()
     member_1 = Mock()
     member_1.quality = classification
@@ -15,7 +17,7 @@ def test_changes_target_structure_quality(current_quality, classification):
     member_2.quality = classification
     view.members = StructureCollection({member_1, member_2})
     view.quality = current_quality
-    evaluator = ViewEvaluator(Mock(), Mock(), Mock(), view, Mock())
+    evaluator = ViewEvaluator(Mock(), Mock(), bubble_chamber, view, Mock())
     evaluator.run()
     assert classification == view.quality
     assert 1 == len(evaluator.child_codelets)

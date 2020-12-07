@@ -10,7 +10,7 @@ from homer.codelets.selectors import LabelSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
-from homer.structures.links import Label
+from homer.structures.links import Label, Relation
 from homer.structures.spaces import WorkingSpace
 
 
@@ -29,6 +29,33 @@ def bubble_chamber():
         StructureCollection(),
         Mock(),
     )
+    label_concept = Concept(
+        Mock(),
+        Mock(),
+        "label",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(label_concept)
+    evaluate_concept = Concept(
+        Mock(),
+        Mock(),
+        "evaluate",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(evaluate_concept)
+    relation = Relation(Mock(), Mock(), label_concept, evaluate_concept, None, None, 1)
+    label_concept.links_out.add(relation)
+    evaluate_concept.links_in.add(relation)
     return chamber
 
 

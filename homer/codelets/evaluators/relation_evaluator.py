@@ -15,8 +15,9 @@ class RelationEvaluator(Evaluator):
         target_structure: Structure,
         urgency: FloatBetweenOneAndZero,
     ):
-        Evaluator.__init__(self, codelet_id, parent_id, target_structure, urgency)
-        self.bubble_chamber = bubble_chamber
+        Evaluator.__init__(
+            self, codelet_id, parent_id, bubble_chamber, target_structure, urgency
+        )
         self.original_confidence = self.target_structure.quality
 
     @classmethod
@@ -30,6 +31,11 @@ class RelationEvaluator(Evaluator):
         codelet_id = ID.new(cls)
         return cls(codelet_id, parent_id, bubble_chamber, target_structure, urgency)
 
+    @property
+    def _parent_link(self):
+        structure_concept = self.bubble_chamber.concepts["relation"]
+        return structure_concept.relations_with(self._evaluate_concept).get_random()
+
     def _calculate_confidence(self):
         self.confidence = self.target_structure.parent_concept.classifier.classify(
             {
@@ -39,6 +45,7 @@ class RelationEvaluator(Evaluator):
                 "end": self.target_structure.end,
             }
         )
+        self.change_in_confidence = abs(self.confidence - self.original_confidence)
 
     def _engender_follow_up(self):
         self.child_codelets.append(
@@ -46,6 +53,6 @@ class RelationEvaluator(Evaluator):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structure,
-                abs(self.confidence - self.original_confidence),
+                self.change_in_confidence,
             )
         )

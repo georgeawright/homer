@@ -29,6 +29,35 @@ def bubble_chamber():
         StructureCollection(),
         Mock(),
     )
+    relation_concept = Concept(
+        Mock(),
+        Mock(),
+        "relation",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(relation_concept)
+    evaluate_concept = Concept(
+        Mock(),
+        Mock(),
+        "evaluate",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(evaluate_concept)
+    relation = Relation(
+        Mock(), Mock(), relation_concept, evaluate_concept, None, None, 1
+    )
+    relation_concept.links_out.add(relation)
+    evaluate_concept.links_in.add(relation)
     return chamber
 
 
