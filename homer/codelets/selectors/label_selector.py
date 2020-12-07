@@ -3,6 +3,7 @@ import random
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import LabelBuilder
 from homer.codelets.selector import Selector
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
@@ -49,8 +50,11 @@ class LabelSelector(Selector):
         candidates = self.champion.start.labels_in_space(self.champion.parent_space)
         if len(candidates) == 1:
             return False
-        self.challenger = candidates.get_active(exclude=[self.champion])
-        return True
+        try:
+            self.challenger = candidates.get_active(exclude=[self.champion])
+            return True
+        except MissingStructureError:
+            return False
 
     def _boost_winner(self):
         self.winner.boost_activation(self.confidence)
