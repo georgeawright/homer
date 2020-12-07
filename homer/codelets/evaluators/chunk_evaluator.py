@@ -44,12 +44,10 @@ class ChunkEvaluator(Evaluator):
             for space in self.target_structure.parent_spaces
             for member in self.target_structure.members
         ]
-        self.confidence = statistics.fmean(proximities)
+        self.confidence = statistics.fmean(proximities) if proximities != [] else 0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
 
     def _engender_follow_up(self):
-        print(self.confidence)
-        print(self.original_confidence)
         self.child_codelets.append(
             ChunkSelector.spawn(
                 self.codelet_id,
