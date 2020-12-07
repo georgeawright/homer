@@ -185,6 +185,24 @@ def activity_and_structure_concepts_view(request, run_id):
     select_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="select"
     )
+    chunk_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="chunk"
+    )
+    correspondence_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="correspondence"
+    )
+    label_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="label"
+    )
+    relation_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="relation"
+    )
+    view_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="view"
+    )
+    word_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="word"
+    )
     build_relations = (
         build_record.links.filter(~Q(end=evaluate_record))
         .filter(~Q(end=build_record))
@@ -202,7 +220,7 @@ def activity_and_structure_concepts_view(request, run_id):
     )
 
     pyplot.clf()
-    figure, charts = pyplot.subplots(nrows=2, ncols=2, figsize=(15, 10))
+    figure, charts = pyplot.subplots(nrows=2, ncols=3, figsize=(22, 10))
     figure.suptitle("Activity and Structure Concept Activations")
 
     for concept_record in [build_record, evaluate_record, select_record]:
@@ -218,6 +236,26 @@ def activity_and_structure_concepts_view(request, run_id):
     charts[0, 0].set(xlabel="Codelets Run", ylabel="Activation")
     charts[0, 0].legend(loc="best")
 
+    for concept_record in [
+        chunk_record,
+        correspondence_record,
+        label_record,
+        relation_record,
+        view_record,
+        word_record,
+    ]:
+        data = [
+            (int(codelets_run), activation)
+            for codelets_run, activation in concept_record.activation.items()
+        ]
+        data.sort()
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
+        charts[0, 1].plot(x, y, label=concept_record.value)
+    charts[0, 1].set_title("Structure Concept Activations")
+    charts[0, 1].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[0, 1].legend(loc="best")
+
     for relation in build_relations:
         data = [
             (int(codelets_run), activation)
@@ -226,10 +264,10 @@ def activity_and_structure_concepts_view(request, run_id):
         data.sort()
         x = [codelets_run for codelets_run, _ in data]
         y = [activation for _, activation in data]
-        charts[0, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
-    charts[0, 1].set_title("Activations of structure relations with build concept")
-    charts[0, 1].set(xlabel="Codelets Run", ylabel="Activation")
-    charts[0, 1].legend(loc="best")
+        charts[1, 0].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[1, 0].set_title("Activations of build-structure links")
+    charts[1, 0].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[1, 0].legend(loc="best")
 
     for relation in evaluate_relations:
         data = [
@@ -239,10 +277,10 @@ def activity_and_structure_concepts_view(request, run_id):
         data.sort()
         x = [codelets_run for codelets_run, _ in data]
         y = [activation for _, activation in data]
-        charts[1, 0].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
-    charts[1, 0].set_title("Activations of structure relations with evaluate concept")
-    charts[1, 0].set(xlabel="Codelets Run", ylabel="Activation")
-    charts[1, 0].legend(loc="best")
+        charts[1, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[1, 1].set_title("Activations of evaluate-structure links")
+    charts[1, 1].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[1, 1].legend(loc="best")
 
     for relation in select_relations:
         data = [
@@ -252,10 +290,10 @@ def activity_and_structure_concepts_view(request, run_id):
         data.sort()
         x = [codelets_run for codelets_run, _ in data]
         y = [activation for _, activation in data]
-        charts[1, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
-    charts[1, 1].set_title("Activations of structure relations with select concept")
-    charts[1, 1].set(xlabel="Codelets Run", ylabel="Activation")
-    charts[1, 1].legend(loc="best")
+        charts[1, 2].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[1, 2].set_title("Activations of select-structure links")
+    charts[1, 2].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[1, 2].legend(loc="best")
 
     buf = io.BytesIO()
     figure.savefig(buf, format="svg", bbox_inches="tight")
