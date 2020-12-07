@@ -62,7 +62,7 @@ def test_nearby():
     chunk.parent_spaces.add(space_2)
     chunk.locations.append(space_2_location)
     assert space_1_object in chunk.nearby()
-    assert space_2_object not in chunk.nearby()
+    assert space_2_object in chunk.nearby()
     assert space_1_object in chunk.nearby(space_1)
     assert space_2_object not in chunk.nearby(space_1)
     assert space_1_object in chunk.nearby(space_2)

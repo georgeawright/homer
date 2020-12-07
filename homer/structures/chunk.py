@@ -55,7 +55,7 @@ class Chunk(Structure):
             nearby_chunks = space.contents.near(self.location).of_type(type(self))
             nearby_chunks.remove(self)
             return nearby_chunks
-        nearby_chunks = StructureCollection.intersection(
+        nearby_chunks = StructureCollection.union(
             *[location.space.contents.near(location) for location in self.locations]
         ).of_type(type(self))
         nearby_chunks.remove(self)
