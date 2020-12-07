@@ -136,16 +136,21 @@ class FactoryCodelet(Codelet):
                 raise Exception("unknown structure type")
         elif action_type == self.bubble_chamber.concepts["evaluate"]:
             if structure_type == self.bubble_chamber.concepts["chunk"]:
-                raise MissingStructureError
                 target = self.bubble_chamber.chunks.get_active()
                 follow_up = ChunkEvaluator.spawn(
-                    self.codelet_id, self.bubble_chamber, target, target.activation
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target,
+                    structure_type.activation,
                 )
             elif structure_type == self.bubble_chamber.concepts["correspondence"]:
                 raise MissingStructureError
                 target = self.bubble_chamber.correspondences.get_active()
                 follow_up = CorrespondenceEvaluator.spawn(
-                    self.codelet_id, self.bubble_chamber, target, target.activation
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target,
+                    structure_type.activation,
                 )
             elif structure_type == self.bubble_chamber.concepts["label"]:
                 target = self.bubble_chamber.labels.get_active()
@@ -156,16 +161,21 @@ class FactoryCodelet(Codelet):
                     structure_type.activation,
                 )
             elif structure_type == self.bubble_chamber.concepts["relation"]:
-                raise MissingStructureError
                 target = self.bubble_chamber.relations.get_active()
                 follow_up = RelationEvaluator.spawn(
-                    self.codelet_id, self.bubble_chamber, target, target.activation
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target,
+                    structure_type.activation,
                 )
             elif structure_type == self.bubble_chamber.concepts["view"]:
                 raise MissingStructureError
                 target = self.bubble_chamber.views.get_active()
                 follow_up = ViewEvaluator.spawn(
-                    self.codelet_id, self.bubble_chamber, target, target.activation
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target,
+                    structure_type.activation,
                 )
             else:
                 raise Exception("unknown structure type")
