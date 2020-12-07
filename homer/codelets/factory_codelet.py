@@ -150,7 +150,10 @@ class FactoryCodelet(Codelet):
             elif structure_type == self.bubble_chamber.concepts["label"]:
                 target = self.bubble_chamber.labels.get_active()
                 follow_up = LabelEvaluator.spawn(
-                    self.codelet_id, self.bubble_chamber, target, target.activation
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target,
+                    structure_type.activation,
                 )
             elif structure_type == self.bubble_chamber.concepts["relation"]:
                 raise MissingStructureError
