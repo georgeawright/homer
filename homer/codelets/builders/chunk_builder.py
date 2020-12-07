@@ -9,7 +9,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
+from homer.structures import Chunk, Concept, Space
 from homer.tools import average_vector
 
 
@@ -86,8 +86,14 @@ class ChunkBuilder(Builder):
             new_chunk_members,
             new_chunk_neighbours,
             0,
-            self.target_chunk.parent_spaces,
+            StructureCollection.union(
+                self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
+            ),
         )
+        chunk.locations = [
+            self._get_average_location(chunk.members, space)
+            for space in chunk.parent_spaces
+        ]
         for member in new_chunk_members:
             member.parent_chunks.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
@@ -122,7 +128,17 @@ class ChunkBuilder(Builder):
                 values.append(chunk.value)
         return average_vector(values)
 
-    def _get_average_location(self, chunks: StructureCollection):
+    def _get_average_location(self, chunks: StructureCollection, space: Space = None):
+        if space is not None:
+            locations = []
+            for chunk in chunks:
+                for _ in range(chunk.size):
+                    locations.append(
+                        Location(
+                            getattr(chunk, space.parent_concept.relevant_value), space
+                        )
+                    )
+            return Location.average(locations)
         locations = []
         for chunk in chunks:
             for _ in range(chunk.size):

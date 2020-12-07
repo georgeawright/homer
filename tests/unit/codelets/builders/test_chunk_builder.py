@@ -21,6 +21,7 @@ def bubble_chamber():
 def common_space():
     space = Mock()
     space.proximity_between.return_value = 1.0
+    space.parent_concept.relevant_value = "value"
     return space
 
 
