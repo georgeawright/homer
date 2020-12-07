@@ -45,6 +45,7 @@ class Homer:
 
     def print_status_update(self):
         codelets_run = self.coderack.codelets_run
+        bubble_chamber_satisfaction = self.bubble_chamber.satisfaction
         build_activation = self.bubble_chamber.concepts["build"].activation
         evaluate_activation = self.bubble_chamber.concepts["evaluate"].activation
         select_activation = self.bubble_chamber.concepts["select"].activation
@@ -53,6 +54,7 @@ class Homer:
         )
         print(
             f"codelets run: {codelets_run}; "
+            + f"satisfaction: {bubble_chamber_satisfaction}; "
             + f"build: {build_activation}; "
             + f"evaluate: {evaluate_activation}; "
             + f"select: {select_activation}; "
