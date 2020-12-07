@@ -74,7 +74,7 @@ class CorrespondenceSelector(Selector):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.champion,
-                abs(self.winner.quality - self.loser.quality),
+                1 - abs(self.winner.activation - self.loser.activation),
                 challenger=self.challenger,
             )
         )

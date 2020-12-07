@@ -81,7 +81,7 @@ class ChunkSelector(Selector):
                 self.bubble_chamber,
                 self.target_space,
                 self.champion,
-                abs(self.winner.quality - self.loser.quality),
+                1 - abs(self.winner.activation - self.loser.activation),
                 challenger=self.challenger,
             )
         )
