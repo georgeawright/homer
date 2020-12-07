@@ -54,7 +54,7 @@ class Builder(Codelet):
 
     def _boost_activations(self):
         self._build_concept.boost_activation(1)
-        self._structure_concept.boost_activation()
+        self._structure_concept.boost_activation(1)
         self._parent_link.boost_activation(self.confidence)
 
     def _decay_activations(self):
