@@ -260,7 +260,7 @@ link_concepts(build_concept, word_concept)
 
 link_concepts(evaluate_concept, chunk_concept)
 link_concepts(evaluate_concept, correspondence_concept)
-link_concepts(evaluate_concept, label_concept)
+link_concepts(evaluate_concept, label_concept, activation=1.0)
 link_concepts(evaluate_concept, relation_concept)
 link_concepts(evaluate_concept, view_concept)
 
