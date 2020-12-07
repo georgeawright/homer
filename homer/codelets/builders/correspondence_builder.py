@@ -129,7 +129,7 @@ class CorrespondenceBuilder(Builder):
             self.parent_concept,
             parent_space,
             self.target_conceptual_space,
-            self.confidence,
+            0,
         )
         parent_space.contents.add(correspondence)
         self.target_structure_one.links_in.add(correspondence)

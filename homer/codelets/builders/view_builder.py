@@ -134,7 +134,7 @@ class ViewBuilder(Builder):
             self.correspondences,
             self.bubble_chamber.spaces["top level working"],
             view_output_space,
-            self.confidence,
+            0,
         )
         self.bubble_chamber.views.add(view)
         self.bubble_chamber.spaces.add(view_output_space)

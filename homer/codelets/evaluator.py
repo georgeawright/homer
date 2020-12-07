@@ -24,7 +24,7 @@ class Evaluator(Codelet):
 
     def run(self):
         self._calculate_confidence()
-        self.target_structure.quality += self.confidence
+        self.target_structure.quality = self.confidence
         self._engender_follow_up()
         self.result = CodeletResult.SUCCESS
         return self.result

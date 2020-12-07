@@ -96,7 +96,7 @@ class RelationBuilder(Builder):
             self.target_structure_two,
             self.parent_concept,
             self.target_space,
-            self.confidence,
+            0,
         )
         self.target_space.contents.add(relation)
         self.target_structure_one.links_out.add(relation)

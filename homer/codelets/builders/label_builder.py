@@ -72,7 +72,7 @@ class LabelBuilder(Builder):
             self.target_chunk,
             self.parent_concept,
             space,
-            self.confidence,
+            0,
         )
         if self.target_chunk not in space.contents:
             space.contents.add(self.target_chunk)

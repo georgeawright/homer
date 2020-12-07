@@ -84,7 +84,7 @@ class WordBuilder(Builder):
             word_value,
             word_location,
             StructureCollection({self.output_space}),
-            self.confidence,
+            0,
         )
         slot_to_word_space = self.bubble_chamber.common_parent_space(
             self.slot_space, self.output_space
@@ -99,7 +99,7 @@ class WordBuilder(Builder):
             self.bubble_chamber.concepts["same"],
             slot_to_word_space,
             concept.parent_space,
-            self.confidence,
+            0,
         )
         self.slot.links_out.add(projection_from_slot)
         word.links_in.add(projection_from_slot)
@@ -119,7 +119,7 @@ class WordBuilder(Builder):
             self.bubble_chamber.concepts["same"],
             non_slot_to_word_space,
             concept.parent_space,
-            self.confidence,
+            0,
         )
         self.non_slot.links_out.add(projection_from_non_slot)
         word.links_in.add(projection_from_non_slot)

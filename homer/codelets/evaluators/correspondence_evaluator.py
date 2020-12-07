@@ -17,6 +17,7 @@ class CorrespondenceEvaluator(Evaluator):
     ):
         Evaluator.__init__(self, codelet_id, parent_id, target_structure, urgency)
         self.bubble_chamber = bubble_chamber
+        self.original_confidence = self.target_structure.quality
 
     @classmethod
     def spawn(
@@ -30,7 +31,7 @@ class CorrespondenceEvaluator(Evaluator):
         return cls(codelet_id, parent_id, bubble_chamber, target_structure, urgency)
 
     def _calculate_confidence(self):
-        quality_estimate = self.target_structure.parent_concept.classifier.classify(
+        self.confidence = self.target_structure.parent_concept.classifier.classify(
             {
                 "space": self.target_structure.conceptual_space,
                 "concept": self.target_structure.parent_concept,
@@ -38,7 +39,6 @@ class CorrespondenceEvaluator(Evaluator):
                 "end": self.target_structure.end,
             }
         )
-        self.confidence = quality_estimate - self.target_structure.quality
 
     def _engender_follow_up(self):
         self.child_codelets.append(
@@ -46,6 +46,6 @@ class CorrespondenceEvaluator(Evaluator):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structure,
-                self.confidence,
+                abs(self.confidence - self.original_confidence),
             )
         )

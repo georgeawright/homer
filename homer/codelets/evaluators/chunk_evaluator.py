@@ -19,6 +19,7 @@ class ChunkEvaluator(Evaluator):
     ):
         Evaluator.__init__(self, codelet_id, parent_id, target_structure, urgency)
         self.bubble_chamber = bubble_chamber
+        self.original_confidence = self.target_structure.quality
 
     @classmethod
     def spawn(
@@ -37,16 +38,17 @@ class ChunkEvaluator(Evaluator):
             for space in self.target_structure.parent_spaces
             for member in self.target_structure.members
         ]
-        quality_estimate = statistics.fmean(proximities)
-        self.confidence = quality_estimate - self.target_structure.quality
+        self.confidence = statistics.fmean(proximities)
 
     def _engender_follow_up(self):
+        print(self.confidence)
+        print(self.original_confidence)
         self.child_codelets.append(
             ChunkSelector.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structure.parent_spaces.get_random(),
                 self.target_structure,
-                self.confidence,
+                abs(self.confidence - self.original_confidence),
             )
         )

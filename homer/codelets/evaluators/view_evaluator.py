@@ -19,6 +19,7 @@ class ViewEvaluator(Evaluator):
     ):
         Evaluator.__init__(self, codelet_id, parent_id, target_structure, urgency)
         self.bubble_chamber = bubble_chamber
+        self.original_confidence = self.target_structure.quality
 
     @classmethod
     def spawn(
@@ -32,10 +33,9 @@ class ViewEvaluator(Evaluator):
         return cls(codelet_id, parent_id, bubble_chamber, target_structure, urgency)
 
     def _calculate_confidence(self):
-        quality_estimate = statistics.fmean(
+        self.confidence = statistics.fmean(
             [member.quality for member in self.target_structure.members]
         )
-        self.confidence = quality_estimate - self.target_structure.quality
 
     def _engender_follow_up(self):
         self.child_codelets.append(
@@ -43,6 +43,6 @@ class ViewEvaluator(Evaluator):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structure,
-                self.confidence,
+                abs(self.confidence - self.original_confidence),
             )
         )

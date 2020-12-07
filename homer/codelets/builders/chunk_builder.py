@@ -87,7 +87,7 @@ class ChunkBuilder(Builder):
             self._get_average_location(new_chunk_members),
             new_chunk_members,
             new_chunk_neighbours,
-            self.confidence,
+            0,
             self.target_chunk.parent_spaces,
         )
         for member in new_chunk_members:
