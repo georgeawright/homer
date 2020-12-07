@@ -41,10 +41,8 @@ class ViewEnlarger(Builder):
         )
 
     @property
-    def _parent_link(self):
-        view = self.bubble_chamber.concepts["view"]
-        build = self.bubble_chamber.concepts["build"]
-        return view.relations_with(build).get_random()
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["view"]
 
     def _passes_preliminary_checks(self):
         try:

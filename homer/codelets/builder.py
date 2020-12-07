@@ -41,15 +41,20 @@ class Builder(Codelet):
         return CodeletResult.FAIL
 
     @property
+    def _parent_link(self):
+        return self._structure_concept.relations_with(self._build_concept).get_random()
+
+    @property
     def _build_concept(self):
         return self.bubble_chamber.concepts["build"]
 
     @abstractproperty
-    def _parent_link(self):
+    def _structure_concept(self):
         pass
 
     def _boost_activations(self):
         self._build_concept.boost_activation(1)
+        self._structure_concept.boost_activation()
         self._parent_link.boost_activation(self.confidence)
 
     def _decay_activations(self):

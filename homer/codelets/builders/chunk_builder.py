@@ -45,10 +45,8 @@ class ChunkBuilder(Builder):
         )
 
     @property
-    def _parent_link(self):
-        chunk = self.bubble_chamber.concepts["chunk"]
-        build = self.bubble_chamber.concepts["build"]
-        return chunk.relations_with(build).get_random()
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["chunk"]
 
     def _passes_preliminary_checks(self):
         try:

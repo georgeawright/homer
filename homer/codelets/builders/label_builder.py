@@ -43,10 +43,8 @@ class LabelBuilder(Builder):
         )
 
     @property
-    def _parent_link(self):
-        label = self.bubble_chamber.concepts["label"]
-        build = self.bubble_chamber.concepts["build"]
-        return label.relations_with(build).get_random()
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["label"]
 
     def _passes_preliminary_checks(self):
         if self.parent_concept is None:

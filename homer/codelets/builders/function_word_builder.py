@@ -38,10 +38,8 @@ class FunctionWordBuilder(Builder):
         )
 
     @property
-    def _parent_link(self):
-        word = self.bubble_chamber.concepts["word"]
-        build = self.bubble_chamber.concepts["build"]
-        return word.relations_with(build).get_random()
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["word"]
 
     def _passes_preliminary_checks(self):
         self.template_word = self.input_space.contents.get_unhappy()
