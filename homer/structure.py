@@ -113,6 +113,9 @@ class Structure(ABC):
     def nearby(self, space: Structure = None):
         raise NotImplementedError
 
+    def is_near(self, location: Location):
+        return self.location.is_near(location)
+
     def has_link(self, structure: Structure) -> bool:
         from homer.structures.links import Correspondence, Label, Relation
 
