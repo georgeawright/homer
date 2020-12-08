@@ -8,7 +8,14 @@ from homer.codelets.selectors import ViewSelector
 from homer.structure_collection import StructureCollection
 
 
-def test_finds_challenger_when_not_given_one():
+@pytest.fixture
+def bubble_chamber():
+    chamber = Mock()
+    chamber.concepts = {"view": Mock(), "select": Mock()}
+    return chamber
+
+
+def test_finds_challenger_when_not_given_one(bubble_chamber):
     common_members = StructureCollection({Mock(), Mock()})
     champion = Mock()
     champion.members = common_members
@@ -18,7 +25,6 @@ def test_finds_challenger_when_not_given_one():
     champion.activation = 1.0
     challenger.quality = 1.0
     challenger.activation = 1.0
-    bubble_chamber = Mock()
     bubble_chamber.views.get_random.return_value = challenger
     selector = ViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     assert selector.challenger is None
@@ -44,6 +50,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
     challenger_activation,
     random_number,
     expected_winner,
+    bubble_chamber,
 ):
     with patch.object(random, "random", return_value=random_number):
         champion = Mock()
@@ -53,7 +60,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
         selector = ViewSelector(
-            Mock(), Mock(), Mock(), champion, Mock(), challenger=challenger
+            Mock(), Mock(), bubble_chamber, champion, Mock(), challenger=challenger
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result
@@ -67,13 +74,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         assert isinstance(selector.child_codelets[0], ViewSelector)
 
 
-def test_spawns_builder_when_fizzling():
+def test_spawns_builder_when_fizzling(bubble_chamber):
     champion = Mock()
     champion.members = StructureCollection({Mock(), Mock()})
     challenger = Mock()
     challenger.size = 1
     challenger.members = StructureCollection()
-    bubble_chamber = Mock()
     bubble_chamber.views.get_random.return_value = challenger
     selector = ViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     selector.run()

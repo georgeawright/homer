@@ -7,7 +7,9 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors import ViewSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
+from homer.structures import Concept
 from homer.structures.chunks import View
+from homer.structures.links import Relation
 from homer.structures.spaces import WorkingSpace
 
 
@@ -26,6 +28,25 @@ def bubble_chamber():
         StructureCollection(),
         Mock(),
     )
+    view_concept = Concept(
+        Mock(), Mock(), "view", None, None, None, "value", StructureCollection(), None
+    )
+    chamber.concepts.add(view_concept)
+    select_concept = Concept(
+        Mock(),
+        Mock(),
+        "select",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(select_concept)
+    relation = Relation(Mock(), Mock(), view_concept, select_concept, None, None, 1)
+    view_concept.links_out.add(relation)
+    select_concept.links_in.add(relation)
     return chamber
 
 

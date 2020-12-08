@@ -19,8 +19,7 @@ class ViewSelector(Selector):
         urgency: FloatBetweenOneAndZero,
         challenger: View = None,
     ):
-        Selector.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.champion = champion
         self.challenger = challenger
 
@@ -43,6 +42,10 @@ class ViewSelector(Selector):
             challenger=challenger,
         )
 
+    @property
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["view"]
+
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
@@ -53,12 +56,6 @@ class ViewSelector(Selector):
         return len(members_intersection) > 0.5 * len(self.champion.members) and len(
             members_intersection
         ) > 0.5 * len(self.challenger.members)
-
-    def _boost_winner(self):
-        self.winner.boost_activation(self.confidence)
-
-    def _decay_loser(self):
-        self.loser.decay_activation(self.confidence)
 
     def _fizzle(self):
         new_target = self.bubble_chamber.correspondences.get_unhappy()

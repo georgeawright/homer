@@ -16,8 +16,7 @@ class CorrespondenceSelector(Selector):
         urgency: FloatBetweenOneAndZero,
         challenger: Correspondence = None,
     ):
-        Selector.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.champion = champion
         self.challenger = challenger
 
@@ -40,6 +39,10 @@ class CorrespondenceSelector(Selector):
             challenger=challenger,
         )
 
+    @property
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["correspondence"]
+
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
@@ -50,12 +53,6 @@ class CorrespondenceSelector(Selector):
             return False
         self.challenger = candidates.get_active(exclude=[self.champion])
         return True
-
-    def _boost_winner(self):
-        self.winner.boost_activation(self.confidence)
-
-    def _decay_loser(self):
-        self.loser.decay_activation(self.confidence)
 
     def _fizzle(self):
         self.child_codelets.append(

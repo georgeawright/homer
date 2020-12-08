@@ -8,7 +8,14 @@ from homer.codelets.selectors import CorrespondenceSelector
 from homer.structure_collection import StructureCollection
 
 
-def test_finds_challenger_when_not_given_one():
+@pytest.fixture
+def bubble_chamber():
+    chamber = Mock()
+    chamber.concepts = {"correspondence": Mock(), "select": Mock()}
+    return chamber
+
+
+def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion = Mock()
     challenger = Mock()
     champion.quality = 1.0
@@ -18,7 +25,7 @@ def test_finds_challenger_when_not_given_one():
     champion.start.correspondences_to_space.return_value = StructureCollection(
         {champion, challenger}
     )
-    selector = CorrespondenceSelector(Mock(), Mock(), Mock(), champion, Mock())
+    selector = CorrespondenceSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     assert selector.challenger is None
     selector.run()
     assert selector.challenger == challenger
@@ -42,6 +49,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
     challenger_activation,
     random_number,
     expected_winner,
+    bubble_chamber,
 ):
     with patch.object(random, "random", return_value=random_number):
         champion = Mock()
@@ -51,7 +59,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
         selector = CorrespondenceSelector(
-            Mock(), Mock(), Mock(), champion, Mock(), challenger=challenger
+            Mock(), Mock(), bubble_chamber, champion, Mock(), challenger=challenger
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result
@@ -65,12 +73,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         assert isinstance(selector.child_codelets[0], CorrespondenceSelector)
 
 
-def test_spawns_builder_when_fizzling():
+def test_spawns_builder_when_fizzling(bubble_chamber):
     champion = Mock()
     champion.start.correspondences_to_space.return_value = StructureCollection(
         {champion}
     )
-    selector = CorrespondenceSelector(Mock(), Mock(), Mock(), champion, Mock())
+    selector = CorrespondenceSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     selector.run()
     assert selector.challenger is None
     assert CodeletResult.FIZZLE == selector.result

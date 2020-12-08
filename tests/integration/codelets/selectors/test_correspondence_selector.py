@@ -8,13 +8,54 @@ from homer.codelets.selectors import CorrespondenceSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
-from homer.structures.links import Correspondence
+from homer.structures.links import Correspondence, Relation
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = Mock()
+    chamber = BubbleChamber(
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        Mock(),
+    )
+    correspondence_concept = Concept(
+        Mock(),
+        Mock(),
+        "correspondence",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(correspondence_concept)
+    select_concept = Concept(
+        Mock(),
+        Mock(),
+        "select",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(select_concept)
+    relation = Relation(
+        Mock(), Mock(), correspondence_concept, select_concept, None, None, 1
+    )
+    correspondence_concept.links_out.add(relation)
+    select_concept.links_in.add(relation)
     return chamber
 
 

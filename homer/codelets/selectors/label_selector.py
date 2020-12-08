@@ -19,8 +19,7 @@ class LabelSelector(Selector):
         urgency: FloatBetweenOneAndZero,
         challenger: Structure = None,
     ):
-        Selector.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.champion = champion
         self.challenger = challenger
 
@@ -43,6 +42,10 @@ class LabelSelector(Selector):
             challenger=challenger,
         )
 
+    @property
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["label"]
+
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
@@ -55,12 +58,6 @@ class LabelSelector(Selector):
             return True
         except MissingStructureError:
             return False
-
-    def _boost_winner(self):
-        self.winner.boost_activation(self.confidence)
-
-    def _decay_loser(self):
-        self.loser.decay_activation(self.confidence)
 
     def _fizzle(self):
         self.child_codelets.append(

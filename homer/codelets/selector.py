@@ -1,6 +1,7 @@
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 import random
 
+from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -8,9 +9,14 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 
 class Selector(Codelet):
     def __init__(
-        self, codelet_id: str, parent_id: str, urgency: FloatBetweenOneAndZero
+        self,
+        codelet_id: str,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero,
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
+        self.bubble_chamber = bubble_chamber
         self.champion = None
         self.challenger = None
         self.winner = None
@@ -20,11 +26,13 @@ class Selector(Codelet):
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
             self._fizzle()
+            self._decay_activations()
             self.result = CodeletResult.FIZZLE
             return self.result
         self._hold_competition()
         self._boost_winner()
         self._decay_loser()
+        self._boost_activations()
         self._engender_follow_up()
         self.result = CodeletResult.SUCCESS
         return self.result
@@ -47,16 +55,34 @@ class Selector(Codelet):
             self.champion = self.challenger
             self.challenger = tmp
 
+    @property
+    def _parent_link(self):
+        return self._structure_concept.relations_with(self._select_concept).get_random()
+
+    @property
+    def _select_concept(self):
+        return self.bubble_chamber.concepts["select"]
+
+    @abstractproperty
+    def _structure_concept(self):
+        pass
+
+    def _boost_activations(self):
+        self._select_concept.boost_activation(self.confidence)
+        self._parent_link.boost_activation(self.confidence)
+
+    def _decay_activations(self):
+        self._select_concept.decay_activation()
+        self._parent_link.decay_activation(1 - self.confidence)
+
+    def _boost_winner(self):
+        self.winner.boost_activation(self.confidence)
+
+    def _decay_loser(self):
+        self.loser.decay_activation(self.confidence)
+
     @abstractmethod
     def _passes_preliminary_checks(self):
-        pass
-
-    @abstractmethod
-    def _boost_winner(self):
-        pass
-
-    @abstractmethod
-    def _decay_loser(self):
         pass
 
     @abstractmethod

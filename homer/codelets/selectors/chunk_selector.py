@@ -19,8 +19,7 @@ class ChunkSelector(Selector):
         urgency: FloatBetweenOneAndZero,
         challenger: Chunk = None,
     ):
-        Selector.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_space = target_space
         self.champion = champion
         self.challenger = challenger
@@ -46,10 +45,17 @@ class ChunkSelector(Selector):
             challenger=challenger,
         )
 
+    @property
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["chunk"]
+
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
-        self.challenger = self.champion.nearby(self.target_space).get_active()
+        try:
+            self.challenger = self.champion.nearby(self.target_space).get_active()
+        except MissingStructureError:
+            return False
         members_intersection = StructureCollection.intersection(
             self.champion.members, self.challenger.members
         )
@@ -57,14 +63,8 @@ class ChunkSelector(Selector):
             members_intersection
         ) > 0.5 * len(self.challenger.members)
 
-    def _boost_winner(self):
-        self.winner.boost_activation(self.confidence)
-
-    def _decay_loser(self):
-        self.loser.decay_activation(self.confidence)
-
     def _fizzle(self):
-        new_target = self.champion.nearby(self.target_space).get_unhappy()
+        new_target = self.bubble_chamber.chunks.get_unhappy()
         self.child_codelets.append(
             ChunkBuilder.spawn(
                 self.codelet_id,

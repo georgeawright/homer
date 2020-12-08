@@ -8,7 +8,14 @@ from homer.codelets.selectors import ChunkSelector
 from homer.structure_collection import StructureCollection
 
 
-def test_finds_challenger_when_not_given_one():
+@pytest.fixture
+def bubble_chamber():
+    chamber = Mock()
+    chamber.concepts = {"chunk": Mock(), "select": Mock()}
+    return chamber
+
+
+def test_finds_challenger_when_not_given_one(bubble_chamber):
     common_members = StructureCollection({Mock(), Mock()})
     champion = Mock()
     champion.members = common_members
@@ -21,7 +28,7 @@ def test_finds_challenger_when_not_given_one():
     collection = Mock()
     collection.get_active.return_value = challenger
     champion.nearby.return_value = collection
-    selector = ChunkSelector(Mock(), Mock(), Mock(), Mock(), champion, Mock())
+    selector = ChunkSelector(Mock(), Mock(), bubble_chamber, Mock(), champion, Mock())
     assert selector.challenger is None
     selector.run()
     assert selector.challenger == challenger
@@ -45,6 +52,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
     challenger_activation,
     random_number,
     expected_winner,
+    bubble_chamber,
 ):
     with patch.object(random, "random", return_value=random_number):
         champion = Mock()
@@ -54,7 +62,13 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
         selector = ChunkSelector(
-            Mock(), Mock(), Mock(), Mock(), champion, Mock(), challenger=challenger
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            Mock(),
+            champion,
+            Mock(),
+            challenger=challenger,
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result
@@ -68,13 +82,13 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         assert isinstance(selector.child_codelets[0], ChunkSelector)
 
 
-def test_spawns_builder_when_fizzling():
+def test_spawns_builder_when_fizzling(bubble_chamber):
     champion = Mock()
     champion.members = StructureCollection({Mock(), Mock()})
     challenger = Mock()
     challenger.members = StructureCollection()
     champion.nearby.return_value = StructureCollection({challenger})
-    selector = ChunkSelector(Mock(), Mock(), Mock(), Mock(), champion, Mock())
+    selector = ChunkSelector(Mock(), Mock(), bubble_chamber, Mock(), champion, Mock())
     selector.run()
     assert CodeletResult.FIZZLE == selector.result
     assert 1 == len(selector.child_codelets)

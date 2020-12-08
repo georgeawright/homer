@@ -2,17 +2,58 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
+from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.selectors import ChunkSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk
+from homer.structures import Chunk, Concept
+from homer.structures.links import Relation
 from homer.structures.spaces import WorkingSpace
 
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = Mock()
+    chamber = BubbleChamber(
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
+        Mock(),
+    )
+    chunk_concept = Concept(
+        Mock(),
+        Mock(),
+        "chunk",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(chunk_concept)
+    select_concept = Concept(
+        Mock(),
+        Mock(),
+        "select",
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(select_concept)
+    relation = Relation(Mock(), Mock(), chunk_concept, select_concept, None, None, 1)
+    chunk_concept.links_out.add(relation)
+    select_concept.links_in.add(relation)
     return chamber
 
 
