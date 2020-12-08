@@ -49,17 +49,27 @@ class Chunk(Structure):
 
     def nearby(self, space: Space = None):
         if space is not None:
-            location = [
-                location for location in self.locations if location.space == space
-            ][0]
-            nearby_chunks = space.contents.near(self.location).of_type(type(self))
-            nearby_chunks.remove(self)
-            return nearby_chunks
+            return StructureCollection.difference(
+                space.contents.near(self).of_type(type(self)),
+                StructureCollection({self}),
+            )
         nearby_chunks = StructureCollection.union(
-            *[location.space.contents.near(location) for location in self.locations]
+            *[location.space.contents.near(self) for location in self.locations]
         ).of_type(type(self))
         nearby_chunks.remove(self)
         return nearby_chunks
+
+    def is_near(self, other: Structure):
+        if hasattr(other, "locations"):
+            for other_location in other.locations:
+                for self_location in self.locations:
+                    if self_location.is_near(other_location):
+                        return True
+        else:
+            for self_location in self.locations:
+                if self_location.is_near(other.location):
+                    return True
+        return False
 
     def add_member(self, new_member: Chunk):
         self.members.add(new_member)

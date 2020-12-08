@@ -48,9 +48,9 @@ class StructureCollection:
             }
         )
 
-    def near(self, location: Location) -> StructureCollection:
+    def near(self, other: "Structure") -> StructureCollection:
         return StructureCollection(
-            {structure for structure in self.structures if structure.is_near(location)}
+            {structure for structure in self.structures if structure.is_near(other)}
         )
 
     def add(self, structure):
