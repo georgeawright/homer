@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from matplotlib import pyplot
 import numpy
 
+from homer.tools import last_value_of_dict
+
 from .models import (
     CodeletRecord,
     CoderackRecord,
@@ -28,12 +30,6 @@ def index(request):
 
 
 def run_view(request, run_id):
-    def last_value_of_dict(dictionary):
-        try:
-            return dictionary[max(k for k in dictionary.keys())]
-        except ValueError:
-            return None
-
     coderack_record = CoderackRecord.objects.get(run_id=run_id)
     output = "<h1>Basic Run information:</h1>"
     output += "<ul>"
@@ -102,6 +98,13 @@ def run_view(request, run_id):
         if chunk in original_chunks:
             continue
         output += f"<h3>{chunk.structure_id}</h3>"
+        output += (
+            "<p>Quality: "
+            + str(last_value_of_dict(chunk.quality))
+            + "; Activation: "
+            + str(last_value_of_dict(chunk.activation))
+            + "</p>"
+        )
         output += "".join(
             [
                 f"{link.value} " + str(last_value_of_dict(link.quality)) + "<br>"
@@ -444,19 +447,19 @@ def structure_view(request, run_id, structure_id):
         )
     else:
         output += "<li>Parent Concept: None</li>"
-    if structure_record.connections is None:
-        output += "<li>Connections: None</li>"
+    if structure_record.links is None:
+        output += "<li>Links: None</li>"
     else:
-        output += "<li>Connections: " + ", ".join(
+        output += "<li>Links: " + ", ".join(
             [
                 '<a href="/runs/'
                 + str(run_id)
                 + "/structures/"
-                + connection.structure_id
+                + link.structure_id
                 + '">'
-                + connection.structure_id
+                + link.structure_id
                 + "</a>"
-                for connection in structure_record.connections.all()
+                for link in structure_record.links.all()
             ]
         )
         output += "</li>"
@@ -464,35 +467,38 @@ def structure_view(request, run_id, structure_id):
     output += "<li>Unhappiness : " + str(structure_record.unhappiness) + "</li>"
     output += "<li>Quality: " + str(structure_record.quality) + "</li>"
     output += "</ul>"
-    if re.match(r"^Group*", structure_record.structure_id):
+    if re.match(r"^Chunk*", structure_record.structure_id):
         structure_records = StructureRecord.objects.filter(run_id=run_id).all()
         last_column = 0
         last_row = 0
-        raw_structures = []
+        original_chunks = []
         for record in structure_records:
-            if not re.match("^RawStructure", record.structure_id):
+            if not re.match("^Chunk", record.structure_id):
                 continue
-            raw_structures.append(record)
-            if record.location[1] > last_row:
-                last_row = record.location[1]
-            if record.location[2] > last_column:
-                last_column = record.location[2]
-        raw_structures_matrix = [
+            if record.parent_codelet is not None:
+                continue
+            original_chunks.append(record)
+            if record.location[0] > last_row:
+                last_row = record.location[0]
+            if record.location[1] > last_column:
+                last_column = record.location[1]
+        original_chunks_matrix = [
             [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
         ]
-        for raw_structure in raw_structures:
-            row = raw_structure.location[1]
-            column = raw_structure.location[2]
-            raw_structures_matrix[row][column] = raw_structure
+        for original_chunk in original_chunks:
+            row = original_chunk.location[0]
+            column = original_chunk.location[1]
+            original_chunks_matrix[row][column] = original_chunk
+        output += "<h2>Members</h2>"
         output += '<table border="1">'
         for i in range(last_row + 1):
             output += "<tr>"
             for j in range(last_column + 1):
-                if structure_record in raw_structures_matrix[i][j].connections.all():
+                if original_chunks_matrix[i][j] in structure_record.members.all():
                     output += '<td style="background-color: coral;">'
                 else:
                     output += "<td>"
-                output += str(raw_structures_matrix[i][j].value)
+                output += str(original_chunks_matrix[i][j].value)
                 output += "</td>"
             output += "</tr>"
         output += "</table>"
