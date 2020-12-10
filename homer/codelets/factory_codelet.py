@@ -136,7 +136,7 @@ class FactoryCodelet(Codelet):
                 raise Exception("unknown structure type")
         elif action_type == self.bubble_chamber.concepts["evaluate"]:
             if structure_type == self.bubble_chamber.concepts["chunk"]:
-                target = self.bubble_chamber.chunks.get_active()
+                target = self.bubble_chamber.chunks.get_random()
                 follow_up = ChunkEvaluator.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
