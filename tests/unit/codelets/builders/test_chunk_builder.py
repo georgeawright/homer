@@ -30,6 +30,8 @@ def second_target_chunk(common_space):
     chunk = Mock()
     chunk.value = [20]
     chunk.size = 1
+    chunk.activation = 0.5
+    chunk.quality = 0.5
     chunk.location.coordinates = [1, 1]
     chunk.neighbours = StructureCollection()
     chunk.parent_spaces = StructureCollection({common_space})
@@ -43,6 +45,8 @@ def target_chunk(common_space, second_target_chunk):
     chunk = Mock()
     chunk.value = [20]
     chunk.size = 1
+    chunk.activation = 0.5
+    chunk.quality = 0.5
     chunk.location.coordinates = [2, 2]
     chunk.members = StructureCollection()
     chunk.neighbours = StructureCollection()

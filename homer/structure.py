@@ -60,6 +60,10 @@ class Structure(ABC):
     def activation(self) -> FloatBetweenOneAndZero:
         return self._activation
 
+    @activation.setter
+    def activation(self, a: FloatBetweenOneAndZero):
+        self._activation = a
+
     @property
     def unhappiness(self) -> FloatBetweenOneAndZero:
         return statistics.fmean([self.unchunkedness, self.unlinkedness])

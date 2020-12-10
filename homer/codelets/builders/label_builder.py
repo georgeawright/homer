@@ -72,6 +72,7 @@ class LabelBuilder(Builder):
             space,
             0,
         )
+        label.activation = self.INITIAL_STRUCTURE_ACTIVATION
         if self.target_chunk not in space.contents:
             space.contents.add(self.target_chunk)
             self.target_chunk.parent_spaces.add(space)

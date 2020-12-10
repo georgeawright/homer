@@ -96,6 +96,7 @@ class RelationBuilder(Builder):
             self.target_space,
             0,
         )
+        relation.activation = self.INITIAL_STRUCTURE_ACTIVATION
         self.target_space.contents.add(relation)
         self.target_structure_one.links_out.add(relation)
         self.target_structure_two.links_in.add(relation)

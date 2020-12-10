@@ -36,3 +36,5 @@ class HyperParameters:
     STARTER_CODELET_URGENCY = 0.5
 
     HOW_FAR_IS_NEAR = 1.5
+
+    INITIAL_STRUCTURE_ACTIVATION = 0.5

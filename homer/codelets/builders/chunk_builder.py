@@ -90,6 +90,23 @@ class ChunkBuilder(Builder):
                 self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
             ),
         )
+        activation_from_chunk_one = (
+            self.target_chunk.activation * self.target_chunk.size / chunk.size
+        )
+        activation_from_chunk_two = (
+            self.second_target_chunk.activation
+            * self.second_target_chunk.size
+            / chunk.size
+        )
+        chunk.activation = max(
+            activation_from_chunk_one + activation_from_chunk_two,
+            self.INITIAL_STRUCTURE_ACTIVATION,
+        )
+        self.target_chunk.activation = activation_from_chunk_one
+        self.second_target_chunk.activation = activation_from_chunk_two
+        chunk.quality = statistics.fmean(
+            [self.target_chunk.quality, self.second_target_chunk.quality]
+        )
         chunk.locations = [
             self._get_average_location(chunk.members, space)
             for space in chunk.parent_spaces
@@ -101,6 +118,8 @@ class ChunkBuilder(Builder):
         self._copy_across_links(self.target_chunk, chunk)
         self._copy_across_links(self.second_target_chunk, chunk)
         self.bubble_chamber.logger.log(self.child_structure)
+        self.bubble_chamber.logger.log(self.target_chunk)
+        self.bubble_chamber.logger.log(self.second_target_chunk)
         for link in chunk.links:
             self.bubble_chamber.add_to_collections(link)
             self.bubble_chamber.logger.log(link)

@@ -10,6 +10,7 @@ from homer.hyper_parameters import HyperParameters
 class Builder(Codelet):
 
     CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
+    INITIAL_STRUCTURE_ACTIVATION = HyperParameters.INITIAL_STRUCTURE_ACTIVATION
 
     def __init__(
         self,
