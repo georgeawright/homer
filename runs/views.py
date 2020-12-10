@@ -79,7 +79,9 @@ def run_view(request, run_id):
             original_chunk = original_chunks_matrix[i][j]
             output += "".join(
                 [
-                    f"{link.value} " + str(last_value_of_dict(link.quality)) + "<br>"
+                    f'<a href="structures/{link.structure_id}">{link.value}</a> '
+                    + str(last_value_of_dict(link.quality))
+                    + "<br>"
                     for link in original_chunk.links.all()
                     if re.match(r"^Label*", link.structure_id)
                 ]
@@ -96,7 +98,7 @@ def run_view(request, run_id):
     for chunk in chunks:
         if chunk in original_chunks:
             continue
-        output += f"<h3>{chunk.structure_id}</h3>"
+        output += f'<a href="structures/{chunk.structure_id}"><h3>{chunk.structure_id}</h3></a>'
         output += (
             "<p>Quality: "
             + str(last_value_of_dict(chunk.quality))
@@ -106,7 +108,9 @@ def run_view(request, run_id):
         )
         output += "".join(
             [
-                f"{link.value} " + str(last_value_of_dict(link.quality)) + "<br>"
+                f'<a href="structures/{link.structure_id}">{link.value}</a> '
+                + str(last_value_of_dict(link.quality))
+                + "<br>"
                 for link in chunk.links.all()
                 if re.match(r"^Label*", link.structure_id)
             ]
@@ -467,7 +471,7 @@ def structure_view(request, run_id, structure_id):
         + "</li>"
     )
     output += (
-        "<li>Finals Quality: "
+        "<li>Final Quality: "
         + str(last_value_of_dict(structure_record.quality))
         + "</li>"
     )
