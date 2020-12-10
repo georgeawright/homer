@@ -384,18 +384,21 @@ def codelet_view(request, run_id, codelet_id):
         )
     else:
         output += "None</li>"
-    output += "<li>Follow up: "
+    output += "<li>Follow ups: "
     try:
-        follow_up = CodeletRecord.objects.get(run_id=run_id, parent=codelet_record)
-        output += (
-            '<a href="/runs/'
-            + str(run_id)
-            + "/codelets/"
-            + follow_up.codelet_id
-            + '/">'
-            + follow_up.codelet_id
-            + "</a></li>"
-        )
+        follow_ups = CodeletRecord.objects.filter(run_id=run_id, parent=codelet_record)
+        output += "<ul>"
+        for follow_up in follow_ups:
+            output += (
+                '<li><a href="/runs/'
+                + str(run_id)
+                + "/codelets/"
+                + follow_up.codelet_id
+                + '/">'
+                + follow_up.codelet_id
+                + "</a></li>"
+            )
+        output += "</ul></li>"
     except CodeletRecord.DoesNotExist:
         output += "None</li>"
     output += "<li>Child Structure: "
