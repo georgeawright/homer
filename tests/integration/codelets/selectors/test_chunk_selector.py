@@ -67,7 +67,11 @@ def target_space():
 
 @pytest.fixture
 def chunk_members():
-    members = StructureCollection({Mock(), Mock()})
+    member_1 = Mock()
+    member_1.size = 1
+    member_2 = Mock()
+    member_2.size = 1
+    members = StructureCollection({member_1, member_2})
     return members
 
 

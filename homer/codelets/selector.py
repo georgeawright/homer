@@ -38,18 +38,21 @@ class Selector(Codelet):
         return self.result
 
     def _hold_competition(self):
-        total_quality = self.champion.quality + self.challenger.quality
-        champion_normalized_quality = self.champion.quality / total_quality
+        champ_size_adjusted_quality = self.champion.quality * self.champion.size
+        chall_size_adjusted_quality = self.challenger.quality * self.challenger.size
+        total_quality = champ_size_adjusted_quality + chall_size_adjusted_quality
+        champ_normalized_quality = champ_size_adjusted_quality / total_quality
         choice = random.random()
-        if choice < champion_normalized_quality:
-            self.winner = self.champion
-            self.loser = self.challenger
+        if choice < champ_normalized_quality:
+            self.winner, self.loser = self.champion, self.challenger
+            self.confidence = FloatBetweenOneAndZero(
+                champ_size_adjusted_quality - chall_size_adjusted_quality
+            )
         else:
-            self.loser = self.champion
-            self.winner = self.challenger
-        self.confidence = FloatBetweenOneAndZero(
-            self.winner.quality - self.loser.quality
-        )
+            self.loser, self.winner = self.champion, self.challenger
+            self.confidence = FloatBetweenOneAndZero(
+                chall_size_adjusted_quality - champ_size_adjusted_quality
+            )
         if self.challenger.activation > self.champion.activation:
             tmp = self.champion
             self.champion = self.challenger

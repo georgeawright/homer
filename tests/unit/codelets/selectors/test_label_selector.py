@@ -18,8 +18,10 @@ def bubble_chamber():
 def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion = Mock()
     challenger = Mock()
+    champion.size = 1
     champion.quality = 1.0
     champion.activation = 1.0
+    challenger.size = 1
     challenger.quality = 1.0
     challenger.activation = 1.0
     champion.start.labels_in_space.return_value = StructureCollection(
@@ -53,9 +55,11 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
 ):
     with patch.object(random, "random", return_value=random_number):
         champion = Mock()
+        champion.size = 1
         champion.quality = champion_quality
         champion.activation = champion_activation
         challenger = Mock()
+        challenger.size = 1
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
         selector = LabelSelector(

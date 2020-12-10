@@ -37,6 +37,10 @@ class Structure(ABC):
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
 
     @property
+    def size(self) -> int:
+        return 1
+
+    @property
     def coordinates(self) -> list:
         return self.location.coordinates
 
