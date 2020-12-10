@@ -13,14 +13,9 @@ urlpatterns = [
     path("<int:run_id>/codelets/", views.codelets_view, name="codelets"),
     path("<int:run_id>/structures/", views.structures_view, name="structures"),
     path(
-        "<int:run_id>/coderack_population",
-        views.coderack_population_view,
-        name="coderack_population",
-    ),
-    path(
-        "<int:run_id>/bubble_chamber_satisfaction",
-        views.bubble_chamber_satisfaction_view,
-        name="bubble_chamber_satisfaction",
+        "<int:run_id>/run-summary-graphs",
+        views.run_summary_graphs_view,
+        name="run-summary-graphs",
     ),
     path("<int:run_id>/codelets/<str:codelet_id>/", views.codelet_view, name="codelet"),
     path(

@@ -38,8 +38,7 @@ def run_view(request, run_id):
     output += '<p><a href="activity-and-structure-concepts">Activity and structure concepts</a></p>'
     output += '<p><a href="codelets">Codelets</a></p>'
     output += '<p><a href="structures">Structures</a></p>'
-    output += f'<img src="/runs/{run_id}/coderack_population">'
-    output += f'<img src="/runs/{run_id}/bubble_chamber_satisfaction">'
+    output += f'<img src="/runs/{run_id}/run-summary-graphs">'
     structure_records = StructureRecord.objects.filter(run_id=run_id).all()
     last_column = 0
     last_row = 0
@@ -146,33 +145,26 @@ def run_view(request, run_id):
     return HttpResponse(output)
 
 
-def coderack_population_view(request, run_id):
+def run_summary_graphs_view(request, run_id):
+    pyplot.clf()
+    figure, charts = pyplot.subplots(nrows=1, ncols=2, figsize=(14, 5))
+    figure.suptitle("Run Summary")
+
     coderack_record = CoderackRecord.objects.get(run_id=run_id)
     x = coderack_record.codelets_run
     y = coderack_record.population
-    pyplot.clf()
-    pyplot.title("Coderack Population")
-    pyplot.xlabel("Codelets Run")
-    pyplot.ylabel("Codelets on Rack")
-    pyplot.plot(x, y)
-    buf = io.BytesIO()
-    pyplot.savefig(buf, format="svg", bbox_inches="tight")
-    svg = buf.getvalue()
-    buf.close()
-    return HttpResponse(svg, content_type="image/svg+xml")
+    charts[0].set_title("Coderack Population")
+    charts[0].set(xlabel="Codelets Run", ylabel="Codelets on Rack")
+    charts[0].plot(x, y)
 
-
-def bubble_chamber_satisfaction_view(request, run_id):
-    coderack_record = CoderackRecord.objects.get(run_id=run_id)
     x = coderack_record.codelets_run
     y = coderack_record.satisfaction
-    pyplot.clf()
-    pyplot.title("Bubble Chamber Satisfaction")
-    pyplot.xlabel("Codelets Run")
-    pyplot.ylabel("Satisfaction")
-    pyplot.plot(x, y)
+    charts[1].set_title("Bubble Chamber Satisfaction")
+    charts[1].set(xlabel="Codelets Run", ylabel="Satisfaction")
+    charts[1].plot(x, y)
+
     buf = io.BytesIO()
-    pyplot.savefig(buf, format="svg", bbox_inches="tight")
+    figure.savefig(buf, format="svg", bbox_inches="tight")
     svg = buf.getvalue()
     buf.close()
     return HttpResponse(svg, content_type="image/svg+xml")
