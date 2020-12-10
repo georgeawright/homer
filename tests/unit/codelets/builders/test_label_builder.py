@@ -29,6 +29,10 @@ def bubble_chamber(parent_concept):
     space.name = "label concepts"
     space.contents = StructureCollection({label_concept})
     chamber.spaces = StructureCollection({space})
+    top_level_working_space = Mock()
+    top_level_working_space.name = "top level working"
+    top_level_working_space.contents = StructureCollection()
+    chamber.spaces.add(top_level_working_space)
     return chamber
 
 

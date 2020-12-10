@@ -22,6 +22,14 @@ def label_concepts_space():
 
 
 @pytest.fixture
+def top_level_working_space():
+    space = WorkingSpace(
+        Mock(), Mock(), "top level working", StructureCollection(), Mock(), Mock()
+    )
+    return space
+
+
+@pytest.fixture
 def temperature_concept(label_concepts_space):
     concept = Concept(
         Mock(),
@@ -66,7 +74,7 @@ def mild_concept(temperature_space):
 
 
 @pytest.fixture
-def bubble_chamber(mild_concept, label_concepts_space):
+def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
     chamber = BubbleChamber(
         StructureCollection(),
         StructureCollection(),
@@ -82,6 +90,7 @@ def bubble_chamber(mild_concept, label_concepts_space):
     )
     chamber.concepts.add(mild_concept)
     chamber.conceptual_spaces.add(label_concepts_space)
+    chamber.working_spaces.add(top_level_working_space)
     label_concept = Concept(
         Mock(),
         Mock(),
