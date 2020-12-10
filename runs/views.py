@@ -162,6 +162,7 @@ def run_summary_graphs_view(request, run_id):
     charts[1].set_title("Bubble Chamber Satisfaction")
     charts[1].set(xlabel="Codelets Run", ylabel="Satisfaction")
     charts[1].plot(x, y)
+    charts[1].plot(0, 1)
 
     buf = io.BytesIO()
     figure.savefig(buf, format="svg", bbox_inches="tight")
