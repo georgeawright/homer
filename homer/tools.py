@@ -9,8 +9,15 @@ def average_vector(vectors: List[List[Union[float, int]]]):
     ]
 
 
-def last_value_of_dict(dictionary):
+def first_key_of_dict(dictionary: dict):
     try:
-        return dictionary[max(k for k in dictionary.keys())]
+        return min(int(k) for k in dictionary.keys())
+    except ValueError:
+        return None
+
+
+def last_value_of_dict(dictionary: dict):
+    try:
+        return dictionary[str(max(int(k) for k in dictionary.keys()))]
     except ValueError:
         return None

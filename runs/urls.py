@@ -28,4 +28,9 @@ urlpatterns = [
         views.structure_view,
         name="structure",
     ),
+    path(
+        "<int:run_id>/structures-series/<str:structure_id>/",
+        views.structure_graphs_view,
+        name="structure-graphs",
+    ),
 ]

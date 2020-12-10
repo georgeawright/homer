@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from matplotlib import pyplot
 import numpy
 
-from homer.tools import last_value_of_dict
+from homer.tools import first_key_of_dict, last_value_of_dict
 
 from .models import (
     CodeletRecord,
@@ -513,3 +513,72 @@ def structure_view(request, run_id, structure_id):
             + f"{update.codelet.codelet_id}</a>.</p>"
         )
     return HttpResponse(output)
+
+
+def structure_graphs_view(request, run_id, structure_id):
+    def add_ends_to_series(series: dict):
+        # if "0" not in series:
+        #    series[str(first_key_of_dict(series) - 1)] = 0.0
+        #    series["0"] = 0.0
+        coderack_record = CoderackRecord.objects.get(run_id=run_id)
+        codelets_run = str(coderack_record.codelets_run[-1])
+        if codelets_run not in series:
+            series[codelets_run] = last_value_of_dict(series)
+        return series
+
+    structure_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id=structure_id
+    )
+    quality_series = add_ends_to_series(structure_record.quality)
+    activation_series = add_ends_to_series(structure_record.activation)
+    unhappiness_series = add_ends_to_series(structure_record.unhappiness)
+
+    pyplot.clf()
+    figure, charts = pyplot.subplots(nrows=1, ncols=3, figsize=(22, 5))
+    figure.suptitle("Structure Metrics")
+
+    quality_data = [
+        (int(codelets_run), quality) for codelets_run, quality in quality_series.items()
+    ]
+    quality_data.sort()
+    x = [codelets_run for codelets_run, _ in quality_data]
+    y = [quality for _, quality in quality_data]
+    charts[0].plot(x, y)
+    charts[0].plot(0, 0)
+    charts[0].plot(0, 1)
+    charts[0].set_title("Quality")
+    charts[0].set(xlabel="Codelets Run", ylabel="Quality")
+
+    activation_data = [
+        (int(codelets_run), activation)
+        for codelets_run, activation in activation_series.items()
+    ]
+    activation_data.sort()
+    x = [codelets_run for codelets_run, _ in activation_data]
+    y = [activation for _, activation in activation_data]
+    charts[1].plot(x, y)
+    charts[1].plot(0, 0)
+    charts[1].plot(0, 1)
+    charts[1].set_title("Activation")
+    charts[1].set(xlabel="Codelets Run", ylabel="Activation")
+
+    unhappiness_data = [
+        (int(codelets_run), unhappiness)
+        for codelets_run, unhappiness in unhappiness_series.items()
+    ]
+    print(unhappiness_data)
+    unhappiness_data.sort()
+    print(unhappiness_data)
+    x = [codelets_run for codelets_run, _ in unhappiness_data]
+    y = [unhappiness for _, unhappiness in unhappiness_data]
+    charts[2].plot(x, y)
+    charts[2].plot(0, 0)
+    charts[2].plot(0, 1)
+    charts[2].set_title("Unhappiness")
+    charts[2].set(xlabel="Codelets Run", ylabel="Unhappiness")
+
+    buf = io.BytesIO()
+    figure.savefig(buf, format="svg", bbox_inches="tight")
+    svg = buf.getvalue()
+    buf.close()
+    return HttpResponse(svg, content_type="image/svg+xml")
