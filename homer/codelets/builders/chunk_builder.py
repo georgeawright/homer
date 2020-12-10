@@ -104,9 +104,6 @@ class ChunkBuilder(Builder):
         )
         self.target_chunk.activation = activation_from_chunk_one
         self.second_target_chunk.activation = activation_from_chunk_two
-        chunk.quality = statistics.fmean(
-            [self.target_chunk.quality, self.second_target_chunk.quality]
-        )
         chunk.locations = [
             self._get_average_location(chunk.members, space)
             for space in chunk.parent_spaces
