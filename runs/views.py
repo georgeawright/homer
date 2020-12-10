@@ -1,3 +1,4 @@
+from collections import defaultdict
 import io
 import re
 
@@ -308,8 +309,34 @@ def codelets_view(request, run_id):
         .filter(~Q(time_run=None))
         .order_by("time_run")
     )
-    output = "<h1>Codelets in order run</h1>"
+    unrun_codelet_records = (
+        CodeletRecord.objects.filter(run_id=run_id)
+        .filter(time_run=None)
+        .order_by("birth_time")
+    )
+
+    output = "<h1>Codelets</h1>"
+
+    codelet_type_counts = defaultdict(int)
+    for record in codelet_records:
+        codelet_type_counts[record.codelet_type] += 1
+    output += "<h2>Number of Codelets Run By Type</h2>"
     output += "<ul>"
+    for codelet_type, count in codelet_type_counts.items():
+        output += f"<li>{codelet_type}: {count}</li>"
+    output += "</ul>"
+
+    unrun_codelet_type_counts = defaultdict(int)
+    for record in unrun_codelet_records:
+        unrun_codelet_type_counts[record.codelet_type] += 1
+    output += "<h2>Number of Codelets Spawned But Not Run By Type</h2>"
+    output += "<ul>"
+    for codelet_type, count in unrun_codelet_type_counts.items():
+        output += f"<li>{codelet_type}: {count}</li>"
+    output += "</ul>"
+
+    output += "<h2>Codelets in order run</h2>"
+    output += "<ol>"
     output += "".join(
         [
             '<li><a href="'
@@ -320,7 +347,7 @@ def codelets_view(request, run_id):
             for codelet in codelet_records
         ]
     )
-    output += "</ul>"
+    output += "</ol>"
     return HttpResponse(output)
 
 
