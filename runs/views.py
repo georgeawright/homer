@@ -463,10 +463,23 @@ def structure_view(request, run_id, structure_id):
             ]
         )
         output += "</li>"
-    output += "<li>Activation: " + str(structure_record.activation) + "</li>"
-    output += "<li>Unhappiness : " + str(structure_record.unhappiness) + "</li>"
-    output += "<li>Quality: " + str(structure_record.quality) + "</li>"
+    output += (
+        "<li>Final Activation: "
+        + str(last_value_of_dict(structure_record.activation))
+        + "</li>"
+    )
+    output += (
+        "<li>Final Unhappiness : "
+        + str(last_value_of_dict(structure_record.unhappiness))
+        + "</li>"
+    )
+    output += (
+        "<li>Finals Quality: "
+        + str(last_value_of_dict(structure_record.quality))
+        + "</li>"
+    )
     output += "</ul>"
+    output += f'<img src="/runs/{run_id}/structures-series/{structure_id}">'
     if re.match(r"^Chunk*", structure_record.structure_id):
         structure_records = StructureRecord.objects.filter(run_id=run_id).all()
         last_column = 0
