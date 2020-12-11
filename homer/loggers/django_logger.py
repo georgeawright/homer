@@ -9,6 +9,7 @@ import time
 from typing import Any
 
 from homer.codelet import Codelet
+from homer.codelets import Builder, Evaluator, Selector
 from homer.coderack import Coderack
 from homer.logger import Logger
 from homer.structure import Structure
@@ -17,6 +18,7 @@ from homer.tools import last_value_of_dict
 from runs.models import (
     CodeletRecord,
     CoderackRecord,
+    EventRecord,
     StructureRecord,
     StructureUpdateRecord,
     RunRecord,
@@ -66,13 +68,81 @@ class DjangoLogger(Logger):
             codelet_id=codelet.codelet_id, run_id=self.run
         )
         codelet_record.time_run = self.codelets_run
+        codelet_record.result = codelet.result
         codelet_record.save()
+        self._log_codelet_events(codelet, codelet_record)
 
     def _log_message(self, message):
         print(message)
         messages_file = self.log_directory + "/messages.txt"
         with open(messages_file, "a") as f:
             f.write(message + "\n")
+
+    def _log_codelet_events(self, codelet: Codelet, codelet_record):
+        event_type = None
+        if isinstance(codelet, Builder):
+            event_type = "building"
+        elif isinstance(codelet, Evaluator):
+            event_type = "evaluation"
+        elif isinstance(codelet, Selector):
+            event_type = "selection"
+        if event_type is None:
+            return
+        target_one = None
+        target_two = None
+        child_structure = None
+        winner = None
+        loser = None
+        if (
+            hasattr(codelet, "target_structure")
+            and codelet.target_structure is not None
+        ):
+            target_one = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.target_structure.structure_id
+            )
+        if hasattr(codelet, "target_chunk") and codelet.target_chunk is not None:
+            target_one = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.target_chunk.structure_id
+            )
+        if (
+            hasattr(codelet, "second_target_structure")
+            and codelet.second_target_structure is not None
+        ):
+            target_two = StructureRecord.objects.get(
+                run_id=self.run,
+                structure_id=codelet.second_target_structure.structure_id,
+            )
+        if (
+            hasattr(codelet, "second_target_chunk")
+            and codelet.second_target_chunk is not None
+        ):
+            target_two = StructureRecord.objects.get(
+                run_id=self.run,
+                structure_id=codelet.second_target_chunk.structure_id,
+            )
+        if hasattr(codelet, "child_structure") and codelet.child_structure is not None:
+            child_structure = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.child_structure.structure_id
+            )
+        if hasattr(codelet, "winner") and codelet.winner is not None:
+            winner = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.winner.structure_id
+            )
+        if hasattr(codelet, "loser") and codelet.loser is not None:
+            loser = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.loser.structure_id
+            )
+        EventRecord.objects.create(
+            run_id=self.run,
+            event_time=self.codelets_run,
+            event_type=event_type,
+            codelet=codelet_record,
+            target_one=target_one,
+            target_two=target_two,
+            child_structure=child_structure,
+            winner=winner,
+            loser=loser,
+        )
 
     def _log_codelet(self, codelet: Codelet):
         self._log_message(

@@ -10,10 +10,11 @@ class RunRecord(models.Model):
 class CodeletRecord(models.Model):
     codelet_id = models.CharField("Codelet ID", max_length=MAX_STRING_LENGTH)
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
-    codelet_type = models.CharField("Codelet ID", max_length=MAX_STRING_LENGTH)
+    codelet_type = models.CharField("Codelet Type", max_length=MAX_STRING_LENGTH)
     birth_time = models.IntegerField("Birth Time")
     time_run = models.IntegerField("Time Run", blank=True, null=True)
     urgency = models.FloatField("Urgency")
+    result = models.IntegerField("Result", blank=True, null=True)
     parent = models.ForeignKey(
         "self",
         related_name="+",
@@ -39,6 +40,48 @@ class CoderackRecord(models.Model):
     codelets_run = models.JSONField("Codelets Run")
     population = models.JSONField("Population")
     satisfaction = models.JSONField("Satisfaction")
+
+
+class EventRecord(models.Model):
+    run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
+    event_time = models.IntegerField("Birth Time")
+    event_type = models.CharField("Codelet ID", max_length=MAX_STRING_LENGTH)
+    codelet = models.ForeignKey("CodeletRecord", on_delete=models.CASCADE)
+    target_one = models.ForeignKey(
+        "StructureRecord",
+        related_name="_target_one",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    target_two = models.ForeignKey(
+        "StructureRecord",
+        related_name="_target_two",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    child_structure = models.ForeignKey(
+        "StructureRecord",
+        related_name="_child_structure",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    winner = models.ForeignKey(
+        "StructureRecord",
+        related_name="_winner",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    loser = models.ForeignKey(
+        "StructureRecord",
+        related_name="_loser",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
 
 
 class StructureRecord(models.Model):

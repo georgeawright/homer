@@ -39,8 +39,8 @@ class Coderack:
 
     def select_and_run_codelet(self):
         codelet = self.select_codelet()
-        self.logger.log_codelet_run(codelet)
         codelet.run()
+        self.logger.log_codelet_run(codelet)
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)
