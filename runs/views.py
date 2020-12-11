@@ -538,7 +538,10 @@ def structure_view(request, run_id, structure_id):
         for i in range(last_row + 1):
             output += "<tr>"
             for j in range(last_column + 1):
-                if original_chunks_matrix[i][j] in structure_record.members.all():
+                if (
+                    original_chunks_matrix[i][j] in structure_record.members.all()
+                    or original_chunks_matrix[i][j] == structure_record
+                ):
                     output += '<td style="background-color: coral;">'
                 else:
                     output += "<td>"
