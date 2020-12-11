@@ -155,17 +155,45 @@ class DjangoLogger(Logger):
             codelet_type=type(codelet).__name__,
             birth_time=self.codelets_run,
             urgency=codelet.urgency,
-            target_structure=None
-            if codelet.target_structure is None
-            else StructureRecord.objects.get(
+        )
+        if (
+            hasattr(codelet, "target_structure")
+            and codelet.target_structure is not None
+        ):
+            codelet_record.target_structure = StructureRecord.objects.get(
                 run_id=self.run, structure_id=codelet.target_structure.structure_id
-            ),
-        )
-        if codelet.parent_id == "coderack":
-            return
-        codelet_record.parent = CodeletRecord.objects.get(
-            codelet_id=codelet.parent_id, run_id=self.run
-        )
+            )
+        if (
+            hasattr(codelet, "second_target_structure")
+            and codelet.second_target_structure is not None
+        ):
+            codelet_record.second_target_structure = StructureRecord.objects.get(
+                run_id=self.run,
+                structure_id=codelet.second_target_structure.structure_id,
+            )
+        if hasattr(codelet, "target_chunk") and codelet.target_chunk is not None:
+            codelet_record.target_structure = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.target_chunk.structure_id
+            )
+        if (
+            hasattr(codelet, "second_target_chunk")
+            and codelet.second_target_chunk is not None
+        ):
+            codelet_record.second_target_structure = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.second_target_chunk.structure_id
+            )
+        if hasattr(codelet, "champion") and codelet.champion is not None:
+            codelet_record.champion = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.champion.structure_id
+            )
+        if hasattr(codelet, "challenger") and codelet.challenger is not None:
+            codelet_record.challenger = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.challenger.structure_id
+            )
+        if codelet.parent_id != "coderack":
+            codelet_record.parent = CodeletRecord.objects.get(
+                codelet_id=codelet.parent_id, run_id=self.run
+            )
         codelet_record.save()
 
     def _log_coderack(self, coderack: Coderack):

@@ -23,7 +23,32 @@ class CodeletRecord(models.Model):
         null=True,
     )
     target_structure = models.ForeignKey(
-        "StructureRecord", on_delete=models.CASCADE, blank=True, null=True
+        "StructureRecord",
+        related_name="target_structure",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    second_target_structure = models.ForeignKey(
+        "StructureRecord",
+        related_name="second_target_structure",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    champion = models.ForeignKey(
+        "StructureRecord",
+        related_name="champion",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    challenger = models.ForeignKey(
+        "StructureRecord",
+        related_name="challenger",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     follow_up = models.ForeignKey(
         "self",
