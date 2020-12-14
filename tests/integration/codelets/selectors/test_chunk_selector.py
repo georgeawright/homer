@@ -87,6 +87,7 @@ def good_chunk(target_space, chunk_members):
         1.0,
         StructureCollection({target_space}),
     )
+    chunk._activation = 0.0
     target_space.contents.add(chunk)
     return chunk
 
@@ -103,6 +104,7 @@ def bad_chunk(target_space, chunk_members):
         0.0,
         StructureCollection({target_space}),
     )
+    chunk._activation = 1.0
     target_space.contents.add(chunk)
     return chunk
 
@@ -110,16 +112,16 @@ def bad_chunk(target_space, chunk_members):
 def test_good_chunk_is_boosted_bad_chunk_is_decayed(
     bubble_chamber, target_space, good_chunk, bad_chunk
 ):
+    original_good_chunk_activation = good_chunk.activation
+    original_bad_chunk_activation = bad_chunk.activation
     parent_id = ""
     champion = bad_chunk
     urgency = 1.0
     selector = ChunkSelector.spawn(
         parent_id, bubble_chamber, target_space, champion, urgency
     )
-    for _ in range(20):
-        selector.run()
-        selector = selector.child_codelets[0]
-        good_chunk.update_activation()
-        bad_chunk.update_activation()
-    assert 1 == good_chunk.activation
-    assert 0 == bad_chunk.activation
+    selector.run()
+    good_chunk.update_activation()
+    bad_chunk.update_activation()
+    assert good_chunk.activation > original_good_chunk_activation
+    assert bad_chunk.activation < original_bad_chunk_activation

@@ -83,7 +83,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 1 == len(selector.child_codelets)
-        assert isinstance(selector.child_codelets[0], ChunkSelector)
+        assert isinstance(selector.child_codelets[0], ChunkBuilder)
 
 
 def test_spawns_builder_when_fizzling(bubble_chamber):

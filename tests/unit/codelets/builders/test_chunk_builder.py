@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder
+from homer.codelets.evaluators import ChunkEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk
 from homer.structures.links import Label
@@ -63,7 +64,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(bubble_chamber, target_ch
     assert CodeletResult.SUCCESS == result
     assert isinstance(chunk_builder.child_structure, Chunk)
     assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)
+    assert isinstance(chunk_builder.child_codelets[0], ChunkEvaluator)
 
 
 def test_new_chunk_has_no_duplicate_links(

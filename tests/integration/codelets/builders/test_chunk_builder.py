@@ -5,6 +5,7 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder
+from homer.codelets.evaluators import ChunkEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
@@ -88,7 +89,7 @@ def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_can
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert isinstance(builder.child_structure, Chunk)
-    assert isinstance(builder.child_codelets[0], ChunkBuilder)
+    assert isinstance(builder.child_codelets[0], ChunkEvaluator)
     builder = ChunkBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

@@ -162,8 +162,10 @@ class ChunkBuilder(Builder):
         return Location.average(locations)
 
     def _engender_follow_up(self):
+        from homer.codelets.evaluators import ChunkEvaluator
+
         self.child_codelets.append(
-            ChunkBuilder.spawn(
+            ChunkEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.child_structure,

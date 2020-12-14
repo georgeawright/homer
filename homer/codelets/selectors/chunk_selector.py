@@ -76,12 +76,10 @@ class ChunkSelector(Selector):
 
     def _engender_follow_up(self):
         self.child_codelets.append(
-            self.spawn(
+            ChunkBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.target_space,
                 self.champion,
-                1 - abs(self.winner.activation - self.loser.activation),
-                challenger=self.challenger,
+                self.champion.activation,
             )
         )
