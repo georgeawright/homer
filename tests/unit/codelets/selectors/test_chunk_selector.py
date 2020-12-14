@@ -84,16 +84,3 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert champion.decay_activation.is_called()
         assert 1 == len(selector.child_codelets)
         assert isinstance(selector.child_codelets[0], ChunkBuilder)
-
-
-def test_spawns_builder_when_fizzling(bubble_chamber):
-    champion = Mock()
-    champion.members = StructureCollection({Mock(), Mock()})
-    challenger = Mock()
-    challenger.members = StructureCollection()
-    champion.nearby.return_value = StructureCollection({challenger})
-    selector = ChunkSelector(Mock(), Mock(), bubble_chamber, Mock(), champion, Mock())
-    selector.run()
-    assert CodeletResult.FIZZLE == selector.result
-    assert 1 == len(selector.child_codelets)
-    assert isinstance(selector.child_codelets[0], ChunkBuilder)

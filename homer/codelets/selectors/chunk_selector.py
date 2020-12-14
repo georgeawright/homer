@@ -55,13 +55,16 @@ class ChunkSelector(Selector):
         try:
             self.challenger = self.champion.nearby(self.target_space).get_active()
         except MissingStructureError:
-            return False
+            return True
         members_intersection = StructureCollection.intersection(
             self.champion.members, self.challenger.members
         )
-        return len(members_intersection) > 0.5 * len(self.champion.members) and len(
-            members_intersection
-        ) > 0.5 * len(self.challenger.members)
+        if not (
+            len(members_intersection) > 0.5 * len(self.champion.members)
+            and len(members_intersection) > 0.5 * len(self.challenger.members)
+        ):
+            self.challenger = None
+        return True
 
     def _fizzle(self):
         new_target = self.bubble_chamber.chunks.get_unhappy()
@@ -77,9 +80,6 @@ class ChunkSelector(Selector):
     def _engender_follow_up(self):
         self.child_codelets.append(
             ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.champion,
-                self.champion.activation,
+                self.codelet_id, self.bubble_chamber, self.champion, self.confidence
             )
         )

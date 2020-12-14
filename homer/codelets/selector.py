@@ -29,9 +29,12 @@ class Selector(Codelet):
             self._decay_activations()
             self.result = CodeletResult.FIZZLE
             return self.result
-        self._hold_competition()
-        self._boost_winner()
-        self._decay_loser()
+        if self.challenger is not None:
+            self._hold_competition()
+            self._boost_winner()
+            self._decay_loser()
+        else:
+            self._boost_champion()
         self._boost_activations()
         self._engender_follow_up()
         self.result = CodeletResult.SUCCESS
@@ -83,6 +86,10 @@ class Selector(Codelet):
 
     def _decay_loser(self):
         self.loser.decay_activation(self.confidence)
+
+    def _boost_champion(self):
+        self.confidence = self.champion.quality
+        self.champion.boost_activation(self.confidence)
 
     @abstractmethod
     def _passes_preliminary_checks(self):
