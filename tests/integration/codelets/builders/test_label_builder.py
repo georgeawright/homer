@@ -6,6 +6,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import StretchyProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import LabelBuilder
+from homer.codelets.evaluators import LabelEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
@@ -161,7 +162,7 @@ def test_successful_adds_label_to_chunk_and_spawns_follow_up_and_same_label_cann
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert isinstance(builder.child_structure, Label)
-    assert isinstance(builder.child_codelets[0], LabelBuilder)
+    assert isinstance(builder.child_codelets[0], LabelEvaluator)
     builder = LabelBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

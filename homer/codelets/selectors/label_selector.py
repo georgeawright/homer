@@ -70,12 +70,24 @@ class LabelSelector(Selector):
         )
 
     def _engender_follow_up(self):
+        from homer.codelets.builders import LabelBuilder
+
+        new_target = self.bubble_chamber.chunks.get_exigent()
         self.child_codelets.append(
-            self.spawn(
+            LabelBuilder.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                new_target,
+                new_target.unlinkedness,
+                parent_concept=self.champion.parent_concept,
+            )
+        )
+        self.child_codelets.append(
+            LabelSelector.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.champion,
-                1 - abs(self.winner.activation - self.loser.activation),
+                self.confidence,
                 challenger=self.challenger,
             )
         )

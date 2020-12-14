@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import LabelBuilder
+from homer.codelets.evaluators import LabelEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept
 from homer.structures.links import Label
@@ -58,7 +59,7 @@ def test_successful_creates_label_and_spawns_follow_up(bubble_chamber, target_ch
     assert CodeletResult.SUCCESS == result
     assert isinstance(label_builder.child_structure, Label)
     assert len(label_builder.child_codelets) == 1
-    assert isinstance(label_builder.child_codelets[0], LabelBuilder)
+    assert isinstance(label_builder.child_codelets[0], LabelEvaluator)
 
 
 def test_fails_when_chunk_is_bad_example(bubble_chamber, target_chunk):

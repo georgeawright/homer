@@ -6,6 +6,7 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder
 from homer.codelets.selectors import ChunkSelector
 from homer.structure_collection import StructureCollection
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -82,5 +83,6 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         else:
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
-        assert 1 == len(selector.child_codelets)
-        assert isinstance(selector.child_codelets[0], ChunkBuilder)
+        assert 2 == len(selector.child_codelets)
+        assert hasinstance(selector.child_codelets, ChunkBuilder)
+        assert hasinstance(selector.child_codelets, ChunkSelector)

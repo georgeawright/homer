@@ -92,14 +92,14 @@ class LabelBuilder(Builder):
         self.bubble_chamber.logger.log(self.child_structure)
 
     def _engender_follow_up(self):
-        new_target = self.target_chunk.neighbours.get_unhappy()
+        from homer.codelets.evaluators import LabelEvaluator
+
         self.child_codelets.append(
-            LabelBuilder.spawn(
+            LabelEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                new_target,
+                self.child_structure,
                 self.confidence,
-                self.parent_concept,
             )
         )
 

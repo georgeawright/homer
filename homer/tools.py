@@ -1,5 +1,5 @@
 import statistics
-from typing import List, Union
+from typing import Iterable, List, Union
 
 
 def average_vector(vectors: List[List[Union[float, int]]]):
@@ -21,3 +21,10 @@ def last_value_of_dict(dictionary: dict):
         return dictionary[str(max(int(k) for k in dictionary.keys()))]
     except ValueError:
         return None
+
+
+def hasinstance(items: Iterable, t: type) -> bool:
+    for item in items:
+        if isinstance(item, t):
+            return True
+    return False

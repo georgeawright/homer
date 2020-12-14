@@ -70,7 +70,7 @@ def working_space():
 
 
 @pytest.fixture
-def chunk(working_space):
+def chunk(bubble_chamber, working_space):
     chunk = Chunk(
         Mock(),
         Mock(),
@@ -81,6 +81,7 @@ def chunk(working_space):
         Mock(),
         StructureCollection({working_space}),
     )
+    bubble_chamber.chunks.add(chunk)
     return chunk
 
 
@@ -115,6 +116,7 @@ def bad_label(chunk, conceptual_space, working_space):
         working_space,
         0.0,
     )
+    label._activation = 1.0
     chunk.links_out.add(label)
     working_space.contents.add(label)
     return label
@@ -123,14 +125,14 @@ def bad_label(chunk, conceptual_space, working_space):
 def test_good_chunk_is_boosted_bad_chunk_is_decayed(
     bubble_chamber, good_label, bad_label
 ):
+    original_good_label_activation = good_label.activation
+    original_bad_label_activation = bad_label.activation
     parent_id = ""
     champion = bad_label
     urgency = 1.0
     selector = LabelSelector.spawn(parent_id, bubble_chamber, champion, urgency)
-    for _ in range(20):
-        selector.run()
-        selector = selector.child_codelets[0]
-        good_label.update_activation()
-        bad_label.update_activation()
-    assert 1 == good_label.activation
-    assert 0 == bad_label.activation
+    selector.run()
+    good_label.update_activation()
+    bad_label.update_activation()
+    assert good_label.activation > original_good_label_activation
+    assert bad_label.activation < original_bad_label_activation
