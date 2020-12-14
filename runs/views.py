@@ -152,6 +152,18 @@ def run_view(request, run_id):
             output += "<br>"
         except AttributeError:
             pass  # relations with no parent space are links between concepts
+    templates = [
+        structure
+        for structure in structure_records
+        if re.match(r"^Template[0-9]+$", structure.structure_id)
+    ]
+    output += "<h2>Templates</h2>"
+    for template in templates:
+        activation = last_value_of_dict(template.activation)
+        output += (
+            f"{template.structure_id}: {template.value} (activation: {activation})"
+        )
+        output += "<br>"
     return HttpResponse(output)
 
 
