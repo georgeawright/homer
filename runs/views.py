@@ -96,8 +96,12 @@ def run_view(request, run_id):
         for structure in structure_records
         if re.match("^Chunk*", structure.structure_id)
     ]
-    output += "<h2>Chunks</h2>"
-    for chunk in chunks:
+    chunks = sorted(
+        chunks, key=lambda chunk: last_value_of_dict(chunk.activation), reverse=True
+    )
+    output += "<h2>Most Active Chunks</h2>"
+    for i in range(5):
+        chunk = chunks[i]
         if chunk in original_chunks:
             continue
         output += f'<a href="structures/{chunk.structure_id}"><h3>{chunk.structure_id}</h3></a>'
