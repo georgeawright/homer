@@ -456,7 +456,7 @@ def structure_view(request, run_id, structure_id):
     output = "<h1>" + structure_id + "</h1>"
     output += "<ul>"
     output += "<li>Birth Time: " + str(structure_record.time_created) + "</li>"
-    output += "<li>Value: " + structure_record.value + "</li>"
+    output += f"<li>Value: {structure_record.value}</li>"
     output += "<li>Location: " + str(structure_record.location) + "</li>"
     if structure_record.parent_codelet is not None:
         output += (
