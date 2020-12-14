@@ -35,6 +35,7 @@ class Structure(ABC):
         self._activation = FloatBetweenOneAndZero(0)
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
+        self.stable = False
 
     @property
     def size(self) -> int:
@@ -228,11 +229,15 @@ class Structure(ABC):
         return self.activation == 1.0
 
     def boost_activation(self, amount: float = None):
+        if self.stable:
+            return
         if amount is None:
             amount = self.MINIMUM_ACTIVATION_UPDATE
         self._activation_buffer += self._activation_update_coefficient * amount
 
     def decay_activation(self, amount: float = None):
+        if self.stable:
+            return
         if amount is None:
             amount = self.MINIMUM_ACTIVATION_UPDATE
         self._activation_buffer -= self._activation_update_coefficient * amount
@@ -240,6 +245,8 @@ class Structure(ABC):
     def spread_activation(self):
         if not self.is_fully_active():
             return
+        if hasattr(self, "parent_concept") and self.parent_concept is not None:
+            self.parent_concept.boost_activation(self.activation)
         for link in self.links_out:
             try:
                 link.end.boost_activation(link.activation)
