@@ -1,3 +1,5 @@
+import statistics
+
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept, Space
 
@@ -28,4 +30,11 @@ class Frame(Space):
             child_spaces=child_spaces,
             links_in=links_in,
             links_out=links_out,
+        )
+
+    def update_activation(self):
+        self._activation = (
+            statistics.fmean([structure.activation for structure in self.contents])
+            if self.contents != []
+            else 0.0
         )
