@@ -174,19 +174,17 @@ class ChunkBuilder(Builder):
         )
 
     def _fizzle(self):
+        from homer.codelets.selectors import ChunkSelector
+
         self.child_codelets.append(
-            ChunkBuilder.spawn(
+            ChunkSelector.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
+                self.target_chunk.parent_spaces.get_random(),
                 self.target_chunk,
-                self.urgency / 2,
+                self.target_chunk.quality,
             )
         )
 
     def _fail(self):
-        new_target = self.bubble_chamber.chunks.get_unhappy()
-        self.child_codelets.append(
-            ChunkBuilder.spawn(
-                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
-            )
-        )
+        self._fizzle()

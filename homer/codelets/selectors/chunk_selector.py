@@ -86,13 +86,3 @@ class ChunkSelector(Selector):
                 self.champion.activation,
             )
         )
-        self.child_codelets.append(
-            ChunkSelector.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_space,
-                self.champion,
-                self.champion.activation,
-                challenger=self.challenger,
-            )
-        )
