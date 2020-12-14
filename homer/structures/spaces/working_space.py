@@ -35,12 +35,15 @@ class WorkingSpace(Space):
 
     @property
     def quality(self):
-        if len(self.contents) == 0 and len(self.child_spaces) == 0:
+        active_contents = [
+            structure for structure in self.contents if structure.activation > 0
+        ]
+        if len(active_contents) == 0 and len(self.child_spaces) == 0:
             return 0.0
-        if len(self.contents) != 0:
+        if len(active_contents) > 0:
             contents_quality = [
                 statistics.fmean(
-                    [item.quality * item.activation for item in self.contents]
+                    [item.quality * item.activation for item in active_contents]
                 )
             ]
         else:
