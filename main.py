@@ -11,7 +11,7 @@ from homer.id import ID
 from homer.location import Location
 from homer.loggers import DjangoLogger
 from homer.structures import Chunk, Concept, Lexeme
-from homer.structures.chunks import Word
+from homer.structures.chunks import Slot, Word
 from homer.structures.chunks.slots import TemplateSlot
 from homer.structures.links import Relation
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
@@ -49,6 +49,7 @@ logger.log(top_level_working_space)
 bubble_chamber = BubbleChamber(
     StructureCollection({top_level_conceptual_space}),
     StructureCollection({top_level_working_space}),
+    StructureCollection(),
     StructureCollection(),
     StructureCollection(),
     StructureCollection(),
@@ -714,7 +715,6 @@ template_1 = Template(
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
-logger.log(template_1)
 word_the = Word(
     ID.new(Word),
     "",
@@ -723,7 +723,6 @@ word_the = Word(
     StructureCollection({template_1}),
     1.0,
 )
-logger.log(word_the)
 slot_location = TemplateSlot(
     ID.new(TemplateSlot),
     "",
@@ -732,7 +731,6 @@ slot_location = TemplateSlot(
     Location([1], template_1),
     StructureCollection({template_1}),
 )
-logger.log(slot_location)
 word_is = Word(
     ID.new(Word),
     "",
@@ -741,7 +739,6 @@ word_is = Word(
     StructureCollection({template_1}),
     1.0,
 )
-logger.log(word_is)
 slot_temperature = TemplateSlot(
     ID.new(TemplateSlot),
     "",
@@ -750,7 +747,6 @@ slot_temperature = TemplateSlot(
     Location([3], template_1),
     StructureCollection({template_1}),
 )
-logger.log(slot_temperature)
 template_1.contents.add(word_the)
 template_1.contents.add(slot_location)
 template_1.contents.add(word_is)
@@ -766,7 +762,6 @@ template_2 = Template(
     None,
     parent_spaces=StructureCollection({templates_space}),
 )
-logger.log(template_2)
 word_it = Word(
     ID.new(Word),
     "",
@@ -775,7 +770,6 @@ word_it = Word(
     StructureCollection({template_2}),
     1.0,
 )
-logger.log(word_it)
 word_is = Word(
     ID.new(Word),
     "",
@@ -827,7 +821,7 @@ bubble_chamber.conceptual_spaces.add(template_2)
 
 # TEMPLATE 3: it is temperature.comparative in the location
 template_3 = Template(
-    ID.new(TemplateSlot),
+    ID.new(Template),
     "",
     "it is [temperature.comparative] in the [location]",
     StructureCollection(),
@@ -894,7 +888,7 @@ bubble_chamber.conceptual_spaces.add(template_3)
 
 # TEMPLATE 4: it is temperature.comparative in the location than the location
 template_4 = Template(
-    ID.new(TemplateSlot),
+    ID.new(Template),
     "",
     "it is [temperature.comparative] in the [location] than the [location]",
     StructureCollection(),
@@ -988,6 +982,18 @@ template_4.contents.add(word_than)
 template_4.contents.add(word_the_2)
 template_4.contents.add(slot_location_2)
 bubble_chamber.conceptual_spaces.add(template_4)
+
+for template in [template_1, template_2, template_3, template_4]:
+    logger.log(template)
+    for structure in template.contents:
+        if isinstance(structure, Slot):
+            bubble_chamber.slots.add(structure)
+        logger.log(structure)
+        if isinstance(structure, TemplateSlot) and structure.value is not None:
+            link = link_concepts(structure.value, structure, activation=1.0)
+            link.stable = True
+            bubble_chamber.concept_links.add(link)
+
 
 for concept in bubble_chamber.concepts:
     for link in concept.links_out:
