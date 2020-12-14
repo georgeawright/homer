@@ -25,6 +25,7 @@ def test_structures():
         StructureCollection(),
         StructureCollection({word}),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     assert chunk in bubble_chamber.structures
@@ -36,6 +37,7 @@ def test_structures():
 
 def test_add_to_collections():
     bubble_chamber = BubbleChamber(
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -134,6 +136,7 @@ def test_spread_activations():
         StructureCollection(),
         StructureCollection({word}),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     bubble_chamber.spread_activations()
@@ -161,6 +164,7 @@ def test_update_activations():
         StructureCollection(),
         StructureCollection({word}),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     bubble_chamber.update_activations()
@@ -179,6 +183,7 @@ def test_has_chunk():
         StructureCollection(),
         StructureCollection(),
         StructureCollection({existing_chunk}),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -206,6 +211,7 @@ def test_has_view():
         StructureCollection({existing_view}),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     assert bubble_chamber.has_view(existing_view_members)
@@ -213,6 +219,7 @@ def test_has_view():
 
 def test_common_parent_space_is_created_if_necessary():
     bubble_chamber = BubbleChamber(
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),

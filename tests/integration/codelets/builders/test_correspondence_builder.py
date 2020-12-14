@@ -120,6 +120,7 @@ def bubble_chamber(
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chamber.concepts.add(more_concept)

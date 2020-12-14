@@ -26,6 +26,7 @@ class BubbleChamber:
         views: StructureCollection,
         words: StructureCollection,
         concept_links: StructureCollection,
+        slots: StructureCollection,
         logger: Logger,
     ):
         self.conceptual_spaces = conceptual_spaces
@@ -38,6 +39,7 @@ class BubbleChamber:
         self.views = views
         self.words = words
         self.concept_links = concept_links
+        self.slots = slots
         self.logger = logger
         self.result = None
 
@@ -58,6 +60,7 @@ class BubbleChamber:
             self.views,
             self.words,
             self.concept_links,
+            self.slots,
         )
 
     @property
