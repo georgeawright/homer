@@ -86,8 +86,8 @@ class LabelSelector(Selector):
             LabelSelector.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion,
+                self.winner,
                 self.confidence,
-                challenger=self.challenger,
+                challenger=self.loser,
             )
         )
