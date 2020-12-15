@@ -1,4 +1,5 @@
 import math
+import statistics
 
 from homer import BubbleChamber, Coderack, Homer, StructureCollection
 from homer.classifiers import (
@@ -397,6 +398,7 @@ bubble_chamber.concepts.add(location_concept)
 location_space = ConceptualSpace(
     "location", "", "location", StructureCollection(), location_concept
 )
+
 logger.log(location_space)
 label_concepts_space.child_spaces.add(location_space)
 bubble_chamber.conceptual_spaces.add(location_space)
@@ -599,6 +601,46 @@ midlands_lexeme = Lexeme.new(
 )
 logger.log(midlands_lexeme)
 bubble_chamber.lexemes.add(midlands_lexeme)
+north_south_space = ConceptualSpace(
+    "north-south",
+    "",
+    "north-south",
+    StructureCollection(),
+    south,
+    coordinates_from_super_space_location=lambda location: [location.coordinates[0]],
+)
+west_east_space = ConceptualSpace(
+    "west-east",
+    "",
+    "west-east",
+    StructureCollection(),
+    east,
+    coordinates_from_super_space_location=lambda location: [location.coordinates[1]],
+)
+nw_se_space = ConceptualSpace(
+    "nw-se",
+    "",
+    "nw-se",
+    StructureCollection(),
+    southeast,
+    coordinates_from_super_space_location=lambda location: [
+        statistics.fmean(location.coordinates)
+    ],
+)
+ne_sw_space = ConceptualSpace(
+    "ne-sw",
+    "",
+    "ne-sw",
+    StructureCollection(),
+    southwest,
+    coordinates_from_super_space_location=lambda location: [
+        statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
+    ],
+)
+location_space.sub_spaces.add(north_south_space)
+location_space.sub_spaces.add(west_east_space)
+location_space.sub_spaces.add(nw_se_space)
+location_space.sub_spaces.add(ne_sw_space)
 
 more_less_concept = Concept.new(
     "more-less",
