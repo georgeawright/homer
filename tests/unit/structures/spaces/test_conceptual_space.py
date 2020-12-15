@@ -11,6 +11,19 @@ def test_instance_returns_working_space():
     assert isinstance(instance, WorkingSpace)
 
 
+def test_instance_returns_working_space_with_working_sub_spaces():
+    super_space = ConceptualSpace("super", Mock(), "super", Mock(), Mock())
+    sub_space = ConceptualSpace("sub", Mock(), "sub", Mock(), Mock())
+    super_space.sub_spaces.add(sub_space)
+    super_instance = super_space.instance
+    assert isinstance(super_instance, WorkingSpace)
+    assert "super working" == super_instance.name
+    assert 1 == len(super_instance.sub_spaces)
+    sub_instance = super_instance.sub_spaces.get_random()
+    assert isinstance(sub_instance, WorkingSpace)
+    assert "sub working" == sub_instance.name
+
+
 @pytest.mark.parametrize(
     "activation_1, activation_2, activation_3, expected_activation",
     [(1.0, 1.0, 1.0, 1.0), (0.5, 0.2, 0.0, 0.5), (1.0, 0.0, 0.0, 1.0)],
