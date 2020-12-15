@@ -48,6 +48,7 @@ class ConceptualSpace(Space):
                 StructureCollection(),
                 FloatBetweenOneAndZero(0),
                 self.parent_concept,
+                coordinates_from_super_space_location=self.coordinates_from_super_space_location,
                 links_in=StructureCollection(),
                 links_out=StructureCollection(),
             )

@@ -1,4 +1,5 @@
 import statistics
+from typing import Callable
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection import StructureCollection
@@ -16,6 +17,7 @@ class WorkingSpace(Space):
         parent_concept: Concept,
         parent_spaces: StructureCollection = None,
         child_spaces: StructureCollection = None,
+        coordinates_from_super_space_location: Callable = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -29,6 +31,7 @@ class WorkingSpace(Space):
             parent_concept,
             parent_spaces=parent_spaces,
             child_spaces=child_spaces,
+            coordinates_from_super_space_location=coordinates_from_super_space_location,
             links_in=links_in,
             links_out=links_out,
         )
