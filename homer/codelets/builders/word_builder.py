@@ -2,6 +2,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.chunks import Word, Slot, View
 from homer.structures.links import Correspondence
@@ -75,7 +76,7 @@ class WordBuilder(Builder):
         concept = self.non_slot.labels.get_active().parent_concept
         lexeme = concept.lexemes.get_active()
         word_value = lexeme.get_form(self.slot.form)
-        word_location = self.slot.location
+        word_location = Location(self.slot.location.coordinates, self.output_space)
         word = Word(
             ID.new(Word),
             self.codelet_id,
@@ -101,7 +102,7 @@ class WordBuilder(Builder):
         )
         self.slot.links_out.add(projection_from_slot)
         word.links_in.add(projection_from_slot)
-        slot_to_word_space.contents.add(projection_from_slot)
+        slot_to_word_space.add(projection_from_slot)
         self.bubble_chamber.correspondences.add(projection_from_slot)
         self.target_view.members.add(projection_from_slot)
         non_slot_to_word_space = self.bubble_chamber.common_parent_space(
@@ -121,10 +122,10 @@ class WordBuilder(Builder):
         )
         self.non_slot.links_out.add(projection_from_non_slot)
         word.links_in.add(projection_from_non_slot)
-        non_slot_to_word_space.contents.add(projection_from_non_slot)
+        non_slot_to_word_space.add(projection_from_non_slot)
         self.bubble_chamber.correspondences.add(projection_from_non_slot)
         self.target_view.members.add(projection_from_non_slot)
-        self.output_space.contents.add(word)
+        self.output_space.add(word)
         self.bubble_chamber.words.add(word)
         self.child_structure = word
 

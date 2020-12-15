@@ -2,6 +2,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
 from homer.structures.chunks import Word
@@ -56,11 +57,11 @@ class FunctionWordBuilder(Builder):
             ID.new(Word),
             self.codelet_id,
             self.template_word.value,
-            self.template_word.location,
+            Location(self.template_word.location.coordinates, self.output_space),
             StructureCollection({self.output_space}),
             self.confidence,
         )
-        self.output_space.contents.add(output_word)
+        self.output_space.add(output_word)
         correspondence_space = self.bubble_chamber.common_parent_space(
             self.input_space, self.output_space
         )
@@ -78,7 +79,7 @@ class FunctionWordBuilder(Builder):
         )
         self.template_word.links_out.add(correspondence)
         output_word.links_in.add(correspondence)
-        correspondence_space.contents.add(correspondence)
+        correspondence_space.add(correspondence)
         self.bubble_chamber.correspondences.add(correspondence)
         self.child_structure = output_word
 

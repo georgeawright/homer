@@ -71,6 +71,14 @@ class Chunk(Structure):
                     return True
         return False
 
+    def location_in_space(self, space: Space):
+        for location in self.locations:
+            if location.space == space:
+                return location
+        raise Exception(
+            "{self.structure_id} has no location in space {space.structure_id}"
+        )
+
     def add_member(self, new_member: Chunk):
         self.members.add(new_member)
         new_member.neighbours.remove(self)

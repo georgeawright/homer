@@ -69,6 +69,29 @@ def test_nearby():
     assert space_2_object in chunk.nearby(space_2)
 
 
+def test_location_in_space():
+    space_1 = Mock()
+    space_1_location = Mock()
+    space_1_location.space = space_1
+    space_2 = Mock()
+    space_2_location = Mock()
+    space_2_location.space = space_2
+    chunk = Chunk(
+        Mock(),
+        Mock(),
+        Mock(),
+        space_1_location,
+        Mock(),
+        Mock(),
+        Mock(),
+        StructureCollection({space_1}),
+    )
+    chunk.parent_spaces.add(space_2)
+    chunk.locations.append(space_2_location)
+    assert chunk.location_in_space(space_1) == space_1_location
+    assert chunk.location_in_space(space_2) == space_2_location
+
+
 def test_add_member():
     current_member = Mock()
     current_member.value = [1]

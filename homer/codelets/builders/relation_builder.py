@@ -97,7 +97,7 @@ class RelationBuilder(Builder):
             0,
         )
         relation.activation = self.INITIAL_STRUCTURE_ACTIVATION
-        self.target_space.contents.add(relation)
+        self.target_space.add(relation)
         self.target_structure_one.links_out.add(relation)
         self.target_structure_two.links_in.add(relation)
         self.bubble_chamber.relations.add(relation)

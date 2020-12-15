@@ -80,7 +80,7 @@ class Concept(Structure):
             links_out=links_out,
             depth=depth,
         )
-        parent_space.contents.add(concept)
+        parent_space.add(concept)
         return concept
 
     def distance_from(self, other: Structure):

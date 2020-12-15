@@ -74,15 +74,15 @@ class LabelBuilder(Builder):
         )
         label.activation = self.INITIAL_STRUCTURE_ACTIVATION
         if self.target_chunk not in space.contents:
-            space.contents.add(self.target_chunk)
-            self.target_chunk.parent_spaces.add(space)
             self.target_chunk.locations.append(
                 Location(
                     getattr(self.target_chunk, self.parent_concept.relevant_value),
                     space,
                 )
             )
-        space.contents.add(label)
+            self.target_chunk.parent_spaces.add(space)
+            space.add(self.target_chunk)
+        space.add(label)
         self.target_chunk.links_out.add(label)
         self.bubble_chamber.labels.add(label)
         self.bubble_chamber.working_spaces.add(space)

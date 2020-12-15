@@ -129,7 +129,7 @@ class CorrespondenceBuilder(Builder):
             self.target_conceptual_space,
             0,
         )
-        parent_space.contents.add(correspondence)
+        parent_space.add(correspondence)
         self.target_structure_one.links_in.add(correspondence)
         self.target_structure_one.links_out.add(correspondence)
         self.target_structure_two.links_in.add(correspondence)
