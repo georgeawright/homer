@@ -62,6 +62,11 @@ class Homer:
         print(
             "================================================================================"
         )
+        for chunk in self.bubble_chamber.chunks:
+            print(
+                chunk.structure_id,
+                [space.structure_id for space in chunk.parent_spaces],
+            )
 
     def print_results(self):
         print("results go here")

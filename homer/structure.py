@@ -25,7 +25,7 @@ class Structure(ABC):
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
-        self.location = location
+        self.locations = [location]
         self._quality = quality
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
@@ -38,12 +38,19 @@ class Structure(ABC):
         self.stable = False
 
     @property
+    def location(self) -> Location:
+        return self.locations[0]
+
+    @property
     def size(self) -> int:
         return 1
 
     @property
     def coordinates(self) -> list:
-        return self.location.coordinates
+        for location in self.locations:
+            if location.space.value == "input":
+                return location.coordinates
+        raise Exception(f"{self.structure_id} has no location in input space")
 
     @property
     def exigency(self) -> FloatBetweenOneAndZero:
@@ -123,11 +130,19 @@ class Structure(ABC):
         raise NotImplementedError
 
     def is_near(self, other: Structure):
-        if hasattr(other, "locations"):
-            for other_location in other.locations:
-                if self.location.is_near(other_location):
+        for other_location in other.locations:
+            for self_location in self.locations:
+                if self_location.is_near(other_location):
                     return True
-        return self.location.is_near(other.location)
+        return False
+
+    def location_in_space(self, space: Structure):
+        for location in self.locations:
+            if location.space == space:
+                return location
+        raise Exception(
+            f"{self.structure_id} has no location in space {space.structure_id}"
+        )
 
     def has_link(self, structure: Structure) -> bool:
         from homer.structures.links import Correspondence, Label, Relation

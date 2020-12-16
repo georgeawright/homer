@@ -90,39 +90,3 @@ def test_location_in_space():
     chunk.locations.append(space_2_location)
     assert chunk.location_in_space(space_1) == space_1_location
     assert chunk.location_in_space(space_2) == space_2_location
-
-
-def test_add_member():
-    current_member = Mock()
-    current_member.value = [1]
-    current_member.location = Location([1, 1], Mock())
-    current_member.size = 1
-    mutual_neighbour = Mock()
-    new_members_neighbour = Mock()
-    new_member = Chunk(
-        Mock(),
-        Mock(),
-        [2],
-        Location([1, 2], Mock()),
-        StructureCollection(),
-        StructureCollection({mutual_neighbour, new_members_neighbour}),
-        Mock(),
-        Mock(),
-    )
-    chunk = Chunk(
-        Mock(),
-        Mock(),
-        current_member.value,
-        current_member.location,
-        StructureCollection({current_member}),
-        StructureCollection({mutual_neighbour, new_member}),
-        Mock(),
-        Mock(),
-    )
-    chunk.add_member(new_member)
-    assert [1.5] == chunk.value
-    assert [1, 1.5] == chunk.location.coordinates
-    assert 2 == chunk.size
-    assert new_member in chunk.members
-    assert new_member not in chunk.neighbours
-    assert new_members_neighbour in chunk.neighbours

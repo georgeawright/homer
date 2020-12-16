@@ -183,7 +183,13 @@ class FactoryCodelet(Codelet):
             raise MissingStructureError
             if structure_type == self.bubble_chamber.concepts["chunk"]:
                 champion = self.bubble_chamber.chunks.get_active()
-                target_space = champion.parent_spaces.get_random()
+                target_space = StructureCollection(
+                    {
+                        space
+                        for space in champion.parent_spaces
+                        if not space.is_sub_space
+                    }
+                ).get_random()
                 follow_up = ChunkSelector.spawn(
                     self.codelet_id,
                     self.bubble_chamber,

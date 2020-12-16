@@ -50,6 +50,10 @@ class ChunkSelector(Selector):
         return self.bubble_chamber.concepts["chunk"]
 
     def _passes_preliminary_checks(self):
+        print(self.target_space.structure_id)
+        print(self.champion.structure_id)
+        print(self.champion.locations)
+        print(self.champion.location_in_space(self.target_space))
         if self.challenger is not None:
             return True
         try:

@@ -6,6 +6,7 @@ from homer.codelets.selectors import ChunkSelector
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 
 
 class ChunkEvaluator(Evaluator):
@@ -43,16 +44,24 @@ class ChunkEvaluator(Evaluator):
             space.proximity_between(member, self.target_structure)
             for space in self.target_structure.parent_spaces
             for member in self.target_structure.members
+            if not space.is_sub_space
         ]
         self.confidence = statistics.fmean(proximities) if proximities != [] else 0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
 
     def _engender_follow_up(self):
+        target_space = StructureCollection(
+            {
+                space
+                for space in self.target_structure.parent_spaces
+                if not space.is_sub_space
+            }
+        ).get_random()
         self.child_codelets.append(
             ChunkSelector.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.target_structure.parent_spaces.get_random(),
+                target_space,
                 self.target_structure,
                 self.change_in_confidence,
             )

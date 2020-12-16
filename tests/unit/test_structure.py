@@ -82,7 +82,7 @@ def test_lexemes_returns_lexemes():
     number_of_lexemes = 10
     for _ in range(number_of_lexemes):
         lexeme = Lexeme(Mock(), Mock(), Mock(), Mock())
-        relation = Relation(Mock(), Mock(), structure, lexeme, Mock(), Mock(), Mock())
+        relation = Relation(Mock(), Mock(), structure, lexeme, Mock(), None, Mock())
         structure.links_out.add(relation)
     for _ in range(number_of_lexemes):
         structure.links_out.add(Mock())
@@ -114,13 +114,13 @@ def test_relations_in_space_with():
     space = Mock()
     space.contents = StructureCollection()
     relation_in_space_with_end = Relation(
-        Mock(), Mock(), structure, end, Mock(), Mock(), Mock()
+        Mock(), Mock(), structure, end, Mock(), None, Mock()
     )
     relation_in_space_not_with_end = Relation(
-        Mock(), Mock(), structure, Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), structure, Mock(), Mock(), None, Mock()
     )
     relation_not_in_space_with_end = Relation(
-        Mock(), Mock(), structure, end, Mock(), Mock(), Mock()
+        Mock(), Mock(), structure, end, Mock(), None, Mock()
     )
     space.contents.add(relation_in_space_with_end)
     space.contents.add(relation_in_space_not_with_end)
@@ -140,7 +140,7 @@ def test_correspondences_to():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     space = Mock()
     correspondence_1 = Correspondence(
-        Mock(), Mock(), structure, Mock(), Mock(), space, Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), structure, Mock(), Mock(), space, Mock(), None, Mock(), Mock()
     )
     correspondence_2 = Correspondence(
         Mock(), Mock(), Mock(), structure, space, Mock(), Mock(), Mock(), Mock(), Mock()
@@ -153,7 +153,7 @@ def test_correspondences_to():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        None,
         Mock(),
         Mock(),
     )

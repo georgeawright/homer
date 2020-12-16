@@ -20,7 +20,7 @@ class Link(Structure):
             self,
             structure_id,
             parent_id,
-            start.location,
+            start.location_in_space(parent_space) if parent_space is not None else None,
             quality,
             links_in=links_in,
             links_out=links_out,

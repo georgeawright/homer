@@ -4,6 +4,7 @@ from homer.classifier import Classifier
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 from homer.id import ID
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
@@ -24,6 +25,7 @@ class Concept(Structure):
         prototype: Any,
         classifier: Classifier,
         parent_space: Space,
+        location: Location,
         relevant_value: str,
         child_spaces: StructureCollection,
         distance_function: Callable,
@@ -31,7 +33,6 @@ class Concept(Structure):
         links_out: StructureCollection = None,
         depth: int = 1,
     ):
-        location = None
         quality = None
         Structure.__init__(
             self,
@@ -73,6 +74,7 @@ class Concept(Structure):
             prototype,
             classifier,
             parent_space,
+            Location(prototype, parent_space),
             relevant_value,
             child_spaces,
             distance_function,

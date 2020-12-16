@@ -30,13 +30,23 @@ def bubble_chamber():
         Mock(),
     )
     view_concept = Concept(
-        Mock(), Mock(), "view", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "view",
+        None,
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(view_concept)
     select_concept = Concept(
         Mock(),
         Mock(),
         "select",
+        None,
         None,
         None,
         None,
@@ -95,7 +105,7 @@ def bad_view(bubble_chamber, target_space, view_members):
     return view
 
 
-def test_good_chunk_is_boosted_bad_chunk_is_decayed(
+def test_good_view_is_boosted_bad_view_is_decayed(
     bubble_chamber, target_space, good_view, bad_view
 ):
     parent_id = ""

@@ -64,15 +64,6 @@ class LabelBuilder(Builder):
     def _process_structure(self):
         space = self.parent_concept.parent_space.instance
         self.bubble_chamber.logger.log(space)
-        label = Label(
-            ID.new(Label),
-            self.codelet_id,
-            self.target_chunk,
-            self.parent_concept,
-            space,
-            0,
-        )
-        label.activation = self.INITIAL_STRUCTURE_ACTIVATION
         if self.target_chunk not in space.contents:
             self.target_chunk.locations.append(
                 Location(
@@ -82,6 +73,15 @@ class LabelBuilder(Builder):
             )
             self.target_chunk.parent_spaces.add(space)
             space.add(self.target_chunk)
+        label = Label(
+            ID.new(Label),
+            self.codelet_id,
+            self.target_chunk,
+            self.parent_concept,
+            space,
+            0,
+        )
+        label.activation = self.INITIAL_STRUCTURE_ACTIVATION
         space.add(label)
         self.target_chunk.links_out.add(label)
         self.bubble_chamber.labels.add(label)

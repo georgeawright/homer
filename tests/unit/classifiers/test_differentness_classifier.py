@@ -76,7 +76,7 @@ def test_classify_chunks_with_different_labels():
         Mock(),
         Mock(),
         differentness_concept,
-        Mock(),
+        None,
         Mock(),
         1.0,
     )
@@ -111,7 +111,7 @@ def test_classify_relations_with_different_arguments():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        None,
         Mock(),
         links_out=StructureCollection(),
     )
@@ -152,7 +152,7 @@ def test_classify_relations_with_different_arguments():
         Mock(),
         Mock(),
         differentness_concept,
-        Mock(),
+        None,
         Mock(),
         1.0,
     )
@@ -209,7 +209,7 @@ def test_classify_relations_with_different_arguments():
         Mock(),
         Mock(),
         differentness_concept,
-        Mock(),
+        None,
         Mock(),
         1.0,
     )
@@ -227,7 +227,7 @@ def test_classify_relations_with_different_arguments():
         start_relation_start,
         start_relation_end,
         start_relation_parent_concept,
-        Mock(),
+        None,
         1.0,
     )
     end_relation = Relation(
@@ -236,7 +236,7 @@ def test_classify_relations_with_different_arguments():
         end_relation_start,
         end_relation_end,
         end_relation_parent_concept,
-        Mock(),
+        None,
         1.0,
     )
 

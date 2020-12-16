@@ -39,7 +39,6 @@ class Chunk(Structure):
         self.members = members
         self.neighbours = neighbours
         self.parent_spaces = parent_spaces
-        self.locations = [location]
 
     @property
     def size(self):
@@ -58,48 +57,3 @@ class Chunk(Structure):
         ).of_type(type(self))
         nearby_chunks.remove(self)
         return nearby_chunks
-
-    def is_near(self, other: Structure):
-        if hasattr(other, "locations"):
-            for other_location in other.locations:
-                for self_location in self.locations:
-                    if self_location.is_near(other_location):
-                        return True
-        else:
-            for self_location in self.locations:
-                if self_location.is_near(other.location):
-                    return True
-        return False
-
-    def location_in_space(self, space: Space):
-        for location in self.locations:
-            if location.space == space:
-                return location
-        raise Exception(
-            "{self.structure_id} has no location in space {space.structure_id}"
-        )
-
-    def add_member(self, new_member: Chunk):
-        self.members.add(new_member)
-        new_member.neighbours.remove(self)
-        for neighbour in new_member.neighbours:
-            if neighbour not in self.members:
-                self.neighbours.add(neighbour)
-        self.neighbours.remove(new_member)
-        self.value = self._get_average_value(self.members)
-        self.location = self._get_average_location(self.members)
-
-    def _get_average_value(self, chunks: StructureCollection):
-        values = []
-        for chunk in chunks:
-            for _ in range(chunk.size):
-                values.append(chunk.value)
-        return average_vector(values)
-
-    def _get_average_location(self, chunks: StructureCollection):
-        # TODO: needs to be for each space
-        locations = []
-        for chunk in chunks:
-            for _ in range(chunk.size):
-                locations.append(chunk.location)
-        return Location.average(locations)

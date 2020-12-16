@@ -39,7 +39,7 @@ def test_classify_chunks_with_same_labels():
         Mock(),
         Mock(),
         concept,
-        Mock(),
+        None,
         1.0,
     )
     start.links_out.add(start_label)
@@ -59,7 +59,7 @@ def test_classify_chunks_with_same_labels():
         Mock(),
         Mock(),
         concept,
-        Mock(),
+        None,
         1.0,
     )
     end.links_out.add(end_label)
@@ -72,7 +72,7 @@ def test_classify_chunks_with_same_labels():
         Mock(),
         Mock(),
         sameness_concept,
-        Mock(),
+        None,
         Mock(),
         1.0,
     )
@@ -117,7 +117,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         start_concept,
-        Mock(),
+        None,
         1.0,
     )
     start_relation_start.links_out.add(start_relation_start_label)
@@ -137,7 +137,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         start_concept,
-        Mock(),
+        None,
         1.0,
     )
     end_relation_start.links_out.add(end_relation_start_label)
@@ -149,7 +149,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         sameness_concept,
-        Mock(),
+        None,
         Mock(),
         1.0,
     )
@@ -175,7 +175,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         end_concept,
-        Mock(),
+        None,
         1.0,
     )
     start_relation_end.links_out.add(start_relation_end_label)
@@ -195,7 +195,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         end_concept,
-        Mock(),
+        None,
         1.0,
     )
     end_relation_end.links_out.add(end_relation_end_label)
@@ -207,7 +207,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         sameness_concept,
-        Mock(),
+        None,
         Mock(),
         1.0,
     )
@@ -223,7 +223,7 @@ def test_classify_relations_with_same_arguments():
         start_relation_start,
         start_relation_end,
         relation_parent_concept,
-        Mock(),
+        None,
         1.0,
     )
     end_relation = Relation(
@@ -232,7 +232,7 @@ def test_classify_relations_with_same_arguments():
         end_relation_start,
         end_relation_end,
         relation_parent_concept,
-        Mock(),
+        None,
         1.0,
     )
 

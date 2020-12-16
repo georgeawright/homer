@@ -601,6 +601,7 @@ midlands_lexeme = Lexeme.new(
 )
 logger.log(midlands_lexeme)
 bubble_chamber.lexemes.add(midlands_lexeme)
+
 north_south_space = ConceptualSpace(
     "north-south",
     "",
@@ -608,6 +609,7 @@ north_south_space = ConceptualSpace(
     StructureCollection(),
     south,
     coordinates_from_super_space_location=lambda location: [location.coordinates[0]],
+    is_sub_space=True,
 )
 west_east_space = ConceptualSpace(
     "west-east",
@@ -616,6 +618,7 @@ west_east_space = ConceptualSpace(
     StructureCollection(),
     east,
     coordinates_from_super_space_location=lambda location: [location.coordinates[1]],
+    is_sub_space=True,
 )
 nw_se_space = ConceptualSpace(
     "nw-se",
@@ -626,6 +629,7 @@ nw_se_space = ConceptualSpace(
     coordinates_from_super_space_location=lambda location: [
         statistics.fmean(location.coordinates)
     ],
+    is_sub_space=True,
 )
 ne_sw_space = ConceptualSpace(
     "ne-sw",
@@ -636,6 +640,7 @@ ne_sw_space = ConceptualSpace(
     coordinates_from_super_space_location=lambda location: [
         statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
     ],
+    is_sub_space=True,
 )
 location_space.sub_spaces.add(north_south_space)
 location_space.sub_spaces.add(west_east_space)
@@ -1050,7 +1055,6 @@ relative_neighbour_coordinates = [
 ]
 
 input_chunks = StructureCollection()
-parent_spaces = StructureCollection({bubble_chamber.spaces["input"]})
 for i, row in enumerate(problem):
     for j, cell in enumerate(row):
         value = [cell]
@@ -1066,7 +1070,7 @@ for i, row in enumerate(problem):
             members,
             neighbours,
             quality,
-            parent_spaces,
+            StructureCollection({bubble_chamber.spaces["input"]}),
         )
         logger.log(chunk)
         input_chunks.add(chunk)

@@ -49,6 +49,7 @@ class ChunkBuilder(Builder):
         return self.bubble_chamber.concepts["chunk"]
 
     def _passes_preliminary_checks(self):
+        print(self.codelet_id)
         try:
             self.second_target_chunk = self.target_chunk.nearby().get_random()
         except MissingStructureError:
@@ -64,6 +65,7 @@ class ChunkBuilder(Builder):
         distances = [
             space.proximity_between(self.target_chunk, self.second_target_chunk)
             for space in self.target_chunk.parent_spaces
+            if not space.is_sub_space
         ]
         self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
 
@@ -146,14 +148,16 @@ class ChunkBuilder(Builder):
 
     def _get_average_location(self, chunks: StructureCollection, space: Space = None):
         if space is not None:
+            print(space.structure_id)
             locations = []
             for chunk in chunks:
                 for _ in range(chunk.size):
-                    locations.append(
-                        Location(
-                            getattr(chunk, space.parent_concept.relevant_value), space
+                    try:
+                        locations.append(chunk.location_in_space(space))
+                    except Exception:
+                        locations.append(
+                            Location(space.get_relevant_value(chunk), space)
                         )
-                    )
             return Location.average(locations)
         locations = []
         for chunk in chunks:

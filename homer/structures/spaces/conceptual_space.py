@@ -15,6 +15,7 @@ class ConceptualSpace(Space):
         name: str,
         contents: StructureCollection,
         parent_concept: Concept,
+        is_sub_space: bool = False,
         parent_spaces: StructureCollection = None,
         child_spaces: StructureCollection = None,
         coordinates_from_super_space_location: Callable = None,
@@ -30,6 +31,7 @@ class ConceptualSpace(Space):
             contents,
             quality,
             parent_concept,
+            is_sub_space=is_sub_space,
             parent_spaces=parent_spaces,
             child_spaces=child_spaces,
             coordinates_from_super_space_location=coordinates_from_super_space_location,
@@ -49,6 +51,7 @@ class ConceptualSpace(Space):
                 FloatBetweenOneAndZero(0),
                 self.parent_concept,
                 coordinates_from_super_space_location=self.coordinates_from_super_space_location,
+                is_sub_space=self.is_sub_space,
                 links_in=StructureCollection(),
                 links_out=StructureCollection(),
             )

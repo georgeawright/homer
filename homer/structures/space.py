@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Any, Callable
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
@@ -15,6 +15,7 @@ class Space(Structure):
         contents: list,
         quality: FloatBetweenOneAndZero,
         parent_concept: "Concept",
+        is_sub_space: bool = False,
         parent_spaces: StructureCollection = None,
         child_spaces: StructureCollection = None,
         sub_spaces: StructureCollection = None,
@@ -36,6 +37,7 @@ class Space(Structure):
         self.value = name
         self.contents = contents
         self.parent_concept = parent_concept
+        self.is_sub_space = is_sub_space
         self.parent_spaces = (
             parent_spaces if parent_spaces is not None else StructureCollection()
         )
@@ -50,6 +52,7 @@ class Space(Structure):
         )
 
     def add(self, structure: Structure):
+        print(structure.structure_id)
         self.contents.add(structure)
         if not hasattr(structure, "location_in_space"):
             return
@@ -58,9 +61,19 @@ class Space(Structure):
             location_in_sub_space = sub_space.location_from_super_space_location(
                 location_in_this_space
             )
+            print(location_in_sub_space)
             structure.locations.append(location_in_sub_space)
             sub_space.add(structure)
             structure.parent_spaces.add(sub_space)
+            print(structure.locations)
+
+    def get_relevant_value(self, chunk) -> Any:
+        relevant_value = getattr(chunk, self.parent_concept.relevant_value)
+        if self.coordinates_from_super_space_location is not None:
+            relevant_value = self.coordinates_from_super_space_location(
+                Location(relevant_value, None)
+            )
+        return relevant_value
 
     def location_from_super_space_location(self, location: Location) -> Location:
         if self.coordinates_from_super_space_location is None:
@@ -73,4 +86,5 @@ class Space(Structure):
         return self.parent_concept.distance_between(a, b)
 
     def proximity_between(self, a: Structure, b: Structure):
+        print(self.structure_id)
         return self.parent_concept.proximity_between(a, b)

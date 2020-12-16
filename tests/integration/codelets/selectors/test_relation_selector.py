@@ -35,6 +35,7 @@ def bubble_chamber():
         None,
         None,
         None,
+        None,
         "value",
         StructureCollection(),
         None,
@@ -44,6 +45,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "select",
+        None,
         None,
         None,
         None,
@@ -71,8 +73,9 @@ def working_space():
 
 
 @pytest.fixture
-def start():
+def start(working_space):
     chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk.locations.append(Location([1, 1], working_space))
     return chunk
 
 
@@ -85,7 +88,16 @@ def end():
 @pytest.fixture
 def good_relation(start, end, conceptual_space, working_space):
     concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        conceptual_space,
+        Mock(),
+        Mock(),
+        Mock(),
     )
     relation = Relation(
         Mock(),
@@ -105,7 +117,16 @@ def good_relation(start, end, conceptual_space, working_space):
 @pytest.fixture
 def bad_relation(start, end, conceptual_space, working_space):
     concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        conceptual_space,
+        Mock(),
+        Mock(),
+        Mock(),
     )
     relation = Relation(
         Mock(),

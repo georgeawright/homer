@@ -13,6 +13,7 @@ def test_changes_target_structure_quality(current_quality, classification):
     chunk = Mock()
     chunk.members = StructureCollection({Mock(), Mock()})
     space = Mock()
+    space.is_sub_space = False
     space.proximity_between.return_value = classification
     chunk.parent_spaces = StructureCollection({space})
     chunk.quality = current_quality

@@ -56,27 +56,33 @@ def test_nearby():
 
 
 def test_get_slot_argument_returns_slot():
-    slot = Slot(Mock(), Mock())
+    space = Mock()
+    location = Mock()
+    location.space = space
+    slot = Slot(Mock(), Mock(), location=location)
     non_slot = Mock()
     correspondence = Correspondence(
-        Mock(), Mock(), slot, non_slot, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), slot, non_slot, Mock(), Mock(), Mock(), space, Mock(), Mock()
     )
     assert slot == correspondence.get_slot_argument()
     correspondence = Correspondence(
-        Mock(), Mock(), non_slot, slot, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), non_slot, slot, Mock(), Mock(), Mock(), space, Mock(), Mock()
     )
     assert slot == correspondence.get_slot_argument()
 
 
 def test_get_non_slot_argument_returns_non_slot():
-    slot = Slot(Mock(), Mock())
+    space = Mock()
+    location = Mock()
+    location.space = space
+    slot = Slot(Mock(), Mock(), location=location)
     non_slot = Mock()
     correspondence = Correspondence(
-        Mock(), Mock(), slot, non_slot, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), slot, non_slot, Mock(), Mock(), Mock(), space, Mock(), Mock()
     )
     assert non_slot == correspondence.get_non_slot_argument()
     correspondence = Correspondence(
-        Mock(), Mock(), non_slot, slot, Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(), Mock(), non_slot, slot, Mock(), Mock(), Mock(), space, Mock(), Mock()
     )
     assert non_slot == correspondence.get_non_slot_argument()
 

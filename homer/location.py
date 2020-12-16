@@ -35,4 +35,5 @@ class Location:
     def is_near(self, other: Location) -> bool:
         if self.space != other.space:
             return False
+        print(f"{self} is near {other}?")
         return math.dist(self.coordinates, other.coordinates) <= self.NEARNESS

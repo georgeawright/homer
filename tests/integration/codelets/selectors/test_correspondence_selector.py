@@ -35,6 +35,7 @@ def bubble_chamber():
         None,
         None,
         None,
+        None,
         "value",
         StructureCollection(),
         None,
@@ -44,6 +45,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "select",
+        None,
         None,
         None,
         None,
@@ -73,18 +75,6 @@ def working_space():
 
 
 @pytest.fixture
-def start():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    return chunk
-
-
-@pytest.fixture
-def end():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    return chunk
-
-
-@pytest.fixture
 def start_space():
     space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
     return space
@@ -97,11 +87,33 @@ def end_space():
 
 
 @pytest.fixture
+def start(start_space):
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk.locations.append(Location([1, 1], start_space))
+    return chunk
+
+
+@pytest.fixture
+def end():
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    return chunk
+
+
+@pytest.fixture
 def good_correspondence(
     start, end, start_space, end_space, conceptual_space, working_space
 ):
     concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        conceptual_space,
+        Mock(),
+        Mock(),
+        Mock(),
     )
     correspondence = Correspondence(
         Mock(),
@@ -131,7 +143,16 @@ def bad_correspondence(
     working_space,
 ):
     concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), conceptual_space, Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        conceptual_space,
+        Mock(),
+        Mock(),
+        Mock(),
     )
     correspondence = Correspondence(
         Mock(),
@@ -151,7 +172,7 @@ def bad_correspondence(
     return correspondence
 
 
-def test_good_chunk_is_boosted_bad_chunk_is_decayed(
+def test_good_correspondence_is_boosted_bad_correspondence_is_decayed(
     bubble_chamber, good_correspondence, bad_correspondence
 ):
     parent_id = ""
