@@ -1010,9 +1010,6 @@ slot_location_2 = TemplateSlot(
     Location([8], template_4),
     StructureCollection({template_4}),
 )
-more_relation = Relation(
-    ID.new(Relation), "", slot_location_1, slot_location_2, more, temperature_space, 1.0
-)
 
 template_4.contents.add(word_it)
 template_4.contents.add(word_is)
