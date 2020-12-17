@@ -74,19 +74,12 @@ class ChunkBuilder(Builder):
             self._members_from_chunk(self.target_chunk),
             self._members_from_chunk(self.second_target_chunk),
         )
-        new_chunk_neighbours = StructureCollection.difference(
-            StructureCollection.union(
-                self.target_chunk.neighbours, self.second_target_chunk.neighbours
-            ),
-            new_chunk_members,
-        )
         chunk = Chunk(
             ID.new(Chunk),
             self.codelet_id,
             self._get_average_value(new_chunk_members),
             self._get_average_location(new_chunk_members),
             new_chunk_members,
-            new_chunk_neighbours,
             0,
             StructureCollection.union(
                 self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces

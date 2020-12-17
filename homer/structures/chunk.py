@@ -20,7 +20,6 @@ class Chunk(Structure):
         value: Any,
         location: Location,
         members: StructureCollection,
-        neighbours: StructureCollection,
         quality: FloatBetweenOneAndZero,
         parent_spaces: StructureCollection,
         links_in: StructureCollection = None,
@@ -37,7 +36,6 @@ class Chunk(Structure):
         )
         self.value = value
         self.members = members
-        self.neighbours = neighbours
         self.parent_spaces = parent_spaces
 
     @property

@@ -14,7 +14,6 @@ class Word(Chunk):
         parent_spaces: StructureCollection,
         quality: FloatBetweenOneAndZero,
         members: StructureCollection = None,
-        neighbours: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -25,7 +24,6 @@ class Word(Chunk):
             value,
             location,
             members,
-            neighbours,
             quality,
             parent_spaces,
             links_in=links_in,

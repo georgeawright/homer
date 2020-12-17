@@ -25,10 +25,9 @@ def test_size_recursive():
                 StructureCollection(),
                 Mock(),
                 Mock(),
-                Mock(),
             )
         )
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), members, Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), members, Mock(), Mock())
     assert size == chunk.size
 
 
@@ -56,7 +55,6 @@ def test_nearby():
         space_1_location,
         Mock(),
         Mock(),
-        Mock(),
         StructureCollection({space_1}),
     )
     chunk.parent_spaces.add(space_2)
@@ -81,7 +79,6 @@ def test_location_in_space():
         Mock(),
         Mock(),
         space_1_location,
-        Mock(),
         Mock(),
         Mock(),
         StructureCollection({space_1}),

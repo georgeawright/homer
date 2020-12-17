@@ -1064,7 +1064,6 @@ for i, row in enumerate(problem):
         value = [cell]
         location = Location([i, j], bubble_chamber.spaces["input"])
         members = StructureCollection()
-        neighbours = StructureCollection()
         quality = 0.0
         chunk = Chunk(
             ID.new(Chunk),
@@ -1072,7 +1071,6 @@ for i, row in enumerate(problem):
             value,
             location,
             members,
-            neighbours,
             quality,
             StructureCollection({bubble_chamber.spaces["input"]}),
         )
@@ -1080,18 +1078,6 @@ for i, row in enumerate(problem):
         input_chunks.add(chunk)
         bubble_chamber.chunks.add(chunk)
         input_space.contents.add(chunk)
-for chunk in input_chunks:
-    i = chunk.location.coordinates[0]
-    j = chunk.location.coordinates[1]
-    for x, y in relative_neighbour_coordinates:
-        if (
-            i + x >= 0
-            and i + x < len(problem)
-            and j + y >= 0
-            and j + y < len(problem[0])
-        ):
-            neighbour_location = Location([i + x, j + y], input_space)
-            chunk.neighbours.add(input_chunks.at(neighbour_location).get_random())
 
 coderack = Coderack.setup(bubble_chamber, logger)
 
