@@ -26,6 +26,16 @@ class Location:
             locations[0].space,
         )
 
+    @classmethod
+    def for_correspondence_between(
+        cls, location_1: Location, location_2: Location, space: "Space"
+    ):
+        if location_1.space == space.child_spaces[0]:
+            coordinates = location_1.coordinates + location_2.coordinates
+        else:
+            coordinates = location_2.coordinates + location_1.coordinates
+        return Location(coordinates, space)
+
     def __eq__(self, other: Location) -> bool:
         return self.coordinates == other.coordinates and self.space == other.space
 

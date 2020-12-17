@@ -1,8 +1,9 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder, RelationBuilder
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence
@@ -52,48 +53,53 @@ def test_gets_second_target_space_and_structure_if_needed(
     target_structure_one,
     parent_concept,
 ):
-    correspondence_builder = CorrespondenceBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        Mock(),
-        target_structure_one,
-        Mock(),
-        parent_concept=parent_concept,
-    )
-    assert correspondence_builder.target_space_two is None
-    assert correspondence_builder.target_structure_two is None
-    correspondence_builder.run()
-    assert correspondence_builder.target_space_two is not None
-    assert correspondence_builder.target_structure_two is not None
+    with patch.object(Location, "for_correspondence_between", return_value=Mock()):
+        correspondence_builder = CorrespondenceBuilder(
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            Mock(),
+            target_structure_one,
+            Mock(),
+            parent_concept=parent_concept,
+        )
+        assert correspondence_builder.target_space_two is None
+        assert correspondence_builder.target_structure_two is None
+        correspondence_builder.run()
+        assert correspondence_builder.target_space_two is not None
+        assert correspondence_builder.target_structure_two is not None
 
 
 def test_gets_parent_concept_if_needed(bubble_chamber, target_structure_one):
-    correspondence_builder = CorrespondenceBuilder(
-        Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
-    )
-    assert correspondence_builder.parent_concept is None
-    correspondence_builder.run()
-    assert correspondence_builder.parent_concept is not None
+    with patch.object(Location, "for_correspondence_between", return_value=Mock()):
+        correspondence_builder = CorrespondenceBuilder(
+            Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
+        )
+        assert correspondence_builder.parent_concept is None
+        correspondence_builder.run()
+        assert correspondence_builder.parent_concept is not None
 
 
 def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber, target_structure_one, parent_concept
 ):
-    correspondence_builder = CorrespondenceBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        Mock(),
-        target_structure_one,
-        Mock(),
-        parent_concept=parent_concept,
-    )
-    result = correspondence_builder.run()
-    assert CodeletResult.SUCCESS == result
-    assert isinstance(correspondence_builder.child_structure, Correspondence)
-    assert len(correspondence_builder.child_codelets) == 1
-    assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceBuilder)
+    with patch.object(Location, "for_correspondence_between", return_value=Mock()):
+        correspondence_builder = CorrespondenceBuilder(
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            Mock(),
+            target_structure_one,
+            Mock(),
+            parent_concept=parent_concept,
+        )
+        result = correspondence_builder.run()
+        assert CodeletResult.SUCCESS == result
+        assert isinstance(correspondence_builder.child_structure, Correspondence)
+        assert len(correspondence_builder.child_codelets) == 1
+        assert isinstance(
+            correspondence_builder.child_codelets[0], CorrespondenceBuilder
+        )
 
 
 def test_fails_when_structures_do_not_correspond(bubble_chamber, target_structure_one):

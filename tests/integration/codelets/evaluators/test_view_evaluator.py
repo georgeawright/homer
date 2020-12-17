@@ -31,13 +31,23 @@ def bubble_chamber():
         Mock(),
     )
     view_concept = Concept(
-        Mock(), Mock(), "view", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "view",
+        None,
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(view_concept)
     evaluate_concept = Concept(
         Mock(),
         Mock(),
         "evaluate",
+        None,
         None,
         None,
         None,

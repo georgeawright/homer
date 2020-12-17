@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept, Link, Space
@@ -15,6 +16,7 @@ class Correspondence(Link):
         parent_id: str,
         start: Structure,
         end: Structure,
+        location: Location,
         start_space: Space,
         end_space: Space,
         parent_concept: Concept,
@@ -28,6 +30,7 @@ class Correspondence(Link):
             parent_id,
             start,
             end,
+            location,
             parent_concept,
             parent_space,
             quality,
@@ -48,6 +51,11 @@ class Correspondence(Link):
             parent_id,
             start,
             end,
+            Location.for_correspondence_between(
+                start.location_in_space(self.start_space),
+                end.location_in_space(self.end_space),
+                self.parent_space,
+            ),
             self.start_space,
             self.end_space,
             self.parent_concept,

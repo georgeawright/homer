@@ -93,6 +93,11 @@ class WordBuilder(Builder):
             self.codelet_id,
             self.slot,
             word,
+            Location.for_correspondence_between(
+                self.slot.location_in_space(self.slot_space),
+                word.location_in_space(self.output_space),
+                slot_to_word_space,
+            ),
             self.slot_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],
@@ -113,6 +118,11 @@ class WordBuilder(Builder):
             self.codelet_id,
             self.non_slot,
             word,
+            Location.for_correspondence_between(
+                self.non_slot.location_in_space(self.non_slot_space),
+                word.location_in_space(self.output_space),
+                non_slot_to_word_space,
+            ),
             self.non_slot_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],

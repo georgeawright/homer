@@ -4,6 +4,7 @@ from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept, Space
@@ -122,6 +123,11 @@ class CorrespondenceBuilder(Builder):
             self.codelet_id,
             self.target_structure_one,
             self.target_structure_two,
+            Location.for_correspondence_between(
+                self.target_structure_one.location_in_space(self.target_space_one),
+                self.target_structure_two.location_in_space(self.target_structure_two),
+                parent_space,
+            ),
             self.target_space_one,
             self.target_space_two,
             self.parent_concept,

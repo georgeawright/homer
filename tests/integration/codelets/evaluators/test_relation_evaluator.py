@@ -37,6 +37,7 @@ def bubble_chamber():
         None,
         None,
         None,
+        None,
         "value",
         StructureCollection(),
         None,
@@ -46,6 +47,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "evaluate",
+        None,
         None,
         None,
         None,
@@ -65,10 +67,28 @@ def bubble_chamber():
 @pytest.fixture
 def good_relation(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "coordinates",
+        Mock(),
+        math.dist,
     )
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "value",
+        Mock(),
+        math.dist,
     )
     input_space = WorkingSpace(
         Mock(), Mock(), "input", StructureCollection(), 0, location_concept
@@ -83,6 +103,7 @@ def good_relation(bubble_chamber):
         [5],
         StretchyProximityClassifier(),
         temperature_space,
+        Mock(),
         "value",
         StructureCollection(),
         math.dist,
@@ -118,10 +139,28 @@ def good_relation(bubble_chamber):
 @pytest.fixture
 def bad_relation(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "coordinates",
+        Mock(),
+        math.dist,
     )
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "value",
+        Mock(),
+        math.dist,
     )
     input_space = WorkingSpace(
         Mock(), Mock(), "input", StructureCollection(), 0, location_concept
@@ -136,6 +175,7 @@ def bad_relation(bubble_chamber):
         [5],
         StretchyProximityClassifier(),
         temperature_space,
+        Mock(),
         "value",
         StructureCollection(),
         math.dist,

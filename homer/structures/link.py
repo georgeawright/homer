@@ -1,4 +1,5 @@
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
@@ -10,6 +11,7 @@ class Link(Structure):
         parent_id: str,
         start: Structure,
         end: Structure,
+        location: Location,
         parent_concept: "Concept",
         parent_space: "Space",
         quality: FloatBetweenOneAndZero,
@@ -20,7 +22,7 @@ class Link(Structure):
             self,
             structure_id,
             parent_id,
-            start.location_in_space(parent_space) if parent_space is not None else None,
+            location,
             quality,
             links_in=links_in,
             links_out=links_out,

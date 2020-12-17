@@ -24,6 +24,7 @@ class Relation(Link):
             parent_id,
             start,
             end,
+            start.location_in_space(parent_space) if parent_space is not None else None,
             parent_concept,
             parent_space,
             quality,

@@ -70,6 +70,11 @@ class FunctionWordBuilder(Builder):
             self.codelet_id,
             self.template_word,
             output_word,
+            Location.for_correspondence_between(
+                self.template_word.location_in_space(self.input_space),
+                output_word.location_in_space(self.output_space),
+                correspondence_space,
+            ),
             self.input_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],
