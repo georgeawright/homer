@@ -611,6 +611,7 @@ north_south_space = ConceptualSpace(
     coordinates_from_super_space_location=lambda location: [location.coordinates[0]],
     is_sub_space=True,
 )
+logger.log(north_south_space)
 west_east_space = ConceptualSpace(
     "west-east",
     "",
@@ -620,6 +621,7 @@ west_east_space = ConceptualSpace(
     coordinates_from_super_space_location=lambda location: [location.coordinates[1]],
     is_sub_space=True,
 )
+logger.log(west_east_space)
 nw_se_space = ConceptualSpace(
     "nw-se",
     "",
@@ -631,6 +633,7 @@ nw_se_space = ConceptualSpace(
     ],
     is_sub_space=True,
 )
+logger.log(nw_se_space)
 ne_sw_space = ConceptualSpace(
     "ne-sw",
     "",
@@ -642,6 +645,7 @@ ne_sw_space = ConceptualSpace(
     ],
     is_sub_space=True,
 )
+logger.log(ne_sw_space)
 location_space.sub_spaces.add(north_south_space)
 location_space.sub_spaces.add(west_east_space)
 location_space.sub_spaces.add(nw_se_space)
