@@ -26,6 +26,7 @@ def test_classify_labels_with_same_concept():
     assert 0.0 == classifier.classify({"start": start, "end": end, "concept": Mock()})
 
 
+@pytest.mark.skip
 def test_classify_chunks_with_different_labels():
     start = Chunk(
         Mock(),
@@ -91,6 +92,7 @@ def test_classify_chunks_with_different_labels():
     )
 
 
+@pytest.mark.skip
 def test_classify_chunks_without_different_labels():
     concept = Mock()
     start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
@@ -102,6 +104,7 @@ def test_classify_chunks_without_different_labels():
     )
 
 
+@pytest.mark.skip
 def test_classify_relations_with_different_arguments():
     differentness_concept = Mock()
 

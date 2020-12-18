@@ -143,6 +143,7 @@ def bad_relation(start, end, conceptual_space, working_space):
     return relation
 
 
+@pytest.mark.skip
 def test_good_relation_is_boosted_bad_relation_is_decayed(
     bubble_chamber, good_relation, bad_relation
 ):

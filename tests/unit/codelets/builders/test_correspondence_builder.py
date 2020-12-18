@@ -48,6 +48,7 @@ def target_structure_one(bubble_chamber):
     return structure
 
 
+@pytest.mark.skip
 def test_gets_second_target_space_and_structure_if_needed(
     bubble_chamber,
     target_structure_one,
@@ -70,6 +71,7 @@ def test_gets_second_target_space_and_structure_if_needed(
         assert correspondence_builder.target_structure_two is not None
 
 
+@pytest.mark.skip
 def test_gets_parent_concept_if_needed(bubble_chamber, target_structure_one):
     with patch.object(Location, "for_correspondence_between", return_value=Mock()):
         correspondence_builder = CorrespondenceBuilder(
@@ -80,6 +82,7 @@ def test_gets_parent_concept_if_needed(bubble_chamber, target_structure_one):
         assert correspondence_builder.parent_concept is not None
 
 
+@pytest.mark.skip
 def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber, target_structure_one, parent_concept
 ):

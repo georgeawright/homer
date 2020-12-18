@@ -3,6 +3,8 @@ from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
+from .space import Space
+
 
 class Link(Structure):
     def __init__(
@@ -13,7 +15,6 @@ class Link(Structure):
         end: Structure,
         location: Location,
         parent_concept: "Concept",
-        parent_space: "Space",
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
@@ -22,7 +23,7 @@ class Link(Structure):
             self,
             structure_id,
             parent_id,
-            location,
+            [location],
             quality,
             links_in=links_in,
             links_out=links_out,
@@ -31,8 +32,10 @@ class Link(Structure):
         self.end = end
         self.parent_concept = parent_concept
         self.value = parent_concept.name if hasattr(parent_concept, "name") else None
-        self.parent_space = parent_space
-        self.parent_spaces = StructureCollection({parent_space})
+
+    @property
+    def parent_space(self) -> Space:
+        return self.locations[0].space
 
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""

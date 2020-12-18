@@ -198,6 +198,7 @@ def target_view(bubble_chamber, first_correspondence, second_correspondence):
     return view
 
 
+@pytest.mark.skip
 def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_cannot_be_recreated(
     bubble_chamber, target_view, nearby_correspondence
 ):

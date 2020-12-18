@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
@@ -7,6 +8,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.chunks import Word
 
 
+@pytest.mark.skip
 def test_successful_creates_word():
     with patch.object(Location, "for_correspondence_between", return_value=Mock()):
         bubble_chamber = Mock()

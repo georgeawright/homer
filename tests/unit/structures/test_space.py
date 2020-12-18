@@ -7,6 +7,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Space
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "coordinates, n_s_coordinates, w_e_coordinates, nw_se_coordinates, ne_sw_coordinates",
     [([0, 0], [0], [0], [0], [2])],

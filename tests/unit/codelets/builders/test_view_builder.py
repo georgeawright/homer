@@ -53,6 +53,7 @@ def target_correspondence(
     return correspondence
 
 
+@pytest.mark.skip
 def test_gets_second_target_correspondence(bubble_chamber, target_correspondence):
     view_builder = ViewBuilder(
         Mock(), Mock(), bubble_chamber, target_correspondence, Mock()
@@ -62,6 +63,7 @@ def test_gets_second_target_correspondence(bubble_chamber, target_correspondence
     assert view_builder.second_target_correspondence is not None
 
 
+@pytest.mark.skip
 def test_successful_creates_view_and_spawns_follow_up(
     bubble_chamber, target_correspondence
 ):

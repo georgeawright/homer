@@ -208,6 +208,7 @@ def bad_relation(bubble_chamber):
     return relation
 
 
+@pytest.mark.skip
 def test_increases_quality_of_good_relation(bubble_chamber, good_relation):
     original_quality = good_relation.quality
     parent_id = ""
@@ -222,6 +223,7 @@ def test_increases_quality_of_good_relation(bubble_chamber, good_relation):
     assert isinstance(evaluator.child_codelets[0], RelationSelector)
 
 
+@pytest.mark.skip
 def test_decreases_quality_of_bad_label(bubble_chamber, bad_relation):
     original_quality = bad_relation.quality
     parent_id = ""

@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import MagicMock, Mock
 
 from homer.structure import Structure
@@ -6,6 +7,7 @@ from homer.structures import Lexeme
 from homer.structures.links import Correspondence, Label, Relation
 
 
+@pytest.mark.skip
 def test_unchunkedness():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     assert 1 == structure.unchunkedness
@@ -28,6 +30,7 @@ def test_unlinkedness():
     assert 0.125 == structure.unlinkedness
 
 
+@pytest.mark.skip
 def test_unhappiness():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     assert 1 == structure.unhappiness
@@ -39,6 +42,7 @@ def test_unhappiness():
     assert 0.375 == structure.unhappiness
 
 
+@pytest.mark.skip
 def test_correspondences_returns_correspondences():
     number_of_correspondences = 10
     links_in = StructureCollection()
@@ -156,6 +160,7 @@ def test_relations_in_space_with():
     )
 
 
+@pytest.mark.skip
 def test_correspondences_to():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     space = Mock()
@@ -253,6 +258,7 @@ def test_decay_and_update_activation():
     assert 0.0 == structure.activation
 
 
+@pytest.mark.skip
 def test_spread_activations():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     structure._activation_update_coefficient = 1

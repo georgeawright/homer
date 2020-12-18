@@ -68,6 +68,7 @@ def target_chunk(common_space, second_target_chunk):
     return chunk
 
 
+@pytest.mark.skip
 def test_successful_creates_chunk_and_spawns_follow_up(bubble_chamber, target_chunk):
     chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
     result = chunk_builder.run()
@@ -77,6 +78,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(bubble_chamber, target_ch
     assert isinstance(chunk_builder.child_codelets[0], ChunkEvaluator)
 
 
+@pytest.mark.skip
 def test_new_chunk_has_no_duplicate_links(
     bubble_chamber, target_chunk, second_target_chunk, common_space
 ):

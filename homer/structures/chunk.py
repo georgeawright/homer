@@ -18,31 +18,43 @@ class Chunk(Structure):
         structure_id: str,
         parent_id: str,
         value: Any,
-        location: Location,
+        locations: List[Location],
         members: StructureCollection,
         quality: FloatBetweenOneAndZero,
-        parent_spaces: StructureCollection,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
+        containing_chunks: StructureCollection = None,
     ):
         Structure.__init__(
             self,
             structure_id,
             parent_id,
-            location,
+            locations,
             quality,
             links_in=links_in,
             links_out=links_out,
         )
         self.value = value
         self.members = members
-        self.parent_spaces = parent_spaces
+        # TODO: containing chunks needs a better name - chunks that have been made out of this chunk
+        # self.chunks_made_from_this_chunk ?
+        self.containing_chunks = (
+            containing_chunks
+            if containing_chunks is not None
+            else StructureCollection()
+        )
 
     @property
     def size(self):
         return (
             1 if len(self.members) == 0 else sum(member.size for member in self.members)
         )
+
+    @property
+    def unchunkedness(self):
+        return 0.5 ** len(self.containing_chunks)
+
+    # TODO: this should be defined recursively so that chunks contained in chunks contained in chunks have even lower unchunkedness
 
     def nearby(self, space: Space = None):
         if space is not None:

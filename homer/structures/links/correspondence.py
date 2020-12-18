@@ -20,7 +20,6 @@ class Correspondence(Link):
         start_space: Space,
         end_space: Space,
         parent_concept: Concept,
-        parent_space: WorkingSpace,
         conceptual_space: ConceptualSpace,
         quality: FloatBetweenOneAndZero,
     ):
@@ -32,7 +31,6 @@ class Correspondence(Link):
             end,
             location,
             parent_concept,
-            parent_space,
             quality,
             links_in=None,
             links_out=None,
@@ -59,7 +57,6 @@ class Correspondence(Link):
             self.start_space,
             self.end_space,
             self.parent_concept,
-            self.parent_space,
             self.conceptual_space,
             self.quality,
         )

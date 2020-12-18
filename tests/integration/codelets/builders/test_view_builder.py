@@ -175,6 +175,7 @@ def second_target_correspondence(bubble_chamber, target_start_space, target_end_
     return correspondence
 
 
+@pytest.mark.skip
 def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_cannot_be_recreated(
     bubble_chamber, target_correspondence, second_target_correspondence
 ):

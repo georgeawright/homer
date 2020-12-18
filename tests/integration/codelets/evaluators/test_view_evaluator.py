@@ -90,6 +90,7 @@ def bad_view(bubble_chamber):
     return view
 
 
+@pytest.mark.skip
 def test_increases_quality_of_good_view(bubble_chamber, good_view):
     original_quality = good_view.quality
     parent_id = ""
@@ -102,6 +103,7 @@ def test_increases_quality_of_good_view(bubble_chamber, good_view):
     assert isinstance(evaluator.child_codelets[0], ViewSelector)
 
 
+@pytest.mark.skip
 def test_decreases_quality_of_bad_view(bubble_chamber, bad_view):
     original_quality = bad_view.quality
     parent_id = ""

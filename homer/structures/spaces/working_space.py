@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import statistics
-from typing import Callable
+from typing import Callable, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept, Space
 
@@ -12,12 +15,13 @@ class WorkingSpace(Space):
         structure_id: str,
         parent_id: str,
         name: str,
-        contents: StructureCollection,
-        quality: FloatBetweenOneAndZero,
         parent_concept: Concept,
-        is_sub_space: bool = False,
-        parent_spaces: StructureCollection = None,
-        child_spaces: StructureCollection = None,
+        locations: List[Location],
+        contents: StructureCollection,
+        dimensions: List[WorkingSpace],
+        sub_spaces: List[WorkingSpace],
+        quality: FloatBetweenOneAndZero,
+        is_basic_level: bool = False,
         coordinates_from_super_space_location: Callable = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
@@ -27,12 +31,13 @@ class WorkingSpace(Space):
             structure_id,
             parent_id,
             name,
-            contents,
-            quality,
             parent_concept,
-            is_sub_space=is_sub_space,
-            parent_spaces=parent_spaces,
-            child_spaces=child_spaces,
+            locations,
+            contents,
+            dimensions,
+            sub_spaces,
+            quality,
+            is_basic_level=is_basic_level,
             coordinates_from_super_space_location=coordinates_from_super_space_location,
             links_in=links_in,
             links_out=links_out,
@@ -40,22 +45,15 @@ class WorkingSpace(Space):
 
     @property
     def quality(self):
-        active_contents = [
-            structure for structure in self.contents if structure.activation > 0
-        ]
-        if len(active_contents) == 0 and len(self.child_spaces) == 0:
+        active_contents = {
+            structure
+            for space in [self] + self.sub_spaces
+            for structure in space.contents
+            if structure.activation > 0
+        }
+        if len(active_contents) == 0:
             return 0.0
-        if len(active_contents) > 0:
-            contents_quality = [
-                statistics.fmean(
-                    [item.quality * item.activation for item in active_contents]
-                )
-            ]
-        else:
-            contents_quality = []
-        return statistics.fmean(
-            [space.quality for space in self.child_spaces] + contents_quality
-        )
+        return statistics.fmean([structure.quality for structure in active_contents])
 
     def update_activation(self):
         self._activation = (

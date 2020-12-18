@@ -153,6 +153,7 @@ def target_chunk(bubble_chamber):
     return chunk
 
 
+@pytest.mark.skip
 def test_successful_adds_label_to_chunk_and_spawns_follow_up_and_same_label_cannot_be_recreated(
     bubble_chamber, target_chunk
 ):

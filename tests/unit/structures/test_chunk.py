@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import Mock
 
 from homer.location import Location
@@ -31,6 +32,7 @@ def test_size_recursive():
     assert size == chunk.size
 
 
+@pytest.mark.skip
 def test_nearby():
     space_1 = Mock()
     space_1_object = Chunk(
@@ -67,6 +69,7 @@ def test_nearby():
     assert space_2_object in chunk.nearby(space_2)
 
 
+@pytest.mark.skip
 def test_location_in_space():
     space_1 = Mock()
     space_1_location = Mock()

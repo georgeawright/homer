@@ -178,6 +178,7 @@ def bad_correspondence(bubble_chamber):
     return correspondence
 
 
+@pytest.mark.skip
 def test_increases_quality_of_good_correspondence(bubble_chamber, good_correspondence):
     original_quality = good_correspondence.quality
     parent_id = ""
@@ -192,6 +193,7 @@ def test_increases_quality_of_good_correspondence(bubble_chamber, good_correspon
     assert isinstance(evaluator.child_codelets[0], CorrespondenceSelector)
 
 
+@pytest.mark.skip
 def test_decreases_quality_of_bad_label(bubble_chamber, bad_correspondence):
     original_quality = bad_correspondence.quality
     parent_id = ""

@@ -77,6 +77,7 @@ class CorrespondenceBuilder(Builder):
                 )
             except MissingStructureError:
                 return False
+        print(self.target_space_two)
         try:
             if self.target_structure_two is None:
                 self.target_structure_two = self.target_space_two.contents.of_type(
@@ -84,6 +85,7 @@ class CorrespondenceBuilder(Builder):
                 ).get_exigent()
         except MissingStructureError:
             return False
+        print(self.target_structure_two.value)
         if self.target_conceptual_space is None:
             try:
                 self.target_conceptual_space = StructureCollection.intersection(
@@ -125,7 +127,7 @@ class CorrespondenceBuilder(Builder):
             self.target_structure_two,
             Location.for_correspondence_between(
                 self.target_structure_one.location_in_space(self.target_space_one),
-                self.target_structure_two.location_in_space(self.target_structure_two),
+                self.target_structure_two.location_in_space(self.target_space_two),
                 parent_space,
             ),
             self.target_space_one,

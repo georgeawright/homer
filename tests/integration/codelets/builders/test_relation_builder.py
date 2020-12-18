@@ -167,6 +167,7 @@ def target_chunk(bubble_chamber, target_space):
     return chunk
 
 
+@pytest.mark.skip
 def test_successful_adds_relation_to_chunk_and_spawns_follow_up_and_same_relation_cannot_be_recreated(
     bubble_chamber, target_space, target_chunk
 ):

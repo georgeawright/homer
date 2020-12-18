@@ -5,6 +5,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.spaces import WorkingSpace
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "activation_1, activation_2, activation_3, expected_activation",
     [

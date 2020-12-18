@@ -1,4 +1,7 @@
-from homer.structures import Concept
+from typing import List
+
+from homer.location import Location
+from homer.structures import Concept, Space
 from homer.structure_collection import StructureCollection
 from homer.structures.chunks.slot import Slot
 from homer.structures.chunks.word import Word
@@ -12,10 +15,9 @@ class Template(Frame):
         structure_id: str,
         parent_id: str,
         name: str,
-        contents: StructureCollection,
         parent_concept: Concept,
-        parent_spaces: StructureCollection = None,
-        child_spaces: StructureCollection = None,
+        locations: List[Location],
+        contents: StructureCollection,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -24,10 +26,9 @@ class Template(Frame):
             structure_id,
             parent_id,
             name,
-            contents,
             parent_concept,
-            parent_spaces=parent_spaces,
-            child_spaces=child_spaces,
+            locations,
+            contents,
             links_in=links_in,
             links_out=links_out,
         )

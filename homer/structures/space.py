@@ -1,4 +1,6 @@
-from typing import Any, Callable
+from __future__ import annotations
+
+from typing import Any, Callable, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
@@ -12,41 +14,33 @@ class Space(Structure):
         structure_id: str,
         parent_id: str,
         name: str,
-        contents: list,
-        quality: FloatBetweenOneAndZero,
         parent_concept: "Concept",
-        is_sub_space: bool = False,
-        parent_spaces: StructureCollection = None,
-        child_spaces: StructureCollection = None,
-        sub_spaces: StructureCollection = None,
+        locations: List[Location],
+        contents: StructureCollection,
+        dimensions: List[Space],
+        sub_spaces: List[Space],
+        quality: FloatBetweenOneAndZero,
+        is_basic_level: bool = False,
         coordinates_from_super_space_location: Callable = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        location = None
         Structure.__init__(
             self,
             structure_id,
             parent_id,
-            location,
+            locations,
             quality,
             links_in=links_in,
             links_out=links_out,
         )
         self.name = name
         self.value = name
-        self.contents = contents
         self.parent_concept = parent_concept
-        self.is_sub_space = is_sub_space
-        self.parent_spaces = (
-            parent_spaces if parent_spaces is not None else StructureCollection()
-        )
-        self.child_spaces = (
-            child_spaces if child_spaces is not None else StructureCollection()
-        )
-        self.sub_spaces = (
-            sub_spaces if sub_spaces is not None else StructureCollection()
-        )
+        self.contents = contents
+        self.dimensions = dimensions
+        self.sub_spaces = sub_spaces
+        self.is_basic_level = is_basic_level
         self.coordinates_from_super_space_location = (
             coordinates_from_super_space_location
         )

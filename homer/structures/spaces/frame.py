@@ -1,5 +1,7 @@
 import statistics
+from typing import List
 
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept, Space
 
@@ -10,24 +12,27 @@ class Frame(Space):
         structure_id: str,
         parent_id: str,
         name: str,
-        contents: StructureCollection,
         parent_concept: Concept,
-        parent_spaces: StructureCollection = None,
-        child_spaces: StructureCollection = None,
+        locations: List[Location],
+        contents: StructureCollection,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        quality = None
+        quality = 1
+        sub_spaces = []
+        dimensions = []
         Space.__init__(
             self,
             structure_id,
             parent_id,
             name,
-            contents,
-            quality,
             parent_concept,
-            parent_spaces=parent_spaces,
-            child_spaces=child_spaces,
+            locations,
+            contents,
+            dimensions,
+            sub_spaces,
+            quality,
+            is_basic_level=False,
             links_in=links_in,
             links_out=links_out,
         )

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC
 import statistics
+from typing import List
 
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
@@ -17,25 +18,24 @@ class Structure(ABC):
         self,
         structure_id: str,
         parent_id: str,
-        location: Location,
+        locations: List[Location],
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
-        parent_chunks: StructureCollection = None,
+        stable_activation: float = None,
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
-        self.locations = [location]
+        self.locations = locations
         self._quality = quality
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
-        self.parent_chunks = (
-            StructureCollection() if parent_chunks is None else parent_chunks
+        self._activation = FloatBetweenOneAndZero(
+            0 if stable_activation is None else stable_activation
         )
-        self._activation = FloatBetweenOneAndZero(0)
+        self.stable = stable_activation is not None
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
-        self.stable = False
 
     @property
     def location(self) -> Location:
@@ -78,7 +78,7 @@ class Structure(ABC):
 
     @property
     def unchunkedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** len(self.parent_chunks)
+        return 0
 
     @property
     def unlinkedness(self) -> FloatBetweenOneAndZero:
