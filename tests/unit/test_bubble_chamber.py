@@ -2,10 +2,12 @@ import pytest
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Space
 from homer.structures.chunks import View, Word
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.spaces import WorkingSpace
 
 
 def test_structures():
@@ -35,7 +37,6 @@ def test_structures():
     assert word in bubble_chamber.structures
 
 
-@pytest.mark.skip
 def test_add_to_collections():
     bubble_chamber = BubbleChamber(
         StructureCollection(),
@@ -52,8 +53,6 @@ def test_add_to_collections():
         Mock(),
     )
     chunk = Chunk(
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -99,7 +98,6 @@ def test_add_to_collections():
         Mock(),
     )
     word = Word(
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -218,8 +216,7 @@ def test_has_view():
     assert bubble_chamber.has_view(existing_view_members)
 
 
-@pytest.mark.skip
-def test_common_parent_space_is_created_if_necessary():
+def test_get_super_space_is_created_if_necessary():
     bubble_chamber = BubbleChamber(
         StructureCollection(),
         StructureCollection(),
@@ -234,18 +231,49 @@ def test_common_parent_space_is_created_if_necessary():
         StructureCollection(),
         Mock(),
     )
-    space_one = Mock()
-    space_one.name = "one"
-    space_one.parent_spaces = StructureCollection()
-    space_two = Mock()
-    space_two.name = "two"
-    space_two.parent_spaces = StructureCollection()
+    top_level_working_space = WorkingSpace(
+        Mock(),
+        Mock(),
+        "top level working",
+        None,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+        0,
+    )
+    space_one = WorkingSpace(
+        Mock(),
+        Mock(),
+        "one",
+        None,
+        [Location([], top_level_working_space)],
+        Mock(),
+        1,
+        [],
+        [],
+        0,
+    )
+    space_two = WorkingSpace(
+        Mock(),
+        Mock(),
+        "two",
+        None,
+        [Location([], top_level_working_space)],
+        Mock(),
+        1,
+        [],
+        [],
+        0,
+    )
+    bubble_chamber.working_spaces.add(top_level_working_space)
     bubble_chamber.working_spaces.add(space_one)
     bubble_chamber.working_spaces.add(space_two)
-    assert 2 == len(bubble_chamber.working_spaces)
-    parent = bubble_chamber.common_parent_space(space_one, space_two)
-    assert isinstance(parent, Space)
+    assert 3 == len(bubble_chamber.working_spaces)
+    parent = bubble_chamber.get_super_space(space_one, space_two)
+    assert isinstance(parent, WorkingSpace)
     assert parent in bubble_chamber.working_spaces
-    assert 3 == len(bubble_chamber.working_spaces)
-    parent = bubble_chamber.common_parent_space(space_one, space_two)
-    assert 3 == len(bubble_chamber.working_spaces)
+    assert 4 == len(bubble_chamber.working_spaces)
+    parent = bubble_chamber.get_super_space(space_one, space_two)
+    assert 4 == len(bubble_chamber.working_spaces)

@@ -4,6 +4,7 @@ from typing import List, Union
 
 from .errors import MissingStructureError
 from .id import ID
+from .location import Location
 from .logger import Logger
 from .problem import Problem
 from .structure_collection import StructureCollection
@@ -99,22 +100,27 @@ class BubbleChamber:
                 return True
         return False
 
-    def common_parent_space(self, space_one: Space, space_two: Space):
-        try:
-            parent_space = StructureCollection.intersection(
-                space_one.parent_spaces, space_two.parent_spaces
-            ).get_random()
-        except MissingStructureError:
-            parent_space = WorkingSpace(
-                ID.new(WorkingSpace),
-                "",
-                space_one.name + " x " + space_two.name,
-                StructureCollection(),
-                0,
-                None,
-                child_spaces=StructureCollection({space_one, space_two}),
-            )
-            self.working_spaces.add(parent_space)
-            space_one.parent_spaces.add(parent_space)
-            space_two.parent_spaces.add(parent_space)
-        return parent_space
+    def get_super_space(self, space_one: Space, space_two: Space) -> WorkingSpace:
+        for space in self.working_spaces:
+            try:
+                if (
+                    space.dimensions == space_one.dimensions + space_two.dimensions
+                    or space.dimensions == space_two.dimensions + space_one.dimensions
+                ):
+                    return space
+            except Exception:
+                pass
+        super_space = WorkingSpace(
+            ID.new(WorkingSpace),
+            "",
+            f"{space_one.name} x {space_two.name}",
+            None,
+            [Location([], self.spaces["top level working"])],
+            StructureCollection(),
+            space_one.no_of_dimensions + space_two.no_of_dimensions,
+            space_one.dimensions + space_two.dimensions,
+            [space_one, space_two],
+            0,
+        )
+        self.working_spaces.add(super_space)
+        return super_space
