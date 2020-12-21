@@ -22,12 +22,9 @@ def test_classify_labels_with_different_concept():
     assert 0.0 == classifier.classify({"start": start, "end": end, "concept": Mock()})
 
 
-@pytest.mark.skip
 def test_classify_chunks_with_same_labels():
     concept = Mock()
     start = Chunk(
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -46,8 +43,6 @@ def test_classify_chunks_with_same_labels():
     )
     start.links_out.add(start_label)
     end = Chunk(
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -75,7 +70,6 @@ def test_classify_chunks_with_same_labels():
         Mock(),
         Mock(),
         sameness_concept,
-        None,
         Mock(),
         1.0,
     )
@@ -89,11 +83,10 @@ def test_classify_chunks_with_same_labels():
     )
 
 
-@pytest.mark.skip
 def test_classify_chunks_without_same_labels():
     concept = Mock()
-    start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     sameness_concept = Mock()
     classifier = SamenessClassifier()
     assert 0.0 == classifier.classify(
@@ -101,14 +94,11 @@ def test_classify_chunks_without_same_labels():
     )
 
 
-@pytest.mark.skip
 def test_classify_relations_with_same_arguments():
     sameness_concept = Mock()
 
     start_concept = Mock()
     start_relation_start = Chunk(
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -127,8 +117,6 @@ def test_classify_relations_with_same_arguments():
     )
     start_relation_start.links_out.add(start_relation_start_label)
     end_relation_start = Chunk(
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -155,7 +143,6 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         sameness_concept,
-        None,
         Mock(),
         1.0,
     )
@@ -166,8 +153,6 @@ def test_classify_relations_with_same_arguments():
 
     end_concept = Mock()
     start_relation_end = Chunk(
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -186,8 +171,6 @@ def test_classify_relations_with_same_arguments():
     )
     start_relation_end.links_out.add(start_relation_end_label)
     end_relation_end = Chunk(
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -214,7 +197,6 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         sameness_concept,
-        None,
         Mock(),
         1.0,
     )
