@@ -53,6 +53,10 @@ class Structure(ABC):
         raise Exception(f"{self.structure_id} has no location in input space")
 
     @property
+    def parent_spaces(self) -> StructureCollection:
+        return StructureCollection({location.space for location in self.locations})
+
+    @property
     def exigency(self) -> FloatBetweenOneAndZero:
         return self.activation * self.unhappiness
 
@@ -74,6 +78,7 @@ class Structure(ABC):
 
     @property
     def unhappiness(self) -> FloatBetweenOneAndZero:
+        # probably should just return unlinkedness
         return statistics.fmean([self.unchunkedness, self.unlinkedness])
 
     @property

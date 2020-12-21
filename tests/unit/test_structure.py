@@ -7,16 +7,6 @@ from homer.structures import Lexeme
 from homer.structures.links import Correspondence, Label, Relation
 
 
-@pytest.mark.skip
-def test_unchunkedness():
-    structure = Structure(Mock(), Mock(), Mock(), Mock())
-    assert 1 == structure.unchunkedness
-    structure.parent_chunks.add(Mock())
-    assert 0.5 == structure.unchunkedness
-    structure.parent_chunks.add(Mock())
-    assert 0.25 == structure.unchunkedness
-
-
 def test_unlinkedness():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     assert 1 == structure.unlinkedness
@@ -42,7 +32,6 @@ def test_unhappiness():
     assert 0.375 == structure.unhappiness
 
 
-@pytest.mark.skip
 def test_correspondences_returns_correspondences():
     number_of_correspondences = 10
     links_in = StructureCollection()
@@ -57,7 +46,6 @@ def test_correspondences_returns_correspondences():
             Mock(),
             Mock(),
             Mock(),
-            Mock,
             Mock(),
             Mock(),
         )
@@ -71,7 +59,6 @@ def test_correspondences_returns_correspondences():
             Mock(),
             Mock(),
             Mock(),
-            Mock,
             Mock(),
             Mock(),
         )
@@ -160,8 +147,7 @@ def test_relations_in_space_with():
     )
 
 
-@pytest.mark.skip
-def test_correspondences_to():
+def test_correspondences_to_space():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     space = Mock()
     correspondence_1 = Correspondence(
@@ -172,7 +158,6 @@ def test_correspondences_to():
         Mock(),
         Mock(),
         space,
-        Mock(),
         None,
         Mock(),
         Mock(),
@@ -180,12 +165,11 @@ def test_correspondences_to():
     correspondence_2 = Correspondence(
         Mock(),
         Mock(),
-        Mock(),
         structure,
         Mock(),
+        Mock(),
+        Mock(),
         space,
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -198,13 +182,11 @@ def test_correspondences_to():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
         None,
         Mock(),
         Mock(),
     )
     correspondence_4 = Correspondence(
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -258,7 +240,6 @@ def test_decay_and_update_activation():
     assert 0.0 == structure.activation
 
 
-@pytest.mark.skip
 def test_spread_activations():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     structure._activation_update_coefficient = 1
@@ -270,7 +251,6 @@ def test_spread_activations():
         Mock(),
         Mock(),
         correspondence_end,
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
