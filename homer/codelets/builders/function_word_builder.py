@@ -78,7 +78,6 @@ class FunctionWordBuilder(Builder):
             self.input_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],
-            correspondence_space,
             self.bubble_chamber.spaces["text"],
             self.confidence,
         )
