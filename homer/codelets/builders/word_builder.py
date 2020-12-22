@@ -101,7 +101,6 @@ class WordBuilder(Builder):
             self.slot_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],
-            slot_to_word_space,
             concept.parent_space,
             0,
         )
@@ -126,7 +125,6 @@ class WordBuilder(Builder):
             self.non_slot_space,
             self.output_space,
             self.bubble_chamber.concepts["same"],
-            non_slot_to_word_space,
             concept.parent_space,
             0,
         )
