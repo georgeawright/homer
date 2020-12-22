@@ -29,6 +29,7 @@ class Frame(Space):
             parent_concept,
             locations,
             contents,
+            0,
             dimensions,
             sub_spaces,
             quality,

@@ -5,28 +5,36 @@ from homer.structure_collection import StructureCollection
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
-@pytest.mark.skip
 def test_instance_returns_working_space():
-    conceptual_space = ConceptualSpace("id", Mock(), "name", Mock(), Mock())
+    conceptual_space = ConceptualSpace(
+        "id", "", "name", Mock(), [Mock()], Mock(), 0, [], []
+    )
     instance = conceptual_space.instance
     assert isinstance(instance, WorkingSpace)
 
 
-@pytest.mark.skip
 def test_instance_returns_working_space_with_working_sub_spaces():
-    super_space = ConceptualSpace("super", Mock(), "super", Mock(), Mock())
-    sub_space = ConceptualSpace("sub", Mock(), "sub", Mock(), Mock())
-    super_space.sub_spaces.add(sub_space)
+    sub_space = ConceptualSpace("sub", "", "sub", Mock(), [Mock()], Mock(), 1, [], [])
+    super_space = ConceptualSpace(
+        "super",
+        [],
+        "super",
+        Mock(),
+        [Mock()],
+        Mock(),
+        2,
+        [sub_space, Mock()],
+        [sub_space, Mock()],
+    )
     super_instance = super_space.instance
     assert isinstance(super_instance, WorkingSpace)
     assert "super working" == super_instance.name
-    assert 1 == len(super_instance.sub_spaces)
-    sub_instance = super_instance.sub_spaces.get_random()
+    assert len(super_space.sub_spaces) == len(super_instance.sub_spaces)
+    sub_instance = super_instance.sub_spaces[0]
     assert isinstance(sub_instance, WorkingSpace)
     assert "sub working" == sub_instance.name
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "activation_1, activation_2, activation_3, expected_activation",
     [(1.0, 1.0, 1.0, 1.0), (0.5, 0.2, 0.0, 0.5), (1.0, 0.0, 0.0, 1.0)],
@@ -41,10 +49,14 @@ def test_update_activation(
     concept_3 = Mock()
     concept_3.activation = activation_3
     conceptual_space = ConceptualSpace(
-        Mock(),
-        Mock(),
+        "",
+        "",
         "name",
+        Mock(),
+        Mock(),
         StructureCollection({concept_1, concept_2, concept_3}),
+        Mock(),
+        Mock(),
         Mock(),
     )
     conceptual_space.update_activation()

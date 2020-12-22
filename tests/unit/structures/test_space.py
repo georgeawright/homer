@@ -7,7 +7,6 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Space
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "coordinates, n_s_coordinates, w_e_coordinates, nw_se_coordinates, ne_sw_coordinates",
     [([0, 0], [0], [0], [0], [2])],
@@ -15,58 +14,82 @@ from homer.structures import Chunk, Space
 def test_add(
     coordinates, n_s_coordinates, w_e_coordinates, nw_se_coordinates, ne_sw_coordinates
 ):
-    location_space = Space("", "", "location", StructureCollection(), Mock(), Mock())
+
     north_south_space = Space(
-        "north-south",
+        "",
         "",
         "north-south",
+        Mock(),
+        [],
         StructureCollection(),
-        Mock(),
-        Mock(),
+        1,
+        [],
+        [],
+        1,
         coordinates_from_super_space_location=lambda location: [
             location.coordinates[0]
         ],
     )
     west_east_space = Space(
-        "west-east",
+        "",
         "",
         "west-east",
+        Mock(),
+        [],
         StructureCollection(),
-        Mock(),
-        Mock(),
+        1,
+        [],
+        [],
+        1,
         coordinates_from_super_space_location=lambda location: [
             location.coordinates[1]
         ],
     )
     nw_se_space = Space(
-        "nw-se",
+        "",
         "",
         "nw-se",
+        Mock(),
+        [],
         StructureCollection(),
-        Mock(),
-        Mock(),
+        1,
+        [],
+        [],
+        1,
         coordinates_from_super_space_location=lambda location: [
             statistics.fmean(location.coordinates)
         ],
     )
     ne_sw_space = Space(
-        "ne-sw",
+        "",
         "",
         "ne-sw",
+        Mock(),
+        [],
         StructureCollection(),
-        Mock(),
-        Mock(),
+        1,
+        [],
+        [],
+        1,
         coordinates_from_super_space_location=lambda location: [
             statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
         ],
     )
-    location_space.sub_spaces.add(north_south_space)
-    location_space.sub_spaces.add(west_east_space)
-    location_space.sub_spaces.add(nw_se_space)
-    location_space.sub_spaces.add(ne_sw_space)
+    location_space = Space(
+        "",
+        "",
+        "location",
+        Mock(),
+        [],
+        StructureCollection(),
+        2,
+        [north_south_space, west_east_space],
+        [north_south_space, west_east_space, nw_se_space, ne_sw_space],
+        1,
+        is_basic_level=True,
+    )
     location = Location(coordinates, location_space)
-    parent_spaces = StructureCollection({location_space})
-    chunk = Chunk("", "", Mock(), location, Mock(), Mock(), Mock(), parent_spaces)
+    chunk = Chunk("", "", Mock(), [location], Mock(), Mock())
     location_space.add(chunk)
 
     assert chunk in location_space.contents

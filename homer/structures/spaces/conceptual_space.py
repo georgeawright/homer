@@ -19,6 +19,7 @@ class ConceptualSpace(Space):
         parent_concept: Concept,
         locations: List[Location],
         contents: StructureCollection,
+        no_of_dimensions: int,
         dimensions: List[ConceptualSpace],
         sub_spaces: List[ConceptualSpace],
         is_basic_level: bool = False,
@@ -35,6 +36,7 @@ class ConceptualSpace(Space):
             parent_concept,
             locations,
             contents,
+            no_of_dimensions,
             dimensions,
             sub_spaces,
             quality,
@@ -52,7 +54,11 @@ class ConceptualSpace(Space):
                 Location(location.coordinates, location.space.instance)
                 for location in self.locations
             ]
-            dimensions = [dimension.instance for dimension in self.dimensions]
+            dimensions = (
+                [dimension.instance for dimension in self.dimensions]
+                if self.no_of_dimensions > 1
+                else []
+            )
             sub_spaces = [sub_space.instance for sub_space in self.sub_spaces]
             self._instance = WorkingSpace(
                 self.structure_id + "_working_space",
@@ -61,9 +67,9 @@ class ConceptualSpace(Space):
                 self.parent_concept,
                 locations,
                 StructureCollection(),
+                self.no_of_dimensions,
                 dimensions,
                 sub_spaces,
-                FloatBetweenOneAndZero(0),
                 is_basic_level=self.is_basic_level,
                 coordinates_from_super_space_location=self.coordinates_from_super_space_location,
                 links_in=StructureCollection(),

@@ -18,14 +18,15 @@ class WorkingSpace(Space):
         parent_concept: Concept,
         locations: List[Location],
         contents: StructureCollection,
+        no_of_dimensions: int,
         dimensions: List[WorkingSpace],
         sub_spaces: List[WorkingSpace],
-        quality: FloatBetweenOneAndZero,
         is_basic_level: bool = False,
         coordinates_from_super_space_location: Callable = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
+        quality = 0
         Space.__init__(
             self,
             structure_id,
@@ -34,6 +35,7 @@ class WorkingSpace(Space):
             parent_concept,
             locations,
             contents,
+            no_of_dimensions,
             dimensions,
             sub_spaces,
             quality,

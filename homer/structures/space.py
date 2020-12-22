@@ -17,6 +17,7 @@ class Space(Structure):
         parent_concept: "Concept",
         locations: List[Location],
         contents: StructureCollection,
+        no_of_dimensions: int,
         dimensions: List[Space],
         sub_spaces: List[Space],
         quality: FloatBetweenOneAndZero,
@@ -38,12 +39,21 @@ class Space(Structure):
         self.value = name
         self.parent_concept = parent_concept
         self.contents = contents
-        self.dimensions = dimensions
+        self.no_of_dimensions = no_of_dimensions
+        self._dimensions = dimensions
         self.sub_spaces = sub_spaces
         self.is_basic_level = is_basic_level
         self.coordinates_from_super_space_location = (
             coordinates_from_super_space_location
         )
+
+    @property
+    def dimensions(self) -> List[Space]:
+        if self.no_of_dimensions < 1:
+            return []
+        if self.no_of_dimensions == 1:
+            return [self]
+        return self._dimensions
 
     def add(self, structure: Structure):
         print(structure.structure_id)
