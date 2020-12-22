@@ -5,6 +5,7 @@ from homer.id import ID
 from homer.location import Location
 from homer.structures import Chunk, Concept
 from homer.structures.links import Label
+from homer.tools import project_item_into_space
 
 
 class LabelBuilder(Builder):
@@ -65,14 +66,7 @@ class LabelBuilder(Builder):
         space = self.parent_concept.parent_space.instance
         self.bubble_chamber.logger.log(space)
         if self.target_chunk not in space.contents:
-            self.target_chunk.locations.append(
-                Location(
-                    getattr(self.target_chunk, self.parent_concept.relevant_value),
-                    space,
-                )
-            )
-            self.target_chunk.parent_spaces.add(space)
-            space.add(self.target_chunk)
+            project_item_into_space(self.target_chunk, space)
         label = Label(
             ID.new(Label),
             self.codelet_id,
