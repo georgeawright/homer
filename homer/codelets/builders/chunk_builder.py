@@ -10,7 +10,7 @@ from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept, Space
-from homer.tools import average_vector
+from homer.tools import average_vector, project_item_into_space
 
 
 class ChunkBuilder(Builder):
@@ -74,16 +74,25 @@ class ChunkBuilder(Builder):
             self._members_from_chunk(self.target_chunk),
             self._members_from_chunk(self.second_target_chunk),
         )
+        locations = []
+        for parent_space in StructureCollection.union(
+            self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
+        ):
+            for member in new_chunk_members:
+                try:
+                    member.location_in_space(parent_space)
+                except Exception:
+                    project_item_into_space(member, parent_space)
+            locations.append(
+                self._get_average_location(new_chunk_members, space=parent_space)
+            )
         chunk = Chunk(
             ID.new(Chunk),
             self.codelet_id,
             self._get_average_value(new_chunk_members),
-            self._get_average_location(new_chunk_members),
+            locations,
             new_chunk_members,
             0,
-            StructureCollection.union(
-                self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
-            ),
         )
         activation_from_chunk_one = (
             self.target_chunk.activation * self.target_chunk.size / chunk.size
@@ -141,7 +150,6 @@ class ChunkBuilder(Builder):
 
     def _get_average_location(self, chunks: StructureCollection, space: Space = None):
         if space is not None:
-            print(space.structure_id)
             locations = []
             for chunk in chunks:
                 for _ in range(chunk.size):

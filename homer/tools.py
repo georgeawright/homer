@@ -28,3 +28,12 @@ def hasinstance(items: Iterable, t: type) -> bool:
         if isinstance(item, t):
             return True
     return False
+
+
+def project_item_into_space(item: "Structure", space: "Space"):
+    from homer.location import Location
+
+    item.locations.append(
+        Location(getattr(item, space.parent_concept.relevant_value), space)
+    )
+    space.add(item)
