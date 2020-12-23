@@ -32,35 +32,46 @@ def test_size_recursive():
     assert size == chunk.size
 
 
-@pytest.mark.skip
 def test_nearby():
     space_1 = Mock()
+    space_1_object_location = Mock()
+    space_1_object_location.space = space_1
     space_1_object = Chunk(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        [space_1_object_location],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     space_1.contents.near.return_value = StructureCollection({space_1_object})
-    space_1_location = Mock()
-    space_1_location.space = space_1
     space_2 = Mock()
+    space_2_object_location = Mock()
+    space_2_object_location.space = space_2
     space_2_object = Chunk(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        [space_2_object_location],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     space_2.contents.near.return_value = StructureCollection(
         {space_2_object, space_1_object}
     )
-    space_2_location = Mock()
-    space_2_location.space = space_2
     chunk = Chunk(
         Mock(),
         Mock(),
         Mock(),
-        space_1_location,
+        [space_1_object_location, space_2_object_location],
         Mock(),
         Mock(),
         StructureCollection({space_1}),
     )
-    chunk.parent_spaces.add(space_2)
-    chunk.locations.append(space_2_location)
     assert space_1_object in chunk.nearby()
     assert space_2_object in chunk.nearby()
     assert space_1_object in chunk.nearby(space_1)
@@ -69,7 +80,6 @@ def test_nearby():
     assert space_2_object in chunk.nearby(space_2)
 
 
-@pytest.mark.skip
 def test_location_in_space():
     space_1 = Mock()
     space_1_location = Mock()
@@ -81,12 +91,10 @@ def test_location_in_space():
         Mock(),
         Mock(),
         Mock(),
-        space_1_location,
+        [space_1_location, space_2_location],
         Mock(),
         Mock(),
         StructureCollection({space_1}),
     )
-    chunk.parent_spaces.add(space_2)
-    chunk.locations.append(space_2_location)
     assert chunk.location_in_space(space_1) == space_1_location
     assert chunk.location_in_space(space_2) == space_2_location
