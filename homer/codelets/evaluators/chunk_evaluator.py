@@ -44,7 +44,7 @@ class ChunkEvaluator(Evaluator):
             space.proximity_between(member, self.target_structure)
             for space in self.target_structure.parent_spaces
             for member in self.target_structure.members
-            if not space.is_sub_space
+            if space.is_basic_level
         ]
         self.confidence = statistics.fmean(proximities) if proximities != [] else 0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
@@ -54,7 +54,7 @@ class ChunkEvaluator(Evaluator):
             {
                 space
                 for space in self.target_structure.parent_spaces
-                if not space.is_sub_space
+                if space.is_basic_level
             }
         ).get_random()
         self.child_codelets.append(

@@ -33,8 +33,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "chunk",
-        None,
-        None,
+        Mock(),
         None,
         "value",
         StructureCollection(),
@@ -45,8 +44,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "evaluate",
-        None,
-        None,
+        Mock(),
         None,
         "value",
         StructureCollection(),
@@ -60,43 +58,55 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def good_chunk(bubble_chamber):
-    location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+def location_concept():
+    concept = Concept(
+        Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
-    input_space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    return concept
+
+
+@pytest.fixture
+def input_space(location_concept):
+    space = WorkingSpace(
+        Mock(),
+        Mock(),
+        "input",
+        location_concept,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+        is_basic_level=True,
     )
-    parent_spaces = StructureCollection({input_space})
+    return space
+
+
+@pytest.fixture
+def good_chunk(bubble_chamber, location_concept, input_space):
     member_1 = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     member_2 = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 1], input_space),
-        StructureCollection(),
+        [Location([0, 1], input_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     chunk = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 0], input_space),
+        [Location([0, 0], input_space)],
         StructureCollection({member_1, member_2}),
-        StructureCollection(),
         0.0,
-        parent_spaces,
     )
     bubble_chamber.chunks.add(chunk)
     input_space.contents.add(chunk)
@@ -104,49 +114,45 @@ def good_chunk(bubble_chamber):
 
 
 @pytest.fixture
-def bad_chunk(bubble_chamber):
-    location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
-    )
+def bad_chunk(bubble_chamber, location_concept, input_space):
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
-    )
-    input_space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+        Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
     )
     temperature_space = WorkingSpace(
-        Mock(), Mock(), "temperature", StructureCollection(), 0, temperature_concept
+        Mock(),
+        Mock(),
+        "temperature",
+        temperature_concept,
+        [],
+        StructureCollection(),
+        1,
+        [],
+        [],
+        is_basic_level=True,
     )
-    parent_spaces = StructureCollection({input_space, temperature_space})
     member_1 = Chunk(
         Mock(),
         Mock(),
         [12],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space), Location([12], temperature_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     member_2 = Chunk(
         Mock(),
         Mock(),
         [5],
-        Location([0, 1], input_space),
-        StructureCollection(),
+        [Location([0, 1], input_space), Location([5], temperature_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     chunk = Chunk(
         Mock(),
         Mock(),
         [8.5],
-        Location([0, 0], input_space),
+        [Location([0, 0], input_space), Location([8.5], temperature_space)],
         StructureCollection({member_1, member_2}),
-        StructureCollection(),
         1.0,
-        parent_spaces,
     )
     bubble_chamber.chunks.add(chunk)
     input_space.contents.add(chunk)
@@ -154,7 +160,6 @@ def bad_chunk(bubble_chamber):
     return chunk
 
 
-@pytest.mark.skip
 def test_increases_quality_of_good_chunk(bubble_chamber, good_chunk):
     original_chunk_quality = good_chunk.quality
     parent_id = ""
@@ -167,7 +172,6 @@ def test_increases_quality_of_good_chunk(bubble_chamber, good_chunk):
     assert isinstance(evaluator.child_codelets[0], ChunkSelector)
 
 
-@pytest.mark.skip
 def test_decreases_quality_of_bad_chunk(bubble_chamber, bad_chunk):
     original_chunk_quality = bad_chunk.quality
     parent_id = ""
