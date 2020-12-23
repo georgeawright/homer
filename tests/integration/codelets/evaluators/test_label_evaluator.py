@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
-from homer.classifiers import StretchyProximityClassifier
+from homer.classifiers import ProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.evaluators import LabelEvaluator
 from homer.codelets.selectors import LabelSelector
@@ -61,40 +61,91 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def good_label(bubble_chamber):
-    location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+def location_concept():
+    concept = Concept(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "coordinates",
+        Mock(),
+        Mock(),
     )
-    temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+    return concept
+
+
+@pytest.fixture
+def input_space(location_concept):
+    space = WorkingSpace(
+        Mock(),
+        Mock(),
+        Mock(),
+        location_concept,
+        [],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
-    input_space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+    return space
+
+
+@pytest.fixture
+def temperature_concept():
+    concept = Concept(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "value",
+        Mock(),
+        Mock(),
     )
-    temperature_space = WorkingSpace(
-        Mock(), Mock(), "temperature", StructureCollection(), 0, temperature_concept
+    return concept
+
+
+@pytest.fixture
+def temperature_space(temperature_concept):
+    space = WorkingSpace(
+        Mock(),
+        Mock(),
+        Mock(),
+        temperature_concept,
+        [],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
-    warm_concept = Concept(
+    return space
+
+
+@pytest.fixture
+def warm_concept(temperature_space):
+    warm = Concept(
         Mock(),
         Mock(),
         "warm",
-        [15],
-        StretchyProximityClassifier(),
-        temperature_space,
+        Location([15], temperature_space),
+        ProximityClassifier(),
         "value",
         StructureCollection(),
         math.dist,
     )
-    parent_spaces = StructureCollection({input_space, temperature_space})
+    return warm
+
+
+@pytest.fixture
+def good_label(bubble_chamber, input_space, temperature_space, warm_concept):
     start = Chunk(
         Mock(),
         Mock(),
         [15],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space), Location([15], temperature_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     quality = 0.0
     label = Label(Mock(), Mock(), start, warm_concept, temperature_space, quality)
@@ -102,47 +153,20 @@ def good_label(bubble_chamber):
 
 
 @pytest.fixture
-def bad_label(bubble_chamber):
-    location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
-    )
-    temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
-    )
-    input_space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
-    )
-    temperature_space = WorkingSpace(
-        Mock(), Mock(), "temperature", StructureCollection(), 0, temperature_concept
-    )
-    warm_concept = Concept(
-        Mock(),
-        Mock(),
-        "warm",
-        [15],
-        StretchyProximityClassifier(),
-        temperature_space,
-        "value",
-        StructureCollection(),
-        math.dist,
-    )
-    parent_spaces = StructureCollection({input_space, temperature_space})
+def bad_label(bubble_chamber, input_space, temperature_space, warm_concept):
     start = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space), Location([10], temperature_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     quality = 1.0
     label = Label(Mock(), Mock(), start, warm_concept, temperature_space, quality)
     return label
 
 
-@pytest.mark.skip
 def test_increases_quality_of_good_label(bubble_chamber, good_label):
     original_quality = good_label.quality
     parent_id = ""
@@ -155,7 +179,6 @@ def test_increases_quality_of_good_label(bubble_chamber, good_label):
     assert isinstance(evaluator.child_codelets[0], LabelSelector)
 
 
-@pytest.mark.skip
 def test_decreases_quality_of_bad_label(bubble_chamber, bad_label):
     original_quality = bad_label.quality
     parent_id = ""
