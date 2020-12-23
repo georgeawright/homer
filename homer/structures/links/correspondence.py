@@ -52,7 +52,7 @@ class Correspondence(Link):
             Location.for_correspondence_between(
                 start.location_in_space(self.start_space),
                 end.location_in_space(self.end_space),
-                self.parent_space,
+                self.location.space,
             ),
             self.start_space,
             self.end_space,

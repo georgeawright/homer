@@ -6,7 +6,6 @@ from homer.structures.chunks import Slot
 from homer.structures.links import Correspondence
 
 
-@pytest.mark.skip
 def test_copy():
     start_space = Mock()
     end_space = Mock()
@@ -25,18 +24,17 @@ def test_copy():
     new_end = Mock()
     new_end.location_in_space.return_value = end_location
     parent_id = "id"
-    parent_space = Mock()
-    parent_space.child_spaces = [start_space, end_space]
+    location = Mock()
+    location.space.sub_spaces = [start_space, end_space]
     correspondence = Correspondence(
         Mock(),
         Mock(),
         old_start,
         old_end,
+        location,
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        parent_space,
         Mock(),
         Mock(),
     )
@@ -56,7 +54,6 @@ def test_copy():
     assert copy.parent_id == parent_id
 
 
-@pytest.mark.skip
 def test_nearby():
     start = Mock()
     start.correspondences = StructureCollection({Mock()})
@@ -64,16 +61,17 @@ def test_nearby():
     end.correspondences = StructureCollection({Mock()})
     parent_space = Mock()
     parent_space.contents = StructureCollection({Mock()})
+    location = Mock()
+    location.space = parent_space
     correspondence = Correspondence(
         Mock(),
         Mock(),
         start,
         end,
+        location,
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        parent_space,
         Mock(),
         Mock(),
     )
@@ -83,11 +81,8 @@ def test_nearby():
     assert correspondence not in neighbours
 
 
-@pytest.mark.skip
 def test_get_slot_argument_returns_slot():
-    space = Mock()
     location = Mock()
-    location.space = space
     slot = Slot(Mock(), Mock(), location=location)
     non_slot = Mock()
     correspondence = Correspondence(
@@ -99,7 +94,6 @@ def test_get_slot_argument_returns_slot():
         Mock(),
         Mock(),
         Mock(),
-        space,
         Mock(),
         Mock(),
     )
@@ -113,18 +107,14 @@ def test_get_slot_argument_returns_slot():
         Mock(),
         Mock(),
         Mock(),
-        space,
         Mock(),
         Mock(),
     )
     assert slot == correspondence.get_slot_argument()
 
 
-@pytest.mark.skip
 def test_get_non_slot_argument_returns_non_slot():
-    space = Mock()
     location = Mock()
-    location.space = space
     slot = Slot(Mock(), Mock(), location=location)
     non_slot = Mock()
     correspondence = Correspondence(
@@ -136,7 +126,6 @@ def test_get_non_slot_argument_returns_non_slot():
         Mock(),
         Mock(),
         Mock(),
-        space,
         Mock(),
         Mock(),
     )
@@ -150,14 +139,12 @@ def test_get_non_slot_argument_returns_non_slot():
         Mock(),
         Mock(),
         Mock(),
-        space,
         Mock(),
         Mock(),
     )
     assert non_slot == correspondence.get_non_slot_argument()
 
 
-@pytest.mark.skip
 def test_common_arguments_with():
     arg_1 = Mock()
     arg_2 = Mock()
@@ -168,7 +155,6 @@ def test_common_arguments_with():
         Mock(),
         arg_1,
         arg_2,
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -187,14 +173,12 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
     )
     correspondence_3 = Correspondence(
         Mock(),
         Mock(),
         arg_1,
         arg_3,
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -213,14 +197,12 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
     )
     correspondence_5 = Correspondence(
         Mock(),
         Mock(),
         arg_3,
         arg_4,
-        Mock(),
         Mock(),
         Mock(),
         Mock(),

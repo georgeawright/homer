@@ -15,19 +15,19 @@ class Slot(Chunk):
         value: Any = None,
         location: Location = None,
         members: StructureCollection = None,
-        parent_spaces: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
+        containing_chunks: StructureCollection = None,
     ):
         Chunk.__init__(
             self,
             structure_id,
             parent_id,
             value,
-            location,
+            [location],
             members,
-            None,
-            parent_spaces,
+            1,
             links_in=links_in,
             links_out=links_out,
+            containing_chunks=containing_chunks,
         )

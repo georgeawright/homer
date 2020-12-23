@@ -13,7 +13,6 @@ class TemplateSlot(Slot):
         prototype: Concept,
         form: WordForm,
         location: Location,
-        parent_spaces: StructureCollection,
     ):
         Slot.__init__(
             self,
@@ -21,6 +20,5 @@ class TemplateSlot(Slot):
             parent_id,
             value=prototype,
             location=location,
-            parent_spaces=parent_spaces,
         )
         self.form = form
