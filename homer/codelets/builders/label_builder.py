@@ -80,7 +80,9 @@ class LabelBuilder(Builder):
         self.target_chunk.links_out.add(label)
         self.bubble_chamber.labels.add(label)
         self.bubble_chamber.working_spaces.add(space)
-        self.bubble_chamber.spaces["top level working"].child_spaces.add(space)
+        top_level_working_space = self.bubble_chamber.spaces["top level working"]
+        space.locations.append(Location([], top_level_working_space))
+        top_level_working_space.add(space)
         space.parent_spaces.add(self.bubble_chamber.spaces["top level working"])
         self.child_structure = label
         self.bubble_chamber.logger.log(self.child_structure)

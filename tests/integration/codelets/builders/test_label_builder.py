@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
-from homer.classifiers import StretchyProximityClassifier
+from homer.classifiers import ProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import LabelBuilder
 from homer.codelets.evaluators import LabelEvaluator
@@ -17,7 +17,15 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 @pytest.fixture
 def label_concepts_space():
     space = ConceptualSpace(
-        Mock(), Mock(), "label concepts", StructureCollection(), Mock()
+        Mock(),
+        Mock(),
+        "label concepts",
+        Mock(),
+        [],
+        StructureCollection(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     return space
 
@@ -25,7 +33,15 @@ def label_concepts_space():
 @pytest.fixture
 def top_level_working_space():
     space = WorkingSpace(
-        Mock(), Mock(), "top level working", StructureCollection(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        "top level working",
+        Mock(),
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
     )
     return space
 
@@ -39,6 +55,7 @@ def temperature_concept(label_concepts_space):
         None,
         None,
         label_concepts_space,
+        Mock(),
         "value",
         StructureCollection(),
         math.dist,
@@ -50,7 +67,15 @@ def temperature_concept(label_concepts_space):
 @pytest.fixture
 def temperature_space(temperature_concept):
     space = ConceptualSpace(
-        "temperature", Mock(), "temperature", StructureCollection(), Mock()
+        "temperature",
+        Mock(),
+        "temperature",
+        temperature_concept,
+        [],
+        StructureCollection(),
+        1,
+        [],
+        [],
     )
     temperature_concept.child_spaces.add(space)
     return space
@@ -58,7 +83,7 @@ def temperature_space(temperature_concept):
 
 @pytest.fixture
 def mild_concept(temperature_space):
-    classifier = StretchyProximityClassifier()
+    classifier = ProximityClassifier()
     mild = Concept(
         Mock(),
         Mock(),
@@ -66,6 +91,7 @@ def mild_concept(temperature_space):
         [10],
         classifier,
         temperature_space,
+        Mock(),
         "value",
         StructureCollection(),
         math.dist,
@@ -100,13 +126,23 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
         None,
         None,
         None,
+        Mock(),
         "value",
         StructureCollection(),
         None,
     )
     chamber.concepts.add(label_concept)
     build_concept = Concept(
-        Mock(), Mock(), "build", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "build",
+        None,
+        None,
+        None,
+        Mock(),
+        "value",
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(build_concept)
     relation = Relation(Mock(), Mock(), label_concept, build_concept, None, None, 1)
@@ -118,33 +154,45 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
 @pytest.fixture
 def target_chunk(bubble_chamber):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "coordinates",
+        Mock(),
+        math.dist,
     )
     input_space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+        Mock(),
+        Mock(),
+        "input",
+        location_concept,
+        [],
+        StructureCollection(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     parent_spaces = StructureCollection({input_space})
     chunk = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     second_chunk = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 1], input_space),
-        StructureCollection(),
+        [Location([0, 1], input_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
-    chunk.neighbours.add(second_chunk)
     bubble_chamber.chunks.add(chunk)
     bubble_chamber.chunks.add(second_chunk)
     input_space.contents.add(chunk)
@@ -153,7 +201,6 @@ def target_chunk(bubble_chamber):
     return chunk
 
 
-@pytest.mark.skip
 def test_successful_adds_label_to_chunk_and_spawns_follow_up_and_same_label_cannot_be_recreated(
     bubble_chamber, target_chunk
 ):
