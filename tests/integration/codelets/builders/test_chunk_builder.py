@@ -76,26 +76,32 @@ def target_chunk(bubble_chamber):
         math.dist,
     )
     input_space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
+        Mock(),
+        Mock(),
+        "input",
+        location_concept,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+        is_basic_level=True,
     )
-    parent_spaces = StructureCollection({input_space})
     chunk = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 0], input_space),
+        [Location([0, 0], input_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     second_chunk = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 1], input_space),
+        [Location([0, 1], input_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     bubble_chamber.chunks.add(chunk)
     bubble_chamber.chunks.add(second_chunk)
@@ -105,7 +111,6 @@ def target_chunk(bubble_chamber):
     return chunk
 
 
-@pytest.mark.skip
 def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_cannot_be_recreated(
     bubble_chamber, target_chunk
 ):
