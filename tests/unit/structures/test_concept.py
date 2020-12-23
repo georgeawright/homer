@@ -27,13 +27,13 @@ def structure():
 def test_distance_from(
     prototype, relevant_value, distance_function, expected, structure
 ):
+    location = Mock()
+    location.coordinates = prototype
     concept = Concept(
         Mock(),
         Mock(),
         Mock(),
-        prototype,
-        Mock(),
-        Mock(),
+        location,
         Mock(),
         relevant_value,
         Mock(),
@@ -59,13 +59,13 @@ def test_proximity_to(
     expected,
     structure,
 ):
+    location = Mock()
+    location.coordinates = prototype
     concept = Concept(
         Mock(),
         Mock(),
         Mock(),
-        prototype,
-        Mock(),
-        Mock(),
+        location,
         Mock(),
         relevant_value,
         Mock(),

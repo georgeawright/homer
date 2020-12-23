@@ -33,9 +33,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "chunk",
-        None,
-        None,
-        None,
+        Mock(),
         None,
         "value",
         StructureCollection(),
@@ -46,9 +44,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "build",
-        None,
-        None,
-        None,
+        Mock(),
         None,
         "value",
         StructureCollection(),
@@ -64,8 +60,6 @@ def bubble_chamber():
 @pytest.fixture
 def target_chunk(bubble_chamber):
     location_concept = Concept(
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),

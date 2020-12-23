@@ -22,10 +22,8 @@ class Concept(Structure):
         structure_id: str,
         parent_id: str,
         name: str,
-        prototype: Any,
-        classifier: Classifier,
-        parent_space: Space,
         location: Location,
+        classifier: Classifier,
         relevant_value: str,
         child_spaces: StructureCollection,
         distance_function: Callable,
@@ -38,16 +36,14 @@ class Concept(Structure):
             self,
             structure_id,
             parent_id,
-            location,
+            [location],
             quality,
             links_in=links_in,
             links_out=links_out,
         )
         self.name = name
         self.value = name
-        self.prototype = prototype
         self.classifier = classifier
-        self.parent_space = parent_space
         self.relevant_value = relevant_value
         self.child_spaces = child_spaces
         self.distance_function = distance_function
@@ -71,10 +67,8 @@ class Concept(Structure):
             ID.new(cls),
             "",
             name,
-            prototype,
-            classifier,
-            parent_space,
             Location(prototype, parent_space),
+            classifier,
             relevant_value,
             child_spaces,
             distance_function,
@@ -84,6 +78,14 @@ class Concept(Structure):
         )
         parent_space.add(concept)
         return concept
+
+    @property
+    def prototype(self) -> list:
+        return self.location.coordinates
+
+    @property
+    def parent_space(self) -> Space:
+        return self.location.space
 
     def distance_from(self, other: Structure):
         other_value = (
