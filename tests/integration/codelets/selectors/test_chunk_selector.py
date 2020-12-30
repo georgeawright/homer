@@ -63,7 +63,15 @@ def bubble_chamber():
 @pytest.fixture
 def target_space():
     space = WorkingSpace(
-        Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
     )
     return space
 
@@ -84,11 +92,9 @@ def good_chunk(target_space, chunk_members):
         Mock(),
         Mock(),
         Mock(),
-        Location([0, 0], target_space),
+        [Location([0, 0], target_space)],
         chunk_members,
-        Mock(),
         1.0,
-        StructureCollection({target_space}),
     )
     chunk._activation = 0.0
     target_space.contents.add(chunk)
@@ -101,18 +107,15 @@ def bad_chunk(target_space, chunk_members):
         Mock(),
         Mock(),
         Mock(),
-        Location([0, 1], target_space),
+        [Location([0, 1], target_space)],
         chunk_members,
-        Mock(),
         0.0,
-        StructureCollection({target_space}),
     )
     chunk._activation = 1.0
     target_space.contents.add(chunk)
     return chunk
 
 
-@pytest.mark.skip
 def test_good_chunk_is_boosted_bad_chunk_is_decayed(
     bubble_chamber, target_space, good_chunk, bad_chunk
 ):

@@ -62,13 +62,15 @@ def bubble_chamber():
 
 @pytest.fixture
 def conceptual_space():
-    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), Mock())
+    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), [], Mock(), 1, [], [])
     return space
 
 
 @pytest.fixture
 def working_space():
-    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(
+        Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 0, [], []
+    )
     return space
 
 
@@ -78,11 +80,9 @@ def chunk(bubble_chamber, working_space):
         Mock(),
         Mock(),
         Mock(),
+        [Mock()],
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
-        StructureCollection({working_space}),
     )
     chunk.locations.append(Location([1, 1], working_space))
     bubble_chamber.chunks.add(chunk)
@@ -95,10 +95,8 @@ def good_label(chunk, conceptual_space, working_space):
         Mock(),
         Mock(),
         Mock(),
+        Location(Mock(), conceptual_space),
         Mock(),
-        Mock(),
-        Mock(),
-        conceptual_space,
         Mock(),
         Mock(),
         Mock(),
@@ -122,10 +120,8 @@ def bad_label(chunk, conceptual_space, working_space):
         Mock(),
         Mock(),
         Mock(),
+        Location(Mock(), conceptual_space),
         Mock(),
-        Mock(),
-        Mock(),
-        conceptual_space,
         Mock(),
         Mock(),
         Mock(),
@@ -144,7 +140,6 @@ def bad_label(chunk, conceptual_space, working_space):
     return label
 
 
-@pytest.mark.skip
 def test_good_label_is_boosted_bad_label_is_decayed(
     bubble_chamber, good_label, bad_label
 ):
