@@ -62,26 +62,29 @@ def bubble_chamber():
 
 @pytest.fixture
 def conceptual_space():
-    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), Mock())
+    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), [], Mock(), 0, [], [])
     return space
 
 
 @pytest.fixture
 def working_space():
-    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(
+        Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 0, [], []
+    )
     return space
 
 
 @pytest.fixture
 def start(working_space):
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    chunk.locations.append(Location([1, 1], working_space))
+    chunk = Chunk(
+        Mock(), Mock(), Mock(), [Location([1, 1], working_space)], Mock(), Mock()
+    )
     return chunk
 
 
 @pytest.fixture
 def end():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     return chunk
 
 
@@ -91,10 +94,8 @@ def good_relation(start, end, conceptual_space, working_space):
         Mock(),
         Mock(),
         Mock(),
+        Location([], conceptual_space),
         Mock(),
-        Mock(),
-        Mock(),
-        conceptual_space,
         Mock(),
         Mock(),
         Mock(),
@@ -120,10 +121,8 @@ def bad_relation(start, end, conceptual_space, working_space):
         Mock(),
         Mock(),
         Mock(),
+        Location([], conceptual_space),
         Mock(),
-        Mock(),
-        Mock(),
-        conceptual_space,
         Mock(),
         Mock(),
         Mock(),
@@ -143,7 +142,6 @@ def bad_relation(start, end, conceptual_space, working_space):
     return relation
 
 
-@pytest.mark.skip
 def test_good_relation_is_boosted_bad_relation_is_decayed(
     bubble_chamber, good_relation, bad_relation
 ):

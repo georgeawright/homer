@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
-from homer.classifiers import StretchyProximityClassifier
+from homer.classifiers import ProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.evaluators import RelationEvaluator
 from homer.codelets.selectors import RelationSelector
@@ -34,10 +34,8 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "relation",
-        None,
-        None,
-        None,
-        None,
+        Mock(),
+        Mock(),
         "value",
         StructureCollection(),
         None,
@@ -47,10 +45,8 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "evaluate",
-        None,
-        None,
-        None,
-        None,
+        Mock(),
+        Mock(),
         "value",
         StructureCollection(),
         None,
@@ -65,10 +61,8 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def good_relation(bubble_chamber):
-    location_concept = Concept(
-        Mock(),
-        Mock(),
+def location_concept():
+    concept = Concept(
         Mock(),
         Mock(),
         Mock(),
@@ -78,9 +72,12 @@ def good_relation(bubble_chamber):
         Mock(),
         math.dist,
     )
-    temperature_concept = Concept(
-        Mock(),
-        Mock(),
+    return concept
+
+
+@pytest.fixture
+def temperature_concept():
+    concept = Concept(
         Mock(),
         Mock(),
         Mock(),
@@ -90,44 +87,57 @@ def good_relation(bubble_chamber):
         Mock(),
         math.dist,
     )
-    input_space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
-    )
-    temperature_space = WorkingSpace(
-        Mock(), Mock(), "temperature", StructureCollection(), 0, temperature_concept
-    )
-    more_concept = Concept(
+    return concept
+
+
+@pytest.fixture
+def more_concept():
+    concept = Concept(
         Mock(),
         Mock(),
         "more",
-        [5],
-        StretchyProximityClassifier(),
-        temperature_space,
-        Mock(),
+        Location([5], Mock()),
+        ProximityClassifier(),
         "value",
         StructureCollection(),
         math.dist,
     )
-    parent_spaces = StructureCollection({input_space, temperature_space})
+    return concept
+
+
+@pytest.fixture
+def input_space(location_concept):
+    space = WorkingSpace(
+        Mock(), Mock(), "input", Mock(), [], StructureCollection(), 0, [], []
+    )
+    return space
+
+
+@pytest.fixture
+def temperature_space(temperature_concept):
+    space = WorkingSpace(
+        Mock(), Mock(), "temperature", Mock(), [], StructureCollection(), 0, [], []
+    )
+    return space
+
+
+@pytest.fixture
+def good_relation(bubble_chamber, input_space, temperature_space, more_concept):
     start = Chunk(
         Mock(),
         Mock(),
         [15],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space), Location([15], temperature_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     end = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space), Location([10], temperature_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     quality = 0.0
     relation = Relation(
@@ -137,69 +147,22 @@ def good_relation(bubble_chamber):
 
 
 @pytest.fixture
-def bad_relation(bubble_chamber):
-    location_concept = Concept(
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        "coordinates",
-        Mock(),
-        math.dist,
-    )
-    temperature_concept = Concept(
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        "value",
-        Mock(),
-        math.dist,
-    )
-    input_space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
-    )
-    temperature_space = WorkingSpace(
-        Mock(), Mock(), "temperature", StructureCollection(), 0, temperature_concept
-    )
-    more_concept = Concept(
-        Mock(),
-        Mock(),
-        "more",
-        [5],
-        StretchyProximityClassifier(),
-        temperature_space,
-        Mock(),
-        "value",
-        StructureCollection(),
-        math.dist,
-    )
-    parent_spaces = StructureCollection({input_space, temperature_space})
+def bad_relation(bubble_chamber, input_space, temperature_space, more_concept):
     start = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space), Location([10], temperature_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     end = Chunk(
         Mock(),
         Mock(),
         [15],
-        Location([0, 0], input_space),
-        StructureCollection(),
+        [Location([0, 0], input_space), Location([15], temperature_space)],
         StructureCollection(),
         0.0,
-        parent_spaces,
     )
     quality = 1.0
     relation = Relation(
@@ -208,7 +171,6 @@ def bad_relation(bubble_chamber):
     return relation
 
 
-@pytest.mark.skip
 def test_increases_quality_of_good_relation(bubble_chamber, good_relation):
     original_quality = good_relation.quality
     parent_id = ""
@@ -223,7 +185,6 @@ def test_increases_quality_of_good_relation(bubble_chamber, good_relation):
     assert isinstance(evaluator.child_codelets[0], RelationSelector)
 
 
-@pytest.mark.skip
 def test_decreases_quality_of_bad_label(bubble_chamber, bad_relation):
     original_quality = bad_relation.quality
     parent_id = ""
