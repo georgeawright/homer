@@ -141,7 +141,7 @@ class Homer:
             classifier=classifier,
             relevant_value=relevant_value,
             child_spaces=(
-                child_spaces if child_spaces is not None else StructureCollection
+                child_spaces if child_spaces is not None else StructureCollection()
             ),
             distance_function=distance_function,
             links_in=links_in,
@@ -183,6 +183,8 @@ class Homer:
             links_out=links_out,
         )
         self.logger.log(conceptual_space)
+        if parent_concept is not None:
+            parent_concept.child_spaces.add(conceptual_space)
         for location in locations:
             if location is None:
                 continue
@@ -191,7 +193,7 @@ class Homer:
         return conceptual_space
 
     def def_concept_link(
-        self, start: Concept, end: Concept, activation: FloatBetweenOneAndZero
+        self, start: Concept, end: Concept, activation: FloatBetweenOneAndZero = 0.0
     ) -> Relation:
         relation = Relation(
             structure_id=ID.new(Relation),
