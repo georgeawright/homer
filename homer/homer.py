@@ -1,4 +1,4 @@
-from typing import Any, Callable, List
+from typing import Any, Callable, Dict, List
 
 from homer import fuzzy
 from .bubble_chamber import BubbleChamber
@@ -13,7 +13,7 @@ from .logger import Logger
 from .loggers import DjangoLogger
 from .problem import Problem
 from .structure_collection import StructureCollection
-from .structures import Concept
+from .structures import Concept, Lexeme
 from .structures.links import Relation
 from .structures.spaces import ConceptualSpace, WorkingSpace
 
@@ -209,6 +209,25 @@ class Homer:
         end.links_in.add(relation)
         self.logger.log(relation)
         return relation
+
+    def def_lexeme(
+        self,
+        headword: str = "",
+        forms: Dict[str, str] = None,
+        parent_concept: Concept = None,
+    ) -> Lexeme:
+        lexeme = Lexeme(
+            structure_id=ID.new(Lexeme),
+            parent_id="",
+            headword=headword,
+            forms=forms,
+        )
+        self.logger.log(lexeme)
+        self.bubble_chamber.lexemes.add(lexeme)
+        link_to_concept = self.def_concept_link(parent_concept, lexeme, activation=1.0)
+        parent_concept.links_out.add(link_to_concept)
+        lexeme.links_in.add(link_to_concept)
+        return lexeme
 
     def def_working_space(
         self,
