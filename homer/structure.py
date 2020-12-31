@@ -39,7 +39,10 @@ class Structure(ABC):
 
     @property
     def location(self) -> Location:
-        return self.locations[0]
+        try:
+            return self.locations[0]
+        except TypeError:
+            return None
 
     @property
     def size(self) -> int:
