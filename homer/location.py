@@ -30,8 +30,6 @@ class Location:
     def for_correspondence_between(
         cls, location_1: Location, location_2: Location, space: "Space"
     ):
-        print(location_1.space)
-        print(space.sub_spaces)
         if location_1.space == space.sub_spaces[0]:
             coordinates = location_1.coordinates + location_2.coordinates
         else:
@@ -47,5 +45,4 @@ class Location:
     def is_near(self, other: Location) -> bool:
         if self.space != other.space:
             return False
-        print(f"{self} is near {other}?")
         return math.dist(self.coordinates, other.coordinates) <= self.NEARNESS

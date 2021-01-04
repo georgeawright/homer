@@ -258,7 +258,6 @@ class DjangoLogger(Logger):
                 hasattr(structure, "parent_space")
                 and structure.parent_space is not None
             ):
-                print(structure.parent_space.structure_id)
                 structure_record.parent_space = StructureRecord.objects.get(
                     structure_id=structure.parent_space.structure_id, run_id=self.run
                 )

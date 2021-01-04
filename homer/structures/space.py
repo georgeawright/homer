@@ -56,7 +56,6 @@ class Space(Structure):
         return self._dimensions
 
     def add(self, structure: Structure):
-        print(structure.structure_id)
         self.contents.add(structure)
         if not hasattr(structure, "location_in_space"):
             return
@@ -65,11 +64,9 @@ class Space(Structure):
             location_in_sub_space = sub_space.location_from_super_space_location(
                 location_in_this_space
             )
-            print(location_in_sub_space)
             structure.locations.append(location_in_sub_space)
             sub_space.add(structure)
             structure.parent_spaces.add(sub_space)
-            print(structure.locations)
 
     def get_relevant_value(self, chunk) -> Any:
         relevant_value = getattr(chunk, self.parent_concept.relevant_value)
@@ -90,5 +87,4 @@ class Space(Structure):
         return self.parent_concept.distance_between(a, b)
 
     def proximity_between(self, a: Structure, b: Structure):
-        print(self.structure_id)
         return self.parent_concept.proximity_between(a, b)
