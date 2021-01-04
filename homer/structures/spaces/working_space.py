@@ -55,7 +55,9 @@ class WorkingSpace(Space):
         }
         if len(active_contents) == 0:
             return 0.0
-        return statistics.fmean([structure.quality for structure in active_contents])
+        return statistics.fmean(
+            [structure.quality * structure.activation for structure in active_contents]
+        )
 
     def update_activation(self):
         self._activation = (
