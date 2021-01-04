@@ -53,6 +53,16 @@ class StructureCollection:
             {structure for structure in self.structures if structure.is_near(other)}
         )
 
+    def where(self, **kwargs) -> StructureCollection:
+        old_collection = self
+        for key, value in kwargs.items():
+            new_collection = StructureCollection()
+            for structure in old_collection:
+                if hasattr(structure, key) and getattr(structure, key) == value:
+                    new_collection.add(structure)
+            old_collection = new_collection
+        return new_collection
+
     def add(self, structure):
         self.structures.add(structure)
         if self.structures_by_name is not None and hasattr(structure, "name"):
