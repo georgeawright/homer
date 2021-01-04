@@ -57,8 +57,6 @@ class Space(Structure):
 
     def add(self, structure: Structure):
         self.contents.add(structure)
-        if not hasattr(structure, "location_in_space"):
-            return
         location_in_this_space = structure.location_in_space(self)
         for sub_space in self.sub_spaces:
             location_in_sub_space = sub_space.location_from_super_space_location(
