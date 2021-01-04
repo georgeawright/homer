@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Union
 
 from homer import fuzzy
 from .bubble_chamber import BubbleChamber
@@ -14,8 +14,12 @@ from .loggers import DjangoLogger
 from .problem import Problem
 from .structure_collection import StructureCollection
 from .structures import Concept, Lexeme
+from .structures.chunks import Word
+from .structures.chunks.slots import TemplateSlot
 from .structures.links import Relation
 from .structures.spaces import ConceptualSpace, WorkingSpace
+from .structures.spaces.frames import Template
+from .word_form import WordForm
 
 
 class Homer:
@@ -193,7 +197,11 @@ class Homer:
         return conceptual_space
 
     def def_concept_link(
-        self, start: Concept, end: Concept, activation: FloatBetweenOneAndZero = 0.0
+        self,
+        start: Concept,
+        end: Concept,
+        activation: FloatBetweenOneAndZero = 0.0,
+        stable: bool = False,
     ) -> Relation:
         relation = Relation(
             structure_id=ID.new(Relation),
@@ -205,9 +213,11 @@ class Homer:
             quality=1.0,
         )
         relation._activation = activation
+        relation.stable = stable
         start.links_out.add(relation)
         end.links_in.add(relation)
         self.logger.log(relation)
+        self.bubble_chamber.concept_links.add(relation)
         return relation
 
     def def_lexeme(
@@ -228,6 +238,52 @@ class Homer:
         parent_concept.links_out.add(link_to_concept)
         lexeme.links_in.add(link_to_concept)
         return lexeme
+
+    def def_template(
+        self,
+        name: str = "",
+        parent_concept: Concept = None,
+        contents: List[Union[Word, TemplateSlot]] = None,
+    ) -> Template:
+        template = Template(
+            structure_id=ID.new(Template),
+            parent_id="",
+            name=name,
+            parent_concept=parent_concept,
+            locations=[Location([], self.bubble_chamber.spaces["templates"])],
+            contents=StructureCollection(),
+        )
+        for i, item in enumerate(contents):
+            template.contents.add(item)
+            item.locations = [Location([i], template)]
+            self.logger.log(item)
+            if isinstance(item, TemplateSlot):
+                self.def_concept_link(item.value, item, activation=1.0, stable=True)
+        self.logger.log(template)
+        self.bubble_chamber.conceptual_spaces.add(template)
+        self.bubble_chamber.spaces["templates"].add(template)
+        return template
+
+    def def_template_slot(self, concept: Concept = None, form: WordForm = None):
+        slot = TemplateSlot(
+            structure_id=ID.new(TemplateSlot),
+            parent_id="",
+            prototype=concept,
+            form=form,
+            location=None,
+        )
+        self.bubble_chamber.slots.add(slot)
+        return slot
+
+    def def_word(self, value: str = "", quality: FloatBetweenOneAndZero = 1.0):
+        word = Word(
+            structure_id=ID.new(Word),
+            parent_id="",
+            value=value,
+            location=None,
+            quality=quality,
+        )
+        return word
 
     def def_working_space(
         self,

@@ -19,18 +19,6 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
 from homer.word_form import WordForm
 
-path_to_logs = "logs"
-logger = DjangoLogger.setup(path_to_logs)
-
-
-def link_concepts(concept_1, concept_2, activation=0.0):
-    relation = Relation(ID.new(Relation), "", concept_1, concept_2, None, None, 1.0)
-    relation._activation = activation
-    concept_1.links_out.add(relation)
-    concept_2.links_in.add(relation)
-    logger.log(relation)
-    return relation
-
 
 problem = [
     [4, 5, 6, 4, 3],
@@ -41,1045 +29,531 @@ problem = [
     [22, 22, 24, 23, 22],
 ]
 
-top_level_conceptual_space = ConceptualSpace(
-    "top_level_space", "", "top level", StructureCollection(), None
-)
-logger.log(top_level_conceptual_space)
+path_to_logs = "logs"
+logger = DjangoLogger.setup(path_to_logs)
+homer = Homer.setup(logger)
+
+top_level_conceptual_space = homer.bubble_chamber.spaces["top level"]
 top_level_working_space = top_level_conceptual_space.instance
-logger.log(top_level_working_space)
-bubble_chamber = BubbleChamber(
-    StructureCollection({top_level_conceptual_space}),
-    StructureCollection({top_level_working_space}),
-    StructureCollection(),
-    StructureCollection(),
-    StructureCollection(),
-    StructureCollection(),
-    StructureCollection(),
-    StructureCollection(),
-    StructureCollection(),
-    StructureCollection(),
-    StructureCollection(),
-    logger,
-)
-bubble_chamber.lexemes = StructureCollection()
 
-input_concept = Concept.new(
-    "input",
-    None,
-    None,
-    top_level_conceptual_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+input_concept = homer.def_concept(
+    name="input",
+    parent_space=top_level_conceptual_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(input_concept)
-bubble_chamber.concepts.add(input_concept)
-input_space = WorkingSpace(
-    "input_space", "", "input", StructureCollection(), 0.0, input_concept
+input_space = homer.def_working_space(
+    name="input",
+    parent_concept=input_concept,
+    locations=[Location([], top_level_working_space)],
 )
-logger.log(input_space)
-bubble_chamber.working_spaces.add(input_space)
-top_level_working_space.child_spaces.add(input_space)
+activity_concept = homer.def_concept(
+    name="activity",
+    parent_space=top_level_conceptual_space,
+)
+activities_space = homer.def_conceptual_space(
+    name="activities",
+    parent_concept=activity_concept,
+    locations=[Location([], top_level_conceptual_space)],
+)
+build_concept = homer.def_concept(
+    name="build",
+    parent_space=activities_space,
+)
+evaluate_concept = homer.def_concept(
+    name="evaluate",
+    parent_space=activities_space,
+)
+select_concept = homer.def_concept(
+    name="select",
+    parent_space=activities_space,
+)
+structure_concept = homer.def_concept(
+    name="structure",
+    parent_space=top_level_conceptual_space,
+)
+structures_space = homer.def_conceptual_space(
+    name="structures",
+    parent_concept=structure_concept,
+    locations=[Location([], top_level_conceptual_space)],
+)
+chunk_concept = homer.def_concept(
+    name="chunk",
+    parent_space=structures_space,
+)
+view_concept = homer.def_concept(
+    name="view",
+    parent_space=structures_space,
+)
+word_concept = homer.def_concept(
+    name="word",
+    parent_space=structures_space,
+)
+label_concept = homer.def_concept(
+    name="label",
+    parent_space=structures_space,
+)
+relation_concept = homer.def_concept(
+    name="relation",
+    parent_space=structures_space,
+)
+correspondence_concept = homer.def_concept(
+    name="correspondence",
+    parent_space=structures_space,
+)
+template_concept = homer.def_concept(
+    name="template",
+    parent_space=structures_space,
+)
+label_concepts_space = homer.def_conceptual_space(
+    name="label concepts",
+    parent_concept=label_concept,
+    locations=[Location([], top_level_conceptual_space)],
+)
+relational_concepts_space = homer.def_conceptual_space(
+    name="relational concepts",
+    parent_concept=relation_concept,
+    locations=[Location([], top_level_conceptual_space)],
+)
+correspondential_concepts_space = homer.def_conceptual_space(
+    name="correspondential concepts",
+    parent_concept=correspondence_concept,
+    locations=[Location([], top_level_conceptual_space)],
+)
+templates_space = homer.def_conceptual_space(
+    name="templates",
+    parent_concept=template_concept,
+    locations=[Location([], top_level_conceptual_space)],
+)
+homer.def_concept_link(build_concept, chunk_concept)
+homer.def_concept_link(build_concept, correspondence_concept)
+homer.def_concept_link(build_concept, label_concept, activation=1.0)
+homer.def_concept_link(build_concept, relation_concept)
+homer.def_concept_link(build_concept, view_concept)
+homer.def_concept_link(build_concept, word_concept)
+homer.def_concept_link(evaluate_concept, chunk_concept)
+homer.def_concept_link(evaluate_concept, correspondence_concept)
+homer.def_concept_link(evaluate_concept, label_concept)
+homer.def_concept_link(evaluate_concept, relation_concept)
+homer.def_concept_link(evaluate_concept, view_concept)
+homer.def_concept_link(select_concept, chunk_concept)
+homer.def_concept_link(select_concept, correspondence_concept)
+homer.def_concept_link(select_concept, label_concept)
+homer.def_concept_link(select_concept, relation_concept)
+homer.def_concept_link(select_concept, view_concept)
+homer.def_concept_link(build_concept, evaluate_concept, activation=1.0)
+homer.def_concept_link(evaluate_concept, select_concept, activation=1.0)
+homer.def_concept_link(select_concept, build_concept, activation=1.0)
 
-activity_concept = Concept.new(
-    "activity",
-    None,
-    None,
-    top_level_conceptual_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(activity_concept)
-bubble_chamber.concepts.add(activity_concept)
-activities_space = ConceptualSpace(
-    "activities", "", "activities", StructureCollection(), None
-)
-logger.log(activities_space)
-bubble_chamber.conceptual_spaces.add(activities_space)
-build_concept = Concept.new(
-    "build",
-    None,
-    None,
-    activities_space,
-    None,
-    StructureCollection(),
-    None,
-)
-build_concept._activation = 1.0
-logger.log(build_concept)
-bubble_chamber.concepts.add(build_concept)
-evaluate_concept = Concept.new(
-    "evaluate",
-    None,
-    None,
-    activities_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(evaluate_concept)
-bubble_chamber.concepts.add(evaluate_concept)
-select_concept = Concept.new(
-    "select",
-    None,
-    None,
-    activities_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(select_concept)
-bubble_chamber.concepts.add(select_concept)
+# Domain Specific Knowledge
 
-structure_concept = Concept.new(
-    "structure",
-    None,
-    None,
-    top_level_conceptual_space,
-    None,
-    StructureCollection(),
-    None,
+temperature_concept = homer.def_concept(
+    name="temperature",
+    parent_space=label_concepts_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(structure_concept)
-bubble_chamber.concepts.add(structure_concept)
-structures_space = ConceptualSpace(
-    "structures", "", "structures", StructureCollection(), None
+temperature_space = homer.def_conceptual_space(
+    name="temperature",
+    parent_concept=temperature_concept,
+    locations=[Location([], label_concepts_space)],
+    is_basic_level=True,
 )
-logger.log(structures_space)
-bubble_chamber.conceptual_spaces.add(structures_space)
-chunk_concept = Concept.new(
-    "chunk",
-    None,
-    None,
-    structures_space,
-    None,
-    StructureCollection(),
-    None,
+hot = homer.def_concept(
+    name="hot",
+    prototype=[22],
+    classifier=ProximityClassifier(),
+    parent_space=temperature_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(chunk_concept)
-bubble_chamber.concepts.add(chunk_concept)
-view_concept = Concept.new(
-    "view",
-    None,
-    None,
-    structures_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(view_concept)
-bubble_chamber.concepts.add(view_concept)
-word_concept = Concept.new(
-    "word",
-    None,
-    None,
-    structures_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(word_concept)
-bubble_chamber.concepts.add(word_concept)
-label_concept = Concept.new(
-    "label",
-    None,
-    None,
-    structures_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(label_concept)
-bubble_chamber.concepts.add(label_concept)
-label_concepts_space = ConceptualSpace(
-    "label_concept", "", "label concepts", StructureCollection(), label_concept
-)
-logger.log(label_concepts_space)
-bubble_chamber.conceptual_spaces.add(label_concepts_space)
-relation_concept = Concept.new(
-    "relation",
-    None,
-    None,
-    structures_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(relation_concept)
-bubble_chamber.concepts.add(relation_concept)
-relational_concepts_space = ConceptualSpace(
-    "relational_concepts",
-    "",
-    "relational concepts",
-    StructureCollection(),
-    relation_concept,
-)
-logger.log(relational_concepts_space)
-bubble_chamber.conceptual_spaces.add(relational_concepts_space)
-correspondence_concept = Concept.new(
-    "correspondence",
-    None,
-    None,
-    structures_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(correspondence_concept)
-bubble_chamber.concepts.add(correspondence_concept)
-correspondential_concepts_space = ConceptualSpace(
-    "correspondential_concepts",
-    "",
-    "correspondential concepts",
-    StructureCollection(),
-    correspondence_concept,
-)
-logger.log(correspondential_concepts_space)
-bubble_chamber.conceptual_spaces.add(correspondential_concepts_space)
-template_concept = Concept.new(
-    "template",
-    None,
-    None,
-    structures_space,
-    None,
-    StructureCollection(),
-    None,
-)
-logger.log(template_concept)
-bubble_chamber.concepts.add(template_concept)
-templates_space = ConceptualSpace(
-    "templates", "", "templates", StructureCollection(), template_concept
-)
-logger.log(templates_space)
-
-link_concepts(build_concept, chunk_concept)
-link_concepts(build_concept, correspondence_concept)
-link_concepts(build_concept, label_concept, activation=1.0)
-link_concepts(build_concept, relation_concept)
-link_concepts(build_concept, view_concept)
-link_concepts(build_concept, word_concept)
-
-link_concepts(evaluate_concept, chunk_concept)
-link_concepts(evaluate_concept, correspondence_concept)
-link_concepts(evaluate_concept, label_concept, activation=1.0)
-link_concepts(evaluate_concept, relation_concept)
-link_concepts(evaluate_concept, view_concept)
-
-link_concepts(select_concept, chunk_concept)
-link_concepts(select_concept, correspondence_concept)
-link_concepts(select_concept, label_concept)
-link_concepts(select_concept, relation_concept)
-link_concepts(select_concept, view_concept)
-
-link_concepts(build_concept, evaluate_concept, activation=1.0)
-link_concepts(evaluate_concept, select_concept, activation=1.0)
-link_concepts(select_concept, build_concept, activation=1.0)
-
-
-temperature_concept = Concept.new(
-    "temperature",
-    None,
-    None,
-    label_concepts_space,
-    "value",
-    StructureCollection(),
-    math.dist,
-)
-logger.log(temperature_concept)
-bubble_chamber.concepts.add(temperature_concept)
-temperature_space = ConceptualSpace(
-    "temperature", "", "temperature", StructureCollection(), temperature_concept
-)
-logger.log(temperature_space)
-label_concepts_space.child_spaces.add(temperature_space)
-bubble_chamber.conceptual_spaces.add(temperature_space)
-temperature_concept.child_spaces.add(temperature_space)
-hot = Concept.new(
-    "hot",
-    [22],
-    ProximityClassifier(),
-    temperature_space,
-    "value",
-    StructureCollection(),
-    math.dist,
-)
-logger.log(hot)
-bubble_chamber.concepts.add(hot)
-hot_lexeme = Lexeme.new(
-    "hot",
-    {
+hot_lexeme = homer.def_lexeme(
+    headword="hot",
+    forms={
         WordForm.HEADWORD: "hot",
         WordForm.COMPARATIVE: "hotter",
         WordForm.SUPERLATIVE: "hottest",
     },
-    hot,
+    parent_concept=hot,
 )
-logger.log(hot_lexeme)
-bubble_chamber.lexemes.add(hot_lexeme)
-warm = Concept.new(
-    "warm",
-    [16],
-    ProximityClassifier(),
-    temperature_space,
-    "value",
-    StructureCollection(),
-    math.dist,
+warm = homer.def_concept(
+    name="warm",
+    prototype=[16],
+    classifier=ProximityClassifier(),
+    parent_space=temperature_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(warm)
-bubble_chamber.concepts.add(warm)
-warm_lexeme = Lexeme.new(
-    "warm",
-    {
+warm_lexeme = homer.def_lexeme(
+    headword="warm",
+    forms={
         WordForm.HEADWORD: "warm",
         WordForm.COMPARATIVE: "warmer",
         WordForm.SUPERLATIVE: "warmest",
     },
-    warm,
+    parent_concept=warm,
 )
-logger.log(warm_lexeme)
-bubble_chamber.lexemes.add(warm_lexeme)
-mild = Concept.new(
-    "mild",
-    [10],
-    ProximityClassifier(),
-    temperature_space,
-    "value",
-    StructureCollection(),
-    math.dist,
+mild = homer.def_concept(
+    name="mild",
+    prototype=[10],
+    classifier=ProximityClassifier(),
+    parent_space=temperature_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(mild)
-bubble_chamber.concepts.add(mild)
-mild_lexeme = Lexeme.new(
-    "mild",
-    {
+mild_lexeme = homer.def_lexeme(
+    headword="mild",
+    forms={
         WordForm.HEADWORD: "mild",
         WordForm.COMPARATIVE: "milder",
         WordForm.SUPERLATIVE: "mildest",
     },
-    mild,
+    parent_concept=mild,
 )
-logger.log(mild_lexeme)
-bubble_chamber.lexemes.add(mild_lexeme)
-cold = Concept.new(
-    "cold",
-    [4],
-    ProximityClassifier(),
-    temperature_space,
-    "value",
-    StructureCollection(),
-    math.dist,
+cold = homer.def_concept(
+    name="cold",
+    prototype=[4],
+    classifier=ProximityClassifier(),
+    parent_space=temperature_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(cold)
-bubble_chamber.concepts.add(cold)
-cold_lexeme = Lexeme.new(
-    "cold",
-    {
+cold_lexeme = homer.def_lexeme(
+    headword="cold",
+    forms={
         WordForm.HEADWORD: "cold",
         WordForm.COMPARATIVE: "colder",
         WordForm.SUPERLATIVE: "coldest",
     },
-    cold,
+    parent_concept=cold,
 )
-logger.log(cold_lexeme)
-bubble_chamber.lexemes.add(cold_lexeme)
-
-location_concept = Concept.new(
-    "location",
-    None,
-    None,
-    label_concepts_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+location_concept = homer.def_concept(
+    name="location",
+    parent_space=label_concepts_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(location_concept)
-bubble_chamber.concepts.add(location_concept)
-location_space = ConceptualSpace(
-    "location", "", "location", StructureCollection(), location_concept
+north_south_space = homer.def_conceptual_space(
+    name="north-south",
+    parent_concept=location_concept,
+    locations=[Location([], label_concepts_space)],
+    coordinates_from_super_space_location=lambda location: [location.coordinates[0]],
 )
-
-logger.log(location_space)
-label_concepts_space.child_spaces.add(location_space)
-bubble_chamber.conceptual_spaces.add(location_space)
-location_concept.child_spaces.add(location_space)
-north = Concept.new(
-    "north",
-    [0, 2],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+west_east_space = homer.def_conceptual_space(
+    name="west-east",
+    parent_concept=location_concept,
+    locations=[Location([], label_concepts_space)],
+    coordinates_from_super_space_location=lambda location: [location.coordinates[1]],
 )
-logger.log(north)
-bubble_chamber.concepts.add(north)
-north_lexeme = Lexeme.new(
-    "north",
-    {
+nw_se_space = homer.def_conceptual_space(
+    name="nw-se",
+    parent_concept=location_concept,
+    locations=[Location([], label_concepts_space)],
+    coordinates_from_super_space_location=lambda location: [
+        statistics.fmean(location.coordinates)
+    ],
+)
+ne_sw_space = homer.def_conceptual_space(
+    name="ne-sw",
+    parent_concept=location_concept,
+    locations=[Location([], label_concepts_space)],
+    coordinates_from_super_space_location=lambda location: [
+        statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
+    ],
+)
+location_space = homer.def_conceptual_space(
+    name="location",
+    parent_concept=location_concept,
+    locations=[Location([], label_concepts_space)],
+    is_basic_level=True,
+)
+north = homer.def_concept(
+    name="north",
+    prototype=[0, 2],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordintes",
+    distance_function=math.dist,
+)
+north_lexeme = homer.def_lexeme(
+    headword="north",
+    forms={
         WordForm.HEADWORD: "north",
         WordForm.COMPARATIVE: "further north",
         WordForm.SUPERLATIVE: "furthest north",
     },
-    north,
+    parent_concept=north,
 )
-logger.log(north_lexeme)
-bubble_chamber.lexemes.add(north_lexeme)
-south = Concept.new(
-    "south",
-    [5, 2],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+south = homer.def_concept(
+    name="south",
+    prototype=[5, 2],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(south)
-bubble_chamber.concepts.add(south)
-south_lexeme = Lexeme.new(
-    "south",
-    {
+south_lexeme = homer.def_lexeme(
+    headword="south",
+    forms={
         WordForm.HEADWORD: "south",
         WordForm.COMPARATIVE: "further south",
         WordForm.SUPERLATIVE: "furthest south",
     },
-    south,
+    parent_concept=south,
 )
-logger.log(south_lexeme)
-bubble_chamber.lexemes.add(south_lexeme)
-east = Concept.new(
-    "east",
-    [2.5, 4],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+east = homer.def_concept(
+    name="east",
+    prototype=[2.5, 4],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(east)
-bubble_chamber.concepts.add(east)
-east_lexeme = Lexeme.new(
-    "east",
-    {
+east_lexeme = homer.def_lexeme(
+    headword="east",
+    forms={
         WordForm.HEADWORD: "east",
         WordForm.COMPARATIVE: "further east",
         WordForm.SUPERLATIVE: "furthest east",
     },
-    east,
+    parent_concept=east,
 )
-logger.log(east_lexeme)
-bubble_chamber.lexemes.add(east_lexeme)
-west = Concept.new(
-    "west",
-    [2.5, 0],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+west = homer.def_concept(
+    name="west",
+    prototype=[2.5, 0],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(west)
-bubble_chamber.concepts.add(west)
-west_lexeme = Lexeme.new(
-    "west",
-    {
+west_lexeme = homer.def_lexeme(
+    headword="west",
+    forms={
         WordForm.HEADWORD: "west",
         WordForm.COMPARATIVE: "further west",
         WordForm.SUPERLATIVE: "furthest west",
     },
-    west,
+    parent_concept=west,
 )
-logger.log(west_lexeme)
-bubble_chamber.lexemes.add(west_lexeme)
-northwest = Concept.new(
-    "northwest",
-    [0, 0],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+northwest = homer.def_concept(
+    name="northwest",
+    prototype=[0, 0],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(northwest)
-bubble_chamber.concepts.add(northwest)
-northwest_lexeme = Lexeme.new(
-    "northwest",
-    {
+northwest_lexeme = homer.def_lexeme(
+    headword="northwest",
+    forms={
         WordForm.HEADWORD: "northwest",
         WordForm.COMPARATIVE: "further northwest",
         WordForm.SUPERLATIVE: "furthest northwest",
     },
-    northwest,
+    parent_concept=northwest,
 )
-logger.log(northwest_lexeme)
-bubble_chamber.lexemes.add(northwest_lexeme)
-northeast = Concept.new(
-    "northeast",
-    [0, 4],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+northeast = homer.def_concept(
+    name="northeast",
+    prototype=[0, 4],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(northeast)
-bubble_chamber.concepts.add(northeast)
-northeast_lexeme = Lexeme.new(
-    "northeast",
-    {
+northeast_lexeme = homer.def_lexeme(
+    headword="northeast",
+    forms={
         WordForm.HEADWORD: "northeast",
         WordForm.COMPARATIVE: "further northeast",
         WordForm.SUPERLATIVE: "furthest northeast",
     },
-    northeast,
+    parent_concept=northeast,
 )
-logger.log(northeast_lexeme)
-bubble_chamber.lexemes.add(northeast_lexeme)
-southwest = Concept.new(
-    "southwest",
-    [5, 0],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+southwest = homer.def_concept(
+    name="southwest",
+    prototype=[5, 0],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(southwest)
-bubble_chamber.concepts.add(southwest)
-southwest_lexeme = Lexeme.new(
-    "southwest",
-    {
+southwest_lexeme = homer.def_lexeme(
+    headword="southwest",
+    forms={
         WordForm.HEADWORD: "southwest",
         WordForm.COMPARATIVE: "further southwest",
         WordForm.SUPERLATIVE: "furthest southwest",
     },
-    southwest,
+    parent_concept=southwest,
 )
-logger.log(southwest_lexeme)
-bubble_chamber.lexemes.add(southwest_lexeme)
-southeast = Concept.new(
-    "southeast",
-    [5, 4],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+southeast = homer.def_concept(
+    name="southeast",
+    prototype=[5, 4],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(southeast)
-bubble_chamber.concepts.add(southeast)
-southeast_lexeme = Lexeme.new(
-    "southeast",
-    {
+southeast_lexeme = homer.def_lexeme(
+    headword="southeast",
+    forms={
         WordForm.HEADWORD: "southeast",
         WordForm.COMPARATIVE: "further southeast",
         WordForm.SUPERLATIVE: "furthest southeast",
     },
-    southeast,
+    parent_concept=southeast,
 )
-logger.log(southeast_lexeme)
-bubble_chamber.lexemes.add(southeast_lexeme)
-midlands = Concept.new(
-    "midlands",
-    [2.5, 2],
-    ProximityClassifier(),
-    location_space,
-    "coordinates",
-    StructureCollection(),
-    math.dist,
+midlands = homer.def_concept(
+    name="midlands",
+    prototype=[2.5, 2],
+    classifier=ProximityClassifier(),
+    parent_space=location_space,
+    relevant_value="coordinates",
+    distance_function=math.dist,
 )
-logger.log(midlands)
-bubble_chamber.concepts.add(midlands)
-midlands_lexeme = Lexeme.new(
-    "midlands",
-    {
+midlands_lexeme = homer.def_lexeme(
+    headword="midlands",
+    forms={
         WordForm.HEADWORD: "midlands",
         WordForm.COMPARATIVE: "further inland",
         WordForm.SUPERLATIVE: "furthest inland",
     },
-    midlands,
+    parent_concept=midlands,
 )
-logger.log(midlands_lexeme)
-bubble_chamber.lexemes.add(midlands_lexeme)
-
-north_south_space = ConceptualSpace(
-    "north-south",
-    "",
-    "north-south",
-    StructureCollection(),
-    south,
-    coordinates_from_super_space_location=lambda location: [location.coordinates[0]],
-    is_sub_space=True,
+more_less_concept = homer.def_concept(
+    name="more-less",
+    parent_space=relational_concepts_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(north_south_space)
-west_east_space = ConceptualSpace(
-    "west-east",
-    "",
-    "west-east",
-    StructureCollection(),
-    east,
-    coordinates_from_super_space_location=lambda location: [location.coordinates[1]],
-    is_sub_space=True,
+more_less_space = homer.def_conceptual_space(
+    name="more-less",
+    locations=[Location([], relational_concepts_space)],
+    parent_concept=more_less_concept,
+    is_basic_level=True,
 )
-logger.log(west_east_space)
-nw_se_space = ConceptualSpace(
-    "nw-se",
-    "",
-    "nw-se",
-    StructureCollection(),
-    southeast,
-    coordinates_from_super_space_location=lambda location: [
-        statistics.fmean(location.coordinates)
-    ],
-    is_sub_space=True,
+more = homer.def_concept(
+    name="more",
+    prototype=[4],
+    classifier=DifferenceClassifier(ProximityClassifier()),
+    parent_space=more_less_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(nw_se_space)
-ne_sw_space = ConceptualSpace(
-    "ne-sw",
-    "",
-    "ne-sw",
-    StructureCollection(),
-    southwest,
-    coordinates_from_super_space_location=lambda location: [
-        statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
-    ],
-    is_sub_space=True,
-)
-logger.log(ne_sw_space)
-location_space.sub_spaces.add(north_south_space)
-location_space.sub_spaces.add(west_east_space)
-location_space.sub_spaces.add(nw_se_space)
-location_space.sub_spaces.add(ne_sw_space)
-
-more_less_concept = Concept.new(
-    "more-less",
-    None,
-    None,
-    relational_concepts_space,
-    "value",
-    StructureCollection(),
-    math.dist,
-)
-logger.log(more_less_concept)
-bubble_chamber.concepts.add(more_less_concept)
-more_less_space = ConceptualSpace(
-    "more-less", "", "more-less", StructureCollection(), more_less_concept
-)
-logger.log(more_less_space)
-more_less_concept.child_spaces.add(more_less_space)
-relational_concepts_space.child_spaces.add(more_less_space)
-bubble_chamber.conceptual_spaces.add(more_less_space)
-more = Concept.new(
-    "more",
-    [4],
-    DifferenceClassifier(ProximityClassifier()),
-    more_less_space,
-    "value",
-    StructureCollection(),
-    math.dist,
-)
-logger.log(more)
-bubble_chamber.concepts.add(more)
-more_lexeme = Lexeme.new(
-    "more",
-    {
+more_lexeme = homer.def_lexeme(
+    headword="more",
+    forms={
         WordForm.HEADWORD: "more",
         WordForm.COMPARATIVE: "more",
         WordForm.SUPERLATIVE: "most",
     },
-    more,
+    parent_concept=more,
 )
-logger.log(more_lexeme)
-bubble_chamber.lexemes.add(more_lexeme)
-less = Concept.new(
-    "less",
-    [-4],
-    DifferenceClassifier(ProximityClassifier()),
-    more_less_space,
-    "value",
-    StructureCollection(),
-    math.dist,
+less = homer.def_concept(
+    name="less",
+    prototype=[-4],
+    classifier=DifferenceClassifier(ProximityClassifier()),
+    parent_space=more_less_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(less)
-bubble_chamber.concepts.add(less)
-less_lexeme = Lexeme.new(
-    "less",
-    {
+less_lexeme = homer.def_lexeme(
+    headword="less",
+    forms={
         WordForm.HEADWORD: "less",
         WordForm.COMPARATIVE: "less",
         WordForm.SUPERLATIVE: "least",
     },
-    less,
+    parent_concept=less,
 )
-logger.log(less_lexeme)
-bubble_chamber.lexemes.add(less_lexeme)
-
-same_different_concept = Concept.new(
-    "same-different",
-    None,
-    None,
-    correspondential_concepts_space,
-    "value",
-    StructureCollection(),
-    math.dist,
+same_different_concept = homer.def_concept(
+    name="same-different",
+    parent_space=correspondential_concepts_space,
+    relevant_value="value",
+    distance_function=math.dist,
 )
-logger.log(same_different_concept)
-bubble_chamber.concepts.add(same_different_concept)
-same_different_space = ConceptualSpace(
-    "same-different",
-    "",
-    "same-different",
-    StructureCollection(),
-    same_different_concept,
+same_different_space = homer.def_conceptual_space(
+    name="same-different",
+    locations=[Location([], correspondential_concepts_space)],
+    parent_concept=same_different_concept,
+    is_basic_level=True,
 )
-logger.log(same_different_space)
-bubble_chamber.conceptual_spaces.add(same_different_space)
-same = Concept.new(
-    "same",
-    None,
-    SamenessClassifier(),
-    same_different_space,
-    None,
-    StructureCollection(),
-    math.dist,
+same = homer.def_concept(
+    name="same",
+    classifier=SamenessClassifier(),
+    parent_space=same_different_space,
+    distance_function=math.dist,
 )
-logger.log(same)
-bubble_chamber.concepts.add(same)
-different = Concept.new(
-    "different",
-    None,
-    DifferentnessClassifier(),
-    same_different_space,
-    None,
-    StructureCollection(),
-    math.dist,
+different = homer.def_concept(
+    name="different",
+    classifier=DifferentnessClassifier(),
+    parent_space=same_different_space,
+    distance_function=math.dist,
 )
-logger.log(different)
-bubble_chamber.concepts.add(different)
-
-# TEMPLATE 1: the location is temperature
-template_1 = Template(
-    ID.new(Template),
-    "",
-    "the [location] is [temperature]",
-    StructureCollection(),
-    None,
-    parent_spaces=StructureCollection({templates_space}),
+template_1 = homer.def_template(
+    name="the [location] is [temperature]",
+    contents=[
+        homer.def_word("the"),
+        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
+        homer.def_word("is"),
+        homer.def_template_slot(temperature_concept, form=WordForm.HEADWORD),
+    ],
 )
-word_the = Word(
-    ID.new(Word),
-    "",
-    "the",
-    Location([0], template_1),
-    StructureCollection({template_1}),
-    1.0,
+template_2 = homer.def_template(
+    name="it is [temperature] in the [location]",
+    contents=[
+        homer.def_word("it"),
+        homer.def_word("is"),
+        homer.def_template_slot(temperature_concept, form=WordForm.HEADWORD),
+        homer.def_word("in"),
+        homer.def_word("the"),
+        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
+    ],
 )
-slot_location = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    location_concept,
-    WordForm.HEADWORD,
-    Location([1], template_1),
-    StructureCollection({template_1}),
+template_3 = homer.def_template(
+    name="it is [temperature.comparative] in the [location]",
+    contents=[
+        homer.def_word("it"),
+        homer.def_word("is"),
+        homer.def_template_slot(temperature_concept, form=WordForm.COMPARATIVE),
+        homer.def_word("in"),
+        homer.def_word("the"),
+        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
+    ],
 )
-word_is = Word(
-    ID.new(Word),
-    "",
-    "is",
-    Location([2], template_1),
-    StructureCollection({template_1}),
-    1.0,
+template_4 = homer.def_template(
+    name="it is [temperature.comparative] in the [location] than the [location]",
+    contents=[
+        homer.def_word("it"),
+        homer.def_word("is"),
+        homer.def_template_slot(temperature_concept, form=WordForm.COMPARATIVE),
+        homer.def_word("in"),
+        homer.def_word("the"),
+        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
+        homer.def_word("than"),
+        homer.def_word("the"),
+        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
+    ],
 )
-slot_temperature = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    temperature_concept,
-    WordForm.HEADWORD,
-    Location([3], template_1),
-    StructureCollection({template_1}),
-)
-template_1.contents.add(word_the)
-template_1.contents.add(slot_location)
-template_1.contents.add(word_is)
-template_1.contents.add(slot_temperature)
-bubble_chamber.conceptual_spaces.add(template_1)
-
-# TEMPLATE 2: it is temperature in the location
-template_2 = Template(
-    ID.new(Template),
-    "",
-    "it is [temperature] in the [location]",
-    StructureCollection(),
-    None,
-    parent_spaces=StructureCollection({templates_space}),
-)
-word_it = Word(
-    ID.new(Word),
-    "",
-    "it",
-    Location([0], template_2),
-    StructureCollection({template_2}),
-    1.0,
-)
-word_is = Word(
-    ID.new(Word),
-    "",
-    "is",
-    Location([1], template_2),
-    StructureCollection({template_2}),
-    1.0,
-)
-slot_temperature = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    temperature_concept,
-    WordForm.HEADWORD,
-    Location([2], template_2),
-    StructureCollection({template_2}),
-)
-word_in = Word(
-    ID.new(Word),
-    "",
-    "in",
-    Location([3], template_2),
-    StructureCollection({template_2}),
-    1.0,
-)
-word_the = Word(
-    ID.new(Word),
-    "",
-    "the",
-    Location([4], template_2),
-    StructureCollection({template_2}),
-    1.0,
-)
-slot_location = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    location_concept,
-    WordForm.HEADWORD,
-    Location([5], template_2),
-    StructureCollection({template_2}),
-)
-
-template_2.contents.add(word_it)
-template_2.contents.add(word_is)
-template_2.contents.add(slot_temperature)
-template_2.contents.add(word_in)
-template_2.contents.add(word_the)
-template_2.contents.add(slot_location)
-bubble_chamber.conceptual_spaces.add(template_2)
-
-# TEMPLATE 3: it is temperature.comparative in the location
-template_3 = Template(
-    ID.new(Template),
-    "",
-    "it is [temperature.comparative] in the [location]",
-    StructureCollection(),
-    None,
-    parent_spaces=StructureCollection({templates_space}),
-)
-logger.log(template_3)
-word_it = Word(
-    ID.new(Word),
-    "",
-    "it",
-    Location([0], template_3),
-    StructureCollection({template_3}),
-    1.0,
-)
-word_is = Word(
-    ID.new(Word),
-    "",
-    "is",
-    Location([1], template_3),
-    StructureCollection({template_3}),
-    1.0,
-)
-slot_temperature = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    temperature_concept,
-    WordForm.COMPARATIVE,
-    Location([2], template_3),
-    StructureCollection({template_3}),
-)
-word_in = Word(
-    ID.new(Word),
-    "",
-    "in",
-    Location([3], template_3),
-    StructureCollection({template_3}),
-    1.0,
-)
-word_the = Word(
-    ID.new(Word),
-    "",
-    "the",
-    Location([4], template_3),
-    StructureCollection({template_3}),
-    1.0,
-)
-slot_location = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    location_concept,
-    WordForm.HEADWORD,
-    Location([5], template_3),
-    StructureCollection({template_3}),
-)
-
-template_3.contents.add(word_it)
-template_3.contents.add(word_is)
-template_3.contents.add(slot_temperature)
-template_3.contents.add(word_in)
-template_3.contents.add(word_the)
-template_3.contents.add(slot_location)
-bubble_chamber.conceptual_spaces.add(template_3)
-
-# TEMPLATE 4: it is temperature.comparative in the location than the location
-template_4 = Template(
-    ID.new(Template),
-    "",
-    "it is [temperature.comparative] in the [location] than the [location]",
-    StructureCollection(),
-    None,
-    parent_spaces=StructureCollection({templates_space}),
-)
-logger.log(template_4)
-word_it = Word(
-    ID.new(Word),
-    "",
-    "it",
-    Location([0], template_4),
-    StructureCollection({template_4}),
-    1.0,
-)
-word_is = Word(
-    ID.new(Word),
-    "",
-    "is",
-    Location([1], template_4),
-    StructureCollection({template_4}),
-    1.0,
-)
-slot_temperature = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    temperature_concept,
-    WordForm.COMPARATIVE,
-    Location([2], template_4),
-    StructureCollection({template_4}),
-)
-word_in = Word(
-    ID.new(Word),
-    "",
-    "in",
-    Location([3], template_4),
-    StructureCollection({template_4}),
-    1.0,
-)
-word_the_1 = Word(
-    ID.new(Word),
-    "",
-    "the",
-    Location([4], template_4),
-    StructureCollection({template_4}),
-    1.0,
-)
-slot_location_1 = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    location_concept,
-    WordForm.HEADWORD,
-    Location([5], template_4),
-    StructureCollection({template_4}),
-)
-word_than = Word(
-    ID.new(Word),
-    "",
-    "than",
-    Location([6], template_4),
-    StructureCollection({template_4}),
-    1.0,
-)
-word_the_2 = Word(
-    ID.new(Word),
-    "",
-    "the",
-    Location([7], template_4),
-    StructureCollection({template_4}),
-    1.0,
-)
-slot_location_2 = TemplateSlot(
-    ID.new(TemplateSlot),
-    "",
-    location_concept,
-    WordForm.HEADWORD,
-    Location([8], template_4),
-    StructureCollection({template_4}),
-)
-
-template_4.contents.add(word_it)
-template_4.contents.add(word_is)
-template_4.contents.add(slot_temperature)
-template_4.contents.add(word_in)
-template_4.contents.add(word_the_1)
-template_4.contents.add(slot_location_1)
-template_4.contents.add(word_than)
-template_4.contents.add(word_the_2)
-template_4.contents.add(slot_location_2)
-bubble_chamber.conceptual_spaces.add(template_4)
-
-for template in [template_1, template_2, template_3, template_4]:
-    logger.log(template)
-    for structure in template.contents:
-        if isinstance(structure, Slot):
-            bubble_chamber.slots.add(structure)
-        logger.log(structure)
-        if isinstance(structure, TemplateSlot) and structure.value is not None:
-            link = link_concepts(structure.value, structure, activation=1.0)
-            link.stable = True
-            bubble_chamber.concept_links.add(link)
-
-
-for concept in bubble_chamber.concepts:
-    for link in concept.links_out:
-        bubble_chamber.concept_links.add(link)
-
-relative_neighbour_coordinates = [
-    (-1, 0),
-    (-1, 1),
-    (0, 1),
-    (1, 1),
-    (1, 0),
-    (1, -1),
-    (0, -1),
-    (-1, -1),
-]
 
 input_chunks = StructureCollection()
 for i, row in enumerate(problem):
     for j, cell in enumerate(row):
         value = [cell]
-        location = Location([i, j], bubble_chamber.spaces["input"])
+        location = Location([i, j], homer.bubble_chamber.spaces["input"])
         members = StructureCollection()
         quality = 0.0
         chunk = Chunk(
             ID.new(Chunk),
             "",
             value,
-            location,
+            [location],
             members,
             quality,
-            StructureCollection({bubble_chamber.spaces["input"]}),
         )
         logger.log(chunk)
         input_chunks.add(chunk)
-        bubble_chamber.chunks.add(chunk)
+        homer.bubble_chamber.chunks.add(chunk)
         input_space.contents.add(chunk)
 
-coderack = Coderack.setup(bubble_chamber, logger)
-
-homer = Homer(bubble_chamber, coderack, logger)
 homer.run()
