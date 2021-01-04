@@ -272,7 +272,7 @@ north = homer.def_concept(
     prototype=[0, 2],
     classifier=ProximityClassifier(),
     parent_space=location_space,
-    relevant_value="coordintes",
+    relevant_value="coordinates",
     distance_function=math.dist,
 )
 north_lexeme = homer.def_lexeme(
