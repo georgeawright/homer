@@ -126,6 +126,7 @@ class Homer:
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
         depth: int = 1,
+        activation: float = 0.0,
     ) -> Concept:
         location = (
             Location(prototype, parent_space)
@@ -147,6 +148,7 @@ class Homer:
             links_out=links_out,
             depth=depth,
         )
+        concept._activation = activation
         parent_space.add(concept)
         self.logger.log(concept)
         self.bubble_chamber.concepts.add(concept)
