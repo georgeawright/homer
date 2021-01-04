@@ -43,6 +43,8 @@ class Structure(ABC):
             return self.locations[0]
         except TypeError:
             return None
+        except IndexError:
+            return None
 
     @property
     def size(self) -> int:
@@ -146,7 +148,7 @@ class Structure(ABC):
 
     def location_in_space(self, space: Structure):
         for location in self.locations:
-            if location.space == space:
+            if location is not None and location.space == space:
                 return location
         raise Exception(
             f"{self.structure_id} has no location in space {space.structure_id}"

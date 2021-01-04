@@ -55,8 +55,6 @@ class ConceptualSpace(Space):
                 for location in self.locations
                 if location is not None
             ]
-            if locations == []:
-                locations = [None]
             dimensions = (
                 [dimension.instance for dimension in self.dimensions]
                 if self.no_of_dimensions > 1
