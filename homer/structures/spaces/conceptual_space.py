@@ -79,4 +79,7 @@ class ConceptualSpace(Space):
         return self._instance
 
     def update_activation(self):
-        self._activation = max(item.activation for item in self.contents)
+        if len(self.contents) == 0:
+            self._activation = 0
+        else:
+            self._activation = max(item.activation for item in self.contents)
