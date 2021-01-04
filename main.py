@@ -59,6 +59,7 @@ activities_space = homer.def_conceptual_space(
 build_concept = homer.def_concept(
     name="build",
     parent_space=activities_space,
+    activation=1.0,
 )
 evaluate_concept = homer.def_concept(
     name="evaluate",
