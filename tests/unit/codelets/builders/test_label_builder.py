@@ -30,12 +30,11 @@ def bubble_chamber(parent_concept):
     chamber = Mock()
     chamber.concepts = {"label": Mock(), "build": Mock()}
     label_concept_space = Mock()
+    label_concept_space.is_basic_level = True
     label_concept_space.contents = StructureCollection({parent_concept})
-    label_concept = Mock()
-    label_concept.child_spaces = StructureCollection({label_concept_space})
     space = Mock()
     space.name = "label concepts"
-    space.contents = StructureCollection({label_concept})
+    space.contents.of_type.return_value = StructureCollection({label_concept_space})
     chamber.spaces = StructureCollection({space})
     top_level_working_space = Mock()
     top_level_working_space.name = "top level working"

@@ -17,15 +17,15 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 @pytest.fixture
 def label_concepts_space():
     space = ConceptualSpace(
-        Mock(),
+        "label concepts",
         Mock(),
         "label concepts",
         Mock(),
         [],
         StructureCollection(),
-        Mock(),
-        Mock(),
-        Mock(),
+        0,
+        [],
+        [],
     )
     return space
 
@@ -63,18 +63,20 @@ def temperature_concept(label_concepts_space):
 
 
 @pytest.fixture
-def temperature_space(temperature_concept):
+def temperature_space(label_concepts_space, temperature_concept):
     space = ConceptualSpace(
         "temperature",
         Mock(),
         "temperature",
         temperature_concept,
-        [],
+        [Location([], label_concepts_space)],
         StructureCollection(),
         1,
         [],
         [],
+        is_basic_level=True,
     )
+    label_concepts_space.add(space)
     temperature_concept.child_spaces.add(space)
     return space
 

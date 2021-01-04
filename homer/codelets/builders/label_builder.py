@@ -5,6 +5,7 @@ from homer.id import ID
 from homer.location import Location
 from homer.structures import Chunk, Concept
 from homer.structures.links import Label
+from homer.structures.spaces import ConceptualSpace
 from homer.tools import project_item_into_space
 
 
@@ -51,8 +52,9 @@ class LabelBuilder(Builder):
         if self.parent_concept is None:
             self.parent_concept = (
                 self.bubble_chamber.spaces["label concepts"]
-                .contents.get_random()
-                .child_spaces.get_random()
+                .contents.of_type(ConceptualSpace)
+                .where(is_basic_level=True)
+                .get_random()
                 .contents.get_random()
             )
         return not self.target_chunk.has_label(self.parent_concept)
