@@ -6,6 +6,7 @@ from homer.id import ID
 from homer.structure import Structure
 from homer.structures import Chunk, Concept, Space
 from homer.structures.links import Relation
+from homer.structures.spaces import ConceptualSpace
 
 from .chunk_builder import ChunkBuilder
 
@@ -68,9 +69,10 @@ class RelationBuilder(Builder):
         if self.parent_concept is None:
             self.parent_concept = (
                 self.bubble_chamber.spaces["relational concepts"]
-                .contents.get_random()
-                .child_spaces.get_random()
-                .contents.get_random()
+                .contents.of_type(ConceptualSpace)
+                .get_random()
+                .contents.of_type(Concept)
+                .get_random()
             )
         return not self.target_structure_one.has_relation(
             self.target_space, self.parent_concept, self.target_structure_two

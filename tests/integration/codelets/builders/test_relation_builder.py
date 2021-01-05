@@ -16,7 +16,7 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 @pytest.fixture
 def relational_concepts_space():
     space = ConceptualSpace(
-        Mock(),
+        "relational concepts",
         Mock(),
         "relational concepts",
         Mock(),
@@ -46,18 +46,19 @@ def more_less_concept(relational_concepts_space):
 
 
 @pytest.fixture
-def more_less_space(more_less_concept):
+def more_less_space(relational_concepts_space, more_less_concept):
     space = ConceptualSpace(
-        Mock(),
+        "more-less",
         Mock(),
         "more-less",
         more_less_concept,
-        [],
+        [Location([], relational_concepts_space)],
         StructureCollection(),
         1,
         [],
         [],
     )
+    relational_concepts_space.add(space)
     more_less_concept.child_spaces.add(space)
     return space
 

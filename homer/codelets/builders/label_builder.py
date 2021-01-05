@@ -55,7 +55,8 @@ class LabelBuilder(Builder):
                 .contents.of_type(ConceptualSpace)
                 .where(is_basic_level=True)
                 .get_random()
-                .contents.get_random()
+                .contents.of_type(Concept)
+                .get_random()
             )
         return not self.target_chunk.has_label(self.parent_concept)
 
