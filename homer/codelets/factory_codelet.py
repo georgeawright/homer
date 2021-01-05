@@ -83,8 +83,6 @@ class FactoryCodelet(Codelet):
         self.child_codelets.append(follow_up)
 
     def _get_follow_up_type(self, action_type: Concept, structure_type: Concept):
-        print(action_type.name)
-        print(structure_type.name)
         try:
             return {
                 "build": {
