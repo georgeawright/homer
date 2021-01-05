@@ -110,7 +110,7 @@ class FactoryCodelet(Codelet):
                     self.bubble_chamber,
                     target_space,
                     target,
-                    target.unhappiness,
+                    target.exigency,
                 )
             elif structure_type == self.bubble_chamber.concepts["view"]:
                 raise MissingStructureError
