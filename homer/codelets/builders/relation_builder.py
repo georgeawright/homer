@@ -54,6 +54,14 @@ class RelationBuilder(Builder):
             parent_concept=parent_concept,
         )
 
+    @classmethod
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        target = bubble_chamber.chunks.get_exigent()
+        target_space = target.parent_spaces.where(no_of_dimensions=1).get_random()
+        return cls.spawn(
+            parent_id, bubble_chamber, target_space, target, target.exigency
+        )
+
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]

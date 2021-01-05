@@ -40,6 +40,11 @@ class RelationSelector(Selector):
             challenger=challenger,
         )
 
+    @classmethod
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        champion = bubble_chamber.relations.get_active()
+        return cls.spawn(parent_id, bubble_chamber, champion, champion.activation)
+
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]

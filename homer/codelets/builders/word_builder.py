@@ -46,6 +46,18 @@ class WordBuilder(Builder):
             urgency,
         )
 
+    @classmethod
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        target_view = bubble_chamber.views.get_unhappy()
+        target_correspondence = bubble_chamber.correspondences.get_unhappy()
+        return cls.spawn(
+            parent_id,
+            bubble_chamber,
+            target_view,
+            target_correspondence,
+            target_correspondence.unhappiness,
+        )
+
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]

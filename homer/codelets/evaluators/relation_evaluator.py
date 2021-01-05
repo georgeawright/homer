@@ -31,6 +31,12 @@ class RelationEvaluator(Evaluator):
         codelet_id = ID.new(cls)
         return cls(codelet_id, parent_id, bubble_chamber, target_structure, urgency)
 
+    @classmethod
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        structure_type = bubble_chamber.concepts["relation"]
+        target = bubble_chamber.relations.get_active()
+        return cls.spawn(parent_id, bubble_chamber, target, structure_type.activation)
+
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["relation"]

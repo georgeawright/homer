@@ -15,47 +15,66 @@ from homer.structure_collection import StructureCollection
 
 @pytest.fixture
 def build_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "build"
+    return concept
 
 
 @pytest.fixture
 def evaluate_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "evaluate"
+    return concept
 
 
 @pytest.fixture
 def select_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "select"
+    return concept
 
 
 @pytest.fixture
 def chunk_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "chunk"
+    return concept
+    return Mock(name="chunk")
 
 
 @pytest.fixture
 def correspondence_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "correspondence"
+    return concept
 
 
 @pytest.fixture
 def label_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "label"
+    return concept
 
 
 @pytest.fixture
 def relation_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "relation"
+    return concept
 
 
 @pytest.fixture
 def view_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "view"
+    return concept
 
 
 @pytest.fixture
 def word_concept():
-    return Mock()
+    concept = Mock()
+    concept.name = "word"
+    return concept
 
 
 @pytest.fixture

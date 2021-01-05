@@ -65,6 +65,14 @@ class CorrespondenceBuilder(Builder):
             parent_concept,
         )
 
+    @classmethod
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        target_space = bubble_chamber.working_spaces.get_active()
+        target = target_space.contents.get_unhappy()
+        return cls.spawn(
+            parent_id, bubble_chamber, target_space, target, target.unhappiness
+        )
+
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["correspondence"]

@@ -44,6 +44,11 @@ class ChunkBuilder(Builder):
             urgency,
         )
 
+    @classmethod
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        target = bubble_chamber.chunks.get_unhappy()
+        return cls.spawn(parent_id, bubble_chamber, target, target.unhappiness)
+
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]

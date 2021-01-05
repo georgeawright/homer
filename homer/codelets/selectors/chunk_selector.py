@@ -45,6 +45,16 @@ class ChunkSelector(Selector):
             challenger=challenger,
         )
 
+    @classmethod
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        champion = bubble_chamber.chunks.get_active()
+        target_space = StructureCollection(
+            {space for space in champion.parent_spaces if space.is_basic_level}
+        ).get_random()
+        return cls.spawn(
+            parent_id, bubble_chamber, target_space, champion, champion.activation
+        )
+
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]

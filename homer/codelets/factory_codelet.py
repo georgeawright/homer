@@ -78,161 +78,31 @@ class FactoryCodelet(Codelet):
             }
         )
         structure_type = links_to_structure_nodes.get_active().end
-        if action_type == self.bubble_chamber.concepts["build"]:
-            if structure_type == self.bubble_chamber.concepts["chunk"]:
-                target = self.bubble_chamber.chunks.get_unhappy()
-                follow_up = ChunkBuilder.spawn(
-                    self.codelet_id, self.bubble_chamber, target, target.unhappiness
-                )
-            elif structure_type == self.bubble_chamber.concepts["correspondence"]:
-                raise MissingStructureError
-                target_space = self.bubble_chamber.working_spaces.get_active()
-                target = target_space.contents.get_unhappy()
-                follow_up = CorrespondenceBuilder.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target_space,
-                    target,
-                    target.unhappiness,
-                )
-            elif structure_type == self.bubble_chamber.concepts["label"]:
-                target = self.bubble_chamber.chunks.get_unhappy()
-                follow_up = LabelBuilder.spawn(
-                    self.codelet_id, self.bubble_chamber, target, target.unhappiness
-                )
-            elif structure_type == self.bubble_chamber.concepts["relation"]:
-                target = self.bubble_chamber.chunks.get_exigent()
-                target_space = target.parent_spaces.where(
-                    no_of_dimensions=1
-                ).get_random()
-                follow_up = RelationBuilder.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target_space,
-                    target,
-                    target.exigency,
-                )
-            elif structure_type == self.bubble_chamber.concepts["view"]:
-                raise MissingStructureError
-                target = self.bubble_chamber.correspondences.get_unhappy()
-                follow_up = ViewBuilder.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target,
-                    target.unhappiness,
-                )
-            elif structure_type == self.bubble_chamber.concepts["word"]:
-                raise MissingStructureError
-                target_view = self.bubble_chamber.views.get_unhappy()
-                target_correspondence = (
-                    self.bubble_chamber.correspondences.get_unhappy()
-                )
-                follow_up = WordBuilder.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target_view,
-                    target_correspondence,
-                    target_correspondence.unhappiness,
-                )
-            else:
-                raise Exception("unknown structure type")
-        elif action_type == self.bubble_chamber.concepts["evaluate"]:
-            if structure_type == self.bubble_chamber.concepts["chunk"]:
-                target = self.bubble_chamber.chunks.get_random()
-                follow_up = ChunkEvaluator.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target,
-                    structure_type.activation,
-                )
-            elif structure_type == self.bubble_chamber.concepts["correspondence"]:
-                raise MissingStructureError
-                target = self.bubble_chamber.correspondences.get_active()
-                follow_up = CorrespondenceEvaluator.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target,
-                    structure_type.activation,
-                )
-            elif structure_type == self.bubble_chamber.concepts["label"]:
-                target = self.bubble_chamber.labels.get_active()
-                follow_up = LabelEvaluator.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target,
-                    structure_type.activation,
-                )
-            elif structure_type == self.bubble_chamber.concepts["relation"]:
-                target = self.bubble_chamber.relations.get_active()
-                follow_up = RelationEvaluator.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target,
-                    structure_type.activation,
-                )
-            elif structure_type == self.bubble_chamber.concepts["view"]:
-                raise MissingStructureError
-                target = self.bubble_chamber.views.get_active()
-                follow_up = ViewEvaluator.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target,
-                    structure_type.activation,
-                )
-            else:
-                raise Exception("unknown structure type")
-        elif action_type == self.bubble_chamber.concepts["select"]:
-            raise MissingStructureError
-            if structure_type == self.bubble_chamber.concepts["chunk"]:
-                champion = self.bubble_chamber.chunks.get_active()
-                target_space = StructureCollection(
-                    {
-                        space
-                        for space in champion.parent_spaces
-                        if not space.is_sub_space
-                    }
-                ).get_random()
-                follow_up = ChunkSelector.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    target_space,
-                    champion,
-                    champion.activation,
-                )
-            elif structure_type == self.bubble_chamber.concepts["correspondence"]:
-                champion = self.bubble_chamber.correspondences.get_active()
-                follow_up = CorrespondenceSelector.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    champion,
-                    champion.activation,
-                )
-            elif structure_type == self.bubble_chamber.concepts["label"]:
-                champion = self.bubble_chamber.labels.get_active()
-                follow_up = LabelSelector.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    champion,
-                    champion.activation,
-                )
-            elif structure_type == self.bubble_chamber.concepts["relation"]:
-                champion = self.bubble_chamber.relations.get_active()
-                follow_up = RelationSelector.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    champion,
-                    champion.activation,
-                )
-            elif structure_type == self.bubble_chamber.concepts["view"]:
-                champion = self.bubble_chamber.views.get_active()
-                follow_up = ViewSelector.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    champion,
-                    champion.activation,
-                )
-            else:
-                raise Exception("unknown structure type")
-        else:
-            raise Exception("unknown activity type")
+        follow_up_type = self._get_follow_up_type(action_type, structure_type)
+        follow_up = follow_up_type.make(self.codelet_id, self.bubble_chamber)
         self.child_codelets.append(follow_up)
+
+    def _get_follow_up_type(self, action_type: Concept, structure_type: Concept):
+        print(action_type.name)
+        print(structure_type.name)
+        try:
+            return {
+                "build": {
+                    "chunk": ChunkBuilder,
+                    "label": LabelBuilder,
+                    "relation": RelationBuilder,
+                },
+                "evaluate": {
+                    "chunk": ChunkEvaluator,
+                    "label": LabelEvaluator,
+                    "relation": RelationEvaluator,
+                },
+                "select": {
+                    "chunk": ChunkSelector,
+                    "label": LabelSelector,
+                    "relation": RelationSelector,
+                },
+            }[action_type.name][structure_type.name]
+        except KeyError:
+            # this should be removed when all codelet types have been added to the dict
+            raise MissingStructureError
