@@ -14,20 +14,18 @@ class Coderack:
     IDEAL_POPULATION = HyperParameters.IDEAL_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
-    def __init__(
-        self, bubble_chamber: BubbleChamber, codelets: List[Codelet], logger: Logger
-    ):
+    def __init__(self, bubble_chamber: BubbleChamber, logger: Logger):
         self.bubble_chamber = bubble_chamber
-        self._codelets = codelets
+        self._codelets = []
         self.codelets_run = 0
         self.logger = logger
 
     @classmethod
     def setup(cls, bubble_chamber: BubbleChamber, logger: Logger):
+        coderack = cls(bubble_chamber, logger)
         factory_codelet = FactoryCodelet.spawn("coderack", bubble_chamber, 1.0)
-        logger.log(factory_codelet)
-        codelets = [factory_codelet]
-        return cls(bubble_chamber, codelets, logger)
+        coderack.add_codelet(factory_codelet)
+        return coderack
 
     def add_codelet(self, codelet: Codelet):
         if codelet.urgency < self.MINIMUM_CODELET_URGENCY:

@@ -16,14 +16,13 @@ def test_select_codelet(
     urgency_values, bubble_chamber_satisfaction, random_numbers, expected_urgency
 ):
     with patch.object(random, "random", side_effect=random_numbers):
-        codelets = []
+        bubble_chamber = Mock()
+        bubble_chamber.satisfaction = bubble_chamber_satisfaction
+        coderack = Coderack(bubble_chamber, Mock())
+        coderack.IDEAL_POPULATION = 1
         for urgency_value in urgency_values:
             codelet = Mock()
             codelet.urgency = urgency_value
-            codelets.append(codelet)
-        bubble_chamber = Mock()
-        bubble_chamber.satisfaction = bubble_chamber_satisfaction
-        coderack = Coderack(bubble_chamber, codelets, Mock())
-        coderack.IDEAL_POPULATION = 1
+            coderack._codelets.append(codelet)
         codelet = coderack.select_codelet()
         assert expected_urgency == codelet.urgency
