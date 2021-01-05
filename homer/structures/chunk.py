@@ -59,11 +59,11 @@ class Chunk(Structure):
     def nearby(self, space: Space = None):
         if space is not None:
             return StructureCollection.difference(
-                space.contents.near(self).of_type(type(self)),
+                space.contents.near(self.location_in_space(space)).of_type(type(self)),
                 StructureCollection({self}),
             )
         nearby_chunks = StructureCollection.union(
-            *[location.space.contents.near(self) for location in self.locations]
+            *[location.space.contents.near(location) for location in self.locations]
         ).of_type(type(self))
         nearby_chunks.remove(self)
         return nearby_chunks

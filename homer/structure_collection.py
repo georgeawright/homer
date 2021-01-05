@@ -48,9 +48,13 @@ class StructureCollection:
             }
         )
 
-    def near(self, other: "Structure") -> StructureCollection:
+    def near(self, location: Location) -> StructureCollection:
         return StructureCollection(
-            {structure for structure in self.structures if structure.is_near(other)}
+            {
+                structure
+                for structure in self.structures
+                if structure.location.is_near(location)
+            }
         )
 
     def where(self, **kwargs) -> StructureCollection:
