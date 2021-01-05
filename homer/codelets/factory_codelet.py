@@ -102,13 +102,15 @@ class FactoryCodelet(Codelet):
                 )
             elif structure_type == self.bubble_chamber.concepts["relation"]:
                 target = self.bubble_chamber.chunks.get_exigent()
-                target_space = target.parent_spaces.get_random()
+                target_space = target.parent_spaces.where(
+                    no_of_dimensions=1
+                ).get_random()
                 follow_up = RelationBuilder.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
                     target_space,
                     target,
-                    target.exigency,
+                    target.unhappiness,
                 )
             elif structure_type == self.bubble_chamber.concepts["view"]:
                 raise MissingStructureError
