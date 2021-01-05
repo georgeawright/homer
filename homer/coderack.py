@@ -5,6 +5,7 @@ from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
 from .codelets import FactoryCodelet
 from .errors import NoMoreCodelets
+from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .logger import Logger
 
@@ -23,7 +24,9 @@ class Coderack:
     @classmethod
     def setup(cls, bubble_chamber: BubbleChamber, logger: Logger):
         coderack = cls(bubble_chamber, logger)
-        factory_codelet = FactoryCodelet.spawn("coderack", bubble_chamber, 1.0)
+        factory_codelet = FactoryCodelet.spawn(
+            "coderack", bubble_chamber, coderack, 1.0
+        )
         coderack.add_codelet(factory_codelet)
         return coderack
 
@@ -63,6 +66,15 @@ class Coderack:
             if isinstance(codelet, FactoryCodelet):
                 return True
         return False
+
+    def proportion_of_codelets_of_type(self, t: type) -> float:
+        try:
+            return self.number_of_codelets_of_type(t) / len(self._codelets)
+        except ZeroDivisionError:
+            return 0.0
+
+    def number_of_codelets_of_type(self, t: type) -> int:
+        return sum(1 for codelet in self._codelets if isinstance(codelet, t))
 
     def _randomness(self) -> float:
         return 1 - self.bubble_chamber.satisfaction

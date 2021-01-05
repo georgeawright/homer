@@ -1,3 +1,5 @@
+import random
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
@@ -38,20 +40,23 @@ class FactoryCodelet(Codelet):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        coderack: "Coderack",
         urgency: FloatBetweenOneAndZero,
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
+        self.coderack = coderack
 
     @classmethod
     def spawn(
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        coderack: "Coderack",
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        return cls(codelet_id, parent_id, bubble_chamber, urgency)
+        return cls(codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
     def run(self) -> CodeletResult:
         try:
@@ -62,6 +67,7 @@ class FactoryCodelet(Codelet):
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
+                self.coderack,
                 1 - self.bubble_chamber.satisfaction,
             )
         )
@@ -79,8 +85,12 @@ class FactoryCodelet(Codelet):
         )
         structure_type = links_to_structure_nodes.get_active().end
         follow_up_type = self._get_follow_up_type(action_type, structure_type)
-        follow_up = follow_up_type.make(self.codelet_id, self.bubble_chamber)
-        self.child_codelets.append(follow_up)
+        proportion_of_follow_up_type_on_coderack = (
+            self.coderack.proportion_of_codelets_of_type(follow_up_type)
+        )
+        if proportion_of_follow_up_type_on_coderack < random.random():
+            follow_up = follow_up_type.make(self.codelet_id, self.bubble_chamber)
+            self.child_codelets.append(follow_up)
 
     def _get_follow_up_type(self, action_type: Concept, structure_type: Concept):
         try:
