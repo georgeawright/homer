@@ -144,7 +144,7 @@ def run_view(request, run_id):
             output += (
                 f"{relation.structure_id}: "
                 + f"{relation.value}("
-                + f"{relation.parent_space.structure_id}, "
+                + f"{relation.parent_space.value}, "
                 + f"{relation.start.structure_id}, "
                 + f"{relation.end.structure_id}) "
                 + str(last_value_of_dict(relation.quality))
