@@ -213,6 +213,9 @@ class DjangoLogger(Logger):
             )
 
     def _log_structure(self, structure: Structure):
+        if hasattr(structure, "sub_spaces"):
+            for sub_space in structure.sub_spaces:
+                self._log_structure(sub_space)
         try:
             structure_record = StructureRecord.objects.get(
                 structure_id=structure.structure_id, run_id=self.run
