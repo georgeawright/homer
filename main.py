@@ -158,6 +158,7 @@ temperature_space = homer.def_conceptual_space(
     name="temperature",
     parent_concept=temperature_concept,
     locations=[Location([], label_concepts_space)],
+    no_of_dimensions=1,
     is_basic_level=True,
 )
 hot = homer.def_concept(
@@ -238,18 +239,21 @@ north_south_space = homer.def_conceptual_space(
     name="north-south",
     parent_concept=location_concept,
     locations=[Location([], label_concepts_space)],
+    no_of_dimensions=1,
     coordinates_from_super_space_location=lambda location: [location.coordinates[0]],
 )
 west_east_space = homer.def_conceptual_space(
     name="west-east",
     parent_concept=location_concept,
     locations=[Location([], label_concepts_space)],
+    no_of_dimensions=1,
     coordinates_from_super_space_location=lambda location: [location.coordinates[1]],
 )
 nw_se_space = homer.def_conceptual_space(
     name="nw-se",
     parent_concept=location_concept,
     locations=[Location([], label_concepts_space)],
+    no_of_dimensions=1,
     coordinates_from_super_space_location=lambda location: [
         statistics.fmean(location.coordinates)
     ],
@@ -258,6 +262,7 @@ ne_sw_space = homer.def_conceptual_space(
     name="ne-sw",
     parent_concept=location_concept,
     locations=[Location([], label_concepts_space)],
+    no_of_dimensions=1,
     coordinates_from_super_space_location=lambda location: [
         statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
     ],
@@ -266,6 +271,9 @@ location_space = homer.def_conceptual_space(
     name="location",
     parent_concept=location_concept,
     locations=[Location([], label_concepts_space)],
+    no_of_dimensions=2,
+    dimensions=[north_south_space, west_east_space],
+    sub_spaces=[north_south_space, west_east_space, nw_se_space, ne_sw_space],
     is_basic_level=True,
 )
 north = homer.def_concept(
