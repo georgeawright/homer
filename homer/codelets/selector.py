@@ -44,7 +44,10 @@ class Selector(Codelet):
         champ_size_adjusted_quality = self.champion.quality * self.champion.size
         chall_size_adjusted_quality = self.challenger.quality * self.challenger.size
         total_quality = champ_size_adjusted_quality + chall_size_adjusted_quality
-        champ_normalized_quality = champ_size_adjusted_quality / total_quality
+        try:
+            champ_normalized_quality = champ_size_adjusted_quality / total_quality
+        except ZeroDivisionError:
+            champ_normalized_quality = 0.0
         choice = random.random()
         if choice < champ_normalized_quality:
             self.winner, self.loser = self.champion, self.challenger
