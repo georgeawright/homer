@@ -49,8 +49,10 @@ class Coderack:
     def select_codelet(self) -> Codelet:
         codelet_choice = None
         highest_weight = 0
+        randomness = self._randomness()
+        rationality = 1 - randomness
         for codelet in self._codelets:
-            weight = codelet.urgency + random.random() * self._randomness()
+            weight = codelet.urgency * rationality + random.random() * randomness
             if weight > highest_weight:
                 highest_weight = weight
                 codelet_choice = codelet
