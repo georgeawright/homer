@@ -125,12 +125,21 @@ def bubble_chamber(
     return bubble_chamber
 
 
-def test_engenders_chunk_builder(bubble_chamber, build_concept, chunk_concept):
+@pytest.fixture
+def coderack():
+    rack = Mock()
+    rack.proportion_of_codelets_of_type.return_value = 0.0
+    return rack
+
+
+def test_engenders_chunk_builder(
+    bubble_chamber, coderack, build_concept, chunk_concept
+):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = chunk_concept
     build_concept.links_out = StructureCollection({link})
-    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
+    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, coderack, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
     assert isinstance(factory_codelet.child_codelets[0], ChunkBuilder) or isinstance(
@@ -143,13 +152,13 @@ def test_engenders_chunk_builder(bubble_chamber, build_concept, chunk_concept):
 
 @pytest.mark.skip
 def test_engenders_correspondence_builder(
-    bubble_chamber, build_concept, correspondence_concept
+    bubble_chamber, coderack, build_concept, correspondence_concept
 ):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = correspondence_concept
     build_concept.links_out.get_active.return_value = link
-    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
+    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, coderack, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
     assert isinstance(
@@ -160,12 +169,14 @@ def test_engenders_correspondence_builder(
     )
 
 
-def test_engenders_label_builder(bubble_chamber, build_concept, label_concept):
+def test_engenders_label_builder(
+    bubble_chamber, coderack, build_concept, label_concept
+):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = label_concept
     build_concept.links_out = StructureCollection({link})
-    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
+    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, coderack, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
     assert isinstance(factory_codelet.child_codelets[0], LabelBuilder) or isinstance(
@@ -176,12 +187,14 @@ def test_engenders_label_builder(bubble_chamber, build_concept, label_concept):
     )
 
 
-def test_engenders_relation_builder(bubble_chamber, build_concept, relation_concept):
+def test_engenders_relation_builder(
+    bubble_chamber, coderack, build_concept, relation_concept
+):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = relation_concept
     build_concept.links_out = StructureCollection({link})
-    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
+    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, coderack, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
     assert isinstance(factory_codelet.child_codelets[0], RelationBuilder) or isinstance(
@@ -193,12 +206,12 @@ def test_engenders_relation_builder(bubble_chamber, build_concept, relation_conc
 
 
 @pytest.mark.skip
-def test_engenders_view_builder(bubble_chamber, build_concept, view_concept):
+def test_engenders_view_builder(bubble_chamber, coderack, build_concept, view_concept):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = view_concept
     build_concept.links_out.get_active.return_value = link
-    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
+    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, coderack, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
     assert isinstance(factory_codelet.child_codelets[0], ViewBuilder) or isinstance(
@@ -210,12 +223,12 @@ def test_engenders_view_builder(bubble_chamber, build_concept, view_concept):
 
 
 @pytest.mark.skip
-def test_engenders_word_builder(bubble_chamber, build_concept, word_concept):
+def test_engenders_word_builder(bubble_chamber, coderack, build_concept, word_concept):
     bubble_chamber.spaces["activities"].contents.get_active.return_value = build_concept
     link = Mock()
     link.end = word_concept
     build_concept.links_out.get_active.return_value = link
-    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, Mock())
+    factory_codelet = FactoryCodelet(Mock(), Mock(), bubble_chamber, coderack, Mock())
     factory_codelet.run()
     assert 2 == len(factory_codelet.child_codelets)
     assert isinstance(factory_codelet.child_codelets[0], WordBuilder) or isinstance(
