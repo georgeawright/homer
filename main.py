@@ -46,6 +46,7 @@ input_space = homer.def_working_space(
     name="input",
     parent_concept=input_concept,
     locations=[Location([], top_level_working_space)],
+    is_basic_level=True,
 )
 activity_concept = homer.def_concept(
     name="activity",
