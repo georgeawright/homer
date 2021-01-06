@@ -119,6 +119,6 @@ class LabelBuilder(Builder):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_chunk,
-                self.target_chunk.unhappiness,
+                self.urgency / 2,
             )
         )
