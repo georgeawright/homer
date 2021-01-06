@@ -4,7 +4,6 @@ from unittest.mock import Mock
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder
 from homer.codelets.evaluators import ChunkEvaluator
-from homer.codelets.selectors import ChunkSelector
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk
 from homer.structures.links import Label
@@ -96,7 +95,7 @@ def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common
     assert CodeletResult.FAIL == result
     assert chunk_builder.child_structure is None
     assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ChunkSelector)
+    assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)
 
 
 def test_fizzles_when_no_second_target(bubble_chamber, target_chunk):
@@ -107,7 +106,7 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_chunk):
     assert CodeletResult.FIZZLE == result
     assert chunk_builder.child_structure is None
     assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ChunkSelector)
+    assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)
 
 
 def test_fizzles_when_chunk_already_exists(bubble_chamber, target_chunk):
@@ -118,4 +117,4 @@ def test_fizzles_when_chunk_already_exists(bubble_chamber, target_chunk):
     assert CodeletResult.FIZZLE == result
     assert chunk_builder.child_structure is None
     assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ChunkSelector)
+    assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)
