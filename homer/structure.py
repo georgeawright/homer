@@ -139,14 +139,21 @@ class Structure(ABC):
     def nearby(self, space: Structure = None):
         raise NotImplementedError
 
-    def is_near(self, other: Structure):
+    def is_near(self, other: Structure) -> bool:
         for other_location in other.locations:
             for self_location in self.locations:
                 if self_location.is_near(other_location):
                     return True
         return False
 
-    def location_in_space(self, space: Structure):
+    def has_location_in_space(self, space: Structure) -> bool:
+        try:
+            self.location_in_space(space)
+            return True
+        except Exception:
+            return False
+
+    def location_in_space(self, space: Structure) -> Location:
         for location in self.locations:
             if location is not None and location.space == space:
                 return location
