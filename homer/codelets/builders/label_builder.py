@@ -47,7 +47,7 @@ class LabelBuilder(Builder):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
         target = bubble_chamber.chunks.get_unhappy()
-        urgency = urgency if urgency is not None else target.unhappiness
+        urgency = urgency if urgency is not None else target.unlinkedness
         return cls.spawn(parent_id, bubble_chamber, target, urgency)
 
     @property
