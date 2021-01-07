@@ -45,9 +45,10 @@ class LabelBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
         target = bubble_chamber.chunks.get_unhappy()
-        return cls.spawn(parent_id, bubble_chamber, target, target.unhappiness)
+        urgency = urgency if urgency is not None else target.unhappiness
+        return cls.spawn(parent_id, bubble_chamber, target, urgency)
 
     @property
     def _structure_concept(self):
@@ -115,10 +116,5 @@ class LabelBuilder(Builder):
 
     def _re_engender(self):
         self.child_codelets.append(
-            LabelBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_chunk,
-                self.urgency / 2,
-            )
+            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
         )
