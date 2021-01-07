@@ -3,5 +3,5 @@ from abc import ABC, abstractmethod
 
 class Classifier(ABC):
     @abstractmethod
-    def confidence(self):
+    def classify(self):
         pass

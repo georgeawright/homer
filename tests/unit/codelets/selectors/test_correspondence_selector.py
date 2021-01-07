@@ -1,48 +1,90 @@
+import pytest
+import random
 from unittest.mock import Mock, patch
 
+from homer.codelet_result import CodeletResult
+from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.selectors import CorrespondenceSelector
-from homer.perceptlet_collection import PerceptletCollection
-
-FLOAT_COMPARISON_TOLERANCE = 1e-3
+from homer.structure_collection import StructureCollection
 
 
-def test_passes_preliminary_checks():
-    first_argument = Mock()
-    second_argument = Mock()
-    parent_concept = Mock()
+@pytest.fixture
+def bubble_chamber():
+    chamber = Mock()
+    chamber.concepts = {"correspondence": Mock(), "select": Mock()}
+    return chamber
+
+
+def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion = Mock()
-    champion.location = [0, 0, 0]
-    champion.first_argument = first_argument
-    champion.second_argument = second_argument
-    champion.parent_concept = parent_concept
     challenger = Mock()
-    challenger.first_argument = first_argument
-    challenger.second_argument = second_argument
-    challenger.parent_concept = parent_concept
-    with patch.object(PerceptletCollection, "get_random", return_value=challenger):
-        bubble_chamber = Mock()
-        bubble_chamber.workspace.correspondences.at.side_effect = [
-            PerceptletCollection(),
-            PerceptletCollection(),
-        ]
-        selector = CorrespondenceSelector(
-            bubble_chamber, Mock(), Mock(), champion, Mock(), Mock()
-        )
-        selector.challenger = challenger
-        assert selector._passes_preliminary_checks() is True
-        champion.first_argument = second_argument
-        champion.second_argument = first_argument
-        assert selector._passes_preliminary_checks() is False
-
-
-def test_engender_follow_up():
-    champion = Mock()
-    champion.location = [0, 0, 0]
-    champion.activation.as_scalar.side_effect = [0.6]
-    challenger = Mock()
-    challenger.activation.as_scalar.side_effect = [0.5]
-    selector = CorrespondenceSelector(
-        Mock(), Mock(), Mock(), champion, Mock(), Mock(), challenger
+    champion.size = 1
+    champion.quality = 1.0
+    champion.activation = 1.0
+    challenger.size = 1
+    challenger.quality = 1.0
+    challenger.activation = 1.0
+    champion.start.correspondences_to_space.return_value = StructureCollection(
+        {champion, challenger}
     )
-    follow_up = selector._engender_follow_up()
-    assert CorrespondenceSelector == type(follow_up)
+    selector = CorrespondenceSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
+    assert selector.challenger is None
+    selector.run()
+    assert selector.challenger == challenger
+
+
+@pytest.mark.parametrize(
+    "champion_quality, champion_activation, "
+    + "challenger_quality, challenger_activation, "
+    + "random_number, expected_winner",
+    [
+        (1.0, 0.5, 0.0, 0.5, 0.5, "champion"),  # champion is better
+        (0.5, 1.0, 1.0, 0.0, 0.5, "challenger"),  # challenger is better
+        (0.5, 1.0, 1.0, 0.0, 0.1, "champion"),  # challenger is better but rand too low
+        (1.0, 1.0, 0.5, 0.0, 0.9, "challenger"),  # champion is better but rand too high
+    ],
+)
+def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
+    champion_quality,
+    champion_activation,
+    challenger_quality,
+    challenger_activation,
+    random_number,
+    expected_winner,
+    bubble_chamber,
+):
+    with patch.object(random, "random", return_value=random_number):
+        champion = Mock()
+        champion.size = 1
+        champion.quality = champion_quality
+        champion.activation = champion_activation
+        challenger = Mock()
+        challenger.size = 1
+        challenger.quality = challenger_quality
+        challenger.activation = challenger_activation
+        selector = CorrespondenceSelector(
+            Mock(), Mock(), bubble_chamber, champion, Mock(), challenger=challenger
+        )
+        selector.run()
+        assert CodeletResult.SUCCESS == selector.result
+        if expected_winner == "champion":
+            assert champion.boost_activation.is_called()
+            assert challenger.decay_activation.is_called()
+        else:
+            assert challenger.boost_activation.is_called()
+            assert champion.decay_activation.is_called()
+        assert 1 == len(selector.child_codelets)
+        assert isinstance(selector.child_codelets[0], CorrespondenceSelector)
+
+
+def test_spawns_builder_when_fizzling(bubble_chamber):
+    champion = Mock()
+    champion.start.correspondences_to_space.return_value = StructureCollection(
+        {champion}
+    )
+    selector = CorrespondenceSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
+    selector.run()
+    assert selector.challenger is None
+    assert CodeletResult.FIZZLE == selector.result
+    assert 1 == len(selector.child_codelets)
+    assert isinstance(selector.child_codelets[0], CorrespondenceBuilder)

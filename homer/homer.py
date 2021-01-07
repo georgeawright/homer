@@ -1,36 +1,25 @@
+from typing import Any, Callable, Dict, List, Union
+
 from homer import fuzzy
 from .bubble_chamber import BubbleChamber
-from .bubbles.concepts.correspondence_type import CorrespondenceType
-from .bubbles.concepts.emotion import Emotion
-from .bubbles.concepts.euclidean_concept import EuclideanConcept
-from .bubbles.concepts.euclidean_space import EuclideanSpace
-from .bubbles.concepts.perceptlet_types import (
-    CorrespondenceConcept,
-    CorrespondenceEvaluationConcept,
-    CorrespondenceLabelConcept,
-    CorrespondenceSelectionConcept,
-    GroupConcept,
-    GroupEvaluationConcept,
-    GroupSelectionConcept,
-    GroupLabelConcept,
-    GroupLabelEvaluationConcept,
-    GroupLabelSelectionConcept,
-    LabelConcept,
-    LabelEvaluationConcept,
-    TextletConcept,
-)
-from .codelets import BottomUpRawPerceptletLabeler
+from .classifier import Classifier
 from .coderack import Coderack
-from .concept_space import ConceptSpace
 from .errors import NoMoreCodelets
-from .event_trace import EventTrace
+from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
+from .id import ID
+from .location import Location
 from .logger import Logger
 from .loggers import DjangoLogger
 from .problem import Problem
-from .template import Template
-from .workspace import Workspace
-from .worldview import Worldview
+from .structure_collection import StructureCollection
+from .structures import Concept, Lexeme
+from .structures.chunks import Word
+from .structures.chunks.slots import TemplateSlot
+from .structures.links import Relation
+from .structures.spaces import ConceptualSpace, WorkingSpace
+from .structures.spaces.frames import Template
+from .word_form import WordForm
 
 
 class Homer:
@@ -47,152 +36,38 @@ class Homer:
         self.activation_update_frequency = activation_update_frequency
 
     @classmethod
-    def setup(cls, path_to_logs: str, path_to_problem: str):
-        """Set up every component and sub-component from a configuration file"""
-        logger = DjangoLogger.setup(path_to_logs)
-        problem = Problem(path_to_problem)
-        event_trace = EventTrace([])
-        workspace = Workspace(event_trace, problem.as_raw_perceptlet_field_sequence())
-        for raw_perceptlet in workspace.raw_perceptlets:
-            logger.log(raw_perceptlet)
-        worldview = Worldview(set())
-
-        satisfaction = Emotion("satisfaction")
-        emotions = {satisfaction}
-
-        temperature_templates = [Template(["it", "will", "be", None])]
-        location_templates = [Template(["in", "the", None])]
-
-        textlet_concept = TextletConcept()
-        correspondence_selection_concept = CorrespondenceSelectionConcept()
-        correspondence_evaluation_concept = CorrespondenceEvaluationConcept()
-        correspondence_evaluation_concept.connections.add(
-            correspondence_selection_concept
+    def setup(cls, logger: Logger):
+        top_level_conceptual_space = ConceptualSpace(
+            "top_level_space",
+            "",
+            "top level",
+            None,
+            [None],
+            StructureCollection(),
+            0,
+            [],
+            [],
         )
-        correspondence_label_concept = CorrespondenceLabelConcept()
-        correspondence_concept = CorrespondenceConcept()
-        correspondence_concept.connections.add(textlet_concept)
-        correspondence_concept.connections.add(correspondence_label_concept)
-        correspondence_concept.connections.add(correspondence_evaluation_concept)
-        group_selection_concept = GroupSelectionConcept()
-        group_evaluation_concept = GroupEvaluationConcept()
-        group_evaluation_concept.connections.add(group_selection_concept)
-        group_label_selection_concept = GroupLabelSelectionConcept()
-        group_label_evaluation_concept = GroupLabelEvaluationConcept()
-        group_label_evaluation_concept.connections.add(group_label_selection_concept)
-        group_label_concept = GroupLabelConcept()
-        group_label_concept.connections.add(group_label_evaluation_concept)
-        group_concept = GroupConcept()
-        group_concept.connections.add(correspondence_concept)
-        group_concept.connections.add(group_label_concept)
-        group_concept.connections.add(group_evaluation_concept)
-        label_evaluation_concept = LabelEvaluationConcept()
-        label_concept = LabelConcept()
-        label_concept.connections.add(label_evaluation_concept)
-        label_concept.connections.add(group_concept)
-        perceptlet_types = {
-            textlet_concept,
-            correspondence_concept,
-            correspondence_label_concept,
-            correspondence_evaluation_concept,
-            correspondence_selection_concept,
-            group_concept,
-            group_evaluation_concept,
-            group_selection_concept,
-            group_label_concept,
-            group_label_evaluation_concept,
-            group_label_selection_concept,
-            label_concept,
-            label_evaluation_concept,
-        }
-        correspondence_types = {
-            CorrespondenceType(
-                "sameness",
-                lambda same_labels, proximity: fuzzy.AND(same_labels, proximity),
-            ),
-            CorrespondenceType(
-                "oppositeness",
-                lambda same_labels, proximity: fuzzy.AND(
-                    fuzzy.NOT(same_labels), fuzzy.NOT(proximity)
-                ),
-            ),
-            CorrespondenceType(
-                "extremeness",
-                lambda same_labels, proximity: fuzzy.AND(
-                    same_labels, fuzzy.NOT(proximity)
-                ),
-            ),
-        }
-        temperature_space = EuclideanSpace("temperature", 5, 1.5, temperature_templates)
-        location_space = EuclideanSpace(
-            "location", 5, 1, location_templates, relevant_value="location"
-        )
-        spaces = {temperature_space, location_space}
-        workspace_concepts = {
-            EuclideanConcept("cold", [4], temperature_space, depth=1, boundary=[7]),
-            EuclideanConcept("mild", [10], temperature_space, depth=1),
-            EuclideanConcept("warm", [16], temperature_space, depth=1),
-            EuclideanConcept("hot", [22], temperature_space, depth=1, boundary=[19]),
-            EuclideanConcept(
-                "north", [0, 2], location_space, depth=2, relevant_value="location"
-            ),
-            EuclideanConcept(
-                "south", [5, 2], location_space, depth=2, relevant_value="location"
-            ),
-            EuclideanConcept(
-                "east", [2.5, 4], location_space, depth=2, relevant_value="location"
-            ),
-            EuclideanConcept(
-                "west", [2.5, 0], location_space, depth=2, relevant_value="location"
-            ),
-            EuclideanConcept(
-                "northwest", [0, 0], location_space, depth=2, relevant_value="location",
-            ),
-            EuclideanConcept(
-                "northeast", [0, 4], location_space, depth=2, relevant_value="location",
-            ),
-            EuclideanConcept(
-                "southwest", [5, 0], location_space, depth=2, relevant_value="location",
-            ),
-            EuclideanConcept(
-                "southeast", [5, 4], location_space, depth=2, relevant_value="location",
-            ),
-            EuclideanConcept(
-                "midlands", [2.5, 2], location_space, depth=2, relevant_value="location"
-            ),
-        }
-
-        concept_space = ConceptSpace(
-            emotions,
-            perceptlet_types,
-            correspondence_types,
-            spaces,
-            workspace_concepts,
+        logger.log(top_level_conceptual_space)
+        top_level_working_space = top_level_conceptual_space.instance
+        logger.log(top_level_working_space)
+        bubble_chamber = BubbleChamber(
+            StructureCollection({top_level_conceptual_space}),
+            StructureCollection({top_level_working_space}),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
             logger,
         )
-
-        for concept in concept_space:
-            logger.log(concept)
-
-        bubble_chamber = BubbleChamber(
-            concept_space, event_trace, workspace, worldview, logger,
-        )
-        coderack = Coderack(bubble_chamber, logger)
-        logger.log(coderack)
-        codelets = [
-            BottomUpRawPerceptletLabeler(
-                bubble_chamber,
-                concept_space.get_perceptlet_type_by_name("label"),
-                bubble_chamber.workspace.raw_perceptlets.get_random(),
-                HyperParameters.STARTER_CODELET_URGENCY,
-                "",
-            )
-            for _ in range(HyperParameters.NO_OF_STARTER_CODELETS)
-        ]
-        for codelet in codelets:
-            coderack.add_codelet(codelet)
-
-        return Homer(bubble_chamber, coderack, logger)
+        bubble_chamber.lexemes = StructureCollection()
+        coderack = Coderack.setup(bubble_chamber, logger)
+        return cls(bubble_chamber, coderack, logger)
 
     def run(self):
         while self.bubble_chamber.result is None:
@@ -200,6 +75,7 @@ class Homer:
             self.logger.log(self.coderack)
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.print_status_update()
+                self.bubble_chamber.spread_activations()
                 self.bubble_chamber.update_activations()
             try:
                 self.coderack.select_and_run_codelet()
@@ -211,70 +87,234 @@ class Homer:
                 raise e
         return {
             "result": self.bubble_chamber.result,
-            "satisfaction": self.bubble_chamber.concept_space[
-                "satisfaction"
-            ].activation.as_scalar(),
+            "satisfaction": self.bubble_chamber.top_level_working_space.quality,
             "codelets_run": self.coderack.codelets_run,
         }
 
     def print_status_update(self):
         codelets_run = self.coderack.codelets_run
-        label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "label"
-        ).activation.as_scalar()
-        group_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "group"
-        ).activation.as_scalar()
-        group_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "group-label"
-        ).activation.as_scalar()
-        correspondence_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "correspondence"
-        ).activation.as_scalar()
-        correspondence_label_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "correspondence-label"
-        ).activation.as_scalar()
-        textlet_activation = self.bubble_chamber.concept_space.get_perceptlet_type_by_name(
-            "textlet"
-        ).activation.as_scalar()
+        bubble_chamber_satisfaction = self.bubble_chamber.satisfaction
+        build_activation = self.bubble_chamber.concepts["build"].activation
+        evaluate_activation = self.bubble_chamber.concepts["evaluate"].activation
+        select_activation = self.bubble_chamber.concepts["select"].activation
         print(
             "================================================================================"
         )
         print(
-            f"codelets run: {codelets_run}; label: {label_activation}; group: {group_activation}; gr_label: {group_label_activation}; corresp: {correspondence_activation}; co_label: {correspondence_label_activation}; textlet: {textlet_activation}"
+            f"codelets run: {codelets_run}; "
+            + f"satisfaction: {bubble_chamber_satisfaction}; "
+            + f"build: {build_activation}; "
+            + f"evaluate: {evaluate_activation}; "
+            + f"select: {select_activation}; "
         )
         print(
             "================================================================================"
         )
 
     def print_results(self):
-        for raw_perceptlet_field in self.bubble_chamber.workspace.input_sequence:
-            for row in raw_perceptlet_field:
-                for raw_perceptlet in row:
-                    print(
-                        ",".join(
-                            [
-                                label.parent_concept.name
-                                for label in raw_perceptlet.labels
-                            ]
-                        ),
-                        end="|",
-                    )
-                print("\n")
-        for group in self.bubble_chamber.workspace.groups:
-            print(
-                f"{group.perceptlet_id} - location: {group.location}; size: {group.size}, activation: {group.activation.activation}"
-            )
-            print([(member.value, member.location) for member in group.members])
-            print(
-                "labels:",
-                [(label.value, label.activation.activation) for label in group.labels],
-            )
-            print("textlets:", [textlet.value for textlet in group.textlets])
-            print("\n")
-        for correspondence in self.bubble_chamber.workspace.correspondences:
-            print(
-                f"{correspondence.perceptlet_id} from {correspondence.first_argument.perceptlet_id} to {correspondence.second_argument.perceptlet_id} in {correspondence.parent_concept.name}"
-            )
-            print(" ".join([label.value for label in correspondence.labels]))
-            print("\n")
+        print("results go here")
+
+    def def_concept(
+        self,
+        name: str = "",
+        prototype: Any = None,
+        classifier: Classifier = None,
+        parent_space: ConceptualSpace = None,
+        relevant_value: str = "",
+        child_spaces: StructureCollection = None,
+        distance_function: Callable = None,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
+        depth: int = 1,
+        activation: float = 0.0,
+    ) -> Concept:
+        location = (
+            Location(prototype, parent_space)
+            if prototype is not None
+            else Location([], parent_space)
+        )
+        concept = Concept(
+            structure_id=ID.new(Concept),
+            parent_id="",
+            name=name,
+            location=location,
+            classifier=classifier,
+            relevant_value=relevant_value,
+            child_spaces=(
+                child_spaces if child_spaces is not None else StructureCollection()
+            ),
+            distance_function=distance_function,
+            links_in=links_in,
+            links_out=links_out,
+            depth=depth,
+        )
+        concept._activation = activation
+        parent_space.add(concept)
+        self.logger.log(concept)
+        self.bubble_chamber.concepts.add(concept)
+        return concept
+
+    def def_conceptual_space(
+        self,
+        name: str = "",
+        parent_concept: Concept = None,
+        locations: List[Location] = None,
+        contents: StructureCollection = None,
+        no_of_dimensions: int = 0,
+        dimensions: List[ConceptualSpace] = None,
+        sub_spaces: List[ConceptualSpace] = None,
+        is_basic_level: bool = False,
+        coordinates_from_super_space_location: Callable = None,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
+    ) -> ConceptualSpace:
+        conceptual_space = ConceptualSpace(
+            structure_id=ID.new(ConceptualSpace),
+            parent_id="",
+            name=name,
+            parent_concept=parent_concept,
+            locations=(locations if locations is not None else []),
+            contents=(contents if contents is not None else StructureCollection()),
+            no_of_dimensions=no_of_dimensions,
+            dimensions=(dimensions if dimensions is not None else []),
+            sub_spaces=(sub_spaces if sub_spaces is not None else []),
+            is_basic_level=is_basic_level,
+            coordinates_from_super_space_location=coordinates_from_super_space_location,
+            links_in=links_in,
+            links_out=links_out,
+        )
+        self.logger.log(conceptual_space)
+        if parent_concept is not None:
+            parent_concept.child_spaces.add(conceptual_space)
+        for location in locations:
+            if location is None:
+                continue
+            location.space.add(conceptual_space)
+        self.bubble_chamber.conceptual_spaces.add(conceptual_space)
+        return conceptual_space
+
+    def def_concept_link(
+        self,
+        start: Concept,
+        end: Concept,
+        activation: FloatBetweenOneAndZero = 0.0,
+        stable: bool = False,
+    ) -> Relation:
+        relation = Relation(
+            structure_id=ID.new(Relation),
+            parent_id="",
+            start=start,
+            end=end,
+            parent_concept=None,
+            parent_space=None,
+            quality=1.0,
+        )
+        relation._activation = activation
+        relation.stable = stable
+        start.links_out.add(relation)
+        end.links_in.add(relation)
+        self.logger.log(relation)
+        self.bubble_chamber.concept_links.add(relation)
+        return relation
+
+    def def_lexeme(
+        self,
+        headword: str = "",
+        forms: Dict[str, str] = None,
+        parent_concept: Concept = None,
+    ) -> Lexeme:
+        lexeme = Lexeme(
+            structure_id=ID.new(Lexeme),
+            parent_id="",
+            headword=headword,
+            forms=forms,
+        )
+        self.logger.log(lexeme)
+        self.bubble_chamber.lexemes.add(lexeme)
+        link_to_concept = self.def_concept_link(parent_concept, lexeme, activation=1.0)
+        parent_concept.links_out.add(link_to_concept)
+        lexeme.links_in.add(link_to_concept)
+        return lexeme
+
+    def def_template(
+        self,
+        name: str = "",
+        parent_concept: Concept = None,
+        contents: List[Union[Word, TemplateSlot]] = None,
+    ) -> Template:
+        template = Template(
+            structure_id=ID.new(Template),
+            parent_id="",
+            name=name,
+            parent_concept=parent_concept,
+            locations=[Location([], self.bubble_chamber.spaces["templates"])],
+            contents=StructureCollection(),
+        )
+        for i, item in enumerate(contents):
+            template.contents.add(item)
+            item.locations = [Location([i], template)]
+            self.logger.log(item)
+            if isinstance(item, TemplateSlot):
+                self.def_concept_link(item.value, item, activation=1.0, stable=True)
+        self.logger.log(template)
+        self.bubble_chamber.conceptual_spaces.add(template)
+        self.bubble_chamber.spaces["templates"].add(template)
+        return template
+
+    def def_template_slot(self, concept: Concept = None, form: WordForm = None):
+        slot = TemplateSlot(
+            structure_id=ID.new(TemplateSlot),
+            parent_id="",
+            prototype=concept,
+            form=form,
+            location=None,
+        )
+        self.bubble_chamber.slots.add(slot)
+        return slot
+
+    def def_word(self, value: str = "", quality: FloatBetweenOneAndZero = 1.0):
+        word = Word(
+            structure_id=ID.new(Word),
+            parent_id="",
+            value=value,
+            location=None,
+            quality=quality,
+        )
+        return word
+
+    def def_working_space(
+        self,
+        name: str = "",
+        parent_concept: Concept = None,
+        locations: List[Location] = None,
+        contents: StructureCollection = None,
+        no_of_dimensions: int = 0,
+        dimensions: List[WorkingSpace] = None,
+        sub_spaces: List[WorkingSpace] = None,
+        is_basic_level: bool = False,
+        coordinates_from_super_space_location: Callable = None,
+        links_in: StructureCollection = None,
+        links_out: StructureCollection = None,
+    ) -> WorkingSpace:
+        working_space = WorkingSpace(
+            structure_id=ID.new(WorkingSpace),
+            parent_id="",
+            name=name,
+            parent_concept=parent_concept,
+            locations=(locations if locations is not None else []),
+            contents=(contents if contents is not None else StructureCollection()),
+            no_of_dimensions=no_of_dimensions,
+            dimensions=(dimensions if dimensions is not None else []),
+            sub_spaces=(sub_spaces if sub_spaces is not None else []),
+            is_basic_level=is_basic_level,
+            coordinates_from_super_space_location=coordinates_from_super_space_location,
+            links_in=links_in,
+            links_out=links_out,
+        )
+        self.logger.log(working_space)
+        for location in locations:
+            if location is None:
+                continue
+            location.space.add(working_space)
+        self.bubble_chamber.working_spaces.add(working_space)
+        return working_space

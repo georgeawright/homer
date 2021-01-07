@@ -8,18 +8,19 @@ import os
 import time
 from typing import Any
 
-from homer.bubbles import Concept, Perceptlet
-from homer.bubbles.perceptlets import RawPerceptlet
 from homer.codelet import Codelet
+from homer.codelets import Builder, Evaluator, Selector
 from homer.coderack import Coderack
 from homer.logger import Logger
+from homer.structure import Structure
+from homer.tools import last_value_of_dict
 
 from runs.models import (
     CodeletRecord,
     CoderackRecord,
-    ConceptRecord,
-    PerceptletRecord,
-    PerceptletUpdateRecord,
+    EventRecord,
+    StructureRecord,
+    StructureUpdateRecord,
     RunRecord,
 )
 
@@ -59,60 +60,89 @@ class DjangoLogger(Logger):
             return self._log_codelet(item)
         if isinstance(item, Coderack):
             return self._log_coderack(item)
-        if isinstance(item, Concept):
-            return self._log_concept(item)
-        if isinstance(item, Perceptlet):
-            return self._log_perceptlet(item)
+        if isinstance(item, Structure):
+            return self._log_structure(item)
 
     def log_codelet_run(self, codelet: Codelet):
         codelet_record = CodeletRecord.objects.get(
             codelet_id=codelet.codelet_id, run_id=self.run
         )
         codelet_record.time_run = self.codelets_run
+        codelet_record.result = codelet.result
         codelet_record.save()
-
-    def log_perceptlet_update(
-        self, codelet: Codelet, perceptlet: Perceptlet, action: str
-    ):
-        PerceptletUpdateRecord.objects.create(
-            run_id=self.run,
-            time=self.codelets_run,
-            codelet_id=CodeletRecord.objects.get(
-                run_id=self.run, codelet_id=codelet.codelet_id
-            ).id,
-            perceptlet_id=PerceptletRecord.objects.get(
-                run_id=self.run, perceptlet_id=perceptlet.perceptlet_id
-            ).id,
-            action=action,
-        )
-        perceptlet_record = PerceptletRecord.objects.get(
-            run_id=self.run, perceptlet_id=perceptlet.perceptlet_id
-        )
-        perceptlet_record.activation.append(perceptlet.activation.activation)
-        perceptlet_record.unhappiness.append(perceptlet.unhappiness.activation)
-        perceptlet_record.quality.append(perceptlet.quality)
-        perceptlet_record.save()
-
-    def log_perceptlet_connection(
-        self, codelet: Codelet, perceptlet: Perceptlet, connection: Perceptlet
-    ):
-        perceptlet_record = PerceptletRecord.objects.get(
-            run_id=self.run, perceptlet_id=perceptlet.perceptlet_id
-        )
-        connection_record = PerceptletRecord.objects.get(
-            run_id=self.run, perceptlet_id=connection.perceptlet_id
-        )
-        perceptlet_record.connections.add(connection_record)
-        perceptlet_record.save()
-        self.log_perceptlet_update(
-            codelet, perceptlet, f"Connected to {connection.perceptlet_id}"
-        )
+        self._log_codelet_events(codelet, codelet_record)
 
     def _log_message(self, message):
         print(message)
         messages_file = self.log_directory + "/messages.txt"
         with open(messages_file, "a") as f:
             f.write(message + "\n")
+
+    def _log_codelet_events(self, codelet: Codelet, codelet_record):
+        event_type = None
+        if isinstance(codelet, Builder):
+            event_type = "building"
+        elif isinstance(codelet, Evaluator):
+            event_type = "evaluation"
+        elif isinstance(codelet, Selector):
+            event_type = "selection"
+        if event_type is None:
+            return
+        target_one = None
+        target_two = None
+        child_structure = None
+        winner = None
+        loser = None
+        if (
+            hasattr(codelet, "target_structure")
+            and codelet.target_structure is not None
+        ):
+            target_one = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.target_structure.structure_id
+            )
+        if hasattr(codelet, "target_chunk") and codelet.target_chunk is not None:
+            target_one = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.target_chunk.structure_id
+            )
+        if (
+            hasattr(codelet, "second_target_structure")
+            and codelet.second_target_structure is not None
+        ):
+            target_two = StructureRecord.objects.get(
+                run_id=self.run,
+                structure_id=codelet.second_target_structure.structure_id,
+            )
+        if (
+            hasattr(codelet, "second_target_chunk")
+            and codelet.second_target_chunk is not None
+        ):
+            target_two = StructureRecord.objects.get(
+                run_id=self.run,
+                structure_id=codelet.second_target_chunk.structure_id,
+            )
+        if hasattr(codelet, "child_structure") and codelet.child_structure is not None:
+            child_structure = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.child_structure.structure_id
+            )
+        if hasattr(codelet, "winner") and codelet.winner is not None:
+            winner = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.winner.structure_id
+            )
+        if hasattr(codelet, "loser") and codelet.loser is not None:
+            loser = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.loser.structure_id
+            )
+        EventRecord.objects.create(
+            run_id=self.run,
+            event_time=self.codelets_run,
+            event_type=event_type,
+            codelet=codelet_record,
+            target_one=target_one,
+            target_two=target_two,
+            child_structure=child_structure,
+            winner=winner,
+            loser=loser,
+        )
 
     def _log_codelet(self, codelet: Codelet):
         self._log_message(
@@ -125,40 +155,46 @@ class DjangoLogger(Logger):
             codelet_type=type(codelet).__name__,
             birth_time=self.codelets_run,
             urgency=codelet.urgency,
-            target_perceptlet=PerceptletRecord.objects.get(
-                run_id=self.run, perceptlet_id=codelet.target_perceptlet.perceptlet_id
-            ),
         )
-        codelet_record.perceptlet_types.add(
-            ConceptRecord.objects.get(
-                concept_id=codelet.perceptlet_type.concept_id, run_id=self.run
+        if (
+            hasattr(codelet, "target_structure")
+            and codelet.target_structure is not None
+        ):
+            codelet_record.target_structure = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.target_structure.structure_id
             )
-        )
-        if codelet.parent_id == "" or codelet.parent_id[2] == "n":
-            return
-        codelet_record.parent = CodeletRecord.objects.get(
-            codelet_id=codelet.parent_id, run_id=self.run
-        )
-        codelet_record.save()
-
-    def _log_concept(self, concept: Concept):
-        try:
-            concept_record = ConceptRecord.objects.get(
-                concept_id=concept.concept_id, run_id=self.run
-            )
-            concept_record.activation.append(
-                [self.codelets_run, concept.activation.activation_matrix.tolist()]
-            )
-            concept_record.save()
-        except ConceptRecord.DoesNotExist:
-            ConceptRecord.objects.create(
-                concept_id=concept.concept_id,
+        if (
+            hasattr(codelet, "second_target_structure")
+            and codelet.second_target_structure is not None
+        ):
+            codelet_record.second_target_structure = StructureRecord.objects.get(
                 run_id=self.run,
-                name=concept.name,
-                activation=[
-                    [self.codelets_run, concept.activation.activation_matrix.tolist()]
-                ],
+                structure_id=codelet.second_target_structure.structure_id,
             )
+        if hasattr(codelet, "target_chunk") and codelet.target_chunk is not None:
+            codelet_record.target_structure = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.target_chunk.structure_id
+            )
+        if (
+            hasattr(codelet, "second_target_chunk")
+            and codelet.second_target_chunk is not None
+        ):
+            codelet_record.second_target_structure = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.second_target_chunk.structure_id
+            )
+        if hasattr(codelet, "champion") and codelet.champion is not None:
+            codelet_record.champion = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.champion.structure_id
+            )
+        if hasattr(codelet, "challenger") and codelet.challenger is not None:
+            codelet_record.challenger = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.challenger.structure_id
+            )
+        if codelet.parent_id != "coderack":
+            codelet_record.parent = CodeletRecord.objects.get(
+                codelet_id=codelet.parent_id, run_id=self.run
+            )
+        codelet_record.save()
 
     def _log_coderack(self, coderack: Coderack):
         self.codelets_run = coderack.codelets_run
@@ -166,56 +202,132 @@ class DjangoLogger(Logger):
             coderack_record = CoderackRecord.objects.get(run_id=self.run)
             coderack_record.codelets_run.append(self.codelets_run)
             coderack_record.population.append(len(coderack._codelets))
+            coderack_record.satisfaction.append(coderack.bubble_chamber.satisfaction)
             coderack_record.save()
         except CoderackRecord.DoesNotExist:
             CoderackRecord.objects.create(
                 run_id=self.run,
                 codelets_run=[self.codelets_run],
                 population=[len(coderack._codelets)],
+                satisfaction=[coderack.bubble_chamber.satisfaction],
             )
 
-    def _log_perceptlet(self, perceptlet: Perceptlet):
-        self._log_message(
-            f"{perceptlet.perceptlet_id} created "
-            + f" by {perceptlet.parent_id} - value: {perceptlet.value}; "
-            + f"location: {perceptlet.location}; activation: {perceptlet.activation.activation}"
-        )
-        perceptlet_record = PerceptletRecord.objects.create(
-            perceptlet_id=perceptlet.perceptlet_id,
-            run_id=self.run,
-            time_created=self.codelets_run,
-            value=perceptlet.value,
-            location=perceptlet.location,
-            activation=[perceptlet.activation.activation],
-            unhappiness=[perceptlet.unhappiness.activation],
-            quality=[perceptlet.quality],
-        )
-        if perceptlet.parent_id != "":
-            parent_codelet = CodeletRecord.objects.get(
-                codelet_id=perceptlet.parent_id, run_id=self.run
+    def _log_structure(self, structure: Structure):
+        if hasattr(structure, "sub_spaces"):
+            for sub_space in structure.sub_spaces:
+                self._log_structure(sub_space)
+        try:
+            structure_record = StructureRecord.objects.get(
+                structure_id=structure.structure_id, run_id=self.run
             )
-            perceptlet_record.parent_codelet = parent_codelet
-            PerceptletUpdateRecord.objects.create(
+        except StructureRecord.DoesNotExist:
+            structure_record = StructureRecord.objects.create(
+                structure_id=structure.structure_id,
                 run_id=self.run,
-                time=self.codelets_run,
-                codelet_id=parent_codelet.id,
-                perceptlet_id=perceptlet_record.id,
-                action="Created",
+                time_created=self.codelets_run,
+                value=structure.value,
+                location=structure.location.coordinates
+                if structure.location is not None
+                else None,
+                activation={},
+                unhappiness={},
+                quality={},
             )
-        if hasattr(perceptlet, "parent_concept"):
-            perceptlet_record.parent_concept = ConceptRecord.objects.get(
-                concept_id=perceptlet.parent_concept.concept_id, run_id=self.run
+            self._log_message(
+                f"{structure.structure_id} created "
+                + f" by {structure.parent_id} - value: {structure.value}; "
+                + f"location: {structure.location}; activation: {structure.activation}"
             )
-        if hasattr(perceptlet, "first_argument"):
-            perceptlet_record.first_argument = perceptlet.first_argument.perceptlet_id
-        if hasattr(perceptlet, "second_argument"):
-            perceptlet_record.second_argument = perceptlet.second_argument.perceptlet_id
-        for connection in perceptlet.connections:
-            connection_record = PerceptletRecord.objects.get(
-                perceptlet_id=connection.perceptlet_id, run_id=self.run
+            if structure.parent_id != "":
+                parent_codelet = CodeletRecord.objects.get(
+                    codelet_id=structure.parent_id, run_id=self.run
+                )
+                structure_record.parent_codelet = parent_codelet
+                StructureUpdateRecord.objects.create(
+                    run_id=self.run,
+                    time=self.codelets_run,
+                    codelet_id=parent_codelet.id,
+                    structure_id=structure_record.id,
+                    action="Created",
+                )
+            if (
+                hasattr(structure, "parent_concept")
+                and structure.parent_concept is not None
+            ):
+                structure_record.parent_concept = StructureRecord.objects.get(
+                    structure_id=structure.parent_concept.structure_id, run_id=self.run
+                )
+            if (
+                hasattr(structure, "parent_space")
+                and structure.parent_space is not None
+            ):
+                structure_record.parent_space = StructureRecord.objects.get(
+                    structure_id=structure.parent_space.structure_id, run_id=self.run
+                )
+            if hasattr(structure, "members") and structure.members is not None:
+                for member in structure.members:
+                    member_record = StructureRecord.objects.get(
+                        structure_id=member.structure_id, run_id=self.run
+                    )
+                    structure_record.members.add(member_record)
+                    print(
+                        f"{member.structure_id} added as member to {structure.structure_id}"
+                    )
+            if hasattr(structure, "start") and structure.start is not None:
+                start_record = StructureRecord.objects.get(
+                    structure_id=structure.start.structure_id, run_id=self.run
+                )
+                structure_record.start = start_record
+                start_record.links.add(structure_record)
+                print(
+                    f"{structure.structure_id} linked to {structure.start.structure_id}"
+                )
+            if hasattr(structure, "end") and structure.end is not None:
+                end_record = StructureRecord.objects.get(
+                    structure_id=structure.end.structure_id, run_id=self.run
+                )
+                structure_record.end = end_record
+                end_record.links.add(structure_record)
+                print(
+                    f"{structure.structure_id} linked to {structure.end.structure_id}"
+                )
+        last_activation = last_value_of_dict(structure_record.activation)
+        last_unhappiness = last_value_of_dict(structure_record.unhappiness)
+        last_quality = last_value_of_dict(structure_record.quality)
+        if structure.activation != last_activation:
+            changed = (
+                "increased"
+                if last_activation is None or structure.activation > last_activation
+                else "decreased"
             )
-            perceptlet_record.connections.add(connection_record)
-        perceptlet_record.save()
+            self._log_message(
+                f"{structure.structure_id} activation {changed} from "
+                + f"{last_activation} to {structure.activation}"
+            )
+            structure_record.activation[self.codelets_run] = structure.activation
+        if structure.unhappiness != last_unhappiness:
+            changed = (
+                "increased"
+                if last_unhappiness is None or structure.unhappiness > last_unhappiness
+                else "decreased"
+            )
+            self._log_message(
+                f"{structure.structure_id} unhappiness {changed} from "
+                + f"{last_unhappiness} to {structure.unhappiness}"
+            )
+            structure_record.unhappiness[self.codelets_run] = structure.unhappiness
+        if structure.quality != last_quality:
+            changed = (
+                "increased"
+                if last_quality is None or structure.quality > last_quality
+                else "decreased"
+            )
+            self._log_message(
+                f"{structure.structure_id} quality {changed} from "
+                + f"{last_quality} to {structure.quality}"
+            )
+            structure_record.quality[self.codelets_run] = structure.quality
+        structure_record.save()
 
     def graph_concepts(self, concept_names, file_name):
         pass

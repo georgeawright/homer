@@ -1,3 +1,4 @@
+from collections import defaultdict
 import io
 import re
 
@@ -6,12 +7,14 @@ from django.http import HttpResponse
 from matplotlib import pyplot
 import numpy
 
+from homer.tools import first_key_of_dict, last_value_of_dict
+
 from .models import (
     CodeletRecord,
     CoderackRecord,
-    ConceptRecord,
-    PerceptletRecord,
-    PerceptletUpdateRecord,
+    EventRecord,
+    StructureRecord,
+    StructureUpdateRecord,
     RunRecord,
 )
 
@@ -34,36 +37,38 @@ def run_view(request, run_id):
     output += "<ul>"
     output += "<li>Codelets Run: " + str(coderack_record.codelets_run[-1])
     output += "</ul>"
+    output += '<p><a href="activity-and-structure-concepts">Activity and structure concepts</a></p>'
     output += '<p><a href="codelets">Codelets</a></p>'
-    output += '<p><a href="concepts">Concepts</a></p>'
-    output += '<p><a href="perceptlets">Perceptlets</a></p>'
-    output += f'<img src="/runs/{run_id}/coderack_population">'
-    perceptlet_records = PerceptletRecord.objects.filter(run_id=run_id).all()
+    output += '<p><a href="structures">Structures</a></p>'
+    output += f'<img src="/runs/{run_id}/run-summary-graphs">'
+    structure_records = StructureRecord.objects.filter(run_id=run_id).all()
     last_column = 0
     last_row = 0
-    raw_perceptlets = []
-    for record in perceptlet_records:
-        if not re.match("^RawPerceptlet", record.perceptlet_id):
+    original_chunks = []
+    for record in structure_records:
+        if not re.match("^Chunk", record.structure_id):
             continue
-        raw_perceptlets.append(record)
-        if record.location[1] > last_row:
-            last_row = record.location[1]
-        if record.location[2] > last_column:
-            last_column = record.location[2]
-    raw_perceptlets_matrix = [
+        if record.parent_codelet is not None:
+            continue
+        original_chunks.append(record)
+        if record.location[0] > last_row:
+            last_row = record.location[0]
+        if record.location[1] > last_column:
+            last_column = record.location[1]
+    original_chunks_matrix = [
         [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
     ]
-    for raw_perceptlet in raw_perceptlets:
-        row = raw_perceptlet.location[1]
-        column = raw_perceptlet.location[2]
-        raw_perceptlets_matrix[row][column] = raw_perceptlet
+    for original_chunk in original_chunks:
+        row = original_chunk.location[0]
+        column = original_chunk.location[1]
+        original_chunks_matrix[row][column] = original_chunk
     output += "<h2>Raw Input</h2>"
     output += '<table border="1">'
     for i in range(last_row + 1):
         output += "<tr>"
         for j in range(last_column + 1):
             output += "<td>"
-            output += str(raw_perceptlets_matrix[i][j].value)
+            output += str(original_chunks_matrix[i][j].value)
             output += "</td>"
         output += "</tr>"
     output += "</table>"
@@ -73,81 +78,243 @@ def run_view(request, run_id):
         output += "<tr>"
         for j in range(last_column + 1):
             output += "<td>"
-            raw_perceptlet = raw_perceptlets_matrix[i][j]
+            original_chunk = original_chunks_matrix[i][j]
             output += "".join(
                 [
-                    f"{connection.value} ({connection.quality[-1]})<br>"
-                    for connection in raw_perceptlet.connections.all()
-                    if re.match(r"^Label*", connection.perceptlet_id)
+                    f'<a href="structures/{link.structure_id}">{link.value}</a> '
+                    + str(last_value_of_dict(link.quality))
+                    + "<br>"
+                    for link in original_chunk.links.all()
+                    if re.match(r"^Label*", link.structure_id)
                 ]
             )
             output += "</td>"
         output += "</tr>"
     output += "</table>"
-    groups = [
-        perceptlet
-        for perceptlet in perceptlet_records
-        if re.match("^Group*", perceptlet.perceptlet_id)
+    chunks = [
+        structure
+        for structure in structure_records
+        if re.match("^Chunk*", structure.structure_id)
     ]
-    output += "<h2>Groups</h2>"
-    for group in groups:
-        output += f"<h3>{group.perceptlet_id}</h3>"
-        output += "".join(
-            [
-                f"{connection.value} ({connection.quality[-1]})<br>"
-                for connection in group.connections.all()
-                if re.match(r"^Label*", connection.perceptlet_id)
-            ]
+    chunks = sorted(
+        chunks, key=lambda chunk: last_value_of_dict(chunk.activation), reverse=True
+    )
+    output += "<h2>Most Active Chunks</h2>"
+    for i in range(5):
+        chunk = chunks[i]
+        if chunk in original_chunks:
+            continue
+        output += f'<a href="structures/{chunk.structure_id}"><h3>{chunk.structure_id}</h3></a>'
+        output += (
+            "<p>Quality: "
+            + str(last_value_of_dict(chunk.quality))
+            + "; Activation: "
+            + str(last_value_of_dict(chunk.activation))
+            + "</p>"
         )
         output += "".join(
             [
-                f"{connection.value} ({connection.quality[-1]})<br>"
-                for connection in group.connections.all()
-                if re.match(r"^Textlet*", connection.perceptlet_id)
+                f'<a href="structures/{link.structure_id}">{link.value}</a> '
+                + str(last_value_of_dict(link.quality))
+                + "<br>"
+                for link in chunk.links.all()
+                if re.match(r"^Label*", link.structure_id)
             ]
         )
         output += '<table border="1">'
         for i in range(last_row + 1):
             output += "<tr>"
             for j in range(last_column + 1):
-                if group in raw_perceptlets_matrix[i][j].connections.all():
+                if original_chunks_matrix[i][j] in chunk.members.all():
                     output += '<td style="background-color: coral;">'
                 else:
                     output += "<td>"
-                output += str(raw_perceptlets_matrix[i][j].value)
+                output += str(original_chunks_matrix[i][j].value)
                 output += "</td>"
             output += "</tr>"
         output += "</table>"
-    correspondences = [
-        perceptlet
-        for perceptlet in perceptlet_records
-        if re.match(r"^Correspondence*", perceptlet.perceptlet_id)
+    relations = [
+        structure
+        for structure in structure_records
+        if re.match(r"^Relation*", structure.structure_id)
     ]
-    output += "<h2>Correspondences</h2>"
-    for correspondence in correspondences:
+    output += "<h2>Relations</h2>"
+    for relation in relations:
+        try:
+            output += (
+                f"{relation.structure_id}: "
+                + f"{relation.value}("
+                + f"{relation.parent_space.value}, "
+                + f"{relation.start.structure_id}, "
+                + f"{relation.end.structure_id}) "
+                + str(last_value_of_dict(relation.quality))
+            )
+            output += "<br>"
+        except AttributeError:
+            pass  # relations with no parent space are links between concepts
+    templates = [
+        structure
+        for structure in structure_records
+        if re.match(r"^Template[0-9]+$", structure.structure_id)
+    ]
+    output += "<h2>Templates</h2>"
+    for template in templates:
+        activation = last_value_of_dict(template.activation)
         output += (
-            f"{correspondence.perceptlet_id}: "
-            + f"{correspondence.first_argument} "
-            + f"--> {correspondence.second_argument} "
+            f"{template.structure_id}: {template.value} (activation: {activation})"
         )
-        for connection in correspondence.connections.all():
-            if re.match(r"^Label*", connection.perceptlet_id):
-                output += f"({connection.value})"
         output += "<br>"
     return HttpResponse(output)
 
 
-def coderack_population_view(request, run_id):
+def run_summary_graphs_view(request, run_id):
+    pyplot.clf()
+    figure, charts = pyplot.subplots(nrows=1, ncols=2, figsize=(14, 5))
+    figure.suptitle("Run Summary")
+
     coderack_record = CoderackRecord.objects.get(run_id=run_id)
     x = coderack_record.codelets_run
     y = coderack_record.population
-    pyplot.clf()
-    pyplot.title("Coderack Population")
-    pyplot.xlabel("Codelets Run")
-    pyplot.ylabel("Codelets on Rack")
-    pyplot.plot(x, y)
+    charts[0].set_title("Coderack Population")
+    charts[0].set(xlabel="Codelets Run", ylabel="Codelets on Rack")
+    charts[0].plot(x, y)
+
+    x = coderack_record.codelets_run
+    y = coderack_record.satisfaction
+    charts[1].set_title("Bubble Chamber Satisfaction")
+    charts[1].set(xlabel="Codelets Run", ylabel="Satisfaction")
+    charts[1].plot(x, y)
+    charts[1].plot(0, 1)
+
     buf = io.BytesIO()
-    pyplot.savefig(buf, format="svg", bbox_inches="tight")
+    figure.savefig(buf, format="svg", bbox_inches="tight")
+    svg = buf.getvalue()
+    buf.close()
+    return HttpResponse(svg, content_type="image/svg+xml")
+
+
+def activity_and_structure_concepts_view(request, run_id):
+    build_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="build"
+    )
+    evaluate_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="evaluate"
+    )
+    select_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="select"
+    )
+    chunk_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="chunk"
+    )
+    correspondence_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="correspondence"
+    )
+    label_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="label"
+    )
+    relation_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="relation"
+    )
+    view_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="view"
+    )
+    word_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="word"
+    )
+    build_relations = (
+        build_record.links.filter(~Q(end=evaluate_record))
+        .filter(~Q(end=build_record))
+        .all()
+    )
+    evaluate_relations = (
+        evaluate_record.links.filter(~Q(end=select_record))
+        .filter(~Q(end=evaluate_record))
+        .all()
+    )
+    select_relations = (
+        select_record.links.filter(~Q(end=build_record))
+        .filter(~Q(end=select_record))
+        .all()
+    )
+
+    pyplot.clf()
+    figure, charts = pyplot.subplots(nrows=2, ncols=3, figsize=(22, 10))
+    figure.suptitle("Activity and Structure Concept Activations")
+
+    for concept_record in [build_record, evaluate_record, select_record]:
+        data = [
+            (int(codelets_run), activation)
+            for codelets_run, activation in concept_record.activation.items()
+        ]
+        data.sort()
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
+        charts[0, 0].plot(x, y, label=concept_record.value)
+    charts[0, 0].set_title("Activity Concept Activations")
+    charts[0, 0].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[0, 0].legend(loc="best")
+
+    for concept_record in [
+        chunk_record,
+        correspondence_record,
+        label_record,
+        relation_record,
+        view_record,
+        word_record,
+    ]:
+        data = [
+            (int(codelets_run), activation)
+            for codelets_run, activation in concept_record.activation.items()
+        ]
+        data.sort()
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
+        charts[0, 1].plot(x, y, label=concept_record.value)
+    charts[0, 1].set_title("Structure Concept Activations")
+    charts[0, 1].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[0, 1].legend(loc="best")
+
+    for relation in build_relations:
+        data = [
+            (int(codelets_run), activation)
+            for codelets_run, activation in relation.activation.items()
+        ]
+        data.sort()
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
+        charts[1, 0].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[1, 0].set_title("Activations of build-structure links")
+    charts[1, 0].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[1, 0].legend(loc="best")
+
+    for relation in evaluate_relations:
+        data = [
+            (int(codelets_run), activation)
+            for codelets_run, activation in relation.activation.items()
+        ]
+        data.sort()
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
+        charts[1, 1].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[1, 1].set_title("Activations of evaluate-structure links")
+    charts[1, 1].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[1, 1].legend(loc="best")
+
+    for relation in select_relations:
+        data = [
+            (int(codelets_run), activation)
+            for codelets_run, activation in relation.activation.items()
+        ]
+        data.sort()
+        x = [codelets_run for codelets_run, _ in data]
+        y = [activation for _, activation in data]
+        charts[1, 2].plot(x, y, label=f"{relation.start.value}-{relation.end.value}")
+    charts[1, 2].set_title("Activations of select-structure links")
+    charts[1, 2].set(xlabel="Codelets Run", ylabel="Activation")
+    charts[1, 2].legend(loc="best")
+
+    buf = io.BytesIO()
+    figure.savefig(buf, format="svg", bbox_inches="tight")
     svg = buf.getvalue()
     buf.close()
     return HttpResponse(svg, content_type="image/svg+xml")
@@ -159,8 +326,34 @@ def codelets_view(request, run_id):
         .filter(~Q(time_run=None))
         .order_by("time_run")
     )
-    output = "<h1>Codelets in order run</h1>"
+    unrun_codelet_records = (
+        CodeletRecord.objects.filter(run_id=run_id)
+        .filter(time_run=None)
+        .order_by("birth_time")
+    )
+
+    output = "<h1>Codelets</h1>"
+
+    codelet_type_counts = defaultdict(int)
+    for record in codelet_records:
+        codelet_type_counts[record.codelet_type] += 1
+    output += "<h2>Number of Codelets Run By Type</h2>"
     output += "<ul>"
+    for codelet_type, count in codelet_type_counts.items():
+        output += f"<li>{codelet_type}: {count}</li>"
+    output += "</ul>"
+
+    unrun_codelet_type_counts = defaultdict(int)
+    for record in unrun_codelet_records:
+        unrun_codelet_type_counts[record.codelet_type] += 1
+    output += "<h2>Number of Codelets Spawned But Not Run By Type</h2>"
+    output += "<ul>"
+    for codelet_type, count in unrun_codelet_type_counts.items():
+        output += f"<li>{codelet_type}: {count}</li>"
+    output += "</ul>"
+
+    output += "<h2>Codelets in order run</h2>"
+    output += "<ol>"
     output += "".join(
         [
             '<li><a href="'
@@ -171,7 +364,7 @@ def codelets_view(request, run_id):
             for codelet in codelet_records
         ]
     )
-    output += "</ul>"
+    output += "</ol>"
     return HttpResponse(output)
 
 
@@ -182,15 +375,15 @@ def codelet_view(request, run_id, codelet_id):
     output += "<li>Birth Time: " + str(codelet_record.birth_time) + "</li>"
     output += "<li>Time Run: " + str(codelet_record.time_run) + "</li>"
     output += "<li>Urgency: " + str(codelet_record.urgency) + "</li>"
-    output += "<li>Target Perceptlet: "
-    if codelet_record.target_perceptlet is not None:
+    output += "<li>Target Structure: "
+    if codelet_record.target_structure is not None:
         output += (
             '<a href="/runs/'
             + str(run_id)
-            + "/perceptlets/"
-            + codelet_record.target_perceptlet.perceptlet_id
+            + "/structures/"
+            + codelet_record.target_structure.structure_id
             + '/">'
-            + codelet_record.target_perceptlet.perceptlet_id
+            + codelet_record.target_structure.structure_id
             + "</a></li>"
         )
     else:
@@ -208,194 +401,303 @@ def codelet_view(request, run_id, codelet_id):
         )
     else:
         output += "None</li>"
-    output += "<li>Follow up: "
+    output += "<li>Follow ups: "
     try:
-        follow_up = CodeletRecord.objects.get(run_id=run_id, parent=codelet_record)
-        output += (
-            '<a href="/runs/'
-            + str(run_id)
-            + "/codelets/"
-            + follow_up.codelet_id
-            + '/">'
-            + follow_up.codelet_id
-            + "</a></li>"
-        )
+        follow_ups = CodeletRecord.objects.filter(run_id=run_id, parent=codelet_record)
+        output += "<ul>"
+        for follow_up in follow_ups:
+            output += (
+                '<li><a href="/runs/'
+                + str(run_id)
+                + "/codelets/"
+                + follow_up.codelet_id
+                + '/">'
+                + follow_up.codelet_id
+                + "</a></li>"
+            )
+        output += "</ul></li>"
     except CodeletRecord.DoesNotExist:
         output += "None</li>"
-    output += "<li>Child Perceptlet: "
+    output += "<li>Child Structures: "
     try:
-        child_perceptlet = PerceptletRecord.objects.get(
+        child_structures = StructureRecord.objects.filter(
             run_id=run_id, parent_codelet=codelet_record.id
         )
-        output += (
-            '<a href="/runs/'
-            + str(run_id)
-            + "/perceptlets/"
-            + child_perceptlet.perceptlet_id
-            + '/">'
-            + child_perceptlet.perceptlet_id
-            + "</a></li>"
-        )
-    except PerceptletRecord.DoesNotExist:
+        output += "<ul>"
+        for child_structure in child_structures:
+            output += (
+                '<li><a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + child_structure.structure_id
+                + '/">'
+                + child_structure.structure_id
+                + "</a></li>"
+            )
+        output += "</ul></li>"
+    except StructureRecord.DoesNotExist:
         output += "None</li>"
     output += "</ul>"
     return HttpResponse(output)
 
 
-def concepts_view(request, run_id):
-    concept_records = ConceptRecord.objects.filter(run_id=run_id).order_by("name")
-    output = "<h1>Concepts</h1>"
-    output += "<ul>"
-    output += "".join(
-        [
-            '<li><a href="' + concept.concept_id + '">' + concept.name + "</a></li>"
-            for concept in concept_records
-        ]
+def structures_view(request, run_id):
+    structure_records = StructureRecord.objects.filter(run_id=run_id).order_by(
+        "structure_id"
     )
-    output += "</ul>"
-    return HttpResponse(output)
-
-
-def concept_view(request, run_id, concept_id):
-    concept_record = ConceptRecord.objects.get(run_id=run_id, concept_id=concept_id)
-    output = "<h1>" + concept_id + "</h1>"
-    output += f'<img src="/runs/{run_id}/concepts/{concept_id}/activation">'
-    output += "<ul>"
-    output += "<li>Activation: " + str(concept_record.activation) + "</li>"
-    output += "</ul>"
-    return HttpResponse(output)
-
-
-def concept_activation_view(request, run_id, concept_id):
-    concept_record = ConceptRecord.objects.get(run_id=run_id, concept_id=concept_id)
-    x = [i for i, j in concept_record.activation]
-    y = [numpy.mean(numpy.array(j)) for i, j in concept_record.activation]
-    pyplot.clf()
-    name = concept_record.name.upper()
-    pyplot.title(f"{name} activation")
-    pyplot.xlabel("Codelets Run")
-    pyplot.ylabel("Concept Activation")
-    pyplot.plot(x, y)
-    buf = io.BytesIO()
-    pyplot.savefig(buf, format="svg", bbox_inches="tight")
-    svg = buf.getvalue()
-    buf.close()
-    return HttpResponse(svg, content_type="image/svg+xml")
-
-
-def perceptlets_view(request, run_id):
-    perceptlet_records = PerceptletRecord.objects.filter(run_id=run_id).order_by(
-        "perceptlet_id"
-    )
-    output = "<h1>Perceptlets</h1>"
+    output = "<h1>Structures</h1>"
     output += "<ul>"
     output += "".join(
         [
             '<li><a href="'
-            + perceptlet.perceptlet_id
+            + structure.structure_id
             + '">'
-            + perceptlet.perceptlet_id
+            + structure.structure_id
             + "</a></li>"
-            for perceptlet in perceptlet_records
+            for structure in structure_records
         ]
     )
     output += "</ul>"
     return HttpResponse(output)
 
 
-def perceptlet_view(request, run_id, perceptlet_id):
-    perceptlet_record = PerceptletRecord.objects.get(
-        run_id=run_id, perceptlet_id=perceptlet_id
+def structure_view(request, run_id, structure_id):
+    structure_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id=structure_id
     )
-    output = "<h1>" + perceptlet_id + "</h1>"
+    output = "<h1>" + structure_id + "</h1>"
     output += "<ul>"
-    output += "<li>Birth Time: " + str(perceptlet_record.time_created) + "</li>"
-    output += "<li>Value: " + perceptlet_record.value + "</li>"
-    output += "<li>Location: " + str(perceptlet_record.location) + "</li>"
-    if perceptlet_record.parent_codelet is not None:
+    output += "<li>Birth Time: " + str(structure_record.time_created) + "</li>"
+    output += f"<li>Value: {structure_record.value}</li>"
+    output += "<li>Location: " + str(structure_record.location) + "</li>"
+    if structure_record.parent_codelet is not None:
         output += (
             '<li>Parent Codelet: <a href="/runs/'
             + str(run_id)
             + "/codelets/"
-            + perceptlet_record.parent_codelet.codelet_id
+            + structure_record.parent_codelet.codelet_id
             + '">'
-            + perceptlet_record.parent_codelet.codelet_id
+            + structure_record.parent_codelet.codelet_id
             + "</a></li>"
         )
     else:
         output += "<li>Parent Codelet: None</li>"
-    if perceptlet_record.parent_concept is not None:
+    if structure_record.parent_concept is not None:
         output += (
             '<li>Parent Concept: <a href="/runs/'
             + str(run_id)
             + "/concepts/"
-            + perceptlet_record.parent_concept.concept_id
+            + structure_record.parent_concept.structure_id
             + '">'
-            + perceptlet_record.parent_concept.concept_id
+            + structure_record.parent_concept.structure_id
             + "</a></li>"
         )
     else:
         output += "<li>Parent Concept: None</li>"
-    if perceptlet_record.connections is None:
-        output += "<li>Connections: None</li>"
+    if structure_record.links is None:
+        output += "<li>Links: None</li>"
     else:
-        output += "<li>Connections: " + ", ".join(
+        output += "<li>Links: " + ", ".join(
             [
                 '<a href="/runs/'
                 + str(run_id)
-                + "/perceptlets/"
-                + connection.perceptlet_id
+                + "/structures/"
+                + link.structure_id
                 + '">'
-                + connection.perceptlet_id
+                + link.structure_id
                 + "</a>"
-                for connection in perceptlet_record.connections.all()
+                for link in structure_record.links.all()
             ]
         )
         output += "</li>"
-    output += "<li>Activation: " + str(perceptlet_record.activation) + "</li>"
-    output += "<li>Unhappiness : " + str(perceptlet_record.unhappiness) + "</li>"
-    output += "<li>Quality: " + str(perceptlet_record.quality) + "</li>"
+    output += (
+        "<li>Final Activation: "
+        + str(last_value_of_dict(structure_record.activation))
+        + "</li>"
+    )
+    output += (
+        "<li>Final Unhappiness : "
+        + str(last_value_of_dict(structure_record.unhappiness))
+        + "</li>"
+    )
+    output += (
+        "<li>Final Quality: "
+        + str(last_value_of_dict(structure_record.quality))
+        + "</li>"
+    )
     output += "</ul>"
-    if re.match(r"^Group*", perceptlet_record.perceptlet_id):
-        perceptlet_records = PerceptletRecord.objects.filter(run_id=run_id).all()
+    output += f'<img src="/runs/{run_id}/structures-series/{structure_id}">'
+    if re.match(r"^Chunk*", structure_record.structure_id):
+        structure_records = StructureRecord.objects.filter(run_id=run_id).all()
         last_column = 0
         last_row = 0
-        raw_perceptlets = []
-        for record in perceptlet_records:
-            if not re.match("^RawPerceptlet", record.perceptlet_id):
+        original_chunks = []
+        for record in structure_records:
+            if not re.match("^Chunk", record.structure_id):
                 continue
-            raw_perceptlets.append(record)
-            if record.location[1] > last_row:
-                last_row = record.location[1]
-            if record.location[2] > last_column:
-                last_column = record.location[2]
-        raw_perceptlets_matrix = [
+            if record.parent_codelet is not None:
+                continue
+            original_chunks.append(record)
+            if record.location[0] > last_row:
+                last_row = record.location[0]
+            if record.location[1] > last_column:
+                last_column = record.location[1]
+        original_chunks_matrix = [
             [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
         ]
-        for raw_perceptlet in raw_perceptlets:
-            row = raw_perceptlet.location[1]
-            column = raw_perceptlet.location[2]
-            raw_perceptlets_matrix[row][column] = raw_perceptlet
+        for original_chunk in original_chunks:
+            row = original_chunk.location[0]
+            column = original_chunk.location[1]
+            original_chunks_matrix[row][column] = original_chunk
+        output += "<h2>Members</h2>"
         output += '<table border="1">'
         for i in range(last_row + 1):
             output += "<tr>"
             for j in range(last_column + 1):
-                if perceptlet_record in raw_perceptlets_matrix[i][j].connections.all():
+                if (
+                    original_chunks_matrix[i][j] in structure_record.members.all()
+                    or original_chunks_matrix[i][j] == structure_record
+                ):
                     output += '<td style="background-color: coral;">'
                 else:
                     output += "<td>"
-                output += str(raw_perceptlets_matrix[i][j].value)
+                output += str(original_chunks_matrix[i][j].value)
                 output += "</td>"
             output += "</tr>"
         output += "</table>"
-    output += "<h2>History</h2>"
-    updates = PerceptletUpdateRecord.objects.filter(
-        run_id=run_id, perceptlet=perceptlet_record
-    ).order_by("time")
-    for update in updates:
-        output += (
-            f"<p>{update.time}: {update.action} by "
-            + f'<a href="/runs/{run_id}/codelets/{update.codelet.codelet_id}">'
-            + f"{update.codelet.codelet_id}</a>.</p>"
+    output += "<h2>History of Events</h2>"
+    events = (
+        EventRecord.objects.filter(run_id=run_id)
+        .filter(
+            Q(child_structure=structure_record)
+            | Q(target_one=structure_record)
+            | Q(target_two=structure_record)
+            | Q(winner=structure_record)
+            | Q(loser=structure_record)
         )
+        .order_by("event_time")
+    )
+    for event in events:
+        one = event.target_one.structure_id if event.target_one is not None else None
+        two = event.target_two.structure_id if event.target_two is not None else None
+        child = (
+            event.child_structure.structure_id
+            if event.child_structure is not None
+            else None
+        )
+        winner = event.winner.structure_id if event.winner is not None else None
+        loser = event.loser.structure_id if event.loser is not None else None
+        codelet = event.codelet.codelet_id
+        if event.codelet.result != 0:
+            continue
+        output += f"<p>{event.event_time}: ({event.event_type}) "
+        if (
+            "ChunkBuilder" in event.codelet.codelet_id
+            or "ViewBuilder" in event.codelet.codelet_id
+        ):
+            output += (
+                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> created out of '
+                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
+                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
+                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+            )
+        if "LabelBuilder" in event.codelet.codelet_id:
+            output += (
+                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> '
+                + f"({event.child_structure.value}) attached to "
+                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> by '
+                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>'
+            )
+        if (
+            "RelationBuilder" in event.codelet.codelet_id
+            or "CorrespondenceBuilder" in event.codelet.codelet_id
+        ):
+            output += (
+                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> drawn between '
+                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
+                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
+                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+            )
+        if "Evaluator" in event.codelet.codelet_id:
+            output += (
+                f'<a href="/runs/{run_id}/structures/{one}">{one}</a> evaluated by '
+                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+            )
+        if "Selector" in event.codelet.codelet_id:
+            output += (
+                f'<a href="/runs/{run_id}/structures/{winner}">{winner}</a> selected over '
+                + f'<a href="/runs/{run_id}/structures/{loser}">{loser}</a> by '
+                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+            )
+        output += "</p>"
+
     return HttpResponse(output)
+
+
+def structure_graphs_view(request, run_id, structure_id):
+    def add_ends_to_series(series: dict):
+        # if "0" not in series:
+        #    series[str(first_key_of_dict(series) - 1)] = 0.0
+        #    series["0"] = 0.0
+        coderack_record = CoderackRecord.objects.get(run_id=run_id)
+        codelets_run = str(coderack_record.codelets_run[-1])
+        if codelets_run not in series:
+            series[codelets_run] = last_value_of_dict(series)
+        return series
+
+    structure_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id=structure_id
+    )
+    quality_series = add_ends_to_series(structure_record.quality)
+    activation_series = add_ends_to_series(structure_record.activation)
+    unhappiness_series = add_ends_to_series(structure_record.unhappiness)
+
+    pyplot.clf()
+    figure, charts = pyplot.subplots(nrows=1, ncols=3, figsize=(22, 5))
+    figure.suptitle("Structure Metrics")
+
+    quality_data = [
+        (int(codelets_run), quality) for codelets_run, quality in quality_series.items()
+    ]
+    quality_data.sort()
+    x = [codelets_run for codelets_run, _ in quality_data]
+    y = [quality for _, quality in quality_data]
+    charts[0].plot(x, y)
+    charts[0].plot(0, 0)
+    charts[0].plot(0, 1)
+    charts[0].set_title("Quality")
+    charts[0].set(xlabel="Codelets Run", ylabel="Quality")
+
+    activation_data = [
+        (int(codelets_run), activation)
+        for codelets_run, activation in activation_series.items()
+    ]
+    activation_data.sort()
+    x = [codelets_run for codelets_run, _ in activation_data]
+    y = [activation for _, activation in activation_data]
+    charts[1].plot(x, y)
+    charts[1].plot(0, 0)
+    charts[1].plot(0, 1)
+    charts[1].set_title("Activation")
+    charts[1].set(xlabel="Codelets Run", ylabel="Activation")
+
+    unhappiness_data = [
+        (int(codelets_run), unhappiness)
+        for codelets_run, unhappiness in unhappiness_series.items()
+    ]
+    print(unhappiness_data)
+    unhappiness_data.sort()
+    print(unhappiness_data)
+    x = [codelets_run for codelets_run, _ in unhappiness_data]
+    y = [unhappiness for _, unhappiness in unhappiness_data]
+    charts[2].plot(x, y)
+    charts[2].plot(0, 0)
+    charts[2].plot(0, 1)
+    charts[2].set_title("Unhappiness")
+    charts[2].set(xlabel="Codelets Run", ylabel="Unhappiness")
+
+    buf = io.BytesIO()
+    figure.savefig(buf, format="svg", bbox_inches="tight")
+    svg = buf.getvalue()
+    buf.close()
+    return HttpResponse(svg, content_type="image/svg+xml")

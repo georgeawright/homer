@@ -1,75 +1,107 @@
+from abc import abstractmethod, abstractproperty
 import random
-import statistics
 
 from homer.bubble_chamber import BubbleChamber
-from homer.bubbles import Perceptlet
-from homer.bubbles.concepts.perceptlet_type import PerceptletType
 from homer.codelet import Codelet
-from homer.hyper_parameters import HyperParameters
+from homer.codelet_result import CodeletResult
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 
 
 class Selector(Codelet):
-
-    CONFIDENCE_THRESHOLD = HyperParameters.SELECTOR_CONFIDENCE_THRESHOLD
-    SELECTION_RANDOMNESS = HyperParameters.SELECTION_RANDOMNESS
-
     def __init__(
         self,
-        bubble_chamber: BubbleChamber,
-        perceptlet_type: PerceptletType,
-        target_type: PerceptletType,
-        champion: Perceptlet,
-        urgency: float,
+        codelet_id: str,
         parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero,
     ):
-        parent_concept = None
-        Codelet.__init__(
-            self,
-            bubble_chamber,
-            perceptlet_type,
-            parent_concept,
-            champion,
-            urgency,
-            parent_id,
-        )
-        self.target_type = target_type
-        self.champion = champion
+        Codelet.__init__(self, codelet_id, parent_id, urgency)
+        self.bubble_chamber = bubble_chamber
+        self.champion = None
+        self.challenger = None
+        self.winner = None
+        self.loser = None
+        self.confidence = 0.0
 
-    def _fizzle(self):
-        self.perceptlet_type.activation.decay(self.location)
-        return None
+    def run(self) -> CodeletResult:
+        if not self._passes_preliminary_checks():
+            self._fizzle()
+            self._decay_activations()
+            self.result = CodeletResult.FIZZLE
+            return self.result
+        if self.challenger is not None:
+            self._hold_competition()
+            self._boost_winner()
+            self._decay_loser()
+        else:
+            self._boost_champion()
+        self._boost_activations()
+        self._engender_follow_up()
+        self.result = CodeletResult.SUCCESS
+        return self.result
 
-    def _fail(self):
-        self.perceptlet_type.activation.decay(self.location)
-        return None
+    def _hold_competition(self):
+        champ_size_adjusted_quality = self.champion.quality * self.champion.size
+        chall_size_adjusted_quality = self.challenger.quality * self.challenger.size
+        total_quality = champ_size_adjusted_quality + chall_size_adjusted_quality
+        try:
+            champ_normalized_quality = champ_size_adjusted_quality / total_quality
+        except ZeroDivisionError:
+            champ_normalized_quality = 0.0
+        choice = random.random()
+        if choice < champ_normalized_quality:
+            self.winner, self.loser = self.champion, self.challenger
+            self.confidence = FloatBetweenOneAndZero(
+                champ_size_adjusted_quality - chall_size_adjusted_quality
+            )
+        else:
+            self.loser, self.winner = self.champion, self.challenger
+            self.confidence = FloatBetweenOneAndZero(
+                chall_size_adjusted_quality - champ_size_adjusted_quality
+            )
+        if self.challenger.activation > self.champion.activation:
+            tmp = self.champion
+            self.champion = self.challenger
+            self.challenger = tmp
 
-    def _calculate_confidence(self):
-        champion_score = (
-            self.champion.quality * (1 - self.SELECTION_RANDOMNESS)
-            + random.random() * self.SELECTION_RANDOMNESS
-        )
-        challenger_score = (
-            self.challenger.quality * (1 - self.SELECTION_RANDOMNESS)
-            + random.random() * self.SELECTION_RANDOMNESS
-        )
-        self.confidence = champion_score - challenger_score
+    @property
+    def _parent_link(self):
+        return self._structure_concept.relations_with(self._select_concept).get_random()
 
-    def _process_perceptlet(self):
+    @property
+    def _select_concept(self):
+        return self.bubble_chamber.concepts["select"]
+
+    @abstractproperty
+    def _structure_concept(self):
+        pass
+
+    def _boost_activations(self):
+        self._select_concept.boost_activation(self.confidence)
+        self._parent_link.boost_activation(self.confidence)
+
+    def _decay_activations(self):
+        self._select_concept.decay_activation()
+        self._parent_link.decay_activation(1 - self.confidence)
+
+    def _boost_winner(self):
+        self.winner.boost_activation(self.confidence)
+
+    def _decay_loser(self):
+        self.loser.decay_activation(self.confidence)
+
+    def _boost_champion(self):
+        self.confidence = self.champion.quality
         self.champion.boost_activation(self.confidence)
-        self.challenger.decay_activation(self.confidence)
-        self.bubble_chamber.logger.log_perceptlet_update(
-            self, self.champion, "Activation updated"
-        )
-        self.bubble_chamber.logger.log_perceptlet_update(
-            self, self.challenger, "Activation updated"
-        )
-        self.target_type.activation.decay(self.location)
-        satisfaction = statistics.fmean(
-            [
-                self.champion.activation.as_scalar() * self.champion.quality,
-                self.challenger.activation.as_scalar() * self.challenger.quality,
-            ]
-        )
-        self.bubble_chamber.concept_space["satisfaction"].activation.boost(
-            satisfaction, self.location
-        )
+
+    @abstractmethod
+    def _passes_preliminary_checks(self):
+        pass
+
+    @abstractmethod
+    def _fizzle(self):
+        pass
+
+    @abstractmethod
+    def _engender_follow_up(self):
+        pass

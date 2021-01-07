@@ -1,19 +1,23 @@
+import pytest
 from unittest.mock import Mock
 
 from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.codelets.selectors import CorrespondenceSelector
 
 
-def test_engender_follow_up():
-    target_correspondence = Mock()
-    target_correspondence.location = [0, 0, 0]
+@pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
+def test_changes_target_structure_quality(current_quality, classification):
     bubble_chamber = Mock()
-    bubble_chamber.concept_space = {"correspondence-selection": Mock()}
-    collection = Mock()
-    collection.get_most_active.side_effect = [target_correspondence]
-    bubble_chamber.workspace.correspondences.at.side_effect = [collection]
+    bubble_chamber.concepts = {"evaluate": Mock(), "correspondence": Mock()}
+    concept = Mock()
+    concept.classifier.classify.return_value = classification
+    correspondence = Mock()
+    correspondence.quality = current_quality
+    correspondence.parent_concept = concept
     evaluator = CorrespondenceEvaluator(
-        bubble_chamber, Mock(), Mock(), target_correspondence, Mock(), Mock()
+        Mock(), Mock(), bubble_chamber, correspondence, Mock()
     )
-    follow_up = evaluator._engender_follow_up()
-    assert CorrespondenceSelector == type(follow_up)
+    evaluator.run()
+    assert classification == correspondence.quality
+    assert 1 == len(evaluator.child_codelets)
+    assert isinstance(evaluator.child_codelets[0], CorrespondenceSelector)
