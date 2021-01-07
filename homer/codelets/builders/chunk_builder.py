@@ -162,7 +162,6 @@ class ChunkBuilder(Builder):
             locations = []
             for chunk in chunks:
                 for _ in range(chunk.size):
-                    print(chunk.location_in_space(space))
                     locations.append(chunk.location_in_space(space))
             return Location.average(locations)
         locations = []
