@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Callable, Dict, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Concept, Space
@@ -46,6 +47,7 @@ class ConceptualSpace(Space):
             links_out=links_out,
         )
         self._instance = None
+        self._instances = {}
 
     @property
     def instance(self) -> WorkingSpace:
@@ -65,6 +67,46 @@ class ConceptualSpace(Space):
                 self.structure_id + "_working_space",
                 "",
                 self.name + " working",
+                self.parent_concept,
+                self,
+                locations,
+                StructureCollection(),
+                self.no_of_dimensions,
+                dimensions,
+                sub_spaces,
+                is_basic_level=self.is_basic_level,
+                super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
+                links_in=StructureCollection(),
+                links_out=StructureCollection(),
+            )
+        return self._instance
+
+    def instance_in_space(self, containing_space: Space) -> WorkingSpace:
+        if containing_space not in self._instances:
+            locations = [
+                Location(
+                    location.coordinates,
+                    location.space.instance_in_space(containing_space),
+                )
+                for location in self.locations
+                if location is not None
+            ]
+            dimensions = (
+                [
+                    dimension.instance_in_space(containing_space)
+                    for dimension in self.dimensions
+                ]
+                if self.no_of_dimensions > 1
+                else []
+            )
+            sub_spaces = [
+                sub_space.instance_in_space(containing_space)
+                for sub_space in self.sub_spaces
+            ]
+            self._instance = WorkingSpace(
+                ID.new(WorkingSpace),
+                "",
+                self.name + " IN " + containing_space.name,
                 self.parent_concept,
                 self,
                 locations,

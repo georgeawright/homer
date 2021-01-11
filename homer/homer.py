@@ -4,7 +4,7 @@ from homer import fuzzy
 from .bubble_chamber import BubbleChamber
 from .classifier import Classifier
 from .coderack import Coderack
-from .errors import NoMoreCodelets
+from .errors import MissingStructureError, NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .id import ID
@@ -256,6 +256,20 @@ class Homer:
             item.locations = [Location([i], template)]
             self.logger.log(item)
             if isinstance(item, TemplateSlot):
+                try:
+                    working_space = (
+                        template.contents.of_type(WorkingSpace)
+                        .where(parent_concept=item.value)
+                        .get_random()
+                    )
+                except MissingStructureError:
+                    conceptual_space = item.value.location.space
+                    working_space = conceptual_space.instance_in_space(template)
+                    working_space.locations.append(Location([], template))
+                    template.add(working_space)
+                item.locations.append(Location([], working_space))
+                working_space.add(item)
+                self.logger.log(item)
                 self.def_concept_link(item.value, item, activation=1.0, stable=True)
         self.logger.log(template)
         self.bubble_chamber.conceptual_spaces.add(template)
