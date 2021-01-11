@@ -103,6 +103,11 @@ class StructureCollection:
             {element for element in self.structures if isinstance(element, t)}
         )
 
+    def not_of_type(self, t: type) -> StructureCollection:
+        return StructureCollection(
+            {element for element in self.structures if not isinstance(element, t)}
+        )
+
     def proportion_with_label(self, concept):
         return self.number_with_label(concept) / len(self)
 
