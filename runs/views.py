@@ -385,12 +385,21 @@ def codelets_view(request, run_id):
 
 
 def codelet_view(request, run_id, codelet_id):
+    codelet_result_code_to_str = lambda code: {
+        0: "SUCCESS",
+        1: "FAIL",
+        2: "FIZZLE",
+        None: "N/A",
+    }[code]
     codelet_record = CodeletRecord.objects.get(run_id=run_id, codelet_id=codelet_id)
     output = "<h1>" + codelet_id + "</h1>"
     output += "<ul>"
     output += "<li>Birth Time: " + str(codelet_record.birth_time) + "</li>"
     output += "<li>Time Run: " + str(codelet_record.time_run) + "</li>"
     output += "<li>Urgency: " + str(codelet_record.urgency) + "</li>"
+    output += (
+        "<li>Result: " + codelet_result_code_to_str(codelet_record.result) + "</li>"
+    )
     output += "<li>Target Structure: "
     if codelet_record.target_structure is not None:
         output += (
