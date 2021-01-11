@@ -152,6 +152,22 @@ def run_view(request, run_id):
             output += "<br>"
         except AttributeError:
             pass  # relations with no parent space are links between concepts
+    correspondences = [
+        structure
+        for structure in structure_records
+        if re.match(r"^Correspondence*", structure.structure_id)
+    ]
+    output += "<h2>Correspondences</h2>"
+    for correspondence in correspondences:
+        output += (
+            f"{correspondence.structure_id}: "
+            + f"{correspondence.value}("
+            + f"{correspondence.conceptual_space.value}, "
+            + f"{correspondence.start.structure_id}, "
+            + f"{correspondence.end.structure_id}) "
+            + str(last_value_of_dict(correspondence.quality))
+        )
+        output += "<br>"
     templates = [
         structure
         for structure in structure_records
