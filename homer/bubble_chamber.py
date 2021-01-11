@@ -140,4 +140,5 @@ class BubbleChamber:
             super_space.name
         ] = lambda location: location.coordinates[space_one.no_of_dimensions :]
         self.working_spaces.add(super_space)
+        self.logger.log(super_space)
         return super_space

@@ -83,14 +83,7 @@ class ConceptualSpace(Space):
 
     def instance_in_space(self, containing_space: Space) -> WorkingSpace:
         if containing_space not in self._instances:
-            locations = [
-                Location(
-                    location.coordinates,
-                    location.space.instance_in_space(containing_space),
-                )
-                for location in self.locations
-                if location is not None
-            ]
+            locations = [Location([], containing_space)]
             dimensions = (
                 [
                     dimension.instance_in_space(containing_space)
@@ -103,7 +96,7 @@ class ConceptualSpace(Space):
                 sub_space.instance_in_space(containing_space)
                 for sub_space in self.sub_spaces
             ]
-            self._instance = WorkingSpace(
+            self._instances[containing_space] = WorkingSpace(
                 ID.new(WorkingSpace),
                 "",
                 self.name + " IN " + containing_space.name,
@@ -119,7 +112,7 @@ class ConceptualSpace(Space):
                 links_in=StructureCollection(),
                 links_out=StructureCollection(),
             )
-        return self._instance
+        return self._instances[containing_space]
 
     def update_activation(self):
         if len(self.contents) == 0:

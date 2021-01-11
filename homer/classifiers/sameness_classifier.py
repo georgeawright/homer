@@ -21,11 +21,15 @@ class SamenessClassifier(Classifier):
         if isinstance(start, Chunk) and isinstance(end, Chunk):
             if isinstance(start, Slot) or isinstance(end, Slot):
                 slot, chunk = (start, end) if isinstance(start, Slot) else (end, start)
-                return max(
-                    label.quality
-                    for label in chunk.labels
-                    if label.parent_concept.location.space in slot.value.child_spaces
-                )
+                try:
+                    return max(
+                        label.quality
+                        for label in chunk.labels
+                        if label.parent_concept.location.space
+                        in slot.value.child_spaces
+                    )
+                except ValueError:
+                    return 0.0
             common_correspondences = set.intersection(
                 {
                     correspondence

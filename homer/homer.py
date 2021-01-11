@@ -263,11 +263,14 @@ class Homer:
                         .get_random()
                     )
                 except MissingStructureError:
-                    conceptual_space = item.value.location.space
+                    conceptual_space = self.bubble_chamber.conceptual_spaces[
+                        item.value.name
+                    ]
                     working_space = conceptual_space.instance_in_space(template)
-                    working_space.locations.append(Location([], template))
+                    self.logger.log(working_space)
                     template.add(working_space)
-                item.locations.append(Location([], working_space))
+                filler_coordinates = [0 for _ in conceptual_space.dimensions]
+                item.locations.append(Location(filler_coordinates, working_space))
                 working_space.add(item)
                 self.logger.log(item)
                 self.def_concept_link(item.value, item, activation=1.0, stable=True)
