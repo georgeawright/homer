@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import statistics
-from typing import Callable, List
+from typing import Callable, Dict, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
@@ -16,13 +16,14 @@ class WorkingSpace(Space):
         parent_id: str,
         name: str,
         parent_concept: Concept,
+        conceptual_space: Space,
         locations: List[Location],
         contents: StructureCollection,
         no_of_dimensions: int,
         dimensions: List[WorkingSpace],
         sub_spaces: List[WorkingSpace],
         is_basic_level: bool = False,
-        coordinates_from_super_space_location: Callable = None,
+        super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -40,10 +41,11 @@ class WorkingSpace(Space):
             sub_spaces,
             quality,
             is_basic_level=is_basic_level,
-            coordinates_from_super_space_location=coordinates_from_super_space_location,
+            super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
         )
+        self.conceptual_space = conceptual_space
 
     @property
     def quality(self):
@@ -65,3 +67,13 @@ class WorkingSpace(Space):
             if len(self.contents) != 0
             else 0.0
         )
+
+    def location_from_super_space_location(self, location: Location) -> Location:
+        space = (
+            location.space.name
+            if location.space.conceptual_space is None
+            else location.space.conceptual_space.name
+        )
+        coordinates_function = self.super_space_to_coordinate_function_map[space]
+        coordinates = coordinates_function(location)
+        return Location(coordinates, self)

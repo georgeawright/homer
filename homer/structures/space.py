@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, List
+from typing import Any, Callable, Dict, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
@@ -22,7 +22,7 @@ class Space(Structure):
         sub_spaces: List[Space],
         quality: FloatBetweenOneAndZero,
         is_basic_level: bool = False,
-        coordinates_from_super_space_location: Callable = None,
+        super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -43,8 +43,10 @@ class Space(Structure):
         self._dimensions = dimensions
         self.sub_spaces = sub_spaces
         self.is_basic_level = is_basic_level
-        self.coordinates_from_super_space_location = (
-            coordinates_from_super_space_location
+        self.super_space_to_coordinate_function_map = (
+            (super_space_to_coordinate_function_map)
+            if super_space_to_coordinate_function_map is not None
+            else {}
         )
 
     @property
@@ -75,11 +77,11 @@ class Space(Structure):
         return relevant_value
 
     def location_from_super_space_location(self, location: Location) -> Location:
-        if self.coordinates_from_super_space_location is None:
-            raise Exception(
-                f"{self.structure_id} has no coordinates-from-super-space-location function"
-            )
-        return Location(self.coordinates_from_super_space_location(location), self)
+        coordinates_function = self.super_space_to_coordinate_function_map[
+            location.space.name
+        ]
+        coordinates = coordinates_function(location)
+        return Location(coordinates, self)
 
     def distance_between(self, a: Structure, b: Structure):
         return self.parent_concept.distance_between(a, b)

@@ -35,6 +35,7 @@ class CorrespondenceBuilder(Builder):
         self.target_structure_two = target_structure_two
         self.target_conceptual_space = target_conceptual_space
         self.parent_concept = parent_concept
+        self.parent_space = None
         self.child_structure = None
 
     @classmethod
@@ -80,8 +81,10 @@ class CorrespondenceBuilder(Builder):
     def _passes_preliminary_checks(self):
         if self.target_space_two is None:
             try:
-                self.target_space_two = self.bubble_chamber.working_spaces.get_active(
-                    exclude=[self.target_space_one]
+                self.target_space_two = (
+                    self.bubble_chamber.frames.get_active()
+                    .contents.of_type(WorkingSpace)
+                    .get_random()
                 )
             except MissingStructureError:
                 return False
@@ -95,17 +98,35 @@ class CorrespondenceBuilder(Builder):
         if self.target_conceptual_space is None:
             try:
                 self.target_conceptual_space = StructureCollection.intersection(
-                    self.bubble_chamber.spaces["label concepts"].child_spaces,
-                    self.target_structure_one.parent_spaces,
-                    self.target_structure_two.parent_spaces,
+                    self.bubble_chamber.spaces["label concepts"].contents.of_type(
+                        ConceptualSpace
+                    ),
+                    StructureCollection(
+                        {
+                            space.conceptual_space
+                            for space in self.target_structure_one.parent_spaces
+                            if space.conceptual_space is not None
+                        }
+                    ),
+                    StructureCollection(
+                        {
+                            space.conceptual_space
+                            for space in self.target_structure_two.parent_spaces
+                            if space.conceptual_space is not None
+                        }
+                    ),
                 ).get_random()
             except MissingStructureError:
                 return False
         if self.parent_concept is None:
-            self.parent_concept = self.bubble_chamber.spaces[
-                "correspondential concepts"
-            ].contents.get_random()
-        self.parent_space = self.bubble_chamber.common_parent_space(
+            self.parent_concept = (
+                self.bubble_chamber.spaces["correspondential concepts"]
+                .contents.of_type(ConceptualSpace)
+                .get_random()
+                .contents.of_type(Concept)
+                .get_random()
+            )
+        self.parent_space = self.bubble_chamber.get_super_space(
             self.target_space_one, self.target_space_two
         )
         return not self.target_structure_one.has_correspondence(
@@ -123,9 +144,6 @@ class CorrespondenceBuilder(Builder):
         )
 
     def _process_structure(self):
-        parent_space = self.bubble_chamber.common_parent_space(
-            self.target_space_one, self.target_space_two
-        )
         correspondence = Correspondence(
             ID.new(Correspondence),
             self.codelet_id,
@@ -134,7 +152,7 @@ class CorrespondenceBuilder(Builder):
             Location.for_correspondence_between(
                 self.target_structure_one.location_in_space(self.target_space_one),
                 self.target_structure_two.location_in_space(self.target_space_two),
-                parent_space,
+                self.parent_space,
             ),
             self.target_space_one,
             self.target_space_two,
@@ -142,7 +160,7 @@ class CorrespondenceBuilder(Builder):
             self.target_conceptual_space,
             0,
         )
-        parent_space.add(correspondence)
+        self.parent_space.add(correspondence)
         self.target_structure_one.links_in.add(correspondence)
         self.target_structure_one.links_out.add(correspondence)
         self.target_structure_two.links_in.add(correspondence)
@@ -151,7 +169,10 @@ class CorrespondenceBuilder(Builder):
         self.child_structure = correspondence
 
     def _engender_follow_up(self):
-        new_target = self.target_structure_one.nearby().get_unhappy()
+        try:
+            new_target = self.target_structure_one.nearby().get_unhappy()
+        except MissingStructureError:
+            return
         new_target_conceptual_space = self.bubble_chamber.spaces[
             "label concepts"
         ].contents.get_random(exclude=[self.target_conceptual_space])

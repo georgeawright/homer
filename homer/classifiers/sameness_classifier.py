@@ -3,6 +3,7 @@ import statistics
 from homer.classifier import Classifier
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structures import Chunk
+from homer.structures.chunks import Slot
 from homer.structures.links import Label, Relation
 
 
@@ -14,12 +15,17 @@ class SamenessClassifier(Classifier):
         start = arguments["start"]
         end = arguments["end"]
         sameness_concept = arguments["concept"]
-        if type(start) != type(end):
-            return FloatBetweenOneAndZero(0)
-        if isinstance(start, Label):
+        if isinstance(start, Label) and isinstance(end, Label):
             if start.parent_concept == end.parent_concept:
                 return statistics.fmean([start.quality, end.quality])
-        if isinstance(start, Chunk):
+        if isinstance(start, Chunk) and isinstance(end, Chunk):
+            if isinstance(start, Slot) or isinstance(end, Slot):
+                slot, chunk = (start, end) if isinstance(start, Slot) else (end, start)
+                return max(
+                    label.quality
+                    for label in chunk.labels
+                    if label.parent_concept.location.space in slot.value.child_spaces
+                )
             common_correspondences = set.intersection(
                 {
                     correspondence
@@ -42,7 +48,7 @@ class SamenessClassifier(Classifier):
                 )
             except statistics.StatisticsError:
                 return FloatBetweenOneAndZero(0)
-        if isinstance(start, Relation):
+        if isinstance(start, Relation) and isinstance(end, Relation):
             relation_starts_sameness = self.classify(
                 {
                     "start": start.start,

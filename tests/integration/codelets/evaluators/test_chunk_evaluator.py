@@ -27,6 +27,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chunk_concept = Concept(
@@ -72,6 +73,7 @@ def input_space(location_concept):
         Mock(),
         "input",
         location_concept,
+        Mock(),
         [],
         StructureCollection(),
         0,
@@ -123,6 +125,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
         Mock(),
         "temperature",
         temperature_concept,
+        Mock(),
         [],
         StructureCollection(),
         1,

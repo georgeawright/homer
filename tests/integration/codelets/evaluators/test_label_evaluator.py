@@ -28,6 +28,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     label_concept = Concept(
@@ -82,6 +83,7 @@ def input_space(location_concept):
         Mock(),
         Mock(),
         location_concept,
+        Mock(),
         [],
         Mock(),
         Mock(),
@@ -113,6 +115,7 @@ def temperature_space(temperature_concept):
         Mock(),
         Mock(),
         temperature_concept,
+        Mock(),
         [],
         Mock(),
         Mock(),

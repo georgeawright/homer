@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, List
+from typing import Callable, Dict, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
@@ -23,7 +23,7 @@ class ConceptualSpace(Space):
         dimensions: List[ConceptualSpace],
         sub_spaces: List[ConceptualSpace],
         is_basic_level: bool = False,
-        coordinates_from_super_space_location: Callable = None,
+        super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -41,7 +41,7 @@ class ConceptualSpace(Space):
             sub_spaces,
             quality,
             is_basic_level=is_basic_level,
-            coordinates_from_super_space_location=coordinates_from_super_space_location,
+            super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
         )
@@ -66,13 +66,14 @@ class ConceptualSpace(Space):
                 "",
                 self.name + " working",
                 self.parent_concept,
+                self,
                 locations,
                 StructureCollection(),
                 self.no_of_dimensions,
                 dimensions,
                 sub_spaces,
                 is_basic_level=self.is_basic_level,
-                coordinates_from_super_space_location=self.coordinates_from_super_space_location,
+                super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
                 links_in=StructureCollection(),
                 links_out=StructureCollection(),
             )

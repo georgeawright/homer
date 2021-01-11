@@ -63,6 +63,7 @@ class Homer:
             StructureCollection(),
             StructureCollection(),
             StructureCollection(),
+            StructureCollection(),
             logger,
         )
         bubble_chamber.lexemes = StructureCollection()
@@ -164,7 +165,7 @@ class Homer:
         dimensions: List[ConceptualSpace] = None,
         sub_spaces: List[ConceptualSpace] = None,
         is_basic_level: bool = False,
-        coordinates_from_super_space_location: Callable = None,
+        super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ) -> ConceptualSpace:
@@ -179,7 +180,7 @@ class Homer:
             dimensions=(dimensions if dimensions is not None else []),
             sub_spaces=(sub_spaces if sub_spaces is not None else []),
             is_basic_level=is_basic_level,
-            coordinates_from_super_space_location=coordinates_from_super_space_location,
+            super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
         )
@@ -258,7 +259,7 @@ class Homer:
                 self.def_concept_link(item.value, item, activation=1.0, stable=True)
         self.logger.log(template)
         self.bubble_chamber.conceptual_spaces.add(template)
-        self.bubble_chamber.spaces["templates"].add(template)
+        self.bubble_chamber.frames.add(template)
         return template
 
     def def_template_slot(self, concept: Concept = None, form: WordForm = None):
@@ -267,7 +268,7 @@ class Homer:
             parent_id="",
             prototype=concept,
             form=form,
-            location=None,
+            locations=[],
         )
         self.bubble_chamber.slots.add(slot)
         return slot
@@ -286,13 +287,14 @@ class Homer:
         self,
         name: str = "",
         parent_concept: Concept = None,
+        conceptual_space: ConceptualSpace = None,
         locations: List[Location] = None,
         contents: StructureCollection = None,
         no_of_dimensions: int = 0,
         dimensions: List[WorkingSpace] = None,
         sub_spaces: List[WorkingSpace] = None,
         is_basic_level: bool = False,
-        coordinates_from_super_space_location: Callable = None,
+        super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ) -> WorkingSpace:
@@ -301,13 +303,14 @@ class Homer:
             parent_id="",
             name=name,
             parent_concept=parent_concept,
+            conceptual_space=conceptual_space,
             locations=(locations if locations is not None else []),
             contents=(contents if contents is not None else StructureCollection()),
             no_of_dimensions=no_of_dimensions,
             dimensions=(dimensions if dimensions is not None else []),
             sub_spaces=(sub_spaces if sub_spaces is not None else []),
             is_basic_level=is_basic_level,
-            coordinates_from_super_space_location=coordinates_from_super_space_location,
+            super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
         )

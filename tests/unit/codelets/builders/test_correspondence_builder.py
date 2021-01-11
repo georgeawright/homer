@@ -10,22 +10,44 @@ from homer.structures.links import Correspondence
 
 
 @pytest.fixture
-def parent_concept():
+def same_concept():
     concept = Mock()
+    concept.name = "same"
     concept.classifier.classify.return_value = 1.0
     return concept
 
 
 @pytest.fixture
-def bubble_chamber(parent_concept):
+def same_different_space(same_concept):
+    space = Mock()
+    space.contents.of_type.return_value = StructureCollection({same_concept})
+    return space
+
+
+@pytest.fixture
+def label_concept_space():
+    return Mock()
+
+
+@pytest.fixture
+def label_concept_working_space(label_concept_space):
+    space = Mock()
+    space.conceptual_space = label_concept_space
+    return space
+
+
+@pytest.fixture
+def bubble_chamber(same_different_space, label_concept_space):
     chamber = Mock()
     chamber.concepts = {"correspondence": Mock(), "build": Mock()}
-    labeling_spaces = Mock()
-    labeling_spaces.child_spaces = StructureCollection({Mock(), Mock()})
+    label_concepts = Mock()
+    label_concepts.contents.of_type.return_value = StructureCollection(
+        {label_concept_space}
+    )
     correspondential_concepts = Mock()
-    correspondential_concepts.contents = StructureCollection({parent_concept})
-    target_structure_two = Mock()
-    target_structure_two.parent_spaces = labeling_spaces.child_spaces
+    correspondential_concepts.contents.of_type.return_value = StructureCollection(
+        {same_different_space}
+    )
     working_spaces = Mock()
     working_space = Mock()
     working_space_contents = Mock()
@@ -33,7 +55,7 @@ def bubble_chamber(parent_concept):
     working_space.contents.of_type.return_value = working_space_contents
     working_spaces.get_active.return_value = working_space
     chamber.spaces = {
-        "label concepts": labeling_spaces,
+        "label concepts": label_concepts,
         "correspondential concepts": correspondential_concepts,
     }
     chamber.working_spaces = working_spaces
@@ -41,17 +63,38 @@ def bubble_chamber(parent_concept):
 
 
 @pytest.fixture
-def target_structure_one(bubble_chamber):
+def target_space_two(bubble_chamber):
+    space = Mock()
+    space.name = "target_space_two"
+    template = Mock()
+    template.contents.of_type.return_value = StructureCollection({space})
+    bubble_chamber.frames.get_active.return_value = template
+    return space
+
+
+@pytest.fixture
+def target_structure_one(bubble_chamber, label_concept_working_space):
     structure = Mock()
     structure.has_correspondence.return_value = False
-    structure.parent_spaces = bubble_chamber.spaces["label concepts"].child_spaces
+    structure.parent_spaces = StructureCollection({label_concept_working_space})
+    return structure
+
+
+@pytest.fixture
+def target_structure_two(label_concept_working_space, target_space_two):
+    structure = Mock()
+    structure.name = "target_structure_two"
+    structure.parent_spaces = StructureCollection({label_concept_working_space})
+    target_space_two.contents.of_type.return_value = StructureCollection({structure})
     return structure
 
 
 def test_gets_second_target_space_and_structure_if_needed(
     bubble_chamber,
     target_structure_one,
-    parent_concept,
+    same_concept,
+    target_space_two,
+    target_structure_two,
 ):
     with patch.object(Location, "for_correspondence_between", return_value=Mock()):
         correspondence_builder = CorrespondenceBuilder(
@@ -61,19 +104,28 @@ def test_gets_second_target_space_and_structure_if_needed(
             Mock(),
             target_structure_one,
             Mock(),
-            parent_concept=parent_concept,
+            parent_concept=same_concept,
         )
         assert correspondence_builder.target_space_two is None
         assert correspondence_builder.target_structure_two is None
         correspondence_builder.run()
-        assert correspondence_builder.target_space_two is not None
-        assert correspondence_builder.target_structure_two is not None
+        assert correspondence_builder.target_space_two == target_space_two
+        assert correspondence_builder.target_structure_two == target_structure_two
 
 
-def test_gets_parent_concept_if_needed(bubble_chamber, target_structure_one):
+def test_gets_parent_concept_if_needed(
+    bubble_chamber, target_structure_one, target_space_two, target_structure_two
+):
     with patch.object(Location, "for_correspondence_between", return_value=Mock()):
         correspondence_builder = CorrespondenceBuilder(
-            Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            Mock(),
+            target_structure_one,
+            Mock(),
+            target_space_two=target_space_two,
+            target_structure_two=target_structure_two,
         )
         assert correspondence_builder.parent_concept is None
         correspondence_builder.run()
@@ -81,7 +133,11 @@ def test_gets_parent_concept_if_needed(bubble_chamber, target_structure_one):
 
 
 def test_successful_creates_chunk_and_spawns_follow_up(
-    bubble_chamber, target_structure_one, parent_concept
+    bubble_chamber,
+    target_structure_one,
+    same_concept,
+    target_space_two,
+    target_structure_two,
 ):
     with patch.object(Location, "for_correspondence_between", return_value=Mock()):
         correspondence_builder = CorrespondenceBuilder(
@@ -91,7 +147,9 @@ def test_successful_creates_chunk_and_spawns_follow_up(
             Mock(),
             target_structure_one,
             Mock(),
-            parent_concept=parent_concept,
+            target_space_two=target_space_two,
+            target_structure_two=target_structure_two,
+            parent_concept=same_concept,
         )
         result = correspondence_builder.run()
         assert CodeletResult.SUCCESS == result
@@ -102,7 +160,9 @@ def test_successful_creates_chunk_and_spawns_follow_up(
         )
 
 
-def test_fails_when_structures_do_not_correspond(bubble_chamber, target_structure_one):
+def test_fails_when_structures_do_not_correspond(
+    bubble_chamber, target_structure_one, target_space_two, target_structure_two
+):
     concept = Mock()
     concept.classifier.classify.return_value = 0.0
     correspondence_builder = CorrespondenceBuilder(
@@ -112,6 +172,8 @@ def test_fails_when_structures_do_not_correspond(bubble_chamber, target_structur
         Mock(),
         target_structure_one,
         Mock(),
+        target_space_two=target_space_two,
+        target_structure_two=target_structure_two,
         parent_concept=concept,
     )
     result = correspondence_builder.run()
@@ -121,14 +183,24 @@ def test_fails_when_structures_do_not_correspond(bubble_chamber, target_structur
     assert isinstance(correspondence_builder.child_codelets[0], RelationBuilder)
 
 
-def test_fizzles_when_correspondence_already_exists(bubble_chamber):
-    target_structure_one = Mock()
+def test_fizzles_when_correspondence_already_exists(
+    bubble_chamber,
+    target_structure_one,
+    target_space_two,
+    target_structure_two,
+    same_concept,
+):
     target_structure_one.has_correspondence.return_value = True
-    target_structure_one.parent_spaces = bubble_chamber.spaces[
-        "label concepts"
-    ].child_spaces
     correspondence_builder = CorrespondenceBuilder(
-        Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        Mock(),
+        target_structure_one,
+        Mock(),
+        target_space_two=target_space_two,
+        target_structure_two=target_structure_two,
+        parent_concept=same_concept,
     )
     result = correspondence_builder.run()
     assert CodeletResult.FIZZLE == result

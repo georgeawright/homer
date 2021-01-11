@@ -26,6 +26,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     label_concept = Concept(
@@ -69,7 +70,7 @@ def conceptual_space():
 @pytest.fixture
 def working_space():
     space = WorkingSpace(
-        Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 0, [], []
+        Mock(), Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 0, [], []
     )
     return space
 

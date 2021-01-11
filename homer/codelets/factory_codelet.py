@@ -99,16 +99,19 @@ class FactoryCodelet(Codelet):
                     "chunk": ChunkBuilder,
                     "label": LabelBuilder,
                     "relation": RelationBuilder,
+                    "correspondence": CorrespondenceBuilder,
                 },
                 "evaluate": {
                     "chunk": ChunkEvaluator,
                     "label": LabelEvaluator,
                     "relation": RelationEvaluator,
+                    "correspondence": CorrespondenceEvaluator,
                 },
                 "select": {
                     "chunk": ChunkSelector,
                     "label": LabelSelector,
                     "relation": RelationSelector,
+                    "correspondence": CorrespondenceSelector,
                 },
             }[action_type.name][structure_type.name]
         except KeyError:

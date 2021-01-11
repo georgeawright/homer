@@ -3,124 +3,29 @@ import pytest
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
-from homer.classifiers import DifferenceClassifier, ProximityClassifier
+from homer.classifiers import (
+    DifferenceClassifier,
+    ProximityClassifier,
+    SamenessClassifier,
+)
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
-from homer.structures.links import Correspondence, Relation
+from homer.structures.chunks.slots import TemplateSlot
+from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import ConceptualSpace, Frame, WorkingSpace
+from homer.structures.spaces.frames import Template
+from homer.word_form import WordForm
 
 
 @pytest.fixture
-def more_concept():
-    classifier = DifferenceClassifier(ProximityClassifier())
-    comparison_space = ConceptualSpace(
-        Mock(), Mock(), "comparison", StructureCollection(), Mock()
-    )
-    more = Concept(
-        Mock(),
-        Mock(),
-        "more",
-        [5],
-        classifier,
-        comparison_space,
-        Location([5], comparison_space),
-        "value",
-        StructureCollection(),
-        math.dist,
-    )
-    comparison_space.contents.add(more)
-    return more
-
-
-@pytest.fixture
-def location_concept():
-    concept = Concept(
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        "coordinates",
-        Mock(),
-        math.dist,
-    )
-    return concept
-
-
-@pytest.fixture
-def location_conceptual_space(location_concept):
-    space = ConceptualSpace(
-        Mock(), Mock(), "location", StructureCollection(), location_concept
-    )
-    return space
-
-
-@pytest.fixture
-def target_conceptual_space():
-    temperature = Concept(
-        Mock(),
-        Mock(),
-        "temperature",
-        None,
-        Mock(),
-        Mock(),
-        None,
-        "value",
-        StructureCollection(),
-        math.dist,
-    )
-    temperature_space = ConceptualSpace(
-        Mock(), Mock(), "temperature", StructureCollection(), temperature
-    )
-    return temperature_space
-
-
-@pytest.fixture
-def input_space(location_concept):
-    space = WorkingSpace(
-        Mock(), Mock(), "input", StructureCollection(), 0, location_concept
-    )
-    return space
-
-
-@pytest.fixture
-def active_frame():
-    frame = Frame(Mock(), Mock(), "frame", StructureCollection(), Mock())
-    return frame
-
-
-@pytest.fixture
-def bubble_chamber(
-    more_concept,
-    target_conceptual_space,
-    input_space,
-    active_frame,
-    location_conceptual_space,
-):
-    working_spaces = StructureCollection({input_space, active_frame})
-    correspondential_concepts_space = ConceptualSpace(
-        Mock(),
-        Mock(),
-        "correspondential concepts",
-        StructureCollection({more_concept}),
-        Mock(),
-    )
-    labeling_spaces = ConceptualSpace(
-        Mock(),
-        Mock(),
-        "label concepts",
-        Mock(),
-        Mock(),
-        child_spaces=[target_conceptual_space, location_conceptual_space],
-    )
+def bubble_chamber():
     chamber = BubbleChamber(
         StructureCollection(),
-        working_spaces,
+        StructureCollection(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -132,9 +37,6 @@ def bubble_chamber(
         StructureCollection(),
         Mock(),
     )
-    chamber.concepts.add(more_concept)
-    chamber.conceptual_spaces.add(correspondential_concepts_space)
-    chamber.conceptual_spaces.add(labeling_spaces)
     correspondence_concept = Concept(
         Mock(),
         Mock(),
@@ -166,69 +68,273 @@ def bubble_chamber(
     )
     correspondence_concept.links_out.add(relation)
     build_concept.links_in.add(relation)
+    label_concepts_space = ConceptualSpace(
+        "label concepts",
+        Mock(),
+        "label concepts",
+        None,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+    )
+    chamber.conceptual_spaces.add(label_concepts_space)
+    correspondential_concepts_space = ConceptualSpace(
+        "correspondential concepts",
+        Mock(),
+        "correspondential concepts",
+        None,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+    )
+    chamber.conceptual_spaces.add(correspondential_concepts_space)
+    top_level_space = ConceptualSpace(
+        "top level",
+        Mock(),
+        "top level",
+        None,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+    )
+    chamber.conceptual_spaces.add(top_level_space)
+    chamber.working_spaces.add(top_level_space.instance)
     return chamber
 
 
 @pytest.fixture
-def target_chunk(bubble_chamber, target_conceptual_space, input_space, active_frame):
-    parent_spaces = StructureCollection({input_space, target_conceptual_space})
+def same_different_concept(bubble_chamber):
+    same_different = Concept(
+        Mock(),
+        Mock(),
+        "same",
+        Location([], bubble_chamber.spaces["correspondential concepts"]),
+        Mock(),
+        "value",
+        StructureCollection(),
+        math.dist,
+    )
+    bubble_chamber.concepts.add(same_different)
+    bubble_chamber.spaces["correspondential concepts"].add(same_different)
+    return same_different
+
+
+@pytest.fixture
+def same_different_space(same_different_concept, bubble_chamber):
+    space = ConceptualSpace(
+        "same-different",
+        Mock(),
+        "same-different",
+        same_different_concept,
+        [Location([], bubble_chamber.spaces["correspondential concepts"])],
+        StructureCollection(),
+        1,
+        [],
+        [],
+    )
+    bubble_chamber.conceptual_spaces.add(space)
+    bubble_chamber.spaces["correspondential concepts"].add(space)
+    return space
+
+
+@pytest.fixture
+def same_concept(same_different_space, bubble_chamber):
+    concept = Concept(
+        Mock(),
+        Mock(),
+        "same",
+        Location([1], same_different_space),
+        SamenessClassifier(),
+        "value",
+        StructureCollection(),
+        math.dist,
+    )
+    same_different_space.add(concept)
+    bubble_chamber.concepts.add(concept)
+    return concept
+
+
+@pytest.fixture
+def temperature_concept(bubble_chamber):
+    temperature = Concept(
+        Mock(),
+        Mock(),
+        "temperature",
+        Location([], bubble_chamber.spaces["label concepts"]),
+        Mock(),
+        "value",
+        StructureCollection(),
+        math.dist,
+    )
+    bubble_chamber.concepts.add(temperature)
+    bubble_chamber.spaces["label concepts"].add(temperature)
+    return temperature
+
+
+@pytest.fixture
+def temperature_conceptual_space(temperature_concept, bubble_chamber):
+    space = ConceptualSpace(
+        "temperature",
+        Mock(),
+        "temperature",
+        temperature_concept,
+        [Location([], bubble_chamber.spaces["label concepts"])],
+        StructureCollection(),
+        1,
+        [],
+        [],
+    )
+    temperature_concept.child_spaces.add(space)
+    bubble_chamber.conceptual_spaces.add(space)
+    bubble_chamber.spaces["label concepts"].add(space)
+    return space
+
+
+@pytest.fixture
+def mild_concept(temperature_conceptual_space, bubble_chamber):
+    concept = Concept(
+        Mock(),
+        Mock(),
+        "mild",
+        Location([10], temperature_conceptual_space),
+        Mock(),
+        "value",
+        StructureCollection(),
+        math.dist,
+    )
+    temperature_conceptual_space.add(concept)
+    bubble_chamber.concepts.add(concept)
+    return concept
+
+
+@pytest.fixture
+def temperature_working_space(temperature_conceptual_space, bubble_chamber):
+    working_space = temperature_conceptual_space.instance
+    bubble_chamber.working_spaces.add(working_space)
+    return working_space
+
+
+@pytest.fixture
+def templates_space(bubble_chamber):
+    space = ConceptualSpace(
+        Mock(),
+        Mock(),
+        "templates",
+        None,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+    )
+    bubble_chamber.conceptual_spaces.add(space)
+    return space
+
+
+@pytest.fixture
+def template(templates_space, bubble_chamber):
+    template = Template(
+        Mock(),
+        Mock(),
+        "[temperature]",
+        None,
+        [Location([], templates_space)],
+        StructureCollection(),
+    )
+    bubble_chamber.frames.add(template)
+    return template
+
+
+@pytest.fixture
+def temperature_template_space(
+    temperature_concept, temperature_conceptual_space, template, bubble_chamber
+):
+    space = WorkingSpace(
+        Mock(),
+        Mock(),
+        "temperature space for template",
+        temperature_concept,
+        temperature_conceptual_space,
+        [Location([], template)],
+        StructureCollection(),
+        1,
+        [],
+        [],
+        is_basic_level=True,
+    )
+    template.add(space)
+    bubble_chamber.working_spaces.add(space)
+    return space
+
+
+@pytest.fixture
+def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
     chunk = Chunk(
         Mock(),
         Mock(),
         [10],
-        Location([0, 0], input_space),
+        [Location([10], temperature_working_space)],
         StructureCollection(),
-        0.0,
-        parent_spaces,
+        1.0,
     )
-    second_chunk = Chunk(
-        Mock(),
-        Mock(),
-        [5],
-        Location([0, 1], active_frame),
-        StructureCollection(),
-        0.0,
-        parent_spaces,
-    )
-    neighbouring_chunk = Chunk(
-        Mock(),
-        Mock(),
-        [5],
-        Location([1, 0], input_space),
-        StructureCollection(),
-        0.0,
-        parent_spaces,
-    )
+    temperature_working_space.add(chunk)
     bubble_chamber.chunks.add(chunk)
-    bubble_chamber.chunks.add(second_chunk)
-    bubble_chamber.chunks.add(neighbouring_chunk)
-    input_space.contents.add(chunk)
-    input_space.contents.add(neighbouring_chunk)
-    active_frame.contents.add(second_chunk)
-    chunk.parent_spaces.add(input_space)
-    neighbouring_chunk.parent_spaces.add(input_space)
-    second_chunk.parent_spaces.add(active_frame)
-    chunk.parent_spaces.add(target_conceptual_space)
-    second_chunk.parent_spaces.add(target_conceptual_space)
+    mild_label = Label(
+        Mock(), Mock(), chunk, mild_concept, temperature_working_space, 1.0
+    )
+    bubble_chamber.labels.add(mild_label)
+    chunk.links_out.add(mild_label)
+    nearby_chunk = Chunk(
+        Mock(),
+        Mock(),
+        [10],
+        [Location([10], temperature_working_space)],
+        StructureCollection(),
+        1.0,
+    )
+    temperature_working_space.add(nearby_chunk)
+    bubble_chamber.chunks.add(nearby_chunk)
     return chunk
 
 
-@pytest.mark.skip
+@pytest.fixture
+def target_slot(
+    temperature_concept, template, temperature_template_space, bubble_chamber
+):
+    slot = TemplateSlot(
+        Mock(),
+        Mock(),
+        temperature_concept,
+        WordForm.HEADWORD,
+        [Location([0], template), Location([None], temperature_template_space)],
+    )
+    temperature_template_space.add(slot)
+    bubble_chamber.slots.add(slot)
+    template.add(slot)
+    return Mock()
+
+
 def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_correspondence_cannot_be_recreated(
-    bubble_chamber, input_space, target_chunk
+    bubble_chamber, temperature_working_space, target_chunk, target_slot, same_concept
 ):
     parent_id = ""
     urgency = 1.0
-
     builder = CorrespondenceBuilder.spawn(
-        parent_id, bubble_chamber, input_space, target_chunk, urgency
+        parent_id, bubble_chamber, temperature_working_space, target_chunk, urgency
     )
     builder.run()
+    assert same_concept == builder.parent_concept
     assert CodeletResult.SUCCESS == builder.result
     assert isinstance(builder.child_structure, Correspondence)
     assert isinstance(builder.child_codelets[0], CorrespondenceBuilder)
     builder = CorrespondenceBuilder.spawn(
-        parent_id, bubble_chamber, input_space, target_chunk, urgency
+        parent_id, bubble_chamber, temperature_working_space, target_chunk, urgency
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

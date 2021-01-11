@@ -26,6 +26,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     correspondence_concept = Concept(
@@ -64,38 +65,46 @@ def bubble_chamber():
 
 @pytest.fixture
 def conceptual_space():
-    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), Mock())
+    space = ConceptualSpace(
+        Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 1, [], []
+    )
     return space
 
 
 @pytest.fixture
 def working_space():
-    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(
+        Mock(), Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 1, [], []
+    )
     return space
 
 
 @pytest.fixture
 def start_space():
-    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(
+        Mock(), Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 1, [], []
+    )
     return space
 
 
 @pytest.fixture
 def end_space():
-    space = WorkingSpace(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock())
+    space = WorkingSpace(
+        Mock(), Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 1, [], []
+    )
     return space
 
 
 @pytest.fixture
 def start(start_space):
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock())
     chunk.locations.append(Location([1, 1], start_space))
     return chunk
 
 
 @pytest.fixture
 def end():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock())
     return chunk
 
 
@@ -120,10 +129,10 @@ def good_correspondence(
         Mock(),
         start,
         end,
+        Location([], working_space),
         start_space,
         end_space,
         concept,
-        working_space,
         conceptual_space,
         1.0,
     )
@@ -159,33 +168,33 @@ def bad_correspondence(
         Mock(),
         start,
         end,
+        Location([], working_space),
         start_space,
         end_space,
         concept,
-        working_space,
         conceptual_space,
         0.0,
     )
+    correspondence._activation = 1.0
     start.links_out.add(correspondence)
     end.links_in.add(correspondence)
     working_space.contents.add(correspondence)
     return correspondence
 
 
-@pytest.mark.skip
 def test_good_correspondence_is_boosted_bad_correspondence_is_decayed(
     bubble_chamber, good_correspondence, bad_correspondence
 ):
+    original_good_correspondence_activation = good_correspondence.activation
+    original_bad_correspondence_activation = bad_correspondence.activation
     parent_id = ""
     champion = bad_correspondence
     urgency = 1.0
     selector = CorrespondenceSelector.spawn(
         parent_id, bubble_chamber, champion, urgency
     )
-    for _ in range(20):
-        selector.run()
-        selector = selector.child_codelets[0]
-        good_correspondence.update_activation()
-        bad_correspondence.update_activation()
-    assert 1 == good_correspondence.activation
-    assert 0 == bad_correspondence.activation
+    selector.run()
+    good_correspondence.update_activation()
+    bad_correspondence.update_activation()
+    assert good_correspondence.activation > original_good_correspondence_activation
+    assert bad_correspondence.activation < original_bad_correspondence_activation

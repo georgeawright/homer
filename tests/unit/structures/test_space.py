@@ -26,9 +26,9 @@ def test_add(
         [],
         [],
         1,
-        coordinates_from_super_space_location=lambda location: [
-            location.coordinates[0]
-        ],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [location.coordinates[0]],
+        },
     )
     west_east_space = Space(
         "",
@@ -41,9 +41,9 @@ def test_add(
         [],
         [],
         1,
-        coordinates_from_super_space_location=lambda location: [
-            location.coordinates[1]
-        ],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [location.coordinates[1]]
+        },
     )
     nw_se_space = Space(
         "",
@@ -56,9 +56,9 @@ def test_add(
         [],
         [],
         1,
-        coordinates_from_super_space_location=lambda location: [
-            statistics.fmean(location.coordinates)
-        ],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [statistics.fmean(location.coordinates)]
+        },
     )
     ne_sw_space = Space(
         "",
@@ -71,15 +71,19 @@ def test_add(
         [],
         [],
         1,
-        coordinates_from_super_space_location=lambda location: [
-            statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
-        ],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [
+                statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
+            ]
+        },
     )
+    location_concept = Mock()
+    location_concept.name = "location"
     location_space = Space(
         "",
         "",
         "location",
-        Mock(),
+        location_concept,
         [],
         StructureCollection(),
         2,
