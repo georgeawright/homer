@@ -63,9 +63,19 @@ def bubble_chamber(same_different_space, label_concept_space):
 
 
 @pytest.fixture
-def target_space_two(bubble_chamber):
+def target_space_one(bubble_chamber):
+    space = Mock()
+    space.name = "target_space_one"
+    space.conceptual_space = Mock()
+    bubble_chamber.working_spaces.add(target_space_one)
+    return space
+
+
+@pytest.fixture
+def target_space_two(bubble_chamber, target_space_one):
     space = Mock()
     space.name = "target_space_two"
+    space.conceptual_space = target_space_one.conceptual_space
     template = Mock()
     template.contents.of_type.return_value = StructureCollection({space})
     bubble_chamber.frames.get_active.return_value = template
@@ -114,14 +124,18 @@ def test_gets_second_target_space_and_structure_if_needed(
 
 
 def test_gets_parent_concept_if_needed(
-    bubble_chamber, target_structure_one, target_space_two, target_structure_two
+    bubble_chamber,
+    target_space_one,
+    target_structure_one,
+    target_space_two,
+    target_structure_two,
 ):
     with patch.object(Location, "for_correspondence_between", return_value=Mock()):
         correspondence_builder = CorrespondenceBuilder(
             Mock(),
             Mock(),
             bubble_chamber,
-            Mock(),
+            target_space_one,
             target_structure_one,
             Mock(),
             target_space_two=target_space_two,
@@ -134,6 +148,7 @@ def test_gets_parent_concept_if_needed(
 
 def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber,
+    target_space_one,
     target_structure_one,
     same_concept,
     target_space_two,
@@ -144,7 +159,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
             Mock(),
             Mock(),
             bubble_chamber,
-            Mock(),
+            target_space_one,
             target_structure_one,
             Mock(),
             target_space_two=target_space_two,
@@ -161,7 +176,11 @@ def test_successful_creates_chunk_and_spawns_follow_up(
 
 
 def test_fails_when_structures_do_not_correspond(
-    bubble_chamber, target_structure_one, target_space_two, target_structure_two
+    bubble_chamber,
+    target_space_one,
+    target_structure_one,
+    target_space_two,
+    target_structure_two,
 ):
     concept = Mock()
     concept.classifier.classify.return_value = 0.0
@@ -169,7 +188,7 @@ def test_fails_when_structures_do_not_correspond(
         Mock(),
         Mock(),
         bubble_chamber,
-        Mock(),
+        target_space_one,
         target_structure_one,
         Mock(),
         target_space_two=target_space_two,

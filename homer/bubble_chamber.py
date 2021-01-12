@@ -112,13 +112,8 @@ class BubbleChamber:
                     space.dimensions == space_one.dimensions + space_two.dimensions
                     or space.dimensions == space_two.dimensions + space_one.dimensions
                 ):
-                    print("found super space")
-                    print(space.name)
-                    print(space.dimensions)
-                    print(f"{space_one.dimensions} + {space_two.dimensions}")
                     return space
             except Exception:
-                print("not found super space")
                 pass
         super_space = WorkingSpace(
             ID.new(WorkingSpace),

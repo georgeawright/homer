@@ -68,7 +68,9 @@ class CorrespondenceBuilder(Builder):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        target_space = bubble_chamber.working_spaces.get_active()
+        target_space = bubble_chamber.working_spaces.where(
+            is_basic_level=True
+        ).get_active()
         target = target_space.contents.not_of_type(Space).get_unhappy()
         return cls.spawn(
             parent_id, bubble_chamber, target_space, target, target.unhappiness
@@ -79,9 +81,6 @@ class CorrespondenceBuilder(Builder):
         return self.bubble_chamber.concepts["correspondence"]
 
     def _passes_preliminary_checks(self):
-        print("target space one: ", self.target_space_one.name)
-        print("target structure one: ", self.target_structure_one.structure_id)
-        print(self.target_structure_one.locations)
         if self.target_space_two is None:
             try:
                 self.target_space_two = (
@@ -91,7 +90,6 @@ class CorrespondenceBuilder(Builder):
                 )
             except MissingStructureError:
                 return False
-        print("target space two: ", self.target_space_two.name)
         try:
             if self.target_structure_two is None:
                 self.target_structure_two = self.target_space_two.contents.of_type(
@@ -99,36 +97,10 @@ class CorrespondenceBuilder(Builder):
                 ).get_exigent()
         except MissingStructureError:
             return False
-        print("target structure two: ", self.target_structure_two.value.name)
-        print(self.target_structure_two.locations)
         if self.target_conceptual_space is None:
-            try:
-                self.target_conceptual_space = (
-                    StructureCollection.intersection(
-                        self.bubble_chamber.spaces["label concepts"].contents.of_type(
-                            ConceptualSpace
-                        ),
-                        StructureCollection(
-                            {
-                                space.conceptual_space
-                                for space in self.target_structure_one.parent_spaces
-                                if space.conceptual_space is not None
-                            }
-                        ),
-                        StructureCollection(
-                            {
-                                space.conceptual_space
-                                for space in self.target_structure_two.parent_spaces
-                                if space.conceptual_space is not None
-                            }
-                        ),
-                    )
-                    .where(is_basic_level=True)
-                    .get_random()
-                )
-            except MissingStructureError:
-                return False
-        print("target conceptual space: ", self.target_conceptual_space.name)
+            self.target_conceptual_space = self.target_space_one.conceptual_space
+        if self.target_conceptual_space != self.target_space_two.conceptual_space:
+            return False
         if self.parent_concept is None:
             self.parent_concept = (
                 self.bubble_chamber.spaces["correspondential concepts"]
@@ -137,11 +109,9 @@ class CorrespondenceBuilder(Builder):
                 .contents.of_type(Concept)
                 .get_random()
             )
-        print("parent concept: ", self.parent_concept.name)
         self.parent_space = self.bubble_chamber.get_super_space(
             self.target_space_one, self.target_space_two
         )
-        print("parent space: ", self.parent_space.name)
         return not self.target_structure_one.has_correspondence(
             self.parent_space, self.parent_concept, self.target_structure_two
         )
@@ -205,7 +175,6 @@ class CorrespondenceBuilder(Builder):
 
     def _fizzle(self):
         try:
-            print(self.target_structure_one)
             new_target = self.target_structure_one.nearby().get_unhappy()
         except MissingStructureError:
             new_target = self.target_structure_one
