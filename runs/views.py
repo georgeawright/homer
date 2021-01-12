@@ -162,7 +162,7 @@ def run_view(request, run_id):
         output += (
             f"{correspondence.structure_id}: "
             + f"{correspondence.value}("
-            + f"{correspondence.conceptual_space.value}, "
+            + f"{correspondence.parent_space.value}, "
             + f"{correspondence.start.structure_id}, "
             + f"{correspondence.end.structure_id}) "
             + str(last_value_of_dict(correspondence.quality))
@@ -491,6 +491,16 @@ def structure_view(request, run_id, structure_id):
         run_id=run_id, structure_id=structure_id
     )
     output = "<h1>" + structure_id + "</h1>"
+    if "Relation" in structure_id:
+        output += (
+            f"{structure_id}: "
+            + f"{structure_record.value}("
+            + f"{structure_record.parent_space.value}, "
+            + f"{structure_record.start.structure_id}, "
+            + f"{structure_record.end.structure_id}) "
+            + str(last_value_of_dict(structure_record.quality))
+            + "<br>"
+        )
     output += "<ul>"
     output += "<li>Birth Time: " + str(structure_record.time_created) + "</li>"
     output += f"<li>Value: {structure_record.value}</li>"
@@ -511,7 +521,7 @@ def structure_view(request, run_id, structure_id):
         output += (
             '<li>Parent Concept: <a href="/runs/'
             + str(run_id)
-            + "/concepts/"
+            + "/structures/"
             + structure_record.parent_concept.structure_id
             + '">'
             + structure_record.parent_concept.structure_id
