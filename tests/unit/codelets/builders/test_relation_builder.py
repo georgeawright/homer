@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder, RelationBuilder
+from homer.codelets.evaluators import RelationEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 
@@ -79,7 +80,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     assert CodeletResult.SUCCESS == result
     assert isinstance(relation_builder.child_structure, Relation)
     assert len(relation_builder.child_codelets) == 1
-    assert isinstance(relation_builder.child_codelets[0], RelationBuilder)
+    assert isinstance(relation_builder.child_codelets[0], RelationEvaluator)
 
 
 def test_fails_when_structures_cannot_be_related(

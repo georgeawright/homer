@@ -117,15 +117,14 @@ class RelationBuilder(Builder):
         self.bubble_chamber.logger.log(relation)
 
     def _engender_follow_up(self):
-        new_target = self.target_space.contents.of_type(Chunk).get_unhappy()
+        from homer.codelets.evaluators import RelationEvaluator
+
         self.child_codelets.append(
-            RelationBuilder.spawn(
+            RelationEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.target_space,
-                new_target,
+                self.child_structure,
                 self.confidence,
-                parent_concept=self.parent_concept,
             )
         )
 
