@@ -84,6 +84,7 @@ def chunk(bubble_chamber, working_space):
         [Mock()],
         Mock(),
         Mock(),
+        Mock(),
     )
     chunk.locations.append(Location([1, 1], working_space))
     bubble_chamber.chunks.add(chunk)

@@ -80,14 +80,20 @@ def working_space():
 @pytest.fixture
 def start(working_space):
     chunk = Chunk(
-        Mock(), Mock(), Mock(), [Location([1, 1], working_space)], Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        [Location([1, 1], working_space)],
+        Mock(),
+        Mock(),
+        Mock(),
     )
     return chunk
 
 
 @pytest.fixture
 def end():
-    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     return chunk
 
 

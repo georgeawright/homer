@@ -281,6 +281,7 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
         [10],
         [Location([10], temperature_working_space)],
         StructureCollection(),
+        Mock(),
         1.0,
     )
     temperature_working_space.add(chunk)
@@ -296,6 +297,7 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
         [10],
         [Location([10], temperature_working_space)],
         StructureCollection(),
+        Mock(),
         1.0,
     )
     temperature_working_space.add(nearby_chunk)
@@ -308,6 +310,7 @@ def target_slot(
     temperature_concept, template, temperature_template_space, bubble_chamber
 ):
     slot = TemplateSlot(
+        Mock(),
         Mock(),
         Mock(),
         temperature_concept,

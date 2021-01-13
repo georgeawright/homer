@@ -61,6 +61,7 @@ def test_add_to_collections():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence = Correspondence(
         Mock(),
@@ -100,6 +101,7 @@ def test_add_to_collections():
         Mock(),
     )
     word = Word(
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

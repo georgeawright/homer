@@ -96,6 +96,7 @@ def good_chunk(target_space, chunk_members):
         Mock(),
         [Location([0, 0], target_space)],
         chunk_members,
+        Mock(),
         1.0,
     )
     chunk._activation = 0.0
@@ -111,6 +112,7 @@ def bad_chunk(target_space, chunk_members):
         Mock(),
         [Location([0, 1], target_space)],
         chunk_members,
+        Mock(),
         0.0,
     )
     chunk._activation = 1.0

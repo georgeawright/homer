@@ -161,6 +161,7 @@ def target_chunk(bubble_chamber, temperature_space):
         [10],
         [Location([0, 0], input_space), Location([10], temperature_space)],
         StructureCollection(),
+        Mock(),
         0.0,
     )
     second_chunk = Chunk(
@@ -169,6 +170,7 @@ def target_chunk(bubble_chamber, temperature_space):
         [5],
         [Location([0, 1], input_space), Location([5], temperature_space)],
         StructureCollection(),
+        Mock(),
         0.0,
     )
     bubble_chamber.chunks.add(chunk)

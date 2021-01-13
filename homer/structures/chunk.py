@@ -20,6 +20,7 @@ class Chunk(Structure):
         value: Any,
         locations: List[Location],
         members: StructureCollection,
+        parent_space: Space,
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
@@ -36,6 +37,7 @@ class Chunk(Structure):
         )
         self.value = value
         self.members = members
+        self.parent_space = parent_space
         # TODO: containing chunks needs a better name - chunks that have been made out of this chunk
         # self.chunks_made_from_this_chunk ?
         self.containing_chunks = (

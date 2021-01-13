@@ -177,6 +177,7 @@ def target_chunk(bubble_chamber):
         [10],
         [Location([0, 0], input_space)],
         StructureCollection(),
+        input_space,
         0.0,
     )
     second_chunk = Chunk(
@@ -185,6 +186,7 @@ def target_chunk(bubble_chamber):
         [10],
         [Location([0, 1], input_space)],
         StructureCollection(),
+        Mock(),
         0.0,
     )
     bubble_chamber.chunks.add(chunk)

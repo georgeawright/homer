@@ -54,7 +54,6 @@ class LabelSelector(Selector):
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
-        space = self.champion.parent_space
         candidates = self.champion.start.labels_in_space(self.champion.parent_space)
         if len(candidates) == 1:
             return False
@@ -75,8 +74,6 @@ class LabelSelector(Selector):
         )
 
     def _engender_follow_up(self):
-        from homer.codelets.builders import LabelBuilder
-
         new_target = self.bubble_chamber.chunks.get_exigent()
         self.child_codelets.append(
             LabelBuilder.spawn(

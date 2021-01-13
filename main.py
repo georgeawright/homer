@@ -565,6 +565,7 @@ for i, row in enumerate(problem):
             value,
             [location],
             members,
+            input_space,
             quality,
         )
         logger.log(chunk)

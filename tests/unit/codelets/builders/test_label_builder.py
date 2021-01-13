@@ -13,6 +13,7 @@ from homer.structures.links import Label
 def working_space():
     space = Mock()
     space.parent_concept.relevant_value = "value"
+    space.contents = StructureCollection()
     return space
 
 
@@ -20,7 +21,7 @@ def working_space():
 def parent_concept(working_space):
     concept = Mock()
     concept.relevant_value = "value"
-    concept.parent_space.instance = working_space
+    concept.parent_space.instance_in_space.return_value = working_space
     concept.classifier.classify.return_value = 1.0
     return concept
 
@@ -40,18 +41,15 @@ def bubble_chamber(parent_concept):
     chamber.spaces = StructureCollection({space})
     top_level_working_space = Mock()
     top_level_working_space.name = "top level working"
-    top_level_working_space.contents = StructureCollection()
     chamber.spaces.add(top_level_working_space)
     return chamber
 
 
 @pytest.fixture
-def target_chunk(working_space):
+def target_chunk():
     chunk = Mock()
     chunk.has_label.return_value = False
     chunk.nearby.get_unhappy.return_value = Mock()
-    chunk.parent_spaces = [working_space]
-    working_space.contents = StructureCollection({chunk})
     return chunk
 
 
@@ -76,12 +74,7 @@ def test_fails_when_chunk_is_bad_example(bubble_chamber, target_chunk):
     parent_concept = Mock()
     parent_concept.classifier.classify.return_value = 0.0
     label_builder = LabelBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        target_chunk,
-        1.0,
-        parent_concept=parent_concept,
+        Mock(), Mock(), bubble_chamber, target_chunk, 1.0, parent_concept=parent_concept
     )
     result = label_builder.run()
     assert CodeletResult.FAIL == result

@@ -5,7 +5,7 @@ from homer.id import ID
 from homer.location import Location
 from homer.structures import Chunk, Concept
 from homer.structures.links import Label
-from homer.structures.spaces import ConceptualSpace
+from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.tools import project_item_into_space
 
 
@@ -72,7 +72,9 @@ class LabelBuilder(Builder):
         )
 
     def _process_structure(self):
-        space = self.parent_concept.parent_space.instance
+        space = self.parent_concept.parent_space.instance_in_space(
+            self.target_chunk.parent_space
+        )
         self.bubble_chamber.logger.log(space)
         if self.target_chunk not in space.contents:
             project_item_into_space(self.target_chunk, space)

@@ -97,14 +97,14 @@ def end_space():
 
 @pytest.fixture
 def start(start_space):
-    chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock(), Mock())
     chunk.locations.append(Location([1, 1], start_space))
     return chunk
 
 
 @pytest.fixture
 def end():
-    chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock(), Mock())
     return chunk
 
 

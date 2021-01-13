@@ -98,6 +98,7 @@ class ChunkBuilder(Builder):
             self._get_average_value(new_chunk_members),
             locations,
             new_chunk_members,
+            self.target_chunk.parent_space,
             0,
         )
         activation_from_chunk_one = (
