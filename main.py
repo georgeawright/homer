@@ -34,7 +34,9 @@ logger = DjangoLogger.setup(path_to_logs)
 homer = Homer.setup(logger)
 
 top_level_conceptual_space = homer.bubble_chamber.spaces["top level"]
-top_level_working_space = top_level_conceptual_space.instance
+top_level_working_space = top_level_conceptual_space.instance_in_space(
+    None, name="top level working"
+)
 
 input_concept = homer.def_concept(
     name="input",
@@ -46,7 +48,6 @@ input_space = homer.def_working_space(
     name="input",
     parent_concept=input_concept,
     locations=[Location([], top_level_working_space)],
-    is_basic_level=True,
 )
 activity_concept = homer.def_concept(
     name="activity",
