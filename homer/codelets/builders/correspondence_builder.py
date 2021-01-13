@@ -153,23 +153,14 @@ class CorrespondenceBuilder(Builder):
         self.child_structure = correspondence
 
     def _engender_follow_up(self):
-        try:
-            new_target = self.target_structure_one.nearby().get_unhappy()
-        except MissingStructureError:
-            return
-        new_target_conceptual_space = self.bubble_chamber.spaces[
-            "label concepts"
-        ].contents.get_random(exclude=[self.target_conceptual_space])
+        from homer.codelets.evaluators import CorrespondenceEvaluator
+
         self.child_codelets.append(
-            CorrespondenceBuilder.spawn(
+            CorrespondenceEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.target_space_one,
-                new_target,
+                self.child_structure,
                 self.confidence,
-                target_space_two=self.target_space_two,
-                target_conceptual_space=new_target_conceptual_space,
-                parent_concept=self.parent_concept,
             )
         )
 

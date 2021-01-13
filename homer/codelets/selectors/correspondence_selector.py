@@ -1,6 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.selector import Selector
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structures.links import Correspondence
@@ -71,6 +72,22 @@ class CorrespondenceSelector(Selector):
         )
 
     def _engender_follow_up(self):
+        try:
+            new_target = self.champion.nearby().get_exigent()
+            new_target_space = new_target.parent_spaces.where(
+                is_basic_level=True
+            ).get_random()
+        except MissingStructureError:
+            return
+        self.child_codelets.append(
+            CorrespondenceBuilder.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                new_target_space,
+                new_target,
+                new_target.unlinkedness,
+            )
+        )
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
