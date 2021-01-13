@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder, RelationBuilder
+from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
@@ -171,7 +172,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
         assert isinstance(correspondence_builder.child_structure, Correspondence)
         assert len(correspondence_builder.child_codelets) == 1
         assert isinstance(
-            correspondence_builder.child_codelets[0], CorrespondenceBuilder
+            correspondence_builder.child_codelets[0], CorrespondenceEvaluator
         )
 
 

@@ -76,6 +76,21 @@ class RelationSelector(Selector):
         )
 
     def _engender_follow_up(self):
+        try:
+            target = self.bubble_chamber.chunks.get_exigent()
+            target_space = target.parent_spaces.where(no_of_dimensions=1).get_random()
+            self.child_codelets.append(
+                RelationBuilder.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target_space,
+                    target,
+                    target.unlinkedness,
+                    parent_concept=self.champion.parent_concept,
+                )
+            )
+        except MissingStructureError:
+            pass
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,

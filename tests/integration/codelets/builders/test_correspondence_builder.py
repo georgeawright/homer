@@ -10,6 +10,7 @@ from homer.classifiers import (
 )
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder
+from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
@@ -356,7 +357,7 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
     assert same_concept == builder.parent_concept
     assert CodeletResult.SUCCESS == builder.result
     assert isinstance(builder.child_structure, Correspondence)
-    assert isinstance(builder.child_codelets[0], CorrespondenceBuilder)
+    assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
     builder = CorrespondenceBuilder.spawn(
         parent_id, bubble_chamber, temperature_working_space, target_chunk, urgency
     )

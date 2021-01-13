@@ -3,6 +3,7 @@ import statistics
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
 from homer.codelets.selectors import ChunkSelector
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
@@ -56,13 +57,16 @@ class ChunkEvaluator(Evaluator):
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
 
     def _engender_follow_up(self):
-        target_space = StructureCollection(
-            {
-                space
-                for space in self.target_structure.parent_spaces
-                if space.is_basic_level
-            }
-        ).get_random()
+        try:
+            target_space = StructureCollection(
+                {
+                    space
+                    for space in self.target_structure.parent_spaces
+                    if space.is_basic_level
+                }
+            ).get_random()
+        except MissingStructureError:
+            return
         self.child_codelets.append(
             ChunkSelector.spawn(
                 self.codelet_id,

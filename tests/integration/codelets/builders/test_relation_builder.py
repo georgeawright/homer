@@ -6,6 +6,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import DifferenceClassifier, ProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import RelationBuilder
+from homer.codelets.evaluators import RelationEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
@@ -198,7 +199,7 @@ def test_successful_adds_relation_to_chunk_and_spawns_follow_up_and_same_relatio
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert isinstance(builder.child_structure, Relation)
-    assert isinstance(builder.child_codelets[0], RelationBuilder)
+    assert isinstance(builder.child_codelets[0], RelationEvaluator)
     builder = RelationBuilder.spawn(
         parent_id, bubble_chamber, temperature_space, target_chunk, urgency
     )
