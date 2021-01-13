@@ -148,6 +148,7 @@ def good_label(bubble_chamber, input_space, temperature_space, warm_concept):
         [15],
         [Location([0, 0], input_space), Location([15], temperature_space)],
         StructureCollection(),
+        Mock(),
         0.0,
     )
     quality = 0.0
@@ -163,6 +164,7 @@ def bad_label(bubble_chamber, input_space, temperature_space, warm_concept):
         [10],
         [Location([0, 0], input_space), Location([10], temperature_space)],
         StructureCollection(),
+        Mock(),
         0.0,
     )
     quality = 1.0

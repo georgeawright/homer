@@ -9,11 +9,13 @@ def test_instance_returns_working_space():
     conceptual_space = ConceptualSpace(
         "id", "", "name", Mock(), [Mock()], Mock(), 0, [], []
     )
-    instance = conceptual_space.instance
+    instance = conceptual_space.instance_in_space(None, name="")
     assert isinstance(instance, WorkingSpace)
 
 
 def test_instance_returns_working_space_with_working_sub_spaces():
+    parent_space = Mock()
+    parent_space.name = "parent"
     sub_space = ConceptualSpace("sub", "", "sub", Mock(), [Mock()], Mock(), 1, [], [])
     super_space = ConceptualSpace(
         "super",
@@ -26,13 +28,13 @@ def test_instance_returns_working_space_with_working_sub_spaces():
         [sub_space, Mock()],
         [sub_space, Mock()],
     )
-    super_instance = super_space.instance
+    super_instance = super_space.instance_in_space(parent_space)
     assert isinstance(super_instance, WorkingSpace)
-    assert "super working" == super_instance.name
+    assert "super IN parent" == super_instance.name
     assert len(super_space.sub_spaces) == len(super_instance.sub_spaces)
     sub_instance = super_instance.sub_spaces[0]
     assert isinstance(sub_instance, WorkingSpace)
-    assert "sub working" == sub_instance.name
+    assert "sub IN parent" == sub_instance.name
 
 
 @pytest.mark.parametrize(

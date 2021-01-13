@@ -49,7 +49,9 @@ class Homer:
             [],
         )
         logger.log(top_level_conceptual_space)
-        top_level_working_space = top_level_conceptual_space.instance
+        top_level_working_space = top_level_conceptual_space.instance_in_space(
+            None, name="top level working"
+        )
         logger.log(top_level_working_space)
         bubble_chamber = BubbleChamber(
             StructureCollection({top_level_conceptual_space}),
@@ -251,9 +253,11 @@ class Homer:
             locations=[Location([], self.bubble_chamber.spaces["templates"])],
             contents=StructureCollection(),
         )
+        self.logger.log(template)
         for i, item in enumerate(contents):
-            template.contents.add(item)
+            item.parent_space = template
             item.locations = [Location([i], template)]
+            template.contents.add(item)
             self.logger.log(item)
             if isinstance(item, TemplateSlot):
                 try:
@@ -274,7 +278,6 @@ class Homer:
                 working_space.add(item)
                 self.logger.log(item)
                 self.def_concept_link(item.value, item, activation=1.0, stable=True)
-        self.logger.log(template)
         self.bubble_chamber.conceptual_spaces.add(template)
         self.bubble_chamber.frames.add(template)
         return template
@@ -283,6 +286,7 @@ class Homer:
         slot = TemplateSlot(
             structure_id=ID.new(TemplateSlot),
             parent_id="",
+            parent_space=None,
             prototype=concept,
             form=form,
             locations=[],
@@ -294,6 +298,7 @@ class Homer:
         word = Word(
             structure_id=ID.new(Word),
             parent_id="",
+            parent_space=None,
             value=value,
             location=None,
             quality=quality,

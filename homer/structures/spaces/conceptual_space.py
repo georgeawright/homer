@@ -49,41 +49,13 @@ class ConceptualSpace(Space):
         self._instance = None
         self._instances = {}
 
-    @property
-    def instance(self) -> WorkingSpace:
-        if self._instance is None:
-            locations = [
-                Location(location.coordinates, location.space.instance)
-                for location in self.locations
-                if location is not None
-            ]
-            dimensions = (
-                [dimension.instance for dimension in self.dimensions]
-                if self.no_of_dimensions > 1
-                else []
-            )
-            sub_spaces = [sub_space.instance for sub_space in self.sub_spaces]
-            self._instance = WorkingSpace(
-                self.structure_id + "_working_space",
-                "",
-                self.name + " working",
-                self.parent_concept,
-                self,
-                locations,
-                StructureCollection(),
-                self.no_of_dimensions,
-                dimensions,
-                sub_spaces,
-                is_basic_level=self.is_basic_level,
-                super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
-                links_in=StructureCollection(),
-                links_out=StructureCollection(),
-            )
-        return self._instance
-
-    def instance_in_space(self, containing_space: Space) -> WorkingSpace:
+    def instance_in_space(
+        self, containing_space: Space, name: str = None
+    ) -> WorkingSpace:
         if containing_space not in self._instances:
-            locations = [Location([], containing_space)]
+            locations = (
+                [Location([], containing_space)] if containing_space is not None else []
+            )
             dimensions = (
                 [
                     dimension.instance_in_space(containing_space)
@@ -99,7 +71,7 @@ class ConceptualSpace(Space):
             self._instances[containing_space] = WorkingSpace(
                 ID.new(WorkingSpace),
                 "",
-                self.name + " IN " + containing_space.name,
+                self.name + " IN " + containing_space.name if name is None else name,
                 self.parent_concept,
                 self,
                 locations,

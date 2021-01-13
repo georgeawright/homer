@@ -3,6 +3,7 @@ from typing import Any, List
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.chunk import Chunk
+from homer.structures.space import Space
 
 
 class Slot(Chunk):
@@ -12,6 +13,7 @@ class Slot(Chunk):
         self,
         structure_id: str,
         parent_id: str,
+        parent_space: Space,
         value: Any = None,
         locations: List[Location] = None,
         members: StructureCollection = None,
@@ -27,6 +29,7 @@ class Slot(Chunk):
             value,
             locations,
             members,
+            parent_space,
             1,
             links_in=links_in,
             links_out=links_out,

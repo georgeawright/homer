@@ -35,6 +35,7 @@ def test_classify_chunks_with_different_labels():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
         links_out=StructureCollection(),
     )
     start_label = Label(
@@ -47,6 +48,7 @@ def test_classify_chunks_with_different_labels():
     )
     start.links_out.add(start_label)
     end = Chunk(
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -90,8 +92,8 @@ def test_classify_chunks_with_different_labels():
 
 def test_classify_chunks_without_different_labels():
     concept = Mock()
-    start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    start = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     differentness_concept = Mock()
     classifier = DifferentnessClassifier()
     assert 0.0 == classifier.classify(
@@ -103,6 +105,7 @@ def test_classify_relations_with_different_arguments():
     differentness_concept = Mock()
 
     start_relation_start = Chunk(
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -121,6 +124,7 @@ def test_classify_relations_with_different_arguments():
     )
     start_relation_start.links_out.add(start_relation_start_label)
     end_relation_start = Chunk(
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -162,6 +166,7 @@ def test_classify_relations_with_different_arguments():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
         links_out=StructureCollection(),
     )
     start_relation_end_label = Label(
@@ -174,6 +179,7 @@ def test_classify_relations_with_different_arguments():
     )
     start_relation_end.links_out.add(start_relation_end_label)
     end_relation_end = Chunk(
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

@@ -104,7 +104,9 @@ def bubble_chamber():
         [],
     )
     chamber.conceptual_spaces.add(top_level_space)
-    chamber.working_spaces.add(top_level_space.instance)
+    chamber.working_spaces.add(
+        top_level_space.instance_in_space(None, name="top level working")
+    )
     return chamber
 
 
@@ -214,8 +216,27 @@ def mild_concept(temperature_conceptual_space, bubble_chamber):
 
 
 @pytest.fixture
-def temperature_working_space(temperature_conceptual_space, bubble_chamber):
-    working_space = temperature_conceptual_space.instance
+def input_space():
+    space = WorkingSpace(
+        "input",
+        Mock(),
+        "input",
+        Mock(),
+        None,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+    )
+    return space
+
+
+@pytest.fixture
+def temperature_working_space(
+    temperature_conceptual_space, input_space, bubble_chamber
+):
+    working_space = temperature_conceptual_space.instance_in_space(input_space)
     bubble_chamber.working_spaces.add(working_space)
     return working_space
 
@@ -281,6 +302,7 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
         [10],
         [Location([10], temperature_working_space)],
         StructureCollection(),
+        Mock(),
         1.0,
     )
     temperature_working_space.add(chunk)
@@ -296,6 +318,7 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
         [10],
         [Location([10], temperature_working_space)],
         StructureCollection(),
+        Mock(),
         1.0,
     )
     temperature_working_space.add(nearby_chunk)
@@ -308,6 +331,7 @@ def target_slot(
     temperature_concept, template, temperature_template_space, bubble_chamber
 ):
     slot = TemplateSlot(
+        Mock(),
         Mock(),
         Mock(),
         temperature_concept,

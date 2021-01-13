@@ -56,8 +56,10 @@ class RelationBuilder(Builder):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        target = bubble_chamber.chunks.get_exigent()
-        target_space = target.parent_spaces.where(no_of_dimensions=1).get_random()
+        target_space = bubble_chamber.working_spaces.where(
+            no_of_dimensions=1
+        ).get_random()
+        target = target_space.contents.of_type(Chunk).get_exigent()
         return cls.spawn(
             parent_id, bubble_chamber, target_space, target, target.exigency
         )
