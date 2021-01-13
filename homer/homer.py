@@ -49,7 +49,9 @@ class Homer:
             [],
         )
         logger.log(top_level_conceptual_space)
-        top_level_working_space = top_level_conceptual_space.instance
+        top_level_working_space = top_level_conceptual_space.instance_in_space(
+            None, name="top level working"
+        )
         logger.log(top_level_working_space)
         bubble_chamber = BubbleChamber(
             StructureCollection({top_level_conceptual_space}),

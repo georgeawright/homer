@@ -78,7 +78,9 @@ def bubble_chamber():
         [],
     )
     chamber.conceptual_spaces.add(top_level_space)
-    chamber.working_spaces.add(top_level_space.instance)
+    chamber.working_spaces.add(
+        top_level_space.instance_in_space(None, name="top level working")
+    )
     return chamber
 
 
@@ -107,8 +109,25 @@ def temperature_conceptual_space(temperature_concept):
 
 
 @pytest.fixture
-def temperature_working_space(temperature_conceptual_space):
-    space = temperature_conceptual_space.instance
+def input_space():
+    space = WorkingSpace(
+        "input",
+        Mock(),
+        "input",
+        Mock(),
+        None,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+    )
+    return space
+
+
+@pytest.fixture
+def temperature_working_space(temperature_conceptual_space, input_space):
+    space = temperature_conceptual_space.instance_in_space(input_space)
     return space
 
 
