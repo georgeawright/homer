@@ -189,6 +189,9 @@ class CorrespondenceBuilder(Builder):
         )
 
     def _fail(self):
-        self.child_codelets.append(
-            RelationBuilder.make(self.codelet_id, self.bubble_chamber)
-        )
+        try:
+            self.child_codelets.append(
+                RelationBuilder.make(self.codelet_id, self.bubble_chamber)
+            )
+        except MissingStructureError:
+            pass
