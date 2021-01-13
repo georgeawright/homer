@@ -37,6 +37,7 @@ class Frame(Space):
             links_in=links_in,
             links_out=links_out,
         )
+        self.conceptual_space = None
 
     def update_activation(self):
         self._activation = (

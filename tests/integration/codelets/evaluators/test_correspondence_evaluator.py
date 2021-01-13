@@ -30,6 +30,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     text_concept = Concept(
@@ -65,33 +66,72 @@ def bubble_chamber():
     )
     correspondence_concept.links_out.add(relation)
     evaluate_concept.links_in.add(relation)
+    top_level_space = ConceptualSpace(
+        "top level",
+        Mock(),
+        "top level",
+        None,
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
+    )
+    chamber.conceptual_spaces.add(top_level_space)
+    chamber.working_spaces.add(top_level_space.instance)
     return chamber
 
 
 @pytest.fixture
-def good_correspondence(bubble_chamber):
-    temperature_concept = Concept(
+def temperature_concept():
+    concept = Concept(
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
     )
-    temperature_working_space = WorkingSpace(
+    return concept
+
+
+@pytest.fixture
+def temperature_conceptual_space(temperature_concept):
+    space = ConceptualSpace(
+        "temperature",
         Mock(),
-        Mock(),
-        "temperature working",
-        StructureCollection(),
-        0,
+        "temperature",
         temperature_concept,
+        [],
+        StructureCollection(),
+        1,
+        [],
+        [],
     )
-    temperature_conceptual_space = ConceptualSpace(
-        Mock(), Mock(), "temperature", StructureCollection(), temperature_concept
-    )
-    warm_concept = Concept(
+    return space
+
+
+@pytest.fixture
+def temperature_working_space(temperature_conceptual_space):
+    space = temperature_conceptual_space.instance
+    return space
+
+
+@pytest.fixture
+def warm_concept():
+    concept = Concept(
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
     )
+    return concept
+
+
+@pytest.fixture
+def template(bubble_chamber):
     parent_concept = bubble_chamber.concepts["text"]
     template = Template(
-        Mock(), Mock(), "mock template", StructureCollection(), parent_concept
+        Mock(), Mock(), "mock template", parent_concept, [], StructureCollection()
     )
-    same_concept = Concept(
+    return template
+
+
+@pytest.fixture
+def same_concept(temperature_conceptual_space):
+    concept = Concept(
         Mock(),
         Mock(),
         "same",
@@ -102,21 +142,31 @@ def good_correspondence(bubble_chamber):
         StructureCollection(),
         math.dist,
     )
+    return concept
+
+
+@pytest.fixture
+def good_correspondence(
+    bubble_chamber,
+    temperature_conceptual_space,
+    temperature_working_space,
+    warm_concept,
+    template,
+    same_concept,
+):
     start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.7)
     end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
-    parent_space = bubble_chamber.common_parent_space(
-        temperature_working_space, template
-    )
+    parent_space = bubble_chamber.get_super_space(temperature_working_space, template)
     quality = 0.0
     correspondence = Correspondence(
         Mock(),
         Mock(),
         start,
         end,
+        Location([], parent_space),
         temperature_working_space,
         template,
         same_concept,
-        parent_space,
         temperature_conceptual_space,
         quality,
     )
@@ -124,61 +174,33 @@ def good_correspondence(bubble_chamber):
 
 
 @pytest.fixture
-def bad_correspondence(bubble_chamber):
-    temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
-    )
-    temperature_working_space = WorkingSpace(
-        Mock(),
-        Mock(),
-        "temperature working",
-        StructureCollection(),
-        0,
-        temperature_concept,
-    )
-    temperature_conceptual_space = ConceptualSpace(
-        Mock(), Mock(), "temperature", StructureCollection(), temperature_concept
-    )
-    warm_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
-    )
-    parent_concept = bubble_chamber.concepts["text"]
-    template = Template(
-        Mock(), Mock(), "mock template", StructureCollection(), parent_concept
-    )
-    same_concept = Concept(
-        Mock(),
-        Mock(),
-        "same",
-        None,
-        SamenessClassifier(),
-        temperature_conceptual_space,
-        "value",
-        StructureCollection(),
-        math.dist,
-    )
+def bad_correspondence(
+    bubble_chamber,
+    temperature_conceptual_space,
+    temperature_working_space,
+    warm_concept,
+    template,
+    same_concept,
+):
     start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.0)
     end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
-    parent_space = bubble_chamber.common_parent_space(
-        temperature_working_space, template
-    )
+    parent_space = bubble_chamber.get_super_space(temperature_working_space, template)
     quality = 1.0
     correspondence = Correspondence(
         Mock(),
         Mock(),
         start,
         end,
+        Location([], parent_space),
         temperature_working_space,
         template,
         same_concept,
-        parent_space,
         temperature_conceptual_space,
         quality,
     )
     return correspondence
 
 
-@pytest.mark.skip
 def test_increases_quality_of_good_correspondence(bubble_chamber, good_correspondence):
     original_quality = good_correspondence.quality
     parent_id = ""
@@ -193,7 +215,6 @@ def test_increases_quality_of_good_correspondence(bubble_chamber, good_correspon
     assert isinstance(evaluator.child_codelets[0], CorrespondenceSelector)
 
 
-@pytest.mark.skip
 def test_decreases_quality_of_bad_label(bubble_chamber, bad_correspondence):
     original_quality = bad_correspondence.quality
     parent_id = ""

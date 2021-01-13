@@ -27,6 +27,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chunk_concept = Concept(
@@ -74,6 +75,7 @@ def target_chunk(bubble_chamber):
         Mock(),
         "input",
         location_concept,
+        Mock(),
         [],
         StructureCollection(),
         0,

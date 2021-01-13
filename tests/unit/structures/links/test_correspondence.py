@@ -83,7 +83,7 @@ def test_nearby():
 
 def test_get_slot_argument_returns_slot():
     location = Mock()
-    slot = Slot(Mock(), Mock(), location=location)
+    slot = Slot(Mock(), Mock(), locations=[location])
     non_slot = Mock()
     correspondence = Correspondence(
         Mock(),
@@ -115,7 +115,7 @@ def test_get_slot_argument_returns_slot():
 
 def test_get_non_slot_argument_returns_non_slot():
     location = Mock()
-    slot = Slot(Mock(), Mock(), location=location)
+    slot = Slot(Mock(), Mock(), locations=[location])
     non_slot = Mock()
     correspondence = Correspondence(
         Mock(),

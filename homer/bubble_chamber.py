@@ -19,6 +19,7 @@ class BubbleChamber:
         self,
         conceptual_spaces: StructureCollection,
         working_spaces: StructureCollection,
+        frames: StructureCollection,
         chunks: StructureCollection,
         concepts: StructureCollection,
         correspondences: StructureCollection,
@@ -32,6 +33,7 @@ class BubbleChamber:
     ):
         self.conceptual_spaces = conceptual_spaces
         self.working_spaces = working_spaces
+        self.frames = frames
         self.chunks = chunks
         self.concepts = concepts
         self.correspondences = correspondences
@@ -46,13 +48,16 @@ class BubbleChamber:
 
     @property
     def spaces(self):
-        return StructureCollection.union(self.conceptual_spaces, self.working_spaces)
+        return StructureCollection.union(
+            self.conceptual_spaces, self.working_spaces, self.frames
+        )
 
     @property
     def structures(self):
         return StructureCollection.union(
             self.conceptual_spaces,
             self.working_spaces,
+            self.frames,
             self.chunks,
             self.concepts,
             self.correspondences,
@@ -115,6 +120,7 @@ class BubbleChamber:
             "",
             f"{space_one.name} x {space_two.name}",
             None,
+            None,
             [Location([], self.spaces["top level working"])],
             StructureCollection(),
             space_one.no_of_dimensions + space_two.no_of_dimensions,
@@ -122,5 +128,12 @@ class BubbleChamber:
             [space_one, space_two],
             0,
         )
+        space_one.super_space_to_coordinate_function_map[
+            super_space.name
+        ] = lambda location: location.coordinates[: space_one.no_of_dimensions]
+        space_two.super_space_to_coordinate_function_map[
+            super_space.name
+        ] = lambda location: location.coordinates[space_one.no_of_dimensions :]
         self.working_spaces.add(super_space)
+        self.logger.log(super_space)
         return super_space

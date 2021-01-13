@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 
 from homer.location import Location
 from homer.structure_collection import StructureCollection
@@ -13,18 +13,19 @@ class Slot(Chunk):
         structure_id: str,
         parent_id: str,
         value: Any = None,
-        location: Location = None,
+        locations: List[Location] = None,
         members: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
         containing_chunks: StructureCollection = None,
     ):
+        locations = locations if locations is not None else []
         Chunk.__init__(
             self,
             structure_id,
             parent_id,
             value,
-            [location],
+            locations,
             members,
             1,
             links_in=links_in,

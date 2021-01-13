@@ -26,6 +26,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chunk_concept = Concept(
@@ -63,6 +64,7 @@ def bubble_chamber():
 @pytest.fixture
 def target_space():
     space = WorkingSpace(
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

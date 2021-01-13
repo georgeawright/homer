@@ -19,6 +19,7 @@ def test_structures():
     bubble_chamber = BubbleChamber(
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
         StructureCollection(),
@@ -39,6 +40,7 @@ def test_structures():
 
 def test_add_to_collections():
     bubble_chamber = BubbleChamber(
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -127,6 +129,7 @@ def test_spread_activations():
     bubble_chamber = BubbleChamber(
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
         StructureCollection(),
@@ -155,6 +158,7 @@ def test_update_activations():
     bubble_chamber = BubbleChamber(
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
         StructureCollection(),
@@ -181,6 +185,7 @@ def test_has_chunk():
     bubble_chamber = BubbleChamber(
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         StructureCollection({existing_chunk}),
         StructureCollection(),
         StructureCollection(),
@@ -200,6 +205,7 @@ def test_has_view():
     existing_view = Mock()
     existing_view.members = existing_view_members
     bubble_chamber = BubbleChamber(
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -229,6 +235,7 @@ def test_get_super_space_is_created_if_necessary():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     top_level_working_space = WorkingSpace(
@@ -236,6 +243,7 @@ def test_get_super_space_is_created_if_necessary():
         Mock(),
         "top level working",
         None,
+        Mock(),
         [],
         StructureCollection(),
         0,
@@ -248,6 +256,7 @@ def test_get_super_space_is_created_if_necessary():
         Mock(),
         "one",
         None,
+        Mock(),
         [Location([], top_level_working_space)],
         Mock(),
         1,
@@ -260,6 +269,7 @@ def test_get_super_space_is_created_if_necessary():
         Mock(),
         "two",
         None,
+        Mock(),
         [Location([], top_level_working_space)],
         Mock(),
         1,

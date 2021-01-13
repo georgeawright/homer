@@ -4,7 +4,7 @@ from homer import fuzzy
 from .bubble_chamber import BubbleChamber
 from .classifier import Classifier
 from .coderack import Coderack
-from .errors import NoMoreCodelets
+from .errors import MissingStructureError, NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .id import ID
@@ -54,6 +54,7 @@ class Homer:
         bubble_chamber = BubbleChamber(
             StructureCollection({top_level_conceptual_space}),
             StructureCollection({top_level_working_space}),
+            StructureCollection(),
             StructureCollection(),
             StructureCollection(),
             StructureCollection(),
@@ -164,7 +165,7 @@ class Homer:
         dimensions: List[ConceptualSpace] = None,
         sub_spaces: List[ConceptualSpace] = None,
         is_basic_level: bool = False,
-        coordinates_from_super_space_location: Callable = None,
+        super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ) -> ConceptualSpace:
@@ -179,7 +180,7 @@ class Homer:
             dimensions=(dimensions if dimensions is not None else []),
             sub_spaces=(sub_spaces if sub_spaces is not None else []),
             is_basic_level=is_basic_level,
-            coordinates_from_super_space_location=coordinates_from_super_space_location,
+            super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
         )
@@ -255,10 +256,27 @@ class Homer:
             item.locations = [Location([i], template)]
             self.logger.log(item)
             if isinstance(item, TemplateSlot):
+                try:
+                    working_space = (
+                        template.contents.of_type(WorkingSpace)
+                        .where(parent_concept=item.value)
+                        .get_random()
+                    )
+                except MissingStructureError:
+                    conceptual_space = self.bubble_chamber.conceptual_spaces[
+                        item.value.name
+                    ]
+                    working_space = conceptual_space.instance_in_space(template)
+                    self.logger.log(working_space)
+                    template.add(working_space)
+                filler_coordinates = [0 for _ in conceptual_space.dimensions]
+                item.locations.append(Location(filler_coordinates, working_space))
+                working_space.add(item)
+                self.logger.log(item)
                 self.def_concept_link(item.value, item, activation=1.0, stable=True)
         self.logger.log(template)
         self.bubble_chamber.conceptual_spaces.add(template)
-        self.bubble_chamber.spaces["templates"].add(template)
+        self.bubble_chamber.frames.add(template)
         return template
 
     def def_template_slot(self, concept: Concept = None, form: WordForm = None):
@@ -267,7 +285,7 @@ class Homer:
             parent_id="",
             prototype=concept,
             form=form,
-            location=None,
+            locations=[],
         )
         self.bubble_chamber.slots.add(slot)
         return slot
@@ -286,13 +304,14 @@ class Homer:
         self,
         name: str = "",
         parent_concept: Concept = None,
+        conceptual_space: ConceptualSpace = None,
         locations: List[Location] = None,
         contents: StructureCollection = None,
         no_of_dimensions: int = 0,
         dimensions: List[WorkingSpace] = None,
         sub_spaces: List[WorkingSpace] = None,
         is_basic_level: bool = False,
-        coordinates_from_super_space_location: Callable = None,
+        super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ) -> WorkingSpace:
@@ -301,13 +320,14 @@ class Homer:
             parent_id="",
             name=name,
             parent_concept=parent_concept,
+            conceptual_space=conceptual_space,
             locations=(locations if locations is not None else []),
             contents=(contents if contents is not None else StructureCollection()),
             no_of_dimensions=no_of_dimensions,
             dimensions=(dimensions if dimensions is not None else []),
             sub_spaces=(sub_spaces if sub_spaces is not None else []),
             is_basic_level=is_basic_level,
-            coordinates_from_super_space_location=coordinates_from_super_space_location,
+            super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
         )

@@ -29,6 +29,7 @@ def test_update_activation(
         "name",
         Mock(),
         Mock(),
+        Mock(),
         StructureCollection({structure_1, structure_2, structure_3}),
         Mock(),
         Mock(),

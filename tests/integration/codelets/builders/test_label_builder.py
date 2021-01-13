@@ -37,6 +37,7 @@ def top_level_working_space():
         Mock(),
         "top level working",
         Mock(),
+        Mock(),
         [],
         StructureCollection(),
         0,
@@ -112,6 +113,7 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chamber.concepts.add(mild_concept)
@@ -162,6 +164,7 @@ def target_chunk(bubble_chamber):
         Mock(),
         "input",
         location_concept,
+        Mock(),
         [],
         StructureCollection(),
         Mock(),

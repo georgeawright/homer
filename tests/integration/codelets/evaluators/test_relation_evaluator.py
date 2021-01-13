@@ -28,6 +28,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     relation_concept = Concept(
@@ -108,7 +109,7 @@ def more_concept():
 @pytest.fixture
 def input_space(location_concept):
     space = WorkingSpace(
-        Mock(), Mock(), "input", Mock(), [], StructureCollection(), 0, [], []
+        Mock(), Mock(), "input", Mock(), Mock(), [], StructureCollection(), 0, [], []
     )
     return space
 
@@ -116,7 +117,16 @@ def input_space(location_concept):
 @pytest.fixture
 def temperature_space(temperature_concept):
     space = WorkingSpace(
-        Mock(), Mock(), "temperature", Mock(), [], StructureCollection(), 0, [], []
+        Mock(),
+        Mock(),
+        "temperature",
+        Mock(),
+        Mock(),
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
     )
     return space
 

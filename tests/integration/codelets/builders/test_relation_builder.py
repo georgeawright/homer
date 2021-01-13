@@ -112,6 +112,7 @@ def bubble_chamber(more_concept, relational_concepts_space):
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chamber.concepts.add(more_concept)
@@ -143,7 +144,16 @@ def target_chunk(bubble_chamber, temperature_space):
         Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
     )
     input_space = WorkingSpace(
-        Mock(), Mock(), "input", location_concept, [], StructureCollection(), 0, [], []
+        Mock(),
+        Mock(),
+        "input",
+        location_concept,
+        Mock(),
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
     )
     chunk = Chunk(
         Mock(),

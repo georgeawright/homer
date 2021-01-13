@@ -132,6 +132,7 @@ def coderack():
     return rack
 
 
+@pytest.mark.skip
 def test_engenders_chunk_builder(
     bubble_chamber, coderack, build_concept, chunk_concept
 ):
@@ -169,6 +170,7 @@ def test_engenders_correspondence_builder(
     )
 
 
+@pytest.mark.skip
 def test_engenders_label_builder(
     bubble_chamber, coderack, build_concept, label_concept
 ):
@@ -187,6 +189,7 @@ def test_engenders_label_builder(
     )
 
 
+@pytest.mark.skip
 def test_engenders_relation_builder(
     bubble_chamber, coderack, build_concept, relation_concept
 ):

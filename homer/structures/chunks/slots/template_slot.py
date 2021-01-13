@@ -1,3 +1,5 @@
+from typing import List
+
 from homer.location import Location
 from homer.word_form import WordForm
 from homer.structure_collection import StructureCollection
@@ -12,13 +14,13 @@ class TemplateSlot(Slot):
         parent_id: str,
         prototype: Concept,
         form: WordForm,
-        location: Location,
+        locations: List[Location],
     ):
         Slot.__init__(
             self,
             structure_id,
             parent_id,
             value=prototype,
-            location=location,
+            locations=locations,
         )
         self.form = form

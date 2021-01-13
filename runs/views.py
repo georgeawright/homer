@@ -152,6 +152,22 @@ def run_view(request, run_id):
             output += "<br>"
         except AttributeError:
             pass  # relations with no parent space are links between concepts
+    correspondences = [
+        structure
+        for structure in structure_records
+        if re.match(r"^Correspondence*", structure.structure_id)
+    ]
+    output += "<h2>Correspondences</h2>"
+    for correspondence in correspondences:
+        output += (
+            f"{correspondence.structure_id}: "
+            + f"{correspondence.value}("
+            + f"{correspondence.parent_space.value}, "
+            + f"{correspondence.start.structure_id}, "
+            + f"{correspondence.end.structure_id}) "
+            + str(last_value_of_dict(correspondence.quality))
+        )
+        output += "<br>"
     templates = [
         structure
         for structure in structure_records
@@ -369,12 +385,21 @@ def codelets_view(request, run_id):
 
 
 def codelet_view(request, run_id, codelet_id):
+    codelet_result_code_to_str = lambda code: {
+        0: "SUCCESS",
+        1: "FAIL",
+        2: "FIZZLE",
+        None: "N/A",
+    }[code]
     codelet_record = CodeletRecord.objects.get(run_id=run_id, codelet_id=codelet_id)
     output = "<h1>" + codelet_id + "</h1>"
     output += "<ul>"
     output += "<li>Birth Time: " + str(codelet_record.birth_time) + "</li>"
     output += "<li>Time Run: " + str(codelet_record.time_run) + "</li>"
     output += "<li>Urgency: " + str(codelet_record.urgency) + "</li>"
+    output += (
+        "<li>Result: " + codelet_result_code_to_str(codelet_record.result) + "</li>"
+    )
     output += "<li>Target Structure: "
     if codelet_record.target_structure is not None:
         output += (
@@ -466,6 +491,16 @@ def structure_view(request, run_id, structure_id):
         run_id=run_id, structure_id=structure_id
     )
     output = "<h1>" + structure_id + "</h1>"
+    if "Relation" in structure_id:
+        output += (
+            f"{structure_id}: "
+            + f"{structure_record.value}("
+            + f"{structure_record.parent_space.value}, "
+            + f"{structure_record.start.structure_id}, "
+            + f"{structure_record.end.structure_id}) "
+            + str(last_value_of_dict(structure_record.quality))
+            + "<br>"
+        )
     output += "<ul>"
     output += "<li>Birth Time: " + str(structure_record.time_created) + "</li>"
     output += f"<li>Value: {structure_record.value}</li>"
@@ -486,7 +521,7 @@ def structure_view(request, run_id, structure_id):
         output += (
             '<li>Parent Concept: <a href="/runs/'
             + str(run_id)
-            + "/concepts/"
+            + "/structures/"
             + structure_record.parent_concept.structure_id
             + '">'
             + structure_record.parent_concept.structure_id
