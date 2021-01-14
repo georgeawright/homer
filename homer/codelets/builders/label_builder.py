@@ -68,7 +68,7 @@ class LabelBuilder(Builder):
 
     def _calculate_confidence(self):
         self.confidence = self.parent_concept.classifier.classify(
-            {"concept": self.parent_concept, "start": self.target_chunk}
+            concept=self.parent_concept, start=self.target_chunk
         )
 
     def _process_structure(self):

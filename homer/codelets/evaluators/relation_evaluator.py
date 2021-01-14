@@ -44,12 +44,10 @@ class RelationEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         self.confidence = self.target_structure.parent_concept.classifier.classify(
-            {
-                "space": self.target_structure.parent_space,
-                "concept": self.target_structure.parent_concept,
-                "start": self.target_structure.start,
-                "end": self.target_structure.end,
-            }
+            space=self.target_structure.parent_space,
+            concept=self.target_structure.parent_concept,
+            start=self.target_structure.start,
+            end=self.target_structure.end,
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
 

@@ -14,7 +14,7 @@ def test_classify_labels_with_different_concept():
     end_concept = Mock()
     end = Label(Mock(), Mock(), Mock(), end_concept, Mock(), 0.0)
     classifier = DifferentnessClassifier()
-    assert 0.9 == classifier.classify({"start": start, "end": end, "concept": Mock()})
+    assert 0.9 == classifier.classify(start=start, end=end, concept=Mock())
 
 
 def test_classify_labels_with_same_concept():
@@ -23,7 +23,7 @@ def test_classify_labels_with_same_concept():
     start = Label(Mock(), Mock(), Mock(), concept, Mock(), 1.0)
     end = Label(Mock(), Mock(), Mock(), concept, Mock(), 0.0)
     classifier = DifferentnessClassifier()
-    assert 0.0 == classifier.classify({"start": start, "end": end, "concept": Mock()})
+    assert 0.0 == classifier.classify(start=start, end=end, concept=Mock())
 
 
 def test_classify_chunks_with_different_labels():
@@ -86,7 +86,7 @@ def test_classify_chunks_with_different_labels():
     end_label.links_out.add(correspondence)
     classifier = DifferentnessClassifier()
     assert 1.0 == classifier.classify(
-        {"start": start, "end": end, "concept": differentness_concept}
+        start=start, end=end, concept=differentness_concept
     )
 
 
@@ -97,7 +97,7 @@ def test_classify_chunks_without_different_labels():
     differentness_concept = Mock()
     classifier = DifferentnessClassifier()
     assert 0.0 == classifier.classify(
-        {"start": start, "end": end, "concept": differentness_concept}
+        start=start, end=end, concept=differentness_concept
     )
 
 
@@ -238,9 +238,5 @@ def test_classify_relations_with_different_arguments():
 
     classifier = DifferentnessClassifier()
     assert 1.0 == classifier.classify(
-        {
-            "start": start_relation,
-            "end": end_relation,
-            "concept": differentness_concept,
-        }
+        start=start_relation, end=end_relation, concept=differentness_concept
     )

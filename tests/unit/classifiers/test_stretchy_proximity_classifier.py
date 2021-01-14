@@ -42,4 +42,4 @@ def test_classify(
         else:
             neighbour.has_label.return_value = False
     example.neighbours = neighbours
-    assert expected == classifier.classify({"concept": concept, "start": example})
+    assert expected == classifier.classify(concept=concept, start=example)

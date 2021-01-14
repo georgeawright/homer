@@ -12,14 +12,14 @@ def test_classify_labels_with_same_concept():
     start = Label(Mock(), Mock(), Mock(), concept, Mock(), 1.0)
     end = Label(Mock(), Mock(), Mock(), concept, Mock(), 0.0)
     classifier = SamenessClassifier()
-    assert 0.5 == classifier.classify({"start": start, "end": end, "concept": Mock()})
+    assert 0.5 == classifier.classify(start=start, end=end, concept=Mock())
 
 
 def test_classify_labels_with_different_concept():
     start = Label(Mock(), Mock(), Mock(), Mock(), Mock(), 1.0)
     end = Label(Mock(), Mock(), Mock(), Mock(), Mock(), 0.0)
     classifier = SamenessClassifier()
-    assert 0.0 == classifier.classify({"start": start, "end": end, "concept": Mock()})
+    assert 0.0 == classifier.classify(start=start, end=end, concept=Mock())
 
 
 def test_classify_chunks_with_same_labels():
@@ -80,9 +80,7 @@ def test_classify_chunks_with_same_labels():
     end_label.links_in.add(correspondence)
     end_label.links_out.add(correspondence)
     classifier = SamenessClassifier()
-    assert 1.0 == classifier.classify(
-        {"start": start, "end": end, "concept": sameness_concept}
-    )
+    assert 1.0 == classifier.classify(start=start, end=end, concept=sameness_concept)
 
 
 def test_classify_chunks_without_same_labels():
@@ -91,9 +89,7 @@ def test_classify_chunks_without_same_labels():
     end = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     sameness_concept = Mock()
     classifier = SamenessClassifier()
-    assert 0.0 == classifier.classify(
-        {"start": start, "end": end, "concept": sameness_concept}
-    )
+    assert 0.0 == classifier.classify(start=start, end=end, concept=sameness_concept)
 
 
 def test_classify_relations_with_same_arguments():
@@ -233,5 +229,5 @@ def test_classify_relations_with_same_arguments():
 
     classifier = SamenessClassifier()
     assert 1.0 == classifier.classify(
-        {"start": start_relation, "end": end_relation, "concept": sameness_concept}
+        start=start_relation, end=end_relation, concept=sameness_concept
     )

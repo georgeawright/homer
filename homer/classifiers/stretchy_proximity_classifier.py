@@ -6,12 +6,12 @@ class StretchyProximityClassifier(Classifier):
         self.proximity_weight = proximity_weight
         self.neighbours_weight = neighbours_weight
 
-    def classify(self, arguments: dict):
-        proximity = arguments["concept"].proximity_to(arguments["start"])
-        if len(arguments["start"].neighbours) > 0:
-            neighbours = arguments["start"].neighbours.proportion_with_label(
-                arguments["concept"]
-            )
+    def classify(self, **kwargs: dict):
+        concept = kwargs["concept"]
+        start = kwargs["start"]
+        proximity = concept.proximity_to(start)
+        if len(start.neighbours) > 0:
+            neighbours = start.neighbours.proportion_with_label(concept)
             return sum(
                 [self.proximity_weight * proximity, self.neighbours_weight * neighbours]
             )

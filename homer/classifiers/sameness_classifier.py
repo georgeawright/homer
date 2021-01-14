@@ -11,10 +11,10 @@ class SamenessClassifier(Classifier):
     def __init__(self):
         pass
 
-    def classify(self, arguments: dict):
-        start = arguments["start"]
-        end = arguments["end"]
-        sameness_concept = arguments["concept"]
+    def classify(self, **kwargs: dict):
+        start = kwargs["start"]
+        end = kwargs["end"]
+        sameness_concept = kwargs["concept"]
         if isinstance(start, Label) and isinstance(end, Label):
             if start.parent_concept == end.parent_concept:
                 return statistics.fmean([start.quality, end.quality])
@@ -54,18 +54,10 @@ class SamenessClassifier(Classifier):
                 return FloatBetweenOneAndZero(0)
         if isinstance(start, Relation) and isinstance(end, Relation):
             relation_starts_sameness = self.classify(
-                {
-                    "start": start.start,
-                    "end": end.start,
-                    "concept": sameness_concept,
-                }
+                start=start.start, end=end.start, concept=sameness_concept
             )
             relation_ends_sameness = self.classify(
-                {
-                    "start": start.end,
-                    "end": end.end,
-                    "concept": sameness_concept,
-                }
+                start=start.end, end=end.end, concept=sameness_concept
             )
             relation_concepts_sameness = FloatBetweenOneAndZero(
                 start.parent_concept == end.parent_concept

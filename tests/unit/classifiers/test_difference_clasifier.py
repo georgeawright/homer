@@ -9,7 +9,7 @@ from homer.classifiers import DifferenceClassifier
 )
 def test_classify(start_value, end_value, expected):
     scalar_classifier = Mock()
-    scalar_classifier.classify = lambda x: 1 if x["start"].value[0] > 0 else 0
+    scalar_classifier.classify = lambda **x: 1 if x["start"].value[0] > 0 else 0
     classifier = DifferenceClassifier(scalar_classifier)
     start = Mock()
     start.value = start_value
@@ -17,4 +17,4 @@ def test_classify(start_value, end_value, expected):
     end.value = end_value
     space = Mock()
     space.parent_concept.relevant_value = "value"
-    assert expected == classifier.classify({"start": start, "end": end, "space": space})
+    assert expected == classifier.classify(start=start, end=end, space=space)

@@ -44,10 +44,8 @@ class LabelEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         self.confidence = self.target_structure.parent_concept.classifier.classify(
-            {
-                "start": self.target_structure.start,
-                "concept": self.target_structure.parent_concept,
-            }
+            start=self.target_structure.start,
+            concept=self.target_structure.parent_concept,
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
 
