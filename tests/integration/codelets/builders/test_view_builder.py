@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ViewBuilder, ViewEnlarger
+from homer.codelets.builders import ViewBuilder
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept

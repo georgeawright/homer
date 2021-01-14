@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ViewBuilder, ViewEnlarger
+from homer.codelets.builders import ViewBuilder
 from homer.structure_collection import StructureCollection
 from homer.structures.chunks import View
 

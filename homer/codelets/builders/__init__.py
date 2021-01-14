@@ -4,5 +4,4 @@ from .function_word_builder import FunctionWordBuilder
 from .label_builder import LabelBuilder
 from .relation_builder import RelationBuilder
 from .view_builder import ViewBuilder
-from .view_enlarger import ViewEnlarger
 from .word_builder import WordBuilder
