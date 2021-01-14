@@ -129,7 +129,7 @@ def run_view(request, run_id):
                 + f'<a href="structures/{link.start.structure_id}">{link.start.structure_id}</a>, '
                 + f'<a href="structures/{link.end.structure_id}">{link.end.structure_id}</a>)'
                 for link in chunk.links.all()
-                if re.match(r"^Relations*", link.structure_id)
+                if re.match(r"^Relation*", link.structure_id)
             ]
         )
         output += '<table border="1">'
