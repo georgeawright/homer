@@ -16,19 +16,19 @@ class DifferenceClassifier(Classifier):
         self.proximity_weight = proximity_weight
         self.neighbours_weight = neighbours_weight
 
-    def classify(self, arguments: dict):
+    def classify(self, **kwargs: dict):
         class Dummy:
             def __init__(self, value):
                 self.value = [value]
 
+        start = kwargs["start"]
+        end = kwargs["end"]
+        space = kwargs["space"]
+
         difference = (
-            getattr(
-                arguments["start"], arguments["space"].parent_concept.relevant_value
-            )[0]
-            - getattr(
-                arguments["end"], arguments["space"].parent_concept.relevant_value
-            )[0]
+            getattr(start, space.parent_concept.relevant_value)[0]
+            - getattr(end, space.parent_concept.relevant_value)[0]
         )
         difference_container = Dummy(difference)
-        arguments["start"] = difference_container
-        return self.scalar_classifier.classify(arguments)
+        kwargs["start"] = difference_container
+        return self.scalar_classifier.classify(**kwargs)

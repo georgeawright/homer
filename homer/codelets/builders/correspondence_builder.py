@@ -118,12 +118,10 @@ class CorrespondenceBuilder(Builder):
 
     def _calculate_confidence(self):
         self.confidence = self.parent_concept.classifier.classify(
-            {
-                "concept": self.parent_concept,
-                "space": self.target_conceptual_space,
-                "start": self.target_structure_one,
-                "end": self.target_structure_two,
-            }
+            concept=self.parent_concept,
+            space=self.target_conceptual_space,
+            start=self.target_structure_one,
+            end=self.target_structure_two,
         )
 
     def _process_structure(self):

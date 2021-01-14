@@ -10,10 +10,10 @@ class DifferentnessClassifier(Classifier):
     def __init__(self):
         pass
 
-    def classify(self, arguments: dict):
-        start = arguments["start"]
-        end = arguments["end"]
-        differentness_concept = arguments["concept"]
+    def classify(self, **kwargs: dict):
+        start = kwargs["start"]
+        end = kwargs["end"]
+        differentness_concept = kwargs["concept"]
         if type(start) != type(end):
             return FloatBetweenOneAndZero(0)
         if isinstance(start, Label):
@@ -43,18 +43,10 @@ class DifferentnessClassifier(Classifier):
                 return FloatBetweenOneAndZero(0)
         if isinstance(start, Relation):
             relation_starts_sameness = self.classify(
-                {
-                    "start": start.start,
-                    "end": end.start,
-                    "concept": differentness_concept,
-                }
+                start=start.start, end=end.start, concept=differentness_concept
             )
             relation_ends_sameness = self.classify(
-                {
-                    "start": start.end,
-                    "end": end.end,
-                    "concept": differentness_concept,
-                }
+                start=start.end, end=end.end, concept=differentness_concept
             )
             relation_concepts_sameness = 1 - start.parent_concept.proximity_to(
                 end.parent_concept
