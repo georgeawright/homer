@@ -121,6 +121,17 @@ def run_view(request, run_id):
                 if re.match(r"^Label*", link.structure_id)
             ]
         )
+        output += "".join(
+            [
+                f'<a href="structures/{link.structure_id}">{link.value}</a>('
+                + f'<a href="structures/{link.parent_space.structure_id}">'
+                + f"{link.parent_space.structure_id}</a>, "
+                + f'<a href="structures/{link.start.structure_id}">{link.start.structure_id}</a>, '
+                + f'<a href="structures/{link.end.structure_id}">{link.end.structure_id}</a>)'
+                for link in chunk.links.all()
+                if re.match(r"^Relations*", link.structure_id)
+            ]
+        )
         output += '<table border="1">'
         for i in range(last_row + 1):
             output += "<tr>"
@@ -142,11 +153,15 @@ def run_view(request, run_id):
     for relation in relations:
         try:
             output += (
-                f"{relation.structure_id}: "
+                f'<a href="structures/{relation.structure_id}">'
+                + f"{relation.structure_id}</a>: "
                 + f"{relation.value}("
-                + f"{relation.parent_space.value}, "
-                + f"{relation.start.structure_id}, "
-                + f"{relation.end.structure_id}) "
+                + f'<a href="structures/{relation.parent_space.structure_id}">'
+                + f"{relation.parent_space.value}</a>, "
+                + f'<a href="structures/{relation.start.structure_id}">'
+                + f"{relation.start.structure_id}</a>, "
+                + f'<a href="structures/{relation.end.structure_id}">'
+                + f"{relation.end.structure_id}</a>) "
                 + str(last_value_of_dict(relation.quality))
             )
             output += "<br>"
@@ -160,11 +175,15 @@ def run_view(request, run_id):
     output += "<h2>Correspondences</h2>"
     for correspondence in correspondences:
         output += (
-            f"{correspondence.structure_id}: "
+            f'<a href="structures/{correspondence.structure_id}">'
+            + f"{correspondence.structure_id}</a>: "
             + f"{correspondence.value}("
-            + f"{correspondence.parent_space.value}, "
-            + f"{correspondence.start.structure_id}, "
-            + f"{correspondence.end.structure_id}) "
+            + f'<a href="structures/{correspondence.parent_space.structure_id}">'
+            + f"{correspondence.parent_space.value}</a>, "
+            + f'<a href="structures/{correspondence.start.structure_id}">'
+            + f"{correspondence.start.structure_id}</a>, "
+            + f'<a href="structures/{correspondence.end.structure_id}">'
+            + f"{correspondence.end.structure_id}</a>) "
             + str(last_value_of_dict(correspondence.quality))
         )
         output += "<br>"
@@ -177,7 +196,8 @@ def run_view(request, run_id):
     for template in templates:
         activation = last_value_of_dict(template.activation)
         output += (
-            f"{template.structure_id}: {template.value} (activation: {activation})"
+            f'<a href="structures/{template.structure_id}">{template.structure_id}</a>: '
+            + f"{template.value} (activation: {activation})"
         )
         output += "<br>"
     return HttpResponse(output)
