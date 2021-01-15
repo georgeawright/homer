@@ -5,17 +5,19 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ViewBuilder
+from homer.codelets.evaluators import ViewEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept
 from homer.structures.chunks import View
 from homer.structures.links import Correspondence, Relation
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 @pytest.fixture
 def bubble_chamber():
     chamber = BubbleChamber(
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -33,14 +35,22 @@ def bubble_chamber():
         Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
     )
     chamber.concepts.add(text_concept)
-    chamber.working_spaces.add(
-        WorkingSpace(
-            Mock(), Mock(), "top level working", StructureCollection(), Mock(), Mock()
-        )
+    text_conceptual_space = ConceptualSpace(
+        Mock(), Mock(), "text", text_concept, [], StructureCollection(), 1, [], []
     )
+    chamber.conceptual_spaces.add(text_conceptual_space)
     chamber.working_spaces.add(
         WorkingSpace(
-            Mock(), Mock(), "top level working", StructureCollection(), Mock(), Mock()
+            Mock(),
+            Mock(),
+            "top level working",
+            Mock(),
+            Mock(),
+            [],
+            StructureCollection(),
+            0,
+            [],
+            [],
         )
     )
     view_concept = Concept(
@@ -63,10 +73,13 @@ def target_start_space():
         Mock(),
         Mock(),
         "start",
+        Mock(),
+        Mock(),
+        [],
         StructureCollection(),
-        Mock(),
-        Mock(),
-        parent_spaces=StructureCollection(),
+        1,
+        [],
+        [],
     )
     return space
 
@@ -77,10 +90,13 @@ def target_end_space():
         Mock(),
         Mock(),
         "end",
+        Mock(),
+        Mock(),
+        [],
         StructureCollection(),
-        Mock(),
-        Mock(),
-        parent_spaces=StructureCollection(),
+        1,
+        [],
+        [],
     )
     return space
 
@@ -118,13 +134,11 @@ def target_end(target_end_space):
 
 
 @pytest.fixture
-def target_correspondence(
+def target_view_correspondence(
     bubble_chamber, target_start, target_end, target_start_space, target_end_space
 ):
     parent_concept = Mock()
-    parent_space = bubble_chamber.common_parent_space(
-        target_start_space, target_end_space
-    )
+    parent_space = bubble_chamber.get_super_space(target_start_space, target_end_space)
     conceptual_space = Mock()
     quality = 1.0
     correspondence = Correspondence(
@@ -132,10 +146,10 @@ def target_correspondence(
         Mock(),
         target_start,
         target_end,
+        Location(Mock(), parent_space),
         target_start_space,
         target_end_space,
         parent_concept,
-        parent_space,
         conceptual_space,
         quality,
     )
@@ -149,13 +163,13 @@ def target_correspondence(
 
 
 @pytest.fixture
-def second_target_correspondence(bubble_chamber, target_start_space, target_end_space):
+def second_target_view_correspondence(
+    bubble_chamber, target_start_space, target_end_space
+):
     start = Mock()
     end = Mock()
     parent_concept = Mock()
-    parent_space = bubble_chamber.common_parent_space(
-        target_start_space, target_end_space
-    )
+    parent_space = bubble_chamber.get_super_space(target_start_space, target_end_space)
     conceptual_space = Mock()
     quality = 1.0
     correspondence = Correspondence(
@@ -163,10 +177,10 @@ def second_target_correspondence(bubble_chamber, target_start_space, target_end_
         Mock(),
         start,
         end,
+        Location(Mock(), parent_space),
         target_start_space,
         target_end_space,
         parent_concept,
-        parent_space,
         conceptual_space,
         quality,
     )
@@ -175,22 +189,48 @@ def second_target_correspondence(bubble_chamber, target_start_space, target_end_
     return correspondence
 
 
-@pytest.mark.skip
-def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_cannot_be_recreated(
-    bubble_chamber, target_correspondence, second_target_correspondence
+@pytest.fixture
+def target_view(bubble_chamber, target_view_correspondence):
+    view = View(
+        Mock(),
+        Mock(),
+        Location([], bubble_chamber.spaces["top level working"]),
+        StructureCollection({target_view_correspondence}),
+        Mock(),
+        1.0,
+    )
+    bubble_chamber.spaces["top level working"].add(view)
+    bubble_chamber.views.add(view)
+    return view
+
+
+@pytest.fixture
+def second_target_view(bubble_chamber, second_target_view_correspondence):
+    view = View(
+        Mock(),
+        Mock(),
+        Location([], bubble_chamber.spaces["top level working"]),
+        StructureCollection({second_target_view_correspondence}),
+        Mock(),
+        1.0,
+    )
+    bubble_chamber.spaces["top level working"].add(view)
+    bubble_chamber.views.add(view)
+    return view
+
+
+def test_successful_adds_members_to_view_and_spawns_follow_up_and_same_view_cannot_be_recreated(
+    bubble_chamber,
+    target_view,
+    second_target_view,
 ):
     parent_id = ""
     urgency = 1.0
-
-    builder = ViewBuilder.spawn(
-        parent_id, bubble_chamber, target_correspondence, urgency
-    )
+    builder = ViewBuilder.spawn(parent_id, bubble_chamber, target_view, urgency)
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert isinstance(builder.child_structure, View)
-    assert isinstance(builder.child_codelets[0], ViewEnlarger)
-    builder = ViewBuilder.spawn(
-        parent_id, bubble_chamber, target_correspondence, urgency
-    )
+    assert isinstance(builder.child_codelets[0], ViewEvaluator)
+    builder = ViewBuilder.spawn(parent_id, bubble_chamber, target_view, urgency)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

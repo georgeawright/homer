@@ -60,8 +60,6 @@ class ViewBuilder(Builder):
             self.second_target_view = self.target_view.nearby().get_random()
         except MissingStructureError:
             return False
-        print(self.target_view.members.structures)
-        print(self.second_target_view.members.structures)
         return not self.bubble_chamber.has_view(
             StructureCollection.union(
                 self.target_view.members, self.second_target_view.members
@@ -142,8 +140,8 @@ class ViewBuilder(Builder):
         view = View(
             view_id,
             self.codelet_id,
+            Location([], top_level_working_space),
             self.correspondences,
-            top_level_working_space,
             view_output_space,
             0,
         )

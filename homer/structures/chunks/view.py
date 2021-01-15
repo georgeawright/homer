@@ -1,4 +1,5 @@
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.chunk import Chunk
 from homer.structures.links.correspondence import Correspondence
@@ -13,13 +14,13 @@ class View(Chunk):
         self,
         structure_id: str,
         parent_id: str,
+        location: Location,
         members: StructureCollection,
-        parent_space: Space,
         output_space: WorkingSpace,
         quality: FloatBetweenOneAndZero,
     ):
         value = None
-        location = None
+        parent_space = location.space
         Chunk.__init__(
             self,
             structure_id,
@@ -36,9 +37,3 @@ class View(Chunk):
     @property
     def size(self):
         return len(self.members)
-
-    def nearby(self, space: Space = None):
-        return StructureCollection.difference(
-            StructureCollection.union(*[member.nearby() for member in self.members]),
-            self.members,
-        )
