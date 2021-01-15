@@ -7,8 +7,9 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept, Space
-from homer.structures.links import Correspondence, Label, Relation
+from homer.structures import Concept, Space
+from homer.structures.chunks import View
+from homer.structures.links import Correspondence
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 from .relation_builder import RelationBuilder
@@ -148,6 +149,12 @@ class CorrespondenceBuilder(Builder):
         self.target_structure_two.links_out.add(correspondence)
         self.bubble_chamber.correspondences.add(correspondence)
         self.bubble_chamber.logger.log(correspondence)
+        view = View.new(
+            bubble_chamber=self.bubble_chamber,
+            parent_id=self.codelet_id,
+            members=StructureCollection({correspondence}),
+        )
+        self.bubble_chamber.logger.log(view)
         self.child_structure = correspondence
 
     def _engender_follow_up(self):

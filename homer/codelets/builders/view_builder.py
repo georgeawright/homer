@@ -121,31 +121,11 @@ class ViewBuilder(Builder):
             self.correspondences_to_add.remove(correspondence)
 
     def _process_structure(self):
-        view_id = ID.new(View)
-        top_level_working_space = self.bubble_chamber.spaces["top level working"]
-        view_output_space = WorkingSpace(
-            ID.new(WorkingSpace),
-            self.codelet_id,
-            f"output for {view_id}",
-            self.bubble_chamber.concepts["text"],
-            self.bubble_chamber.conceptual_spaces["text"],
-            [Location([], top_level_working_space)],
-            StructureCollection(),
-            1,
-            [],
-            [],
+        view = View.new(
+            bubble_chamber=self.bubble_chamber,
+            parent_id=self.codelet_id,
+            members=self.correspondences,
         )
-        self.bubble_chamber.working_spaces.add(view_output_space)
-        self.bubble_chamber.logger.log(view_output_space)
-        view = View(
-            view_id,
-            self.codelet_id,
-            Location([], top_level_working_space),
-            self.correspondences,
-            view_output_space,
-            0,
-        )
-        self.bubble_chamber.views.add(view)
         self.bubble_chamber.logger.log(view)
         self.child_structure = view
 

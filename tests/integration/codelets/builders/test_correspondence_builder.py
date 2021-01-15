@@ -67,6 +67,23 @@ def bubble_chamber():
     relation = Relation(
         Mock(), Mock(), correspondence_concept, build_concept, None, None, 1
     )
+    text_concept = Concept(
+        Mock(),
+        Mock(),
+        "text",
+        None,
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(text_concept)
+    text_conceptual_space = ConceptualSpace(
+        "text", Mock(), "text", None, [], StructureCollection(), 1, [], []
+    )
+    chamber.conceptual_spaces.add(text_conceptual_space)
     correspondence_concept.links_out.add(relation)
     build_concept.links_in.add(relation)
     label_concepts_space = ConceptualSpace(

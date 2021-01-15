@@ -40,7 +40,7 @@ def label_concept_working_space(label_concept_space):
 @pytest.fixture
 def bubble_chamber(same_different_space, label_concept_space):
     chamber = Mock()
-    chamber.concepts = {"correspondence": Mock(), "build": Mock()}
+    chamber.concepts = {"correspondence": Mock(), "build": Mock(), "text": Mock()}
     label_concepts = Mock()
     label_concepts.contents.of_type.return_value = StructureCollection(
         {label_concept_space}
@@ -58,6 +58,8 @@ def bubble_chamber(same_different_space, label_concept_space):
     chamber.spaces = {
         "label concepts": label_concepts,
         "correspondential concepts": correspondential_concepts,
+        "top level working": Mock(),
+        "text": Mock(),
     }
     chamber.working_spaces = working_spaces
     return chamber

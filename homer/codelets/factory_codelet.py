@@ -100,18 +100,21 @@ class FactoryCodelet(Codelet):
                     "label": LabelBuilder,
                     "relation": RelationBuilder,
                     "correspondence": CorrespondenceBuilder,
+                    "view": ViewBuilder,
                 },
                 "evaluate": {
                     "chunk": ChunkEvaluator,
                     "label": LabelEvaluator,
                     "relation": RelationEvaluator,
                     "correspondence": CorrespondenceEvaluator,
+                    "view": ViewEvaluator,
                 },
                 "select": {
                     "chunk": ChunkSelector,
                     "label": LabelSelector,
                     "relation": RelationSelector,
                     "correspondence": CorrespondenceSelector,
+                    "view": ViewSelector,
                 },
             }[action_type.name][structure_type.name]
         except KeyError:

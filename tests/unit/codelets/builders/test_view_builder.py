@@ -13,8 +13,7 @@ def bubble_chamber():
     chamber = Mock()
     chamber.has_view.return_value = False
     chamber.concepts = {"build": Mock(), "view": Mock(), "text": Mock()}
-    chamber.conceptual_spaces = {"text": Mock()}
-    chamber.spaces = {"top level working": Mock()}
+    chamber.spaces = {"text": Mock(), "top level working": Mock()}
     return chamber
 
 

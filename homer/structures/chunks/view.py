@@ -1,4 +1,5 @@
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.chunk import Chunk
@@ -33,6 +34,33 @@ class View(Chunk):
             StructureCollection({parent_space}),
         )
         self.output_space = output_space
+
+    @classmethod
+    def new(
+        cls,
+        bubble_chamber: "BubbleChamber",
+        parent_id: str,
+        members: StructureCollection = None,
+    ):
+        members = members if members is not None else StructureCollection()
+        view_id = ID.new(View)
+        view_location = Location([], bubble_chamber.spaces["top level working"])
+        view_output = WorkingSpace(
+            ID.new(WorkingSpace),
+            parent_id,
+            f"output for {view_id}",
+            bubble_chamber.concepts["text"],
+            bubble_chamber.spaces["text"],
+            view_location,
+            StructureCollection(),
+            1,
+            [],
+            [],
+        )
+        bubble_chamber.working_spaces.add(view_output)
+        view = View(view_id, parent_id, view_location, members, view_output, 0.0)
+        bubble_chamber.views.add(view)
+        return view
 
     @property
     def size(self):
