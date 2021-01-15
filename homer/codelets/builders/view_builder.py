@@ -60,6 +60,8 @@ class ViewBuilder(Builder):
             self.second_target_view = self.target_view.nearby().get_random()
         except MissingStructureError:
             return False
+        print(self.target_view.members.structures)
+        print(self.second_target_view.members.structures)
         return not self.bubble_chamber.has_view(
             StructureCollection.union(
                 self.target_view.members, self.second_target_view.members
@@ -70,7 +72,8 @@ class ViewBuilder(Builder):
         self.confidence = 1.0
         self.correspondences = self.target_view.members.copy()
         self.correspondences_to_add = self.second_target_view.members.copy()
-        for correspondence in self.correspondences_to_add:
+        while not self.correspondences_to_add.is_empty():
+            correspondence = self.correspondences_to_add.get_random()
             self._add_correspondence_and_update_confidence(correspondence)
 
     def _add_correspondence_and_update_confidence(self, new: Correspondence):
