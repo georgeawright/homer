@@ -108,6 +108,10 @@ template_concept = homer.def_concept(
     name="template",
     parent_space=structures_space,
 )
+text_concept = homer.def_concept(
+    name="text",
+    parent_space=structures_space,
+)
 label_concepts_space = homer.def_conceptual_space(
     name="label concepts",
     parent_concept=label_concept,
@@ -126,6 +130,11 @@ correspondential_concepts_space = homer.def_conceptual_space(
 templates_space = homer.def_conceptual_space(
     name="templates",
     parent_concept=template_concept,
+    locations=[Location([], top_level_conceptual_space)],
+)
+text_space = homer.def_conceptual_space(
+    name="text",
+    parent_concept=text_concept,
     locations=[Location([], top_level_conceptual_space)],
 )
 homer.def_concept_link(build_concept, chunk_concept)
