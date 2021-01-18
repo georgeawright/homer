@@ -187,6 +187,16 @@ def run_view(request, run_id):
             + str(last_value_of_dict(correspondence.quality))
         )
         output += "<br>"
+    views = [
+        structure
+        for structure in structure_records
+        if re.match(r"^View*", structure.structure_id)
+    ]
+    output += "<h2>Views</h2>"
+    for view in views:
+        output += (
+            f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: <br>'
+        )
     templates = [
         structure
         for structure in structure_records
