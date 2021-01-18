@@ -194,9 +194,11 @@ def run_view(request, run_id):
     ]
     output += "<h2>Views</h2>"
     for view in views:
-        output += (
-            f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: <br>'
-        )
+        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: ('
+        for member in view.members.all():
+            output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
+        output = output[:-2]
+        output += ")<br>"
     templates = [
         structure
         for structure in structure_records
