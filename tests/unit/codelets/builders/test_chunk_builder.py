@@ -42,6 +42,9 @@ def second_target_chunk(common_space):
     chunk.parent_spaces = StructureCollection({common_space})
     chunk.links_in = StructureCollection()
     chunk.links_out = StructureCollection()
+    chunk.labels = []
+    chunk.relations = []
+    chunk.correspondences = []
     return chunk
 
 
@@ -62,6 +65,9 @@ def target_chunk(common_space, second_target_chunk):
     chunk.nearby.return_value = StructureCollection({second_target_chunk})
     chunk.links_in = StructureCollection()
     chunk.links_out = StructureCollection()
+    chunk.labels = []
+    chunk.relations = []
+    chunk.correspondences = []
     return chunk
 
 

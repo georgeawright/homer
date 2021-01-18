@@ -166,13 +166,16 @@ class Structure(ABC):
 
         if isinstance(structure, Label):
             return self.has_label(structure.parent_concept)
+        if isinstance(structure, Relation):
+            return self.has_relation(
+                structure.parent_space,
+                structure.parent_concept,
+                structure.start,
+                structure.end,
+            )
         other_arg = structure.end if self == structure.start else structure.start
         if isinstance(structure, Correspondence):
             return self.has_correspondence(
-                structure.conceptual_space, structure.parent_concept, other_arg
-            )
-        if isinstance(structure, Relation):
-            return self.has_relation(
                 structure.parent_space, structure.parent_concept, other_arg
             )
         return False
@@ -189,13 +192,18 @@ class Structure(ABC):
         )
 
     def has_relation(
-        self, space: Structure, concept: Structure, second_argument: Structure
+        self,
+        space: Structure,
+        concept: Structure,
+        first_argument: Structure,
+        second_argument: Structure,
     ) -> bool:
-        for link in self.links_out:
+        for relation in self.relations:
             if (
-                link.parent_concept == concept
-                and link.end == second_argument
-                and link.parent_space == space
+                relation.parent_concept == concept
+                and relation.start == first_argument
+                and relation.end == second_argument
+                and relation.parent_space == space
             ):
                 return True
         return False
@@ -224,11 +232,11 @@ class Structure(ABC):
     def has_correspondence(
         self, space: Structure, concept: Structure, second_argument: Structure
     ) -> bool:
-        for link in self.links_out:
+        for correspondence in self.correspondences:
             if (
-                link.parent_concept == concept
-                and link.end == second_argument
-                and link.parent_space == space
+                correspondence.parent_concept == concept
+                and correspondence.parent_space == space
+                and second_argument in (correspondence.start, correspondence.end)
             ):
                 return True
         return False
