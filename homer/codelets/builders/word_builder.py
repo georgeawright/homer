@@ -97,7 +97,7 @@ class WordBuilder(Builder):
             StructureCollection({self.output_space}),
             0,
         )
-        slot_to_word_space = self.bubble_chamber.common_parent_space(
+        slot_to_word_space = self.bubble_chamber.get_super_space(
             self.slot_space, self.output_space
         )
         projection_from_slot = Correspondence(
@@ -121,7 +121,7 @@ class WordBuilder(Builder):
         slot_to_word_space.add(projection_from_slot)
         self.bubble_chamber.correspondences.add(projection_from_slot)
         self.target_view.members.add(projection_from_slot)
-        non_slot_to_word_space = self.bubble_chamber.common_parent_space(
+        non_slot_to_word_space = self.bubble_chamber.get_super_space(
             self.non_slot_space, self.output_space
         )
         projection_from_non_slot = Correspondence(
