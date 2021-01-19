@@ -141,8 +141,8 @@ class ChunkBuilder(Builder):
             old_arg=original_chunk, new_arg=new_chunk, parent_id=self.codelet_id
         )
         for correspondence in original_chunk.correspondences:
-            copy = copy_link(correspondence)
-            if not new_chunk.has_link(copy):
+            if not new_chunk.has_link(correspondence, start=original_chunk):
+                copy = copy_link(correspondence)
                 new_chunk.links_in.add(copy)
                 new_chunk.links_out.add(copy)
                 self.bubble_chamber.logger.log(copy)
@@ -153,14 +153,14 @@ class ChunkBuilder(Builder):
                 )
                 self.bubble_chamber.logger.log(view)
         for link in original_chunk.links_in:
-            copy = copy_link(link)
-            if not new_chunk.has_link(copy):
+            if not new_chunk.has_link(link, start=original_chunk):
+                copy = copy_link(link)
                 new_chunk.links_in.add(copy)
                 self.bubble_chamber.add_to_collections(copy)
                 self.bubble_chamber.logger.log(copy)
         for link in original_chunk.links_out:
-            copy = copy_link(link)
-            if not new_chunk.has_link(copy):
+            if not new_chunk.has_link(link, start=original_chunk):
+                copy = copy_link(link)
                 new_chunk.links_out.add(copy)
                 self.bubble_chamber.add_to_collections(copy)
                 self.bubble_chamber.logger.log(copy)

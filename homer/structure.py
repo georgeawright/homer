@@ -161,7 +161,7 @@ class Structure(ABC):
             f"{self.structure_id} has no location in space {space.structure_id}"
         )
 
-    def has_link(self, structure: Structure) -> bool:
+    def has_link(self, structure: Structure, start: Structure = None) -> bool:
         from homer.structures.links import Correspondence, Label, Relation
 
         if isinstance(structure, Label):
@@ -173,7 +173,8 @@ class Structure(ABC):
                 structure.start,
                 structure.end,
             )
-        other_arg = structure.end if self == structure.start else structure.start
+        start = start if start is not None else self
+        other_arg = structure.end if start == structure.start else structure.start
         if isinstance(structure, Correspondence):
             return self.has_correspondence(
                 structure.parent_space, structure.parent_concept, other_arg
