@@ -524,11 +524,11 @@ def structure_view(request, run_id, structure_id):
     )
     output = "<h1>" + structure_id + "</h1>"
     if "Relation" in structure_id:
+        output += f"{structure_id}: " + f"{structure_record.value}("
+        if structure_record.parent_space is not None:
+            output += f"{structure_record.parent_space.value}, "
         output += (
-            f"{structure_id}: "
-            + f"{structure_record.value}("
-            + f"{structure_record.parent_space.value}, "
-            + f"{structure_record.start.structure_id}, "
+            f"{structure_record.start.structure_id}, "
             + f"{structure_record.end.structure_id}) "
             + str(last_value_of_dict(structure_record.quality))
             + "<br>"
