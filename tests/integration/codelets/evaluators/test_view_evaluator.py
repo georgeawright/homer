@@ -28,6 +28,7 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     view_concept = Concept(
@@ -71,7 +72,12 @@ def good_view(bubble_chamber):
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0
     )
     view = View(
-        Mock(), Mock(), StructureCollection({member_1, member_2}), Mock(), Mock(), 0.5
+        Mock(),
+        Mock(),
+        Location([], Mock()),
+        StructureCollection({member_1, member_2}),
+        Mock(),
+        0.5,
     )
     return view
 
@@ -85,12 +91,16 @@ def bad_view(bubble_chamber):
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.4
     )
     view = View(
-        Mock(), Mock(), StructureCollection({member_1, member_2}), Mock(), Mock(), 0.5
+        Mock(),
+        Mock(),
+        Location([], Mock()),
+        StructureCollection({member_1, member_2}),
+        Mock(),
+        0.5,
     )
     return view
 
 
-@pytest.mark.skip
 def test_increases_quality_of_good_view(bubble_chamber, good_view):
     original_quality = good_view.quality
     parent_id = ""
@@ -103,7 +113,6 @@ def test_increases_quality_of_good_view(bubble_chamber, good_view):
     assert isinstance(evaluator.child_codelets[0], ViewSelector)
 
 
-@pytest.mark.skip
 def test_decreases_quality_of_bad_view(bubble_chamber, bad_view):
     original_quality = bad_view.quality
     parent_id = ""

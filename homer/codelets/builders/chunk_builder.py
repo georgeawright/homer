@@ -9,7 +9,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept, Space
+from homer.structures import Chunk, Space
+from homer.structures.chunks import View
 from homer.tools import average_vector, project_item_into_space
 
 
@@ -126,14 +127,11 @@ class ChunkBuilder(Builder):
             member.containing_chunks.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         self.child_structure = chunk
-        self._copy_across_links(self.target_chunk, chunk)
-        self._copy_across_links(self.second_target_chunk, chunk)
         self.bubble_chamber.logger.log(self.child_structure)
         self.bubble_chamber.logger.log(self.target_chunk)
         self.bubble_chamber.logger.log(self.second_target_chunk)
-        for link in chunk.links:
-            self.bubble_chamber.add_to_collections(link)
-            self.bubble_chamber.logger.log(link)
+        self._copy_across_links(self.target_chunk, chunk)
+        self._copy_across_links(self.second_target_chunk, chunk)
 
     def _members_from_chunk(self, chunk):
         return StructureCollection({chunk}) if chunk.size == 1 else chunk.members
@@ -142,14 +140,30 @@ class ChunkBuilder(Builder):
         copy_link = lambda link: link.copy(
             old_arg=original_chunk, new_arg=new_chunk, parent_id=self.codelet_id
         )
-        for link in original_chunk.links_in:
-            copy = copy_link(link)
-            if not new_chunk.has_link(copy):
+        for correspondence in original_chunk.correspondences:
+            if not new_chunk.has_link(correspondence, start=original_chunk):
+                copy = copy_link(correspondence)
                 new_chunk.links_in.add(copy)
-        for link in original_chunk.links_out:
-            copy = copy_link(link)
-            if not new_chunk.has_link(copy):
                 new_chunk.links_out.add(copy)
+                self.bubble_chamber.logger.log(copy)
+                view = View.new(
+                    bubble_chamber=self.bubble_chamber,
+                    parent_id=self.codelet_id,
+                    members=StructureCollection({copy}),
+                )
+                self.bubble_chamber.logger.log(view)
+        for link in original_chunk.links_in:
+            if not new_chunk.has_link(link, start=original_chunk):
+                copy = copy_link(link)
+                new_chunk.links_in.add(copy)
+                self.bubble_chamber.add_to_collections(copy)
+                self.bubble_chamber.logger.log(copy)
+        for link in original_chunk.links_out:
+            if not new_chunk.has_link(link, start=original_chunk):
+                copy = copy_link(link)
+                new_chunk.links_out.add(copy)
+                self.bubble_chamber.add_to_collections(copy)
+                self.bubble_chamber.logger.log(copy)
 
     def _get_average_value(self, chunks: StructureCollection):
         values = []

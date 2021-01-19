@@ -187,6 +187,18 @@ def run_view(request, run_id):
             + str(last_value_of_dict(correspondence.quality))
         )
         output += "<br>"
+    views = [
+        structure
+        for structure in structure_records
+        if re.match(r"^View*", structure.structure_id)
+    ]
+    output += "<h2>Views</h2>"
+    for view in views:
+        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: ('
+        for member in view.members.all():
+            output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
+        output = output[:-2]
+        output += ")<br>"
     templates = [
         structure
         for structure in structure_records
@@ -512,11 +524,11 @@ def structure_view(request, run_id, structure_id):
     )
     output = "<h1>" + structure_id + "</h1>"
     if "Relation" in structure_id:
+        output += f"{structure_id}: " + f"{structure_record.value}("
+        if structure_record.parent_space is not None:
+            output += f"{structure_record.parent_space.value}, "
         output += (
-            f"{structure_id}: "
-            + f"{structure_record.value}("
-            + f"{structure_record.parent_space.value}, "
-            + f"{structure_record.start.structure_id}, "
+            f"{structure_record.start.structure_id}, "
             + f"{structure_record.end.structure_id}) "
             + str(last_value_of_dict(structure_record.quality))
             + "<br>"

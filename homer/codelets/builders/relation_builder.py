@@ -85,7 +85,10 @@ class RelationBuilder(Builder):
                 .get_random()
             )
         return not self.target_structure_one.has_relation(
-            self.target_space, self.parent_concept, self.target_structure_two
+            self.target_space,
+            self.parent_concept,
+            self.target_structure_one,
+            self.target_structure_two,
         )
 
     def _calculate_confidence(self):

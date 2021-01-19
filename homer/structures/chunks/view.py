@@ -1,4 +1,6 @@
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.chunk import Chunk
 from homer.structures.links.correspondence import Correspondence
@@ -13,13 +15,13 @@ class View(Chunk):
         self,
         structure_id: str,
         parent_id: str,
+        location: Location,
         members: StructureCollection,
-        parent_space: Space,
         output_space: WorkingSpace,
         quality: FloatBetweenOneAndZero,
     ):
         value = None
-        location = None
+        parent_space = location.space
         Chunk.__init__(
             self,
             structure_id,
@@ -33,12 +35,33 @@ class View(Chunk):
         )
         self.output_space = output_space
 
+    @classmethod
+    def new(
+        cls,
+        bubble_chamber: "BubbleChamber",
+        parent_id: str,
+        members: StructureCollection = None,
+    ):
+        members = members if members is not None else StructureCollection()
+        view_id = ID.new(View)
+        view_location = Location([], bubble_chamber.spaces["top level working"])
+        view_output = WorkingSpace(
+            ID.new(WorkingSpace),
+            parent_id,
+            f"output for {view_id}",
+            bubble_chamber.concepts["text"],
+            bubble_chamber.spaces["text"],
+            view_location,
+            StructureCollection(),
+            1,
+            [],
+            [],
+        )
+        bubble_chamber.working_spaces.add(view_output)
+        view = View(view_id, parent_id, view_location, members, view_output, 0.0)
+        bubble_chamber.views.add(view)
+        return view
+
     @property
     def size(self):
         return len(self.members)
-
-    def nearby(self, space: Space = None):
-        return StructureCollection.difference(
-            StructureCollection.union(*[member.nearby() for member in self.members]),
-            self.members,
-        )
