@@ -7,12 +7,13 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders import WordBuilder, FunctionWordBuilder
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
+from homer.structures import Chunk, Concept, Lexeme
 from homer.structures.chunks import View, Word
 from homer.structures.chunks.slots import TemplateSlot
 from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
+from homer.word_form import WordForm
 
 
 @pytest.fixture
@@ -93,12 +94,40 @@ def target_view(bubble_chamber):
     return view
 
 
-@pytest.fixture()
+@pytest.fixture
 def temperature_conceptual_space(bubble_chamber):
     space = ConceptualSpace(
         Mock(), Mock(), "temperature", Mock(), [], StructureCollection(), 1, [], []
     )
     return space
+
+
+@pytest.fixture
+def warm_concept(temperature_conceptual_space, bubble_chamber):
+    concept = Concept(
+        Mock(),
+        Mock(),
+        "warm",
+        Location([16], temperature_conceptual_space),
+        Mock(),
+        "value",
+        StructureCollection(),
+        Mock(),
+    )
+    bubble_chamber.concepts.add(concept)
+    temperature_conceptual_space.add(concept)
+    return concept
+
+
+@pytest.fixture
+def warm_lexeme(warm_concept):
+    lexeme = Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "warm"})
+    concept_to_lexeme_relation = Relation(
+        Mock(), Mock(), warm_concept, lexeme, None, None, None
+    )
+    warm_concept.links_out.add(concept_to_lexeme_relation)
+    lexeme.links_in.add(concept_to_lexeme_relation)
+    return lexeme
 
 
 @pytest.fixture
@@ -139,14 +168,19 @@ def temperature_input_space(input_space, temperature_conceptual_space):
 
 @pytest.fixture
 def target_correspondence(
-    temperature_template_space, temperature_input_space, template, input_space
+    temperature_template_space,
+    temperature_input_space,
+    template,
+    input_space,
+    warm_concept,
+    warm_lexeme,
 ):
     start = TemplateSlot(
         Mock(),
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        WordForm.HEADWORD,
         [Location([0], template), Location([0], temperature_template_space)],
     )
     end = Chunk(
@@ -158,7 +192,7 @@ def target_correspondence(
         input_space,
         Mock(),
     )
-    end_label = Label(Mock(), Mock(), end, Mock(), input_space, 1)
+    end_label = Label(Mock(), Mock(), end, warm_concept, input_space, 1)
     end.links_out.add(end_label)
     start_space = temperature_template_space
     end_space = temperature_input_space

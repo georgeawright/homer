@@ -85,7 +85,14 @@ class WordBuilder(Builder):
         self.confidence = self.target_correspondence.activation
 
     def _process_structure(self):
-        concept = self.non_slot.labels.get_active().parent_concept
+        compatible_labels = StructureCollection(
+            {
+                label
+                for label in self.non_slot.labels
+                if label.parent_concept in self.slot_space.conceptual_space.contents
+            }
+        )
+        concept = compatible_labels.get_active().parent_concept
         lexeme = concept.lexemes.get_active()
         word_value = lexeme.get_form(self.slot.form)
         word_location = Location(self.slot.location.coordinates, self.output_space)
@@ -93,6 +100,7 @@ class WordBuilder(Builder):
             ID.new(Word),
             self.codelet_id,
             word_value,
+            lexeme,
             word_location,
             StructureCollection({self.output_space}),
             0,

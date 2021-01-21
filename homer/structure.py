@@ -110,6 +110,23 @@ class Structure(ABC):
         )
 
     @property
+    def correspondees(self) -> StructureCollection:
+        return StructureCollection(
+            set.union(
+                {
+                    correspondence.start
+                    for correspondence in self.correspondences
+                    if self != correspondence.start
+                },
+                {
+                    correspondence.end
+                    for correspondence in self.correspondences
+                    if self != correspondence.end
+                },
+            )
+        )
+
+    @property
     def labels(self) -> StructureCollection:
         from homer.structures.links import Label
 

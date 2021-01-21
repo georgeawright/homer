@@ -1,8 +1,7 @@
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.chunk import Chunk
-from homer.structures.space import Space
+from homer.structures import Chunk, Lexeme, Space
 
 
 class Word(Chunk):
@@ -11,6 +10,7 @@ class Word(Chunk):
         structure_id: str,
         parent_id: str,
         value: str,
+        lexeme: Lexeme,
         location: Location,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
@@ -30,3 +30,10 @@ class Word(Chunk):
             links_in=links_in,
             links_out=links_out,
         )
+        self.lexeme = lexeme
+
+    @property
+    def concepts(self):
+        from .slot import Slot
+
+        return self.lexeme.concepts if self.lexeme is not None else None

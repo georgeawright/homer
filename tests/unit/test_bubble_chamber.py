@@ -107,6 +107,7 @@ def test_add_to_collections():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     bubble_chamber.add_to_collections(chunk)
     bubble_chamber.add_to_collections(correspondence)

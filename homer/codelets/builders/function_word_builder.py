@@ -57,6 +57,7 @@ class FunctionWordBuilder(Builder):
             ID.new(Word),
             self.codelet_id,
             self.template_word.value,
+            None,
             Location(self.template_word.location.coordinates, self.output_space),
             StructureCollection({self.output_space}),
             self.confidence,
