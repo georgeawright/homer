@@ -164,4 +164,13 @@ class WordBuilder(Builder):
         pass
 
     def _fail(self):
-        pass
+        from homer.codelets.selectors import CorrespondenceSelector
+
+        self.child_codelets.append(
+            CorrespondenceSelector.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_correspondence,
+                self.urgency,
+            )
+        )
