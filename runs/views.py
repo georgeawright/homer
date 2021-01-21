@@ -194,11 +194,34 @@ def run_view(request, run_id):
     ]
     output += "<h2>Views</h2>"
     for view in views:
-        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: ('
+        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: '
+        output += "<ul>"
+        output += "<li>Correspondences: "
         for member in view.members.all():
             output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
         output = output[:-2]
-        output += ")<br>"
+        output += "</li>"
+        output += "<li>Output: "
+        output_space = [
+            structure
+            for structure in structure_records
+            if re.match(r"^WorkingSpace*", structure.structure_id)
+            and structure.parent_codelet == view.parent_codelet
+        ][0]
+        output += (
+            f'(<a href="structures/{output_space.structure_id}">'
+            + f"{output_space.structure_id}</a>)"
+        )
+        words = [
+            structure
+            for structure in structure_records
+            if re.match(r"^Word*", structure.structure_id)
+            and structure.parent_space == output_space
+        ]
+        for word in words:
+            output += f"{word.value} "
+        output += "</li>"
+        output += "</ul>"
     templates = [
         structure
         for structure in structure_records
