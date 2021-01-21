@@ -68,7 +68,7 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def target_start_space():
+def target_start_space(bubble_chamber):
     space = WorkingSpace(
         Mock(),
         Mock(),
@@ -80,7 +80,9 @@ def target_start_space():
         1,
         [],
         [],
+        is_basic_level=True,
     )
+    bubble_chamber.working_spaces.add(space)
     return space
 
 

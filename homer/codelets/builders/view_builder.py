@@ -142,7 +142,11 @@ class ViewBuilder(Builder):
         )
 
     def _fizzle(self):
-        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
+        from homer.codelets.builders import CorrespondenceBuilder
+
+        self.child_codelets.append(
+            CorrespondenceBuilder.make(self.codelet_id, self.bubble_chamber)
+        )
 
     def _fail(self):
         self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))

@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ViewBuilder
+from homer.codelets.builders import CorrespondenceBuilder, ViewBuilder
 from homer.codelets.evaluators import ViewEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.chunks import View
@@ -108,7 +108,7 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_view):
     assert CodeletResult.FIZZLE == result
     assert view_builder.child_structure is None
     assert len(view_builder.child_codelets) == 1
-    assert isinstance(view_builder.child_codelets[0], ViewBuilder)
+    assert isinstance(view_builder.child_codelets[0], CorrespondenceBuilder)
 
 
 def test_fizzles_when_view_already_exists(bubble_chamber, target_view):
@@ -119,4 +119,4 @@ def test_fizzles_when_view_already_exists(bubble_chamber, target_view):
     assert CodeletResult.FIZZLE == result
     assert view_builder.child_structure is None
     assert len(view_builder.child_codelets) == 1
-    assert isinstance(view_builder.child_codelets[0], ViewBuilder)
+    assert isinstance(view_builder.child_codelets[0], CorrespondenceBuilder)
