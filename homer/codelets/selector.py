@@ -34,6 +34,7 @@ class Selector(Codelet):
             self._boost_winner()
             self._decay_loser()
         else:
+            self.confidence = self.champion.quality
             self._boost_champion()
         self._boost_activations()
         self._engender_follow_up()

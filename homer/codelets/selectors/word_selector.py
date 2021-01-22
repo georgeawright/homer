@@ -54,4 +54,13 @@ class WordSelector(Selector):
         pass
 
     def _engender_follow_up(self):
-        pass
+        from homer.codelets.builders import WordBuilder
+
+        self.child_codelets.append(
+            WordBuilder.make(self.codelet_id, self.bubble_chamber)
+        )
+        self.child_codelets.append(
+            self.spawn(
+                self.codelet_id, self.bubble_chamber, self.champion, self.confidence
+            )
+        )
