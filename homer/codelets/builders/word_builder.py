@@ -49,7 +49,7 @@ class WordBuilder(Builder):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         target_view = bubble_chamber.views.get_unhappy()
-        target_correspondence = bubble_chamber.correspondences.get_unhappy()
+        target_correspondence = target_view.members.get_unhappy()
         return cls.spawn(
             parent_id,
             bubble_chamber,
