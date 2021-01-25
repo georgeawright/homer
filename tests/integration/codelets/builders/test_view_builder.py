@@ -199,6 +199,7 @@ def target_view(bubble_chamber, target_view_correspondence):
         Location([], bubble_chamber.spaces["top level working"]),
         StructureCollection({target_view_correspondence}),
         Mock(),
+        Mock(),
         1.0,
     )
     bubble_chamber.spaces["top level working"].add(view)
@@ -213,6 +214,7 @@ def second_target_view(bubble_chamber, second_target_view_correspondence):
         Mock(),
         Location([], bubble_chamber.spaces["top level working"]),
         StructureCollection({second_target_view_correspondence}),
+        Mock(),
         Mock(),
         1.0,
     )

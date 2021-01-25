@@ -259,6 +259,9 @@ class Structure(ABC):
                 return True
         return False
 
+    def has_correspondence_to_space(self, space: Structure) -> bool:
+        return len(self.correspondences_to_space(space)) > 0
+
     def correspondences_with(self, other: Structure):
         return StructureCollection(
             {

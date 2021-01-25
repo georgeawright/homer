@@ -77,6 +77,7 @@ def good_view(bubble_chamber):
         Location([], Mock()),
         StructureCollection({member_1, member_2}),
         Mock(),
+        Mock(),
         0.5,
     )
     return view
@@ -95,6 +96,7 @@ def bad_view(bubble_chamber):
         Mock(),
         Location([], Mock()),
         StructureCollection({member_1, member_2}),
+        Mock(),
         Mock(),
         0.5,
     )

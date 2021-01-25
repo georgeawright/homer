@@ -64,7 +64,7 @@ def bubble_chamber():
 
 @pytest.fixture
 def view(bubble_chamber):
-    view = View(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    view = View(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     bubble_chamber.views.add(view)
     return view
 

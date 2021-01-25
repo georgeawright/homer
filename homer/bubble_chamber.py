@@ -108,10 +108,9 @@ class BubbleChamber:
     def get_super_space(self, space_one: Space, space_two: Space) -> WorkingSpace:
         for space in self.working_spaces:
             try:
-                if (
-                    space.dimensions == space_one.dimensions + space_two.dimensions
-                    or space.dimensions == space_two.dimensions + space_one.dimensions
-                ):
+                if space.sub_spaces == [space_one, space_two]:
+                    return space
+                if space.sub_spaces == [space_two, space_one]:
                     return space
             except Exception:
                 pass

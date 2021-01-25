@@ -17,6 +17,7 @@ class View(Chunk):
         parent_id: str,
         location: Location,
         members: StructureCollection,
+        input_spaces: StructureCollection,
         output_space: WorkingSpace,
         quality: FloatBetweenOneAndZero,
     ):
@@ -33,6 +34,7 @@ class View(Chunk):
             quality,
             StructureCollection({parent_space}),
         )
+        self.input_spaces = input_spaces
         self.output_space = output_space
 
     @classmethod
@@ -43,6 +45,14 @@ class View(Chunk):
         members: StructureCollection = None,
     ):
         members = members if members is not None else StructureCollection()
+        input_spaces = StructureCollection(
+            set.union(
+                *[
+                    {correspondence.start_space, correspondence.end_space}
+                    for correspondence in members
+                ]
+            )
+        )
         view_id = ID.new(View)
         view_location = Location([], bubble_chamber.spaces["top level working"])
         view_output = WorkingSpace(
@@ -58,7 +68,9 @@ class View(Chunk):
             [],
         )
         bubble_chamber.working_spaces.add(view_output)
-        view = View(view_id, parent_id, view_location, members, view_output, 0.0)
+        view = View(
+            view_id, parent_id, view_location, members, input_spaces, view_output, 0.0
+        )
         bubble_chamber.views.add(view)
         return view
 

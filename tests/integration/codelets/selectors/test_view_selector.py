@@ -84,6 +84,7 @@ def good_view(bubble_chamber, target_space, view_members):
         Location([], Mock()),
         view_members,
         Mock(),
+        Mock(),
         1.0,
     )
     target_space.contents.add(view)
@@ -98,6 +99,7 @@ def bad_view(bubble_chamber, target_space, view_members):
         Mock(),
         Location([], Mock()),
         view_members,
+        Mock(),
         Mock(),
         0.0,
     )

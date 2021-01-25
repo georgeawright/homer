@@ -4,7 +4,8 @@ from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import WordBuilder, FunctionWordBuilder
+from homer.codelets.builders import WordBuilder
+from homer.codelets.evaluators import WordEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept, Lexeme
@@ -73,31 +74,33 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def target_view(bubble_chamber):
-    members = Mock()
-    parent_space = Mock()
-    output_space = WorkingSpace(
+def temperature_concept(bubble_chamber):
+    concept = Concept(
         Mock(),
         Mock(),
-        "output_space_name",
-        bubble_chamber.concepts["text"],
+        "temperature",
         Mock(),
-        [],
+        Mock(),
+        "value",
         StructureCollection(),
-        0,
-        [],
-        [],
+        Mock(),
     )
-    quality = Mock()
-    view = View(Mock(), Mock(), members, parent_space, output_space, quality)
-    bubble_chamber.spaces.add(output_space)
-    return view
+    bubble_chamber.concepts.add(concept)
+    return concept
 
 
 @pytest.fixture
-def temperature_conceptual_space(bubble_chamber):
+def temperature_conceptual_space(bubble_chamber, temperature_concept):
     space = ConceptualSpace(
-        Mock(), Mock(), "temperature", Mock(), [], StructureCollection(), 1, [], []
+        Mock(),
+        Mock(),
+        "temperature",
+        temperature_concept,
+        [],
+        StructureCollection(),
+        1,
+        [],
+        [],
     )
     return space
 
@@ -167,23 +170,27 @@ def temperature_input_space(input_space, temperature_conceptual_space):
 
 
 @pytest.fixture
-def target_correspondence(
-    temperature_template_space,
-    temperature_input_space,
-    template,
-    input_space,
-    warm_concept,
-    warm_lexeme,
-):
-    start = TemplateSlot(
+def template_slot(template, temperature_template_space, temperature_concept):
+    slot = TemplateSlot(
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
+        template,
+        temperature_concept,
         WordForm.HEADWORD,
         [Location([0], template), Location([0], temperature_template_space)],
     )
-    end = Chunk(
+    return slot
+
+
+@pytest.fixture
+def template_word(template, temperature_template_space):
+    word = Word(Mock(), Mock(), "it", None, Location([1], template), template, 1.0)
+    return word
+
+
+@pytest.fixture
+def input_chunk(input_space, temperature_input_space, warm_concept):
+    chunk = Chunk(
         Mock(),
         Mock(),
         Mock(),
@@ -192,8 +199,22 @@ def target_correspondence(
         input_space,
         Mock(),
     )
-    end_label = Label(Mock(), Mock(), end, warm_concept, input_space, 1)
-    end.links_out.add(end_label)
+    label = Label(Mock(), Mock(), chunk, warm_concept, input_space, 1)
+    chunk.links_out.add(label)
+    return chunk
+
+
+@pytest.fixture
+def target_correspondence(
+    template_slot,
+    input_chunk,
+    temperature_template_space,
+    temperature_input_space,
+    template,
+    input_space,
+    warm_concept,
+    warm_lexeme,
+):
     start_space = temperature_template_space
     end_space = temperature_input_space
     parent_concept = Mock()
@@ -203,8 +224,8 @@ def target_correspondence(
     correspondence = Correspondence(
         Mock(),
         Mock(),
-        start,
-        end,
+        template_slot,
+        input_chunk,
         Location([], parent_space),
         start_space,
         end_space,
@@ -216,21 +237,64 @@ def target_correspondence(
     return correspondence
 
 
-def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_cannot_be_recreated(
-    bubble_chamber, target_view, target_correspondence
+@pytest.fixture
+def target_view(bubble_chamber, target_correspondence, input_space, template):
+    members = StructureCollection({target_correspondence})
+    location = Mock()
+    input_spaces = StructureCollection({input_space, template})
+    output_space = WorkingSpace(
+        Mock(),
+        Mock(),
+        "output_space_name",
+        bubble_chamber.concepts["text"],
+        Mock(),
+        [],
+        StructureCollection(),
+        1,
+        [],
+        [],
+    )
+    quality = Mock()
+    view = View(Mock(), Mock(), location, members, input_spaces, output_space, quality)
+    bubble_chamber.spaces.add(output_space)
+    return view
+
+
+def test_successful_creates_word_and_spawns_follow_up_and_same_word_cannot_be_recreated(
+    bubble_chamber, target_view, template_slot
 ):
     parent_id = ""
     urgency = 1.0
 
     builder = WordBuilder.spawn(
-        parent_id, bubble_chamber, target_view, target_correspondence, urgency
+        parent_id, bubble_chamber, target_view, template_slot, urgency
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert isinstance(builder.child_structure, Word)
-    assert isinstance(builder.child_codelets[0], FunctionWordBuilder)
+    assert isinstance(builder.child_codelets[0], WordEvaluator)
     builder = WordBuilder.spawn(
-        parent_id, bubble_chamber, target_view, target_correspondence, urgency
+        parent_id, bubble_chamber, target_view, template_slot, urgency
+    )
+    builder.run()
+    assert CodeletResult.FIZZLE == builder.result
+
+
+def test_successful_creates_function_word_and_spawns_follow_up_and_same_word_cannot_be_recreated(
+    bubble_chamber, target_view, template_word
+):
+    parent_id = ""
+    urgency = 1.0
+
+    builder = WordBuilder.spawn(
+        parent_id, bubble_chamber, target_view, template_word, urgency
+    )
+    builder.run()
+    assert CodeletResult.SUCCESS == builder.result
+    assert isinstance(builder.child_structure, Word)
+    assert isinstance(builder.child_codelets[0], WordEvaluator)
+    builder = WordBuilder.spawn(
+        parent_id, bubble_chamber, target_view, template_word, urgency
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result
