@@ -48,7 +48,10 @@ class View(Chunk):
         input_spaces = StructureCollection(
             set.union(
                 *[
-                    {correspondence.start_space, correspondence.end_space}
+                    {
+                        correspondence.start_space.location.space,
+                        correspondence.end_space.location.space,
+                    }
                     for correspondence in members
                 ]
             )
