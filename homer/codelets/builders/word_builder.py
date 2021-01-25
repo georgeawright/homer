@@ -9,8 +9,6 @@ from homer.structures.chunks import Word, Slot, View
 from homer.structures.links import Correspondence
 from homer.structures.spaces import Frame, WorkingSpace
 
-from .function_word_builder import FunctionWordBuilder
-
 
 class WordBuilder(Builder):
     """Builds a correspondence and a new item in an output space connected to it."""
