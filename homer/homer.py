@@ -294,12 +294,18 @@ class Homer:
         self.bubble_chamber.slots.add(slot)
         return slot
 
-    def def_word(self, value: str = "", quality: FloatBetweenOneAndZero = 1.0):
+    def def_word(
+        self,
+        value: str = "",
+        lexeme: Lexeme = None,
+        quality: FloatBetweenOneAndZero = 1.0,
+    ):
         word = Word(
             structure_id=ID.new(Word),
             parent_id="",
             parent_space=None,
             value=value,
+            lexeme=lexeme,
             location=None,
             quality=quality,
         )
