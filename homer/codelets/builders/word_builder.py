@@ -1,5 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
@@ -55,7 +56,7 @@ class WordBuilder(Builder):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         target_view = bubble_chamber.views.get_unhappy()
         frame = target_view.input_spaces.of_type(Frame).get_random()
-        target_frame_item = frame.members.of_type(Chunk).get_exigent()
+        target_frame_item = frame.contents.of_type(Chunk).get_exigent()
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -75,13 +76,16 @@ class WordBuilder(Builder):
         ).get_random()
         self.output_space = self.target_view.output_space
         if isinstance(self.target_frame_item, Slot):
-            self.target_correspondence = StructureCollection.union(
-                self.target_view.members.where(start=self.target_frame_item),
-                self.target_view.members.where(end=self.target_frame_item),
-            ).get_active()
-            self.target_non_frame_item = (
-                self.target_correspondence.get_non_slot_argument()
-            )
+            try:
+                self.target_correspondence = StructureCollection.union(
+                    self.target_view.members.where(start=self.target_frame_item),
+                    self.target_view.members.where(end=self.target_frame_item),
+                ).get_active()
+                self.target_non_frame_item = (
+                    self.target_correspondence.get_non_slot_argument()
+                )
+            except MissingStructureError:
+                return False
         return not self.target_frame_item.has_correspondence_to_space(self.output_space)
 
     def _calculate_confidence(self):
@@ -188,7 +192,21 @@ class WordBuilder(Builder):
         )
 
     def _fizzle(self):
-        pass
+        try:
+            new_target_frame_item = self.frame.contents.of_type(Chunk).get_random(
+                exclude=[self.target_frame_item]
+            )
+            self.child_codelets.append(
+                self.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    self.target_view,
+                    new_target_frame_item,
+                    new_target_frame_item.unhappiness,
+                )
+            )
+        except MissingStructureError:
+            pass
 
     def _fail(self):
         from homer.codelets.selectors import CorrespondenceSelector
