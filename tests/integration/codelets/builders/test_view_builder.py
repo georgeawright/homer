@@ -193,12 +193,18 @@ def second_target_view_correspondence(
 
 @pytest.fixture
 def target_view(bubble_chamber, target_view_correspondence):
+    input_spaces = StructureCollection(
+        {
+            target_view_correspondence.start_space,
+            target_view_correspondence.end_space,
+        }
+    )
     view = View(
         Mock(),
         Mock(),
         Location([], bubble_chamber.spaces["top level working"]),
         StructureCollection({target_view_correspondence}),
-        Mock(),
+        input_spaces,
         Mock(),
         1.0,
     )
@@ -209,12 +215,18 @@ def target_view(bubble_chamber, target_view_correspondence):
 
 @pytest.fixture
 def second_target_view(bubble_chamber, second_target_view_correspondence):
+    input_spaces = StructureCollection(
+        {
+            second_target_view_correspondence.start_space,
+            second_target_view_correspondence.end_space,
+        }
+    )
     view = View(
         Mock(),
         Mock(),
         Location([], bubble_chamber.spaces["top level working"]),
         StructureCollection({second_target_view_correspondence}),
-        Mock(),
+        input_spaces,
         Mock(),
         1.0,
     )

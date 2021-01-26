@@ -80,3 +80,10 @@ class View(Chunk):
     @property
     def size(self):
         return len(self.members)
+
+    def nearby(self, space: Space = None) -> StructureCollection:
+        space = space if space is not None else self.location.space
+        return StructureCollection.difference(
+            space.contents.of_type(View).where(input_spaces=self.input_spaces),
+            StructureCollection({self}),
+        )
