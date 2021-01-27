@@ -37,6 +37,12 @@ class Link(Structure):
     def parent_space(self) -> Space:
         return self.locations[0].space
 
+    @property
+    def arguments(self) -> StructureCollection:
+        return StructureCollection(
+            {arg for arg in [self.start, self.end] if arg is not None}
+        )
+
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
     ):

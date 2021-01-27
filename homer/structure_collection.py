@@ -80,6 +80,11 @@ class StructureCollection:
             except KeyError:
                 pass
 
+    def pop(self):
+        structure = self.get_random()
+        self.remove(structure)
+        return structure
+
     @staticmethod
     def union(*collections: List[StructureCollection]) -> StructureCollection:
         return StructureCollection(

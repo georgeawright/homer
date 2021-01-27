@@ -1,4 +1,5 @@
 from __future__ import annotations
+import time
 from typing import List, Set, Tuple
 
 from homer.bubble_chamber import BubbleChamber
@@ -56,10 +57,22 @@ class ViewBuilder(Builder):
         return self.bubble_chamber.concepts["view"]
 
     def _passes_preliminary_checks(self):
+        print(f"running {self.codelet_id}")
+        time.sleep(1)
         try:
             self.second_target_view = self.target_view.nearby().get_random()
+            print(f"second target view: {self.second_target_view.structure_id}")
         except MissingStructureError:
+            print("failed to get second target view")
             return False
+        print(
+            "has view: ",
+            self.bubble_chamber.has_view(
+                StructureCollection.union(
+                    self.target_view.members, self.second_target_view.members
+                )
+            ),
+        )
         return not self.bubble_chamber.has_view(
             StructureCollection.union(
                 self.target_view.members, self.second_target_view.members
@@ -67,58 +80,48 @@ class ViewBuilder(Builder):
         )
 
     def _calculate_confidence(self):
+        time.sleep(1)
+        print("calculating confidence")
+        time.sleep(1)
         self.confidence = 1.0
         self.correspondences = self.target_view.members.copy()
         self.correspondences_to_add = self.second_target_view.members.copy()
         while not self.correspondences_to_add.is_empty():
-            correspondence = self.correspondences_to_add.get_random()
-            self._add_correspondence_and_update_confidence(correspondence)
-
-    def _add_correspondence_and_update_confidence(self, new: Correspondence):
-        final_compatibility = 1.0
-        final_required_correspondences = {new}
-        for old in self.target_view.members:
-            (
-                compatibility,
-                required_correspondences,
-            ) = self._compatibility_and_required_correspondences(old, new)
-            if compatibility < final_compatibility:
-                final_compatibility = compatibility
-            final_required_correspondences |= required_correspondences
-        if final_compatibility < self.confidence:
-            self.confidence = final_compatibility
-        self._transfer_correspondences(*final_required_correspondences)
-
-    def _compatibility_and_required_correspondences(
-        self, old: Correspondence, new: Correspondence
-    ) -> Tuple[float, Set[Correspondence]]:
-        common_arguments = old.common_arguments_with(new)
-        if len(common_arguments) == 0:
-            compatibility = min(old.quality, new.quality)
-            # you are only as strong as your weakest link
-            return (compatibility, set())
-        if len(common_arguments) == 1:
-            third_correspondence_start = (
-                old.start if old.start not in common_arguments else old.end
-            )
-            third_correspondence_end = (
-                new.end if new.end not in common_arguments else new.start
-            )
-            try:
-                third_correspondence = self.second_target_view.members.where(
-                    start=third_correspondence_start, end=third_correspondence_end
-                ).get_random()
-            except MissingStructureError:
-                return (0, set())
-            compatibility = min(old.quality, new.quality, third_correspondence.quality)
-            return (compatibility, {third_correspondence})
-        # 2 common arguments => the correspondences are equivalent/competing
-        return (0, set())
-
-    def _transfer_correspondences(self, *correspondences: List[Correspondence]):
-        for correspondence in correspondences:
-            self.correspondences.add(correspondence)
-            self.correspondences_to_add.remove(correspondence)
+            new = self.correspondences_to_add.pop()
+            print(f"checking correspondence {new.structure_id}")
+            print(f"arguments: {new.start.structure_id}, {new.end.strucuture_id}")
+            for old in self.target_view.members:
+                common_arguments = StructureCollection.intersection(
+                    old.arguments, new.arguments
+                )
+                print("common arguments: ", len(common_arguments))
+                if len(common_arguments) == 0:
+                    self.confidence = min(self.confidence, old.quality, new.quality)
+                    self.correspondences.add(new)
+                elif len(common_arguments) == 1:
+                    all_arguments = StructureCollection.union(
+                        old.arguments, new.arguments
+                    )
+                    distinct_arguments = StructureCollection.difference(
+                        all_arguments, common_arguments
+                    )
+                    try:
+                        third = self.second_target_view.members.where(
+                            arguments=distinct_arguments
+                        ).get_random()
+                        print(f"third correspondence: {third.structure_id}")
+                        self.confidence = min(
+                            self.confidence, old.quality, new.quality, third.quality
+                        )
+                        self.correspondences_to_add.add(third)
+                        self.correspondences.add(new)
+                    except MissingStructureError:
+                        print("no third correspondence")
+                        self.confidence = 0
+                        return
+                else:  # 2 common arguments means equivalent/incompatible correspondences
+                    self.confidence = 0
+                    return
 
     def _process_structure(self):
         view = View.new(
