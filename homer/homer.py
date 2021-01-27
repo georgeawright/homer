@@ -124,6 +124,7 @@ class Homer:
         classifier: Classifier = None,
         parent_space: ConceptualSpace = None,
         relevant_value: str = "",
+        instance_type: type = List[int],
         child_spaces: StructureCollection = None,
         distance_function: Callable = None,
         links_in: StructureCollection = None,
@@ -143,6 +144,7 @@ class Homer:
             location=location,
             classifier=classifier,
             relevant_value=relevant_value,
+            instance_type=instance_type,
             child_spaces=(
                 child_spaces if child_spaces is not None else StructureCollection()
             ),
