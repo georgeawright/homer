@@ -123,9 +123,10 @@ class WordBuilder(Builder):
             word_value,
             lexeme,
             word_location,
-            StructureCollection({self.output_space}),
+            self.output_space,
             0,
         )
+        self.bubble_chamber.logger.log(word)
         frame_to_output_space = self.bubble_chamber.get_super_space(
             self.frame, self.output_space
         )
@@ -150,6 +151,7 @@ class WordBuilder(Builder):
         frame_to_output_space.add(projection_from_frame)
         self.bubble_chamber.correspondences.add(projection_from_frame)
         self.target_view.members.add(projection_from_frame)
+        self.bubble_chamber.logger.log(projection_from_frame)
         if self.target_correspondence is not None:
             non_frame_to_output_space = self.bubble_chamber.get_super_space(
                 self.non_frame, self.output_space
@@ -170,6 +172,7 @@ class WordBuilder(Builder):
                 concept.parent_space,
                 0,
             )
+            self.bubble_chamber.logger.log(projection_from_non_frame)
             self.target_non_frame_item.links_out.add(projection_from_non_frame)
             word.links_in.add(projection_from_non_frame)
             non_frame_to_output_space.add(projection_from_non_frame)
@@ -178,6 +181,8 @@ class WordBuilder(Builder):
         self.output_space.add(word)
         self.bubble_chamber.words.add(word)
         self.child_structure = word
+        self.bubble_chamber.logger.log(word)
+        self.bubble_chamber.logger.log(self.target_view)
 
     def _engender_follow_up(self):
         from homer.codelets.evaluators import WordEvaluator
