@@ -39,6 +39,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -52,6 +53,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )

@@ -38,6 +38,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -49,6 +50,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -71,6 +73,7 @@ def location_concept():
         Mock(),
         "coordinates",
         Mock(),
+        Mock(),
         math.dist,
     )
     return concept
@@ -86,6 +89,7 @@ def temperature_concept():
         Mock(),
         "value",
         Mock(),
+        Mock(),
         math.dist,
     )
     return concept
@@ -100,6 +104,7 @@ def more_concept():
         Location([5], Mock()),
         ProximityClassifier(),
         "value",
+        Mock(),
         StructureCollection(),
         math.dist,
     )

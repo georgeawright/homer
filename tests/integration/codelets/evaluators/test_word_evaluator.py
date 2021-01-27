@@ -39,6 +39,7 @@ def bubble_chamber():
         Mock(),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -50,6 +51,7 @@ def bubble_chamber():
         Mock(),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -120,6 +122,7 @@ def warm_concept(bubble_chamber, temperature_conceptual_space):
         Mock(),
         "warm",
         Location([16], temperature_conceptual_space),
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

@@ -35,26 +35,71 @@ def bubble_chamber():
         Mock(),
     )
     word_concept = Concept(
-        Mock(), Mock(), "word", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "word",
+        None,
+        None,
+        None,
+        "value",
+        Mock(),
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(word_concept)
     build_concept = Concept(
-        Mock(), Mock(), "build", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "build",
+        None,
+        None,
+        None,
+        "value",
+        Mock(),
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(build_concept)
     relation = Relation(Mock(), Mock(), word_concept, build_concept, None, None, 1)
     word_concept.links_out.add(relation)
     build_concept.links_in.add(relation)
     text_concept = Concept(
-        Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "text",
+        None,
+        None,
+        None,
+        "value",
+        Mock(),
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(text_concept)
     same_concept = Concept(
-        Mock(), Mock(), "same", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "same",
+        None,
+        None,
+        None,
+        "value",
+        Mock(),
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(same_concept)
     input_concept = Concept(
-        Mock(), Mock(), "input", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "input",
+        None,
+        None,
+        None,
+        "value",
+        Mock(),
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(input_concept)
     top_level_working_space = WorkingSpace(
@@ -82,6 +127,7 @@ def temperature_concept(bubble_chamber):
         Mock(),
         Mock(),
         "value",
+        Mock(),
         StructureCollection(),
         Mock(),
     )
@@ -114,6 +160,7 @@ def warm_concept(temperature_conceptual_space, bubble_chamber):
         Location([16], temperature_conceptual_space),
         Mock(),
         "value",
+        Mock(),
         StructureCollection(),
         Mock(),
     )

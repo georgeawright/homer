@@ -38,6 +38,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -51,6 +52,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -108,6 +110,7 @@ def good_relation(start, end, conceptual_space, working_space):
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     relation = Relation(
         Mock(),
@@ -131,6 +134,7 @@ def bad_relation(start, end, conceptual_space, working_space):
         Mock(),
         Mock(),
         Location([], conceptual_space),
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

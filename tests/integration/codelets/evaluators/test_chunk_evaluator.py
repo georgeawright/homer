@@ -37,6 +37,7 @@ def bubble_chamber():
         Mock(),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -48,6 +49,7 @@ def bubble_chamber():
         Mock(),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -61,7 +63,15 @@ def bubble_chamber():
 @pytest.fixture
 def location_concept():
     concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "coordinates",
+        Mock(),
+        Mock(),
+        math.dist,
     )
     return concept
 
@@ -121,7 +131,15 @@ def good_chunk(bubble_chamber, location_concept, input_space):
 @pytest.fixture
 def bad_chunk(bubble_chamber, location_concept, input_space):
     temperature_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), "value", Mock(), math.dist
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "value",
+        Mock(),
+        Mock(),
+        math.dist,
     )
     temperature_space = WorkingSpace(
         Mock(),

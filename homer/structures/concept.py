@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any, Callable, List
 
 from homer.classifier import Classifier
@@ -25,6 +26,7 @@ class Concept(Structure):
         location: Location,
         classifier: Classifier,
         relevant_value: str,
+        instance_type: type,
         child_spaces: StructureCollection,
         distance_function: Callable,
         links_in: StructureCollection = None,
@@ -45,6 +47,7 @@ class Concept(Structure):
         self.value = name
         self.classifier = classifier
         self.relevant_value = relevant_value
+        self.instance_type = instance_type
         self.child_spaces = child_spaces
         self.distance_function = distance_function
         self.depth = depth
@@ -57,6 +60,7 @@ class Concept(Structure):
         classifier: Classifier,
         parent_space: Space,
         relevant_value: str,
+        instance_type: type,
         child_spaces: StructureCollection,
         distance_function: Callable,
         links_in: StructureCollection = None,
@@ -70,6 +74,7 @@ class Concept(Structure):
             Location(prototype, parent_space),
             classifier,
             relevant_value,
+            instance_type,
             child_spaces,
             distance_function,
             links_in=links_in,
@@ -86,6 +91,9 @@ class Concept(Structure):
     @property
     def parent_space(self) -> Space:
         return self.location.space
+
+    def is_compatible_with(self, other: Concept) -> bool:
+        return self.instance_type == other.instance_type
 
     def distance_from(self, other: Structure):
         other_value = (

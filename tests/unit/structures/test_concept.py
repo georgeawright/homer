@@ -37,6 +37,7 @@ def test_distance_from(
         Mock(),
         relevant_value,
         Mock(),
+        Mock(),
         distance_function,
     )
     assert expected == concept.distance_from(structure)
@@ -68,6 +69,7 @@ def test_proximity_to(
         location,
         Mock(),
         relevant_value,
+        Mock(),
         Mock(),
         distance_function,
     )

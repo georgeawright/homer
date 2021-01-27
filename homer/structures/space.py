@@ -68,6 +68,9 @@ class Space(Structure):
             sub_space.add(structure)
             structure.parent_spaces.add(sub_space)
 
+    def is_compatible_with(self, other: Space) -> bool:
+        return self.parent_concept.is_compatible_with(other.parent_concept)
+
     def get_relevant_value(self, chunk) -> Any:
         relevant_value = getattr(chunk, self.parent_concept.relevant_value)
         if self.coordinates_from_super_space_location is not None:

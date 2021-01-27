@@ -56,6 +56,7 @@ def temperature_concept(label_concepts_space):
         Location([], label_concepts_space),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         math.dist,
     )
@@ -92,6 +93,7 @@ def mild_concept(temperature_space):
         Location([10], temperature_space),
         classifier,
         "value",
+        Mock(),
         StructureCollection(),
         math.dist,
     )
@@ -126,6 +128,7 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
         Mock(),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -137,6 +140,7 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
         Mock(),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -156,6 +160,7 @@ def target_chunk(bubble_chamber):
         Mock(),
         Mock(),
         "coordinates",
+        Mock(),
         Mock(),
         math.dist,
     )

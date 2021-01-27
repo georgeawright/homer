@@ -91,6 +91,7 @@ view_concept = homer.def_concept(
 word_concept = homer.def_concept(
     name="word",
     parent_space=structures_space,
+    instance_type=str,
 )
 label_concept = homer.def_concept(
     name="label",
@@ -111,6 +112,7 @@ template_concept = homer.def_concept(
 text_concept = homer.def_concept(
     name="text",
     parent_space=structures_space,
+    instance_type=str,
 )
 label_concepts_space = homer.def_conceptual_space(
     name="label concepts",
