@@ -264,15 +264,7 @@ class DjangoLogger(Logger):
                 structure_record.parent_space = StructureRecord.objects.get(
                     structure_id=structure.parent_space.structure_id, run_id=self.run
                 )
-            if hasattr(structure, "members") and structure.members is not None:
-                for member in structure.members:
-                    member_record = StructureRecord.objects.get(
-                        structure_id=member.structure_id, run_id=self.run
-                    )
-                    structure_record.members.add(member_record)
-                    print(
-                        f"{member.structure_id} added as member to {structure.structure_id}"
-                    )
+
             if hasattr(structure, "start") and structure.start is not None:
                 start_record = StructureRecord.objects.get(
                     structure_id=structure.start.structure_id, run_id=self.run
@@ -290,6 +282,17 @@ class DjangoLogger(Logger):
                 end_record.links.add(structure_record)
                 print(
                     f"{structure.structure_id} linked to {structure.end.structure_id}"
+                )
+        if hasattr(structure, "members") and structure.members is not None:
+            for member in structure.members:
+                member_record = StructureRecord.objects.get(
+                    structure_id=member.structure_id, run_id=self.run
+                )
+                if member_record in structure_record.members.all():
+                    continue
+                structure_record.members.add(member_record)
+                print(
+                    f"{member.structure_id} added as member to {structure.structure_id}"
                 )
         last_activation = last_value_of_dict(structure_record.activation)
         last_unhappiness = last_value_of_dict(structure_record.unhappiness)
