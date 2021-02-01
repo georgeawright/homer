@@ -55,21 +55,12 @@ class CorrespondenceSelector(Selector):
         candidates = self.champion.start.correspondences_to_space(
             self.champion.end_space
         )
-        if len(candidates) == 1:
-            return False
-        self.challenger = candidates.get_active(exclude=[self.champion])
+        if len(candidates) > 1:
+            self.challenger = candidates.get_active(exclude=[self.champion])
         return True
 
     def _fizzle(self):
-        self.child_codelets.append(
-            CorrespondenceBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.champion.start.parent_spaces.get_random(),
-                self.champion.start,
-                self.champion.start.unhappiness,
-            )
-        )
+        pass
 
     def _engender_follow_up(self):
         try:
@@ -93,7 +84,7 @@ class CorrespondenceSelector(Selector):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.champion,
-                1 - abs(self.winner.activation - self.loser.activation),
+                self.confidence,
                 challenger=self.challenger,
             )
         )

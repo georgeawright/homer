@@ -92,7 +92,6 @@ class Selector(Codelet):
         self.loser.decay_activation(self.confidence)
 
     def _boost_champion(self):
-        self.confidence = self.champion.quality
         self.champion.boost_activation(self.confidence)
 
     @abstractmethod
