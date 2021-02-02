@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC
+import random
 import statistics
 from typing import List
 
@@ -31,7 +32,7 @@ class Structure(ABC):
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
         self._activation = FloatBetweenOneAndZero(
-            0 if stable_activation is None else stable_activation
+            random.random() if stable_activation is None else stable_activation
         )
         self.stable = stable_activation is not None
         self._activation_buffer = 0.0
