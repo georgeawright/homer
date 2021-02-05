@@ -210,6 +210,7 @@ def test_correspondences_to_space():
 
 def test_boost_and_update_activation():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
+    structure._activation = 0.0
     structure._activation_update_coefficient = 1
     assert 0.0 == structure.activation
     structure.boost_activation(0.5)
@@ -226,6 +227,7 @@ def test_boost_and_update_activation():
 
 def test_decay_and_update_activation():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
+    structure._activation = 0.0
     structure._activation_update_coefficient = 1
     assert 0.0 == structure.activation
     structure.boost_activation(1.0)
