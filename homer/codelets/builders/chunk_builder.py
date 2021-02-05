@@ -140,18 +140,21 @@ class ChunkBuilder(Builder):
         copy_link = lambda link: link.copy(
             old_arg=original_chunk, new_arg=new_chunk, parent_id=self.codelet_id
         )
+        views = StructureCollection()
         for correspondence in original_chunk.correspondences:
-            if not new_chunk.has_link(correspondence, start=original_chunk):
-                copy = copy_link(correspondence)
-                new_chunk.links_in.add(copy)
-                new_chunk.links_out.add(copy)
-                self.bubble_chamber.logger.log(copy)
-                view = View.new(
-                    bubble_chamber=self.bubble_chamber,
-                    parent_id=self.codelet_id,
-                    members=StructureCollection({copy}),
-                )
-                self.bubble_chamber.logger.log(view)
+            for view in self.bubble_chamber.views:
+                if correspondence in view.members:
+                    views.add(view)
+        for view in views:
+            new_view = view.copy(
+                bubble_chamber=self.bubble_chamber,
+                parent_id=self.codelet_id,
+                original_structure=original_chunk,
+                replacement_structure=new_chunk,
+            )
+            for correspondence in new_view.members:
+                self.bubble_chamber.logger.log(correspondence)
+            self.bubble_chamber.logger.log(view)
         for link in original_chunk.links_in:
             if not new_chunk.has_link(link, start=original_chunk):
                 copy = copy_link(link)
