@@ -207,7 +207,7 @@ class WordBuilder(Builder):
                     self.bubble_chamber,
                     self.target_view,
                     new_target_frame_item,
-                    new_target_frame_item.unhappiness,
+                    self.urgency / 2,
                 )
             )
         except MissingStructureError:
