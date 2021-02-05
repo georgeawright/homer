@@ -77,10 +77,12 @@ class View(Chunk):
             [],
             [],
         )
+        view_location.space.add(view_output)
         bubble_chamber.working_spaces.add(view_output)
         view = View(
             view_id, parent_id, view_location, members, input_spaces, view_output, 0.0
         )
+        view_location.space.add(view)
         bubble_chamber.views.add(view)
         return view
 
@@ -97,6 +99,11 @@ class View(Chunk):
     ):
         new_members = StructureCollection()
         for correspondence in self.members:
+            if (
+                correspondence.start in self.output_space.contents
+                or correspondence.end in self.output_space.contents
+            ):
+                continue
             new_correspondence = correspondence.copy(
                 old_arg=original_structure,
                 new_arg=replacement_structure,
@@ -107,15 +114,31 @@ class View(Chunk):
             new_correspondence.end.links_in.add(new_correspondence)
             new_correspondence.end.links_out.add(new_correspondence)
             new_members.add(new_correspondence)
-        return self.new(
+        new_view = self.new(
             bubble_chamber=bubble_chamber, parent_id=parent_id, members=new_members
         )
+        for structure in self.output_space.contents:
+            structure_copy = structure.copy()
+            new_view.output_space.add(structure_copy)
+            for correspondence in structure.correspondences:
+                new_correspondence = correspondence.copy(
+                    old_arg=structure,
+                    new_arg=structure_copy,
+                    parent_id=parent_id,
+                )
+                new_correspondence.start.links_in.add(new_correspondence)
+                new_correspondence.start.links_out.add(new_correspondence)
+                new_correspondence.end.links_in.add(new_correspondence)
+                new_correspondence.end.links_out.add(new_correspondence)
+                new_view.members.add(new_correspondence)
+        return new_view
 
     def nearby(self, space: Space = None) -> StructureCollection:
         space = space if space is not None else self.location.space
         print("searching for nearby views")
         print(space.name)
         views = space.contents.of_type(View)
+        print(space.contents.structures)
         print(views.structures)
         compatible_views = views.where(input_spaces=self.input_spaces)
         print(compatible_views.structures)
