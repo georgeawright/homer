@@ -100,4 +100,4 @@ def test_bad_word_is_not_boosted(bubble_chamber, bad_word):
     selector = WordSelector.spawn(parent_id, bubble_chamber, bad_word, urgency)
     selector.run()
     bad_word.update_activation()
-    assert bad_word.activation == original_activation
+    assert bad_word.activation <= original_activation
