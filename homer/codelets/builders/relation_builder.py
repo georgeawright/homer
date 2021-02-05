@@ -82,7 +82,6 @@ class RelationBuilder(Builder):
                 relational_conceptual_spaces = self.bubble_chamber.spaces[
                     "relational concepts"
                 ].contents.of_type(ConceptualSpace)
-                print(relational_conceptual_spaces.structures)
                 compatible_conceptual_spaces = StructureCollection(
                     {
                         space
@@ -90,13 +89,11 @@ class RelationBuilder(Builder):
                         if space.is_compatible_with(self.target_space)
                     }
                 )
-                print(compatible_conceptual_spaces.structures)
                 self.parent_concept = (
                     compatible_conceptual_spaces.get_random()
                     .contents.of_type(Concept)
                     .get_random()
                 )
-                print(self.parent_concept)
             except MissingStructureError:
                 return False
         return not self.target_structure_one.has_relation(

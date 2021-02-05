@@ -46,12 +46,6 @@ class View(Chunk):
         members: StructureCollection = None,
     ):
         members = members if members is not None else StructureCollection()
-        for correspondence in members:
-            print(f"ADDING {correspondence.structure_id} TO NEW VIEW")
-            print(correspondence.start_space.name)
-            print(correspondence.start_space.location)
-            print(correspondence.end_space.name)
-            print(correspondence.end_space.location)
         input_spaces = StructureCollection(
             set.union(
                 *[
@@ -135,17 +129,8 @@ class View(Chunk):
 
     def nearby(self, space: Space = None) -> StructureCollection:
         space = space if space is not None else self.location.space
-        print("searching for nearby views")
-        print(space.name)
         views = space.contents.of_type(View)
-        print(space.contents.structures)
-        print(views.structures)
         compatible_views = views.where(input_spaces=self.input_spaces)
-        print(compatible_views.structures)
-        compatible_views_not_self = StructureCollection.difference(
-            compatible_views, StructureCollection({self})
-        )
-        print(compatible_views_not_self.structures)
         return StructureCollection.difference(
             space.contents.of_type(View).where(input_spaces=self.input_spaces),
             StructureCollection({self}),

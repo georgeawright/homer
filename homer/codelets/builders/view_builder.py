@@ -1,5 +1,4 @@
 from __future__ import annotations
-import time
 from typing import List, Set, Tuple
 
 from homer.bubble_chamber import BubbleChamber
@@ -57,22 +56,10 @@ class ViewBuilder(Builder):
         return self.bubble_chamber.concepts["view"]
 
     def _passes_preliminary_checks(self):
-        print(f"running {self.codelet_id}")
-        time.sleep(1)
         try:
             self.second_target_view = self.target_view.nearby().get_random()
-            print(f"second target view: {self.second_target_view.structure_id}")
         except MissingStructureError:
-            print("failed to get second target view")
             return False
-        print(
-            "has view: ",
-            self.bubble_chamber.has_view(
-                StructureCollection.union(
-                    self.target_view.members, self.second_target_view.members
-                )
-            ),
-        )
         return not self.bubble_chamber.has_view(
             StructureCollection.union(
                 self.target_view.members, self.second_target_view.members
@@ -80,21 +67,15 @@ class ViewBuilder(Builder):
         )
 
     def _calculate_confidence(self):
-        time.sleep(1)
-        print("calculating confidence")
-        time.sleep(1)
         self.confidence = 1.0
         self.correspondences = self.target_view.members.copy()
         self.correspondences_to_add = self.second_target_view.members.copy()
         while not self.correspondences_to_add.is_empty():
             new = self.correspondences_to_add.pop()
-            print(f"checking correspondence {new.structure_id}")
-            print(f"arguments: {new.start.structure_id}, {new.end.strucuture_id}")
             for old in self.target_view.members:
                 common_arguments = StructureCollection.intersection(
                     old.arguments, new.arguments
                 )
-                print("common arguments: ", len(common_arguments))
                 if len(common_arguments) == 0:
                     self.confidence = min(self.confidence, old.quality, new.quality)
                     self.correspondences.add(new)
@@ -109,14 +90,12 @@ class ViewBuilder(Builder):
                         third = self.second_target_view.members.where(
                             arguments=distinct_arguments
                         ).get_random()
-                        print(f"third correspondence: {third.structure_id}")
                         self.confidence = min(
                             self.confidence, old.quality, new.quality, third.quality
                         )
                         self.correspondences_to_add.add(third)
                         self.correspondences.add(new)
                     except MissingStructureError:
-                        print("no third correspondence")
                         self.confidence = 0
                         return
                 else:  # 2 common arguments means equivalent/incompatible correspondences
