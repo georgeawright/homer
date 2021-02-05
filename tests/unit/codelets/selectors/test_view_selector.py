@@ -27,7 +27,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion.activation = 1.0
     challenger.quality = 1.0
     challenger.activation = 1.0
-    bubble_chamber.views.get_random.return_value = challenger
+    champion.nearby.return_value = StructureCollection({challenger})
     selector = ViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     assert selector.challenger is None
     selector.run()
@@ -75,7 +75,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 1 == len(selector.child_codelets)
-        assert isinstance(selector.child_codelets[0], ViewSelector)
+        assert isinstance(selector.child_codelets[0], ViewBuilder)
 
 
 def test_spawns_builder_when_fizzling(bubble_chamber):
@@ -84,7 +84,7 @@ def test_spawns_builder_when_fizzling(bubble_chamber):
     challenger = Mock()
     challenger.size = 1
     challenger.members = StructureCollection()
-    bubble_chamber.views.get_random.return_value = challenger
+    champion.nearby.return_value = StructureCollection({challenger})
     selector = ViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     selector.run()
     assert CodeletResult.FIZZLE == selector.result
