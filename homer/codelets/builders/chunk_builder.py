@@ -152,9 +152,12 @@ class ChunkBuilder(Builder):
                 original_structure=original_chunk,
                 replacement_structure=new_chunk,
             )
+            self.bubble_chamber.logger.log(new_view.output_space)
+            for structure in new_view.output_space.contents:
+                self.bubble_chamber.logger.log(structure)
             for correspondence in new_view.members:
                 self.bubble_chamber.logger.log(correspondence)
-            self.bubble_chamber.logger.log(view)
+            self.bubble_chamber.logger.log(new_view)
         for link in original_chunk.links_in:
             if not new_chunk.has_link(link, start=original_chunk):
                 copy = copy_link(link)

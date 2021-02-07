@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Lexeme, Space
@@ -37,3 +40,22 @@ class Word(Chunk):
         from .slot import Slot
 
         return self.lexeme.concepts if self.lexeme is not None else None
+
+    def copy(
+        self,
+        bubble_chamber: "BubbleChamber",
+        parent_id: str = "",
+        parent_space: Space = None,
+    ) -> Word:
+        location = Location(self.location.coordinates, parent_space)
+        new_word = Word(
+            ID.new(Word),
+            parent_id,
+            self.value,
+            self.lexeme,
+            location,
+            parent_space,
+            self.quality,
+        )
+        bubble_chamber.words.add(new_word)
+        return new_word

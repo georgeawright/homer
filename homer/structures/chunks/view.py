@@ -112,7 +112,12 @@ class View(Chunk):
             bubble_chamber=bubble_chamber, parent_id=parent_id, members=new_members
         )
         for structure in self.output_space.contents:
-            structure_copy = structure.copy()
+            print(structure.structure_id)
+            structure_copy = structure.copy(
+                bubble_chamber=bubble_chamber,
+                parent_id=parent_id,
+                parent_space=new_view.output_space,
+            )
             new_view.output_space.add(structure_copy)
             for correspondence in structure.correspondences:
                 new_correspondence = correspondence.copy(
@@ -129,8 +134,6 @@ class View(Chunk):
 
     def nearby(self, space: Space = None) -> StructureCollection:
         space = space if space is not None else self.location.space
-        views = space.contents.of_type(View)
-        compatible_views = views.where(input_spaces=self.input_spaces)
         return StructureCollection.difference(
             space.contents.of_type(View).where(input_spaces=self.input_spaces),
             StructureCollection({self}),

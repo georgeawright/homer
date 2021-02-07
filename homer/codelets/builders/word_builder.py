@@ -130,6 +130,7 @@ class WordBuilder(Builder):
         frame_to_output_space = self.bubble_chamber.get_super_space(
             self.frame, self.output_space
         )
+        print("frame to output space", frame_to_output_space.structure_id)
         projection_from_frame = Correspondence(
             ID.new(Correspondence),
             self.codelet_id,
