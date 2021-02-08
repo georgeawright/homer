@@ -108,6 +108,7 @@ class ViewBuilder(Builder):
             parent_id=self.codelet_id,
             members=self.correspondences,
         )
+        self.bubble_chamber.logger.log(view.output_space)
         self.bubble_chamber.logger.log(view)
         self.child_structure = view
 
