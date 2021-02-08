@@ -51,16 +51,17 @@ def run_view(request, run_id):
         if record.parent_codelet is not None:
             continue
         original_chunks.append(record)
-        if record.location[0] > last_row:
-            last_row = record.location[0]
-        if record.location[1] > last_column:
-            last_column = record.location[1]
+        if record.locations["WorkingSpace2"][0] > last_row:
+            # WorkingSpace2 is the input space
+            last_row = record.locations["WorkingSpace2"][0]
+        if record.locations["WorkingSpace2"][1] > last_column:
+            last_column = record.locations["WorkingSpace2"][1]
     original_chunks_matrix = [
         [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
     ]
     for original_chunk in original_chunks:
-        row = original_chunk.location[0]
-        column = original_chunk.location[1]
+        row = original_chunk.locations["WorkingSpace2"][0]
+        column = original_chunk.locations["WorkingSpace2"][1]
         original_chunks_matrix[row][column] = original_chunk
     output += "<h2>Raw Input</h2>"
     output += '<table border="1">'
@@ -560,7 +561,7 @@ def structure_view(request, run_id, structure_id):
     output += "<li>Birth Time: " + str(structure_record.time_created) + "</li>"
     output += f"<li>Value: {structure_record.value}</li>"
     output += "<li>Locations: <ul>"
-    for space, coordinates in structure_record.locations.enumerate():
+    for space, coordinates in structure_record.locations.items():
         output += f"<li>{space}: {coordinates}</li>"
     output += "</ul></li>"
     if structure_record.parent_codelet is not None:
@@ -707,7 +708,7 @@ def structure_view(request, run_id, structure_id):
             + str(run_id)
             + "/structures/"
             + f'{structure_record.conceptual_space.structure_id}">'
-            + "{structure_record.conceptual_space.structure_id}</a>"
+            + f"{structure_record.conceptual_space.structure_id}</a>"
         )
     output += (
         "<li>Final Activation: "
