@@ -3,7 +3,7 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures.chunk import Chunk
+from homer.structures import Chunk, Link
 from homer.structures.links.correspondence import Correspondence
 from homer.structures.space import Space
 from homer.structures.spaces import WorkingSpace
@@ -112,6 +112,8 @@ class View(Chunk):
             bubble_chamber=bubble_chamber, parent_id=parent_id, members=new_members
         )
         for structure in self.output_space.contents:
+            if isinstance(structure, Link):
+                continue
             print(structure.structure_id)
             structure_copy = structure.copy(
                 bubble_chamber=bubble_chamber,
