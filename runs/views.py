@@ -559,7 +559,10 @@ def structure_view(request, run_id, structure_id):
     output += "<ul>"
     output += "<li>Birth Time: " + str(structure_record.time_created) + "</li>"
     output += f"<li>Value: {structure_record.value}</li>"
-    output += "<li>Location: " + str(structure_record.location) + "</li>"
+    output += "<li>Locations: <ul>"
+    for space, coordinates in structure_record.locations.enumerate():
+        output += f"<li>{space}: {coordinates}</li>"
+    output += "</ul></li>"
     if structure_record.parent_codelet is not None:
         output += (
             '<li>Parent Codelet: <a href="/runs/'
@@ -584,6 +587,26 @@ def structure_view(request, run_id, structure_id):
         )
     else:
         output += "<li>Parent Concept: None</li>"
+    if structure_record.start is not None:
+        output += (
+            '<li>Start: <a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + structure_record.start.structure_id
+            + '">'
+            + structure_record.start.structure_id
+            + "</a></li>"
+        )
+    if structure_record.end is not None:
+        output += (
+            '<li>End: <a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + structure_record.end.structure_id
+            + '">'
+            + structure_record.end.structure_id
+            + "</a></li>"
+        )
     if structure_record.links is None:
         output += "<li>Links: None</li>"
     else:
@@ -600,6 +623,92 @@ def structure_view(request, run_id, structure_id):
             ]
         )
         output += "</li>"
+    if structure_record.members is not None:
+        output += "<li>Members: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + member.structure_id
+                + '">'
+                + member.structure_id
+                + "</a>"
+                for member in structure_record.members.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.contents is not None:
+        output += "<li>Contents: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + item.structure_id
+                + '">'
+                + item.structure_id
+                + "</a>"
+                for item in structure_record.contents.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.dimensions is not None:
+        output += "<li>Dimensions: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + dimension.structure_id
+                + '">'
+                + dimension.structure_id
+                + "</a>"
+                for dimension in structure_record.dimensions.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.sub_spaces is not None:
+        output += "<li>Sub Spaces: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + space.structure_id
+                + '">'
+                + space.structure_id
+                + "</a>"
+                for space in structure_record.sub_spaces.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.input_spaces is not None:
+        output += "<li>Input Spaces: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + space.structure_id
+                + '">'
+                + space.structure_id
+                + "</a>"
+                for space in structure_record.input_spaces.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.output_space is not None:
+        output += (
+            '<li>Output Space: <a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + f'{structure_record.output_space.structure_id}">'
+            + "{structure_record.output_space.structure_id}</a>"
+        )
+    if structure_record.conceptual_space is not None:
+        output += (
+            '<li>Conceptual Space: <a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + f'{structure_record.conceptual_space.structure_id}">'
+            + "{structure_record.conceptual_space.structure_id}</a>"
+        )
     output += (
         "<li>Final Activation: "
         + str(last_value_of_dict(structure_record.activation))
