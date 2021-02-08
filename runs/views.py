@@ -219,6 +219,7 @@ def run_view(request, run_id):
             if re.match(r"^Word*", structure.structure_id)
             and structure.parent_space == output_space
         ]
+        words = sorted(words, key=lambda x: list(x.locations.values())[0])
         for word in words:
             output += f"{word.value} "
         output += "</li>"
