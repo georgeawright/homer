@@ -106,11 +106,10 @@ def run_view(request, run_id):
     chunks = sorted(
         chunks, key=lambda chunk: last_value_of_dict(chunk.activation), reverse=True
     )
+    chunks = [chunk for chunk in chunks if chunk not in original_chunks]
     output += "<h2>Most Active Chunks</h2>"
     for i in range(5):
         chunk = chunks[i]
-        if chunk in original_chunks:
-            continue
         output += f'<a href="structures/{chunk.structure_id}"><h3>{chunk.structure_id}</h3></a>'
         output += (
             "<p>Quality: "
@@ -745,16 +744,16 @@ def structure_view(request, run_id, structure_id):
             if record.parent_codelet is not None:
                 continue
             original_chunks.append(record)
-            if record.location[0] > last_row:
-                last_row = record.location[0]
-            if record.location[1] > last_column:
-                last_column = record.location[1]
+            if record.locations["WorkingSpace2"][0] > last_row:
+                last_row = record.locations["WorkingSpace2"][0]
+            if record.locations["WorkingSpace2"][1] > last_column:
+                last_column = record.locations["WorkingSpace2"][1]
         original_chunks_matrix = [
             [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
         ]
         for original_chunk in original_chunks:
-            row = original_chunk.location[0]
-            column = original_chunk.location[1]
+            row = original_chunk.locations["WorkingSpace2"][0]
+            column = original_chunk.locations["WorkingSpace2"][1]
             original_chunks_matrix[row][column] = original_chunk
         output += "<h2>Members</h2>"
         output += '<table border="1">'
