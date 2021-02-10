@@ -92,7 +92,7 @@ class ChunkSelector(Selector):
             ChunkBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion,
-                self.champion.activation,
+                self.winner,
+                self.winner.activation,
             )
         )

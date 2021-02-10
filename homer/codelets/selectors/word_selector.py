@@ -61,6 +61,9 @@ class WordSelector(Selector):
         )
         self.child_codelets.append(
             self.spawn(
-                self.codelet_id, self.bubble_chamber, self.champion, self.confidence
+                self.codelet_id,
+                self.bubble_chamber,
+                self.winner,
+                self.follow_up_urgency,
             )
         )

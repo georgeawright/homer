@@ -81,7 +81,7 @@ class ViewSelector(Selector):
             ViewBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion,
-                self.champion.activation,
+                self.winner,
+                self.winner.activation,
             )
         )

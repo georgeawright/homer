@@ -83,8 +83,8 @@ class CorrespondenceSelector(Selector):
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion,
-                self.confidence,
-                challenger=self.challenger,
+                self.winner,
+                self.follow_up_urgency,
+                challenger=self.loser,
             )
         )

@@ -89,7 +89,7 @@ class LabelSelector(Selector):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winner,
-                self.confidence,
+                self.follow_up_urgency,
                 challenger=self.loser,
             )
         )

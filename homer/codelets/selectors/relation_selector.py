@@ -95,8 +95,8 @@ class RelationSelector(Selector):
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion,
-                1 - abs(self.winner.activation - self.loser.activation),
-                challenger=self.challenger,
+                self.winner,
+                self.follow_up_urgency,
+                challenger=self.loser,
             )
         )
