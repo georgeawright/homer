@@ -23,7 +23,13 @@ def index(request):
     runs = RunRecord.objects.order_by("-start_time")
     list_of_runs = "".join(
         [
-            '<a href="' + str(run.id) + '"><li>' + str(run.start_time) + "</li></a>"
+            '<a href="'
+            + str(run.id)
+            + '"><li>'
+            + str(run.id)
+            + ": "
+            + str(run.start_time)
+            + "</li></a>"
             for run in runs
         ]
     )
