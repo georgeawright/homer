@@ -92,7 +92,7 @@ class BubbleChamber:
     def update_activations(self) -> None:
         for structure in self.structures:
             structure.update_activation()
-            if self.log_count % 5 == 0:
+            if self.log_count % 10 == 0:
                 self.logger.log(structure)
         self.log_count += 1
 
