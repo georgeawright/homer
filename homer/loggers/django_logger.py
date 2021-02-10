@@ -355,42 +355,9 @@ class DjangoLogger(Logger):
                 structure_id=space_name, run_id=self.run
             )
             space_record.contents.add(structure_record)
-        last_activation = last_value_of_dict(structure_record.activation)
-        last_unhappiness = last_value_of_dict(structure_record.unhappiness)
-        last_quality = last_value_of_dict(structure_record.quality)
-        if structure.activation != last_activation:
-            changed = (
-                "increased"
-                if last_activation is None or structure.activation > last_activation
-                else "decreased"
-            )
-            self._log_message(
-                f"{structure.structure_id} activation {changed} from "
-                + f"{last_activation} to {structure.activation}"
-            )
-            structure_record.activation[self.codelets_run] = structure.activation
-        if structure.unhappiness != last_unhappiness:
-            changed = (
-                "increased"
-                if last_unhappiness is None or structure.unhappiness > last_unhappiness
-                else "decreased"
-            )
-            self._log_message(
-                f"{structure.structure_id} unhappiness {changed} from "
-                + f"{last_unhappiness} to {structure.unhappiness}"
-            )
-            structure_record.unhappiness[self.codelets_run] = structure.unhappiness
-        if structure.quality != last_quality:
-            changed = (
-                "increased"
-                if last_quality is None or structure.quality > last_quality
-                else "decreased"
-            )
-            self._log_message(
-                f"{structure.structure_id} quality {changed} from "
-                + f"{last_quality} to {structure.quality}"
-            )
-            structure_record.quality[self.codelets_run] = structure.quality
+        structure_record.activation[self.codelets_run] = structure.activation
+        structure_record.unhappiness[self.codelets_run] = structure.unhappiness
+        structure_record.quality[self.codelets_run] = structure.quality
         structure_record.save()
 
     def graph_concepts(self, concept_names, file_name):
