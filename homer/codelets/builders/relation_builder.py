@@ -148,7 +148,7 @@ class RelationBuilder(Builder):
                 self.bubble_chamber,
                 self.target_space,
                 self.target_structure_one,
-                self.target_structure_one.unhappiness,
+                self.urgency / 2,
             )
         )
 
@@ -156,9 +156,6 @@ class RelationBuilder(Builder):
         new_target = self.target_space.contents.of_type(Chunk).get_unhappy()
         self.child_codelets.append(
             ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                new_target,
-                new_target.unhappiness,
+                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
             )
         )
