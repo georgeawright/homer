@@ -64,6 +64,7 @@ class DjangoLogger(Logger):
             return self._log_structure(item)
 
     def log_codelet_run(self, codelet: Codelet):
+        print(f"- {codelet.codelet_id}")
         codelet_record = CodeletRecord.objects.get(
             codelet_id=codelet.codelet_id, run_id=self.run
         )
