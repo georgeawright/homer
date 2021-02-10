@@ -66,13 +66,13 @@ class ViewSelector(Selector):
         ) > 0.5 * len(self.challenger.members)
 
     def _fizzle(self):
-        new_target = self.bubble_chamber.correspondences.get_unhappy()
+        new_target = self.bubble_chamber.views.get_active()
         self.child_codelets.append(
             ViewBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 new_target,
-                new_target.unhappiness,
+                new_target.activation,
             )
         )
 
