@@ -8,7 +8,9 @@ from homer.structures.links import Correspondence
 
 def test_copy():
     start_space = Mock()
+    start_space.parent_concept = Mock()
     end_space = Mock()
+    end_space.parent_concept = Mock()
     start_location = Mock()
     start_location.coordinates = [1, 1]
     start_location.space = start_space
@@ -17,12 +19,16 @@ def test_copy():
     end_location.space = end_space
     old_start = Mock()
     old_start.location_in_space.return_value = start_location
+    old_start.locations = [start_location]
     old_end = Mock()
     old_end.location_in_space.return_value = end_location
+    old_end.locations = [end_location]
     new_start = Mock()
     new_start.location_in_space.return_value = start_location
+    new_start.locations = [start_location]
     new_end = Mock()
     new_end.location_in_space.return_value = end_location
+    new_end.locations = [end_location]
     parent_id = "id"
     location = Mock()
     location.space.sub_spaces = [start_space, end_space]
@@ -32,8 +38,8 @@ def test_copy():
         old_start,
         old_end,
         location,
-        Mock(),
-        Mock(),
+        start_space,
+        end_space,
         Mock(),
         Mock(),
         Mock(),

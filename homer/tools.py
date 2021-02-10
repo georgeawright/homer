@@ -37,3 +37,15 @@ def project_item_into_space(item: "Structure", space: "Space"):
         Location(getattr(item, space.parent_concept.relevant_value), space)
     )
     space.add(item)
+
+
+def equivalent_space(structure, space):
+    for location in structure.locations:
+        if location is None:
+            continue
+        if location.space.parent_concept == space.parent_concept:
+            return location.space
+    raise Exception(
+        f"{structure.structure_id} does not exist "
+        + f"in any space equivalent to {space.structure_id}"
+    )
