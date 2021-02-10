@@ -12,7 +12,7 @@ from .logger import Logger
 
 class Coderack:
 
-    IDEAL_POPULATION = HyperParameters.IDEAL_CODERACK_POPULATION
+    MAXIMUM_POPULATION = HyperParameters.MAXIMUM_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
     def __init__(self, bubble_chamber: BubbleChamber, logger: Logger):
@@ -33,8 +33,8 @@ class Coderack:
     def add_codelet(self, codelet: Codelet):
         if codelet.urgency < self.MINIMUM_CODELET_URGENCY:
             return
-        if isinstance(codelet, FactoryCodelet) and self.has_factory_codelet():
-            return
+        if len(self._codelets) >= self.MAXIMUM_POPULATION:
+            self.remove_codelet()
         self.logger.log(codelet)
         self._codelets.append(codelet)
 
@@ -63,11 +63,19 @@ class Coderack:
         self._codelets.remove(codelet_choice)
         return codelet_choice
 
-    def has_factory_codelet(self):
+    def remove_codelet(self):
+        codelet_choice = None
+        lowest_weight = float("inf")
+        randomness = self._randomness()
+        rationality = 1 - randomness
         for codelet in self._codelets:
             if isinstance(codelet, FactoryCodelet):
-                return True
-        return False
+                continue
+            weight = codelet.urgency * rationality + random.random() * randomness
+            if weight < lowest_weight:
+                lowest_weight = weight
+                codelet_choice = codelet
+        self._codelets.remove(codelet_choice)
 
     def proportion_of_codelets_of_type(self, t: type) -> float:
         try:
