@@ -46,9 +46,10 @@ class ChunkBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
         target = bubble_chamber.chunks.get_unhappy()
-        return cls.spawn(parent_id, bubble_chamber, target, target.unhappiness)
+        urgency = urgency if urgency is not None else target.unhappiness
+        return cls.spawn(parent_id, bubble_chamber, target, urgency)
 
     @property
     def _structure_concept(self):
@@ -204,7 +205,9 @@ class ChunkBuilder(Builder):
         )
 
     def _fizzle(self):
-        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
+        self.child_codelets.append(
+            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
+        )
 
     def _fail(self):
         self._fizzle()
