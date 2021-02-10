@@ -44,6 +44,7 @@ class BubbleChamber:
         self.concept_links = concept_links
         self.slots = slots
         self.logger = logger
+        self.log_count = 0
         self.result = None
 
     @property
@@ -91,7 +92,9 @@ class BubbleChamber:
     def update_activations(self) -> None:
         for structure in self.structures:
             structure.update_activation()
-            self.logger.log(structure)
+            if self.log_count % 5 == 0:
+                self.logger.log(structure)
+        self.log_count += 1
 
     def has_chunk(self, members: StructureCollection) -> bool:
         for chunk in self.chunks:
