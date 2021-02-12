@@ -74,7 +74,6 @@ class Homer:
 
     def run(self):
         while self.bubble_chamber.result is None:
-            # time.sleep(1)
             self.logger.log(self.coderack)
             if self.coderack.codelets_run % self.activation_update_frequency == 0:
                 self.print_status_update()
@@ -90,7 +89,7 @@ class Homer:
                 raise e
         return {
             "result": self.bubble_chamber.result,
-            "satisfaction": self.bubble_chamber.top_level_working_space.quality,
+            "satisfaction": self.bubble_chamber.satisfaction,
             "codelets_run": self.coderack.codelets_run,
         }
 
