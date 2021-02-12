@@ -72,9 +72,9 @@ class CorrespondenceBuilder(Builder):
         target_space = bubble_chamber.working_spaces.where(
             is_basic_level=True
         ).get_active()
-        target = target_space.contents.not_of_type(Space).get_unhappy()
+        target = target_space.contents.not_of_type(Space).get_exigent()
         return cls.spawn(
-            parent_id, bubble_chamber, target_space, target, target.unhappiness
+            parent_id, bubble_chamber, target_space, target, target.exigency
         )
 
     @property
