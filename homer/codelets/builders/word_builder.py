@@ -53,16 +53,23 @@ class WordBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        target_view = bubble_chamber.views.get_unhappy()
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_view: View = None,
+        urgency: float = None,
+    ):
+        target_view = (
+            target_view
+            if target_view is not None
+            else bubble_chamber.views.get_unhappy()
+        )
         frame = target_view.input_spaces.of_type(Frame).get_random()
         target_frame_item = frame.contents.of_type(Chunk).get_exigent()
+        urgency = urgency if urgency is not None else target_frame_item.exigency
         return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            target_view,
-            target_frame_item,
-            target_frame_item.exigency,
+            parent_id, bubble_chamber, target_view, target_frame_item, urgency
         )
 
     @property
@@ -130,7 +137,6 @@ class WordBuilder(Builder):
         frame_to_output_space = self.bubble_chamber.get_super_space(
             self.frame, self.output_space
         )
-        print("frame to output space", frame_to_output_space.structure_id)
         projection_from_frame = Correspondence(
             ID.new(Correspondence),
             self.codelet_id,
@@ -198,21 +204,14 @@ class WordBuilder(Builder):
         )
 
     def _fizzle(self):
-        try:
-            new_target_frame_item = self.frame.contents.of_type(Chunk).get_random(
-                exclude=[self.target_frame_item]
+        self.child_codelets.append(
+            self.make(
+                self.codelet_id,
+                self.bubble_chamber,
+                target_view=self.target_view,
+                urgency=self.urgency / 2,
             )
-            self.child_codelets.append(
-                self.spawn(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    self.target_view,
-                    new_target_frame_item,
-                    self.urgency / 2,
-                )
-            )
-        except MissingStructureError:
-            pass
+        )
 
     def _fail(self):
         from homer.codelets.selectors import CorrespondenceSelector

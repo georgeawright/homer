@@ -186,6 +186,8 @@ def template(bubble_chamber):
     contents = StructureCollection()
     parent_concept = bubble_chamber.concepts["text"]
     template = Template(Mock(), Mock(), name, parent_concept, [], contents)
+    slot = TemplateSlot(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    template.contents.add(slot)
     bubble_chamber.frames.add(template)
     return template
 

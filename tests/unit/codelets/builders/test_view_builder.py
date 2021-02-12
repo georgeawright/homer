@@ -73,7 +73,7 @@ def test_fails_when_correspondences_are_equivalent(
     arguments = StructureCollection({Mock(), Mock()})
     target_view_correspondence.arguments = arguments
     second_target_view_correspondence.arguments = arguments
-    view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, Mock())
+    view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, 1)
     result = view_builder.run()
     assert CodeletResult.FAIL == result
     assert view_builder.child_structure is None
@@ -94,7 +94,7 @@ def test_fails_when_correspondences_are_not_transitive(
     second_target_view_correspondence.arguments = StructureCollection(
         {common_argument, Mock()}
     )
-    view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, Mock())
+    view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, 1)
     result = view_builder.run()
     assert CodeletResult.FAIL == result
     assert view_builder.child_structure is None
