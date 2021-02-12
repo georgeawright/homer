@@ -134,8 +134,21 @@ def run_view(request, run_id):
                 + f"{link.parent_space.structure_id}</a>, "
                 + f'<a href="structures/{link.start.structure_id}">{link.start.structure_id}</a>, '
                 + f'<a href="structures/{link.end.structure_id}">{link.end.structure_id}</a>)'
+                + "<br>"
                 for link in chunk.links.all()
                 if re.match(r"^Relation*", link.structure_id)
+            ]
+        )
+        output += "".join(
+            [
+                f'<a href="structures/{link.structure_id}">{link.value}</a>('
+                + f'<a href="structures/{link.conceptual_space.structure_id}">'
+                + f"{link.conceptual_space.structure_id}</a>, "
+                + f'<a href="structures/{link.start.structure_id}">{link.start.structure_id}</a>, '
+                + f'<a href="structures/{link.end.structure_id}">{link.end.structure_id}</a>)'
+                + "<br>"
+                for link in chunk.links.all()
+                if re.match(r"^Correspondence*", link.structure_id)
             ]
         )
         output += '<table border="1">'
