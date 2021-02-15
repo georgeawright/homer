@@ -64,8 +64,7 @@ class CorrespondenceSelector(Selector):
 
     def _engender_follow_up(self):
         try:
-            new_target = self.champion.nearby().get_exigent()
-            new_target_space = new_target.parent_spaces.where(
+            new_target_space = self.winner.start.parent_spaces.where(
                 is_basic_level=True
             ).get_random()
         except MissingStructureError:
@@ -75,8 +74,8 @@ class CorrespondenceSelector(Selector):
                 self.codelet_id,
                 self.bubble_chamber,
                 new_target_space,
-                new_target,
-                new_target.unlinkedness,
+                self.winner,
+                self.winner.unhappiness,
             )
         )
         self.child_codelets.append(
