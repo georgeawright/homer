@@ -14,13 +14,11 @@ class ChunkSelector(Selector):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_space: Space,
         champion: Chunk,
         urgency: FloatBetweenOneAndZero,
         challenger: Chunk = None,
     ):
         Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_space = target_space
         self.champion = champion
         self.challenger = challenger
 
@@ -29,7 +27,6 @@ class ChunkSelector(Selector):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_space: Space,
         champion: Chunk,
         urgency: FloatBetweenOneAndZero,
         challenger: Chunk = None,
@@ -39,7 +36,6 @@ class ChunkSelector(Selector):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_space,
             champion,
             urgency,
             challenger=challenger,
@@ -48,12 +44,7 @@ class ChunkSelector(Selector):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         champion = bubble_chamber.chunks.get_active()
-        target_space = StructureCollection(
-            {space for space in champion.parent_spaces if space.is_basic_level}
-        ).get_random()
-        return cls.spawn(
-            parent_id, bubble_chamber, target_space, champion, champion.activation
-        )
+        return cls.spawn(parent_id, bubble_chamber, champion, champion.activation)
 
     @property
     def _structure_concept(self):
@@ -63,7 +54,7 @@ class ChunkSelector(Selector):
         if self.challenger is not None:
             return True
         try:
-            self.challenger = self.champion.nearby(self.target_space).get_active()
+            self.challenger = self.champion.nearby().get_active()
         except MissingStructureError:
             return True
         members_intersection = StructureCollection.intersection(
@@ -100,7 +91,6 @@ class ChunkSelector(Selector):
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.target_space,
                 self.winner,
                 self.follow_up_urgency,
             )

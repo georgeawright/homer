@@ -57,21 +57,10 @@ class ChunkEvaluator(Evaluator):
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
 
     def _engender_follow_up(self):
-        try:
-            target_space = StructureCollection(
-                {
-                    space
-                    for space in self.target_structure.parent_spaces
-                    if space.is_basic_level
-                }
-            ).get_random()
-        except MissingStructureError:
-            return
         self.child_codelets.append(
             ChunkSelector.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                target_space,
                 self.target_structure,
                 self.change_in_confidence,
             )

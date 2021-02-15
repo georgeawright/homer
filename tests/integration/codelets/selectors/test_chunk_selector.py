@@ -121,16 +121,14 @@ def bad_chunk(target_space, chunk_members):
 
 
 def test_good_chunk_is_boosted_bad_chunk_is_decayed(
-    bubble_chamber, target_space, good_chunk, bad_chunk
+    bubble_chamber, good_chunk, bad_chunk
 ):
     original_good_chunk_activation = good_chunk.activation
     original_bad_chunk_activation = bad_chunk.activation
     parent_id = ""
     champion = bad_chunk
     urgency = 1.0
-    selector = ChunkSelector.spawn(
-        parent_id, bubble_chamber, target_space, champion, urgency
-    )
+    selector = ChunkSelector.spawn(parent_id, bubble_chamber, champion, urgency)
     selector.run()
     good_chunk.update_activation()
     bad_chunk.update_activation()
