@@ -74,8 +74,8 @@ class CorrespondenceSelector(Selector):
                 self.codelet_id,
                 self.bubble_chamber,
                 new_target_space,
-                self.winner,
-                self.winner.unhappiness,
+                self.winner.start,
+                self.winner.start.unlinkedness,
             )
         )
         self.child_codelets.append(
