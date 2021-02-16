@@ -85,3 +85,11 @@ class ViewSelector(Selector):
                 self.winner.activation,
             )
         )
+        self.child_codelets.append(
+            self.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.winner,
+                self.follow_up_urgency,
+            )
+        )
