@@ -125,7 +125,7 @@ class ChunkBuilder(Builder):
             self.target_chunk,
             self.second_target_chunk,
         ]:
-            member.containing_chunks.add(chunk)
+            member.chunks_made_from_this_chunk.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         self.child_structure = chunk
         self.bubble_chamber.logger.log(self.child_structure)

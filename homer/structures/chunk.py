@@ -1,4 +1,5 @@
 from __future__ import annotations
+from math import prod
 import statistics
 from typing import Any, List
 
@@ -24,7 +25,7 @@ class Chunk(Structure):
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
-        containing_chunks: StructureCollection = None,
+        chunks_made_from_this_chunk: StructureCollection = None,
     ):
         Structure.__init__(
             self,
@@ -38,11 +39,9 @@ class Chunk(Structure):
         self.value = value
         self.members = members
         self.parent_space = parent_space
-        # TODO: containing chunks needs a better name - chunks that have been made out of this chunk
-        # self.chunks_made_from_this_chunk ?
-        self.containing_chunks = (
-            containing_chunks
-            if containing_chunks is not None
+        self.chunks_made_from_this_chunk = (
+            chunks_made_from_this_chunk
+            if chunks_made_from_this_chunk is not None
             else StructureCollection()
         )
 
@@ -54,9 +53,11 @@ class Chunk(Structure):
 
     @property
     def unchunkedness(self):
-        return 0.5 ** len(self.containing_chunks)
-
-    # TODO: this should be defined recursively so that chunks contained in chunks contained in chunks have even lower unchunkedness
+        if len(self.chunks_made_from_this_chunk) == 0:
+            return 1
+        return 0.5 * prod(
+            [chunk.unchunkedness for chunk in self.chunks_made_from_this_chunk]
+        )
 
     def nearby(self, space: Space = None):
         if space is not None:
