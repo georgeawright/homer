@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from homer.location import Location
 from homer.structures import Concept, Space
@@ -32,3 +32,6 @@ class Template(Frame):
             links_in=links_in,
             links_out=links_out,
         )
+
+    def __getitem__(self, index: int) -> Union[Word, Slot]:
+        return self.contents.at(Location([index], self)).get_random()
