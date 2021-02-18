@@ -28,6 +28,12 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion.start.relations_in_space_with.return_value = StructureCollection(
         {champion, challenger}
     )
+    space = Mock()
+    space.no_of_dimensions = 1
+    champion.start.parent_spaces = StructureCollection({space})
+    champion.end.parent_spaces = StructureCollection({space})
+    challenger.start.parent_spaces = StructureCollection({space})
+    challenger.end.parent_spaces = StructureCollection({space})
     selector = RelationSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     assert selector.challenger is None
     selector.run()
@@ -63,6 +69,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.size = 1
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
+        space = Mock()
+        space.no_of_dimensions = 1
+        champion.start.parent_spaces = StructureCollection({space})
+        champion.end.parent_spaces = StructureCollection({space})
+        challenger.start.parent_spaces = StructureCollection({space})
+        challenger.end.parent_spaces = StructureCollection({space})
         selector = RelationSelector(
             Mock(), Mock(), bubble_chamber, champion, Mock(), challenger=challenger
         )

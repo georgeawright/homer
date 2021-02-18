@@ -69,6 +69,9 @@ class CorrespondenceSelector(Selector):
             new_target_space = self.winner.start.parent_spaces.where(
                 is_basic_level=True
             ).get_random()
+            new_target_space_two = self.winner.end.parent_spaces.where(
+                parent_concept=new_target_space.parent_concept
+            ).get_random()
         except MissingStructureError:
             return
         self.child_codelets.append(
@@ -78,6 +81,8 @@ class CorrespondenceSelector(Selector):
                 new_target_space,
                 self.winner.start,
                 self.winner.start.unlinkedness,
+                target_space_two=new_target_space_two,
+                target_structure_two=self.winner.end,
             )
         )
         self.child_codelets.append(
