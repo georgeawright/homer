@@ -12,11 +12,12 @@ from .location import Location
 from .logger import Logger
 from .loggers import DjangoLogger
 from .problem import Problem
+from .structure import Structure
 from .structure_collection import StructureCollection
-from .structures import Concept, Lexeme
+from .structures import Concept, Lexeme, Space
 from .structures.chunks import Word
 from .structures.chunks.slots import TemplateSlot
-from .structures.links import Relation
+from .structures.links import Correspondence, Relation
 from .structures.spaces import ConceptualSpace, WorkingSpace
 from .structures.spaces.frames import Template
 from .word_form import WordForm
@@ -350,3 +351,51 @@ class Homer:
             location.space.add(working_space)
         self.bubble_chamber.working_spaces.add(working_space)
         return working_space
+
+    def def_correspondence(
+        self,
+        start: Structure,
+        end: Structure,
+        location: Location = None,
+        start_space: Space = None,
+        end_space: Space = None,
+        parent_concept: Concept = None,
+        conceptual_space: ConceptualSpace = None,
+        is_privileged: bool = True,
+        stable: bool = True,
+    ) -> Correspondence:
+        start_space = start.location.space if start_space is None else start_space
+        end_space = end.location.space if end_space is None else end_space
+        location = start.location if location is None else location
+        parent_concept = (
+            self.bubble_chamber.concepts["same"]
+            if parent_concept is None
+            else parent_concept
+        )
+        conceptual_space = (
+            self.bubble_chamber.conceptual_spaces["text"]
+            if conceptual_space is None
+            else conceptual_space
+        )
+        correspondence = Correspondence(
+            structure_id=ID.new(Correspondence),
+            parent_id="",
+            start=start,
+            end=end,
+            location=location,
+            start_space=start_space,
+            end_space=end_space,
+            parent_concept=parent_concept,
+            conceptual_space=conceptual_space,
+            quality=1,
+            is_privileged=is_privileged,
+        )
+        correspondence._activation = 1
+        correspondence.stable = stable
+        start.links_out.add(correspondence)
+        start.links_in.add(correspondence)
+        end.links_out.add(correspondence)
+        end.links_in.add(correspondence)
+        self.logger.log(correspondence)
+        location.space.add(correspondence)
+        return correspondence

@@ -84,10 +84,14 @@ class WordBuilder(Builder):
         self.output_space = self.target_view.output_space
         if isinstance(self.target_frame_item, Slot):
             try:
-                self.target_correspondence = StructureCollection.union(
-                    self.target_view.members.where(start=self.target_frame_item),
-                    self.target_view.members.where(end=self.target_frame_item),
-                ).get_active()
+                self.target_correspondence = (
+                    StructureCollection.union(
+                        self.target_view.members.where(start=self.target_frame_item),
+                        self.target_view.members.where(end=self.target_frame_item),
+                    )
+                    .where(is_privileged=False)
+                    .get_active()
+                )
                 self.target_non_frame_item = (
                     self.target_correspondence.get_non_slot_argument()
                 )

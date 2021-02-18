@@ -118,6 +118,7 @@ def chunk_slot_correspondence(
     correspondence.end_space = temperature_space_in_input
     correspondence.activation = 1.0
     correspondence.get_non_slot_argument.return_value = input_space_chunk
+    correspondence.is_privileged = False
     return correspondence
 
 
@@ -132,7 +133,7 @@ def target_view(input_space, output_space, chunk_slot_correspondence):
 
 def test_successfully_creates_word_from_slot(bubble_chamber, target_view, frame_slot):
     word_builder = WordBuilder(
-        Mock(), Mock(), bubble_chamber, target_view, frame_slot, Mock()
+        Mock(), Mock(), bubble_chamber, target_view, frame_slot, 1
     )
     result = word_builder.run()
     assert CodeletResult.SUCCESS == result
@@ -143,7 +144,7 @@ def test_successfully_creates_word_from_slot(bubble_chamber, target_view, frame_
 
 def test_successfully_creates_word_from_word(bubble_chamber, target_view, frame_word):
     word_builder = WordBuilder(
-        Mock(), Mock(), bubble_chamber, target_view, frame_word, Mock()
+        Mock(), Mock(), bubble_chamber, target_view, frame_word, 1
     )
     result = word_builder.run()
     assert CodeletResult.SUCCESS == result

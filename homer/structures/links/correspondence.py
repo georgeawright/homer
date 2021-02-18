@@ -23,6 +23,7 @@ class Correspondence(Link):
         parent_concept: Concept,
         conceptual_space: ConceptualSpace,
         quality: FloatBetweenOneAndZero,
+        is_privileged: bool = False,
     ):
         Link.__init__(
             self,
@@ -39,6 +40,7 @@ class Correspondence(Link):
         self.start_space = start_space
         self.end_space = end_space
         self.conceptual_space = conceptual_space
+        self.is_privileged = is_privileged
 
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
@@ -47,21 +49,26 @@ class Correspondence(Link):
         end = new_arg if new_arg is not None and old_arg == self.end else self.end
         start_space = equivalent_space(start, self.start_space)
         end_space = equivalent_space(end, self.end_space)
+        if self.location == self.start.location:
+            new_location = start.location
+        else:
+            new_location = Location.for_correspondence_between(
+                start.location_in_space(start_space),
+                end.location_in_space(end_space),
+                self.location.space,
+            )
         new_correspondence = Correspondence(
             ID.new(Correspondence),
             parent_id,
             start,
             end,
-            Location.for_correspondence_between(
-                start.location_in_space(start_space),
-                end.location_in_space(end_space),
-                self.location.space,
-            ),
+            new_location,
             start_space,
             end_space,
             self.parent_concept,
             self.conceptual_space,
             self.quality,
+            is_privileged=self.is_privileged,
         )
         return new_correspondence
 

@@ -529,6 +529,7 @@ template_1 = homer.def_template(
         homer.def_template_slot(temperature_concept, form=WordForm.HEADWORD),
     ],
 )
+homer.def_correspondence(template_1[1], template_1[3])
 template_2 = homer.def_template(
     name="it is [temperature] in the [location]",
     contents=[
@@ -540,6 +541,7 @@ template_2 = homer.def_template(
         homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
     ],
 )
+homer.def_correspondence(template_2[2], template_2[5])
 template_3 = homer.def_template(
     name="it is [temperature.comparative] in the [location]",
     contents=[
@@ -551,6 +553,7 @@ template_3 = homer.def_template(
         homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
     ],
 )
+homer.def_correspondence(template_3[2], template_3[5])
 template_4 = homer.def_template(
     name="it is [temperature.comparative] in the [location] than the [location]",
     contents=[

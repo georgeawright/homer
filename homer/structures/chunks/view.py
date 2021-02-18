@@ -114,7 +114,6 @@ class View(Chunk):
         for structure in self.output_space.contents:
             if isinstance(structure, Link):
                 continue
-            print(structure.structure_id)
             structure_copy = structure.copy(
                 bubble_chamber=bubble_chamber,
                 parent_id=parent_id,

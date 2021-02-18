@@ -88,6 +88,7 @@ def target_space_two(bubble_chamber, target_space_one):
 @pytest.fixture
 def target_structure_one(bubble_chamber, label_concept_working_space):
     structure = Mock()
+    structure.correspondences = StructureCollection()
     structure.has_correspondence.return_value = False
     structure.parent_spaces = StructureCollection({label_concept_working_space})
     return structure
@@ -96,6 +97,7 @@ def target_structure_one(bubble_chamber, label_concept_working_space):
 @pytest.fixture
 def target_structure_two(label_concept_working_space, target_space_two):
     structure = Mock()
+    structure.correspondences = StructureCollection()
     structure.name = "target_structure_two"
     structure.parent_spaces = StructureCollection({label_concept_working_space})
     target_space_two.contents.of_type.return_value = StructureCollection({structure})
