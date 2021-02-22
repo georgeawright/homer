@@ -64,6 +64,7 @@ class DjangoLogger(Logger):
             return self._log_structure(item)
 
     def log_codelet_run(self, codelet: Codelet):
+        print(f"- {codelet.codelet_id}")
         codelet_record = CodeletRecord.objects.get(
             codelet_id=codelet.codelet_id, run_id=self.run
         )
@@ -226,9 +227,7 @@ class DjangoLogger(Logger):
                 run_id=self.run,
                 time_created=self.codelets_run,
                 value=structure.value,
-                location=structure.location.coordinates
-                if structure.location is not None
-                else None,
+                locations={},
                 activation={},
                 unhappiness={},
                 quality={},
@@ -250,6 +249,10 @@ class DjangoLogger(Logger):
                     structure_id=structure_record.id,
                     action="Created",
                 )
+            if hasattr(structure, "no_of_dimensions"):
+                structure_record.no_of_dimensions = structure.no_of_dimensions
+            if hasattr(structure, "is_basic_level"):
+                structure_record.is_basic_level = structure.is_basic_level
             if (
                 hasattr(structure, "parent_concept")
                 and structure.parent_concept is not None
@@ -264,15 +267,7 @@ class DjangoLogger(Logger):
                 structure_record.parent_space = StructureRecord.objects.get(
                     structure_id=structure.parent_space.structure_id, run_id=self.run
                 )
-            if hasattr(structure, "members") and structure.members is not None:
-                for member in structure.members:
-                    member_record = StructureRecord.objects.get(
-                        structure_id=member.structure_id, run_id=self.run
-                    )
-                    structure_record.members.add(member_record)
-                    print(
-                        f"{member.structure_id} added as member to {structure.structure_id}"
-                    )
+
             if hasattr(structure, "start") and structure.start is not None:
                 start_record = StructureRecord.objects.get(
                     structure_id=structure.start.structure_id, run_id=self.run
@@ -291,42 +286,79 @@ class DjangoLogger(Logger):
                 print(
                     f"{structure.structure_id} linked to {structure.end.structure_id}"
                 )
-        last_activation = last_value_of_dict(structure_record.activation)
-        last_unhappiness = last_value_of_dict(structure_record.unhappiness)
-        last_quality = last_value_of_dict(structure_record.quality)
-        if structure.activation != last_activation:
-            changed = (
-                "increased"
-                if last_activation is None or structure.activation > last_activation
-                else "decreased"
+            if hasattr(structure, "dimensions") and structure.dimensions is not None:
+                for dimension in structure.dimensions:
+                    dimension_record = StructureRecord.objects.get(
+                        structure_id=dimension.structure_id, run_id=self.run
+                    )
+                    structure_record.dimensions.add(dimension_record)
+            if hasattr(structure, "sub_spaces") and structure.sub_spaces is not None:
+                for sub_space in structure.sub_spaces:
+                    sub_space_record = StructureRecord.objects.get(
+                        structure_id=sub_space.structure_id, run_id=self.run
+                    )
+                    structure_record.dimensions.add(sub_space_record)
+            if (
+                hasattr(structure, "input_spaces")
+                and structure.input_spaces is not None
+            ):
+                for input_space in structure.input_spaces:
+                    input_space_record = StructureRecord.objects.get(
+                        structure_id=input_space.structure_id, run_id=self.run
+                    )
+                    structure_record.dimensions.add(input_space_record)
+            if (
+                hasattr(structure, "output_space")
+                and structure.output_space is not None
+            ):
+                output_space_record = StructureRecord.objects.get(
+                    structure_id=structure.output_space.structure_id, run_id=self.run
+                )
+                structure_record.output_space = output_space_record
+            if (
+                hasattr(structure, "conceptual_space")
+                and structure.conceptual_space is not None
+            ):
+                conceptual_space_record = StructureRecord.objects.get(
+                    structure_id=structure.conceptual_space.structure_id,
+                    run_id=self.run,
+                )
+                structure_record.conceptual_space = conceptual_space_record
+        if hasattr(structure, "members") and structure.members is not None:
+            for member in structure.members:
+                member_record = StructureRecord.objects.get(
+                    structure_id=member.structure_id, run_id=self.run
+                )
+                if member_record in structure_record.members.all():
+                    continue
+                structure_record.members.add(member_record)
+                print(
+                    f"{member.structure_id} added as member to {structure.structure_id}"
+                )
+        if hasattr(structure, "locations") and structure.locations is not None:
+            for location in structure.locations:
+                if location is None:
+                    continue
+                space_name = location.space.structure_id
+                if space_name not in structure_record.locations:
+                    print(f"Adding {structure.structure_id} to {space_name}")
+                structure_record.locations[space_name] = location.coordinates
+                space_record = StructureRecord.objects.get(
+                    structure_id=space_name, run_id=self.run
+                )
+                space_record.contents.add(structure_record)
+        elif hasattr(structure, "location") and structure.location is not None:
+            space_name = location.space.structure_id
+            if space_name not in structure_record.locations:
+                print(f"Adding {structure.structure_id} to {space_name}")
+            structure_record.locations[space_name] = location.coordinates
+            space_record = StructureRecord.objects.get(
+                structure_id=space_name, run_id=self.run
             )
-            self._log_message(
-                f"{structure.structure_id} activation {changed} from "
-                + f"{last_activation} to {structure.activation}"
-            )
-            structure_record.activation[self.codelets_run] = structure.activation
-        if structure.unhappiness != last_unhappiness:
-            changed = (
-                "increased"
-                if last_unhappiness is None or structure.unhappiness > last_unhappiness
-                else "decreased"
-            )
-            self._log_message(
-                f"{structure.structure_id} unhappiness {changed} from "
-                + f"{last_unhappiness} to {structure.unhappiness}"
-            )
-            structure_record.unhappiness[self.codelets_run] = structure.unhappiness
-        if structure.quality != last_quality:
-            changed = (
-                "increased"
-                if last_quality is None or structure.quality > last_quality
-                else "decreased"
-            )
-            self._log_message(
-                f"{structure.structure_id} quality {changed} from "
-                + f"{last_quality} to {structure.quality}"
-            )
-            structure_record.quality[self.codelets_run] = structure.quality
+            space_record.contents.add(structure_record)
+        structure_record.activation[self.codelets_run] = structure.activation
+        structure_record.unhappiness[self.codelets_run] = structure.unhappiness
+        structure_record.quality[self.codelets_run] = structure.quality
         structure_record.save()
 
     def graph_concepts(self, concept_names, file_name):

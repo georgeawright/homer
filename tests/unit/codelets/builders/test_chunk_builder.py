@@ -96,7 +96,7 @@ def test_new_chunk_has_no_duplicate_links(
 
 def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common_space):
     common_space.proximity_between.return_value = 0.0
-    chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
+    chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
     result = chunk_builder.run()
     assert CodeletResult.FAIL == result
     assert chunk_builder.child_structure is None

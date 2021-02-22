@@ -77,12 +77,20 @@ def view_members():
 
 
 @pytest.fixture
-def good_view(bubble_chamber, target_space, view_members):
+def input_spaces():
+    space_1 = Mock()
+    space_2 = Mock()
+    return StructureCollection({space_1, space_2})
+
+
+@pytest.fixture
+def good_view(bubble_chamber, target_space, view_members, input_spaces):
     view = View(
         Mock(),
         Mock(),
-        Location([], Mock()),
+        Location([], target_space),
         view_members,
+        input_spaces,
         Mock(),
         1.0,
     )
@@ -92,12 +100,13 @@ def good_view(bubble_chamber, target_space, view_members):
 
 
 @pytest.fixture
-def bad_view(bubble_chamber, target_space, view_members):
+def bad_view(bubble_chamber, target_space, view_members, input_spaces):
     view = View(
         Mock(),
         Mock(),
-        Location([], Mock()),
+        Location([], target_space),
         view_members,
+        input_spaces,
         Mock(),
         0.0,
     )
@@ -109,14 +118,14 @@ def bad_view(bubble_chamber, target_space, view_members):
 def test_good_view_is_boosted_bad_view_is_decayed(
     bubble_chamber, target_space, good_view, bad_view
 ):
+    original_good_view_activation = good_view.activation
+    original_bad_view_activation = bad_view.activation
     parent_id = ""
     champion = bad_view
     urgency = 1.0
     selector = ViewSelector.spawn(parent_id, bubble_chamber, champion, urgency)
-    for _ in range(20):
-        selector.run()
-        selector = selector.child_codelets[0]
-        good_view.update_activation()
-        bad_view.update_activation()
-    assert 1 == good_view.activation
-    assert 0 == bad_view.activation
+    selector.run()
+    good_view.update_activation()
+    bad_view.update_activation()
+    assert good_view.activation > original_good_view_activation
+    assert bad_view.activation < original_bad_view_activation

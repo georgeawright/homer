@@ -54,7 +54,10 @@ class ViewSelector(Selector):
     def _passes_preliminary_checks(self):
         if self.challenger is not None:
             return True
-        self.challenger = self.bubble_chamber.views.get_random(exclude=[self.champion])
+        try:
+            self.challenger = self.champion.nearby().get_random()
+        except MissingStructureError:
+            return True
         members_intersection = StructureCollection.intersection(
             self.champion.members, self.challenger.members
         )
@@ -63,7 +66,7 @@ class ViewSelector(Selector):
         ) > 0.5 * len(self.challenger.members)
 
     def _fizzle(self):
-        new_target = self.bubble_chamber.correspondences.get_unhappy()
+        new_target = self.bubble_chamber.views.get_unhappy()
         self.child_codelets.append(
             ViewBuilder.spawn(
                 self.codelet_id,
@@ -75,11 +78,18 @@ class ViewSelector(Selector):
 
     def _engender_follow_up(self):
         self.child_codelets.append(
+            ViewBuilder.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.winner,
+                self.winner.activation,
+            )
+        )
+        self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion,
-                1 - abs(self.winner.activation - self.loser.activation),
-                challenger=self.challenger,
+                self.winner,
+                self.follow_up_urgency,
             )
         )

@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ViewBuilder
+from homer.codelets.builders import CorrespondenceBuilder, ViewBuilder
 from homer.codelets.evaluators import ViewEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.chunks import View
@@ -21,7 +21,7 @@ def bubble_chamber():
 def target_view_correspondence():
     correspondence = Mock()
     correspondence.quality = 1
-    correspondence.common_arguments_with.return_value = StructureCollection()
+    correspondence.arguments = StructureCollection({Mock(), Mock()})
     return correspondence
 
 
@@ -29,6 +29,7 @@ def target_view_correspondence():
 def second_target_view_correspondence():
     correspondence = Mock()
     correspondence.quality = 1
+    correspondence.arguments = StructureCollection({Mock(), Mock()})
     return correspondence
 
 
@@ -64,12 +65,15 @@ def test_successful_creates_view_and_spawns_follow_up(bubble_chamber, target_vie
 
 
 def test_fails_when_correspondences_are_equivalent(
-    bubble_chamber, target_view, target_view_correspondence
+    bubble_chamber,
+    target_view,
+    target_view_correspondence,
+    second_target_view_correspondence,
 ):
-    target_view_correspondence.common_arguments_with.return_value = StructureCollection(
-        {Mock(), Mock()}
-    )
-    view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, Mock())
+    arguments = StructureCollection({Mock(), Mock()})
+    target_view_correspondence.arguments = arguments
+    second_target_view_correspondence.arguments = arguments
+    view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, 1)
     result = view_builder.run()
     assert CodeletResult.FAIL == result
     assert view_builder.child_structure is None
@@ -84,15 +88,13 @@ def test_fails_when_correspondences_are_not_transitive(
     second_target_view_correspondence,
 ):
     common_argument = Mock()
-    target_view_correspondence.start = common_argument
-    second_target_view_correspondence.start = common_argument
-    target_view_correspondence.end.correspondences_with.return_value = (
-        StructureCollection()
+    target_view_correspondence.arguments = StructureCollection(
+        {common_argument, Mock()}
     )
-    target_view_correspondence.common_arguments_with.return_value = StructureCollection(
-        {common_argument}
+    second_target_view_correspondence.arguments = StructureCollection(
+        {common_argument, Mock()}
     )
-    view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, Mock())
+    view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, 1)
     result = view_builder.run()
     assert CodeletResult.FAIL == result
     assert view_builder.child_structure is None
@@ -108,7 +110,7 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_view):
     assert CodeletResult.FIZZLE == result
     assert view_builder.child_structure is None
     assert len(view_builder.child_codelets) == 1
-    assert isinstance(view_builder.child_codelets[0], ViewBuilder)
+    assert isinstance(view_builder.child_codelets[0], CorrespondenceBuilder)
 
 
 def test_fizzles_when_view_already_exists(bubble_chamber, target_view):
@@ -119,4 +121,4 @@ def test_fizzles_when_view_already_exists(bubble_chamber, target_view):
     assert CodeletResult.FIZZLE == result
     assert view_builder.child_structure is None
     assert len(view_builder.child_codelets) == 1
-    assert isinstance(view_builder.child_codelets[0], ViewBuilder)
+    assert isinstance(view_builder.child_codelets[0], CorrespondenceBuilder)

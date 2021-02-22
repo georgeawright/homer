@@ -44,6 +44,7 @@ class BubbleChamber:
         self.concept_links = concept_links
         self.slots = slots
         self.logger = logger
+        self.log_count = 0
         self.result = None
 
     @property
@@ -91,7 +92,9 @@ class BubbleChamber:
     def update_activations(self) -> None:
         for structure in self.structures:
             structure.update_activation()
-            self.logger.log(structure)
+            if self.log_count % 25 == 0:
+                self.logger.log(structure)
+        self.log_count += 1
 
     def has_chunk(self, members: StructureCollection) -> bool:
         for chunk in self.chunks:
@@ -108,10 +111,9 @@ class BubbleChamber:
     def get_super_space(self, space_one: Space, space_two: Space) -> WorkingSpace:
         for space in self.working_spaces:
             try:
-                if (
-                    space.dimensions == space_one.dimensions + space_two.dimensions
-                    or space.dimensions == space_two.dimensions + space_one.dimensions
-                ):
+                if space.sub_spaces == [space_one, space_two]:
+                    return space
+                if space.sub_spaces == [space_two, space_one]:
                     return space
             except Exception:
                 pass

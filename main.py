@@ -91,6 +91,7 @@ view_concept = homer.def_concept(
 word_concept = homer.def_concept(
     name="word",
     parent_space=structures_space,
+    instance_type=str,
 )
 label_concept = homer.def_concept(
     name="label",
@@ -111,6 +112,7 @@ template_concept = homer.def_concept(
 text_concept = homer.def_concept(
     name="text",
     parent_space=structures_space,
+    instance_type=str,
 )
 label_concepts_space = homer.def_conceptual_space(
     name="label concepts",
@@ -148,11 +150,13 @@ homer.def_concept_link(evaluate_concept, correspondence_concept)
 homer.def_concept_link(evaluate_concept, label_concept)
 homer.def_concept_link(evaluate_concept, relation_concept)
 homer.def_concept_link(evaluate_concept, view_concept)
+homer.def_concept_link(evaluate_concept, word_concept)
 homer.def_concept_link(select_concept, chunk_concept)
 homer.def_concept_link(select_concept, correspondence_concept)
 homer.def_concept_link(select_concept, label_concept)
 homer.def_concept_link(select_concept, relation_concept)
 homer.def_concept_link(select_concept, view_concept)
+homer.def_concept_link(select_concept, word_concept)
 homer.def_concept_link(build_concept, evaluate_concept, activation=1.0)
 homer.def_concept_link(evaluate_concept, select_concept, activation=1.0)
 homer.def_concept_link(select_concept, build_concept, activation=1.0)
@@ -525,6 +529,7 @@ template_1 = homer.def_template(
         homer.def_template_slot(temperature_concept, form=WordForm.HEADWORD),
     ],
 )
+homer.def_correspondence(template_1[1], template_1[3])
 template_2 = homer.def_template(
     name="it is [temperature] in the [location]",
     contents=[
@@ -536,6 +541,7 @@ template_2 = homer.def_template(
         homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
     ],
 )
+homer.def_correspondence(template_2[2], template_2[5])
 template_3 = homer.def_template(
     name="it is [temperature.comparative] in the [location]",
     contents=[
@@ -547,6 +553,7 @@ template_3 = homer.def_template(
         homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
     ],
 )
+homer.def_correspondence(template_3[2], template_3[5])
 template_4 = homer.def_template(
     name="it is [temperature.comparative] in the [location] than the [location]",
     contents=[

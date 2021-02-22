@@ -1,6 +1,7 @@
 import math
 import pytest
 from unittest.mock import Mock
+from typing import List
 
 from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import DifferenceClassifier, ProximityClassifier
@@ -39,6 +40,7 @@ def more_less_concept(relational_concepts_space):
         Location(Mock(), relational_concepts_space),
         None,
         "value",
+        List[int],
         StructureCollection(),
         math.dist,
     )
@@ -74,6 +76,7 @@ def more_concept(more_less_space):
         Location([5], more_less_space),
         classifier,
         "value",
+        List[int],
         StructureCollection(),
         math.dist,
     )
@@ -90,6 +93,7 @@ def temperature_space():
         Mock(),
         Mock(),
         "value",
+        List[int],
         StructureCollection(),
         math.dist,
     )
@@ -125,12 +129,21 @@ def bubble_chamber(more_concept, relational_concepts_space):
         Mock(),
         Mock(),
         "value",
+        Mock(),
         StructureCollection(),
         Mock(),
     )
     chamber.concepts.add(relation_concept)
     build_concept = Concept(
-        Mock(), Mock(), "build", Mock(), Mock(), "value", StructureCollection(), Mock()
+        Mock(),
+        Mock(),
+        "build",
+        Mock(),
+        Mock(),
+        "value",
+        Mock(),
+        StructureCollection(),
+        Mock(),
     )
     chamber.concepts.add(build_concept)
     relation = Relation(Mock(), Mock(), relation_concept, build_concept, None, None, 1)
@@ -142,7 +155,15 @@ def bubble_chamber(more_concept, relational_concepts_space):
 @pytest.fixture
 def target_chunk(bubble_chamber, temperature_space):
     location_concept = Concept(
-        Mock(), Mock(), Mock(), Mock(), Mock(), "coordinates", Mock(), math.dist
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        "coordinates",
+        Mock(),
+        Mock(),
+        math.dist,
     )
     input_space = WorkingSpace(
         Mock(),

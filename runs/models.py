@@ -114,9 +114,29 @@ class StructureRecord(models.Model):
     run_id = models.ForeignKey("RunRecord", on_delete=models.CASCADE)
     time_created = models.IntegerField("Time Created")
     value = models.CharField("Value", max_length=MAX_STRING_LENGTH, null=True)
-    location = models.JSONField("location", null=True)
+    locations = models.JSONField("location", blank=True, null=True)
+    no_of_dimensions = models.IntegerField("No of Dimensions", blank=True, null=True)
+    is_basic_level = models.BooleanField("Is basic level", blank=True, null=True)
     links = models.ManyToManyField("self", blank=True, null=True)
     members = models.ManyToManyField("self", blank=True, null=True)
+    contents = models.ManyToManyField("self", blank=True, null=True)
+    dimensions = models.ManyToManyField("self", blank=True, null=True)
+    sub_spaces = models.ManyToManyField("self", blank=True, null=True)
+    input_spaces = models.ManyToManyField("self", blank=True, null=True)
+    output_space = models.ForeignKey(
+        "StructureRecord",
+        related_name="_output_space",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    conceptual_space = models.ForeignKey(
+        "StructureRecord",
+        related_name="_conceptual_space",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     activation = models.JSONField("Activation")
     unhappiness = models.JSONField("Unhappiness")
     quality = models.JSONField("quality")

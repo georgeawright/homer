@@ -1,22 +1,20 @@
-import statistics
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
-from homer.codelets.selectors import ChunkSelector
-from homer.errors import MissingStructureError
+from homer.codelets.selectors import LabelSelector
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure import Structure
 from homer.structure_collection import StructureCollection
+from homer.structures.chunks import Word
+from homer.structures.links import Label
 
 
-class ChunkEvaluator(Evaluator):
+class WordEvaluator(Evaluator):
     def __init__(
         self,
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structure: Structure,
+        target_structure: Word,
         urgency: FloatBetweenOneAndZero,
     ):
         Evaluator.__init__(
@@ -29,7 +27,7 @@ class ChunkEvaluator(Evaluator):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structure: Structure,
+        target_structure: Word,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -37,28 +35,38 @@ class ChunkEvaluator(Evaluator):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        structure_type = bubble_chamber.concepts["chunk"]
-        target = bubble_chamber.chunks.get_random()
+        structure_type = bubble_chamber.concepts["word"]
+        target = bubble_chamber.words.get_random()
         return cls.spawn(parent_id, bubble_chamber, target, structure_type.activation)
 
     @property
     def _parent_link(self):
-        structure_concept = self.bubble_chamber.concepts["chunk"]
+        structure_concept = self.bubble_chamber.concepts["word"]
         return structure_concept.relations_with(self._evaluate_concept).get_random()
 
     def _calculate_confidence(self):
-        proximities = [
-            space.proximity_between(member, self.target_structure)
-            for space in self.target_structure.parent_spaces
-            for member in self.target_structure.members
-            if space.is_basic_level
-        ]
-        self.confidence = statistics.fmean(proximities) if proximities != [] else 0
+        if self.target_structure.concepts is None:
+            self.confidence = 1.0
+        else:
+            labels = StructureCollection.union(
+                *[
+                    correspondee.labels
+                    for correspondee in self.target_structure.correspondees
+                ]
+            )
+            compatible_labels = [
+                label
+                for label in labels
+                if label.parent_concept in self.target_structure.concepts
+            ]
+            self.confidence = max(label.quality for label in compatible_labels)
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
 
     def _engender_follow_up(self):
+        from homer.codelets.selectors import WordSelector
+
         self.child_codelets.append(
-            ChunkSelector.spawn(
+            WordSelector.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structure,

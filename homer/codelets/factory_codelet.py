@@ -17,6 +17,7 @@ from homer.codelets.evaluators import (
     LabelEvaluator,
     RelationEvaluator,
     ViewEvaluator,
+    WordEvaluator,
 )
 from homer.codelets.selectors import (
     ChunkSelector,
@@ -24,6 +25,7 @@ from homer.codelets.selectors import (
     LabelSelector,
     RelationSelector,
     ViewSelector,
+    WordSelector,
 )
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -93,30 +95,29 @@ class FactoryCodelet(Codelet):
             self.child_codelets.append(follow_up)
 
     def _get_follow_up_type(self, action_type: Concept, structure_type: Concept):
-        try:
-            return {
-                "build": {
-                    "chunk": ChunkBuilder,
-                    "label": LabelBuilder,
-                    "relation": RelationBuilder,
-                    "correspondence": CorrespondenceBuilder,
-                    "view": ViewBuilder,
-                },
-                "evaluate": {
-                    "chunk": ChunkEvaluator,
-                    "label": LabelEvaluator,
-                    "relation": RelationEvaluator,
-                    "correspondence": CorrespondenceEvaluator,
-                    "view": ViewEvaluator,
-                },
-                "select": {
-                    "chunk": ChunkSelector,
-                    "label": LabelSelector,
-                    "relation": RelationSelector,
-                    "correspondence": CorrespondenceSelector,
-                    "view": ViewSelector,
-                },
-            }[action_type.name][structure_type.name]
-        except KeyError:
-            # this should be removed when all codelet types have been added to the dict
-            raise MissingStructureError
+        return {
+            "build": {
+                "chunk": ChunkBuilder,
+                "label": LabelBuilder,
+                "relation": RelationBuilder,
+                "correspondence": CorrespondenceBuilder,
+                "view": ViewBuilder,
+                "word": WordBuilder,
+            },
+            "evaluate": {
+                "chunk": ChunkEvaluator,
+                "label": LabelEvaluator,
+                "relation": RelationEvaluator,
+                "correspondence": CorrespondenceEvaluator,
+                "view": ViewEvaluator,
+                "word": WordEvaluator,
+            },
+            "select": {
+                "chunk": ChunkSelector,
+                "label": LabelSelector,
+                "relation": RelationSelector,
+                "correspondence": CorrespondenceSelector,
+                "view": ViewSelector,
+                "word": WordSelector,
+            },
+        }[action_type.name][structure_type.name]

@@ -47,8 +47,9 @@ class ViewBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
         target = bubble_chamber.views.get_exigent()
+        urgency = urgency if urgency is not None else target.exigency
         return cls.spawn(parent_id, bubble_chamber, target, target.unhappiness)
 
     @property
@@ -71,54 +72,36 @@ class ViewBuilder(Builder):
         self.correspondences = self.target_view.members.copy()
         self.correspondences_to_add = self.second_target_view.members.copy()
         while not self.correspondences_to_add.is_empty():
-            correspondence = self.correspondences_to_add.get_random()
-            self._add_correspondence_and_update_confidence(correspondence)
-
-    def _add_correspondence_and_update_confidence(self, new: Correspondence):
-        final_compatibility = 1.0
-        final_required_correspondences = {new}
-        for old in self.target_view.members:
-            (
-                compatibility,
-                required_correspondences,
-            ) = self._compatibility_and_required_correspondences(old, new)
-            if compatibility < final_compatibility:
-                final_compatibility = compatibility
-            final_required_correspondences |= required_correspondences
-        if final_compatibility < self.confidence:
-            self.confidence = final_compatibility
-        self._transfer_correspondences(*final_required_correspondences)
-
-    def _compatibility_and_required_correspondences(
-        self, old: Correspondence, new: Correspondence
-    ) -> Tuple[float, Set[Correspondence]]:
-        common_arguments = old.common_arguments_with(new)
-        if len(common_arguments) == 0:
-            compatibility = min(old.quality, new.quality)
-            # you are only as strong as your weakest link
-            return (compatibility, set())
-        if len(common_arguments) == 1:
-            third_correspondence_start = (
-                old.start if old.start not in common_arguments else old.end
-            )
-            third_correspondence_end = (
-                new.end if new.end not in common_arguments else new.start
-            )
-            try:
-                third_correspondence = self.second_target_view.members.where(
-                    start=third_correspondence_start, end=third_correspondence_end
-                ).get_random()
-            except MissingStructureError:
-                return (0, set())
-            compatibility = min(old.quality, new.quality, third_correspondence.quality)
-            return (compatibility, {third_correspondence})
-        # 2 common arguments => the correspondences are equivalent/competing
-        return (0, set())
-
-    def _transfer_correspondences(self, *correspondences: List[Correspondence]):
-        for correspondence in correspondences:
-            self.correspondences.add(correspondence)
-            self.correspondences_to_add.remove(correspondence)
+            new = self.correspondences_to_add.pop()
+            for old in self.target_view.members:
+                common_arguments = StructureCollection.intersection(
+                    old.arguments, new.arguments
+                )
+                if len(common_arguments) == 0:
+                    self.confidence = min(self.confidence, old.quality, new.quality)
+                    self.correspondences.add(new)
+                elif len(common_arguments) == 1:
+                    all_arguments = StructureCollection.union(
+                        old.arguments, new.arguments
+                    )
+                    distinct_arguments = StructureCollection.difference(
+                        all_arguments, common_arguments
+                    )
+                    try:
+                        third = self.second_target_view.members.where(
+                            arguments=distinct_arguments
+                        ).get_random()
+                        self.confidence = min(
+                            self.confidence, old.quality, new.quality, third.quality
+                        )
+                        self.correspondences_to_add.add(third)
+                        self.correspondences.add(new)
+                    except MissingStructureError:
+                        self.confidence = 0
+                        return
+                else:  # 2 common arguments means equivalent/incompatible correspondences
+                    self.confidence = 0
+                    return
 
     def _process_structure(self):
         view = View.new(
@@ -126,6 +109,7 @@ class ViewBuilder(Builder):
             parent_id=self.codelet_id,
             members=self.correspondences,
         )
+        self.bubble_chamber.logger.log(view.output_space)
         self.bubble_chamber.logger.log(view)
         self.child_structure = view
 
@@ -142,7 +126,13 @@ class ViewBuilder(Builder):
         )
 
     def _fizzle(self):
-        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
+        from homer.codelets.builders import CorrespondenceBuilder
+
+        self.child_codelets.append(
+            CorrespondenceBuilder.make(self.codelet_id, self.bubble_chamber)
+        )
 
     def _fail(self):
-        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
+        self.child_codelets.append(
+            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
+        )

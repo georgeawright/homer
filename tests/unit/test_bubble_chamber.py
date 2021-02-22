@@ -99,8 +99,10 @@ def test_add_to_collections():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     word = Word(
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

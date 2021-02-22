@@ -4,6 +4,7 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Concept, Space
 from homer.structures.links import Relation
 from homer.structures.spaces import ConceptualSpace
@@ -77,13 +78,24 @@ class RelationBuilder(Builder):
             except MissingStructureError:
                 return False
         if self.parent_concept is None:
-            self.parent_concept = (
-                self.bubble_chamber.spaces["relational concepts"]
-                .contents.of_type(ConceptualSpace)
-                .get_random()
-                .contents.of_type(Concept)
-                .get_random()
-            )
+            try:
+                relational_conceptual_spaces = self.bubble_chamber.spaces[
+                    "relational concepts"
+                ].contents.of_type(ConceptualSpace)
+                compatible_conceptual_spaces = StructureCollection(
+                    {
+                        space
+                        for space in relational_conceptual_spaces
+                        if space.is_compatible_with(self.target_space)
+                    }
+                )
+                self.parent_concept = (
+                    compatible_conceptual_spaces.get_random()
+                    .contents.of_type(Concept)
+                    .get_random()
+                )
+            except MissingStructureError:
+                return False
         return not self.target_structure_one.has_relation(
             self.target_space,
             self.parent_concept,
@@ -136,7 +148,7 @@ class RelationBuilder(Builder):
                 self.bubble_chamber,
                 self.target_space,
                 self.target_structure_one,
-                self.target_structure_one.unhappiness,
+                self.urgency / 2,
             )
         )
 
@@ -144,9 +156,6 @@ class RelationBuilder(Builder):
         new_target = self.target_space.contents.of_type(Chunk).get_unhappy()
         self.child_codelets.append(
             ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                new_target,
-                new_target.unhappiness,
+                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
             )
         )

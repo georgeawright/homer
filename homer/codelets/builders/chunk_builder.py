@@ -46,9 +46,10 @@ class ChunkBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
         target = bubble_chamber.chunks.get_unhappy()
-        return cls.spawn(parent_id, bubble_chamber, target, target.unhappiness)
+        urgency = urgency if urgency is not None else target.unhappiness
+        return cls.spawn(parent_id, bubble_chamber, target, urgency)
 
     @property
     def _structure_concept(self):
@@ -124,7 +125,7 @@ class ChunkBuilder(Builder):
             self.target_chunk,
             self.second_target_chunk,
         ]:
-            member.containing_chunks.add(chunk)
+            member.chunks_made_from_this_chunk.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         self.child_structure = chunk
         self.bubble_chamber.logger.log(self.child_structure)
@@ -140,18 +141,24 @@ class ChunkBuilder(Builder):
         copy_link = lambda link: link.copy(
             old_arg=original_chunk, new_arg=new_chunk, parent_id=self.codelet_id
         )
+        views = StructureCollection()
         for correspondence in original_chunk.correspondences:
-            if not new_chunk.has_link(correspondence, start=original_chunk):
-                copy = copy_link(correspondence)
-                new_chunk.links_in.add(copy)
-                new_chunk.links_out.add(copy)
-                self.bubble_chamber.logger.log(copy)
-                view = View.new(
-                    bubble_chamber=self.bubble_chamber,
-                    parent_id=self.codelet_id,
-                    members=StructureCollection({copy}),
-                )
-                self.bubble_chamber.logger.log(view)
+            for view in self.bubble_chamber.views:
+                if correspondence in view.members:
+                    views.add(view)
+        for view in views:
+            new_view = view.copy(
+                bubble_chamber=self.bubble_chamber,
+                parent_id=self.codelet_id,
+                original_structure=original_chunk,
+                replacement_structure=new_chunk,
+            )
+            self.bubble_chamber.logger.log(new_view.output_space)
+            for structure in new_view.output_space.contents:
+                self.bubble_chamber.logger.log(structure)
+            for correspondence in new_view.members:
+                self.bubble_chamber.logger.log(correspondence)
+            self.bubble_chamber.logger.log(new_view)
         for link in original_chunk.links_in:
             if not new_chunk.has_link(link, start=original_chunk):
                 copy = copy_link(link)
@@ -198,7 +205,9 @@ class ChunkBuilder(Builder):
         )
 
     def _fizzle(self):
-        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
+        self.child_codelets.append(
+            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
+        )
 
     def _fail(self):
         self._fizzle()

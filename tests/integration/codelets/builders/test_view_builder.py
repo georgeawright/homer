@@ -68,19 +68,21 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def target_start_space():
+def target_start_space(bubble_chamber):
     space = WorkingSpace(
         Mock(),
         Mock(),
         "start",
         Mock(),
         Mock(),
-        [],
+        [Location([], Mock())],
         StructureCollection(),
         1,
         [],
         [],
+        is_basic_level=True,
     )
+    bubble_chamber.working_spaces.add(space)
     return space
 
 
@@ -92,7 +94,7 @@ def target_end_space():
         "end",
         Mock(),
         Mock(),
-        [],
+        [Location([], Mock())],
         StructureCollection(),
         1,
         [],
@@ -191,11 +193,18 @@ def second_target_view_correspondence(
 
 @pytest.fixture
 def target_view(bubble_chamber, target_view_correspondence):
+    input_spaces = StructureCollection(
+        {
+            target_view_correspondence.start_space,
+            target_view_correspondence.end_space,
+        }
+    )
     view = View(
         Mock(),
         Mock(),
         Location([], bubble_chamber.spaces["top level working"]),
         StructureCollection({target_view_correspondence}),
+        input_spaces,
         Mock(),
         1.0,
     )
@@ -206,11 +215,18 @@ def target_view(bubble_chamber, target_view_correspondence):
 
 @pytest.fixture
 def second_target_view(bubble_chamber, second_target_view_correspondence):
+    input_spaces = StructureCollection(
+        {
+            second_target_view_correspondence.start_space,
+            second_target_view_correspondence.end_space,
+        }
+    )
     view = View(
         Mock(),
         Mock(),
         Location([], bubble_chamber.spaces["top level working"]),
         StructureCollection({second_target_view_correspondence}),
+        input_spaces,
         Mock(),
         1.0,
     )

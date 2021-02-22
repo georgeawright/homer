@@ -37,6 +37,7 @@ def bubble_chamber():
         Mock(),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -48,6 +49,7 @@ def bubble_chamber():
         Mock(),
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -67,6 +69,7 @@ def target_chunk(bubble_chamber):
         Mock(),
         Mock(),
         "coordinates",
+        Mock(),
         Mock(),
         math.dist,
     )

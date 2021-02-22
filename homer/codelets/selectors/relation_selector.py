@@ -4,6 +4,7 @@ from homer.codelets.selector import Selector
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 
 
@@ -77,16 +78,19 @@ class RelationSelector(Selector):
 
     def _engender_follow_up(self):
         try:
-            target = self.bubble_chamber.chunks.get_exigent()
-            target_space = target.parent_spaces.where(no_of_dimensions=1).get_random()
+            target_space = StructureCollection.intersection(
+                self.winner.start.parent_spaces.where(no_of_dimensions=1),
+                self.winner.end.parent_spaces.where(no_of_dimensions=1),
+            ).get_random(exclude=[self.winner.parent_space])
             self.child_codelets.append(
                 RelationBuilder.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
                     target_space,
-                    target,
-                    target.unlinkedness,
-                    parent_concept=self.champion.parent_concept,
+                    self.winner.start,
+                    self.winner.unlinkedness,
+                    target_structure_two=self.winner.end,
+                    parent_concept=self.winner.parent_concept,
                 )
             )
         except MissingStructureError:
@@ -95,8 +99,8 @@ class RelationSelector(Selector):
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion,
-                1 - abs(self.winner.activation - self.loser.activation),
-                challenger=self.challenger,
+                self.winner,
+                self.follow_up_urgency,
+                challenger=self.loser,
             )
         )

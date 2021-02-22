@@ -38,6 +38,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -51,6 +52,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -102,6 +104,7 @@ def good_label(chunk, conceptual_space, working_space):
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     label = Label(
         Mock(),
@@ -123,6 +126,7 @@ def bad_label(chunk, conceptual_space, working_space):
         Mock(),
         Mock(),
         Location(Mock(), conceptual_space),
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

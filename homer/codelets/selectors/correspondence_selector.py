@@ -42,7 +42,9 @@ class CorrespondenceSelector(Selector):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        champion = bubble_chamber.correspondences.get_active()
+        champion = bubble_chamber.correspondences.where(
+            is_privileged=False
+        ).get_active()
         return cls.spawn(parent_id, bubble_chamber, champion, champion.activation)
 
     @property
@@ -55,27 +57,20 @@ class CorrespondenceSelector(Selector):
         candidates = self.champion.start.correspondences_to_space(
             self.champion.end_space
         )
-        if len(candidates) == 1:
-            return False
-        self.challenger = candidates.get_active(exclude=[self.champion])
+        if len(candidates) > 1:
+            self.challenger = candidates.get_active(exclude=[self.champion])
         return True
 
     def _fizzle(self):
-        self.child_codelets.append(
-            CorrespondenceBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.champion.start.parent_spaces.get_random(),
-                self.champion.start,
-                self.champion.start.unhappiness,
-            )
-        )
+        pass
 
     def _engender_follow_up(self):
         try:
-            new_target = self.champion.nearby().get_exigent()
-            new_target_space = new_target.parent_spaces.where(
+            new_target_space = self.winner.start.parent_spaces.where(
                 is_basic_level=True
+            ).get_random()
+            new_target_space_two = self.winner.end.parent_spaces.where(
+                parent_concept=new_target_space.parent_concept
             ).get_random()
         except MissingStructureError:
             return
@@ -84,16 +79,18 @@ class CorrespondenceSelector(Selector):
                 self.codelet_id,
                 self.bubble_chamber,
                 new_target_space,
-                new_target,
-                new_target.unlinkedness,
+                self.winner.start,
+                self.winner.start.unlinkedness,
+                target_space_two=new_target_space_two,
+                target_structure_two=self.winner.end,
             )
         )
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.champion,
-                1 - abs(self.winner.activation - self.loser.activation),
-                challenger=self.challenger,
+                self.winner,
+                self.follow_up_urgency,
+                challenger=self.loser,
             )
         )

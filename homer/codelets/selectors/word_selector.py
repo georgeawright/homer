@@ -8,7 +8,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Chunk, Space
 
 
-class ChunkSelector(Selector):
+class WordSelector(Selector):
     def __init__(
         self,
         codelet_id: str,
@@ -16,11 +16,10 @@ class ChunkSelector(Selector):
         bubble_chamber: BubbleChamber,
         champion: Chunk,
         urgency: FloatBetweenOneAndZero,
-        challenger: Chunk = None,
     ):
         Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.champion = champion
-        self.challenger = challenger
+        self.challenger = None
 
     @classmethod
     def spawn(
@@ -29,7 +28,6 @@ class ChunkSelector(Selector):
         bubble_chamber: BubbleChamber,
         champion: Chunk,
         urgency: FloatBetweenOneAndZero,
-        challenger: Chunk = None,
     ):
         codelet_id = ID.new(cls)
         return cls(
@@ -38,54 +36,28 @@ class ChunkSelector(Selector):
             bubble_chamber,
             champion,
             urgency,
-            challenger=challenger,
         )
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        champion = bubble_chamber.chunks.get_active()
+        champion = bubble_chamber.words.get_active()
         return cls.spawn(parent_id, bubble_chamber, champion, champion.activation)
 
     @property
     def _structure_concept(self):
-        return self.bubble_chamber.concepts["chunk"]
+        return self.bubble_chamber.concepts["word"]
 
     def _passes_preliminary_checks(self):
-        if self.challenger is not None:
-            return True
-        try:
-            self.challenger = self.champion.nearby().get_active()
-        except MissingStructureError:
-            return True
-        members_intersection = StructureCollection.intersection(
-            self.champion.members, self.challenger.members
-        )
-        if not (
-            len(members_intersection) > 0.5 * len(self.champion.members)
-            and len(members_intersection) > 0.5 * len(self.challenger.members)
-        ):
-            self.challenger = None
         return True
 
     def _fizzle(self):
-        new_target = self.bubble_chamber.chunks.get_unhappy()
-        self.child_codelets.append(
-            ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                new_target,
-                new_target.unhappiness,
-            )
-        )
+        pass
 
     def _engender_follow_up(self):
+        from homer.codelets.builders import WordBuilder
+
         self.child_codelets.append(
-            ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winner,
-                self.winner.activation,
-            )
+            WordBuilder.make(self.codelet_id, self.bubble_chamber)
         )
         self.child_codelets.append(
             self.spawn(

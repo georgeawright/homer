@@ -72,9 +72,9 @@ class CorrespondenceBuilder(Builder):
         target_space = bubble_chamber.working_spaces.where(
             is_basic_level=True
         ).get_active()
-        target = target_space.contents.not_of_type(Space).get_unhappy()
+        target = target_space.contents.not_of_type(Space).get_exigent()
         return cls.spawn(
-            parent_id, bubble_chamber, target_space, target, target.unhappiness
+            parent_id, bubble_chamber, target_space, target, target.exigency
         )
 
     @property
@@ -149,11 +149,17 @@ class CorrespondenceBuilder(Builder):
         self.target_structure_two.links_out.add(correspondence)
         self.bubble_chamber.correspondences.add(correspondence)
         self.bubble_chamber.logger.log(correspondence)
+        view_members = StructureCollection.union(
+            StructureCollection({correspondence}),
+            self.target_structure_one.correspondences.where(is_privileged=True),
+            self.target_structure_two.correspondences.where(is_privileged=True),
+        )
         view = View.new(
             bubble_chamber=self.bubble_chamber,
             parent_id=self.codelet_id,
-            members=StructureCollection({correspondence}),
+            members=view_members,
         )
+        self.bubble_chamber.logger.log(view.output_space)
         self.bubble_chamber.logger.log(view)
         self.child_structure = correspondence
 
@@ -170,19 +176,7 @@ class CorrespondenceBuilder(Builder):
         )
 
     def _fizzle(self):
-        try:
-            new_target = self.target_structure_one.nearby().get_unhappy()
-        except MissingStructureError:
-            new_target = self.target_structure_one
-        self.child_codelets.append(
-            CorrespondenceBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_space_one,
-                new_target,
-                new_target.unhappiness,
-            )
-        )
+        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
 
     def _fail(self):
         try:

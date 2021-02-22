@@ -5,6 +5,8 @@ from homer.word_form import WordForm
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
+from .concept import Concept
+
 
 class Lexeme(Structure):
     def __init__(
@@ -44,6 +46,12 @@ class Lexeme(Structure):
         parent_concept.links_out.add(link_to_concept)
         lexeme.links_in.add(link_to_concept)
         return lexeme
+
+    @property
+    def concepts(self) -> StructureCollection:
+        return StructureCollection(
+            {link.start for link in self.links_in if isinstance(link.start, Concept)}
+        )
 
     def get_form(self, form: WordForm) -> str:
         return self.forms[form]

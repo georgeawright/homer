@@ -23,7 +23,13 @@ def index(request):
     runs = RunRecord.objects.order_by("-start_time")
     list_of_runs = "".join(
         [
-            '<a href="' + str(run.id) + '"><li>' + str(run.start_time) + "</li></a>"
+            '<a href="'
+            + str(run.id)
+            + '"><li>'
+            + str(run.id)
+            + ": "
+            + str(run.start_time)
+            + "</li></a>"
             for run in runs
         ]
     )
@@ -51,16 +57,17 @@ def run_view(request, run_id):
         if record.parent_codelet is not None:
             continue
         original_chunks.append(record)
-        if record.location[0] > last_row:
-            last_row = record.location[0]
-        if record.location[1] > last_column:
-            last_column = record.location[1]
+        if record.locations["WorkingSpace2"][0] > last_row:
+            # WorkingSpace2 is the input space
+            last_row = record.locations["WorkingSpace2"][0]
+        if record.locations["WorkingSpace2"][1] > last_column:
+            last_column = record.locations["WorkingSpace2"][1]
     original_chunks_matrix = [
         [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
     ]
     for original_chunk in original_chunks:
-        row = original_chunk.location[0]
-        column = original_chunk.location[1]
+        row = original_chunk.locations["WorkingSpace2"][0]
+        column = original_chunk.locations["WorkingSpace2"][1]
         original_chunks_matrix[row][column] = original_chunk
     output += "<h2>Raw Input</h2>"
     output += '<table border="1">'
@@ -99,11 +106,10 @@ def run_view(request, run_id):
     chunks = sorted(
         chunks, key=lambda chunk: last_value_of_dict(chunk.activation), reverse=True
     )
+    chunks = [chunk for chunk in chunks if chunk not in original_chunks]
     output += "<h2>Most Active Chunks</h2>"
     for i in range(5):
         chunk = chunks[i]
-        if chunk in original_chunks:
-            continue
         output += f'<a href="structures/{chunk.structure_id}"><h3>{chunk.structure_id}</h3></a>'
         output += (
             "<p>Quality: "
@@ -128,8 +134,21 @@ def run_view(request, run_id):
                 + f"{link.parent_space.structure_id}</a>, "
                 + f'<a href="structures/{link.start.structure_id}">{link.start.structure_id}</a>, '
                 + f'<a href="structures/{link.end.structure_id}">{link.end.structure_id}</a>)'
+                + "<br>"
                 for link in chunk.links.all()
                 if re.match(r"^Relation*", link.structure_id)
+            ]
+        )
+        output += "".join(
+            [
+                f'<a href="structures/{link.structure_id}">{link.value}</a>('
+                + f'<a href="structures/{link.conceptual_space.structure_id}">'
+                + f"{link.conceptual_space.structure_id}</a>, "
+                + f'<a href="structures/{link.start.structure_id}">{link.start.structure_id}</a>, '
+                + f'<a href="structures/{link.end.structure_id}">{link.end.structure_id}</a>)'
+                + "<br>"
+                for link in chunk.links.all()
+                if re.match(r"^Correspondence*", link.structure_id)
             ]
         )
         output += '<table border="1">'
@@ -194,11 +213,35 @@ def run_view(request, run_id):
     ]
     output += "<h2>Views</h2>"
     for view in views:
-        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: ('
+        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: '
+        output += "<ul>"
+        output += "<li>Correspondences: "
         for member in view.members.all():
             output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
         output = output[:-2]
-        output += ")<br>"
+        output += "</li>"
+        output += "<li>Output: "
+        output_space = [
+            structure
+            for structure in structure_records
+            if re.match(r"^WorkingSpace*", structure.structure_id)
+            and structure.parent_codelet == view.parent_codelet
+        ][0]
+        output += (
+            f'(<a href="structures/{output_space.structure_id}">'
+            + f"{output_space.structure_id}</a>)"
+        )
+        words = [
+            structure
+            for structure in structure_records
+            if re.match(r"^Word*", structure.structure_id)
+            and structure.parent_space == output_space
+        ]
+        words = sorted(words, key=lambda x: list(x.locations.values())[0])
+        for word in words:
+            output += f"{word.value} "
+        output += "</li>"
+        output += "</ul>"
     templates = [
         structure
         for structure in structure_records
@@ -536,7 +579,10 @@ def structure_view(request, run_id, structure_id):
     output += "<ul>"
     output += "<li>Birth Time: " + str(structure_record.time_created) + "</li>"
     output += f"<li>Value: {structure_record.value}</li>"
-    output += "<li>Location: " + str(structure_record.location) + "</li>"
+    output += "<li>Locations: <ul>"
+    for space, coordinates in structure_record.locations.items():
+        output += f"<li>{space}: {coordinates}</li>"
+    output += "</ul></li>"
     if structure_record.parent_codelet is not None:
         output += (
             '<li>Parent Codelet: <a href="/runs/'
@@ -561,6 +607,26 @@ def structure_view(request, run_id, structure_id):
         )
     else:
         output += "<li>Parent Concept: None</li>"
+    if structure_record.start is not None:
+        output += (
+            '<li>Start: <a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + structure_record.start.structure_id
+            + '">'
+            + structure_record.start.structure_id
+            + "</a></li>"
+        )
+    if structure_record.end is not None:
+        output += (
+            '<li>End: <a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + structure_record.end.structure_id
+            + '">'
+            + structure_record.end.structure_id
+            + "</a></li>"
+        )
     if structure_record.links is None:
         output += "<li>Links: None</li>"
     else:
@@ -577,6 +643,92 @@ def structure_view(request, run_id, structure_id):
             ]
         )
         output += "</li>"
+    if structure_record.members is not None:
+        output += "<li>Members: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + member.structure_id
+                + '">'
+                + member.structure_id
+                + "</a>"
+                for member in structure_record.members.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.contents is not None:
+        output += "<li>Contents: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + item.structure_id
+                + '">'
+                + item.structure_id
+                + "</a>"
+                for item in structure_record.contents.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.dimensions is not None:
+        output += "<li>Dimensions: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + dimension.structure_id
+                + '">'
+                + dimension.structure_id
+                + "</a>"
+                for dimension in structure_record.dimensions.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.sub_spaces is not None:
+        output += "<li>Sub Spaces: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + space.structure_id
+                + '">'
+                + space.structure_id
+                + "</a>"
+                for space in structure_record.sub_spaces.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.input_spaces is not None:
+        output += "<li>Input Spaces: " + ", ".join(
+            [
+                '<a href="/runs/'
+                + str(run_id)
+                + "/structures/"
+                + space.structure_id
+                + '">'
+                + space.structure_id
+                + "</a>"
+                for space in structure_record.input_spaces.all()
+            ]
+        )
+        output += "</li>"
+    if structure_record.output_space is not None:
+        output += (
+            '<li>Output Space: <a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + f'{structure_record.output_space.structure_id}">'
+            + "{structure_record.output_space.structure_id}</a>"
+        )
+    if structure_record.conceptual_space is not None:
+        output += (
+            '<li>Conceptual Space: <a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + f'{structure_record.conceptual_space.structure_id}">'
+            + f"{structure_record.conceptual_space.structure_id}</a>"
+        )
     output += (
         "<li>Final Activation: "
         + str(last_value_of_dict(structure_record.activation))
@@ -605,16 +757,16 @@ def structure_view(request, run_id, structure_id):
             if record.parent_codelet is not None:
                 continue
             original_chunks.append(record)
-            if record.location[0] > last_row:
-                last_row = record.location[0]
-            if record.location[1] > last_column:
-                last_column = record.location[1]
+            if record.locations["WorkingSpace2"][0] > last_row:
+                last_row = record.locations["WorkingSpace2"][0]
+            if record.locations["WorkingSpace2"][1] > last_column:
+                last_column = record.locations["WorkingSpace2"][1]
         original_chunks_matrix = [
             [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
         ]
         for original_chunk in original_chunks:
-            row = original_chunk.location[0]
-            column = original_chunk.location[1]
+            row = original_chunk.locations["WorkingSpace2"][0]
+            column = original_chunk.locations["WorkingSpace2"][1]
             original_chunks_matrix[row][column] = original_chunk
         output += "<h2>Members</h2>"
         output += '<table border="1">'

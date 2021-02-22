@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC
+import random
 import statistics
 from typing import List
 
@@ -31,7 +32,7 @@ class Structure(ABC):
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
         self._activation = FloatBetweenOneAndZero(
-            0 if stable_activation is None else stable_activation
+            random.random() if stable_activation is None else stable_activation
         )
         self.stable = stable_activation is not None
         self._activation_buffer = 0.0
@@ -63,7 +64,7 @@ class Structure(ABC):
 
     @property
     def exigency(self) -> FloatBetweenOneAndZero:
-        return self.activation * self.unhappiness
+        return statistics.fmean([self.activation, self.unhappiness])
 
     @property
     def quality(self) -> FloatBetweenOneAndZero:
@@ -106,6 +107,23 @@ class Structure(ABC):
             set.union(
                 {link for link in self.links_in if isinstance(link, Correspondence)},
                 {link for link in self.links_out if isinstance(link, Correspondence)},
+            )
+        )
+
+    @property
+    def correspondees(self) -> StructureCollection:
+        return StructureCollection(
+            set.union(
+                {
+                    correspondence.start
+                    for correspondence in self.correspondences
+                    if self != correspondence.start
+                },
+                {
+                    correspondence.end
+                    for correspondence in self.correspondences
+                    if self != correspondence.end
+                },
             )
         )
 
@@ -241,6 +259,9 @@ class Structure(ABC):
             ):
                 return True
         return False
+
+    def has_correspondence_to_space(self, space: Structure) -> bool:
+        return len(self.correspondences_to_space(space)) > 0
 
     def correspondences_with(self, other: Structure):
         return StructureCollection(

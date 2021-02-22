@@ -31,7 +31,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     collection = Mock()
     collection.get_active.return_value = challenger
     champion.nearby.return_value = collection
-    selector = ChunkSelector(Mock(), Mock(), bubble_chamber, Mock(), champion, Mock())
+    selector = ChunkSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     assert selector.challenger is None
     selector.run()
     assert selector.challenger == challenger
@@ -70,7 +70,6 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             Mock(),
             Mock(),
             bubble_chamber,
-            Mock(),
             champion,
             Mock(),
             challenger=challenger,
@@ -83,5 +82,6 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         else:
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
-        assert 1 == len(selector.child_codelets)
+        assert 2 == len(selector.child_codelets)
         assert hasinstance(selector.child_codelets, ChunkBuilder)
+        assert hasinstance(selector.child_codelets, ChunkSelector)

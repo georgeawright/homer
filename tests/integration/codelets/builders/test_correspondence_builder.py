@@ -47,6 +47,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -60,6 +61,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -76,6 +78,7 @@ def bubble_chamber():
         None,
         None,
         "value",
+        Mock(),
         StructureCollection(),
         None,
     )
@@ -137,6 +140,7 @@ def same_different_concept(bubble_chamber):
         Location([], bubble_chamber.spaces["correspondential concepts"]),
         Mock(),
         "value",
+        Mock(),
         StructureCollection(),
         math.dist,
     )
@@ -172,6 +176,7 @@ def same_concept(same_different_space, bubble_chamber):
         Location([1], same_different_space),
         SamenessClassifier(),
         "value",
+        Mock(),
         StructureCollection(),
         math.dist,
     )
@@ -189,6 +194,7 @@ def temperature_concept(bubble_chamber):
         Location([], bubble_chamber.spaces["label concepts"]),
         Mock(),
         "value",
+        Mock(),
         StructureCollection(),
         math.dist,
     )
@@ -225,6 +231,7 @@ def mild_concept(temperature_conceptual_space, bubble_chamber):
         Location([10], temperature_conceptual_space),
         Mock(),
         "value",
+        Mock(),
         StructureCollection(),
         math.dist,
     )

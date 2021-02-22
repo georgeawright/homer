@@ -19,7 +19,7 @@ class Slot(Chunk):
         members: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
-        containing_chunks: StructureCollection = None,
+        chunks_made_from_this_chunk: StructureCollection = None,
     ):
         locations = locations if locations is not None else []
         Chunk.__init__(
@@ -33,5 +33,5 @@ class Slot(Chunk):
             1,
             links_in=links_in,
             links_out=links_out,
-            containing_chunks=containing_chunks,
+            chunks_made_from_this_chunk=chunks_made_from_this_chunk,
         )

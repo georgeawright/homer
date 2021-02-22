@@ -22,6 +22,7 @@ class Selector(Codelet):
         self.winner = None
         self.loser = None
         self.confidence = 0.0
+        self.follow_up_urgency = 0.0
 
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
@@ -34,8 +35,11 @@ class Selector(Codelet):
             self._boost_winner()
             self._decay_loser()
         else:
+            self.winner = self.champion
+            self.confidence = self.winner.quality
             self._boost_champion()
         self._boost_activations()
+        self.follow_up_urgency = self.winner.quality - self.winner.activation
         self._engender_follow_up()
         self.result = CodeletResult.SUCCESS
         return self.result
@@ -91,7 +95,6 @@ class Selector(Codelet):
         self.loser.decay_activation(self.confidence)
 
     def _boost_champion(self):
-        self.confidence = self.champion.quality
         self.champion.boost_activation(self.confidence)
 
     @abstractmethod
