@@ -64,7 +64,7 @@ class Structure(ABC):
 
     @property
     def exigency(self) -> FloatBetweenOneAndZero:
-        return self.activation * self.unhappiness
+        return statistics.fmean([self.activation, self.unhappiness])
 
     @property
     def quality(self) -> FloatBetweenOneAndZero:
