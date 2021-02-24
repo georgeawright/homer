@@ -2,13 +2,13 @@ from typing import Dict, List
 
 from homer.id import ID
 from homer.word_form import WordForm
-from homer.structure import Structure
 from homer.structure_collection import StructureCollection
+from homer.structures import Node
 
 from .concept import Concept
 
 
-class Lexeme(Structure):
+class Lexeme(Node):
     def __init__(
         self,
         structure_id: str,
@@ -18,24 +18,22 @@ class Lexeme(Structure):
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        location = None
-        quality = None
-        Structure.__init__(
+        Node.__init__(
             self,
             structure_id,
             parent_id,
-            location,
-            quality,
+            value=headword,
+            locations=[],
+            parent_space=None,
+            quality=None,
             links_in=links_in,
             links_out=links_out,
         )
         self.headword = headword
-        self.value = headword
         self.forms = forms
 
     @classmethod
     def new(cls, headword: str, forms: Dict[WordForm, str], parent_concept):
-        from homer.structures import Concept
         from homer.structures.links import Relation
 
         lexeme = cls(ID.new(cls), "", headword, forms)

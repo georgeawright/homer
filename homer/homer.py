@@ -14,10 +14,9 @@ from .loggers import DjangoLogger
 from .problem import Problem
 from .structure import Structure
 from .structure_collection import StructureCollection
-from .structures import Concept, Lexeme, Space
-from .structures.chunks import Word
-from .structures.chunks.slots import TemplateSlot
+from .structures import Space
 from .structures.links import Correspondence, Relation
+from .structures.nodes import Concept, Lexeme, Word
 from .structures.spaces import ConceptualSpace, WorkingSpace
 from .structures.spaces.frames import Template
 from .word_form import WordForm
@@ -245,7 +244,7 @@ class Homer:
         self,
         name: str = "",
         parent_concept: Concept = None,
-        contents: List[Union[Word, TemplateSlot]] = None,
+        contents: List[Word] = None,
     ) -> Template:
         template = Template(
             structure_id=ID.new(Template),
@@ -261,7 +260,7 @@ class Homer:
             item.locations = [Location([i], template)]
             template.contents.add(item)
             self.logger.log(item)
-            if isinstance(item, TemplateSlot):
+            if item.is_slot:
                 try:
                     working_space = (
                         template.contents.of_type(WorkingSpace)
@@ -285,14 +284,7 @@ class Homer:
         return template
 
     def def_template_slot(self, concept: Concept = None, form: WordForm = None):
-        slot = TemplateSlot(
-            structure_id=ID.new(TemplateSlot),
-            parent_id="",
-            parent_space=None,
-            prototype=concept,
-            form=form,
-            locations=[],
-        )
+        slot = None  # TODO
         self.bubble_chamber.slots.add(slot)
         return slot
 

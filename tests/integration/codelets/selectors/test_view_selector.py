@@ -7,9 +7,9 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors import ViewSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept
-from homer.structures.chunks import View
+from homer.structures import View
 from homer.structures.links import Relation
+from homer.structures.nodes import Concept
 from homer.structures.spaces import WorkingSpace
 
 

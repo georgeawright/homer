@@ -7,8 +7,8 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept, Space
-from homer.structures.chunks import View
+from homer.structures import Space, View
+from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 

@@ -5,8 +5,9 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept, Space
+from homer.structures import Space
 from homer.structures.links import Relation
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace
 
 from .chunk_builder import ChunkBuilder

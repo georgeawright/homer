@@ -31,7 +31,7 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept
+from homer.structures.nodes import Concept
 
 
 class FactoryCodelet(Codelet):

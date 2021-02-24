@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk
+from homer.structures.nodes import Chunk
 
 
 def test_size_no_members():

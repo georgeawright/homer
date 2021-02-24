@@ -8,9 +8,9 @@ from homer.codelets.builders import ViewBuilder
 from homer.codelets.evaluators import ViewEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
-from homer.structures.chunks import View
+from homer.structures import View
 from homer.structures.links import Correspondence, Relation
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 

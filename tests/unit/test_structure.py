@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, Mock
 
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Lexeme
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Lexeme
 
 
 def test_unlinkedness():

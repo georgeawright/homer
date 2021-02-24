@@ -3,7 +3,8 @@ from typing import List
 
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept, Space
+from homer.structures import Space
+from homer.structures.nodes import Concept
 
 
 class Frame(Space):

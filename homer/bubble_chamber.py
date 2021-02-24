@@ -8,9 +8,9 @@ from .location import Location
 from .logger import Logger
 from .problem import Problem
 from .structure_collection import StructureCollection
-from .structures import Chunk, Space
-from .structures.chunks import View, Word
+from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
+from .structures.nodes import Chunk, Word
 from .structures.spaces import ConceptualSpace, WorkingSpace
 
 

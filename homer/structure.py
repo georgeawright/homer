@@ -60,6 +60,10 @@ class Structure(ABC):
         raise Exception(f"{self.structure_id} has no location in input space")
 
     @property
+    def is_slot(self) -> bool:
+        return False
+
+    @property
     def parent_spaces(self) -> StructureCollection:
         return StructureCollection({location.space for location in self.locations})
 
@@ -149,7 +153,7 @@ class Structure(ABC):
 
     @property
     def lexemes(self) -> StructureCollection:
-        from homer.structures import Lexeme
+        from homer.structures.nodes import Lexeme
 
         return StructureCollection(
             {link.end for link in self.links_out if isinstance(link.end, Lexeme)}

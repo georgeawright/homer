@@ -4,8 +4,8 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Space
-from homer.structures.chunks import View, Word
+from homer.structures import Space, View
+from homer.structures.nodes import Chunk, Word
 from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import WorkingSpace
 

@@ -5,7 +5,8 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Space
+from homer.structures import Space
+from homer.structures.nodes import Word
 
 
 class WordSelector(Selector):
@@ -14,7 +15,7 @@ class WordSelector(Selector):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        champion: Chunk,
+        champion: Word,
         urgency: FloatBetweenOneAndZero,
     ):
         Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
@@ -26,7 +27,7 @@ class WordSelector(Selector):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        champion: Chunk,
+        champion: Word,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)

@@ -3,14 +3,14 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Link
+from homer.structures import Link
 from homer.structures.links.correspondence import Correspondence
 from homer.structures.space import Space
 from homer.structures.spaces import WorkingSpace
 
 
-class View(Chunk):
-    """A chunk of self-consistent correspondences."""
+class View(Structure):
+    """A collection of spaces and self-consistent correspondences between them."""
 
     def __init__(
         self,
@@ -22,21 +22,16 @@ class View(Chunk):
         output_space: WorkingSpace,
         quality: FloatBetweenOneAndZero,
     ):
-        value = None
-        parent_space = location.space
-        Chunk.__init__(
+        Structure.__init__(
             self,
             structure_id,
             parent_id,
-            value,
-            [location],
-            members,
-            parent_space,
-            quality,
-            StructureCollection({parent_space}),
+            locations=[location],
+            quality=quality,
         )
         self.input_spaces = input_spaces
         self.output_space = output_space
+        self.members = members
 
     @classmethod
     def new(

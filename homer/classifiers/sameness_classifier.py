@@ -2,8 +2,7 @@ import statistics
 
 from homer.classifier import Classifier
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structures import Chunk
-from homer.structures.chunks import Slot
+from homer.structures.nodes import Chunk
 from homer.structures.links import Label, Relation
 
 
@@ -19,8 +18,8 @@ class SamenessClassifier(Classifier):
             if start.parent_concept == end.parent_concept:
                 return statistics.fmean([start.quality, end.quality])
         if isinstance(start, Chunk) and isinstance(end, Chunk):
-            if isinstance(start, Slot) or isinstance(end, Slot):
-                slot, chunk = (start, end) if isinstance(start, Slot) else (end, start)
+            if start.is_slot or end.is_slot:
+                slot, chunk = (start, end) if start.is_slot else (end, start)
                 try:
                     return max(
                         label.quality

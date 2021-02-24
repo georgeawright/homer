@@ -6,7 +6,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept, Space
+from homer.structures import Space
+from homer.structures.nodes import Concept
 
 from .working_space import WorkingSpace
 

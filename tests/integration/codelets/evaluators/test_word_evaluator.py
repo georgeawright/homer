@@ -8,9 +8,8 @@ from homer.codelets.evaluators import WordEvaluator
 from homer.codelets.selectors import WordSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept, Lexeme
-from homer.structures.chunks import Word
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.word_form import WordForm
 

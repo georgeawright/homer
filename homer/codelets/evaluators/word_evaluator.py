@@ -4,8 +4,8 @@ from homer.codelets.selectors import LabelSelector
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures.chunks import Word
 from homer.structures.links import Label
+from homer.structures.nodes import Word
 
 
 class WordEvaluator(Evaluator):

@@ -5,14 +5,15 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk
-from homer.structures.chunks import Word, Slot, View
+from homer.structures import View
 from homer.structures.links import Correspondence
+from homer.structures.nodes import Chunk, Word
 from homer.structures.spaces import Frame, WorkingSpace
 
 
 class WordBuilder(Builder):
-    """Builds a correspondence and a new item in an output space connected to it."""
+    """Builds a word in an output space
+    and correspondences to the items it refers to in input spaces"""
 
     def __init__(
         self,
@@ -81,8 +82,7 @@ class WordBuilder(Builder):
         self.non_frame = self.target_view.input_spaces.of_type(
             WorkingSpace
         ).get_random()
-        self.output_space = self.target_view.output_space
-        if isinstance(self.target_frame_item, Slot):
+        if self.target_frame_item.is_slot:
             try:
                 self.target_correspondence = (
                     StructureCollection.union(
@@ -97,7 +97,9 @@ class WordBuilder(Builder):
                 )
             except MissingStructureError:
                 return False
-        return not self.target_frame_item.has_correspondence_to_space(self.output_space)
+        return not self.target_frame_item.has_correspondence_to_space(
+            self.target_view.output_space
+        )
 
     def _calculate_confidence(self):
         self.confidence = (

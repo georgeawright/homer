@@ -5,8 +5,8 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder
 from homer.codelets.evaluators import ChunkEvaluator
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk
 from homer.structures.links import Label
+from homer.structures.nodes import Chunk
 
 
 @pytest.fixture

@@ -6,8 +6,7 @@ from homer.codelets.builders import WordBuilder
 from homer.codelets.evaluators import WordEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.chunks import Word
-from homer.structures.chunks.slots import TemplateSlot
+from homer.structures.nodes import Word
 
 
 @pytest.fixture
@@ -56,15 +55,18 @@ def temperature_space_in_frame(temperature_space):
 @pytest.fixture
 def frame_word(frame):
     word = Mock()
+    word.is_slot = False
     word.parent_space = frame
     word.has_correspondence_to_space.return_value = False
     word.location_in_space.return_value = Location([0], frame)
     return word
 
 
+@pytest.mark.skip
 @pytest.fixture
 def frame_slot(frame, temperature_concept):
-    slot = TemplateSlot(Mock(), Mock(), Mock(), Mock(), Mock(), [Location([0], frame)])
+    slot = Mock()
+    slot.is_slot = True
     slot.parent_space = frame
     slot.value = temperature_concept
     return slot

@@ -2,7 +2,7 @@ import math
 import pytest
 from unittest.mock import Mock
 
-from homer.structures import Concept
+from homer.structures.nodes import Concept
 
 
 @pytest.fixture

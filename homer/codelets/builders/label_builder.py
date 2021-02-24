@@ -3,8 +3,8 @@ from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
-from homer.structures import Chunk, Concept
 from homer.structures.links import Label
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.tools import project_item_into_space
 

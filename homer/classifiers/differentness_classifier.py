@@ -2,8 +2,8 @@ import statistics
 
 from homer.classifier import Classifier
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structures import Chunk
 from homer.structures.links import Label, Relation
+from homer.structures.nodes import Chunk
 
 
 class DifferentnessClassifier(Classifier):

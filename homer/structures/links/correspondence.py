@@ -5,7 +5,8 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept, Link, Space
+from homer.structures import Link, Space
+from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
 from homer.tools import equivalent_space
 
@@ -83,20 +84,16 @@ class Correspondence(Link):
         )
 
     def get_slot_argument(self):
-        from homer.structures.chunks import Slot
-
-        if isinstance(self.start, Slot):
+        if self.start.is_slot:
             return self.start
-        if isinstance(self.end, Slot):
+        if self.end.is_slot:
             return self.end
         raise Exception("Correspondence has no slot argument")
 
     def get_non_slot_argument(self):
-        from homer.structures.chunks import Slot
-
-        if not isinstance(self.start, Slot):
+        if not self.start.is_slot:
             return self.start
-        if not isinstance(self.end, Slot):
+        if not self.end.is_slot:
             return self.end
         raise Exception("Correspondence has no non slot argument")
 

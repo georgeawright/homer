@@ -9,8 +9,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Space
-from homer.structures.chunks import View
+from homer.structures import Space, View
+from homer.structures.nodes import Chunk
 from homer.tools import average_vector, project_item_into_space
 
 

@@ -13,8 +13,7 @@ from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
-from homer.structures.chunks.slots import TemplateSlot
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import ConceptualSpace, Frame, WorkingSpace
 from homer.structures.spaces.frames import Template

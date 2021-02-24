@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 from homer.classifiers import DifferentnessClassifier
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Chunk
 
 
 def test_classify_labels_with_different_concept():

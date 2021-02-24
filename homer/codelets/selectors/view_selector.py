@@ -5,8 +5,7 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Space
-from homer.structures.chunks import View
+from homer.structures import Space, View
 
 
 class ViewSelector(Selector):

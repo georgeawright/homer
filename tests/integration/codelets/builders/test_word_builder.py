@@ -8,10 +8,9 @@ from homer.codelets.builders import WordBuilder
 from homer.codelets.evaluators import WordEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept, Lexeme
-from homer.structures.chunks import View, Word
-from homer.structures.chunks.slots import TemplateSlot
+from homer.structures import View
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
 from homer.word_form import WordForm

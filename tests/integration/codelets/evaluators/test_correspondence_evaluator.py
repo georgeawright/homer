@@ -9,9 +9,8 @@ from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.codelets.selectors import CorrespondenceSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
-from homer.structures.chunks import Word
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Chunk, Concept, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
 

@@ -5,7 +5,7 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder, ViewBuilder
 from homer.codelets.evaluators import ViewEvaluator
 from homer.structure_collection import StructureCollection
-from homer.structures.chunks import View
+from homer.structures import View
 
 
 @pytest.fixture

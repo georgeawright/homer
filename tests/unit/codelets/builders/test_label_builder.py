@@ -5,8 +5,8 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders import LabelBuilder
 from homer.codelets.evaluators import LabelEvaluator
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept
 from homer.structures.links import Label
+from homer.structures.nodes import Concept
 
 
 @pytest.fixture
