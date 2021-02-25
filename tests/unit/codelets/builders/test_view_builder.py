@@ -48,6 +48,7 @@ def target_view(target_view_correspondence, second_target_view):
     return view
 
 
+@pytest.mark.skip
 def test_gets_second_target_view(bubble_chamber, target_view):
     view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, Mock())
     assert view_builder.second_target_view is None
@@ -55,6 +56,7 @@ def test_gets_second_target_view(bubble_chamber, target_view):
     assert view_builder.second_target_view is not None
 
 
+@pytest.mark.skip
 def test_successful_creates_view_and_spawns_follow_up(bubble_chamber, target_view):
     view_builder = ViewBuilder(Mock(), Mock(), bubble_chamber, target_view, Mock())
     result = view_builder.run()
@@ -64,6 +66,7 @@ def test_successful_creates_view_and_spawns_follow_up(bubble_chamber, target_vie
     assert isinstance(view_builder.child_codelets[0], ViewEvaluator)
 
 
+@pytest.mark.skip
 def test_fails_when_correspondences_are_equivalent(
     bubble_chamber,
     target_view,
@@ -81,6 +84,7 @@ def test_fails_when_correspondences_are_equivalent(
     assert isinstance(view_builder.child_codelets[0], ViewBuilder)
 
 
+@pytest.mark.skip
 def test_fails_when_correspondences_are_not_transitive(
     bubble_chamber,
     target_view,
@@ -102,6 +106,7 @@ def test_fails_when_correspondences_are_not_transitive(
     assert isinstance(view_builder.child_codelets[0], ViewBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_when_no_second_target(bubble_chamber, target_view):
     target_view.nearby.return_value = StructureCollection()
     urgency = 1.0
@@ -113,6 +118,7 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_view):
     assert isinstance(view_builder.child_codelets[0], CorrespondenceBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_when_view_already_exists(bubble_chamber, target_view):
     bubble_chamber.has_view.return_value = True
     urgency = 1.0

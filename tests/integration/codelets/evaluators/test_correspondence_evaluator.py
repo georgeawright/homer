@@ -150,7 +150,13 @@ def warm_concept():
 def template(bubble_chamber):
     parent_concept = bubble_chamber.concepts["text"]
     template = Template(
-        Mock(), Mock(), "mock template", parent_concept, [], StructureCollection()
+        Mock(),
+        Mock(),
+        "mock template",
+        parent_concept,
+        Mock(),
+        [],
+        StructureCollection(),
     )
     return template
 

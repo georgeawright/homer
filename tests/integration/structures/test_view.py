@@ -13,8 +13,8 @@ def test_nearby():
     input_1 = WorkingSpace(
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
-    frame_1 = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    frame_2 = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    frame_1 = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    frame_2 = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     view_1 = View(
         Mock(),
         Mock(),

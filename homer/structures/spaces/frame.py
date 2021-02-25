@@ -5,6 +5,7 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
 from homer.structures.nodes import Concept
+from homer.structures.spaces import ConceptualSpace
 
 
 class Frame(Space):
@@ -14,6 +15,7 @@ class Frame(Space):
         parent_id: str,
         name: str,
         parent_concept: Concept,
+        conceptual_space: ConceptualSpace,
         locations: List[Location],
         contents: StructureCollection,
         links_in: StructureCollection = None,
@@ -38,7 +40,7 @@ class Frame(Space):
             links_in=links_in,
             links_out=links_out,
         )
-        self.conceptual_space = None
+        self.conceptual_space = conceptual_space
 
     def update_activation(self):
         self._activation = (
