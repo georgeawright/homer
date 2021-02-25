@@ -39,6 +39,18 @@ class Structure(ABC):
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
         self.parent_concept = None
 
+    @classmethod
+    def get_builder_class(cls):
+        raise NotImplementedError
+
+    @classmethod
+    def get_evaluator_class(cls):
+        raise NotImplementedError
+
+    @classmethod
+    def get_selector_class(cls):
+        raise NotImplementedError
+
     @property
     def location(self) -> Location:
         try:

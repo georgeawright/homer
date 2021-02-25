@@ -33,6 +33,10 @@ class RelationBuilder(Builder):
         self.child_structure = None
 
     @classmethod
+    def get_target_class(cls):
+        return Relation
+
+    @classmethod
     def spawn(
         cls,
         parent_id: str,
@@ -129,18 +133,6 @@ class RelationBuilder(Builder):
         self.bubble_chamber.relations.add(relation)
         self.child_structure = relation
         self.bubble_chamber.logger.log(relation)
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import RelationEvaluator
-
-        self.child_codelets.append(
-            RelationEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
 
     def _fizzle(self):
         self.child_codelets.append(

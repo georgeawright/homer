@@ -66,8 +66,9 @@ class ViewSelector(Selector):
 
     def _fizzle(self):
         new_target = self.bubble_chamber.views.get_unhappy()
+        builder_class = self.get_target_class().get_builder_class()
         self.child_codelets.append(
-            ViewBuilder.spawn(
+            builder_class.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 new_target,
@@ -76,13 +77,9 @@ class ViewSelector(Selector):
         )
 
     def _engender_follow_up(self):
+        builder_class = self.get_target_class().get_builder_class()
         self.child_codelets.append(
-            ViewBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winner,
-                self.winner.activation,
-            )
+            builder_class.make(self.codelet_id, self.bubble_chamber)
         )
         self.child_codelets.append(
             self.spawn(

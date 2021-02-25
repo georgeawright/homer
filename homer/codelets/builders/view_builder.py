@@ -1,4 +1,5 @@
 from __future__ import annotations
+from abc import abstractclassmethod
 import statistics
 from typing import List, Set, Tuple
 
@@ -48,11 +49,9 @@ class ViewBuilder(Builder):
             urgency,
         )
 
-    @classmethod
+    @abstractclassmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
-        target = bubble_chamber.frames.get_active()
-        urgency = urgency if urgency is not None else target.exigency
-        return cls.spawn(parent_id, bubble_chamber, target, target.unhappiness)
+        pass
 
     @property
     def _structure_concept(self):
@@ -98,18 +97,6 @@ class ViewBuilder(Builder):
         self.bubble_chamber.logger.log(view_output)
         self.bubble_chamber.logger.log(view)
         self.child_structure = view
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import ViewEvaluator
-
-        self.child_codelets.append(
-            ViewEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
 
     def _fizzle(self):
         from homer.codelets.builders import CorrespondenceBuilder

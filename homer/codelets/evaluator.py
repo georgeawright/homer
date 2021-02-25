@@ -1,5 +1,3 @@
-from abc import abstractmethod, abstractproperty
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
@@ -43,9 +41,9 @@ class Evaluator(Codelet):
     def _evaluate_concept(self):
         return self.bubble_chamber.concepts["evaluate"]
 
-    @abstractproperty
+    @property
     def _parent_link(self):
-        pass
+        raise NotImplementedError
 
     def _boost_activations(self):
         self._evaluate_concept.boost_activation(1)
@@ -55,10 +53,16 @@ class Evaluator(Codelet):
         self._evaluate_concept.decay_activation()
         self._parent_link.decay_activation()
 
-    @abstractmethod
     def _calculate_confidence(self):
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def _engender_follow_up(self):
-        pass
+        selector_class = self.get_target_class().get_selector_class()
+        self.child_codelets.append(
+            selector_class.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.target_structure,
+                self.change_in_confidence,
+            )
+        )

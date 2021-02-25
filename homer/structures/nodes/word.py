@@ -35,6 +35,24 @@ class Word(Node):
         )
         self.lexeme = lexeme
 
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders import WordBuilder
+
+        return WordBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from homer.codelets.evaluators import WordEvaluator
+
+        return WordEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from homer.codelets.selectors import WordSelector
+
+        return WordSelector
+
     @property
     def concepts(self):
         return self.lexeme.concepts if self.lexeme is not None else None

@@ -41,6 +41,24 @@ class Chunk(Node):
             else StructureCollection()
         )
 
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders import ChunkBuilder
+
+        return ChunkBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from homer.codelets.evaluators import ChunkEvaluator
+
+        return ChunkEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from homer.codelets.selectors import ChunkSelector
+
+        return ChunkSelector
+
     @property
     def size(self):
         return (

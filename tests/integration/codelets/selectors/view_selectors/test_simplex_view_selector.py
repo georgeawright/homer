@@ -4,13 +4,13 @@ from unittest.mock import Mock, patch
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
-from homer.codelets.selectors import ViewSelector
+from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import View
 from homer.structures.links import Relation
 from homer.structures.nodes import Concept
 from homer.structures.spaces import WorkingSpace
+from homer.structures.views import SimplexView
 
 
 @pytest.fixture
@@ -59,6 +59,11 @@ def bubble_chamber():
     relation = Relation(Mock(), Mock(), view_concept, select_concept, None, None, 1)
     view_concept.links_out.add(relation)
     select_concept.links_in.add(relation)
+    input_space = WorkingSpace(
+        Mock(), Mock(), "input", Mock(), Mock(), [], StructureCollection(), 0, [], []
+    )
+    chamber.working_spaces.add(input_space)
+    chamber.frames.add(Mock())
     return chamber
 
 
@@ -85,7 +90,7 @@ def input_spaces():
 
 @pytest.fixture
 def good_view(bubble_chamber, target_space, view_members, input_spaces):
-    view = View(
+    view = SimplexView(
         Mock(),
         Mock(),
         Location([], target_space),
@@ -101,7 +106,7 @@ def good_view(bubble_chamber, target_space, view_members, input_spaces):
 
 @pytest.fixture
 def bad_view(bubble_chamber, target_space, view_members, input_spaces):
-    view = View(
+    view = SimplexView(
         Mock(),
         Mock(),
         Location([], target_space),
@@ -115,15 +120,13 @@ def bad_view(bubble_chamber, target_space, view_members, input_spaces):
     return view
 
 
-def test_good_view_is_boosted_bad_view_is_decayed(
-    bubble_chamber, target_space, good_view, bad_view
-):
+def test_good_view_is_boosted_bad_view_is_decayed(bubble_chamber, good_view, bad_view):
     original_good_view_activation = good_view.activation
     original_bad_view_activation = bad_view.activation
     parent_id = ""
     champion = bad_view
     urgency = 1.0
-    selector = ViewSelector.spawn(parent_id, bubble_chamber, champion, urgency)
+    selector = SimplexViewSelector.spawn(parent_id, bubble_chamber, champion, urgency)
     selector.run()
     good_view.update_activation()
     bad_view.update_activation()

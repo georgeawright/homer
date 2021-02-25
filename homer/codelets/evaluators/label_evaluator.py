@@ -21,6 +21,10 @@ class LabelEvaluator(Evaluator):
         self.original_confidence = self.target_structure.quality
 
     @classmethod
+    def get_target_class(cls):
+        return Label
+
+    @classmethod
     def spawn(
         cls,
         parent_id: str,
@@ -48,13 +52,3 @@ class LabelEvaluator(Evaluator):
             concept=self.target_structure.parent_concept,
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-
-    def _engender_follow_up(self):
-        self.child_codelets.append(
-            LabelSelector.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_structure,
-                self.change_in_confidence,
-            )
-        )

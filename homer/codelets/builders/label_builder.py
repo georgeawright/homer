@@ -25,6 +25,10 @@ class LabelBuilder(Builder):
         self.child_structure = None
 
     @classmethod
+    def get_target_class(cls):
+        return Label
+
+    @classmethod
     def spawn(
         cls,
         parent_id: str,
@@ -97,18 +101,6 @@ class LabelBuilder(Builder):
         space.parent_spaces.add(self.bubble_chamber.spaces["top level working"])
         self.child_structure = label
         self.bubble_chamber.logger.log(self.child_structure)
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import LabelEvaluator
-
-        self.child_codelets.append(
-            LabelEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
 
     def _fizzle(self):
         self._re_engender()

@@ -43,6 +43,24 @@ class Correspondence(Link):
         self.conceptual_space = conceptual_space
         self.is_privileged = is_privileged
 
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders import CorrespondenceBuilder
+
+        return CorrespondenceBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from homer.codelets.evaluators import CorrespondenceEvaluator
+
+        return CorrespondenceEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from homer.codelets.selectors import CorrespondenceSelector
+
+        return CorrespondenceSelector
+
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
     ) -> Correspondence:

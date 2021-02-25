@@ -32,6 +32,24 @@ class Label(Link):
             links_out=None,
         )
 
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders import LabelBuilder
+
+        return LabelBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from homer.codelets.evaluators import LabelEvaluator
+
+        return LabelEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from homer.codelets.selectors import LabelSelector
+
+        return LabelSelector
+
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
     ) -> Label:

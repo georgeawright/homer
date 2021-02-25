@@ -40,6 +40,10 @@ class CorrespondenceBuilder(Builder):
         self.child_structure = None
 
     @classmethod
+    def get_target_class(cls):
+        return Correspondence
+
+    @classmethod
     def spawn(
         cls,
         parent_id: str,
@@ -162,18 +166,6 @@ class CorrespondenceBuilder(Builder):
         self.bubble_chamber.logger.log(view.output_space)
         self.bubble_chamber.logger.log(view)
         self.child_structure = correspondence
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import CorrespondenceEvaluator
-
-        self.child_codelets.append(
-            CorrespondenceEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
 
     def _fizzle(self):
         self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))

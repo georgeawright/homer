@@ -49,13 +49,3 @@ class ViewEvaluator(Evaluator):
             [member.quality for member in self.target_structure.members]
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-
-    def _engender_follow_up(self):
-        self.child_codelets.append(
-            ViewSelector.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_structure,
-                self.change_in_confidence,
-            )
-        )

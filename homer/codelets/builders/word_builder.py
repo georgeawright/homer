@@ -35,6 +35,10 @@ class WordBuilder(Builder):
         self.child_structure = None
 
     @classmethod
+    def get_target_class(cls):
+        return Word
+
+    @classmethod
     def spawn(
         cls,
         parent_id: str,
@@ -196,18 +200,6 @@ class WordBuilder(Builder):
         self.child_structure = word
         self.bubble_chamber.logger.log(word)
         self.bubble_chamber.logger.log(self.target_view)
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import WordEvaluator
-
-        self.child_codelets.append(
-            WordEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
 
     def _fizzle(self):
         self.child_codelets.append(

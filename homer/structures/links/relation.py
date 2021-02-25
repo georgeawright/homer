@@ -32,6 +32,24 @@ class Relation(Link):
             links_out=None,
         )
 
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders import RelationBuilder
+
+        return RelationBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from homer.codelets.evaluators import RelationEvaluator
+
+        return RelationEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from homer.codelets.selectors import RelationSelector
+
+        return RelationSelector
+
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
     ) -> Relation:
