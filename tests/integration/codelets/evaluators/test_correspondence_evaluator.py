@@ -33,14 +33,22 @@ def bubble_chamber():
         Mock(),
     )
     text_concept = Concept(
-        Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "text",
+        Mock(),
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(text_concept)
     correspondence_concept = Concept(
         Mock(),
         Mock(),
         "correspondence",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -52,7 +60,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "evaluate",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -153,7 +161,7 @@ def same_concept(temperature_conceptual_space):
         Mock(),
         Mock(),
         "same",
-        None,
+        Mock(),
         SamenessClassifier(),
         temperature_conceptual_space,
         "value",

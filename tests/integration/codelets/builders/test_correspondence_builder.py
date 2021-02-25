@@ -13,7 +13,7 @@ from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.nodes import Chunk, Concept
+from homer.structures.nodes import Chunk, Concept, Word
 from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import ConceptualSpace, Frame, WorkingSpace
 from homer.structures.spaces.frames import Template
@@ -41,7 +41,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "correspondence",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -55,7 +55,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "build",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -72,7 +72,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "text",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -354,13 +354,14 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
 def target_slot(
     temperature_concept, template, temperature_template_space, bubble_chamber
 ):
-    slot = TemplateSlot(
-        Mock(),
+    slot = Word(
         Mock(),
         Mock(),
         temperature_concept,
-        WordForm.HEADWORD,
-        [Location([0], template), Location([None], temperature_template_space)],
+        Mock(),
+        Location([0], template),
+        template,
+        Mock(),
     )
     temperature_template_space.add(slot)
     bubble_chamber.slots.add(slot)

@@ -107,7 +107,7 @@ class Concept(Node):
             a.prototype if isinstance(a, Concept) else getattr(a, self.relevant_value)
         )
         b_value = (
-            b.prototype if isinstance(b, Node) else getattr(b, self.relevant_value)
+            b.prototype if isinstance(b, Concept) else getattr(b, self.relevant_value)
         )
         return self.distance_function(a_value, b_value)
 

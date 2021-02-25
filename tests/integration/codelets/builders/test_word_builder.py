@@ -37,7 +37,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "word",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -50,7 +50,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "build",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -66,7 +66,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "text",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -79,7 +79,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "same",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -92,7 +92,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "input",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -185,7 +185,7 @@ def template(bubble_chamber):
     contents = StructureCollection()
     parent_concept = bubble_chamber.concepts["text"]
     template = Template(Mock(), Mock(), name, parent_concept, [], contents)
-    slot = TemplateSlot(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    slot = Word(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     template.contents.add(slot)
     bubble_chamber.frames.add(template)
     return template
@@ -219,13 +219,14 @@ def temperature_input_space(input_space, temperature_conceptual_space):
 
 @pytest.fixture
 def template_slot(template, temperature_template_space, temperature_concept):
-    slot = TemplateSlot(
+    slot = Word(
         Mock(),
         Mock(),
-        template,
-        temperature_concept,
-        WordForm.HEADWORD,
+        Mock(),
+        Mock(),
         [Location([0], template), Location([0], temperature_template_space)],
+        template,
+        Mock(),
     )
     return slot
 
