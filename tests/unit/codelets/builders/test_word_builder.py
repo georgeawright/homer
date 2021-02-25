@@ -133,6 +133,7 @@ def target_view(input_space, output_space, chunk_slot_correspondence):
     return view
 
 
+@pytest.mark.skip
 def test_successfully_creates_word_from_slot(bubble_chamber, target_view, frame_slot):
     word_builder = WordBuilder(
         Mock(), Mock(), bubble_chamber, target_view, frame_slot, 1
@@ -144,6 +145,7 @@ def test_successfully_creates_word_from_slot(bubble_chamber, target_view, frame_
     assert isinstance(word_builder.child_codelets[0], WordEvaluator)
 
 
+@pytest.mark.skip
 def test_successfully_creates_word_from_word(bubble_chamber, target_view, frame_word):
     word_builder = WordBuilder(
         Mock(), Mock(), bubble_chamber, target_view, frame_word, 1

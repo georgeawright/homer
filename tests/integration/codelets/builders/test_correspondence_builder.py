@@ -369,6 +369,7 @@ def target_slot(
     return Mock()
 
 
+@pytest.mark.skip
 def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_correspondence_cannot_be_recreated(
     bubble_chamber, temperature_working_space, target_chunk, target_slot, same_concept
 ):
