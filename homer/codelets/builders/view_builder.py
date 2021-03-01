@@ -58,52 +58,26 @@ class ViewBuilder(Builder):
         return self.bubble_chamber.concepts["view"]
 
     def _passes_preliminary_checks(self):
+        for view in self.bubble_chamber.views:
+            if view.input_spaces == self.target_spaces:
+                return False
+        print("view doesn't exist")
         if self.frame is None:
             for space in self.target_spaces:
                 if isinstance(space, Frame):
                     self.frame = space
-                    return True
-        return False
+        print(self.frame)
+        return self.frame is not None
 
     def _calculate_confidence(self):
         self.confidence = statistics.fmean(
             [space.activation for space in self.target_spaces]
         )
 
-    def _process_structure(self):
-        view_id = ID.new(View)
-        view_location = Location([], self.bubble_chamber.spaces["top level working"])
-        view_output = WorkingSpace(
-            structure_id=ID.new(WorkingSpace),
-            parent_id=self.codelet_id,
-            name=f"output for {view_id}",
-            parent_concept=self.frame.parent_concept,
-            conceptual_space=self.frame.conceptual_space,
-            locations=[view_location],
-            contents=StructureCollection(),
-            no_of_dimensions=1,
-            dimensions=[],
-            sub_spaces=[],
-        )
-        view = View(
-            structure_id=view_id,
-            parent_id=self.codelet_id,
-            location=view_location,
-            members=StructureCollection(),
-            input_spaces=self.target_spaces,
-            output_space=view_output,
-            quality=0,
-        )
-        self.bubble_chamber.logger.log(view_output)
-        self.bubble_chamber.logger.log(view)
-        self.child_structure = view
-
     def _fizzle(self):
         from homer.codelets.builders import CorrespondenceBuilder
 
-        self.child_codelets.append(
-            CorrespondenceBuilder.make(self.codelet_id, self.bubble_chamber)
-        )
+        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
 
     def _fail(self):
         self.child_codelets.append(
