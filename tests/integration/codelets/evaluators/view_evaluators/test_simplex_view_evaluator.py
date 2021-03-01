@@ -66,10 +66,30 @@ def bubble_chamber():
 @pytest.fixture
 def good_view(bubble_chamber):
     member_1 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        1.0,
     )
     member_2 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        1.0,
     )
     view = SimplexView(
         Mock(),
@@ -86,10 +106,30 @@ def good_view(bubble_chamber):
 @pytest.fixture
 def bad_view(bubble_chamber):
     member_1 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.3
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        0.3,
     )
     member_2 = Correspondence(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.4
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        0.4,
     )
     view = SimplexView(
         Mock(),

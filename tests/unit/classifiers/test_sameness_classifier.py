@@ -73,6 +73,7 @@ def test_classify_chunks_with_same_labels():
         Mock(),
         sameness_concept,
         Mock(),
+        Mock(),
         1.0,
     )
     start_label.links_in.add(correspondence)
@@ -144,6 +145,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         sameness_concept,
         Mock(),
+        Mock(),
         1.0,
     )
     start_relation_start_label.links_in.add(start_correspondence)
@@ -199,6 +201,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         sameness_concept,
+        Mock(),
         Mock(),
         1.0,
     )

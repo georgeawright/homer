@@ -4,7 +4,7 @@ from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Link
-from homer.structures.links.correspondence import Correspondence
+from homer.structures.nodes import Concept
 from homer.structures.space import Space
 from homer.structures.spaces import WorkingSpace
 
@@ -134,3 +134,20 @@ class View(Structure):
             space.contents.of_type(View).where(input_spaces=self.input_spaces),
             StructureCollection({self}),
         )
+
+    def has_member(
+        self,
+        parent_space: Space,
+        parent_concept: Concept,
+        start: Structure,
+        end: Structure,
+    ) -> bool:
+        for correspondence in self.members:
+            if (
+                correspondence.parent_space == parent_space
+                and correspondence.parent_concept == parent_concept
+                and correspondence.start == start
+                and correspondence.end == end
+            ):
+                return True
+        return False

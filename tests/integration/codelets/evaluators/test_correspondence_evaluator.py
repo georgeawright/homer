@@ -200,6 +200,7 @@ def good_correspondence(
         template,
         same_concept,
         temperature_conceptual_space,
+        Mock(),
         quality,
     )
     return correspondence
@@ -228,6 +229,7 @@ def bad_correspondence(
         template,
         same_concept,
         temperature_conceptual_space,
+        Mock(),
         quality,
     )
     return correspondence

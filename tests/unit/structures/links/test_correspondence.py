@@ -42,6 +42,7 @@ def test_copy():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     copy = correspondence.copy(
         old_arg=old_start, new_arg=new_start, parent_id=parent_id
@@ -79,6 +80,7 @@ def test_nearby():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     parent_space.contents.add(correspondence)
     neighbours = correspondence.nearby()
@@ -102,6 +104,7 @@ def test_get_slot_argument_returns_slot():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     assert slot == correspondence.get_slot_argument()
     correspondence = Correspondence(
@@ -109,6 +112,7 @@ def test_get_slot_argument_returns_slot():
         Mock(),
         non_slot,
         slot,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -135,6 +139,7 @@ def test_get_non_slot_argument_returns_non_slot():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     assert non_slot == correspondence.get_non_slot_argument()
     correspondence = Correspondence(
@@ -142,6 +147,7 @@ def test_get_non_slot_argument_returns_non_slot():
         Mock(),
         non_slot,
         slot,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -168,12 +174,14 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence_2 = Correspondence(
         Mock(),
         Mock(),
         arg_1,
         arg_2,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -192,6 +200,7 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence_4 = Correspondence(
         Mock(),
@@ -204,12 +213,14 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence_5 = Correspondence(
         Mock(),
         Mock(),
         arg_3,
         arg_4,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

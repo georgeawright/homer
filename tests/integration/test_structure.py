@@ -25,6 +25,7 @@ def test_has_link():
         parent_space_2,
         Mock(),
         Mock(),
+        Mock(),
         0,
     )
 

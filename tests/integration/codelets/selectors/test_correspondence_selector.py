@@ -134,6 +134,7 @@ def good_correspondence(
         end_space,
         concept,
         conceptual_space,
+        Mock(),
         1.0,
     )
     start.links_out.add(correspondence)
@@ -173,6 +174,7 @@ def bad_correspondence(
         end_space,
         concept,
         conceptual_space,
+        Mock(),
         0.0,
     )
     correspondence._activation = 1.0

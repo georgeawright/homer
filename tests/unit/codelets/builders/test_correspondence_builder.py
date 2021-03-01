@@ -104,8 +104,24 @@ def target_structure_two(label_concept_working_space, target_space_two):
     return structure
 
 
+@pytest.fixture
+def existing_correspondence():
+    correspondence = Mock()
+    correspondence.is_compatible_with.return_value = True
+    return correspondence
+
+
+@pytest.fixture
+def target_view(existing_correspondence):
+    view = Mock()
+    view.has_member.return_value = False
+    view.members = StructureCollection({existing_correspondence})
+    return view
+
+
 def test_gets_second_target_space_and_structure_if_needed(
     bubble_chamber,
+    target_view,
     target_structure_one,
     same_concept,
     target_space_two,
@@ -116,6 +132,7 @@ def test_gets_second_target_space_and_structure_if_needed(
             Mock(),
             Mock(),
             bubble_chamber,
+            target_view,
             Mock(),
             target_structure_one,
             Mock(),
@@ -130,6 +147,7 @@ def test_gets_second_target_space_and_structure_if_needed(
 
 def test_gets_parent_concept_if_needed(
     bubble_chamber,
+    target_view,
     target_space_one,
     target_structure_one,
     target_space_two,
@@ -140,6 +158,7 @@ def test_gets_parent_concept_if_needed(
             Mock(),
             Mock(),
             bubble_chamber,
+            target_view,
             target_space_one,
             target_structure_one,
             Mock(),
@@ -153,6 +172,7 @@ def test_gets_parent_concept_if_needed(
 
 def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber,
+    target_view,
     target_space_one,
     target_structure_one,
     same_concept,
@@ -164,6 +184,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
             Mock(),
             Mock(),
             bubble_chamber,
+            target_view,
             target_space_one,
             target_structure_one,
             Mock(),
@@ -182,33 +203,37 @@ def test_successful_creates_chunk_and_spawns_follow_up(
 
 def test_fails_when_structures_do_not_correspond(
     bubble_chamber,
+    target_view,
     target_space_one,
     target_structure_one,
     target_space_two,
     target_structure_two,
 ):
-    concept = Mock()
-    concept.classifier.classify.return_value = 0.0
-    correspondence_builder = CorrespondenceBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        target_space_one,
-        target_structure_one,
-        Mock(),
-        target_space_two=target_space_two,
-        target_structure_two=target_structure_two,
-        parent_concept=concept,
-    )
-    result = correspondence_builder.run()
-    assert CodeletResult.FAIL == result
-    assert correspondence_builder.child_structure is None
-    assert len(correspondence_builder.child_codelets) == 1
-    assert isinstance(correspondence_builder.child_codelets[0], RelationBuilder)
+    with patch.object(Location, "for_correspondence_between", return_value=Mock()):
+        concept = Mock()
+        concept.classifier.classify.return_value = 0.0
+        correspondence_builder = CorrespondenceBuilder(
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            target_view,
+            target_space_one,
+            target_structure_one,
+            Mock(),
+            target_space_two=target_space_two,
+            target_structure_two=target_structure_two,
+            parent_concept=concept,
+        )
+        result = correspondence_builder.run()
+        assert CodeletResult.FAIL == result
+        assert correspondence_builder.child_structure is None
+        assert len(correspondence_builder.child_codelets) == 1
+        assert isinstance(correspondence_builder.child_codelets[0], RelationBuilder)
 
 
 def test_fizzles_when_correspondence_already_exists(
     bubble_chamber,
+    target_view,
     target_structure_one,
     target_space_two,
     target_structure_two,
@@ -219,6 +244,7 @@ def test_fizzles_when_correspondence_already_exists(
         Mock(),
         Mock(),
         bubble_chamber,
+        target_view,
         Mock(),
         target_structure_one,
         Mock(),

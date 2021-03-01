@@ -48,9 +48,11 @@ def test_correspondences_returns_correspondences():
             Mock(),
             Mock(),
             Mock(),
+            Mock(),
         )
         links_out.add(correspondence)
         correspondence = Correspondence(
+            Mock(),
             Mock(),
             Mock(),
             Mock(),
@@ -161,6 +163,7 @@ def test_correspondences_to_space():
         None,
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence_2 = Correspondence(
         Mock(),
@@ -170,6 +173,7 @@ def test_correspondences_to_space():
         Mock(),
         Mock(),
         space,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -185,8 +189,10 @@ def test_correspondences_to_space():
         None,
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence_4 = Correspondence(
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -253,6 +259,7 @@ def test_spread_activations():
         Mock(),
         Mock(),
         correspondence_end,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

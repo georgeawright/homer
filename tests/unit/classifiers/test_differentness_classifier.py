@@ -78,6 +78,7 @@ def test_classify_chunks_with_different_labels():
         Mock(),
         differentness_concept,
         Mock(),
+        Mock(),
         1.0,
     )
     start_label.links_in.add(correspondence)
@@ -152,6 +153,7 @@ def test_classify_relations_with_different_arguments():
         Mock(),
         differentness_concept,
         Mock(),
+        Mock(),
         1.0,
     )
     start_relation_start_label.links_in.add(start_correspondence)
@@ -206,6 +208,7 @@ def test_classify_relations_with_different_arguments():
         Mock(),
         Mock(),
         differentness_concept,
+        Mock(),
         Mock(),
         1.0,
     )

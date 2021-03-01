@@ -182,6 +182,7 @@ def good_word(bubble_chamber, warm_lexeme, output_space, good_word_correspondee)
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     good_word_correspondee.links_in.add(correspondence)
     good_word_correspondee.links_out.add(correspondence)
@@ -225,6 +226,7 @@ def bad_word(bubble_chamber, warm_lexeme, output_space, bad_word_correspondee):
         Mock(),
         bad_word_correspondee,
         word,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
