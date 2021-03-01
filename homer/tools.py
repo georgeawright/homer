@@ -30,6 +30,13 @@ def hasinstance(items: Iterable, t: type) -> bool:
     return False
 
 
+def areinstances(items: Iterable, t: type) -> bool:
+    for item in items:
+        if not isinstance(item, t):
+            return False
+    return True
+
+
 def project_item_into_space(item: "Structure", space: "Space"):
     from homer.location import Location
 
