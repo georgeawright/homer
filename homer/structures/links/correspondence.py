@@ -108,14 +108,16 @@ class Correspondence(Link):
             StructureCollection({self}),
         )
 
-    def get_slot_argument(self):
+    @property
+    def slot_argument(self):
         if self.start.is_slot:
             return self.start
         if self.end.is_slot:
             return self.end
         raise Exception("Correspondence has no slot argument")
 
-    def get_non_slot_argument(self):
+    @property
+    def non_slot_argument(self):
         if not self.start.is_slot:
             return self.start
         if not self.end.is_slot:

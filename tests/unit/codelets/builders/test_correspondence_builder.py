@@ -88,6 +88,7 @@ def target_space_two(bubble_chamber, target_space_one):
 @pytest.fixture
 def target_structure_one(bubble_chamber, label_concept_working_space):
     structure = Mock()
+    structure.is_slot = False
     structure.correspondences = StructureCollection()
     structure.has_correspondence.return_value = False
     structure.parent_spaces = StructureCollection({label_concept_working_space})
@@ -97,6 +98,7 @@ def target_structure_one(bubble_chamber, label_concept_working_space):
 @pytest.fixture
 def target_structure_two(label_concept_working_space, target_space_two):
     structure = Mock()
+    structure.is_slot = True
     structure.correspondences = StructureCollection()
     structure.name = "target_structure_two"
     structure.parent_spaces = StructureCollection({label_concept_working_space})
@@ -116,6 +118,7 @@ def target_view(existing_correspondence):
     view = Mock()
     view.has_member.return_value = False
     view.members = StructureCollection({existing_correspondence})
+    view.slot_values = {}
     return view
 
 

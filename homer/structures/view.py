@@ -32,6 +32,7 @@ class View(Structure):
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members
+        self.slot_values = {}
 
     @classmethod
     def new(

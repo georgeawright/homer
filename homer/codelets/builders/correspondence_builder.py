@@ -166,6 +166,9 @@ class CorrespondenceBuilder(Builder):
 
     def _process_structure(self):
         self.correspondence.structure_id = ID.new(Correspondence)
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.structure_id
+        ] = self.correspondence.non_slot_argument.value
         self.parent_space.add(self.correspondence)
         self.target_structure_one.links_in.add(self.correspondence)
         self.target_structure_one.links_out.add(self.correspondence)
