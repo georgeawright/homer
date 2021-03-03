@@ -124,14 +124,12 @@ class CorrespondenceBuilder(Builder):
                 .contents.of_type(Concept)
                 .get_random()
             )
-        self.parent_space = self.bubble_chamber.get_super_space(
-            self.target_space_one, self.target_space_two
-        )
         if self.target_view.has_member(
-            self.parent_space,
             self.parent_concept,
             self.target_structure_one,
             self.target_structure_two,
+            self.target_space_one,
+            self.target_space_two,
         ):
             return False
         self.correspondence = Correspondence(
@@ -139,13 +137,12 @@ class CorrespondenceBuilder(Builder):
             self.codelet_id,
             self.target_structure_one,
             self.target_structure_two,
-            Location.for_correspondence_between(
-                self.target_structure_one.location_in_space(self.target_space_one),
-                self.target_structure_two.location_in_space(self.target_space_two),
-                self.parent_space,
-            ),
             self.target_space_one,
             self.target_space_two,
+            [
+                self.target_structure_one.location_in_space(self.target_space_one),
+                self.target_structure_two.location_in_space(self.target_space_two),
+            ],
             self.parent_concept,
             self.target_conceptual_space,
             self.target_view,
@@ -169,7 +166,8 @@ class CorrespondenceBuilder(Builder):
         self.target_view.slot_values[
             self.correspondence.slot_argument.structure_id
         ] = self.correspondence.non_slot_argument.value
-        self.parent_space.add(self.correspondence)
+        self.target_space_one.add(self.correspondence)
+        self.target_space_two.add(self.correspondence)
         self.target_structure_one.links_in.add(self.correspondence)
         self.target_structure_one.links_out.add(self.correspondence)
         self.target_structure_two.links_in.add(self.correspondence)

@@ -107,35 +107,3 @@ class BubbleChamber:
             if view.members == members:
                 return True
         return False
-
-    def get_super_space(self, space_one: Space, space_two: Space) -> WorkingSpace:
-        for space in self.working_spaces:
-            try:
-                if space.sub_spaces == [space_one, space_two]:
-                    return space
-                if space.sub_spaces == [space_two, space_one]:
-                    return space
-            except Exception:
-                pass
-        super_space = WorkingSpace(
-            ID.new(WorkingSpace),
-            "",
-            f"{space_one.name} x {space_two.name}",
-            None,
-            None,
-            [Location([], self.spaces["top level working"])],
-            StructureCollection(),
-            space_one.no_of_dimensions + space_two.no_of_dimensions,
-            space_one.dimensions + space_two.dimensions,
-            [space_one, space_two],
-            0,
-        )
-        space_one.super_space_to_coordinate_function_map[
-            super_space.name
-        ] = lambda location: location.coordinates[: space_one.no_of_dimensions]
-        space_two.super_space_to_coordinate_function_map[
-            super_space.name
-        ] = lambda location: location.coordinates[space_one.no_of_dimensions :]
-        self.working_spaces.add(super_space)
-        self.logger.log(super_space)
-        return super_space

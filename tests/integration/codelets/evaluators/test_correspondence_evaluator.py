@@ -188,16 +188,15 @@ def good_correspondence(
 ):
     start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.7)
     end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
-    parent_space = bubble_chamber.get_super_space(temperature_working_space, template)
     quality = 0.0
     correspondence = Correspondence(
         Mock(),
         Mock(),
         start,
         end,
-        Location([], parent_space),
         temperature_working_space,
         template,
+        [Mock(), Mock()],
         same_concept,
         temperature_conceptual_space,
         Mock(),
@@ -217,16 +216,15 @@ def bad_correspondence(
 ):
     start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.0)
     end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
-    parent_space = bubble_chamber.get_super_space(temperature_working_space, template)
     quality = 1.0
     correspondence = Correspondence(
         Mock(),
         Mock(),
         start,
         end,
-        Location([], parent_space),
         temperature_working_space,
         template,
+        [Mock(), Mock()],
         same_concept,
         temperature_conceptual_space,
         Mock(),

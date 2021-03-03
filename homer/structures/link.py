@@ -1,3 +1,4 @@
+from typing import List
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure import Structure
@@ -13,7 +14,7 @@ class Link(Structure):
         parent_id: str,
         start: Structure,
         end: Structure,
-        location: Location,
+        locations: List[Location],
         parent_concept: "Concept",
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
@@ -23,7 +24,7 @@ class Link(Structure):
             self,
             structure_id,
             parent_id,
-            [location],
+            locations,
             quality,
             links_in=links_in,
             links_out=links_out,

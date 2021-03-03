@@ -138,17 +138,19 @@ class View(Structure):
 
     def has_member(
         self,
-        parent_space: Space,
         parent_concept: Concept,
         start: Structure,
         end: Structure,
+        start_space: Space,
+        end_space: Space,
     ) -> bool:
         for correspondence in self.members:
             if (
-                correspondence.parent_space == parent_space
-                and correspondence.parent_concept == parent_concept
+                correspondence.parent_concept == parent_concept
                 and correspondence.start == start
                 and correspondence.end == end
+                and correspondence.start_space == start_space
+                and correspondence.end_space == end_space
             ):
                 return True
         return False

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import operator
+from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
@@ -22,9 +23,9 @@ class Correspondence(Link):
         parent_id: str,
         start: Structure,
         end: Structure,
-        location: Location,
         start_space: Space,
         end_space: Space,
+        locations: List[Location],
         parent_concept: Concept,
         conceptual_space: ConceptualSpace,
         parent_view: View,
@@ -37,7 +38,7 @@ class Correspondence(Link):
             parent_id,
             start,
             end,
-            location,
+            locations,
             parent_concept,
             quality,
             links_in=None,
@@ -74,22 +75,14 @@ class Correspondence(Link):
         end = new_arg if new_arg is not None and old_arg == self.end else self.end
         start_space = equivalent_space(start, self.start_space)
         end_space = equivalent_space(end, self.end_space)
-        if self.location == self.start.location:
-            new_location = start.location
-        else:
-            new_location = Location.for_correspondence_between(
-                start.location_in_space(start_space),
-                end.location_in_space(end_space),
-                self.location.space,
-            )
         new_correspondence = Correspondence(
             ID.new(Correspondence),
             parent_id,
             start,
             end,
-            new_location,
             start_space,
             end_space,
+            [start.location_in_space(start_space), end.location_in_space(end_space)],
             self.parent_concept,
             self.conceptual_space,
             self.parent_view,
@@ -103,7 +96,6 @@ class Correspondence(Link):
             StructureCollection.union(
                 self.start.correspondences,
                 self.end.correspondences,
-                self.parent_space.contents,
             ),
             StructureCollection({self}),
         )
