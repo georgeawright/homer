@@ -54,6 +54,10 @@ class Label(Link):
 
         return LabelSelector
 
+    @property
+    def is_slot(self) -> bool:
+        return self.parent_concept is None
+
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
     ) -> Label:

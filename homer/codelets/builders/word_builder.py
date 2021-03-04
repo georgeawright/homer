@@ -7,8 +7,8 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import View
 from homer.structures.links import Correspondence
-from homer.structures.nodes import Chunk, Word
-from homer.structures.spaces import Frame, WorkingSpace
+from homer.structures.nodes import Word
+from homer.structures.spaces import Frame
 
 
 class WordBuilder(Builder):
@@ -21,15 +21,14 @@ class WordBuilder(Builder):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         target_view: View,
-        target_frame_item: Chunk,
+        target_word: Word,
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_view = target_view
         self.frame = None
         self.non_frame = None
-        self.output_space = None
-        self.target_frame_item = target_frame_item
+        self.target_word = target_word
         self.target_non_frame_item = None
         self.target_correspondence = None
         self.child_structure = None
@@ -44,7 +43,7 @@ class WordBuilder(Builder):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         target_view: View,
-        target_frame_item: Chunk,
+        target_word: Word,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -53,7 +52,7 @@ class WordBuilder(Builder):
             parent_id,
             bubble_chamber,
             target_view,
-            target_frame_item,
+            target_word,
             urgency,
         )
 
@@ -71,39 +70,55 @@ class WordBuilder(Builder):
             else bubble_chamber.views.get_unhappy()
         )
         frame = target_view.input_spaces.of_type(Frame).get_random()
-        target_frame_item = frame.contents.of_type(Chunk).get_exigent()
-        urgency = urgency if urgency is not None else target_frame_item.exigency
-        return cls.spawn(
-            parent_id, bubble_chamber, target_view, target_frame_item, urgency
-        )
+        target_word = frame.contents.of_type(Word).get_exigent()
+        urgency = urgency if urgency is not None else target_word.exigency
+        return cls.spawn(parent_id, bubble_chamber, target_view, target_word, urgency)
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]
 
     def _passes_preliminary_checks(self):
-        self.frame = self.target_frame_item.parent_space
-        self.non_frame = self.target_view.input_spaces.of_type(
-            WorkingSpace
-        ).get_random()
-        if self.target_frame_item.is_slot:
-            try:
-                self.target_correspondence = (
-                    StructureCollection.union(
-                        self.target_view.members.where(start=self.target_frame_item),
-                        self.target_view.members.where(end=self.target_frame_item),
-                    )
-                    .where(is_privileged=False)
-                    .get_active()
+        try:
+            self.word_correspondee = StructureCollection(
+                {
+                    correspondence.start
+                    if correspondence.start != self.target_word
+                    else correspondence.end
+                    for correspondence in self.target_word.correspondences
+                    if correspondence.start.is_slot and correspondence.end.is_slot
+                }
+            ).get_random()
+            correspondence_to_non_frame_item = StructureCollection(
+                {
+                    correspondence
+                    for correspondence in self.word_correspondee.correspondences
+                    if correspondence.start_space != correspondence.end_space
+                    and correspondence in self.target_view.members
+                }
+            ).get_random()
+            self.non_frame, self.non_frame_item = (
+                (
+                    correspondence_to_non_frame_item.start_space,
+                    correspondence_to_non_frame_item.start,
                 )
-                self.target_non_frame_item = (
-                    self.target_correspondence.get_non_slot_argument()
+                if correspondence_to_non_frame_item.start != self.word_correspondee
+                else (
+                    correspondence_to_non_frame_item.end_space,
+                    correspondence_to_non_frame_item.end,
                 )
-            except MissingStructureError:
-                return False
-        return not self.target_frame_item.has_correspondence_to_space(
-            self.target_view.output_space
-        )
+            )
+            return (
+                self.word_correspondee.structure_id in self.target_view.slot_values
+                and self.target_word.structure_id not in self.target_view.slot_values
+            )
+        except MissingStructureError:
+            return (
+                not self.target_word.is_slot
+                and not self.target_word.has_correspondence_to_space(
+                    self.target_view.output_space
+                )
+            )
 
     def _calculate_confidence(self):
         self.confidence = (
@@ -113,92 +128,75 @@ class WordBuilder(Builder):
         )
 
     def _process_structure(self):
-        if self.target_correspondence is not None:
-            compatible_labels = StructureCollection(
-                {
-                    label
-                    for label in self.target_non_frame_item.labels
-                    if label.parent_concept.parent_space.parent_concept
-                    == self.target_frame_item.value
-                }
-            )
-            concept = compatible_labels.get_active().parent_concept
-            conceptual_space = concept.parent_space
-            lexeme = concept.lexemes.get_active()
-            word_value = lexeme.get_form(self.target_frame_item.form)
+        if self.target_word.is_slot:
+            word_concept = self.target_view.slot_values[
+                self.word_correspondee.structure_id
+            ]
+            lexeme = word_concept.lexemes.get_random()
+            word_form = self.target_word.word_form
+            self.target_view.slot_values[self.target_word.structure_id] = lexeme.forms[
+                word_form
+            ]
         else:
-            conceptual_space = None
             lexeme = None
-            word_value = self.target_frame_item.value
+            word_form = None
         word_location = Location(
-            self.target_frame_item.location_in_space(self.frame).coordinates,
-            self.output_space,
+            self.target_word.location.coordinates,
+            self.target_view.output_space,
         )
         word = Word(
             ID.new(Word),
             self.codelet_id,
-            word_value,
-            lexeme,
-            word_location,
-            self.output_space,
-            0,
+            lexeme=lexeme,
+            word_form=word_form,
+            location=word_location,
+            parent_space=self.target_view.output_space,
+            quality=0.0,
         )
+        self.child_structure = word
+        self.bubble_chamber.words.add(word)
         self.bubble_chamber.logger.log(word)
-        frame_to_output_space = self.bubble_chamber.get_super_space(
-            self.frame, self.output_space
-        )
-        projection_from_frame = Correspondence(
+        frame_to_output_correspondence = Correspondence(
             ID.new(Correspondence),
             self.codelet_id,
-            self.target_frame_item,
-            word,
-            Location.for_correspondence_between(
-                self.target_frame_item.location_in_space(self.frame),
-                word.location_in_space(self.output_space),
-                frame_to_output_space,
-            ),
-            self.frame,
-            self.output_space,
-            self.bubble_chamber.concepts["same"],
-            conceptual_space,
-            0,
+            start=self.target_word,
+            end=self.child_structure,
+            start_space=self.target_word.parent_space,
+            end_space=self.target_view.output_space,
+            locations=[self.target_word.location, word.location],
+            parent_concept=self.bubble_chamber.concepts["same"],
+            conceptual_space=self.target_view.output_space.conceptual_space,
+            parent_view=self.target_view,
+            quality=0.0,
         )
-        self.target_frame_item.links_out.add(projection_from_frame)
-        word.links_in.add(projection_from_frame)
-        frame_to_output_space.add(projection_from_frame)
-        self.bubble_chamber.correspondences.add(projection_from_frame)
-        self.target_view.members.add(projection_from_frame)
-        self.bubble_chamber.logger.log(projection_from_frame)
-        if self.target_correspondence is not None:
-            non_frame_to_output_space = self.bubble_chamber.get_super_space(
-                self.non_frame, self.output_space
-            )
-            projection_from_non_frame = Correspondence(
+        self.bubble_chamber.correspondences.add(frame_to_output_correspondence)
+        self.target_word.links_in.add(frame_to_output_correspondence)
+        self.target_word.links_out.add(frame_to_output_correspondence)
+        word.links_in.add(frame_to_output_correspondence)
+        word.links_out.add(frame_to_output_correspondence)
+        if self.target_word.is_slot:
+            non_frame_to_output_correspondence = Correspondence(
                 ID.new(Correspondence),
                 self.codelet_id,
-                self.target_non_frame_item,
-                word,
-                Location.for_correspondence_between(
-                    self.target_non_frame_item.location_in_space(self.non_frame),
-                    word.location_in_space(self.output_space),
-                    non_frame_to_output_space,
-                ),
-                self.non_frame,
-                self.output_space,
-                self.bubble_chamber.concepts["same"],
-                concept.parent_space,
-                0,
+                start=self.non_frame_item,
+                end=self.child_structure,
+                start_space=self.non_frame,
+                end_space=self.target_view.output_space,
+                locations=[
+                    self.non_frame_item.location_in_space(self.non_frame),
+                    word.location,
+                ],
+                parent_concept=self.bubble_chamber.concepts["same"],
+                conceptual_space=self.target_view.output_space.conceptual_space,
+                parent_view=self.target_view,
+                quality=0.0,
             )
-            self.bubble_chamber.logger.log(projection_from_non_frame)
-            self.target_non_frame_item.links_out.add(projection_from_non_frame)
-            word.links_in.add(projection_from_non_frame)
-            non_frame_to_output_space.add(projection_from_non_frame)
-            self.bubble_chamber.correspondences.add(projection_from_non_frame)
-            self.target_view.members.add(projection_from_non_frame)
-        self.output_space.add(word)
-        self.bubble_chamber.words.add(word)
-        self.child_structure = word
-        self.bubble_chamber.logger.log(word)
+            self.bubble_chamber.correspondences.add(non_frame_to_output_correspondence)
+            word.links_in.add(non_frame_to_output_correspondence)
+            word.links_out.add(non_frame_to_output_correspondence)
+            self.non_frame_item.links_in.add(non_frame_to_output_correspondence)
+            self.non_frame_item.links_out.add(non_frame_to_output_correspondence)
+            self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
         self.bubble_chamber.logger.log(self.target_view)
 
     def _fizzle(self):

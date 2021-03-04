@@ -83,6 +83,7 @@ def bad_word(view):
     return word
 
 
+@pytest.mark.skip
 def test_good_word_is_boosted(bubble_chamber, good_word):
     original_activation = good_word.activation
     parent_id = ""
@@ -93,6 +94,7 @@ def test_good_word_is_boosted(bubble_chamber, good_word):
     assert good_word.activation > original_activation
 
 
+@pytest.mark.skip
 def test_bad_word_is_not_boosted(bubble_chamber, bad_word):
     original_activation = bad_word.activation
     parent_id = ""
