@@ -93,11 +93,12 @@ def test_nearby():
     assert correspondence not in neighbours
 
 
-@pytest.mark.skip
 def test_get_slot_argument_returns_slot():
     location = Mock()
-    slot = Slot(Mock(), Mock(), Mock(), locations=[location])
+    slot = Mock()
+    slot.is_slot = True
     non_slot = Mock()
+    non_slot.is_slot = False
     correspondence = Correspondence(
         Mock(),
         Mock(),
@@ -128,11 +129,12 @@ def test_get_slot_argument_returns_slot():
     assert slot == correspondence.slot_argument
 
 
-@pytest.mark.skip
 def test_get_non_slot_argument_returns_non_slot():
     location = Mock()
-    slot = Slot(Mock(), Mock(), Mock(), locations=[location])
+    slot = Mock()
+    slot.is_slot = True
     non_slot = Mock()
+    non_slot.is_slot = False
     correspondence = Correspondence(
         Mock(),
         Mock(),
