@@ -33,6 +33,10 @@ class Node(Structure):
         self.parent_space = parent_space
 
     @property
+    def is_slot(self):
+        return self.value is None
+
+    @property
     def unchunkedness(self) -> FloatBetweenOneAndZero:
         return 0
 

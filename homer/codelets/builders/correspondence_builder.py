@@ -105,6 +105,8 @@ class CorrespondenceBuilder(Builder):
                 )
             except MissingStructureError:
                 return False
+        print(self.target_space_two.name)
+        print(self.target_space_two.contents.structures)
         try:
             if self.target_structure_two is None:
                 self.target_structure_two = self.target_space_two.contents.of_type(
@@ -112,10 +114,12 @@ class CorrespondenceBuilder(Builder):
                 ).get_exigent()
         except MissingStructureError:
             return False
+        print(self.target_structure_two)
         if self.target_conceptual_space is None:
             self.target_conceptual_space = self.target_space_one.conceptual_space
         if self.target_conceptual_space != self.target_space_two.conceptual_space:
             return False
+        print(self.target_conceptual_space)
         if self.parent_concept is None:
             self.parent_concept = (
                 self.bubble_chamber.spaces["correspondential concepts"]
@@ -124,6 +128,7 @@ class CorrespondenceBuilder(Builder):
                 .contents.of_type(Concept)
                 .get_random()
             )
+        print(self.parent_concept)
         if self.target_view.has_member(
             self.parent_concept,
             self.target_structure_one,
@@ -131,6 +136,7 @@ class CorrespondenceBuilder(Builder):
             self.target_space_one,
             self.target_space_two,
         ):
+            print("has member")
             return False
         self.correspondence = Correspondence(
             None,
@@ -150,6 +156,7 @@ class CorrespondenceBuilder(Builder):
         )
         for correspondence in self.target_view.members:
             if not correspondence.is_compatible_with(self.correspondence):
+                print("correspondence not compatible")
                 return False
         return True
 
@@ -166,6 +173,7 @@ class CorrespondenceBuilder(Builder):
         self.target_view.slot_values[
             self.correspondence.slot_argument.structure_id
         ] = self.correspondence.non_slot_argument.value
+        self.target_view.members.add(self.correspondence)
         self.target_space_one.add(self.correspondence)
         self.target_space_two.add(self.correspondence)
         self.target_structure_one.links_in.add(self.correspondence)

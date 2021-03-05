@@ -58,10 +58,6 @@ class Word(Node):
         return WordSelector
 
     @property
-    def is_slot(self):
-        return self.value is None
-
-    @property
     def concepts(self):
         return self.lexeme.concepts if self.lexeme is not None else None
 

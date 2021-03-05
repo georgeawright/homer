@@ -123,6 +123,8 @@ class Correspondence(Link):
 
     def is_compatible_with(self, other: Correspondence) -> bool:
         common_arguments = self.common_arguments_with(other)
+        print(self.start, self.end)
+        print(other.start, other.end)
         if len(common_arguments) == 2:
             return False
         if areinstances(self.arguments, Node):

@@ -13,6 +13,7 @@ from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
+from homer.structures import View
 from homer.structures.nodes import Chunk, Concept, Word
 from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import ConceptualSpace, Frame, WorkingSpace
@@ -289,6 +290,7 @@ def template(templates_space, bubble_chamber):
         Mock(),
         "[temperature]",
         None,
+        None,
         [Location([], templates_space)],
         StructureCollection(),
     )
@@ -316,6 +318,21 @@ def temperature_template_space(
     template.add(space)
     bubble_chamber.working_spaces.add(space)
     return space
+
+
+@pytest.fixture
+def target_view(bubble_chamber, input_space, template):
+    view = View(
+        "target_view",
+        Mock(),
+        Mock(),
+        StructureCollection(),
+        StructureCollection({input_space, template}),
+        Mock(),
+        0,
+    )
+    bubble_chamber.views.add(view)
+    return view
 
 
 @pytest.fixture
@@ -354,37 +371,58 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
 def target_slot(
     temperature_concept, template, temperature_template_space, bubble_chamber
 ):
-    slot = Word(
+    slot = Chunk(
         Mock(),
         Mock(),
-        temperature_concept,
-        Mock(),
-        Location([0], template),
+        None,
+        [Location([0], template), Location([], temperature_template_space)],
+        StructureCollection(),
         template,
-        Mock(),
+        1.0,
     )
-    temperature_template_space.add(slot)
     bubble_chamber.slots.add(slot)
     template.add(slot)
-    return Mock()
+    temperature_template_space.add(slot)
+    slot_label = Label(Mock(), Mock(), slot, None, temperature_template_space, 1.0)
+    slot.links_out.add(slot_label)
+    temperature_template_space.add(slot_label)
+    bubble_chamber.labels.add(slot_label)
+    return slot
 
 
-@pytest.mark.skip
 def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_correspondence_cannot_be_recreated(
-    bubble_chamber, temperature_working_space, target_chunk, target_slot, same_concept
+    bubble_chamber,
+    target_view,
+    temperature_working_space,
+    target_chunk,
+    target_slot,
+    same_concept,
+    mild_concept,
 ):
-    parent_id = ""
-    urgency = 1.0
+    target_label = target_chunk.labels.get_random()
+    target_slot_label = target_slot.labels.get_random()
     builder = CorrespondenceBuilder.spawn(
-        parent_id, bubble_chamber, temperature_working_space, target_chunk, urgency
+        "", bubble_chamber, target_view, temperature_working_space, target_label, 1.0
     )
     builder.run()
     assert same_concept == builder.parent_concept
     assert CodeletResult.SUCCESS == builder.result
     assert isinstance(builder.child_structure, Correspondence)
     assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
+    assert target_view.slot_values[target_slot_label.structure_id] == mild_concept.value
+    builder.child_structure.quality = 1.0
+
     builder = CorrespondenceBuilder.spawn(
-        parent_id, bubble_chamber, temperature_working_space, target_chunk, urgency
+        "", bubble_chamber, target_view, temperature_working_space, target_chunk, 1.0
+    )
+    builder.run()
+    assert same_concept == builder.parent_concept
+    assert CodeletResult.SUCCESS == builder.result
+    assert isinstance(builder.child_structure, Correspondence)
+    assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
+
+    builder = CorrespondenceBuilder.spawn(
+        "", bubble_chamber, target_view, temperature_working_space, target_chunk, 1.0
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

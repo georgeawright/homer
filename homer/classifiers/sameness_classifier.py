@@ -15,20 +15,13 @@ class SamenessClassifier(Classifier):
         end = kwargs["end"]
         sameness_concept = kwargs["concept"]
         if isinstance(start, Label) and isinstance(end, Label):
+            if start.is_slot or end.is_slot:
+                return (
+                    start.parent_space.parent_concept == end.parent_space.parent_concept
+                )
             if start.parent_concept == end.parent_concept:
                 return statistics.fmean([start.quality, end.quality])
         if isinstance(start, Chunk) and isinstance(end, Chunk):
-            if start.is_slot or end.is_slot:
-                slot, chunk = (start, end) if start.is_slot else (end, start)
-                try:
-                    return max(
-                        label.quality
-                        for label in chunk.labels
-                        if label.parent_concept.location.space
-                        in slot.value.child_spaces
-                    )
-                except ValueError:
-                    return 0.0
             common_correspondences = set.intersection(
                 {
                     correspondence
@@ -37,7 +30,7 @@ class SamenessClassifier(Classifier):
                 },
                 {
                     correspondence
-                    for label in start.labels
+                    for label in end.labels
                     for correspondence in label.correspondences
                 },
             )
