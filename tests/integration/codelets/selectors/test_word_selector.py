@@ -9,8 +9,9 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import View
 from homer.structures.links import Relation
-from homer.structures.nodes import Concept, Word
+from homer.structures.nodes import Concept, Lexeme, Word
 from homer.structures.spaces import WorkingSpace
+from homer.word_form import WordForm
 
 
 @pytest.fixture
@@ -73,17 +74,18 @@ def view(bubble_chamber):
 
 @pytest.fixture
 def good_word(view):
-    word = Word(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0)
+    lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"})
+    word = Word(Mock(), Mock(), lexeme, WordForm.HEADWORD, Mock(), Mock(), 1.0)
     return word
 
 
 @pytest.fixture
 def bad_word(view):
-    word = Word(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.0)
+    lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"})
+    word = Word(Mock(), Mock(), lexeme, WordForm.HEADWORD, Mock(), Mock(), 0.0)
     return word
 
 
-@pytest.mark.skip
 def test_good_word_is_boosted(bubble_chamber, good_word):
     original_activation = good_word.activation
     parent_id = ""
@@ -94,7 +96,6 @@ def test_good_word_is_boosted(bubble_chamber, good_word):
     assert good_word.activation > original_activation
 
 
-@pytest.mark.skip
 def test_bad_word_is_not_boosted(bubble_chamber, bad_word):
     original_activation = bad_word.activation
     parent_id = ""
