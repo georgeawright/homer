@@ -254,7 +254,12 @@ def input_space_chunk(input_space, temperature_input_space, warm_concept, warm_l
         input_space,
         Mock(),
     )
-    label = Label(Mock(), Mock(), chunk, warm_concept, input_space, 1)
+    label = Label(
+        "input chunk label", Mock(), chunk, warm_concept, temperature_input_space, 1
+    )
+    input_space.add(chunk)
+    temperature_input_space.add(chunk)
+    temperature_input_space.add(label)
     chunk.links_out.add(label)
     return chunk
 
@@ -270,7 +275,7 @@ def template_chunk(
     target_view,
 ):
     chunk = Chunk(
-        Mock(),
+        "template chunk",
         Mock(),
         None,
         [Location([], template), Location([], temperature_template_space)],
@@ -278,7 +283,9 @@ def template_chunk(
         template,
         1,
     )
-    label = Label(Mock(), Mock(), chunk, None, temperature_template_space, 1)
+    label = Label(
+        "template chunk label", Mock(), chunk, None, temperature_template_space, 1
+    )
     target_view.slot_values[label.structure_id] = warm_concept
     chunk.links_out.add(label)
     input_chunk_label = input_space_chunk.labels.get_random()
@@ -318,7 +325,7 @@ def template_slot_word(
     )
     label = template_chunk.labels.get_random()
     label_to_slot_correspondence = Correspondence(
-        Mock(),
+        "label to slot word correspondence",
         Mock(),
         label,
         slot,
@@ -355,40 +362,6 @@ def template_function_word(template):
         1.0,
     )
     return word
-
-
-@pytest.fixture
-def target_correspondence(
-    template_slot,
-    input_chunk,
-    temperature_template_space,
-    temperature_input_space,
-    template,
-    input_space,
-    warm_concept,
-    warm_lexeme,
-):
-    start_space = temperature_template_space
-    end_space = temperature_input_space
-    parent_concept = Mock()
-    conceptual_space = Mock()
-    parent_view = Mock()
-    quality = Mock()
-    correspondence = Correspondence(
-        Mock(),
-        Mock(),
-        template_slot,
-        input_chunk,
-        start_space,
-        end_space,
-        [Location([], start_space), Location([], end_space)],
-        parent_concept,
-        conceptual_space,
-        parent_view,
-        quality,
-    )
-    correspondence._activation = 1.0
-    return correspondence
 
 
 def test_successful_creates_word_and_spawns_follow_up_and_same_word_cannot_be_recreated(

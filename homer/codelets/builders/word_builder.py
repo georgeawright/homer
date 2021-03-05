@@ -93,7 +93,10 @@ class WordBuilder(Builder):
                 {
                     correspondence
                     for correspondence in self.word_correspondee.correspondences
-                    if correspondence.start_space != correspondence.end_space
+                    if (
+                        not isinstance(correspondence.start_space, Frame)
+                        or not isinstance(correspondence.end_space, Frame)
+                    )
                     and correspondence in self.target_view.members
                 }
             ).get_random()
