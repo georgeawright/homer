@@ -13,6 +13,9 @@ def test_nearby():
     input_1 = WorkingSpace(
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
+    input_2 = WorkingSpace(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
     frame_1 = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     frame_2 = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
     view_1 = View(
@@ -29,7 +32,7 @@ def test_nearby():
         Mock(),
         Location([], top_level_working_space),
         StructureCollection(),
-        StructureCollection({input_1, frame_1}),
+        StructureCollection({input_1, frame_2}),
         Mock(),
         Mock(),
     )
@@ -38,7 +41,7 @@ def test_nearby():
         Mock(),
         Location([], top_level_working_space),
         StructureCollection(),
-        StructureCollection({input_1, frame_2}),
+        StructureCollection({input_2, frame_1}),
         Mock(),
         Mock(),
     )

@@ -6,7 +6,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Link
 from homer.structures.nodes import Concept
 from homer.structures.space import Space
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import Frame, WorkingSpace
 
 
 class View(Structure):
@@ -77,6 +77,12 @@ class View(Structure):
         return view
 
     @property
+    def input_working_spaces(self):
+        return StructureCollection(
+            {space for space in self.input_spaces if not isinstance(space, Frame)}
+        )
+
+    @property
     def size(self):
         return len(self.members)
 
@@ -131,9 +137,16 @@ class View(Structure):
 
     def nearby(self, space: Space = None) -> StructureCollection:
         space = space if space is not None else self.location.space
-        return StructureCollection.difference(
-            space.contents.of_type(View).where(input_spaces=self.input_spaces),
-            StructureCollection({self}),
+        return StructureCollection(
+            {
+                view
+                for view in space.contents.of_type(View)
+                if StructureCollection.intersection(
+                    view.input_spaces, self.input_working_spaces
+                )
+                == self.input_working_spaces
+                and view != self
+            }
         )
 
     def has_member(
