@@ -134,7 +134,7 @@ def warm_concept(bubble_chamber, temperature_conceptual_space):
 
 @pytest.fixture
 def warm_lexeme(warm_concept):
-    lexeme = Lexeme(Mock(), Mock(), "warm", {WordForm.HEADWORD})
+    lexeme = Lexeme(Mock(), Mock(), "warm", {WordForm.HEADWORD: "warm"})
     link = Relation(Mock(), Mock(), warm_concept, lexeme, None, None, 0)
     warm_concept.links_out.add(link)
     lexeme.links_in.add(link)
@@ -163,8 +163,8 @@ def good_word(bubble_chamber, warm_lexeme, output_space, good_word_correspondee)
     word = Word(
         Mock(),
         Mock(),
-        "warm",
         warm_lexeme,
+        WordForm.HEADWORD,
         Location([0], output_space),
         output_space,
         0,
@@ -213,8 +213,8 @@ def bad_word(bubble_chamber, warm_lexeme, output_space, bad_word_correspondee):
     word = Word(
         Mock(),
         Mock(),
-        "warm",
         warm_lexeme,
+        WordForm.HEADWORD,
         Location([0], output_space),
         output_space,
         1,
@@ -241,7 +241,6 @@ def bad_word(bubble_chamber, warm_lexeme, output_space, bad_word_correspondee):
     return word
 
 
-@pytest.mark.skip
 def test_increases_quality_of_good_word(bubble_chamber, good_word):
     original_word_quality = good_word.quality
     parent_id = ""
@@ -254,7 +253,6 @@ def test_increases_quality_of_good_word(bubble_chamber, good_word):
     assert isinstance(evaluator.child_codelets[0], WordSelector)
 
 
-@pytest.mark.skip
 def test_decreases_quality_of_bad_word(bubble_chamber, bad_word):
     original_word_quality = bad_word.quality
     parent_id = ""
