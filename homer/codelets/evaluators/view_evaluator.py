@@ -48,8 +48,12 @@ class ViewEvaluator(Evaluator):
         proportion_of_slots_filled = len(self.target_structure.slot_values) / len(
             self.target_structure.slots
         )
-        average_correspondence_quality = statistics.fmean(
-            [member.quality for member in self.target_structure.members]
+        average_correspondence_quality = (
+            statistics.fmean(
+                [member.quality for member in self.target_structure.members]
+            )
+            if len(self.target_structure.members) > 0
+            else 0
         )
         self.confidence = statistics.fmean(
             [proportion_of_slots_filled, average_correspondence_quality]
