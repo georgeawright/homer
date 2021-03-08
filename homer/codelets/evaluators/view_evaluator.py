@@ -45,7 +45,13 @@ class ViewEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get_random()
 
     def _calculate_confidence(self):
-        self.confidence = statistics.fmean(
+        proportion_of_slots_filled = len(self.target_structure.slot_values) / len(
+            self.target_structure.slots
+        )
+        average_correspondence_quality = statistics.fmean(
             [member.quality for member in self.target_structure.members]
+        )
+        self.confidence = statistics.fmean(
+            [proportion_of_slots_filled, average_correspondence_quality]
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

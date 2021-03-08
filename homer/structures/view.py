@@ -86,6 +86,17 @@ class View(Structure):
     def size(self):
         return len(self.members)
 
+    @property
+    def slots(self):
+        return StructureCollection(
+            {
+                structure
+                for space in self.input_spaces
+                for structure in space.contents
+                if structure.is_slot
+            }
+        )
+
     def copy(
         self,
         bubble_chamber: "BubbleChamber",

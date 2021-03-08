@@ -9,8 +9,8 @@ from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Relation
-from homer.structures.nodes import Concept
-from homer.structures.spaces import WorkingSpace
+from homer.structures.nodes import Chunk, Concept
+from homer.structures.spaces import Frame, WorkingSpace
 from homer.structures.views import SimplexView
 
 
@@ -65,6 +65,22 @@ def bubble_chamber():
 
 @pytest.fixture
 def good_view(bubble_chamber):
+    slot = Chunk(Mock(), Mock(), None, Mock(), Mock(), Mock(), Mock())
+    input_space = WorkingSpace(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        StructureCollection({Mock()}),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    frame = Frame(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), StructureCollection({slot})
+    )
     member_1 = Correspondence(
         Mock(),
         Mock(),
@@ -96,15 +112,32 @@ def good_view(bubble_chamber):
         Mock(),
         Location([], Mock()),
         StructureCollection({member_1, member_2}),
-        Mock(),
+        StructureCollection({input_space, frame}),
         Mock(),
         0.5,
     )
+    view.slot_values[slot.structure_id] = Mock()
     return view
 
 
 @pytest.fixture
 def bad_view(bubble_chamber):
+    slot = Chunk(Mock(), Mock(), None, Mock(), Mock(), Mock(), Mock())
+    input_space = WorkingSpace(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        StructureCollection({Mock()}),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    frame = Frame(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), StructureCollection({slot})
+    )
     member_1 = Correspondence(
         Mock(),
         Mock(),
@@ -136,7 +169,7 @@ def bad_view(bubble_chamber):
         Mock(),
         Location([], Mock()),
         StructureCollection({member_1, member_2}),
-        Mock(),
+        StructureCollection({input_space, frame}),
         Mock(),
         0.5,
     )
