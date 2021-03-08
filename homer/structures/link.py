@@ -44,6 +44,10 @@ class Link(Structure):
             {arg for arg in [self.start, self.end] if arg is not None}
         )
 
+    @property
+    def is_slot(self) -> bool:
+        return self.parent_concept is None
+
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
     ):
