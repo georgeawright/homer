@@ -29,6 +29,7 @@ class View(Structure):
             locations=[location],
             quality=quality,
         )
+        self.value = None
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members
