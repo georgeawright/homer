@@ -4,6 +4,7 @@ from homer.codelets.selectors import RelationSelector
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
+from homer.structures.links import Relation
 
 
 class RelationEvaluator(Evaluator):
@@ -19,6 +20,10 @@ class RelationEvaluator(Evaluator):
             self, codelet_id, parent_id, bubble_chamber, target_structure, urgency
         )
         self.original_confidence = self.target_structure.quality
+
+    @classmethod
+    def get_target_class(cls):
+        return Relation
 
     @classmethod
     def spawn(
@@ -50,13 +55,3 @@ class RelationEvaluator(Evaluator):
             end=self.target_structure.end,
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-
-    def _engender_follow_up(self):
-        self.child_codelets.append(
-            RelationSelector.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_structure,
-                self.change_in_confidence,
-            )
-        )

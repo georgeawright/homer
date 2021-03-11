@@ -3,8 +3,8 @@ from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
-from homer.structures import Chunk, Concept
 from homer.structures.links import Label
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.tools import project_item_into_space
 
@@ -23,6 +23,10 @@ class LabelBuilder(Builder):
         self.target_chunk = target_chunk
         self.parent_concept = parent_concept
         self.child_structure = None
+
+    @classmethod
+    def get_target_class(cls):
+        return Label
 
     @classmethod
     def spawn(
@@ -97,18 +101,6 @@ class LabelBuilder(Builder):
         space.parent_spaces.add(self.bubble_chamber.spaces["top level working"])
         self.child_structure = label
         self.bubble_chamber.logger.log(self.child_structure)
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import LabelEvaluator
-
-        self.child_codelets.append(
-            LabelEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
 
     def _fizzle(self):
         self._re_engender()

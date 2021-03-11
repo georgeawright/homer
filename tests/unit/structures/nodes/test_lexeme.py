@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.word_form import WordForm
-from homer.structures import Lexeme
+from homer.structures.nodes import Lexeme
 
 
 @pytest.mark.parametrize(

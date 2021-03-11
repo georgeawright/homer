@@ -37,6 +37,19 @@ class Structure(ABC):
         self.stable = stable_activation is not None
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
+        self.parent_concept = None
+
+    @classmethod
+    def get_builder_class(cls):
+        raise NotImplementedError
+
+    @classmethod
+    def get_evaluator_class(cls):
+        raise NotImplementedError
+
+    @classmethod
+    def get_selector_class(cls):
+        raise NotImplementedError
 
     @property
     def location(self) -> Location:
@@ -57,6 +70,10 @@ class Structure(ABC):
             if location.space.value == "input":
                 return location.coordinates
         raise Exception(f"{self.structure_id} has no location in input space")
+
+    @property
+    def is_slot(self) -> bool:
+        return False
 
     @property
     def parent_spaces(self) -> StructureCollection:
@@ -148,7 +165,7 @@ class Structure(ABC):
 
     @property
     def lexemes(self) -> StructureCollection:
-        from homer.structures import Lexeme
+        from homer.structures.nodes import Lexeme
 
         return StructureCollection(
             {link.end for link in self.links_out if isinstance(link.end, Lexeme)}
@@ -307,7 +324,7 @@ class Structure(ABC):
     def spread_activation(self):
         if not self.is_fully_active():
             return
-        if hasattr(self, "parent_concept") and self.parent_concept is not None:
+        if self.parent_concept is not None:
             self.parent_concept.boost_activation(self.activation)
         for link in self.links_out:
             try:

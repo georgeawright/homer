@@ -6,9 +6,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
-from homer.structure_collection import StructureCollection
-from homer.structures import Concept, Space
-from homer.structures.chunks import View
+from homer.structures import Space, View
+from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
@@ -21,6 +20,7 @@ class CorrespondenceBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        target_view: View,
         target_space_one: Space,
         target_structure_one: Structure,
         urgency: FloatBetweenOneAndZero,
@@ -30,6 +30,7 @@ class CorrespondenceBuilder(Builder):
         parent_concept: Concept = None,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        self.target_view = target_view
         self.target_space_one = target_space_one
         self.target_structure_one = target_structure_one
         self.target_space_two = target_space_two
@@ -37,13 +38,19 @@ class CorrespondenceBuilder(Builder):
         self.target_conceptual_space = target_conceptual_space
         self.parent_concept = parent_concept
         self.parent_space = None
+        self.correspondence = None
         self.child_structure = None
+
+    @classmethod
+    def get_target_class(cls):
+        return Correspondence
 
     @classmethod
     def spawn(
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        target_view: View,
         target_space_one: Space,
         target_structure_one: Structure,
         urgency: FloatBetweenOneAndZero,
@@ -58,6 +65,7 @@ class CorrespondenceBuilder(Builder):
             codelet_id,
             parent_id,
             bubble_chamber,
+            target_view,
             target_space_one,
             target_structure_one,
             urgency,
@@ -69,12 +77,18 @@ class CorrespondenceBuilder(Builder):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        target_view = bubble_chamber.views.get_active()
         target_space = bubble_chamber.working_spaces.where(
             is_basic_level=True
         ).get_active()
         target = target_space.contents.not_of_type(Space).get_exigent()
         return cls.spawn(
-            parent_id, bubble_chamber, target_space, target, target.exigency
+            parent_id,
+            bubble_chamber,
+            target_view,
+            target_space,
+            target,
+            target.exigency,
         )
 
     @property
@@ -110,12 +124,34 @@ class CorrespondenceBuilder(Builder):
                 .contents.of_type(Concept)
                 .get_random()
             )
-        self.parent_space = self.bubble_chamber.get_super_space(
-            self.target_space_one, self.target_space_two
+        if self.target_view.has_member(
+            self.parent_concept,
+            self.target_structure_one,
+            self.target_structure_two,
+            self.target_space_one,
+            self.target_space_two,
+        ):
+            return False
+        self.correspondence = Correspondence(
+            None,
+            self.codelet_id,
+            self.target_structure_one,
+            self.target_structure_two,
+            self.target_space_one,
+            self.target_space_two,
+            [
+                self.target_structure_one.location_in_space(self.target_space_one),
+                self.target_structure_two.location_in_space(self.target_space_two),
+            ],
+            self.parent_concept,
+            self.target_conceptual_space,
+            self.target_view,
+            0,
         )
-        return not self.target_structure_one.has_correspondence(
-            self.parent_space, self.parent_concept, self.target_structure_two
-        )
+        for correspondence in self.target_view.members:
+            if not correspondence.is_compatible_with(self.correspondence):
+                return False
+        return True
 
     def _calculate_confidence(self):
         self.confidence = self.parent_concept.classifier.classify(
@@ -126,54 +162,20 @@ class CorrespondenceBuilder(Builder):
         )
 
     def _process_structure(self):
-        correspondence = Correspondence(
-            ID.new(Correspondence),
-            self.codelet_id,
-            self.target_structure_one,
-            self.target_structure_two,
-            Location.for_correspondence_between(
-                self.target_structure_one.location_in_space(self.target_space_one),
-                self.target_structure_two.location_in_space(self.target_space_two),
-                self.parent_space,
-            ),
-            self.target_space_one,
-            self.target_space_two,
-            self.parent_concept,
-            self.target_conceptual_space,
-            0,
-        )
-        self.parent_space.add(correspondence)
-        self.target_structure_one.links_in.add(correspondence)
-        self.target_structure_one.links_out.add(correspondence)
-        self.target_structure_two.links_in.add(correspondence)
-        self.target_structure_two.links_out.add(correspondence)
-        self.bubble_chamber.correspondences.add(correspondence)
-        self.bubble_chamber.logger.log(correspondence)
-        view_members = StructureCollection.union(
-            StructureCollection({correspondence}),
-            self.target_structure_one.correspondences.where(is_privileged=True),
-            self.target_structure_two.correspondences.where(is_privileged=True),
-        )
-        view = View.new(
-            bubble_chamber=self.bubble_chamber,
-            parent_id=self.codelet_id,
-            members=view_members,
-        )
-        self.bubble_chamber.logger.log(view.output_space)
-        self.bubble_chamber.logger.log(view)
-        self.child_structure = correspondence
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import CorrespondenceEvaluator
-
-        self.child_codelets.append(
-            CorrespondenceEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
+        self.correspondence.structure_id = ID.new(Correspondence)
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.structure_id
+        ] = self.correspondence.non_slot_argument.value
+        self.target_view.members.add(self.correspondence)
+        self.target_space_one.add(self.correspondence)
+        self.target_space_two.add(self.correspondence)
+        self.target_structure_one.links_in.add(self.correspondence)
+        self.target_structure_one.links_out.add(self.correspondence)
+        self.target_structure_two.links_in.add(self.correspondence)
+        self.target_structure_two.links_out.add(self.correspondence)
+        self.bubble_chamber.correspondences.add(self.correspondence)
+        self.bubble_chamber.logger.log(self.correspondence)
+        self.child_structure = self.correspondence
 
     def _fizzle(self):
         self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))

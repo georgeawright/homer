@@ -2,7 +2,6 @@ import pytest
 from unittest.mock import Mock
 
 from homer.structure_collection import StructureCollection
-from homer.structures.chunks import Slot
 from homer.structures.links import Correspondence
 
 
@@ -37,9 +36,10 @@ def test_copy():
         Mock(),
         old_start,
         old_end,
-        location,
         start_space,
         end_space,
+        [start_location, end_location],
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -65,32 +65,40 @@ def test_nearby():
     start.correspondences = StructureCollection({Mock()})
     end = Mock()
     end.correspondences = StructureCollection({Mock()})
-    parent_space = Mock()
-    parent_space.contents = StructureCollection({Mock()})
-    location = Mock()
-    location.space = parent_space
+    start_space = Mock()
+    start_space.contents = StructureCollection({Mock()})
+    start_location = Mock()
+    start_location.space = start_space
+    end_space = Mock()
+    end_space.contents = StructureCollection({Mock()})
+    end_location = Mock()
+    end_location.space = end_space
     correspondence = Correspondence(
         Mock(),
         Mock(),
         start,
         end,
-        location,
-        Mock(),
+        start_space,
+        end_space,
+        [start_location, end_location],
         Mock(),
         Mock(),
         Mock(),
         Mock(),
     )
-    parent_space.contents.add(correspondence)
+    start_space.contents.add(correspondence)
+    end_space.contents.add(correspondence)
     neighbours = correspondence.nearby()
-    assert 3 == len(neighbours)
+    assert 2 == len(neighbours)
     assert correspondence not in neighbours
 
 
 def test_get_slot_argument_returns_slot():
     location = Mock()
-    slot = Slot(Mock(), Mock(), Mock(), locations=[location])
+    slot = Mock()
+    slot.is_slot = True
     non_slot = Mock()
+    non_slot.is_slot = False
     correspondence = Correspondence(
         Mock(),
         Mock(),
@@ -102,8 +110,9 @@ def test_get_slot_argument_returns_slot():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
-    assert slot == correspondence.get_slot_argument()
+    assert slot == correspondence.slot_argument
     correspondence = Correspondence(
         Mock(),
         Mock(),
@@ -115,14 +124,17 @@ def test_get_slot_argument_returns_slot():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
-    assert slot == correspondence.get_slot_argument()
+    assert slot == correspondence.slot_argument
 
 
 def test_get_non_slot_argument_returns_non_slot():
     location = Mock()
-    slot = Slot(Mock(), Mock(), Mock(), locations=[location])
+    slot = Mock()
+    slot.is_slot = True
     non_slot = Mock()
+    non_slot.is_slot = False
     correspondence = Correspondence(
         Mock(),
         Mock(),
@@ -134,8 +146,9 @@ def test_get_non_slot_argument_returns_non_slot():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
-    assert non_slot == correspondence.get_non_slot_argument()
+    assert non_slot == correspondence.non_slot_argument
     correspondence = Correspondence(
         Mock(),
         Mock(),
@@ -147,8 +160,9 @@ def test_get_non_slot_argument_returns_non_slot():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
-    assert non_slot == correspondence.get_non_slot_argument()
+    assert non_slot == correspondence.non_slot_argument
 
 
 def test_common_arguments_with():
@@ -167,12 +181,14 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence_2 = Correspondence(
         Mock(),
         Mock(),
         arg_1,
         arg_2,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -191,6 +207,7 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence_4 = Correspondence(
         Mock(),
@@ -203,12 +220,14 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     correspondence_5 = Correspondence(
         Mock(),
         Mock(),
         arg_3,
         arg_4,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

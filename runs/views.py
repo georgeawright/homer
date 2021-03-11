@@ -54,7 +54,7 @@ def run_view(request, run_id):
     for record in structure_records:
         if not re.match("^Chunk", record.structure_id):
             continue
-        if record.parent_codelet is not None:
+        if record.parent_codelet is not None or "WorkingSpace2" not in record.locations:
             continue
         original_chunks.append(record)
         if record.locations["WorkingSpace2"][0] > last_row:

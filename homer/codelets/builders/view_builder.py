@@ -1,4 +1,6 @@
 from __future__ import annotations
+from abc import abstractclassmethod
+import statistics
 from typing import List, Set, Tuple
 
 from homer.bubble_chamber import BubbleChamber
@@ -8,9 +10,9 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.chunks import View
+from homer.structures import Space, View
 from homer.structures.links import Correspondence
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import Frame, WorkingSpace
 
 
 class ViewBuilder(Builder):
@@ -19,22 +21,23 @@ class ViewBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
+        target_spaces: StructureCollection,
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_view = target_view
+        self.target_spaces = target_spaces
         self.second_target_view = None
         self.correspondences = None
         self.correspondences_to_add = None
         self.child_structure = None
+        self.frame = None
 
     @classmethod
     def spawn(
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
+        target_spaces: StructureCollection,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -42,95 +45,37 @@ class ViewBuilder(Builder):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_view,
+            target_spaces,
             urgency,
         )
 
-    @classmethod
+    @abstractclassmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
-        target = bubble_chamber.views.get_exigent()
-        urgency = urgency if urgency is not None else target.exigency
-        return cls.spawn(parent_id, bubble_chamber, target, target.unhappiness)
+        pass
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view"]
 
     def _passes_preliminary_checks(self):
-        try:
-            self.second_target_view = self.target_view.nearby().get_random()
-        except MissingStructureError:
-            return False
-        return not self.bubble_chamber.has_view(
-            StructureCollection.union(
-                self.target_view.members, self.second_target_view.members
-            )
-        )
+        for view in self.bubble_chamber.views:
+            if view.input_spaces == self.target_spaces:
+                return False
+        if self.frame is None:
+            for space in self.target_spaces:
+                if isinstance(space, Frame):
+                    self.frame = space
+        return self.frame is not None
 
     def _calculate_confidence(self):
-        self.confidence = 1.0
-        self.correspondences = self.target_view.members.copy()
-        self.correspondences_to_add = self.second_target_view.members.copy()
-        while not self.correspondences_to_add.is_empty():
-            new = self.correspondences_to_add.pop()
-            for old in self.target_view.members:
-                common_arguments = StructureCollection.intersection(
-                    old.arguments, new.arguments
-                )
-                if len(common_arguments) == 0:
-                    self.confidence = min(self.confidence, old.quality, new.quality)
-                    self.correspondences.add(new)
-                elif len(common_arguments) == 1:
-                    all_arguments = StructureCollection.union(
-                        old.arguments, new.arguments
-                    )
-                    distinct_arguments = StructureCollection.difference(
-                        all_arguments, common_arguments
-                    )
-                    try:
-                        third = self.second_target_view.members.where(
-                            arguments=distinct_arguments
-                        ).get_random()
-                        self.confidence = min(
-                            self.confidence, old.quality, new.quality, third.quality
-                        )
-                        self.correspondences_to_add.add(third)
-                        self.correspondences.add(new)
-                    except MissingStructureError:
-                        self.confidence = 0
-                        return
-                else:  # 2 common arguments means equivalent/incompatible correspondences
-                    self.confidence = 0
-                    return
-
-    def _process_structure(self):
-        view = View.new(
-            bubble_chamber=self.bubble_chamber,
-            parent_id=self.codelet_id,
-            members=self.correspondences,
-        )
-        self.bubble_chamber.logger.log(view.output_space)
-        self.bubble_chamber.logger.log(view)
-        self.child_structure = view
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import ViewEvaluator
-
-        self.child_codelets.append(
-            ViewEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
+        self.confidence = statistics.fmean(
+            [space.activation for space in self.target_spaces]
         )
 
     def _fizzle(self):
         from homer.codelets.builders import CorrespondenceBuilder
 
-        self.child_codelets.append(
-            CorrespondenceBuilder.make(self.codelet_id, self.bubble_chamber)
-        )
+        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
 
     def _fail(self):
         self.child_codelets.append(

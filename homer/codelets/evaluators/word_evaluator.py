@@ -4,8 +4,8 @@ from homer.codelets.selectors import LabelSelector
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures.chunks import Word
 from homer.structures.links import Label
+from homer.structures.nodes import Word
 
 
 class WordEvaluator(Evaluator):
@@ -21,6 +21,10 @@ class WordEvaluator(Evaluator):
             self, codelet_id, parent_id, bubble_chamber, target_structure, urgency
         )
         self.original_confidence = self.target_structure.quality
+
+    @classmethod
+    def get_target_class(cls):
+        return Word
 
     @classmethod
     def spawn(
@@ -61,15 +65,3 @@ class WordEvaluator(Evaluator):
             ]
             self.confidence = max(label.quality for label in compatible_labels)
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-
-    def _engender_follow_up(self):
-        from homer.codelets.selectors import WordSelector
-
-        self.child_codelets.append(
-            WordSelector.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_structure,
-                self.change_in_confidence,
-            )
-        )

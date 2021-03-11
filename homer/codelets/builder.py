@@ -1,5 +1,3 @@
-from abc import abstractmethod, abstractproperty
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
@@ -21,6 +19,7 @@ class Builder(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
+        self.child_structure = None
         self.confidence = 0.0
 
     def run(self) -> CodeletResult:
@@ -49,9 +48,9 @@ class Builder(Codelet):
     def _build_concept(self):
         return self.bubble_chamber.concepts["build"]
 
-    @abstractproperty
+    @property
     def _structure_concept(self):
-        pass
+        raise NotImplementedError
 
     def _boost_activations(self):
         self._build_concept.boost_activation(1)
@@ -62,26 +61,28 @@ class Builder(Codelet):
         self._build_concept.decay_activation()
         self._parent_link.decay_activation(1 - self.confidence)
 
-    @abstractmethod
     def _passes_preliminary_checks(self):
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def _calculate_confidence(self):
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def _process_structure(self):
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def _engender_follow_up(self):
-        pass
+        follow_up_class = self.get_target_class().get_evaluator_class()
+        self.child_codelets.append(
+            follow_up_class.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.child_structure,
+                self.confidence,
+            )
+        )
 
-    @abstractmethod
     def _fizzle(self):
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def _fail(self):
-        pass
+        raise NotImplementedError

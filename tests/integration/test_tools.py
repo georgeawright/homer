@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.location import Location
-from homer.structures import Chunk, Concept
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import WorkingSpace
 from homer.tools import equivalent_space
 

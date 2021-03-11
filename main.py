@@ -11,10 +11,8 @@ from homer.classifiers import (
 from homer.id import ID
 from homer.location import Location
 from homer.loggers import DjangoLogger
-from homer.structures import Chunk, Concept, Lexeme
-from homer.structures.chunks import Slot, Word
-from homer.structures.chunks.slots import TemplateSlot
 from homer.structures.links import Relation
+from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
 from homer.word_form import WordForm
@@ -520,54 +518,170 @@ different = homer.def_concept(
     parent_space=same_different_space,
     distance_function=math.dist,
 )
+the_lexeme = homer.def_lexeme(
+    headword="the", forms={WordForm.HEADWORD: "the"}, parent_concept=None
+)
+is_lexeme = homer.def_lexeme(
+    headword="is", forms={WordForm.HEADWORD: "is"}, parent_concept=None
+)
+it_lexeme = homer.def_lexeme(
+    headword="it", forms={WordForm.HEADWORD: "it"}, parent_concept=None
+)
+in_lexeme = homer.def_lexeme(
+    headword="in", forms={WordForm.HEADWORD: "in"}, parent_concept=None
+)
+than_lexeme = homer.def_lexeme(
+    headword="than", forms={WordForm.HEADWORD: "than"}, parent_concept=None
+)
 template_1 = homer.def_template(
     name="the [location] is [temperature]",
     contents=[
-        homer.def_word("the"),
-        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
-        homer.def_word("is"),
-        homer.def_template_slot(temperature_concept, form=WordForm.HEADWORD),
+        homer.def_word(the_lexeme),
+        homer.def_word(word_form=WordForm.HEADWORD),
+        homer.def_word(is_lexeme),
+        homer.def_word(word_form=WordForm.HEADWORD),
     ],
 )
-homer.def_correspondence(template_1[1], template_1[3])
+template_1_location_space = location_space.instance_in_space(template_1)
+homer.logger.log(template_1_location_space)
+template_1_temperature_space = temperature_space.instance_in_space(template_1)
+homer.logger.log(template_1_temperature_space)
+template_1_slot = homer.def_chunk(
+    locations=[
+        Location([], template_1),
+        Location([0, 0], template_1_location_space),
+        Location([0], template_1_temperature_space),
+    ],
+    parent_space=template_1,
+)
+template_1_slot_location_label = homer.def_label(
+    start=template_1_slot, parent_space=template_1_location_space
+)
+template_1_slot_temperature_label = homer.def_label(
+    start=template_1_slot, parent_space=template_1_temperature_space
+)
+homer.def_correspondence(template_1_slot_location_label, template_1[1])
+homer.def_correspondence(template_1_slot_temperature_label, template_1[3])
 template_2 = homer.def_template(
     name="it is [temperature] in the [location]",
     contents=[
-        homer.def_word("it"),
-        homer.def_word("is"),
-        homer.def_template_slot(temperature_concept, form=WordForm.HEADWORD),
-        homer.def_word("in"),
-        homer.def_word("the"),
-        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
+        homer.def_word(it_lexeme),
+        homer.def_word(is_lexeme),
+        homer.def_word(word_form=WordForm.HEADWORD),
+        homer.def_word(in_lexeme),
+        homer.def_word(the_lexeme),
+        homer.def_word(word_form=WordForm.HEADWORD),
     ],
 )
-homer.def_correspondence(template_2[2], template_2[5])
+template_2_location_space = location_space.instance_in_space(template_2)
+homer.logger.log(template_2_location_space)
+template_2_temperature_space = location_space.instance_in_space(template_2)
+homer.logger.log(template_2_temperature_space)
+template_2_slot = homer.def_chunk(
+    locations=[
+        Location([], template_2),
+        Location([0, 0], template_2_location_space),
+        Location([0], template_2_temperature_space),
+    ],
+    parent_space=template_2,
+)
+template_2_slot_location_label = homer.def_label(
+    start=template_2_slot, parent_space=template_2_location_space
+)
+template_2_slot_temperature_label = homer.def_label(
+    start=template_2_slot, parent_space=template_2_temperature_space
+)
+homer.def_correspondence(template_2_slot_location_label, template_2[2])
+homer.def_correspondence(template_2_slot_temperature_label, template_2[5])
 template_3 = homer.def_template(
     name="it is [temperature.comparative] in the [location]",
     contents=[
-        homer.def_word("it"),
-        homer.def_word("is"),
-        homer.def_template_slot(temperature_concept, form=WordForm.COMPARATIVE),
-        homer.def_word("in"),
-        homer.def_word("the"),
-        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
+        homer.def_word(it_lexeme),
+        homer.def_word(is_lexeme),
+        homer.def_word(word_form=WordForm.COMPARATIVE),
+        homer.def_word(in_lexeme),
+        homer.def_word(the_lexeme),
+        homer.def_word(word_form=WordForm.HEADWORD),
     ],
 )
-homer.def_correspondence(template_3[2], template_3[5])
+template_3_location_space = location_space.instance_in_space(template_3)
+homer.logger.log(template_3_location_space)
+template_3_temperature_space = location_space.instance_in_space(template_3)
+homer.logger.log(template_3_temperature_space)
+template_3_slot_1 = homer.def_chunk(
+    locations=[
+        Location([], template_3),
+        Location([0, 0], template_3_location_space),
+        Location([0], template_3_temperature_space),
+    ],
+    parent_space=template_3,
+)
+template_3_slot_2 = homer.def_chunk(
+    locations=[
+        Location([], template_3),
+        Location([0, 0], template_3_location_space),
+        Location([0], template_3_temperature_space),
+    ],
+    parent_space=template_3,
+)
+template_3_slot_1_location_label = homer.def_label(
+    start=template_3_slot_1, parent_space=template_3_location_space
+)
+template_3_slots_temperature_relation = homer.def_relation(
+    start=template_3_slot_1,
+    end=template_3_slot_2,
+    parent_space=template_3_temperature_space,
+)
+homer.def_correspondence(template_3_slots_temperature_relation, template_3[2])
+homer.def_correspondence(template_3_slot_1_location_label, template_3[5])
 template_4 = homer.def_template(
     name="it is [temperature.comparative] in the [location] than the [location]",
     contents=[
-        homer.def_word("it"),
-        homer.def_word("is"),
-        homer.def_template_slot(temperature_concept, form=WordForm.COMPARATIVE),
-        homer.def_word("in"),
-        homer.def_word("the"),
-        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
-        homer.def_word("than"),
-        homer.def_word("the"),
-        homer.def_template_slot(location_concept, form=WordForm.HEADWORD),
+        homer.def_word(it_lexeme),
+        homer.def_word(is_lexeme),
+        homer.def_word(word_form=WordForm.COMPARATIVE),
+        homer.def_word(in_lexeme),
+        homer.def_word(the_lexeme),
+        homer.def_word(word_form=WordForm.HEADWORD),
+        homer.def_word(than_lexeme),
+        homer.def_word(the_lexeme),
+        homer.def_word(word_form=WordForm.HEADWORD),
     ],
 )
+template_4_location_space = location_space.instance_in_space(template_4)
+homer.logger.log(template_4_location_space)
+template_4_temperature_space = location_space.instance_in_space(template_4)
+homer.logger.log(template_4_temperature_space)
+template_4_slot_1 = homer.def_chunk(
+    locations=[
+        Location([], template_4),
+        Location([0, 0], template_4_location_space),
+        Location([0], template_4_temperature_space),
+    ],
+    parent_space=template_4,
+)
+template_4_slot_2 = homer.def_chunk(
+    locations=[
+        Location([], template_4),
+        Location([0, 0], template_4_location_space),
+        Location([0], template_4_temperature_space),
+    ],
+    parent_space=template_4,
+)
+template_4_slot_1_location_label = homer.def_label(
+    start=template_4_slot_1, parent_space=template_4_location_space
+)
+template_4_slot_2_location_label = homer.def_label(
+    start=template_4_slot_2, parent_space=template_4_location_space
+)
+template_4_slots_temperature_relation = homer.def_relation(
+    start=template_4_slot_1,
+    end=template_4_slot_2,
+    parent_space=template_4_temperature_space,
+)
+homer.def_correspondence(template_4_slots_temperature_relation, template_2[2])
+homer.def_correspondence(template_4_slot_1_location_label, template_4[5])
+homer.def_correspondence(template_4_slot_2_location_label, template_4[8])
 
 input_chunks = StructureCollection()
 for i, row in enumerate(problem):

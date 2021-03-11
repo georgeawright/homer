@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, Mock
 
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Lexeme
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Lexeme
 
 
 def test_unlinkedness():
@@ -48,9 +48,11 @@ def test_correspondences_returns_correspondences():
             Mock(),
             Mock(),
             Mock(),
+            Mock(),
         )
         links_out.add(correspondence)
         correspondence = Correspondence(
+            Mock(),
             Mock(),
             Mock(),
             Mock(),
@@ -153,50 +155,54 @@ def test_correspondences_to_space():
     correspondence_1 = Correspondence(
         Mock(),
         Mock(),
-        structure,
-        Mock(),
-        Mock(),
-        Mock(),
-        space,
-        None,
-        Mock(),
-        Mock(),
+        start=structure,
+        end=Mock(),
+        start_space=Mock(),
+        end_space=space,
+        locations=Mock(),
+        parent_concept=None,
+        conceptual_space=Mock(),
+        parent_view=Mock(),
+        quality=Mock(),
     )
     correspondence_2 = Correspondence(
         Mock(),
         Mock(),
-        structure,
-        Mock(),
-        Mock(),
-        Mock(),
-        space,
-        Mock(),
-        Mock(),
-        Mock(),
+        start=structure,
+        end=Mock(),
+        start_space=Mock(),
+        end_space=space,
+        locations=Mock(),
+        parent_concept=Mock(),
+        conceptual_space=Mock(),
+        parent_view=Mock(),
+        quality=Mock(),
     )
     correspondence_3 = Correspondence(
         Mock(),
         Mock(),
-        structure,
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        None,
-        Mock(),
-        Mock(),
+        start=structure,
+        end=Mock(),
+        start_space=Mock(),
+        end_space=Mock(),
+        locations=Mock(),
+        parent_concept=None,
+        conceptual_space=Mock(),
+        parent_view=Mock(),
+        quality=Mock(),
     )
     correspondence_4 = Correspondence(
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
+        start=Mock(),
+        end=Mock(),
+        start_space=Mock(),
+        end_space=Mock(),
+        locations=Mock(),
+        parent_concept=Mock(),
+        conceptual_space=Mock(),
+        parent_view=Mock(),
+        quality=Mock(),
     )
     structure.links_out.add(correspondence_1)
     structure.links_out.add(correspondence_2)
@@ -253,6 +259,7 @@ def test_spread_activations():
         Mock(),
         Mock(),
         correspondence_end,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

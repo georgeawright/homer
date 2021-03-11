@@ -6,15 +6,13 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 from homer.id import ID
 from homer.location import Location
-from homer.structure import Structure
 from homer.structure_collection import StructureCollection
+from homer.structures import Link, Node, Space
 
 from .chunk import Chunk
-from .link import Link
-from .space import Space
 
 
-class Concept(Structure):
+class Concept(Node):
 
     DISTANCE_TO_PROXIMITY_WEIGHT = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT
 
@@ -34,12 +32,14 @@ class Concept(Structure):
         depth: int = 1,
     ):
         quality = None
-        Structure.__init__(
+        Node.__init__(
             self,
             structure_id,
             parent_id,
-            [location],
-            quality,
+            value=location.coordinates,
+            locations=[location],
+            parent_space=location.space,
+            quality=quality,
             links_in=links_in,
             links_out=links_out,
         )
@@ -88,14 +88,10 @@ class Concept(Structure):
     def prototype(self) -> list:
         return self.location.coordinates
 
-    @property
-    def parent_space(self) -> Space:
-        return self.location.space
-
     def is_compatible_with(self, other: Concept) -> bool:
         return self.instance_type == other.instance_type
 
-    def distance_from(self, other: Structure):
+    def distance_from(self, other: Node):
         other_value = (
             other.prototype
             if isinstance(other, Concept)
@@ -103,10 +99,10 @@ class Concept(Structure):
         )
         return self.distance_function(self.prototype, other_value)
 
-    def proximity_to(self, other: Structure):
+    def proximity_to(self, other: Node):
         return self._distance_to_proximity(self.distance_from(other))
 
-    def distance_between(self, a: Structure, b: Structure):
+    def distance_between(self, a: Node, b: Node):
         a_value = (
             a.prototype if isinstance(a, Concept) else getattr(a, self.relevant_value)
         )
@@ -115,7 +111,7 @@ class Concept(Structure):
         )
         return self.distance_function(a_value, b_value)
 
-    def proximity_between(self, a: Structure, b: Structure):
+    def proximity_between(self, a: Node, b: Node):
         return self._distance_to_proximity(self.distance_between(a, b))
 
     def _distance_to_proximity(self, value: float) -> float:

@@ -7,8 +7,8 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors import ChunkSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
 from homer.structures.links import Relation
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import WorkingSpace
 
 
@@ -33,7 +33,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "chunk",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -46,7 +46,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "select",
-        None,
+        Mock(),
         None,
         None,
         None,

@@ -1,44 +1,64 @@
 from __future__ import annotations
+from typing import Union
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Lexeme, Space
+from homer.structures import Node, Space
+from homer.word_form import WordForm
+
+from .lexeme import Lexeme
 
 
-class Word(Chunk):
+class Word(Node):
     def __init__(
         self,
         structure_id: str,
         parent_id: str,
-        value: str,
-        lexeme: Lexeme,
+        lexeme: Union[Lexeme, None],
+        word_form: WordForm,
         location: Location,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
-        members: StructureCollection = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        Chunk.__init__(
+        value = lexeme.forms[word_form] if lexeme is not None else None
+        Node.__init__(
             self,
             structure_id,
             parent_id,
-            value,
-            [location],
-            members,
-            parent_space,
-            quality,
+            value=value,
+            locations=[location],
+            parent_space=parent_space,
+            quality=quality,
             links_in=links_in,
             links_out=links_out,
         )
         self.lexeme = lexeme
+        self.word_form = word_form
+
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders import WordBuilder
+
+        return WordBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from homer.codelets.evaluators import WordEvaluator
+
+        return WordEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from homer.codelets.selectors import WordSelector
+
+        return WordSelector
 
     @property
     def concepts(self):
-        from .slot import Slot
-
         return self.lexeme.concepts if self.lexeme is not None else None
 
     def copy(

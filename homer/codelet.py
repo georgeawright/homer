@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from .codelet_result import CodeletResult
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -17,6 +17,9 @@ class Codelet(ABC):
         self.child_codelets = []
         self.result = None
 
-    @abstractmethod
+    @classmethod
+    def get_target_class(cls):
+        raise NotImplementedError
+
     def run(self) -> CodeletResult:
-        pass
+        raise NotImplementedError

@@ -3,8 +3,7 @@ from homer.structures import Space
 
 
 class DifferenceClassifier(Classifier):
-    from homer.structures import Chunk
-    from homer.structures import Concept
+    from homer.structures.nodes import Chunk, Concept
 
     def __init__(
         self,

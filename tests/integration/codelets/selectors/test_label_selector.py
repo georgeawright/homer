@@ -7,8 +7,8 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors import LabelSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
 from homer.structures.links import Label, Relation
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
@@ -33,7 +33,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "label",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -47,7 +47,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "select",
-        None,
+        Mock(),
         None,
         None,
         None,

@@ -8,30 +8,30 @@ from homer.codelets.builders import (
     CorrespondenceBuilder,
     LabelBuilder,
     RelationBuilder,
-    ViewBuilder,
     WordBuilder,
 )
+from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators import (
     ChunkEvaluator,
     CorrespondenceEvaluator,
     LabelEvaluator,
     RelationEvaluator,
-    ViewEvaluator,
     WordEvaluator,
 )
+from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.codelets.selectors import (
     ChunkSelector,
     CorrespondenceSelector,
     LabelSelector,
     RelationSelector,
-    ViewSelector,
     WordSelector,
 )
+from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept
+from homer.structures.nodes import Concept
 
 
 class FactoryCodelet(Codelet):
@@ -101,7 +101,7 @@ class FactoryCodelet(Codelet):
                 "label": LabelBuilder,
                 "relation": RelationBuilder,
                 "correspondence": CorrespondenceBuilder,
-                "view": ViewBuilder,
+                "view": SimplexViewBuilder,
                 "word": WordBuilder,
             },
             "evaluate": {
@@ -109,7 +109,7 @@ class FactoryCodelet(Codelet):
                 "label": LabelEvaluator,
                 "relation": RelationEvaluator,
                 "correspondence": CorrespondenceEvaluator,
-                "view": ViewEvaluator,
+                "view": SimplexViewEvaluator,
                 "word": WordEvaluator,
             },
             "select": {
@@ -117,7 +117,7 @@ class FactoryCodelet(Codelet):
                 "label": LabelSelector,
                 "relation": RelationSelector,
                 "correspondence": CorrespondenceSelector,
-                "view": ViewSelector,
+                "view": SimplexViewSelector,
                 "word": WordSelector,
             },
         }[action_type.name][structure_type.name]

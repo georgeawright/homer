@@ -9,9 +9,8 @@ from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.codelets.selectors import CorrespondenceSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
-from homer.structures.chunks import Word
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Chunk, Concept, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
 
@@ -34,14 +33,22 @@ def bubble_chamber():
         Mock(),
     )
     text_concept = Concept(
-        Mock(), Mock(), "text", None, None, None, "value", StructureCollection(), None
+        Mock(),
+        Mock(),
+        "text",
+        Mock(),
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
     )
     chamber.concepts.add(text_concept)
     correspondence_concept = Concept(
         Mock(),
         Mock(),
         "correspondence",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -53,7 +60,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "evaluate",
-        None,
+        Mock(),
         None,
         None,
         "value",
@@ -143,7 +150,13 @@ def warm_concept():
 def template(bubble_chamber):
     parent_concept = bubble_chamber.concepts["text"]
     template = Template(
-        Mock(), Mock(), "mock template", parent_concept, [], StructureCollection()
+        Mock(),
+        Mock(),
+        "mock template",
+        parent_concept,
+        Mock(),
+        [],
+        StructureCollection(),
     )
     return template
 
@@ -154,7 +167,7 @@ def same_concept(temperature_conceptual_space):
         Mock(),
         Mock(),
         "same",
-        None,
+        Mock(),
         SamenessClassifier(),
         temperature_conceptual_space,
         "value",
@@ -175,18 +188,18 @@ def good_correspondence(
 ):
     start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.7)
     end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
-    parent_space = bubble_chamber.get_super_space(temperature_working_space, template)
     quality = 0.0
     correspondence = Correspondence(
         Mock(),
         Mock(),
         start,
         end,
-        Location([], parent_space),
         temperature_working_space,
         template,
+        [Mock(), Mock()],
         same_concept,
         temperature_conceptual_space,
+        Mock(),
         quality,
     )
     return correspondence
@@ -203,18 +216,18 @@ def bad_correspondence(
 ):
     start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.0)
     end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
-    parent_space = bubble_chamber.get_super_space(temperature_working_space, template)
     quality = 1.0
     correspondence = Correspondence(
         Mock(),
         Mock(),
         start,
         end,
-        Location([], parent_space),
         temperature_working_space,
         template,
+        [Mock(), Mock()],
         same_concept,
         temperature_conceptual_space,
+        Mock(),
         quality,
     )
     return correspondence

@@ -7,8 +7,8 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors import CorrespondenceSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
 from homer.structures.links import Correspondence, Relation
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
@@ -33,7 +33,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "correspondence",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -46,7 +46,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "select",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -134,6 +134,7 @@ def good_correspondence(
         end_space,
         concept,
         conceptual_space,
+        Mock(),
         1.0,
     )
     start.links_out.add(correspondence)
@@ -173,6 +174,7 @@ def bad_correspondence(
         end_space,
         concept,
         conceptual_space,
+        Mock(),
         0.0,
     )
     correspondence._activation = 1.0

@@ -7,10 +7,11 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors import WordSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept
-from homer.structures.chunks import View, Word
+from homer.structures import View
 from homer.structures.links import Relation
+from homer.structures.nodes import Concept, Lexeme, Word
 from homer.structures.spaces import WorkingSpace
+from homer.word_form import WordForm
 
 
 @pytest.fixture
@@ -34,7 +35,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "word",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -48,7 +49,7 @@ def bubble_chamber():
         Mock(),
         Mock(),
         "select",
-        None,
+        Mock(),
         None,
         None,
         None,
@@ -73,13 +74,15 @@ def view(bubble_chamber):
 
 @pytest.fixture
 def good_word(view):
-    word = Word(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1.0)
+    lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"})
+    word = Word(Mock(), Mock(), lexeme, WordForm.HEADWORD, Mock(), Mock(), 1.0)
     return word
 
 
 @pytest.fixture
 def bad_word(view):
-    word = Word(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 0.0)
+    lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"})
+    word = Word(Mock(), Mock(), lexeme, WordForm.HEADWORD, Mock(), Mock(), 0.0)
     return word
 
 

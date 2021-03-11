@@ -14,10 +14,9 @@ from .loggers import DjangoLogger
 from .problem import Problem
 from .structure import Structure
 from .structure_collection import StructureCollection
-from .structures import Concept, Lexeme, Space
-from .structures.chunks import Word
-from .structures.chunks.slots import TemplateSlot
-from .structures.links import Correspondence, Relation
+from .structures import Space, View
+from .structures.links import Correspondence, Label, Relation
+from .structures.nodes import Chunk, Concept, Lexeme, Word
 from .structures.spaces import ConceptualSpace, WorkingSpace
 from .structures.spaces.frames import Template
 from .word_form import WordForm
@@ -236,22 +235,27 @@ class Homer:
         )
         self.logger.log(lexeme)
         self.bubble_chamber.lexemes.add(lexeme)
-        link_to_concept = self.def_concept_link(parent_concept, lexeme, activation=1.0)
-        parent_concept.links_out.add(link_to_concept)
-        lexeme.links_in.add(link_to_concept)
+        if parent_concept is not None:
+            link_to_concept = self.def_concept_link(
+                parent_concept, lexeme, activation=1.0
+            )
+            parent_concept.links_out.add(link_to_concept)
+            lexeme.links_in.add(link_to_concept)
         return lexeme
 
     def def_template(
         self,
         name: str = "",
         parent_concept: Concept = None,
-        contents: List[Union[Word, TemplateSlot]] = None,
+        conceptual_space: ConceptualSpace = None,
+        contents: List[Word] = None,
     ) -> Template:
         template = Template(
             structure_id=ID.new(Template),
             parent_id="",
             name=name,
             parent_concept=parent_concept,
+            conceptual_space=conceptual_space,
             locations=[Location([], self.bubble_chamber.spaces["templates"])],
             contents=StructureCollection(),
         )
@@ -261,54 +265,23 @@ class Homer:
             item.locations = [Location([i], template)]
             template.contents.add(item)
             self.logger.log(item)
-            if isinstance(item, TemplateSlot):
-                try:
-                    working_space = (
-                        template.contents.of_type(WorkingSpace)
-                        .where(parent_concept=item.value)
-                        .get_random()
-                    )
-                except MissingStructureError:
-                    conceptual_space = self.bubble_chamber.conceptual_spaces[
-                        item.value.name
-                    ]
-                    working_space = conceptual_space.instance_in_space(template)
-                    self.logger.log(working_space)
-                    template.add(working_space)
-                filler_coordinates = [0 for _ in conceptual_space.dimensions]
-                item.locations.append(Location(filler_coordinates, working_space))
-                working_space.add(item)
-                self.logger.log(item)
-                self.def_concept_link(item.value, item, activation=1.0, stable=True)
         self.bubble_chamber.conceptual_spaces.add(template)
         self.bubble_chamber.frames.add(template)
         return template
 
-    def def_template_slot(self, concept: Concept = None, form: WordForm = None):
-        slot = TemplateSlot(
-            structure_id=ID.new(TemplateSlot),
-            parent_id="",
-            parent_space=None,
-            prototype=concept,
-            form=form,
-            locations=[],
-        )
-        self.bubble_chamber.slots.add(slot)
-        return slot
-
     def def_word(
         self,
-        value: str = "",
         lexeme: Lexeme = None,
+        word_form: WordForm = WordForm.HEADWORD,
         quality: FloatBetweenOneAndZero = 1.0,
     ):
         word = Word(
             structure_id=ID.new(Word),
             parent_id="",
-            parent_space=None,
-            value=value,
             lexeme=lexeme,
+            word_form=word_form,
             location=None,
+            parent_space=None,
             quality=quality,
         )
         return word
@@ -356,17 +329,22 @@ class Homer:
         self,
         start: Structure,
         end: Structure,
-        location: Location = None,
         start_space: Space = None,
         end_space: Space = None,
+        locations: List[Location] = None,
         parent_concept: Concept = None,
         conceptual_space: ConceptualSpace = None,
+        parent_view: View = None,
         is_privileged: bool = True,
         stable: bool = True,
     ) -> Correspondence:
         start_space = start.location.space if start_space is None else start_space
         end_space = end.location.space if end_space is None else end_space
-        location = start.location if location is None else location
+        locations = (
+            [start.location_in_space(start_space), end.location_in_space(end_space)]
+            if locations is None
+            else locations
+        )
         parent_concept = (
             self.bubble_chamber.concepts["same"]
             if parent_concept is None
@@ -382,11 +360,12 @@ class Homer:
             parent_id="",
             start=start,
             end=end,
-            location=location,
             start_space=start_space,
             end_space=end_space,
+            locations=locations,
             parent_concept=parent_concept,
             conceptual_space=conceptual_space,
+            parent_view=parent_view,
             quality=1,
             is_privileged=is_privileged,
         )
@@ -397,5 +376,77 @@ class Homer:
         end.links_out.add(correspondence)
         end.links_in.add(correspondence)
         self.logger.log(correspondence)
-        location.space.add(correspondence)
+        for location in locations:
+            location.space.add(correspondence)
         return correspondence
+
+    def def_chunk(
+        self,
+        value: Any = None,
+        locations: List[Location] = None,
+        members: StructureCollection = None,
+        parent_space: WorkingSpace = None,
+        quality: FloatBetweenOneAndZero = 1,
+    ):
+        locations = locations if locations is not None else []
+        members = members if members is not None else StructureCollection()
+        chunk = Chunk(
+            ID.new(Chunk),
+            "",
+            value=value,
+            locations=locations,
+            members=members,
+            parent_space=parent_space,
+            quality=quality,
+        )
+        for location in locations:
+            location.space.add(chunk)
+        if not chunk.is_slot:
+            self.bubble_chamber.chunks.add(chunk)
+        self.logger.log(chunk)
+        return chunk
+
+    def def_label(
+        self,
+        start: Structure = None,
+        parent_concept: Concept = None,
+        parent_space: WorkingSpace = None,
+        quality: FloatBetweenOneAndZero = 1,
+    ):
+        label = Label(
+            ID.new(Label),
+            "",
+            start=start,
+            parent_concept=parent_concept,
+            parent_space=parent_space,
+            quality=quality,
+        )
+        start.links_out.add(label)
+        if not label.is_slot:
+            self.bubble_chamber.labels.add(label)
+        self.logger.log(label)
+        return label
+
+    def def_relation(
+        self,
+        start: Structure = None,
+        end: Structure = None,
+        parent_concept: Concept = None,
+        parent_space: Space = None,
+        quality: FloatBetweenOneAndZero = 1,
+    ):
+        relation = Relation(
+            ID.new(Relation),
+            "",
+            start=start,
+            end=end,
+            parent_concept=parent_concept,
+            parent_space=parent_space,
+            quality=quality,
+        )
+        start.links_out.add(relation)
+        start.links_in.add(relation)
+        if not relation.is_slot:
+            self.bubble_chamber.relations.add(relation)
+        self.logger.log(relation)
+        return relation

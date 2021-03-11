@@ -8,6 +8,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
+from homer.structures.nodes import Chunk
 
 
 class ChunkEvaluator(Evaluator):
@@ -23,6 +24,10 @@ class ChunkEvaluator(Evaluator):
             self, codelet_id, parent_id, bubble_chamber, target_structure, urgency
         )
         self.original_confidence = self.target_structure.quality
+
+    @classmethod
+    def get_target_class(cls):
+        return Chunk
 
     @classmethod
     def spawn(
@@ -55,13 +60,3 @@ class ChunkEvaluator(Evaluator):
         ]
         self.confidence = statistics.fmean(proximities) if proximities != [] else 0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-
-    def _engender_follow_up(self):
-        self.child_codelets.append(
-            ChunkSelector.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_structure,
-                self.change_in_confidence,
-            )
-        )

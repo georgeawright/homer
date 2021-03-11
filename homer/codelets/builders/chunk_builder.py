@@ -9,8 +9,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Space
-from homer.structures.chunks import View
+from homer.structures import Space, View
+from homer.structures.nodes import Chunk
 from homer.tools import average_vector, project_item_into_space
 
 
@@ -27,6 +27,10 @@ class ChunkBuilder(Builder):
         self.target_chunk = target_chunk
         self.second_target_chunk = None
         self.child_structure = None
+
+    @classmethod
+    def get_target_class(cls):
+        return Chunk
 
     @classmethod
     def spawn(
@@ -191,18 +195,6 @@ class ChunkBuilder(Builder):
             for _ in range(chunk.size):
                 locations.append(chunk.location)
         return Location.average(locations)
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import ChunkEvaluator
-
-        self.child_codelets.append(
-            ChunkEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
 
     def _fizzle(self):
         self.child_codelets.append(

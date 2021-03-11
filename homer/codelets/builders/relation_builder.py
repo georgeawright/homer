@@ -5,8 +5,9 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept, Space
+from homer.structures import Space
 from homer.structures.links import Relation
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace
 
 from .chunk_builder import ChunkBuilder
@@ -30,6 +31,10 @@ class RelationBuilder(Builder):
         self.target_structure_two = target_structure_two
         self.parent_concept = parent_concept
         self.child_structure = None
+
+    @classmethod
+    def get_target_class(cls):
+        return Relation
 
     @classmethod
     def spawn(
@@ -128,18 +133,6 @@ class RelationBuilder(Builder):
         self.bubble_chamber.relations.add(relation)
         self.child_structure = relation
         self.bubble_chamber.logger.log(relation)
-
-    def _engender_follow_up(self):
-        from homer.codelets.evaluators import RelationEvaluator
-
-        self.child_codelets.append(
-            RelationEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
-            )
-        )
 
     def _fizzle(self):
         self.child_codelets.append(

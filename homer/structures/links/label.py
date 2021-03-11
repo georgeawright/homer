@@ -4,7 +4,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Concept, Link, Space
+from homer.structures import Link, Space
+from homer.structures.nodes import Concept
 
 
 class Label(Link):
@@ -24,12 +25,38 @@ class Label(Link):
             parent_id,
             start,
             end,
-            start.location_in_space(parent_space) if parent_space is not None else None,
+            [
+                start.location_in_space(parent_space)
+                if parent_space is not None
+                else None
+            ],
             parent_concept,
             quality,
             links_in=None,
             links_out=None,
         )
+
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders import LabelBuilder
+
+        return LabelBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from homer.codelets.evaluators import LabelEvaluator
+
+        return LabelEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from homer.codelets.selectors import LabelSelector
+
+        return LabelSelector
+
+    @property
+    def is_slot(self) -> bool:
+        return self.parent_concept is None
 
     def copy(
         self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""

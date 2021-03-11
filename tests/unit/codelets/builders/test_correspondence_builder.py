@@ -88,6 +88,7 @@ def target_space_two(bubble_chamber, target_space_one):
 @pytest.fixture
 def target_structure_one(bubble_chamber, label_concept_working_space):
     structure = Mock()
+    structure.is_slot = False
     structure.correspondences = StructureCollection()
     structure.has_correspondence.return_value = False
     structure.parent_spaces = StructureCollection({label_concept_working_space})
@@ -97,6 +98,7 @@ def target_structure_one(bubble_chamber, label_concept_working_space):
 @pytest.fixture
 def target_structure_two(label_concept_working_space, target_space_two):
     structure = Mock()
+    structure.is_slot = True
     structure.correspondences = StructureCollection()
     structure.name = "target_structure_two"
     structure.parent_spaces = StructureCollection({label_concept_working_space})
@@ -104,84 +106,102 @@ def target_structure_two(label_concept_working_space, target_space_two):
     return structure
 
 
+@pytest.fixture
+def existing_correspondence():
+    correspondence = Mock()
+    correspondence.is_compatible_with.return_value = True
+    return correspondence
+
+
+@pytest.fixture
+def target_view(existing_correspondence):
+    view = Mock()
+    view.has_member.return_value = False
+    view.members = StructureCollection({existing_correspondence})
+    view.slot_values = {}
+    return view
+
+
 def test_gets_second_target_space_and_structure_if_needed(
     bubble_chamber,
+    target_view,
     target_structure_one,
     same_concept,
     target_space_two,
     target_structure_two,
 ):
-    with patch.object(Location, "for_correspondence_between", return_value=Mock()):
-        correspondence_builder = CorrespondenceBuilder(
-            Mock(),
-            Mock(),
-            bubble_chamber,
-            Mock(),
-            target_structure_one,
-            Mock(),
-            parent_concept=same_concept,
-        )
-        assert correspondence_builder.target_space_two is None
-        assert correspondence_builder.target_structure_two is None
-        correspondence_builder.run()
-        assert correspondence_builder.target_space_two == target_space_two
-        assert correspondence_builder.target_structure_two == target_structure_two
+    correspondence_builder = CorrespondenceBuilder(
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        target_view,
+        Mock(),
+        target_structure_one,
+        Mock(),
+        parent_concept=same_concept,
+    )
+    assert correspondence_builder.target_space_two is None
+    assert correspondence_builder.target_structure_two is None
+    correspondence_builder.run()
+    assert correspondence_builder.target_space_two == target_space_two
+    assert correspondence_builder.target_structure_two == target_structure_two
 
 
 def test_gets_parent_concept_if_needed(
     bubble_chamber,
+    target_view,
     target_space_one,
     target_structure_one,
     target_space_two,
     target_structure_two,
 ):
-    with patch.object(Location, "for_correspondence_between", return_value=Mock()):
-        correspondence_builder = CorrespondenceBuilder(
-            Mock(),
-            Mock(),
-            bubble_chamber,
-            target_space_one,
-            target_structure_one,
-            Mock(),
-            target_space_two=target_space_two,
-            target_structure_two=target_structure_two,
-        )
-        assert correspondence_builder.parent_concept is None
-        correspondence_builder.run()
-        assert correspondence_builder.parent_concept is not None
+    correspondence_builder = CorrespondenceBuilder(
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        target_view,
+        target_space_one,
+        target_structure_one,
+        Mock(),
+        target_space_two=target_space_two,
+        target_structure_two=target_structure_two,
+    )
+    assert correspondence_builder.parent_concept is None
+    correspondence_builder.run()
+    assert correspondence_builder.parent_concept is not None
 
 
 def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber,
+    target_view,
     target_space_one,
     target_structure_one,
     same_concept,
     target_space_two,
     target_structure_two,
 ):
-    with patch.object(Location, "for_correspondence_between", return_value=Mock()):
-        correspondence_builder = CorrespondenceBuilder(
-            Mock(),
-            Mock(),
-            bubble_chamber,
-            target_space_one,
-            target_structure_one,
-            Mock(),
-            target_space_two=target_space_two,
-            target_structure_two=target_structure_two,
-            parent_concept=same_concept,
-        )
-        result = correspondence_builder.run()
-        assert CodeletResult.SUCCESS == result
-        assert isinstance(correspondence_builder.child_structure, Correspondence)
-        assert len(correspondence_builder.child_codelets) == 1
-        assert isinstance(
-            correspondence_builder.child_codelets[0], CorrespondenceEvaluator
-        )
+    correspondence_builder = CorrespondenceBuilder(
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        target_view,
+        target_space_one,
+        target_structure_one,
+        Mock(),
+        target_space_two=target_space_two,
+        target_structure_two=target_structure_two,
+        parent_concept=same_concept,
+    )
+    result = correspondence_builder.run()
+    assert CodeletResult.SUCCESS == result
+    assert isinstance(correspondence_builder.child_structure, Correspondence)
+    assert len(correspondence_builder.child_codelets) == 1
+    assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceEvaluator)
 
 
 def test_fails_when_structures_do_not_correspond(
     bubble_chamber,
+    target_view,
     target_space_one,
     target_structure_one,
     target_space_two,
@@ -193,6 +213,7 @@ def test_fails_when_structures_do_not_correspond(
         Mock(),
         Mock(),
         bubble_chamber,
+        target_view,
         target_space_one,
         target_structure_one,
         Mock(),
@@ -209,6 +230,7 @@ def test_fails_when_structures_do_not_correspond(
 
 def test_fizzles_when_correspondence_already_exists(
     bubble_chamber,
+    target_view,
     target_structure_one,
     target_space_two,
     target_structure_two,
@@ -219,6 +241,7 @@ def test_fizzles_when_correspondence_already_exists(
         Mock(),
         Mock(),
         bubble_chamber,
+        target_view,
         Mock(),
         target_structure_one,
         Mock(),

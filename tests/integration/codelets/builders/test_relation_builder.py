@@ -10,8 +10,8 @@ from homer.codelets.builders import RelationBuilder
 from homer.codelets.evaluators import RelationEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept
 from homer.structures.links import Relation
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 

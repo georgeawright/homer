@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 from homer.structure_collection import StructureCollection
-from homer.structures.chunks import View
+from homer.structures import View
 
 
 def test_copy():

@@ -1,19 +1,15 @@
 from __future__ import annotations
 from math import prod
-import statistics
 from typing import Any, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
-from homer.structure import Structure
 from homer.structure_collection import StructureCollection
+from homer.structures import Link, Node, Space
 from homer.tools import average_vector
 
-from .link import Link
-from .space import Space
 
-
-class Chunk(Structure):
+class Chunk(Node):
     def __init__(
         self,
         structure_id: str,
@@ -27,23 +23,41 @@ class Chunk(Structure):
         links_out: StructureCollection = None,
         chunks_made_from_this_chunk: StructureCollection = None,
     ):
-        Structure.__init__(
+        Node.__init__(
             self,
             structure_id,
             parent_id,
-            locations,
-            quality,
+            value=value,
+            locations=locations,
+            parent_space=parent_space,
+            quality=quality,
             links_in=links_in,
             links_out=links_out,
         )
-        self.value = value
         self.members = members
-        self.parent_space = parent_space
         self.chunks_made_from_this_chunk = (
             chunks_made_from_this_chunk
             if chunks_made_from_this_chunk is not None
             else StructureCollection()
         )
+
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders import ChunkBuilder
+
+        return ChunkBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from homer.codelets.evaluators import ChunkEvaluator
+
+        return ChunkEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from homer.codelets.selectors import ChunkSelector
+
+        return ChunkSelector
 
     @property
     def size(self):
@@ -58,15 +72,3 @@ class Chunk(Structure):
         return 0.5 * prod(
             [chunk.unchunkedness for chunk in self.chunks_made_from_this_chunk]
         )
-
-    def nearby(self, space: Space = None):
-        if space is not None:
-            return StructureCollection.difference(
-                space.contents.near(self.location_in_space(space)).of_type(type(self)),
-                StructureCollection({self}),
-            )
-        nearby_chunks = StructureCollection.union(
-            *[location.space.contents.near(location) for location in self.locations]
-        ).of_type(type(self))
-        nearby_chunks.remove(self)
-        return nearby_chunks

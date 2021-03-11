@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 from homer.classifiers import SamenessClassifier
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Chunk
 
 
 def test_classify_labels_with_same_concept():
@@ -72,6 +72,7 @@ def test_classify_chunks_with_same_labels():
         Mock(),
         Mock(),
         sameness_concept,
+        Mock(),
         Mock(),
         1.0,
     )
@@ -144,6 +145,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         sameness_concept,
         Mock(),
+        Mock(),
         1.0,
     )
     start_relation_start_label.links_in.add(start_correspondence)
@@ -199,6 +201,7 @@ def test_classify_relations_with_same_arguments():
         Mock(),
         Mock(),
         sameness_concept,
+        Mock(),
         Mock(),
         1.0,
     )

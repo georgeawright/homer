@@ -1,4 +1,3 @@
-from abc import abstractmethod, abstractproperty
 import random
 
 from homer.bubble_chamber import BubbleChamber
@@ -23,6 +22,10 @@ class Selector(Codelet):
         self.loser = None
         self.confidence = 0.0
         self.follow_up_urgency = 0.0
+
+    @classmethod
+    def spawn(cls):
+        raise NotImplementedError
 
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
@@ -76,9 +79,9 @@ class Selector(Codelet):
     def _select_concept(self):
         return self.bubble_chamber.concepts["select"]
 
-    @abstractproperty
+    @property
     def _structure_concept(self):
-        pass
+        raise NotImplementedError
 
     def _boost_activations(self):
         self._select_concept.boost_activation(self.confidence)
@@ -97,14 +100,11 @@ class Selector(Codelet):
     def _boost_champion(self):
         self.champion.boost_activation(self.confidence)
 
-    @abstractmethod
     def _passes_preliminary_checks(self):
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def _fizzle(self):
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def _engender_follow_up(self):
-        pass
+        raise NotImplementedError

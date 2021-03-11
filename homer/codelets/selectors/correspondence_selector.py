@@ -78,6 +78,7 @@ class CorrespondenceSelector(Selector):
             CorrespondenceBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
+                self.winner.parent_view,
                 new_target_space,
                 self.winner.start,
                 self.winner.start.unlinkedness,

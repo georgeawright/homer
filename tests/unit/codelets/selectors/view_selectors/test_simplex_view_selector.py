@@ -3,8 +3,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ViewBuilder
-from homer.codelets.selectors import ViewSelector
+from homer.codelets.builders.view_builders import SimplexViewBuilder
+from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
@@ -13,6 +13,7 @@ from homer.tools import hasinstance
 def bubble_chamber():
     chamber = Mock()
     chamber.concepts = {"view": Mock(), "select": Mock()}
+    chamber.spaces = {"input": Mock()}
     return chamber
 
 
@@ -29,7 +30,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     challenger.quality = 1.0
     challenger.activation = 1.0
     champion.nearby.return_value = StructureCollection({challenger})
-    selector = ViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
+    selector = SimplexViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     assert selector.challenger is None
     selector.run()
     assert selector.challenger == challenger
@@ -64,7 +65,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.size = 1
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
-        selector = ViewSelector(
+        selector = SimplexViewSelector(
             Mock(), Mock(), bubble_chamber, champion, Mock(), challenger=challenger
         )
         selector.run()
@@ -76,8 +77,8 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 2 == len(selector.child_codelets)
-        assert hasinstance(selector.child_codelets, ViewBuilder)
-        assert hasinstance(selector.child_codelets, ViewSelector)
+        assert hasinstance(selector.child_codelets, SimplexViewBuilder)
+        assert hasinstance(selector.child_codelets, SimplexViewSelector)
 
 
 def test_spawns_builder_when_fizzling(bubble_chamber):
@@ -87,8 +88,8 @@ def test_spawns_builder_when_fizzling(bubble_chamber):
     challenger.size = 1
     challenger.members = StructureCollection()
     champion.nearby.return_value = StructureCollection({challenger})
-    selector = ViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
+    selector = SimplexViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
     selector.run()
     assert CodeletResult.FIZZLE == selector.result
     assert 1 == len(selector.child_codelets)
-    assert isinstance(selector.child_codelets[0], ViewBuilder)
+    assert isinstance(selector.child_codelets[0], SimplexViewBuilder)

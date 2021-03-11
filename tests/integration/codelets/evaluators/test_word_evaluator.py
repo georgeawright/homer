@@ -8,9 +8,8 @@ from homer.codelets.evaluators import WordEvaluator
 from homer.codelets.selectors import WordSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Chunk, Concept, Lexeme
-from homer.structures.chunks import Word
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.word_form import WordForm
 
@@ -135,7 +134,7 @@ def warm_concept(bubble_chamber, temperature_conceptual_space):
 
 @pytest.fixture
 def warm_lexeme(warm_concept):
-    lexeme = Lexeme(Mock(), Mock(), "warm", {WordForm.HEADWORD})
+    lexeme = Lexeme(Mock(), Mock(), "warm", {WordForm.HEADWORD: "warm"})
     link = Relation(Mock(), Mock(), warm_concept, lexeme, None, None, 0)
     warm_concept.links_out.add(link)
     lexeme.links_in.add(link)
@@ -164,8 +163,8 @@ def good_word(bubble_chamber, warm_lexeme, output_space, good_word_correspondee)
     word = Word(
         Mock(),
         Mock(),
-        "warm",
         warm_lexeme,
+        WordForm.HEADWORD,
         Location([0], output_space),
         output_space,
         0,
@@ -177,6 +176,7 @@ def good_word(bubble_chamber, warm_lexeme, output_space, good_word_correspondee)
         Mock(),
         good_word_correspondee,
         word,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -213,8 +213,8 @@ def bad_word(bubble_chamber, warm_lexeme, output_space, bad_word_correspondee):
     word = Word(
         Mock(),
         Mock(),
-        "warm",
         warm_lexeme,
+        WordForm.HEADWORD,
         Location([0], output_space),
         output_space,
         1,
@@ -226,6 +226,7 @@ def bad_word(bubble_chamber, warm_lexeme, output_space, bad_word_correspondee):
         Mock(),
         bad_word_correspondee,
         word,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
