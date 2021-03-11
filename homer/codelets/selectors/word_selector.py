@@ -49,7 +49,6 @@ class WordSelector(Selector):
         return self.bubble_chamber.concepts["word"]
 
     def _passes_preliminary_checks(self):
-        print("hello")
         return True
 
     def _fizzle(self):

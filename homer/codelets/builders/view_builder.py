@@ -61,12 +61,10 @@ class ViewBuilder(Builder):
         for view in self.bubble_chamber.views:
             if view.input_spaces == self.target_spaces:
                 return False
-        print("view doesn't exist")
         if self.frame is None:
             for space in self.target_spaces:
                 if isinstance(space, Frame):
                     self.frame = space
-        print(self.frame)
         return self.frame is not None
 
     def _calculate_confidence(self):
