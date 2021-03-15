@@ -14,11 +14,38 @@ from homer.location import Location
 )
 def test_average(sets_of_coordinates, expected_coordinates):
     locations = [
-        Location(sets_of_coordinates[i], Mock())
+        Location([sets_of_coordinates[i]], Mock())
         for i in range(len(sets_of_coordinates))
     ]
     average = Location.average(locations)
-    assert expected_coordinates == average.coordinates
+    assert [expected_coordinates] == average.coordinates
+
+
+@pytest.mark.parametrize(
+    "coordinates_one, coordinates_two, expected_coordinates",
+    [
+        ([[0]], [[1]], [[0], [1]]),
+        ([[0], [1]], [[2], [4]], [[0], [4]]),
+    ],
+)
+def test_merge(coordinates_one, coordinates_two, expected_coordinates):
+    space = Mock()
+    location_one = Location(coordinates_one, space)
+    location_two = Location(coordinates_two, space)
+    merged_location = Location.merge(location_one, location_two)
+    assert expected_coordinates == merged_location.coordinates
+
+
+@pytest.mark.parametrize(
+    "coordinates_one, coordinates_two",
+    [([[0], [1]], [[3], [4]]), ([[3], [4]], [[0], [1]])],
+)
+def test_will_not_merge_non_adjacent_locations(coordinates_one, coordinates_two):
+    space = Mock()
+    location_one = Location(coordinates_one, space)
+    location_two = Location(coordinates_two, space)
+    with pytest.raises(Exception):
+        Location.merge(location_one, location_two)
 
 
 @pytest.mark.parametrize(
