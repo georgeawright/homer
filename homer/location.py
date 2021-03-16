@@ -43,4 +43,6 @@ class Location:
     def is_near(self, other: Location) -> bool:
         if self.space != other.space:
             return False
-        return math.dist(self.coordinates, other.coordinates) <= self.NEARNESS
+        self_average_location = average_vector(self.coordinates)
+        other_average_location = average_vector(other.coordinates)
+        return math.dist(self_average_location, other_average_location) <= self.NEARNESS

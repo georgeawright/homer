@@ -30,7 +30,7 @@ def common_space():
 @pytest.fixture
 def second_target_chunk(common_space):
     location = Mock()
-    location.coordinates = [1, 1]
+    location.coordinates = [[1, 1]]
     location.space = common_space
     chunk = Mock()
     chunk.value = [20]
@@ -51,7 +51,7 @@ def second_target_chunk(common_space):
 @pytest.fixture
 def target_chunk(common_space, second_target_chunk):
     location = Mock()
-    location.coordinates = [2, 2]
+    location.coordinates = [[2, 2]]
     location.space = common_space
     chunk = Mock()
     chunk.value = [20]

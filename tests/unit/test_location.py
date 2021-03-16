@@ -61,7 +61,11 @@ def test_eq(self_coordinates, other_coordinates, expected):
 
 @pytest.mark.parametrize(
     "self_coordinates, other_coordinates, nearness, expected",
-    [([1, 1], [1, 1], 0, True), ([1, 2], [1, 1], 0, False), ([1, 2], [1, 1], 1, True)],
+    [
+        ([[1, 1]], [[1, 1]], 0, True),
+        ([[1, 2]], [[1, 1]], 0, False),
+        ([[1, 2]], [[1, 1]], 1, True),
+    ],
 )
 def test_is_near(self_coordinates, other_coordinates, nearness, expected):
     Location.NEARNESS = nearness
