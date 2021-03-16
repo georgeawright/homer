@@ -15,6 +15,7 @@ class Lexeme(Node):
         parent_id: str,
         headword: str,
         forms: Dict[WordForm, str],
+        parts_of_speech: Dict[WordForm, List[Concept]],
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -31,6 +32,7 @@ class Lexeme(Node):
         )
         self.headword = headword
         self.forms = forms
+        self.parts_of_speech = parts_of_speech
 
     @classmethod
     def new(cls, headword: str, forms: Dict[WordForm, str], parent_concept):

@@ -1,5 +1,6 @@
 from .difference_classifier import DifferenceClassifier
 from .differentness_classifier import DifferentnessClassifier
+from .part_of_speech_classifier import PartOfSpeechClassifier
 from .proximity_classifier import ProximityClassifier
 from .sameness_classifier import SamenessClassifier
 from .stretchy_proximity_classifier import StretchyProximityClassifier
