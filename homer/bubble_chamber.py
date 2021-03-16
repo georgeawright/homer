@@ -28,6 +28,7 @@ class BubbleChamber:
         views: StructureCollection,
         words: StructureCollection,
         concept_links: StructureCollection,
+        phrases: StructureCollection,
         slots: StructureCollection,
         logger: Logger,
     ):
@@ -42,19 +43,24 @@ class BubbleChamber:
         self.views = views
         self.words = words
         self.concept_links = concept_links
+        self.phrases = phrases
         self.slots = slots
         self.logger = logger
         self.log_count = 0
         self.result = None
 
     @property
-    def spaces(self):
+    def spaces(self) -> StructureCollection:
         return StructureCollection.union(
             self.conceptual_spaces, self.working_spaces, self.frames
         )
 
     @property
-    def structures(self):
+    def text_fragments(self) -> StructureCollection:
+        return StructureCollection.union(self.phrases, self.words)
+
+    @property
+    def structures(self) -> StructureCollection:
         return StructureCollection.union(
             self.conceptual_spaces,
             self.working_spaces,
