@@ -44,7 +44,7 @@ class Concept(Node):
             links_out=links_out,
         )
         self.name = name
-        self.value = name
+        self._value = name
         self.classifier = classifier
         self.relevant_value = relevant_value
         self.instance_type = instance_type

@@ -29,8 +29,20 @@ class Node(Structure):
             links_in=links_in,
             links_out=links_out,
         )
-        self.value = value
-        self.parent_space = parent_space
+        self._value = value
+        self._parent_space = parent_space
+
+    @property
+    def value(self) -> Any:
+        return self._value
+
+    @value.setter
+    def value(self, value: Any):
+        self._value = value
+
+    @property
+    def parent_space(self) -> Space:
+        return self._parent_space
 
     @property
     def is_slot(self):

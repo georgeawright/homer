@@ -37,7 +37,7 @@ class Space(Structure):
         )
         self.name = name
         self.value = name
-        self.parent_concept = parent_concept
+        self._parent_concept = parent_concept
         self.contents = contents
         self.no_of_dimensions = no_of_dimensions
         self._dimensions = dimensions

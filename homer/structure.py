@@ -27,7 +27,7 @@ class Structure(ABC):
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
-        self.locations = locations
+        self._locations = locations
         self._quality = quality
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
@@ -37,7 +37,7 @@ class Structure(ABC):
         self.stable = stable_activation is not None
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
-        self.parent_concept = None
+        self._parent_concept = None
 
     @classmethod
     def get_builder_class(cls):
@@ -52,6 +52,10 @@ class Structure(ABC):
         raise NotImplementedError
 
     @property
+    def parent_concept(self) -> Structure:
+        return self._parent_concept
+
+    @property
     def location(self) -> Location:
         try:
             return self.locations[0]
@@ -59,6 +63,14 @@ class Structure(ABC):
             return None
         except IndexError:
             return None
+
+    @property
+    def locations(self) -> List[Location]:
+        return self._locations
+
+    @locations.setter
+    def locations(self, locations: List[Location]):
+        self._locations = locations
 
     @property
     def size(self) -> int:
