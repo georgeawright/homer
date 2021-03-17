@@ -159,6 +159,140 @@ homer.def_concept_link(build_concept, evaluate_concept, activation=1.0)
 homer.def_concept_link(evaluate_concept, select_concept, activation=1.0)
 homer.def_concept_link(select_concept, build_concept, activation=1.0)
 
+# Grammatical Knowledge
+
+grammar_concept = homer.def_concept(
+    name="grammar",
+    parent_space=top_level_conceptual_space,
+    instance_type=str,
+)
+grammatical_concept_space = homer.def_conceptual_space(
+    name="grammar",
+    parent_concept=grammar_concept,
+    locations=[Location([], top_level_conceptual_space)],
+)
+sentence_concept = homer.def_concept(
+    name="s",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+np_concept = homer.def_concept(
+    name="np",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+vp_concept = homer.def_concept(
+    name="vp",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+ap_concept = homer.def_concept(
+    name="ap",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+pp_concept = homer.def_concept(
+    name="pp",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+noun_concept = homer.def_concept(
+    name="noun",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+verb_concept = homer.def_concept(
+    name="verb",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+adj_concept = homer.def_concept(
+    name="adj",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+adv_concept = homer.def_concept(
+    name="adv",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+cop_concept = homer.def_concept(
+    name="cop",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+prep_concept = homer.def_concept(
+    name="prep",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+det_concept = homer.def_concept(
+    name="det",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+null_concept = homer.def_concept(
+    name="null",
+    parent_space=grammatical_concept_space,
+    instance_type=str,
+)
+s_np_vp = homer.def_rule(
+    name="s --> np, vp",
+    location=Location([], grammatical_concept_space),
+    root=sentence_concept,
+    left_branch=np_concept,
+    right_branch=vp_concept,
+    stable_activation=1.0,
+)
+s_s_pp = homer.def_rule(
+    name="s --> s, pp",
+    location=Location([], grammatical_concept_space),
+    root=sentence_concept,
+    left_branch=sentence_concept,
+    right_branch=pp_concept,
+    stable_activation=1.0,
+)
+np_det_noun = homer.def_rule(
+    name="np --> det, noun",
+    location=Location([], grammatical_concept_space),
+    root=np_concept,
+    left_branch=det_concept,
+    right_branch=noun_concept,
+    stable_activation=1.0,
+)
+vp_cop_ap = homer.def_rule(
+    name="vp --> cop, ap",
+    location=Location([], grammatical_concept_space),
+    root=vp_concept,
+    left_branch=cop_concept,
+    right_branch=ap_concept,
+    stable_activation=1.0,
+)
+vp_verb = homer.def_rule(
+    name="vp --> verb",
+    location=Location([], grammatical_concept_space),
+    root=vp_concept,
+    left_branch=verb_concept,
+    right_branch=null_concept,
+    stable_activation=1.0,
+)
+ap_adj = homer.def_rule(
+    name="ap --> adj",
+    location=Location([], grammatical_concept_space),
+    root=ap_concept,
+    left_branch=adj_concept,
+    right_branch=null_concept,
+    stable_activation=1.0,
+)
+pp_prep_np = homer.def_rule(
+    name="pp --> prep, np",
+    location=Location([], grammatical_concept_space),
+    root=pp_concept,
+    left_branch=prep_concept,
+    right_branch=np_concept,
+    stable_activation=1.0,
+)
+
 # Domain Specific Knowledge
 
 temperature_concept = homer.def_concept(
@@ -189,6 +323,11 @@ hot_lexeme = homer.def_lexeme(
         WordForm.COMPARATIVE: "hotter",
         WordForm.SUPERLATIVE: "hottest",
     },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
+    },
     parent_concept=hot,
 )
 warm = homer.def_concept(
@@ -205,6 +344,11 @@ warm_lexeme = homer.def_lexeme(
         WordForm.HEADWORD: "warm",
         WordForm.COMPARATIVE: "warmer",
         WordForm.SUPERLATIVE: "warmest",
+    },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
     },
     parent_concept=warm,
 )
@@ -223,6 +367,11 @@ mild_lexeme = homer.def_lexeme(
         WordForm.COMPARATIVE: "milder",
         WordForm.SUPERLATIVE: "mildest",
     },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
+    },
     parent_concept=mild,
 )
 cold = homer.def_concept(
@@ -239,6 +388,11 @@ cold_lexeme = homer.def_lexeme(
         WordForm.HEADWORD: "cold",
         WordForm.COMPARATIVE: "colder",
         WordForm.SUPERLATIVE: "coldest",
+    },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
     },
     parent_concept=cold,
 )
@@ -310,6 +464,11 @@ north_lexeme = homer.def_lexeme(
         WordForm.COMPARATIVE: "further north",
         WordForm.SUPERLATIVE: "furthest north",
     },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
+    },
     parent_concept=north,
 )
 south = homer.def_concept(
@@ -326,6 +485,11 @@ south_lexeme = homer.def_lexeme(
         WordForm.HEADWORD: "south",
         WordForm.COMPARATIVE: "further south",
         WordForm.SUPERLATIVE: "furthest south",
+    },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
     },
     parent_concept=south,
 )
@@ -344,6 +508,11 @@ east_lexeme = homer.def_lexeme(
         WordForm.COMPARATIVE: "further east",
         WordForm.SUPERLATIVE: "furthest east",
     },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
+    },
     parent_concept=east,
 )
 west = homer.def_concept(
@@ -360,6 +529,11 @@ west_lexeme = homer.def_lexeme(
         WordForm.HEADWORD: "west",
         WordForm.COMPARATIVE: "further west",
         WordForm.SUPERLATIVE: "furthest west",
+    },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
     },
     parent_concept=west,
 )
@@ -378,6 +552,11 @@ northwest_lexeme = homer.def_lexeme(
         WordForm.COMPARATIVE: "further northwest",
         WordForm.SUPERLATIVE: "furthest northwest",
     },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
+    },
     parent_concept=northwest,
 )
 northeast = homer.def_concept(
@@ -394,6 +573,11 @@ northeast_lexeme = homer.def_lexeme(
         WordForm.HEADWORD: "northeast",
         WordForm.COMPARATIVE: "further northeast",
         WordForm.SUPERLATIVE: "furthest northeast",
+    },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
     },
     parent_concept=northeast,
 )
@@ -412,6 +596,11 @@ southwest_lexeme = homer.def_lexeme(
         WordForm.COMPARATIVE: "further southwest",
         WordForm.SUPERLATIVE: "furthest southwest",
     },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
+    },
     parent_concept=southwest,
 )
 southeast = homer.def_concept(
@@ -429,6 +618,11 @@ southeast_lexeme = homer.def_lexeme(
         WordForm.COMPARATIVE: "further southeast",
         WordForm.SUPERLATIVE: "furthest southeast",
     },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
+    },
     parent_concept=southeast,
 )
 midlands = homer.def_concept(
@@ -445,6 +639,11 @@ midlands_lexeme = homer.def_lexeme(
         WordForm.HEADWORD: "midlands",
         WordForm.COMPARATIVE: "further inland",
         WordForm.SUPERLATIVE: "furthest inland",
+    },
+    parts_of_speech={
+        WordForm.HEADWORD: [adj_concept],
+        WordForm.COMPARATIVE: [adj_concept],
+        WordForm.SUPERLATIVE: [adj_concept],
     },
     parent_concept=midlands,
 )
@@ -475,6 +674,11 @@ more_lexeme = homer.def_lexeme(
         WordForm.COMPARATIVE: "more",
         WordForm.SUPERLATIVE: "most",
     },
+    parts_of_speech={
+        WordForm.HEADWORD: [adv_concept],
+        WordForm.COMPARATIVE: [adv_concept],
+        WordForm.SUPERLATIVE: [adv_concept],
+    },
     parent_concept=more,
 )
 less = homer.def_concept(
@@ -491,6 +695,11 @@ less_lexeme = homer.def_lexeme(
         WordForm.HEADWORD: "less",
         WordForm.COMPARATIVE: "less",
         WordForm.SUPERLATIVE: "least",
+    },
+    parts_of_speech={
+        WordForm.HEADWORD: [adv_concept],
+        WordForm.COMPARATIVE: [adv_concept],
+        WordForm.SUPERLATIVE: [adv_concept],
     },
     parent_concept=less,
 )
@@ -519,19 +728,34 @@ different = homer.def_concept(
     distance_function=math.dist,
 )
 the_lexeme = homer.def_lexeme(
-    headword="the", forms={WordForm.HEADWORD: "the"}, parent_concept=None
+    headword="the",
+    forms={WordForm.HEADWORD: "the"},
+    parts_of_speech={WordForm.HEADWORD: [det_concept]},
+    parent_concept=None,
 )
 is_lexeme = homer.def_lexeme(
-    headword="is", forms={WordForm.HEADWORD: "is"}, parent_concept=None
+    headword="is",
+    forms={WordForm.HEADWORD: "is"},
+    parts_of_speech={WordForm.HEADWORD: [cop_concept]},
+    parent_concept=None,
 )
 it_lexeme = homer.def_lexeme(
-    headword="it", forms={WordForm.HEADWORD: "it"}, parent_concept=None
+    headword="it",
+    forms={WordForm.HEADWORD: "it"},
+    parts_of_speech={WordForm.HEADWORD: [noun_concept]},
+    parent_concept=None,
 )
 in_lexeme = homer.def_lexeme(
-    headword="in", forms={WordForm.HEADWORD: "in"}, parent_concept=None
+    headword="in",
+    forms={WordForm.HEADWORD: "in"},
+    parts_of_speech={WordForm.HEADWORD: [prep_concept]},
+    parent_concept=None,
 )
 than_lexeme = homer.def_lexeme(
-    headword="than", forms={WordForm.HEADWORD: "than"}, parent_concept=None
+    headword="than",
+    forms={WordForm.HEADWORD: "than"},
+    parts_of_speech={WordForm.HEADWORD: [prep_concept]},
+    parent_concept=None,
 )
 template_1 = homer.def_template(
     name="the [location] is [temperature]",
