@@ -46,6 +46,10 @@ class Node(Structure):
     def parent_space(self) -> Space:
         return self._parent_space
 
+    @parent_space.setter
+    def parent_space(self, space: Space):
+        self._parent_space = space
+
     @property
     def is_slot(self):
         return self.value is None
