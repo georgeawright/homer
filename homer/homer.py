@@ -16,7 +16,7 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Concept, Lexeme, Word
+from .structures.nodes import Chunk, Concept, Lexeme, Rule, Word
 from .structures.spaces import ConceptualSpace, WorkingSpace
 from .structures.spaces.frames import Template
 from .word_form import WordForm
@@ -56,6 +56,8 @@ class Homer:
         bubble_chamber = BubbleChamber(
             StructureCollection({top_level_conceptual_space}),
             StructureCollection({top_level_working_space}),
+            StructureCollection(),
+            StructureCollection(),
             StructureCollection(),
             StructureCollection(),
             StructureCollection(),
@@ -450,3 +452,28 @@ class Homer:
             self.bubble_chamber.relations.add(relation)
         self.logger.log(relation)
         return relation
+
+    def def_rule(
+        self,
+        name: str,
+        location: Location,
+        root: Concept,
+        left_branch: Concept,
+        right_branch: Concept,
+        stable_activation: FloatBetweenOneAndZero = None,
+    ):
+        rule = Rule(
+            ID.new(Rule),
+            "",
+            name,
+            location,
+            root,
+            left_branch,
+            right_branch,
+            stable_activation=stable_activation,
+        )
+        self.logger.log(rule)
+        root_link = self.def_concept_link(root, rule, stable_activation, True)
+        left_link = self.def_concept_link(rule, left_branch, stable_activation, True)
+        right_link = self.def_concept_link(rule, right_branch, stable_activation, True)
+        self.logger.log(rule)
