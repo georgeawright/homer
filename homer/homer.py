@@ -1,3 +1,4 @@
+import operator
 from typing import Any, Callable, Dict, List, Union
 
 from homer import fuzzy
@@ -227,13 +228,19 @@ class Homer:
         self,
         headword: str = "",
         forms: Dict[str, str] = None,
+        parts_of_speech: Dict[WordForm, List[Concept]] = None,
         parent_concept: Concept = None,
     ) -> Lexeme:
+        if operator.xor(forms is None, parts_of_speech is None) or (
+            forms.keys() != parts_of_speech.keys()
+        ):
+            raise Exception("lexeme forms and parts of speech do not match")
         lexeme = Lexeme(
             structure_id=ID.new(Lexeme),
             parent_id="",
             headword=headword,
             forms=forms,
+            parts_of_speech=parts_of_speech,
         )
         self.logger.log(lexeme)
         self.bubble_chamber.lexemes.add(lexeme)
