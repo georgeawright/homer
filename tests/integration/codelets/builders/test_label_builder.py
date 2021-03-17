@@ -117,6 +117,7 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chamber.concepts.add(mild_concept)

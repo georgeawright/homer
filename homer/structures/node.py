@@ -19,6 +19,7 @@ class Node(Structure):
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection,
         links_out: StructureCollection,
+        stable_activation: FloatBetweenOneAndZero = None,
     ):
         Structure.__init__(
             self,
@@ -28,6 +29,7 @@ class Node(Structure):
             quality,
             links_in=links_in,
             links_out=links_out,
+            stable_activation=stable_activation,
         )
         self._value = value
         self._parent_space = parent_space

@@ -68,14 +68,11 @@ class PhraseBuilder(Builder):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_one = bubble_chamber.text_fragments.get_unhappy()
-        print(target_one.name)
         target_two = target_one.nearby().get_unhappy()
-        print(target_two.name)
         try:
             target_three = StructureCollection.intersection(
                 target_one.nearby(), target_two.nearby()
             ).get_unhappy()
-            print(target_three.name)
             targets = StructureCollection({target_one, target_two, target_three})
         except MissingStructureError:
             targets = StructureCollection({target_one, target_two})
@@ -84,7 +81,6 @@ class PhraseBuilder(Builder):
             remaining_targets = StructureCollection.difference(
                 targets, StructureCollection({target})
             )
-            print(target.name)
             if hasattr(target, "members") and target.members == remaining_targets:
                 target_root = target
                 target_left_branch = target_root.left_branch
@@ -128,7 +124,6 @@ class PhraseBuilder(Builder):
     def _passes_preliminary_checks(self):
         if len(self.target_structures) < 2:
             return False
-        print(self.target_rule)
         if self.target_rule is None:
             self.target_rule = StructureCollection(
                 {
@@ -137,18 +132,17 @@ class PhraseBuilder(Builder):
                     if self._rule_is_compatible_with_targets(rule)
                 }
             ).get_random()
-            print(self.target_rule)
         elif not self._rule_is_compatible_with_targets(self.target_rule):
             return False
+        if len(self.target_structures) == 3:
+            return any([target.is_slot for target in self.target_structures])
         return True
 
     def _calculate_confidence(self):
-        print("calculating confidence")
         mean_quality = statistics.fmean(
             [target.quality for target in self.target_structures if not target.is_slot]
         )
         self.confidence = mean_quality * self.target_rule.activation
-        print(self.confidence)
 
     def _process_structure(self):
         if len(self.target_structures) == 2:
@@ -188,7 +182,6 @@ class PhraseBuilder(Builder):
                 self.target_left_branch = phrase
             elif self.target_right_branch is None:
                 self.target_right_branch = phrase
-        print(self.target_structures)
         slot_target = [target for target in self.target_structures if target.is_slot][0]
         if slot_target in [self.target_left_branch, self.target_right_branch]:
             self.target_root.chunk.members.add(slot_target)

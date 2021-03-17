@@ -29,6 +29,7 @@ class BubbleChamber:
         words: StructureCollection,
         concept_links: StructureCollection,
         phrases: StructureCollection,
+        rules: StructureCollection,
         slots: StructureCollection,
         logger: Logger,
     ):
@@ -44,6 +45,7 @@ class BubbleChamber:
         self.words = words
         self.concept_links = concept_links
         self.phrases = phrases
+        self.rules = rules
         self.slots = slots
         self.logger = logger
         self.log_count = 0
@@ -73,6 +75,8 @@ class BubbleChamber:
             self.views,
             self.words,
             self.concept_links,
+            self.phrases,
+            self.rules,
             self.slots,
         )
 
