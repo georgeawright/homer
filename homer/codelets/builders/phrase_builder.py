@@ -128,13 +128,16 @@ class PhraseBuilder(Builder):
         if len(self.target_structures) < 2:
             return False
         if self.target_rule is None:
-            self.target_rule = StructureCollection(
-                {
-                    rule
-                    for rule in self.bubble_chamber.rules
-                    if self._rule_is_compatible_with_targets(rule)
-                }
-            ).get_random()
+            try:
+                self.target_rule = StructureCollection(
+                    {
+                        rule
+                        for rule in self.bubble_chamber.rules
+                        if self._rule_is_compatible_with_targets(rule)
+                    }
+                ).get_random()
+            except MissingStructureError:
+                return False
         elif not self._rule_is_compatible_with_targets(self.target_rule):
             return False
         if len(self.target_structures) == 3:
