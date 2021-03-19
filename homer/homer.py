@@ -483,4 +483,5 @@ class Homer:
         root_link = self.def_concept_link(root, rule, stable_activation, True)
         left_link = self.def_concept_link(rule, left_branch, stable_activation, True)
         right_link = self.def_concept_link(rule, right_branch, stable_activation, True)
+        self.bubble_chamber.rules.add(rule)
         self.logger.log(rule)
