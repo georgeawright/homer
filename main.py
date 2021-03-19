@@ -141,27 +141,27 @@ text_space = homer.def_conceptual_space(
     parent_concept=text_concept,
     locations=[Location([], top_level_conceptual_space)],
 )
-homer.def_concept_link(build_concept, chunk_concept)
-homer.def_concept_link(build_concept, correspondence_concept)
+# homer.def_concept_link(build_concept, chunk_concept)
+# homer.def_concept_link(build_concept, correspondence_concept)
 homer.def_concept_link(build_concept, label_concept, activation=1.0)
 homer.def_concept_link(build_concept, phrase_concept)
-homer.def_concept_link(build_concept, relation_concept)
-homer.def_concept_link(build_concept, view_concept)
-homer.def_concept_link(build_concept, word_concept)
-homer.def_concept_link(evaluate_concept, chunk_concept)
-homer.def_concept_link(evaluate_concept, correspondence_concept)
+# homer.def_concept_link(build_concept, relation_concept)
+# homer.def_concept_link(build_concept, view_concept)
+# homer.def_concept_link(build_concept, word_concept)
+# homer.def_concept_link(evaluate_concept, chunk_concept)
+# homer.def_concept_link(evaluate_concept, correspondence_concept)
 homer.def_concept_link(evaluate_concept, label_concept)
 homer.def_concept_link(evaluate_concept, phrase_concept)
-homer.def_concept_link(evaluate_concept, relation_concept)
-homer.def_concept_link(evaluate_concept, view_concept)
-homer.def_concept_link(evaluate_concept, word_concept)
-homer.def_concept_link(select_concept, chunk_concept)
-homer.def_concept_link(select_concept, correspondence_concept)
+# homer.def_concept_link(evaluate_concept, relation_concept)
+# homer.def_concept_link(evaluate_concept, view_concept)
+# homer.def_concept_link(evaluate_concept, word_concept)
+# homer.def_concept_link(select_concept, chunk_concept)
+# homer.def_concept_link(select_concept, correspondence_concept)
 homer.def_concept_link(select_concept, label_concept)
 homer.def_concept_link(select_concept, phrase_concept)
-homer.def_concept_link(select_concept, relation_concept)
-homer.def_concept_link(select_concept, view_concept)
-homer.def_concept_link(select_concept, word_concept)
+# homer.def_concept_link(select_concept, relation_concept)
+# homer.def_concept_link(select_concept, view_concept)
+# homer.def_concept_link(select_concept, word_concept)
 homer.def_concept_link(build_concept, evaluate_concept, activation=1.0)
 homer.def_concept_link(evaluate_concept, select_concept, activation=1.0)
 homer.def_concept_link(select_concept, build_concept, activation=1.0)
@@ -944,7 +944,7 @@ if True:
                 "",
                 it_lexeme,
                 WordForm.HEADWORD,
-                Location([0], homer.bubble_chamber.spaces["input"]),
+                Location([[0]], homer.bubble_chamber.spaces["input"]),
                 input_space,
                 1.0,
             ),
@@ -953,7 +953,7 @@ if True:
                 "",
                 is_lexeme,
                 WordForm.HEADWORD,
-                Location([1], homer.bubble_chamber.spaces["input"]),
+                Location([[1]], homer.bubble_chamber.spaces["input"]),
                 input_space,
                 1.0,
             ),
@@ -962,7 +962,7 @@ if True:
                 "",
                 warm_lexeme,
                 WordForm.HEADWORD,
-                Location([2], homer.bubble_chamber.spaces["input"]),
+                Location([[2]], homer.bubble_chamber.spaces["input"]),
                 input_space,
                 1.0,
             ),
@@ -971,7 +971,7 @@ if True:
                 "",
                 in_lexeme,
                 WordForm.HEADWORD,
-                Location([3], homer.bubble_chamber.spaces["input"]),
+                Location([[3]], homer.bubble_chamber.spaces["input"]),
                 input_space,
                 1.0,
             ),
@@ -980,7 +980,7 @@ if True:
                 "",
                 the_lexeme,
                 WordForm.HEADWORD,
-                Location([4], homer.bubble_chamber.spaces["input"]),
+                Location([[4]], homer.bubble_chamber.spaces["input"]),
                 input_space,
                 1.0,
             ),
@@ -989,7 +989,7 @@ if True:
                 "",
                 south_lexeme,
                 WordForm.HEADWORD,
-                Location([5], homer.bubble_chamber.spaces["input"]),
+                Location([[5]], homer.bubble_chamber.spaces["input"]),
                 input_space,
                 1.0,
             ),
