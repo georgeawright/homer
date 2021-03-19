@@ -68,10 +68,10 @@ class PhraseBuilder(Builder):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_one = bubble_chamber.text_fragments.get_unhappy()
-        target_two = target_one.nearby().get_unhappy()
+        target_two = target_one.potential_rule_mates.get_unhappy()
         try:
             target_three = StructureCollection.intersection(
-                target_one.nearby(), target_two.nearby()
+                target_one.potential_rule_mates, target_two.potential_rule_mates
             ).get_unhappy()
             targets = StructureCollection({target_one, target_two, target_three})
         except MissingStructureError:
@@ -86,14 +86,17 @@ class PhraseBuilder(Builder):
                 target_left_branch = target_root.left_branch
                 target_right_branch = target_root.right_branch
         if target_root is None:
-            branch_one = targets.pop()
-            branch_two = targets.pop()
-            (target_left_branch, target_right_branch) = (
-                (branch_one, branch_two)
-                if branch_one.location.coordinates[0][0]
+            branch_one = targets.get_random()
+            branch_two = targets.get_random(exclude=[branch_one])
+            if (
+                branch_one.location.coordinates[0][0]
                 < branch_two.location.coordinates[0][0]
-                else (branch_two, branch_one),
-            )
+            ):
+                target_left_branch = branch_one
+                target_right_branch = branch_two
+            else:
+                target_left_branch = branch_two
+                target_right_branch = branch_one
         urgency = (
             urgency
             if urgency is not None

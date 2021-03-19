@@ -67,9 +67,9 @@ def bubble_chamber(s_np_vp, pp_slot, prep, noun):
     chamber.concepts = {"build": Mock(), "phrase": Mock()}
     chamber.rules = StructureCollection({s_np_vp})
     chamber.text_fragments = StructureCollection({pp_slot, prep, noun})
-    pp_slot.nearby.return_value = StructureCollection({prep, noun})
-    prep.nearby.return_value = StructureCollection({pp_slot, noun})
-    noun.nearby.return_value = StructureCollection({pp_slot, prep})
+    pp_slot.potential_rule_mates = StructureCollection({prep, noun})
+    prep.potential_rule_mates = StructureCollection({pp_slot, noun})
+    noun.potential_rule_mates = StructureCollection({pp_slot, prep})
     return chamber
 
 

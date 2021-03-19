@@ -91,6 +91,10 @@ word_concept = homer.def_concept(
     parent_space=structures_space,
     instance_type=str,
 )
+phrase_concept = homer.def_concept(
+    name="phrase",
+    parent_space=structures_space,
+)
 label_concept = homer.def_concept(
     name="label",
     parent_space=structures_space,
@@ -140,18 +144,21 @@ text_space = homer.def_conceptual_space(
 homer.def_concept_link(build_concept, chunk_concept)
 homer.def_concept_link(build_concept, correspondence_concept)
 homer.def_concept_link(build_concept, label_concept, activation=1.0)
+homer.def_concept_link(build_concept, phrase_concept)
 homer.def_concept_link(build_concept, relation_concept)
 homer.def_concept_link(build_concept, view_concept)
 homer.def_concept_link(build_concept, word_concept)
 homer.def_concept_link(evaluate_concept, chunk_concept)
 homer.def_concept_link(evaluate_concept, correspondence_concept)
 homer.def_concept_link(evaluate_concept, label_concept)
+homer.def_concept_link(evaluate_concept, phrase_concept)
 homer.def_concept_link(evaluate_concept, relation_concept)
 homer.def_concept_link(evaluate_concept, view_concept)
 homer.def_concept_link(evaluate_concept, word_concept)
 homer.def_concept_link(select_concept, chunk_concept)
 homer.def_concept_link(select_concept, correspondence_concept)
 homer.def_concept_link(select_concept, label_concept)
+homer.def_concept_link(select_concept, phrase_concept)
 homer.def_concept_link(select_concept, relation_concept)
 homer.def_concept_link(select_concept, view_concept)
 homer.def_concept_link(select_concept, word_concept)

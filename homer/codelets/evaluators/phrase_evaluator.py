@@ -1,3 +1,5 @@
+import statistics
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Evaluator
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -47,4 +49,13 @@ class PhraseEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get_random()
 
     def _calculate_confidence(self):
-        pass
+        self.confidence = statistics.fmean(
+            [
+                self.target_structure.left_branch.quality,
+                self.target_structure.right_branch.quality,
+                self.target_structure.rule.activation,
+                self.target_structure.unchunkedness,
+                self.target_structure.size,
+            ]
+        )
+        self.change_in_confidence = abs(self.confidence - self.original_confidence)

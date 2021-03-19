@@ -61,6 +61,37 @@ class Word(Node):
     def concepts(self):
         return self.lexeme.concepts if self.lexeme is not None else None
 
+    @property
+    def potential_rule_mates(self) -> StructureCollection:
+        return StructureCollection.union(self.adjacent, self.super_phrases)
+
+    @property
+    def adjacent(self) -> StructureCollection:
+        """return non-overlapping but touching phrases"""
+        from .phrase import Phrase
+
+        left = Location([self.location.coordinates[0]], self.parent_space)
+        right = Location([self.location.coordinates[-1]], self.parent_space)
+        return StructureCollection.union(
+            self.parent_space.contents.at(left).of_type(Word),
+            self.parent_space.contents.at(left).of_type(Phrase),
+            self.parent_space.contents.at(right).of_type(Word),
+            self.parent_space.contents.at(right).of_type(Phrase),
+        )
+
+    @property
+    def super_phrases(self) -> StructureCollection:
+        """return phrases that contain this phrase"""
+        from .phrase import Phrase
+
+        return StructureCollection(
+            {
+                phrase
+                for phrase in self.parent_space.contents.of_type(Phrase)
+                if self in phrase.members
+            }
+        )
+
     def copy(
         self,
         bubble_chamber: "BubbleChamber",

@@ -9,6 +9,7 @@ from homer.codelets.builders import (
     LabelBuilder,
     RelationBuilder,
     WordBuilder,
+    PhraseBuilder,
 )
 from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators import (
@@ -17,6 +18,7 @@ from homer.codelets.evaluators import (
     LabelEvaluator,
     RelationEvaluator,
     WordEvaluator,
+    PhraseEvaluator,
 )
 from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.codelets.selectors import (
@@ -25,6 +27,7 @@ from homer.codelets.selectors import (
     LabelSelector,
     RelationSelector,
     WordSelector,
+    PhraseSelector,
 )
 from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.errors import MissingStructureError
@@ -103,6 +106,7 @@ class FactoryCodelet(Codelet):
                 "correspondence": CorrespondenceBuilder,
                 "view": SimplexViewBuilder,
                 "word": WordBuilder,
+                "phrase": PhraseBuilder,
             },
             "evaluate": {
                 "chunk": ChunkEvaluator,
@@ -111,6 +115,7 @@ class FactoryCodelet(Codelet):
                 "correspondence": CorrespondenceEvaluator,
                 "view": SimplexViewEvaluator,
                 "word": WordEvaluator,
+                "phrase": PhraseEvaluator,
             },
             "select": {
                 "chunk": ChunkSelector,
@@ -119,5 +124,6 @@ class FactoryCodelet(Codelet):
                 "correspondence": CorrespondenceSelector,
                 "view": SimplexViewSelector,
                 "word": WordSelector,
+                "phrase": PhraseSelector,
             },
         }[action_type.name][structure_type.name]
