@@ -62,6 +62,10 @@ class BubbleChamber:
         return StructureCollection.union(self.phrases, self.words)
 
     @property
+    def input_nodes(self) -> StructureCollection:
+        return self.words
+
+    @property
     def structures(self) -> StructureCollection:
         return StructureCollection.union(
             self.conceptual_spaces,

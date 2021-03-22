@@ -50,6 +50,10 @@ class ConceptualSpace(Space):
         self._instance = None
         self._instances = {}
 
+    @property
+    def instance_type(self):
+        return self.parent_concept.instance_type
+
     def instance_in_space(
         self, containing_space: Space, name: str = None
     ) -> WorkingSpace:

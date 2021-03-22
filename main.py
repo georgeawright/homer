@@ -6,6 +6,7 @@ from homer.classifiers import (
     DifferenceClassifier,
     DifferentnessClassifier,
     SamenessClassifier,
+    PartOfSpeechClassifier,
     ProximityClassifier,
 )
 from homer.id import ID
@@ -170,77 +171,100 @@ homer.def_concept_link(select_concept, build_concept, activation=1.0)
 
 grammar_concept = homer.def_concept(
     name="grammar",
-    parent_space=top_level_conceptual_space,
+    parent_space=label_concepts_space,
+    relevant_value="value",
     instance_type=str,
 )
 grammatical_concept_space = homer.def_conceptual_space(
     name="grammar",
     parent_concept=grammar_concept,
-    locations=[Location([], top_level_conceptual_space)],
+    locations=[Location([], label_concepts_space)],
+    no_of_dimensions=1,
+    is_basic_level=True,
 )
 sentence_concept = homer.def_concept(
     name="s",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
 )
 np_concept = homer.def_concept(
     name="np",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
 )
 vp_concept = homer.def_concept(
     name="vp",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
 )
 ap_concept = homer.def_concept(
     name="ap",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
 )
 pp_concept = homer.def_concept(
     name="pp",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
 )
 noun_concept = homer.def_concept(
     name="noun",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
+    classifier=PartOfSpeechClassifier(),
 )
 verb_concept = homer.def_concept(
     name="verb",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
+    classifier=PartOfSpeechClassifier(),
 )
 adj_concept = homer.def_concept(
     name="adj",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
+    classifier=PartOfSpeechClassifier(),
 )
 adv_concept = homer.def_concept(
     name="adv",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
+    classifier=PartOfSpeechClassifier(),
 )
 cop_concept = homer.def_concept(
     name="cop",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
+    classifier=PartOfSpeechClassifier(),
 )
 prep_concept = homer.def_concept(
     name="prep",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
+    classifier=PartOfSpeechClassifier(),
 )
 det_concept = homer.def_concept(
     name="det",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
+    classifier=PartOfSpeechClassifier(),
 )
 null_concept = homer.def_concept(
     name="null",
     parent_space=grammatical_concept_space,
+    relevant_value="value",
     instance_type=str,
 )
 s_np_vp = homer.def_rule(
