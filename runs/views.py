@@ -258,6 +258,66 @@ def run_view(request, run_id):
     return HttpResponse(output)
 
 
+def parse_run_view(request, run_id):
+    coderack_record = CoderackRecord.objects.get(run_id=run_id)
+    output = "<h1>Basic Run information:</h1>"
+    output += "<ul>"
+    output += "<li>Codelets Run: " + str(coderack_record.codelets_run[-1])
+    output += "</ul>"
+    output += '<p><a href="activity-and-structure-concepts">Activity and structure concepts</a></p>'
+    output += '<p><a href="codelets">Codelets</a></p>'
+    output += '<p><a href="structures">Structures</a></p>'
+    output += f'<img src="/runs/{run_id}/run-summary-graphs">'
+    structure_records = StructureRecord.objects.filter(run_id=run_id).all()
+    words = []
+    for record in structure_records:
+        if not re.match("^Word", record.structure_id):
+            continue
+        if record.parent_codelet is not None or "WorkingSpace2" not in record.locations:
+            continue
+        words.append(record)
+    words = sorted(words, key=lambda w: w.locations["WorkingSpace2"][0][0])
+    output += "<h2>Raw Input</h2>"
+    output += "".join(
+        [
+            f'<a href="structures/{word.structure_id}">{word.value}</a> '
+            for word in words
+        ]
+    )
+    labels = [
+        structure
+        for structure in structure_records
+        if "Label" in structure.structure_id
+    ]
+    phrases = [
+        structure
+        for structure in structure_records
+        if "Phrase" in structure.structure_id
+    ]
+    output += "<h2>Labels</h2>"
+    output += "".join(
+        [
+            f'<a href="structures/{label.structure_id}">{label.value}</a>('
+            + f'<a href="structures/{label.start.structure_id}">{label.start.value}</a>)'
+            + "<br>"
+            for label in labels
+        ]
+    )
+    output += "<h2>Phrases</h2>"
+    output += "".join(
+        [
+            f'<a href="structures/{phrase.structure_id}">{phrase.value}</a>('
+            + f'<a href="structures/{phrase.left_branch.structure_id}">'
+            + f"{phrase.left_branch.value}</a>, "
+            + f'<a href="structures/{phrase.right_branch.structure_id}">'
+            + f"{phrase.right_branch.value}</a>)"
+            + "<br>"
+            for phrase in phrases
+        ]
+    )
+    return HttpResponse(output)
+
+
 def run_summary_graphs_view(request, run_id):
     pyplot.clf()
     figure, charts = pyplot.subplots(nrows=1, ncols=2, figsize=(14, 5))

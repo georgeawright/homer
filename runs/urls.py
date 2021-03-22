@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("<int:run_id>/", views.run_view, name="run"),
+    # path("<int:run_id>/", views.run_view, name="run"),
+    path("<int:run_id>/", views.parse_run_view, name="run"),
     path(
         "<int:run_id>/activity-and-structure-concepts/",
         views.activity_and_structure_concepts_view,
