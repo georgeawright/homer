@@ -4,6 +4,7 @@ import random
 import statistics
 from typing import List
 
+from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .location import Location
@@ -233,6 +234,12 @@ class Structure(ABC):
             if label.parent_concept == concept:
                 return True
         return False
+
+    def label_of_type(self, concept: Structure):
+        for label in self.labels:
+            if label.parent_concept == concept:
+                return label
+        raise MissingStructureError
 
     def labels_in_space(self, space: Structure) -> StructureCollection:
         return StructureCollection(

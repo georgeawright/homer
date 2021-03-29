@@ -275,6 +275,14 @@ s_np_vp = homer.def_rule(
     right_branch=vp_concept,
     stable_activation=1.0,
 )
+s_noun_vp = homer.def_rule(
+    name="s --> noun, vp",
+    location=Location([], grammatical_concept_space),
+    root=sentence_concept,
+    left_branch=noun_concept,
+    right_branch=vp_concept,
+    stable_activation=1.0,
+)
 s_s_pp = homer.def_rule(
     name="s --> s, pp",
     location=Location([], grammatical_concept_space),
@@ -289,6 +297,14 @@ np_det_noun = homer.def_rule(
     root=np_concept,
     left_branch=det_concept,
     right_branch=noun_concept,
+    stable_activation=1.0,
+)
+vp_cop_adj = homer.def_rule(
+    name="vp --> cop, adj",
+    location=Location([], grammatical_concept_space),
+    root=vp_concept,
+    left_branch=cop_concept,
+    right_branch=adj_concept,
     stable_activation=1.0,
 )
 vp_cop_ap = homer.def_rule(
@@ -496,7 +512,7 @@ north_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest north",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -518,7 +534,7 @@ south_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest south",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -540,7 +556,7 @@ east_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest east",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -562,7 +578,7 @@ west_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest west",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -584,7 +600,7 @@ northwest_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest northwest",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -606,7 +622,7 @@ northeast_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest northeast",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -628,7 +644,7 @@ southwest_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest southwest",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -650,7 +666,7 @@ southeast_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest southeast",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -672,7 +688,7 @@ midlands_lexeme = homer.def_lexeme(
         WordForm.SUPERLATIVE: "furthest inland",
     },
     parts_of_speech={
-        WordForm.HEADWORD: [adj_concept],
+        WordForm.HEADWORD: [adj_concept, noun_concept],
         WordForm.COMPARATIVE: [adj_concept],
         WordForm.SUPERLATIVE: [adj_concept],
     },
@@ -1025,4 +1041,7 @@ if True:
         input_space.add(word)
 
 
-homer.run()
+homer.input_size = 6
+result = homer.run()
+with open("results.csv", "a") as f:
+    f.write(str(result["codelets_run"]) + "\n")

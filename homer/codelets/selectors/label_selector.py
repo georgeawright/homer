@@ -74,7 +74,7 @@ class LabelSelector(Selector):
         )
 
     def _engender_follow_up(self):
-        new_target = self.bubble_chamber.chunks.get_exigent()
+        new_target = self.bubble_chamber.input_nodes.get_exigent()
         self.child_codelets.append(
             LabelBuilder.spawn(
                 self.codelet_id,

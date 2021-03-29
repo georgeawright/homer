@@ -71,8 +71,6 @@ class LabelBuilder(Builder):
                 .where_not(classifier=None)
                 .get_random()
             )
-        print(self.parent_concept.name)
-        print(self.target_node.value)
         return not self.target_node.has_label(self.parent_concept)
 
     def _calculate_confidence(self):

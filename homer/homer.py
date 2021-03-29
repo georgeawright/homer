@@ -35,6 +35,7 @@ class Homer:
         self.coderack = coderack
         self.logger = logger
         self.activation_update_frequency = activation_update_frequency
+        self.input_size = 0
 
     @classmethod
     def setup(cls, logger: Logger):
@@ -90,6 +91,13 @@ class Homer:
                 break
             except Exception as e:
                 raise e
+            for phrase in self.bubble_chamber.phrases:
+                print(self.input_size)
+                print(phrase.parent_concept.name, phrase.size)
+                print(phrase.size == self.input_size)
+                print(phrase.parent_concept.name == "s")
+                if phrase.size == self.input_size and phrase.parent_concept.name == "s":
+                    self.bubble_chamber.result = phrase.value
         return {
             "result": self.bubble_chamber.result,
             "satisfaction": self.bubble_chamber.satisfaction,

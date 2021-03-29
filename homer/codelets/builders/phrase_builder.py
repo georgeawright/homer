@@ -142,6 +142,13 @@ class PhraseBuilder(Builder):
             return False
         if len(self.target_structures) == 3:
             return any([target.is_slot for target in self.target_structures])
+        for phrase in self.bubble_chamber.phrases:
+            if (
+                phrase.rule == self.target_rule
+                and phrase.left_branch == self.target_left_branch
+                and phrase.right_branch == self.target_right_branch
+            ):
+                return False
         return True
 
     def _calculate_confidence(self):
@@ -175,8 +182,10 @@ class PhraseBuilder(Builder):
                 chunk=chunk,
                 label=label,
                 quality=0.0,
+                rule=self.target_rule,
             )
             phrase.activation = self.INITIAL_STRUCTURE_ACTIVATION
+            self.parent_space.add(phrase)
             self.bubble_chamber.phrases.add(phrase)
             self.bubble_chamber.logger.log(chunk)
             self.bubble_chamber.logger.log(label)
@@ -194,6 +203,8 @@ class PhraseBuilder(Builder):
         if slot_target == self.target_root:
             self.target_root.chunk.members.add(self.target_left_branch)
             self.target_root.chunk.members.add(self.target_right_branch)
+            phrase.left_branch = self.target_left_branch
+            phrase.right_branch = self.target_right_branch
             self.target_root.chunk.value = (
                 f"{self.target_left_branch.value} {self.target_right_branch.value}"
             )
@@ -215,14 +226,28 @@ class PhraseBuilder(Builder):
         pass
 
     def _rule_is_compatible_with_targets(self, rule: Concept):
+        left_branch_concepts = (
+            StructureCollection({self.target_left_branch.parent_concept})
+            if isinstance(self.target_left_branch, Phrase)
+            else StructureCollection(
+                {label.parent_concept for label in self.target_left_branch.labels}
+            )
+        )
+        right_branch_concepts = (
+            StructureCollection({self.target_right_branch.parent_concept})
+            if isinstance(self.target_right_branch, Phrase)
+            else StructureCollection(
+                {label.parent_concept for label in self.target_right_branch.labels}
+            )
+        )
         return (
             (self.target_root is None or self.target_root.parent_concept == rule.root)
             and (
                 self.target_left_branch is None
-                or self.target_left_branch.parent_concept == rule.left_branch
+                or rule.left_branch in left_branch_concepts
             )
             and (
                 self.target_right_branch is None
-                or self.target_right_branch.parent_concept == rule.right_branch
+                or rule.right_branch in right_branch_concepts
             )
         )

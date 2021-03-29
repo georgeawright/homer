@@ -49,10 +49,24 @@ class PhraseEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get_random()
 
     def _calculate_confidence(self):
+        left_branch_quality = (
+            self.target_structure.left_branch.quality
+            if isinstance(self.target_structure.left_branch, Phrase)
+            else self.target_structure.left_branch.label_of_type(
+                self.target_structure.rule.left_branch
+            ).quality
+        )
+        right_branch_quality = (
+            self.target_structure.right_branch.quality
+            if isinstance(self.target_structure.right_branch, Phrase)
+            else self.target_structure.right_branch.label_of_type(
+                self.target_structure.rule.right_branch
+            ).quality
+        )
         self.confidence = statistics.fmean(
             [
-                self.target_structure.left_branch.quality,
-                self.target_structure.right_branch.quality,
+                left_branch_quality,
+                right_branch_quality,
                 self.target_structure.rule.activation,
                 self.target_structure.unchunkedness,
                 self.target_structure.size,

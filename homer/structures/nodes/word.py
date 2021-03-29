@@ -70,13 +70,9 @@ class Word(Node):
         """return non-overlapping but touching phrases"""
         from .phrase import Phrase
 
-        left = Location([[self.location.coordinates[0][0] - 1]], self.parent_space)
-        right = Location([[self.location.coordinates[-1][0] + 1]], self.parent_space)
         return StructureCollection.union(
-            self.parent_space.contents.at(left).of_type(Word),
-            self.parent_space.contents.at(left).of_type(Phrase),
-            self.parent_space.contents.at(right).of_type(Word),
-            self.parent_space.contents.at(right).of_type(Phrase),
+            self.parent_space.contents.next_to(self.location).of_type(Word),
+            self.parent_space.contents.next_to(self.location).of_type(Phrase),
         )
 
     @property
