@@ -1,5 +1,3 @@
-import random
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import LabelBuilder
 from homer.codelets.selector import Selector
