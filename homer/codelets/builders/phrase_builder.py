@@ -203,8 +203,8 @@ class PhraseBuilder(Builder):
         if slot_target == self.target_root:
             self.target_root.chunk.members.add(self.target_left_branch)
             self.target_root.chunk.members.add(self.target_right_branch)
-            phrase.left_branch = self.target_left_branch
-            phrase.right_branch = self.target_right_branch
+            self.target_root.left_branch = self.target_left_branch
+            self.target_root.right_branch = self.target_right_branch
             self.target_root.chunk.value = (
                 f"{self.target_left_branch.value} {self.target_right_branch.value}"
             )
@@ -226,20 +226,22 @@ class PhraseBuilder(Builder):
         pass
 
     def _rule_is_compatible_with_targets(self, rule: Concept):
-        left_branch_concepts = (
-            StructureCollection({self.target_left_branch.parent_concept})
-            if isinstance(self.target_left_branch, Phrase)
-            else StructureCollection(
-                {label.parent_concept for label in self.target_left_branch.labels}
+        if self.target_left_branch is not None:
+            left_branch_concepts = (
+                StructureCollection({self.target_left_branch.parent_concept})
+                if not isinstance(self.target_left_branch, Word)
+                else StructureCollection(
+                    {label.parent_concept for label in self.target_left_branch.labels}
+                )
             )
-        )
-        right_branch_concepts = (
-            StructureCollection({self.target_right_branch.parent_concept})
-            if isinstance(self.target_right_branch, Phrase)
-            else StructureCollection(
-                {label.parent_concept for label in self.target_right_branch.labels}
+        if self.target_right_branch is not None:
+            right_branch_concepts = (
+                StructureCollection({self.target_right_branch.parent_concept})
+                if not isinstance(self.target_right_branch, Word)
+                else StructureCollection(
+                    {label.parent_concept for label in self.target_right_branch.labels}
+                )
             )
-        )
         return (
             (self.target_root is None or self.target_root.parent_concept == rule.root)
             and (

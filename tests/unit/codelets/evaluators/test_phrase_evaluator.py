@@ -12,8 +12,12 @@ def test_changes_target_structure_quality(current_quality, new_quality):
     bubble_chamber.concepts = {"evaluate": Mock(), "phrase": Mock()}
     phrase = Mock()
     phrase.quality = current_quality
-    phrase.left_branch.quality = new_quality
-    phrase.right_branch.quality = new_quality
+    left_label = Mock()
+    left_label.quality = new_quality
+    right_label = Mock()
+    right_label.quality = new_quality
+    phrase.left_branch.label_of_type.return_value = left_label
+    phrase.right_branch.label_of_type.return_value = right_label
     phrase.rule.activation = new_quality
     phrase.unchunkedness = new_quality
     phrase.size = new_quality

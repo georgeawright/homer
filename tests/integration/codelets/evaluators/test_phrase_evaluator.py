@@ -98,20 +98,77 @@ def input_space(text_concept):
 
 
 @pytest.fixture
-def good_phrase(bubble_chamber, input_space):
-    lexeme_1 = Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "the"}, Mock())
-    lexeme_2 = Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "man"}, Mock())
-    word_1 = Word(Mock(), Mock(), lexeme_1, WordForm.HEADWORD, Mock(), Mock(), 1.0)
-    word_2 = Word(Mock(), Mock(), lexeme_2, WordForm.HEADWORD, Mock(), Mock(), 1.0)
+def det_concept():
+    return Mock()
+
+
+@pytest.fixture
+def noun_concept():
+    return Mock()
+
+
+@pytest.fixture
+def the_lexeme():
+    return Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "the"}, Mock())
+
+
+@pytest.fixture
+def man_lexeme():
+    return Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "man"}, Mock())
+
+
+@pytest.fixture
+def the_word(the_lexeme, input_space, det_concept):
+    word = Word(
+        Mock(),
+        Mock(),
+        the_lexeme,
+        WordForm.HEADWORD,
+        Location([[0]], input_space),
+        Mock(),
+        1.0,
+    )
+    word_label = Label(Mock(), Mock(), word, det_concept, input_space, 1.0)
+    word.links_out.add(word_label)
+    return word
+
+
+@pytest.fixture
+def man_word(man_lexeme, input_space, noun_concept):
+    word = Word(
+        Mock(),
+        Mock(),
+        man_lexeme,
+        WordForm.HEADWORD,
+        Location([[1]], input_space),
+        Mock(),
+        1.0,
+    )
+    word_label = Label(Mock(), Mock(), word, noun_concept, input_space, 1.0)
+    word.links_out.add(word_label)
+    return word
+
+
+@pytest.fixture
+def good_phrase(
+    bubble_chamber, input_space, det_concept, noun_concept, the_word, man_word
+):
     rule = Rule(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), stable_activation=1.0
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        det_concept,
+        noun_concept,
+        stable_activation=1.0,
     )
     chunk = Chunk(
         Mock(),
         Mock(),
         Mock(),
         [Location([[0], [1]], input_space)],
-        StructureCollection({word_1, word_2}),
+        StructureCollection({the_word, man_word}),
         input_space,
         1.0,
     )
@@ -122,8 +179,8 @@ def good_phrase(bubble_chamber, input_space):
         chunk,
         label,
         0.0,
-        left_branch=word_1,
-        right_branch=word_2,
+        left_branch=the_word,
+        right_branch=man_word,
         rule=rule,
     )
     bubble_chamber.phrases.add(phrase)
@@ -132,20 +189,27 @@ def good_phrase(bubble_chamber, input_space):
 
 
 @pytest.fixture
-def bad_phrase(bubble_chamber, input_space):
-    lexeme_1 = Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "the"}, Mock())
-    lexeme_2 = Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "man"}, Mock())
-    word_1 = Word(Mock(), Mock(), lexeme_1, WordForm.HEADWORD, Mock(), Mock(), 0.0)
-    word_2 = Word(Mock(), Mock(), lexeme_2, WordForm.HEADWORD, Mock(), Mock(), 0.0)
+def bad_phrase(
+    bubble_chamber, input_space, det_concept, noun_concept, the_word, man_word
+):
+    the_word.label_of_type(det_concept).quality = 0
+    man_word.label_of_type(noun_concept).quality = 0
     rule = Rule(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), stable_activation=0.0
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        det_concept,
+        noun_concept,
+        stable_activation=0.0,
     )
     chunk = Chunk(
         Mock(),
         Mock(),
         Mock(),
         [Location([[0], [1]], input_space)],
-        StructureCollection({word_1, word_2}),
+        StructureCollection({the_word, man_word}),
         input_space,
         1.0,
     )
@@ -156,8 +220,8 @@ def bad_phrase(bubble_chamber, input_space):
         chunk,
         label,
         1.0,
-        left_branch=word_1,
-        right_branch=word_2,
+        left_branch=the_word,
+        right_branch=man_word,
         rule=rule,
     )
     bubble_chamber.phrases.add(phrase)
@@ -171,6 +235,7 @@ def test_increases_quality_of_good_phrase(bubble_chamber, good_phrase):
     urgency = 1.0
     evaluator = PhraseEvaluator.spawn(parent_id, bubble_chamber, good_phrase, urgency)
     evaluator.run()
+    good_phrase.update_activation()
     assert CodeletResult.SUCCESS == evaluator.result
     assert good_phrase.quality > original_phrase_quality
     assert 1 == len(evaluator.child_codelets)
@@ -183,6 +248,7 @@ def test_decreases_quality_of_bad_chunk(bubble_chamber, bad_phrase):
     urgency = 1.0
     evaluator = PhraseEvaluator.spawn(parent_id, bubble_chamber, bad_phrase, urgency)
     evaluator.run()
+    bad_phrase.update_activation()
     assert CodeletResult.SUCCESS == evaluator.result
     assert bad_phrase.quality < original_phrase_quality
     assert 1 == len(evaluator.child_codelets)
