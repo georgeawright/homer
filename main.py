@@ -1,3 +1,4 @@
+import random
 import math
 import statistics
 
@@ -11,6 +12,8 @@ from homer.classifiers import (
 )
 from homer.id import ID
 from homer.location import Location
+
+random.seed(123)
 from homer.loggers import DjangoLogger
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept, Lexeme, Word

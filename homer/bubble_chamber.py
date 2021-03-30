@@ -1,4 +1,3 @@
-import random
 import statistics
 from typing import List, Union
 
