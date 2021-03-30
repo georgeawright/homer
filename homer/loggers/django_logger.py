@@ -191,7 +191,7 @@ class DjangoLogger(Logger):
             codelet_record.challenger = StructureRecord.objects.get(
                 run_id=self.run, structure_id=codelet.challenger.structure_id
             )
-        if codelet.parent_id != "coderack":
+        if codelet.parent_id != "":
             codelet_record.parent = CodeletRecord.objects.get(
                 codelet_id=codelet.parent_id, run_id=self.run
             )

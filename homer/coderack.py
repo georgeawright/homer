@@ -3,7 +3,8 @@ from typing import List
 
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
-from .codelets import FactoryCodelet
+from .codelets.factory import Factory
+from .codelets.factories import RandomFactory, RationalFactory
 from .errors import NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
@@ -24,10 +25,10 @@ class Coderack:
     @classmethod
     def setup(cls, bubble_chamber: BubbleChamber, logger: Logger):
         coderack = cls(bubble_chamber, logger)
-        factory_codelet = FactoryCodelet.spawn(
-            "coderack", bubble_chamber, coderack, 1.0
-        )
-        coderack.add_codelet(factory_codelet)
+        random_factory = RandomFactory.spawn("", bubble_chamber, coderack, 1.0)
+        rational_factory = RationalFactory.spawn("", bubble_chamber, coderack, 1.0)
+        coderack.add_codelet(random_factory)
+        coderack.add_codelet(rational_factory)
         return coderack
 
     def add_codelet(self, codelet: Codelet):
@@ -67,7 +68,7 @@ class Coderack:
         randomness = self._randomness()
         rationality = 1 - randomness
         for codelet in self._codelets:
-            if isinstance(codelet, FactoryCodelet):
+            if isinstance(codelet, Factory):
                 continue
             weight = codelet.urgency * rationality + random.random() * randomness
             if weight < lowest_weight:
