@@ -76,20 +76,33 @@ class CorrespondenceBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
         target_view = bubble_chamber.views.get_active()
         target_space = bubble_chamber.working_spaces.where(
             is_basic_level=True
         ).get_active()
         target = target_space.contents.not_of_type(Space).get_exigent()
+        urgency = urgency if urgency is not None else target.exigency
         return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            target_view,
-            target_space,
-            target,
-            target.exigency,
+            parent_id, bubble_chamber, target_view, target_space, target, urgency
         )
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        parent_concept: Concept,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        correspondence_builder = cls.make(parent_id, bubble_chamber, urgency=urgency)
+        correspondence_builder.parent_concept = parent_concept
+        return correspondence_builder
 
     @property
     def _structure_concept(self):

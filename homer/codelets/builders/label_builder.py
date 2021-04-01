@@ -3,10 +3,11 @@ from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
+from homer.structure_collection import StructureCollection
 from homer.structures import Node
 from homer.structures.links import Label
 from homer.structures.nodes import Concept
-from homer.structures.spaces import ConceptualSpace, WorkingSpace
+from homer.structures.spaces import ConceptualSpace
 from homer.tools import project_item_into_space
 
 
@@ -50,10 +51,35 @@ class LabelBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
         target = bubble_chamber.input_nodes.get_unhappy()
         urgency = urgency if urgency is not None else target.unlinkedness
         return cls.spawn(parent_id, bubble_chamber, target, urgency)
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        parent_concept: Concept,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        target = StructureCollection(
+            {
+                node
+                for node in bubble_chamber.input_nodes
+                if isinstance(node.value, parent_concept.instance_type)
+            }
+        ).get_unhappy()
+        urgency = urgency if urgency is not None else target.unlinkedness
+        return cls.spawn(
+            parent_id, bubble_chamber, target, urgency, parent_concept=parent_concept
+        )
 
     @property
     def _structure_concept(self):

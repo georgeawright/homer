@@ -92,10 +92,6 @@ class Homer:
             except Exception as e:
                 raise e
             for phrase in self.bubble_chamber.phrases:
-                print(self.input_size)
-                print(phrase.parent_concept.name, phrase.size)
-                print(phrase.size == self.input_size)
-                print(phrase.parent_concept.name == "s")
                 if phrase.size == self.input_size and phrase.parent_concept.name == "s":
                     self.bubble_chamber.result = phrase.value
         return {
@@ -134,7 +130,7 @@ class Homer:
         classifier: Classifier = None,
         parent_space: ConceptualSpace = None,
         relevant_value: str = "",
-        instance_type: type = List[int],
+        instance_type: type = list,
         child_spaces: StructureCollection = None,
         distance_function: Callable = None,
         links_in: StructureCollection = None,

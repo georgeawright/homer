@@ -1,6 +1,7 @@
 import random
 import math
 import statistics
+from unittest.mock import Mock
 
 from homer import BubbleChamber, Coderack, Homer, StructureCollection
 from homer.classifiers import (
@@ -33,7 +34,8 @@ def setup_homer() -> Homer:
     ]
 
     path_to_logs = "logs"
-    logger = DjangoLogger.setup(path_to_logs)
+    # logger = DjangoLogger.setup(path_to_logs)
+    logger = Mock()
     homer = Homer.setup(logger)
 
     top_level_conceptual_space = homer.bubble_chamber.spaces["top level"]
@@ -1047,9 +1049,9 @@ def setup_homer() -> Homer:
     return homer
 
 
-for _ in range(10):
+for _ in range(1000):
     homer = setup_homer()
     homer.input_size = 6
     result = homer.run()
-    with open("results2.csv", "a") as f:
+    with open("results-with-concept-driven-factory2.csv", "a") as f:
         f.write(str(result["codelets_run"]) + "\n")

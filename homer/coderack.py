@@ -4,7 +4,7 @@ from typing import List
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
 from .codelets.factory import Factory
-from .codelets.factories import RandomFactory, RationalFactory
+from .codelets.factories import ConceptDrivenFactory, RandomFactory, RationalFactory
 from .errors import NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
@@ -25,8 +25,12 @@ class Coderack:
     @classmethod
     def setup(cls, bubble_chamber: BubbleChamber, logger: Logger):
         coderack = cls(bubble_chamber, logger)
+        concept_driven_factory = ConceptDrivenFactory.spawn(
+            "", bubble_chamber, coderack, 1.0
+        )
         random_factory = RandomFactory.spawn("", bubble_chamber, coderack, 1.0)
         rational_factory = RationalFactory.spawn("", bubble_chamber, coderack, 1.0)
+        coderack.add_codelet(concept_driven_factory)
         coderack.add_codelet(random_factory)
         coderack.add_codelet(rational_factory)
         return coderack

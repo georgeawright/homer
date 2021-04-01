@@ -3,6 +3,7 @@ from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
+from homer.structures.nodes import Concept
 
 
 class Builder(Codelet):
@@ -21,6 +22,25 @@ class Builder(Codelet):
         self.bubble_chamber = bubble_chamber
         self.child_structure = None
         self.confidence = 0.0
+
+    @classmethod
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        raise NotImplementedError
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        parent_concept: Concept,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        return cls.make(parent_id, bubble_chamber, urgency=urgency)
 
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():

@@ -10,7 +10,7 @@ from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
-from homer.structures.nodes import Chunk, Concept, Phrase, Word
+from homer.structures.nodes import Chunk, Concept, Phrase, Rule, Word
 
 
 class PhraseBuilder(Builder):
@@ -46,7 +46,7 @@ class PhraseBuilder(Builder):
         target_left_branch: Union[Phrase, Word],
         target_right_branch: Union[Phrase, Word],
         urgency: FloatBetweenOneAndZero,
-        target_rule: Concept = None,
+        target_rule: Rule = None,
     ):
         codelet_id = ID.new(cls)
         return cls(
@@ -76,27 +76,7 @@ class PhraseBuilder(Builder):
             targets = StructureCollection({target_one, target_two, target_three})
         except MissingStructureError:
             targets = StructureCollection({target_one, target_two})
-        target_root = None
-        for target in targets:
-            remaining_targets = StructureCollection.difference(
-                targets, StructureCollection({target})
-            )
-            if hasattr(target, "members") and target.members == remaining_targets:
-                target_root = target
-                target_left_branch = target_root.left_branch
-                target_right_branch = target_root.right_branch
-        if target_root is None:
-            branch_one = targets.get_random()
-            branch_two = targets.get_random(exclude=[branch_one])
-            if (
-                branch_one.location.coordinates[0][0]
-                < branch_two.location.coordinates[0][0]
-            ):
-                target_left_branch = branch_one
-                target_right_branch = branch_two
-            else:
-                target_left_branch = branch_two
-                target_right_branch = branch_one
+        root, left_branch, right_branch = cls.arrange_targets(targets)
         urgency = (
             urgency
             if urgency is not None
@@ -105,11 +85,87 @@ class PhraseBuilder(Builder):
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            target_root,
-            target_left_branch,
-            target_right_branch,
+            root,
+            left_branch,
+            right_branch,
             urgency,
         )
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_rule: Rule,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        target_one = StructureCollection(
+            {
+                fragment
+                for fragment in bubble_chamber.text_fragments
+                if target_rule.is_compatible_with(fragment)
+            }
+        ).get_unhappy()
+        target_two = StructureCollection(
+            {
+                fragment
+                for fragment in target_one.potential_rule_mates
+                if target_rule.is_compatible_with(target_one, fragment)
+            }
+        ).get_unhappy()
+        try:
+            target_three = StructureCollection(
+                {
+                    fragment
+                    for fragment in StructureCollection.intersection(
+                        target_one.potential_rule_mates, target_two.potential_rule_mates
+                    )
+                    if target_rule.is_compatible_with(target_one, target_two, fragment)
+                }
+            ).get_unhappy()
+            targets = StructureCollection({target_one, target_two, target_three})
+        except MissingStructureError:
+            targets = StructureCollection({target_one, target_two})
+        root, left_branch, right_branch = cls.arrange_targets(targets)
+        urgency = (
+            urgency
+            if urgency is not None
+            else statistics.fmean([target.unhappiness for target in targets])
+        )
+        return cls.spawn(
+            parent_id,
+            bubble_chamber,
+            root,
+            left_branch,
+            right_branch,
+            urgency,
+            target_rule=target_rule,
+        )
+
+    @classmethod
+    def arrange_targets(cls, targets: StructureCollection):
+        root = None
+        for target in targets:
+            remaining_targets = StructureCollection.difference(
+                targets, StructureCollection({target})
+            )
+            if hasattr(target, "members") and target.members == remaining_targets:
+                root = target
+                left_branch = root.left_branch
+                right_branch = root.right_branch
+        if root is None:
+            branch_one = targets.get_random()
+            branch_two = targets.get_random(exclude=[branch_one])
+            if (
+                branch_one.location.coordinates[0][0]
+                < branch_two.location.coordinates[0][0]
+            ):
+                left_branch = branch_one
+                right_branch = branch_two
+            else:
+                left_branch = branch_two
+                right_branch = branch_one
+        return (root, left_branch, right_branch)
 
     @property
     def _structure_concept(self):

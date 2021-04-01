@@ -10,7 +10,7 @@ from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structures import Space, View
-from homer.structures.nodes import Chunk
+from homer.structures.nodes import Chunk, Concept
 from homer.tools import average_vector, project_item_into_space
 
 
@@ -50,7 +50,12 @@ class ChunkBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
         target = bubble_chamber.chunks.get_unhappy()
         urgency = urgency if urgency is not None else target.unhappiness
         return cls.spawn(parent_id, bubble_chamber, target, urgency)
