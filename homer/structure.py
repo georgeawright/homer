@@ -345,7 +345,7 @@ class Structure(ABC):
             return
         if self.parent_concept is not None:
             self.parent_concept.boost_activation(self.activation)
-        for link in self.links_out:
+        for link in self.links:
             try:
                 link.end.boost_activation(link.activation)
             except AttributeError:  # labels have no end
