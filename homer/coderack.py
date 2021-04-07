@@ -1,5 +1,4 @@
 import random
-from typing import List
 
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet

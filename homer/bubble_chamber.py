@@ -62,7 +62,7 @@ class BubbleChamber:
 
     @property
     def input_nodes(self) -> StructureCollection:
-        return self.words
+        return StructureCollection.union(self.chunks, self.words)
 
     @property
     def structures(self) -> StructureCollection:

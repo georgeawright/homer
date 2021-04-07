@@ -32,7 +32,7 @@ def test_gives_function_word_maximum_quality():
     bubble_chamber.concepts = {"evaluate": Mock(), "word": Mock()}
     word = Mock()
     word.quality = 0
-    word.concepts = None
+    word.concepts = StructureCollection()
     evaluator = WordEvaluator(Mock(), Mock(), bubble_chamber, word, Mock())
     evaluator.run()
     assert 1 == word.quality

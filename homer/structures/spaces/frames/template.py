@@ -33,4 +33,4 @@ class Template(Frame):
         )
 
     def __getitem__(self, index: int) -> Word:
-        return self.contents.at(Location([index], self)).get_random()
+        return self.contents.at(Location([[index]], self)).get_random()

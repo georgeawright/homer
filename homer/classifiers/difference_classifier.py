@@ -1,5 +1,6 @@
 from homer.classifier import Classifier
 from homer.structures import Space
+from homer.tools import average_vector
 
 
 class DifferenceClassifier(Classifier):
@@ -18,15 +19,15 @@ class DifferenceClassifier(Classifier):
     def classify(self, **kwargs: dict):
         class Dummy:
             def __init__(self, value):
-                self.value = [value]
+                self.value = [[value]]
 
         start = kwargs["start"]
         end = kwargs["end"]
         space = kwargs["space"]
 
         difference = (
-            getattr(start, space.parent_concept.relevant_value)[0]
-            - getattr(end, space.parent_concept.relevant_value)[0]
+            average_vector(getattr(start, space.parent_concept.relevant_value))[0]
+            - average_vector(getattr(end, space.parent_concept.relevant_value))[0]
         )
         difference_container = Dummy(difference)
         kwargs["start"] = difference_container

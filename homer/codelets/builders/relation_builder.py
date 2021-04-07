@@ -86,8 +86,8 @@ class RelationBuilder(Builder):
             {
                 space
                 for space in bubble_chamber.working_spaces
-                if parent_concept.parent_space.is_compatible_with(space)
-                and space.no_of_dimensions == 1
+                if space.no_of_dimensions == 1
+                and parent_concept.is_compatible_with(space.parent_concept)
             }
         ).get_random()
         target = target_space.contents.of_type(Chunk).get_exigent()

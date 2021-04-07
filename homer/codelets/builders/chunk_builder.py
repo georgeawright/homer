@@ -185,8 +185,8 @@ class ChunkBuilder(Builder):
         values = []
         for chunk in chunks:
             for _ in range(chunk.size):
-                values.append(chunk.value)
-        return average_vector(values)
+                values.append(chunk.value[0])
+        return [average_vector(values)]
 
     def _get_average_location(self, chunks: StructureCollection, space: Space = None):
         if space is not None:

@@ -59,7 +59,7 @@ class Word(Node):
 
     @property
     def concepts(self):
-        return self.lexeme.concepts if self.lexeme is not None else None
+        return self.lexeme.concepts
 
     @property
     def potential_rule_mates(self) -> StructureCollection:

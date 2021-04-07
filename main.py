@@ -1,7 +1,5 @@
 import random
-import math
 import statistics
-from unittest.mock import Mock
 
 from homer import BubbleChamber, Coderack, Homer, StructureCollection
 from homer.classifiers import (
@@ -20,6 +18,7 @@ from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
+from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
 
@@ -34,8 +33,7 @@ def setup_homer() -> Homer:
     ]
 
     path_to_logs = "logs"
-    # logger = DjangoLogger.setup(path_to_logs)
-    logger = Mock()
+    logger = DjangoLogger.setup(path_to_logs)
     homer = Homer.setup(logger)
 
     top_level_conceptual_space = homer.bubble_chamber.spaces["top level"]
@@ -47,7 +45,7 @@ def setup_homer() -> Homer:
         name="input",
         parent_space=top_level_conceptual_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     input_space = homer.def_working_space(
         name="input",
@@ -148,27 +146,27 @@ def setup_homer() -> Homer:
         parent_concept=text_concept,
         locations=[Location([], top_level_conceptual_space)],
     )
-    # homer.def_concept_link(build_concept, chunk_concept)
-    # homer.def_concept_link(build_concept, correspondence_concept)
+    homer.def_concept_link(build_concept, chunk_concept)
+    homer.def_concept_link(build_concept, correspondence_concept)
     homer.def_concept_link(build_concept, label_concept, activation=1.0)
     homer.def_concept_link(build_concept, phrase_concept)
-    # homer.def_concept_link(build_concept, relation_concept)
-    # homer.def_concept_link(build_concept, view_concept)
-    # homer.def_concept_link(build_concept, word_concept)
-    # homer.def_concept_link(evaluate_concept, chunk_concept)
-    # homer.def_concept_link(evaluate_concept, correspondence_concept)
+    homer.def_concept_link(build_concept, relation_concept)
+    homer.def_concept_link(build_concept, view_concept)
+    homer.def_concept_link(build_concept, word_concept)
+    homer.def_concept_link(evaluate_concept, chunk_concept)
+    homer.def_concept_link(evaluate_concept, correspondence_concept)
     homer.def_concept_link(evaluate_concept, label_concept)
     homer.def_concept_link(evaluate_concept, phrase_concept)
-    # homer.def_concept_link(evaluate_concept, relation_concept)
-    # homer.def_concept_link(evaluate_concept, view_concept)
-    # homer.def_concept_link(evaluate_concept, word_concept)
-    # homer.def_concept_link(select_concept, chunk_concept)
-    # homer.def_concept_link(select_concept, correspondence_concept)
+    homer.def_concept_link(evaluate_concept, relation_concept)
+    homer.def_concept_link(evaluate_concept, view_concept)
+    homer.def_concept_link(evaluate_concept, word_concept)
+    homer.def_concept_link(select_concept, chunk_concept)
+    homer.def_concept_link(select_concept, correspondence_concept)
     homer.def_concept_link(select_concept, label_concept)
     homer.def_concept_link(select_concept, phrase_concept)
-    # homer.def_concept_link(select_concept, relation_concept)
-    # homer.def_concept_link(select_concept, view_concept)
-    # homer.def_concept_link(select_concept, word_concept)
+    homer.def_concept_link(select_concept, relation_concept)
+    homer.def_concept_link(select_concept, view_concept)
+    homer.def_concept_link(select_concept, word_concept)
     homer.def_concept_link(build_concept, evaluate_concept, activation=1.0)
     homer.def_concept_link(evaluate_concept, select_concept, activation=1.0)
     homer.def_concept_link(select_concept, build_concept, activation=1.0)
@@ -352,7 +350,7 @@ def setup_homer() -> Homer:
         name="temperature",
         parent_space=label_concepts_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     temperature_space = homer.def_conceptual_space(
         name="temperature",
@@ -363,11 +361,11 @@ def setup_homer() -> Homer:
     )
     hot = homer.def_concept(
         name="hot",
-        prototype=[22],
+        prototype=[[22]],
         classifier=ProximityClassifier(),
         parent_space=temperature_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     hot_lexeme = homer.def_lexeme(
         headword="hot",
@@ -385,11 +383,11 @@ def setup_homer() -> Homer:
     )
     warm = homer.def_concept(
         name="warm",
-        prototype=[16],
+        prototype=[[16]],
         classifier=ProximityClassifier(),
         parent_space=temperature_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     warm_lexeme = homer.def_lexeme(
         headword="warm",
@@ -407,11 +405,11 @@ def setup_homer() -> Homer:
     )
     mild = homer.def_concept(
         name="mild",
-        prototype=[10],
+        prototype=[[10]],
         classifier=ProximityClassifier(),
         parent_space=temperature_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     mild_lexeme = homer.def_lexeme(
         headword="mild",
@@ -429,11 +427,11 @@ def setup_homer() -> Homer:
     )
     cold = homer.def_concept(
         name="cold",
-        prototype=[4],
+        prototype=[[4]],
         classifier=ProximityClassifier(),
         parent_space=temperature_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     cold_lexeme = homer.def_lexeme(
         headword="cold",
@@ -453,7 +451,7 @@ def setup_homer() -> Homer:
         name="location",
         parent_space=label_concepts_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     north_south_space = homer.def_conceptual_space(
         name="north-south",
@@ -461,7 +459,7 @@ def setup_homer() -> Homer:
         locations=[Location([], label_concepts_space)],
         no_of_dimensions=1,
         super_space_to_coordinate_function_map={
-            "location": lambda location: [location.coordinates[0]]
+            "location": lambda location: [[c[0] for c in location.coordinates]]
         },
     )
     west_east_space = homer.def_conceptual_space(
@@ -470,7 +468,7 @@ def setup_homer() -> Homer:
         locations=[Location([], label_concepts_space)],
         no_of_dimensions=1,
         super_space_to_coordinate_function_map={
-            "location": lambda location: [location.coordinates[1]]
+            "location": lambda location: [[c[1] for c in location.coordinates]]
         },
     )
     nw_se_space = homer.def_conceptual_space(
@@ -479,7 +477,9 @@ def setup_homer() -> Homer:
         locations=[Location([], label_concepts_space)],
         no_of_dimensions=1,
         super_space_to_coordinate_function_map={
-            "location": lambda location: [statistics.fmean(location.coordinates)]
+            "location": lambda location: [
+                [statistics.fmean(c) for c in location.coordinates]
+            ]
         },
     )
     ne_sw_space = homer.def_conceptual_space(
@@ -489,7 +489,7 @@ def setup_homer() -> Homer:
         no_of_dimensions=1,
         super_space_to_coordinate_function_map={
             "location": lambda location: [
-                statistics.fmean([location.coordinates[0], 4 - location.coordinates[1]])
+                [statistics.fmean([c[0], 4 - c[1]]) for c in location.coordinates]
             ]
         },
     )
@@ -504,11 +504,11 @@ def setup_homer() -> Homer:
     )
     north = homer.def_concept(
         name="north",
-        prototype=[0, 2],
+        prototype=[[0, 2]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     north_lexeme = homer.def_lexeme(
         headword="north",
@@ -526,11 +526,11 @@ def setup_homer() -> Homer:
     )
     south = homer.def_concept(
         name="south",
-        prototype=[5, 2],
+        prototype=[[5, 2]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     south_lexeme = homer.def_lexeme(
         headword="south",
@@ -548,11 +548,11 @@ def setup_homer() -> Homer:
     )
     east = homer.def_concept(
         name="east",
-        prototype=[2.5, 4],
+        prototype=[[2.5, 4]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     east_lexeme = homer.def_lexeme(
         headword="east",
@@ -570,11 +570,11 @@ def setup_homer() -> Homer:
     )
     west = homer.def_concept(
         name="west",
-        prototype=[2.5, 0],
+        prototype=[[2.5, 0]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     west_lexeme = homer.def_lexeme(
         headword="west",
@@ -592,11 +592,11 @@ def setup_homer() -> Homer:
     )
     northwest = homer.def_concept(
         name="northwest",
-        prototype=[0, 0],
+        prototype=[[0, 0]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     northwest_lexeme = homer.def_lexeme(
         headword="northwest",
@@ -614,11 +614,11 @@ def setup_homer() -> Homer:
     )
     northeast = homer.def_concept(
         name="northeast",
-        prototype=[0, 4],
+        prototype=[[0, 4]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     northeast_lexeme = homer.def_lexeme(
         headword="northeast",
@@ -636,11 +636,11 @@ def setup_homer() -> Homer:
     )
     southwest = homer.def_concept(
         name="southwest",
-        prototype=[5, 0],
+        prototype=[[5, 0]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     southwest_lexeme = homer.def_lexeme(
         headword="southwest",
@@ -658,11 +658,11 @@ def setup_homer() -> Homer:
     )
     southeast = homer.def_concept(
         name="southeast",
-        prototype=[5, 4],
+        prototype=[[5, 4]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     southeast_lexeme = homer.def_lexeme(
         headword="southeast",
@@ -680,11 +680,11 @@ def setup_homer() -> Homer:
     )
     midlands = homer.def_concept(
         name="midlands",
-        prototype=[2.5, 2],
+        prototype=[[2.5, 2]],
         classifier=ProximityClassifier(),
         parent_space=location_space,
         relevant_value="coordinates",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     midlands_lexeme = homer.def_lexeme(
         headword="midlands",
@@ -704,7 +704,7 @@ def setup_homer() -> Homer:
         name="more-less",
         parent_space=relational_concepts_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     more_less_space = homer.def_conceptual_space(
         name="more-less",
@@ -714,11 +714,11 @@ def setup_homer() -> Homer:
     )
     more = homer.def_concept(
         name="more",
-        prototype=[4],
+        prototype=[[4]],
         classifier=DifferenceClassifier(ProximityClassifier()),
         parent_space=more_less_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     more_lexeme = homer.def_lexeme(
         headword="more",
@@ -736,11 +736,11 @@ def setup_homer() -> Homer:
     )
     less = homer.def_concept(
         name="less",
-        prototype=[-4],
+        prototype=[[-4]],
         classifier=DifferenceClassifier(ProximityClassifier()),
         parent_space=more_less_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     less_lexeme = homer.def_lexeme(
         headword="less",
@@ -760,7 +760,7 @@ def setup_homer() -> Homer:
         name="same-different",
         parent_space=correspondential_concepts_space,
         relevant_value="value",
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     same_different_space = homer.def_conceptual_space(
         name="same-different",
@@ -772,13 +772,13 @@ def setup_homer() -> Homer:
         name="same",
         classifier=SamenessClassifier(),
         parent_space=same_different_space,
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     different = homer.def_concept(
         name="different",
         classifier=DifferentnessClassifier(),
         parent_space=same_different_space,
-        distance_function=math.dist,
+        distance_function=centroid_euclidean_distance,
     )
     the_lexeme = homer.def_lexeme(
         headword="the",
@@ -826,8 +826,8 @@ def setup_homer() -> Homer:
     template_1_slot = homer.def_chunk(
         locations=[
             Location([], template_1),
-            Location([0, 0], template_1_location_space),
-            Location([0], template_1_temperature_space),
+            Location([[0, 0]], template_1_location_space),
+            Location([[0]], template_1_temperature_space),
         ],
         parent_space=template_1,
     )
@@ -857,8 +857,8 @@ def setup_homer() -> Homer:
     template_2_slot = homer.def_chunk(
         locations=[
             Location([], template_2),
-            Location([0, 0], template_2_location_space),
-            Location([0], template_2_temperature_space),
+            Location([[0, 0]], template_2_location_space),
+            Location([[0]], template_2_temperature_space),
         ],
         parent_space=template_2,
     )
@@ -888,16 +888,16 @@ def setup_homer() -> Homer:
     template_3_slot_1 = homer.def_chunk(
         locations=[
             Location([], template_3),
-            Location([0, 0], template_3_location_space),
-            Location([0], template_3_temperature_space),
+            Location([[0, 0]], template_3_location_space),
+            Location([[0]], template_3_temperature_space),
         ],
         parent_space=template_3,
     )
     template_3_slot_2 = homer.def_chunk(
         locations=[
             Location([], template_3),
-            Location([0, 0], template_3_location_space),
-            Location([0], template_3_temperature_space),
+            Location([[0, 0]], template_3_location_space),
+            Location([[0]], template_3_temperature_space),
         ],
         parent_space=template_3,
     )
@@ -932,16 +932,16 @@ def setup_homer() -> Homer:
     template_4_slot_1 = homer.def_chunk(
         locations=[
             Location([], template_4),
-            Location([0, 0], template_4_location_space),
-            Location([0], template_4_temperature_space),
+            Location([[0, 0]], template_4_location_space),
+            Location([[0]], template_4_temperature_space),
         ],
         parent_space=template_4,
     )
     template_4_slot_2 = homer.def_chunk(
         locations=[
             Location([], template_4),
-            Location([0, 0], template_4_location_space),
-            Location([0], template_4_temperature_space),
+            Location([[0, 0]], template_4_location_space),
+            Location([[0]], template_4_temperature_space),
         ],
         parent_space=template_4,
     )
@@ -960,12 +960,12 @@ def setup_homer() -> Homer:
     homer.def_correspondence(template_4_slot_1_location_label, template_4[5])
     homer.def_correspondence(template_4_slot_2_location_label, template_4[8])
 
-    if False:
+    if True:
         input_chunks = StructureCollection()
         for i, row in enumerate(problem):
             for j, cell in enumerate(row):
-                value = [cell]
-                location = Location([i, j], homer.bubble_chamber.spaces["input"])
+                value = [[cell]]
+                location = Location([[i, j]], homer.bubble_chamber.spaces["input"])
                 members = StructureCollection()
                 quality = 0.0
                 chunk = Chunk(
@@ -982,7 +982,7 @@ def setup_homer() -> Homer:
                 homer.bubble_chamber.chunks.add(chunk)
                 input_space.contents.add(chunk)
 
-    if True:
+    if False:
         input_words = StructureCollection(
             {
                 Word(
@@ -1049,9 +1049,8 @@ def setup_homer() -> Homer:
     return homer
 
 
-for _ in range(1000):
+for _ in range(1):
     homer = setup_homer()
-    homer.input_size = 6
     result = homer.run()
-    with open("results-with-concept-driven-factory2.csv", "a") as f:
+    with open("results.csv", "a") as f:
         f.write(str(result["codelets_run"]) + "\n")
