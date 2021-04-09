@@ -72,14 +72,11 @@ class LabelSelector(Selector):
         )
 
     def _engender_follow_up(self):
-        new_target = self.bubble_chamber.input_nodes.get_exigent()
         self.child_codelets.append(
-            LabelBuilder.spawn(
+            LabelBuilder.make_top_down(
                 self.codelet_id,
                 self.bubble_chamber,
-                new_target,
-                new_target.unlinkedness,
-                parent_concept=self.champion.parent_concept,
+                self.champion.parent_concept,
             )
         )
         self.child_codelets.append(

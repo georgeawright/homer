@@ -12,7 +12,7 @@ from homer.coderack import Coderack
         ([0.2, 0.4, 0.6, 0.8], 0.0, [0.9, 0.1, 0.1, 0.1], 0.2),
     ],
 )
-def test_select_codelet(
+def test_select_a_codelet(
     urgency_values, bubble_chamber_satisfaction, random_numbers, expected_urgency
 ):
     with patch.object(random, "random", side_effect=random_numbers):
@@ -24,5 +24,5 @@ def test_select_codelet(
             codelet = Mock()
             codelet.urgency = urgency_value
             coderack._codelets.append(codelet)
-        codelet = coderack.select_codelet()
+        codelet = coderack._select_a_codelet()
         assert expected_urgency == codelet.urgency
