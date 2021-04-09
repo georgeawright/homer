@@ -84,7 +84,7 @@ def chunk(bubble_chamber, working_space):
     chunk = Chunk(
         Mock(),
         Mock(),
-        Mock(),
+        [[10]],
         [Mock()],
         Mock(),
         Mock(),
@@ -104,7 +104,7 @@ def good_label(chunk, conceptual_space, working_space):
         Location(Mock(), conceptual_space),
         Mock(),
         Mock(),
-        Mock(),
+        list,
         Mock(),
         Mock(),
     )
@@ -130,7 +130,7 @@ def bad_label(chunk, conceptual_space, working_space):
         Location(Mock(), conceptual_space),
         Mock(),
         Mock(),
-        Mock(),
+        list,
         Mock(),
         Mock(),
     )
