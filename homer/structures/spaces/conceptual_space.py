@@ -89,6 +89,8 @@ class ConceptualSpace(Space):
                 links_in=StructureCollection(),
                 links_out=StructureCollection(),
             )
+            if containing_space is not None:
+                containing_space.add(self._instances[containing_space])
         return self._instances[containing_space]
 
     def update_activation(self):

@@ -56,8 +56,11 @@ class StructureCollection:
             {
                 structure
                 for structure in location.space.contents
-                if structure.location.coordinates[-1][0] == left_most_coordinate - 1
-                or structure.location.coordinates[0][0] == right_most_coordinate + 1
+                if structure.location_in_space(location.space).coordinates != []
+                and (
+                    structure.location.coordinates[-1][0] == left_most_coordinate - 1
+                    or structure.location.coordinates[0][0] == right_most_coordinate + 1
+                )
             }
         )
 

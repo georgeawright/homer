@@ -174,9 +174,9 @@ def target_chunk(bubble_chamber):
         Mock(),
         [],
         StructureCollection(),
-        Mock(),
-        Mock(),
-        Mock(),
+        0,
+        [],
+        [],
     )
     chunk = Chunk(
         Mock(),

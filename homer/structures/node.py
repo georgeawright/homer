@@ -61,11 +61,14 @@ class Node(Structure):
     def nearby(self, space: Space = None) -> StructureCollection:
         if space is not None:
             return StructureCollection.difference(
-                space.contents.near(self.location_in_space(space)).of_type(type(self)),
+                space.contents.of_type(type(self)).near(self.location_in_space(space)),
                 StructureCollection({self}),
             )
         nearby_nodes = StructureCollection.union(
-            *[location.space.contents.near(location) for location in self.locations]
-        ).of_type(type(self))
+            *[
+                location.space.contents.of_type(type(self)).near(location)
+                for location in self.locations
+            ]
+        )
         nearby_nodes.remove(self)
         return nearby_nodes
