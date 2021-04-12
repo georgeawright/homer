@@ -141,7 +141,7 @@ class Correspondence(Link):
             other_corresponding_nodes = StructureCollection(
                 {other.start.start, other.end.start}
             )
-        if areinstances(self.arguments, Relation):
+        if areinstances(other.arguments, Relation):
             other_corresponding_nodes = StructureCollection(
                 {other.start.start, other.start.end, other.end.start, other.end.end}
             )
@@ -165,3 +165,6 @@ class Correspondence(Link):
         ):
             return True
         return False
+
+    def __repr__(self) -> str:
+        return self.structure_id

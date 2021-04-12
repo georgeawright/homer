@@ -433,6 +433,7 @@ class Homer:
             quality=quality,
         )
         start.links_out.add(label)
+        parent_space.add(label)
         if not label.is_slot:
             self.bubble_chamber.labels.add(label)
         self.logger.log(label)

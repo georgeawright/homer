@@ -172,7 +172,7 @@ def same_different_space(same_different_concept, bubble_chamber):
 @pytest.fixture
 def same_concept(same_different_space, bubble_chamber):
     concept = Concept(
-        Mock(),
+        "same concept",
         Mock(),
         "same",
         Location([1], same_different_space),
@@ -217,6 +217,7 @@ def temperature_conceptual_space(temperature_concept, bubble_chamber):
         1,
         [],
         [],
+        is_basic_level=True,
     )
     temperature_concept.child_spaces.add(space)
     bubble_chamber.conceptual_spaces.add(space)
@@ -227,7 +228,7 @@ def temperature_conceptual_space(temperature_concept, bubble_chamber):
 @pytest.fixture
 def mild_concept(temperature_conceptual_space, bubble_chamber):
     concept = Concept(
-        Mock(),
+        "mild concept",
         Mock(),
         "mild",
         Location([10], temperature_conceptual_space),
@@ -305,7 +306,7 @@ def temperature_template_space(
     temperature_concept, temperature_conceptual_space, template, bubble_chamber
 ):
     space = WorkingSpace(
-        Mock(),
+        "temperature space for template",
         Mock(),
         "temperature space for template",
         temperature_concept,
@@ -340,7 +341,7 @@ def target_view(bubble_chamber, input_space, template):
 @pytest.fixture
 def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
     chunk = Chunk(
-        Mock(),
+        "target chunk",
         Mock(),
         [10],
         [Location([10], temperature_working_space)],
@@ -351,7 +352,7 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
     temperature_working_space.add(chunk)
     bubble_chamber.chunks.add(chunk)
     mild_label = Label(
-        Mock(), Mock(), chunk, mild_concept, temperature_working_space, 1.0
+        "mild label", Mock(), chunk, mild_concept, temperature_working_space, 1.0
     )
     bubble_chamber.labels.add(mild_label)
     chunk.links_out.add(mild_label)
@@ -374,7 +375,7 @@ def target_slot(
     temperature_concept, template, temperature_template_space, bubble_chamber
 ):
     slot = Chunk(
-        Mock(),
+        "target slot",
         Mock(),
         None,
         [Location([0], template), Location([], temperature_template_space)],
@@ -385,7 +386,9 @@ def target_slot(
     bubble_chamber.slots.add(slot)
     template.add(slot)
     temperature_template_space.add(slot)
-    slot_label = Label(Mock(), Mock(), slot, None, temperature_template_space, 1.0)
+    slot_label = Label(
+        "slot label", Mock(), slot, None, temperature_template_space, 1.0
+    )
     slot.links_out.add(slot_label)
     temperature_template_space.add(slot_label)
     bubble_chamber.labels.add(slot_label)
@@ -407,11 +410,11 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
         "", bubble_chamber, target_view, temperature_working_space, target_label, 1.0
     )
     builder.run()
-    assert same_concept == builder.parent_concept
     assert CodeletResult.SUCCESS == builder.result
+    assert same_concept == builder.parent_concept
     assert isinstance(builder.child_structure, Correspondence)
     assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
-    assert target_view.slot_values[target_slot_label.structure_id] == mild_concept.value
+    assert target_view.slot_values[target_slot_label.structure_id] == mild_concept
     builder.child_structure.quality = 1.0
 
     builder = CorrespondenceBuilder.spawn(

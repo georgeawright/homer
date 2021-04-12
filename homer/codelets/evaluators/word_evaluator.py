@@ -49,19 +49,20 @@ class WordEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get_random()
 
     def _calculate_confidence(self):
-        if self.target_structure.concepts.is_empty():
-            self.confidence = 1.0
-        else:
-            labels = StructureCollection.union(
-                *[
-                    correspondee.labels
-                    for correspondee in self.target_structure.correspondees
-                ]
-            )
-            compatible_labels = [
-                label
-                for label in labels
-                if label.parent_concept in self.target_structure.concepts
+        labels = StructureCollection.union(
+            *[
+                correspondee.labels
+                for correspondee in self.target_structure.correspondees
             ]
-            self.confidence = max(label.quality for label in compatible_labels)
+        )
+        compatible_labels = [
+            label
+            for label in labels
+            if label.parent_concept in self.target_structure.concepts
+        ]
+        self.confidence = (
+            max(label.quality for label in compatible_labels)
+            if compatible_labels != []
+            else 1.0
+        )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

@@ -358,3 +358,6 @@ class Structure(ABC):
             self._activation + self._activation_buffer
         )
         self._activation_buffer = 0.0
+
+    def __str__(self) -> str:
+        return self.structure_id

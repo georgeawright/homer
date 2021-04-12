@@ -14,11 +14,11 @@ class DifferentnessClassifier(Classifier):
         start = kwargs["start"]
         end = kwargs["end"]
         differentness_concept = kwargs["concept"]
-        if type(start) != type(end):
-            return FloatBetweenOneAndZero(0)
-        if isinstance(start, Label):
+        if isinstance(start, Label) and isinstance(end, Label):
+            if start.is_slot or end.is_slot:
+                return 0.0
             return 1 - start.parent_concept.proximity_to(end.parent_concept)
-        if isinstance(start, Chunk):
+        if isinstance(start, Chunk) and isinstance(end, Chunk):
             common_correspondences = set.intersection(
                 {
                     correspondence
@@ -41,7 +41,7 @@ class DifferentnessClassifier(Classifier):
                 )
             except statistics.StatisticsError:
                 return FloatBetweenOneAndZero(0)
-        if isinstance(start, Relation):
+        if isinstance(start, Relation) and isinstance(end, Relation):
             relation_starts_sameness = self.classify(
                 start=start.start, end=end.start, concept=differentness_concept
             )

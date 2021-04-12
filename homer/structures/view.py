@@ -84,6 +84,12 @@ class View(Structure):
         )
 
     @property
+    def input_frames(self):
+        return StructureCollection(
+            {space for space in self.input_spaces if isinstance(space, Frame)}
+        )
+
+    @property
     def size(self):
         return len(self.members)
 
