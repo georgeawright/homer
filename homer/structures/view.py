@@ -135,3 +135,9 @@ class View(Structure):
             ):
                 return True
         return False
+
+    def __repr__(self) -> str:
+        inputs = ", ".join([space.structure_id for space in self.input_spaces])
+        return (
+            f"<{self.structure_id} from {inputs} to {self.output_space.structure_id}>"
+        )

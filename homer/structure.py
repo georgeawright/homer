@@ -349,5 +349,5 @@ class Structure(ABC):
     def copy(self, **kwargs: dict):
         raise NotImplementedError
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         return self.structure_id

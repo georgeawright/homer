@@ -54,3 +54,8 @@ class Link(Structure):
     def spread_activation(self):
         if self.parent_concept is not None:
             self.parent_concept.boost_activation(self.activation)
+
+    def __repr__(self) -> str:
+        args = ", ".join([arg.structure_id for arg in self.arguments])
+        spaces = ", ".join([location.space.name for location in self.locations])
+        return f"<{self.structure_id} {self.parent_concept.name}({args}) in {spaces}>"
