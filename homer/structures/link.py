@@ -48,11 +48,6 @@ class Link(Structure):
     def is_slot(self) -> bool:
         return self.parent_concept is None
 
-    def copy(
-        self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
-    ):
-        raise NotImplementedError
-
     def is_between(self, a: Structure, b: Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a
 

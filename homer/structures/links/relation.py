@@ -54,18 +54,21 @@ class Relation(Link):
 
         return RelationSelector
 
-    def copy(
-        self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
-    ) -> Relation:
-        start = new_arg if new_arg is not None and old_arg == self.start else self.start
-        end = new_arg if new_arg is not None and old_arg == self.end else self.end
+    def copy(self, **kwargs) -> Relation:
+        """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
+        start = kwargs["start"] if "start" in kwargs else self.start
+        end = kwargs["end"] if "end" in kwargs else self.end
+        parent_space = (
+            kwargs["parent_space"] if "parent_space" in kwargs else self.parent_space
+        )
+        parent_id = kwargs["parent_id"] if "parent_id" in kwargs else ""
         new_relation = Relation(
             ID.new(Relation),
             parent_id,
             start,
             end,
             self.parent_concept,
-            self.parent_space,
+            parent_space,
             self.quality,
         )
         return new_relation

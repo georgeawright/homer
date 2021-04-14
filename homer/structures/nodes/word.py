@@ -88,12 +88,11 @@ class Word(Node):
             }
         )
 
-    def copy(
-        self,
-        bubble_chamber: "BubbleChamber",
-        parent_id: str = "",
-        parent_space: Space = None,
-    ) -> Word:
+    def copy(self, **kwargs: dict) -> Word:
+        """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""
+        bubble_chamber = kwargs["bubble_chamber"]
+        parent_id = kwargs["parent_id"]
+        parent_space = kwargs["parent_space"]
         location = Location(self.location.coordinates, parent_space)
         new_word = Word(
             ID.new(Word),

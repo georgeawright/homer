@@ -196,7 +196,7 @@ def temperature_concept(bubble_chamber):
         Location([], bubble_chamber.spaces["label concepts"]),
         Mock(),
         "value",
-        Mock(),
+        list,
         StructureCollection(),
         math.dist,
     )
@@ -234,7 +234,7 @@ def mild_concept(temperature_conceptual_space, bubble_chamber):
         Location([10], temperature_conceptual_space),
         Mock(),
         "value",
-        Mock(),
+        list,
         StructureCollection(),
         math.dist,
     )
@@ -404,25 +404,25 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
     same_concept,
     mild_concept,
 ):
-    target_label = target_chunk.labels.get_random()
-    target_slot_label = target_slot.labels.get_random()
     builder = CorrespondenceBuilder.spawn(
-        "", bubble_chamber, target_view, temperature_working_space, target_label, 1.0
+        "", bubble_chamber, target_view, temperature_working_space, target_chunk, 1.0
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert same_concept == builder.parent_concept
     assert isinstance(builder.child_structure, Correspondence)
     assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
-    assert target_view.slot_values[target_slot_label.structure_id] == mild_concept
     builder.child_structure.quality = 1.0
 
+    target_label = target_chunk.labels.get_random()
+    target_slot_label = target_slot.labels.get_random()
     builder = CorrespondenceBuilder.spawn(
-        "", bubble_chamber, target_view, temperature_working_space, target_chunk, 1.0
+        "", bubble_chamber, target_view, temperature_working_space, target_label, 1.0
     )
     builder.run()
     assert same_concept == builder.parent_concept
     assert CodeletResult.SUCCESS == builder.result
+    assert target_view.slot_values[target_slot_label.structure_id] == mild_concept
     assert isinstance(builder.child_structure, Correspondence)
     assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
 

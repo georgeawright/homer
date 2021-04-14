@@ -58,16 +58,19 @@ class Label(Link):
     def is_slot(self) -> bool:
         return self.parent_concept is None
 
-    def copy(
-        self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
-    ) -> Label:
-        start = new_arg if new_arg is not None else self.start
+    def copy(self, **kwargs: dict) -> Label:
+        """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
+        start = kwargs["start"] if "start" in kwargs else self.start
+        parent_space = (
+            kwargs["parent_space"] if "parent_space" in kwargs else self.parent_space
+        )
+        parent_id = kwargs["parent_id"] if "parent_id" in kwargs else ""
         new_label = Label(
             ID.new(Label),
             parent_id,
             start,
             self.parent_concept,
-            self.parent_space,
+            parent_space,
             self.quality,
         )
         return new_label

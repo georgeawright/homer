@@ -1,4 +1,3 @@
-import math
 import pytest
 from unittest.mock import Mock
 
@@ -11,6 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import WorkingSpace
+from homer.tools import centroid_euclidean_distance
 
 
 @pytest.fixture
@@ -73,7 +73,7 @@ def target_chunk(bubble_chamber):
         "coordinates",
         Mock(),
         Mock(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     input_space = WorkingSpace(
         Mock(),
@@ -91,7 +91,7 @@ def target_chunk(bubble_chamber):
     chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
+        [[10]],
         [Location([[0, 0]], input_space)],
         StructureCollection(),
         Mock(),
@@ -100,7 +100,7 @@ def target_chunk(bubble_chamber):
     second_chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
+        [[10]],
         [Location([[0, 1]], input_space)],
         StructureCollection(),
         Mock(),
@@ -114,7 +114,6 @@ def target_chunk(bubble_chamber):
     return chunk
 
 
-@pytest.mark.skip
 def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_cannot_be_recreated(
     bubble_chamber, target_chunk
 ):

@@ -188,8 +188,30 @@ def good_correspondence(
     template,
     same_concept,
 ):
-    start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.7)
-    end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
+    start = Chunk(
+        Mock(),
+        Mock(),
+        Mock(),
+        [Location([], temperature_working_space)],
+        Mock(),
+        temperature_working_space,
+        Mock(),
+    )
+    end = Chunk(
+        Mock(),
+        Mock(),
+        Mock(),
+        [Location([], temperature_working_space)],
+        Mock(),
+        temperature_working_space,
+        Mock(),
+    )
+    start_label = Label(
+        Mock(), Mock(), start, warm_concept, temperature_working_space, 1.0
+    )
+    start.links_out.add(start_label)
+    end_label = Label(Mock(), Mock(), end, warm_concept, temperature_working_space, 1.0)
+    end.links_out.add(end_label)
     quality = 0.0
     correspondence = Correspondence(
         Mock(),
@@ -216,8 +238,28 @@ def bad_correspondence(
     template,
     same_concept,
 ):
-    start = Label(Mock(), Mock(), Mock(), warm_concept, temperature_working_space, 0.0)
-    end = Label(Mock(), Mock(), Mock(), warm_concept, template, 1.0)
+    start = Chunk(
+        Mock(),
+        Mock(),
+        Mock(),
+        [Location([], temperature_working_space)],
+        Mock(),
+        temperature_working_space,
+        Mock(),
+    )
+    end = Chunk(
+        Mock(),
+        Mock(),
+        Mock(),
+        [Location([], temperature_working_space)],
+        Mock(),
+        temperature_working_space,
+        Mock(),
+    )
+    start_label = Label(
+        Mock(), Mock(), start, warm_concept, temperature_working_space, 1.0
+    )
+    start.links_out.add(start_label)
     quality = 1.0
     correspondence = Correspondence(
         Mock(),

@@ -209,26 +209,6 @@ class Structure(ABC):
             f"{self.structure_id} has no location in space {space.structure_id}"
         )
 
-    def has_link(self, structure: Structure, start: Structure = None) -> bool:
-        from homer.structures.links import Correspondence, Label, Relation
-
-        if isinstance(structure, Label):
-            return self.has_label(structure.parent_concept)
-        if isinstance(structure, Relation):
-            return self.has_relation(
-                structure.parent_space,
-                structure.parent_concept,
-                structure.start,
-                structure.end,
-            )
-        start = start if start is not None else self
-        other_arg = structure.end if start == structure.start else structure.start
-        if isinstance(structure, Correspondence):
-            return self.has_correspondence(
-                structure.parent_space, structure.parent_concept, other_arg
-            )
-        return False
-
     def has_label(self, concept: Structure) -> bool:
         for label in self.labels:
             if label.parent_concept == concept:
@@ -284,13 +264,20 @@ class Structure(ABC):
             }
         )
 
+    def relation_in_space_of_type_with(
+        self, space: Structure, concept: Structure, start: Structure, end: Structure
+    ) -> Structure:
+        return self.relations.where(
+            parent_space=space, parent_concept=concept, start=start, end=end
+        ).get_random()
+
     def has_correspondence(
         self, space: Structure, concept: Structure, second_argument: Structure
     ) -> bool:
         for correspondence in self.correspondences:
             if (
                 correspondence.parent_concept == concept
-                and correspondence.parent_space == space
+                and correspondence.conceptual_space == space
                 and second_argument in (correspondence.start, correspondence.end)
             ):
                 return True
@@ -358,6 +345,9 @@ class Structure(ABC):
             self._activation + self._activation_buffer
         )
         self._activation_buffer = 0.0
+
+    def copy(self, **kwargs: dict):
+        raise NotImplementedError
 
     def __str__(self) -> str:
         return self.structure_id
