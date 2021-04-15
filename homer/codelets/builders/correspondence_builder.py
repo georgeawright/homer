@@ -5,7 +5,6 @@ from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
 from homer.structure import Structure
 from homer.structures import Node, Space, View
 from homer.structures.nodes import Concept

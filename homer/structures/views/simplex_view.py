@@ -1,8 +1,4 @@
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.location import Location
-from homer.structure_collection import StructureCollection
 from homer.structures import View
-from homer.structures.spaces import WorkingSpace
 
 
 class SimplexView(View):

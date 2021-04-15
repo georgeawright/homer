@@ -1,6 +1,5 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import ViewBuilder
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
