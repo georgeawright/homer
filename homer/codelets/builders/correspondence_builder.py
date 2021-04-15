@@ -184,6 +184,7 @@ class CorrespondenceBuilder(Builder):
             space=self.target_conceptual_space,
             start=self.target_structure_one,
             end=self.target_structure_two,
+            view=self.target_view,
         )
 
     def _process_structure(self):

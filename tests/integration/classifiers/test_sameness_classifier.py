@@ -59,9 +59,10 @@ def test_classify_nodes():
     node_3_label_2 = Label(Mock(), Mock(), node_3, Mock(), working_space_3, Mock())
     node_3.links_out.add(node_3_label_2)
     classifier = SamenessClassifier()
-    assert classifier.classify(start=node_1, end=node_2) > classifier.classify(
-        start=node_1, end=node_3
-    )
+    view = Mock()
+    assert classifier.classify(
+        start=node_1, end=node_2, view=view
+    ) > classifier.classify(start=node_1, end=node_3, view=view)
 
 
 def test_classify_labels_of_corresponding_nodes():
@@ -109,7 +110,9 @@ def test_classify_labels_of_corresponding_nodes():
     node_2.links_out.add(nodes_correspondence)
     node_2.links_in.add(nodes_correspondence)
     classifier = SamenessClassifier()
-    assert classifier.classify(start=node_1_label, end=node_2_label) > 0
+    view = Mock()
+    view.members = StructureCollection({nodes_correspondence})
+    assert classifier.classify(start=node_1_label, end=node_2_label, view=view) > 0
 
 
 def test_classify_labels_of_non_corresponding_nodes():
@@ -139,8 +142,10 @@ def test_classify_labels_of_non_corresponding_nodes():
     )
     node_2_label = Label(Mock(), Mock(), node_2, Mock(), space_2, 1)
     node_2.links_out.add(node_2_label)
+    view = Mock()
+    view.members = StructureCollection()
     classifier = SamenessClassifier()
-    assert classifier.classify(start=node_1_label, end=node_2_label) == 0
+    assert classifier.classify(start=node_1_label, end=node_2_label, view=view) == 0
 
 
 def test_classify_relations_of_corresponding_nodes():
@@ -226,8 +231,12 @@ def test_classify_relations_of_corresponding_nodes():
     node_1_b.links_in.add(nodes_b_correspondence)
     node_2_b.links_out.add(nodes_b_correspondence)
     node_2_b.links_in.add(nodes_b_correspondence)
+    view = Mock()
+    view.members = StructureCollection({nodes_a_correspondence, nodes_b_correspondence})
     classifier = SamenessClassifier()
-    assert classifier.classify(start=space_1_relation, end=space_2_relation) > 0
+    assert (
+        classifier.classify(start=space_1_relation, end=space_2_relation, view=view) > 0
+    )
 
 
 def test_classify_relations_of_non_corresponding_nodes():
@@ -296,5 +305,10 @@ def test_classify_relations_of_non_corresponding_nodes():
     node_1_a.links_in.add(nodes_a_correspondence)
     node_2_a.links_out.add(nodes_a_correspondence)
     node_2_a.links_in.add(nodes_a_correspondence)
+    view = Mock()
+    view.members = StructureCollection({nodes_a_correspondence})
     classifier = SamenessClassifier()
-    assert classifier.classify(start=space_1_relation, end=space_2_relation) == 0
+    assert (
+        classifier.classify(start=space_1_relation, end=space_2_relation, view=view)
+        == 0
+    )

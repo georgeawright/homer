@@ -52,5 +52,6 @@ class CorrespondenceEvaluator(Evaluator):
             concept=self.target_structure.parent_concept,
             start=self.target_structure.start,
             end=self.target_structure.end,
+            view=self.target_structure.parent_view,
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

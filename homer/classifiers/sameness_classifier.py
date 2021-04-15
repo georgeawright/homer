@@ -14,6 +14,7 @@ class SamenessClassifier(Classifier):
     def classify(self, **kwargs: dict) -> FloatBetweenOneAndZero:
         start = kwargs["start"]
         end = kwargs["end"]
+        view = kwargs["view"]
         if isinstance(start, Node) and isinstance(end, Node):
             start_conceptual_spaces = StructureCollection(
                 {label.parent_space.conceptual_space for label in start.labels}
@@ -32,7 +33,8 @@ class SamenessClassifier(Classifier):
             return len(common_conceptual_spaces) / len(all_conceptual_spaces)
         if isinstance(start, Link) and isinstance(end, Link):
             if not (
-                correspond(start.start, end.start) and correspond(start.end, end.end)
+                correspond(start.start, end.start, view=view)
+                and correspond(start.end, end.end, view=view)
             ):
                 return 0.0
             start_concept = (
