@@ -69,6 +69,7 @@ def bubble_chamber(same_different_space, label_concept_space):
 def target_space_one(bubble_chamber):
     space = Mock()
     space.name = "target_space_one"
+    space.parent_spaces = []
     space.conceptual_space = Mock()
     bubble_chamber.working_spaces.add(target_space_one)
     return space
@@ -79,9 +80,7 @@ def target_space_two(bubble_chamber, target_space_one):
     space = Mock()
     space.name = "target_space_two"
     space.conceptual_space = target_space_one.conceptual_space
-    template = Mock()
-    template.contents.of_type.return_value = StructureCollection({space})
-    bubble_chamber.frames.get_active.return_value = template
+    space.is_basic_level = True
     return space
 
 
@@ -114,8 +113,12 @@ def existing_correspondence():
 
 
 @pytest.fixture
-def target_view(existing_correspondence):
+def target_view(existing_correspondence, target_space_one, target_space_two):
+    input_space = Mock()
+    input_space.name = "target space 2 container"
+    input_space.contents.of_type.return_value = StructureCollection({target_space_two})
     view = Mock()
+    view.input_spaces = StructureCollection({input_space})
     view.has_member.return_value = False
     view.members = StructureCollection({existing_correspondence})
     view.slot_values = {}
@@ -125,6 +128,7 @@ def target_view(existing_correspondence):
 def test_gets_second_target_space_and_structure_if_needed(
     bubble_chamber,
     target_view,
+    target_space_one,
     target_structure_one,
     same_concept,
     target_space_two,
@@ -135,7 +139,7 @@ def test_gets_second_target_space_and_structure_if_needed(
         Mock(),
         bubble_chamber,
         target_view,
-        Mock(),
+        target_space_one,
         target_structure_one,
         Mock(),
         parent_concept=same_concept,

@@ -32,6 +32,7 @@ def bubble_chamber(parent_concept):
     chamber.concepts = {"label": Mock(), "build": Mock()}
     label_concept_space = Mock()
     label_concept_space.is_basic_level = True
+    label_concept_space.instance_type = str
     label_concept_space.contents.of_type.return_value = StructureCollection(
         {parent_concept}
     )
@@ -50,11 +51,11 @@ def target_chunk():
     chunk = Mock()
     chunk.has_label.return_value = False
     chunk.nearby.get_unhappy.return_value = Mock()
+    chunk.value = ""
     return chunk
 
 
-def test_bottom_up_codelet_gets_a_concept(bubble_chamber):
-    target_chunk = Mock()
+def test_bottom_up_codelet_gets_a_concept(bubble_chamber, target_chunk):
     label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
     assert label_builder.parent_concept is None
     label_builder.run()

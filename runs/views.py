@@ -57,17 +57,17 @@ def run_view(request, run_id):
         if record.parent_codelet is not None or "WorkingSpace2" not in record.locations:
             continue
         original_chunks.append(record)
-        if record.locations["WorkingSpace2"][0] > last_row:
+        if record.locations["WorkingSpace2"][0][0] > last_row:
             # WorkingSpace2 is the input space
-            last_row = record.locations["WorkingSpace2"][0]
-        if record.locations["WorkingSpace2"][1] > last_column:
-            last_column = record.locations["WorkingSpace2"][1]
+            last_row = record.locations["WorkingSpace2"][0][0]
+        if record.locations["WorkingSpace2"][0][1] > last_column:
+            last_column = record.locations["WorkingSpace2"][0][1]
     original_chunks_matrix = [
         [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
     ]
     for original_chunk in original_chunks:
-        row = original_chunk.locations["WorkingSpace2"][0]
-        column = original_chunk.locations["WorkingSpace2"][1]
+        row = original_chunk.locations["WorkingSpace2"][0][0]
+        column = original_chunk.locations["WorkingSpace2"][0][1]
         original_chunks_matrix[row][column] = original_chunk
     output += "<h2>Raw Input</h2>"
     output += '<table border="1">'
@@ -207,9 +207,7 @@ def run_view(request, run_id):
         )
         output += "<br>"
     views = [
-        structure
-        for structure in structure_records
-        if re.match(r"^View*", structure.structure_id)
+        structure for structure in structure_records if "View" in structure.structure_id
     ]
     output += "<h2>Views</h2>"
     for view in views:
@@ -255,6 +253,38 @@ def run_view(request, run_id):
             + f"{template.value} (activation: {activation})"
         )
         output += "<br>"
+    phrases = [
+        structure
+        for structure in structure_records
+        if "Phrase" in structure.structure_id
+    ]
+    output += "<h2>Phrases</h2>"
+    output += "".join(
+        [
+            f'<a href="structures/{phrase.structure_id}">{phrase.value}</a>('
+            + f'<a href="structures/{phrase.left_branch.structure_id}">'
+            + f"{phrase.left_branch.value}</a>, "
+            + f'<a href="structures/{phrase.right_branch.structure_id}">'
+            + f"{phrase.right_branch.value}</a>)"
+            + "<br>"
+            for phrase in phrases
+        ]
+    )
+    labels = [
+        structure
+        for structure in structure_records
+        if "Label" in structure.structure_id and structure.value is not None
+    ]
+    output += "<h2>Word Labels</h2>"
+    output += "".join(
+        [
+            f'<a href="structures/{label.structure_id}">{label.value}</a>('
+            + f'<a href="structures/{label.start.structure_id}">{label.start.value}</a>)'
+            + "<br>"
+            for label in labels
+            if "Word" in label.start.structure_id
+        ]
+    )
     return HttpResponse(output)
 
 

@@ -1,3 +1,4 @@
+import operator
 from typing import Any, Callable, Dict, List, Union
 
 from homer import fuzzy
@@ -16,7 +17,7 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Concept, Lexeme, Word
+from .structures.nodes import Chunk, Concept, Lexeme, Rule, Word
 from .structures.spaces import ConceptualSpace, WorkingSpace
 from .structures.spaces.frames import Template
 from .word_form import WordForm
@@ -66,6 +67,8 @@ class Homer:
             StructureCollection(),
             StructureCollection(),
             StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
             logger,
         )
         bubble_chamber.lexemes = StructureCollection()
@@ -74,12 +77,14 @@ class Homer:
 
     def run(self):
         while self.bubble_chamber.result is None:
-            self.logger.log(self.coderack)
-            if self.coderack.codelets_run % self.activation_update_frequency == 0:
-                self.print_status_update()
-                self.bubble_chamber.spread_activations()
-                self.bubble_chamber.update_activations()
             try:
+                self.logger.log(self.coderack)
+                if self.coderack.codelets_run % self.activation_update_frequency == 0:
+                    self.print_status_update()
+                    self.bubble_chamber.spread_activations()
+                    self.bubble_chamber.update_activations()
+                if self.coderack.codelets_run >= 10000:
+                    raise NoMoreCodelets
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
                 self.logger.log("no more codelets")
@@ -123,7 +128,7 @@ class Homer:
         classifier: Classifier = None,
         parent_space: ConceptualSpace = None,
         relevant_value: str = "",
-        instance_type: type = List[int],
+        instance_type: type = list,
         child_spaces: StructureCollection = None,
         distance_function: Callable = None,
         links_in: StructureCollection = None,
@@ -225,13 +230,19 @@ class Homer:
         self,
         headword: str = "",
         forms: Dict[str, str] = None,
+        parts_of_speech: Dict[WordForm, List[Concept]] = None,
         parent_concept: Concept = None,
     ) -> Lexeme:
+        if operator.xor(forms is None, parts_of_speech is None) or (
+            forms.keys() != parts_of_speech.keys()
+        ):
+            raise Exception("lexeme forms and parts of speech do not match")
         lexeme = Lexeme(
             structure_id=ID.new(Lexeme),
             parent_id="",
             headword=headword,
             forms=forms,
+            parts_of_speech=parts_of_speech,
         )
         self.logger.log(lexeme)
         self.bubble_chamber.lexemes.add(lexeme)
@@ -262,7 +273,7 @@ class Homer:
         self.logger.log(template)
         for i, item in enumerate(contents):
             item.parent_space = template
-            item.locations = [Location([i], template)]
+            item.locations = [Location([[i]], template)]
             template.contents.add(item)
             self.logger.log(item)
         self.bubble_chamber.conceptual_spaces.add(template)
@@ -422,6 +433,7 @@ class Homer:
             quality=quality,
         )
         start.links_out.add(label)
+        parent_space.add(label)
         if not label.is_slot:
             self.bubble_chamber.labels.add(label)
         self.logger.log(label)
@@ -450,3 +462,30 @@ class Homer:
             self.bubble_chamber.relations.add(relation)
         self.logger.log(relation)
         return relation
+
+    def def_rule(
+        self,
+        name: str,
+        location: Location,
+        root: Concept,
+        left_branch: Concept,
+        right_branch: Concept,
+        stable_activation: FloatBetweenOneAndZero = None,
+    ):
+        rule = Rule(
+            ID.new(Rule),
+            "",
+            name,
+            location,
+            root,
+            left_branch,
+            right_branch,
+            stable_activation=stable_activation,
+        )
+        self.logger.log(rule)
+        root_link = self.def_concept_link(root, rule, stable_activation, True)
+        left_link = self.def_concept_link(rule, left_branch, stable_activation, True)
+        right_link = self.def_concept_link(rule, right_branch, stable_activation, True)
+        self.bubble_chamber.rules.add(rule)
+        self.logger.log(rule)
+        return rule

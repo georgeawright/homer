@@ -9,7 +9,7 @@ def test_copy():
     new_start = Mock()
     parent_id = "id"
     label = Label(Mock(), Mock(), old_start, Mock(), Mock(), Mock())
-    copy = label.copy(old_arg=old_start, new_arg=new_start, parent_id=parent_id)
+    copy = label.copy(start=new_start, parent_id=parent_id)
     assert label.start == old_start
     assert copy.start == new_start
     assert copy.parent_id == parent_id

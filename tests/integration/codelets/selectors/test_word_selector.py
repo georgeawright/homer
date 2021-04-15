@@ -29,6 +29,8 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     word_concept = Concept(
@@ -74,14 +76,14 @@ def view(bubble_chamber):
 
 @pytest.fixture
 def good_word(view):
-    lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"})
+    lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"}, Mock())
     word = Word(Mock(), Mock(), lexeme, WordForm.HEADWORD, Mock(), Mock(), 1.0)
     return word
 
 
 @pytest.fixture
 def bad_word(view):
-    lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"})
+    lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"}, Mock())
     word = Word(Mock(), Mock(), lexeme, WordForm.HEADWORD, Mock(), Mock(), 0.0)
     return word
 

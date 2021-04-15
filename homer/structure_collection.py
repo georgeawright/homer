@@ -43,8 +43,24 @@ class StructureCollection:
         return StructureCollection(
             {
                 structure
+                for coordinates in location.coordinates
                 for structure in self.structures
-                if structure.location == location
+                if coordinates in structure.location.coordinates
+            }
+        )
+
+    def next_to(self, location: Location) -> StructureCollection:
+        left_most_coordinate = location.coordinates[0][0]
+        right_most_coordinate = location.coordinates[-1][0]
+        return StructureCollection(
+            {
+                structure
+                for structure in location.space.contents
+                if structure.location_in_space(location.space).coordinates != []
+                and (
+                    structure.location.coordinates[-1][0] == left_most_coordinate - 1
+                    or structure.location.coordinates[0][0] == right_most_coordinate + 1
+                )
             }
         )
 
@@ -63,6 +79,16 @@ class StructureCollection:
             new_collection = StructureCollection()
             for structure in old_collection:
                 if hasattr(structure, key) and getattr(structure, key) == value:
+                    new_collection.add(structure)
+            old_collection = new_collection
+        return new_collection
+
+    def where_not(self, **kwargs) -> StructureCollection:
+        old_collection = self
+        for key, value in kwargs.items():
+            new_collection = StructureCollection()
+            for structure in old_collection:
+                if hasattr(structure, key) and getattr(structure, key) != value:
                     new_collection.add(structure)
             old_collection = new_collection
         return new_collection
@@ -143,6 +169,9 @@ class StructureCollection:
     def get_unhappy(self, exclude: list = None):
         """Returns a structure probabilistically according to unhappiness."""
         return self._get_structure_according_to("unhappiness", exclude)
+
+    def __repr__(self) -> str:
+        return "{" + ", ".join(repr(structure) for structure in self.structures) + "}"
 
     def _get_structure_according_to(self, attribute: str, exclude: list = None):
         """Returns a structure probabilistically according to attribute."""

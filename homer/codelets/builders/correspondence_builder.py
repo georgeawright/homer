@@ -1,12 +1,12 @@
 from __future__ import annotations
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
 from homer.structure import Structure
-from homer.structures import Space, View
+from homer.structures import Node, Space, View
 from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
@@ -76,20 +76,40 @@ class CorrespondenceBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
         target_view = bubble_chamber.views.get_active()
-        target_space = bubble_chamber.working_spaces.where(
-            is_basic_level=True
-        ).get_active()
-        target = target_space.contents.not_of_type(Space).get_exigent()
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            target_view,
-            target_space,
-            target,
-            target.exigency,
+        target_space = (
+            target_view.input_working_spaces.get_random()
+            .contents.of_type(Space)
+            .where(is_basic_level=True)
+            .get_active()
         )
+        target = (
+            target_space.contents.not_of_type(Space)
+            .not_of_type(Correspondence)
+            .get_exigent()
+        )
+        urgency = urgency if urgency is not None else target.exigency
+        return cls.spawn(
+            parent_id, bubble_chamber, target_view, target_space, target, urgency
+        )
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        parent_concept: Concept,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        correspondence_builder = cls.make(parent_id, bubble_chamber, urgency=urgency)
+        correspondence_builder.parent_concept = parent_concept
+        return correspondence_builder
 
     @property
     def _structure_concept(self):
@@ -99,8 +119,12 @@ class CorrespondenceBuilder(Builder):
         if self.target_space_two is None:
             try:
                 self.target_space_two = (
-                    self.bubble_chamber.frames.get_active()
+                    self.target_view.input_spaces.get_active(
+                        exclude=list(self.target_space_one.parent_spaces)
+                    )
                     .contents.of_type(WorkingSpace)
+                    .where(is_basic_level=True)
+                    .where(conceptual_space=self.target_space_one.conceptual_space)
                     .get_random()
                 )
             except MissingStructureError:
@@ -159,13 +183,16 @@ class CorrespondenceBuilder(Builder):
             space=self.target_conceptual_space,
             start=self.target_structure_one,
             end=self.target_structure_two,
+            view=self.target_view,
         )
 
     def _process_structure(self):
         self.correspondence.structure_id = ID.new(Correspondence)
-        self.target_view.slot_values[
-            self.correspondence.slot_argument.structure_id
-        ] = self.correspondence.non_slot_argument.value
+        self.target_view.slot_values[self.correspondence.slot_argument.structure_id] = (
+            self.correspondence.non_slot_argument.value
+            if isinstance(self.correspondence.non_slot_argument, Node)
+            else self.correspondence.non_slot_argument.parent_concept
+        )
         self.target_view.members.add(self.correspondence)
         self.target_space_one.add(self.correspondence)
         self.target_space_two.add(self.correspondence)

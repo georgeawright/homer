@@ -141,8 +141,8 @@ class WordBuilder(Builder):
                 word_form
             ]
         else:
-            lexeme = None
-            word_form = None
+            lexeme = self.target_word.lexeme
+            word_form = self.target_word.word_form
         word_location = Location(
             self.target_word.location.coordinates,
             self.target_view.output_space,
@@ -173,6 +173,7 @@ class WordBuilder(Builder):
             quality=0.0,
         )
         self.bubble_chamber.correspondences.add(frame_to_output_correspondence)
+        self.bubble_chamber.logger.log(frame_to_output_correspondence)
         self.target_word.links_in.add(frame_to_output_correspondence)
         self.target_word.links_out.add(frame_to_output_correspondence)
         word.links_in.add(frame_to_output_correspondence)
@@ -195,6 +196,7 @@ class WordBuilder(Builder):
                 quality=0.0,
             )
             self.bubble_chamber.correspondences.add(non_frame_to_output_correspondence)
+            self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
             word.links_in.add(non_frame_to_output_correspondence)
             word.links_out.add(non_frame_to_output_correspondence)
             self.non_frame_item.links_in.add(non_frame_to_output_correspondence)

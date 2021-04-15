@@ -50,6 +50,10 @@ class ConceptualSpace(Space):
         self._instance = None
         self._instances = {}
 
+    @property
+    def instance_type(self):
+        return self.parent_concept.instance_type
+
     def instance_in_space(
         self, containing_space: Space, name: str = None
     ) -> WorkingSpace:
@@ -85,6 +89,8 @@ class ConceptualSpace(Space):
                 links_in=StructureCollection(),
                 links_out=StructureCollection(),
             )
+            if containing_space is not None:
+                containing_space.add(self._instances[containing_space])
         return self._instances[containing_space]
 
     def update_activation(self):

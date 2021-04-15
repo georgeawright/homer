@@ -171,6 +171,20 @@ class StructureRecord(models.Model):
         blank=True,
         null=True,
     )
+    left_branch = models.ForeignKey(
+        "StructureRecord",
+        related_name="_left_branch",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    right_branch = models.ForeignKey(
+        "StructureRecord",
+        related_name="_right_branch",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
 
 
 class StructureUpdateRecord(models.Model):

@@ -1,4 +1,3 @@
-import math
 import pytest
 from unittest.mock import Mock
 from typing import List
@@ -13,6 +12,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
+from homer.tools import centroid_euclidean_distance
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def more_less_concept(relational_concepts_space):
         "value",
         List[int],
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     relational_concepts_space.contents.add(concept)
     return concept
@@ -73,12 +73,12 @@ def more_concept(more_less_space):
         Mock(),
         Mock(),
         "more",
-        Location([5], more_less_space),
+        Location([[5]], more_less_space),
         classifier,
         "value",
         List[int],
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     more_less_space.contents.add(more)
     return more
@@ -95,7 +95,7 @@ def temperature_space():
         "value",
         List[int],
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     temperature_space = ConceptualSpace(
         Mock(), Mock(), "temperature", temperature, [], StructureCollection(), 1, [], []
@@ -106,6 +106,8 @@ def temperature_space():
 @pytest.fixture
 def bubble_chamber(more_concept, relational_concepts_space):
     chamber = BubbleChamber(
+        StructureCollection(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -163,7 +165,7 @@ def target_chunk(bubble_chamber, temperature_space):
         "coordinates",
         Mock(),
         Mock(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     input_space = WorkingSpace(
         Mock(),
@@ -180,8 +182,8 @@ def target_chunk(bubble_chamber, temperature_space):
     chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 0], input_space), Location([10], temperature_space)],
+        [[10]],
+        [Location([[0, 0]], input_space), Location([[10]], temperature_space)],
         StructureCollection(),
         Mock(),
         0.0,
@@ -189,8 +191,8 @@ def target_chunk(bubble_chamber, temperature_space):
     second_chunk = Chunk(
         Mock(),
         Mock(),
-        [5],
-        [Location([0, 1], input_space), Location([5], temperature_space)],
+        [[5]],
+        [Location([[0, 1]], input_space), Location([[5]], temperature_space)],
         StructureCollection(),
         Mock(),
         0.0,

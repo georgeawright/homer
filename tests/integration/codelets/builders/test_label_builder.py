@@ -56,7 +56,7 @@ def temperature_concept(label_concepts_space):
         Location([], label_concepts_space),
         None,
         "value",
-        Mock(),
+        list,
         StructureCollection(),
         math.dist,
     )
@@ -104,6 +104,8 @@ def mild_concept(temperature_space):
 @pytest.fixture
 def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
     chamber = BubbleChamber(
+        StructureCollection(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -172,9 +174,9 @@ def target_chunk(bubble_chamber):
         Mock(),
         [],
         StructureCollection(),
-        Mock(),
-        Mock(),
-        Mock(),
+        0,
+        [],
+        [],
     )
     chunk = Chunk(
         Mock(),
@@ -196,6 +198,8 @@ def target_chunk(bubble_chamber):
     )
     bubble_chamber.chunks.add(chunk)
     bubble_chamber.chunks.add(second_chunk)
+    bubble_chamber.words.add(chunk)  # TODO: need to be added to input nodes
+    bubble_chamber.words.add(second_chunk)
     input_space.contents.add(chunk)
     input_space.contents.add(second_chunk)
     chunk.parent_spaces.add(input_space)

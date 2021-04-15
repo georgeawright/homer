@@ -61,7 +61,11 @@ def temperature_space_in_frame(temperature_space):
 
 @pytest.fixture
 def frame_word(frame):
+    is_lexeme = Mock()
     word = Mock()
+    word.lexeme = is_lexeme
+    word.word_form = Mock()
+    is_lexeme.forms = {word.word_form: Mock()}
     word.is_slot = False
     word.parent_space = frame
     word.has_correspondence_to_space.return_value = False

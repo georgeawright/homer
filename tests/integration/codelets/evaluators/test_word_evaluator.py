@@ -29,6 +29,8 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     word_concept = Concept(
@@ -134,7 +136,7 @@ def warm_concept(bubble_chamber, temperature_conceptual_space):
 
 @pytest.fixture
 def warm_lexeme(warm_concept):
-    lexeme = Lexeme(Mock(), Mock(), "warm", {WordForm.HEADWORD: "warm"})
+    lexeme = Lexeme(Mock(), Mock(), "warm", {WordForm.HEADWORD: "warm"}, Mock())
     link = Relation(Mock(), Mock(), warm_concept, lexeme, None, None, 0)
     warm_concept.links_out.add(link)
     lexeme.links_in.add(link)

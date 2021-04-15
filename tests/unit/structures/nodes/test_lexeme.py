@@ -41,5 +41,5 @@ from homer.structures.nodes import Lexeme
     ],
 )
 def test_get_form(headword, forms, required_form, expected):
-    lexeme = Lexeme(Mock(), Mock(), headword, forms)
+    lexeme = Lexeme(Mock(), Mock(), headword, forms, Mock())
     assert expected == lexeme.get_form(required_form)

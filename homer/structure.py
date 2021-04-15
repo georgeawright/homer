@@ -4,6 +4,7 @@ import random
 import statistics
 from typing import List
 
+from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .location import Location
@@ -27,7 +28,7 @@ class Structure(ABC):
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
-        self.locations = locations
+        self._locations = locations
         self._quality = quality
         self.links_in = StructureCollection() if links_in is None else links_in
         self.links_out = StructureCollection() if links_out is None else links_out
@@ -37,7 +38,7 @@ class Structure(ABC):
         self.stable = stable_activation is not None
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
-        self.parent_concept = None
+        self._parent_concept = None
 
     @classmethod
     def get_builder_class(cls):
@@ -52,6 +53,10 @@ class Structure(ABC):
         raise NotImplementedError
 
     @property
+    def parent_concept(self) -> Structure:
+        return self._parent_concept
+
+    @property
     def location(self) -> Location:
         try:
             return self.locations[0]
@@ -59,6 +64,14 @@ class Structure(ABC):
             return None
         except IndexError:
             return None
+
+    @property
+    def locations(self) -> List[Location]:
+        return self._locations
+
+    @locations.setter
+    def locations(self, locations: List[Location]):
+        self._locations = locations
 
     @property
     def size(self) -> int:
@@ -196,31 +209,17 @@ class Structure(ABC):
             f"{self.structure_id} has no location in space {space.structure_id}"
         )
 
-    def has_link(self, structure: Structure, start: Structure = None) -> bool:
-        from homer.structures.links import Correspondence, Label, Relation
-
-        if isinstance(structure, Label):
-            return self.has_label(structure.parent_concept)
-        if isinstance(structure, Relation):
-            return self.has_relation(
-                structure.parent_space,
-                structure.parent_concept,
-                structure.start,
-                structure.end,
-            )
-        start = start if start is not None else self
-        other_arg = structure.end if start == structure.start else structure.start
-        if isinstance(structure, Correspondence):
-            return self.has_correspondence(
-                structure.parent_space, structure.parent_concept, other_arg
-            )
-        return False
-
     def has_label(self, concept: Structure) -> bool:
         for label in self.labels:
             if label.parent_concept == concept:
                 return True
         return False
+
+    def label_of_type(self, concept: Structure):
+        for label in self.labels:
+            if label.parent_concept == concept:
+                return label
+        raise MissingStructureError
 
     def labels_in_space(self, space: Structure) -> StructureCollection:
         return StructureCollection(
@@ -265,13 +264,20 @@ class Structure(ABC):
             }
         )
 
+    def relation_in_space_of_type_with(
+        self, space: Structure, concept: Structure, start: Structure, end: Structure
+    ) -> Structure:
+        return self.relations.where(
+            parent_space=space, parent_concept=concept, start=start, end=end
+        ).get_random()
+
     def has_correspondence(
         self, space: Structure, concept: Structure, second_argument: Structure
     ) -> bool:
         for correspondence in self.correspondences:
             if (
                 correspondence.parent_concept == concept
-                and correspondence.parent_space == space
+                and correspondence.conceptual_space == space
                 and second_argument in (correspondence.start, correspondence.end)
             ):
                 return True
@@ -326,7 +332,7 @@ class Structure(ABC):
             return
         if self.parent_concept is not None:
             self.parent_concept.boost_activation(self.activation)
-        for link in self.links_out:
+        for link in self.links:
             try:
                 link.end.boost_activation(link.activation)
             except AttributeError:  # labels have no end
@@ -339,3 +345,9 @@ class Structure(ABC):
             self._activation + self._activation_buffer
         )
         self._activation_buffer = 0.0
+
+    def copy(self, **kwargs: dict):
+        raise NotImplementedError
+
+    def __repr__(self) -> str:
+        return self.structure_id

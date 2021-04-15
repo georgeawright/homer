@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import Mock
 
 from homer.tools import *
 
@@ -22,3 +23,34 @@ def test_are_instances():
     list_of_ints = [1, 2, 3]
     assert areinstances(list_of_ints, int)
     assert not areinstances(list_of_ints, str)
+
+
+def test_arrange_text_fragments_arranges_three():
+    root = Mock()
+    left = Mock()
+    right = Mock()
+    root.left_branch = left
+    root.right_branch = right
+    result = arrange_text_fragments([root, left, right])
+    assert result["root"] == root
+    assert result["left"] == left
+    assert result["right"] == right
+
+
+def test_arrange_text_fragments_arranges_root_and_branch():
+    root = Mock()
+    branch = Mock()
+    root.left_branch = branch
+    result = arrange_text_fragments([root, branch])
+    assert result["root"] == root
+    assert result["left"] == branch
+
+
+def test_arrange_text_fragments_arranges_branches():
+    left = Mock()
+    left.location.coordinates = [[0]]
+    right = Mock()
+    right.location.coordinates = [[1]]
+    result = arrange_text_fragments([left, right])
+    assert result["left"] == left
+    assert result["right"] == right

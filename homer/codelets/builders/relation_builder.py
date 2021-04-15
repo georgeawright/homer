@@ -61,13 +61,44 @@ class RelationBuilder(Builder):
         )
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
         target_space = bubble_chamber.working_spaces.where(
             no_of_dimensions=1
         ).get_random()
         target = target_space.contents.of_type(Chunk).get_exigent()
+        urgency = urgency if urgency is not None else target.exigency
+        return cls.spawn(parent_id, bubble_chamber, target_space, target, urgency)
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        parent_concept: Concept,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        target_space = StructureCollection(
+            {
+                space
+                for space in bubble_chamber.working_spaces
+                if space.no_of_dimensions == 1
+                and parent_concept.is_compatible_with(space.parent_concept)
+            }
+        ).get_random()
+        target = target_space.contents.of_type(Chunk).get_exigent()
+        urgency = urgency if urgency is not None else target.exigency
         return cls.spawn(
-            parent_id, bubble_chamber, target_space, target, target.exigency
+            parent_id,
+            bubble_chamber,
+            target_space,
+            target,
+            urgency,
+            parent_concept=parent_concept,
         )
 
     @property

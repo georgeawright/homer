@@ -27,6 +27,8 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     chunk_concept = Concept(
@@ -94,7 +96,7 @@ def good_chunk(target_space, chunk_members):
         Mock(),
         Mock(),
         Mock(),
-        [Location([0, 0], target_space)],
+        [Location([[0, 0]], target_space)],
         chunk_members,
         Mock(),
         1.0,
@@ -110,7 +112,7 @@ def bad_chunk(target_space, chunk_members):
         Mock(),
         Mock(),
         Mock(),
-        [Location([0, 1], target_space)],
+        [Location([[0, 1]], target_space)],
         chunk_members,
         Mock(),
         0.0,

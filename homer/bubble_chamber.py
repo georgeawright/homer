@@ -1,4 +1,3 @@
-import random
 import statistics
 from typing import List, Union
 
@@ -28,6 +27,8 @@ class BubbleChamber:
         views: StructureCollection,
         words: StructureCollection,
         concept_links: StructureCollection,
+        phrases: StructureCollection,
+        rules: StructureCollection,
         slots: StructureCollection,
         logger: Logger,
     ):
@@ -42,19 +43,29 @@ class BubbleChamber:
         self.views = views
         self.words = words
         self.concept_links = concept_links
+        self.phrases = phrases
+        self.rules = rules
         self.slots = slots
         self.logger = logger
         self.log_count = 0
         self.result = None
 
     @property
-    def spaces(self):
+    def spaces(self) -> StructureCollection:
         return StructureCollection.union(
             self.conceptual_spaces, self.working_spaces, self.frames
         )
 
     @property
-    def structures(self):
+    def text_fragments(self) -> StructureCollection:
+        return StructureCollection.union(self.phrases, self.words)
+
+    @property
+    def input_nodes(self) -> StructureCollection:
+        return StructureCollection.union(self.chunks, self.words)
+
+    @property
+    def structures(self) -> StructureCollection:
         return StructureCollection.union(
             self.conceptual_spaces,
             self.working_spaces,
@@ -67,6 +78,8 @@ class BubbleChamber:
             self.views,
             self.words,
             self.concept_links,
+            self.phrases,
+            self.rules,
             self.slots,
         )
 

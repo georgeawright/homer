@@ -31,7 +31,7 @@ class Link(Structure):
         )
         self.start = start
         self.end = end
-        self.parent_concept = parent_concept
+        self._parent_concept = parent_concept
         self.value = parent_concept.name if hasattr(parent_concept, "name") else None
 
     @property
@@ -48,14 +48,15 @@ class Link(Structure):
     def is_slot(self) -> bool:
         return self.parent_concept is None
 
-    def copy(
-        self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
-    ):
-        raise NotImplementedError
-
     def is_between(self, a: Structure, b: Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a
 
     def spread_activation(self):
         if self.parent_concept is not None:
             self.parent_concept.boost_activation(self.activation)
+
+    def __repr__(self) -> str:
+        concept = "none" if self.parent_concept is None else self.parent_concept.name
+        args = ", ".join([arg.structure_id for arg in self.arguments])
+        spaces = ", ".join([location.space.name for location in self.locations])
+        return f"<{self.structure_id} {concept}({args}) in {spaces}>"

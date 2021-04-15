@@ -191,7 +191,7 @@ class DjangoLogger(Logger):
             codelet_record.challenger = StructureRecord.objects.get(
                 run_id=self.run, structure_id=codelet.challenger.structure_id
             )
-        if codelet.parent_id != "coderack":
+        if codelet.parent_id != "":
             codelet_record.parent = CodeletRecord.objects.get(
                 codelet_id=codelet.parent_id, run_id=self.run
             )
@@ -356,6 +356,14 @@ class DjangoLogger(Logger):
                 structure_id=space_name, run_id=self.run
             )
             space_record.contents.add(structure_record)
+        if hasattr(structure, "left_branch") and structure.left_branch is not None:
+            structure_record.left_branch = StructureRecord.objects.get(
+                structure_id=structure.left_branch.structure_id, run_id=self.run
+            )
+        if hasattr(structure, "right_branch") and structure.right_branch is not None:
+            structure_record.right_branch = StructureRecord.objects.get(
+                structure_id=structure.right_branch.structure_id, run_id=self.run
+            )
         structure_record.activation[self.codelets_run] = structure.activation
         structure_record.unhappiness[self.codelets_run] = structure.unhappiness
         structure_record.quality[self.codelets_run] = structure.quality

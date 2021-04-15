@@ -68,11 +68,19 @@ class Correspondence(Link):
 
         return CorrespondenceSelector
 
-    def copy(
-        self, old_arg: Structure = None, new_arg: Structure = None, parent_id: str = ""
-    ) -> Correspondence:
-        start = new_arg if new_arg is not None and old_arg == self.start else self.start
-        end = new_arg if new_arg is not None and old_arg == self.end else self.end
+    def copy(self, **kwargs: dict) -> Correspondence:
+        """Requires keyword arguments 'new arg', 'old_arg', and 'parent_id'."""
+        start = (
+            kwargs["new_arg"]
+            if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.start
+            else self.start
+        )
+        end = (
+            kwargs["new_arg"]
+            if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.end
+            else self.end
+        )
+        parent_id = kwargs["parent_id"]
         start_space = equivalent_space(start, self.start_space)
         end_space = equivalent_space(end, self.end_space)
         new_correspondence = Correspondence(
@@ -141,7 +149,7 @@ class Correspondence(Link):
             other_corresponding_nodes = StructureCollection(
                 {other.start.start, other.end.start}
             )
-        if areinstances(self.arguments, Relation):
+        if areinstances(other.arguments, Relation):
             other_corresponding_nodes = StructureCollection(
                 {other.start.start, other.start.end, other.end.start, other.end.end}
             )
@@ -165,3 +173,6 @@ class Correspondence(Link):
         ):
             return True
         return False
+
+    def __repr__(self) -> str:
+        return self.structure_id

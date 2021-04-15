@@ -30,10 +30,10 @@ def common_space():
 @pytest.fixture
 def second_target_chunk(common_space):
     location = Mock()
-    location.coordinates = [1, 1]
+    location.coordinates = [[1, 1]]
     location.space = common_space
     chunk = Mock()
-    chunk.value = [20]
+    chunk.value = [[20]]
     chunk.size = 1
     chunk.activation = 0.5
     chunk.quality = 0.5
@@ -51,10 +51,10 @@ def second_target_chunk(common_space):
 @pytest.fixture
 def target_chunk(common_space, second_target_chunk):
     location = Mock()
-    location.coordinates = [2, 2]
+    location.coordinates = [[2, 2]]
     location.space = common_space
     chunk = Mock()
-    chunk.value = [20]
+    chunk.value = [[20]]
     chunk.size = 1
     chunk.activation = 0.5
     chunk.quality = 0.5
@@ -84,10 +84,10 @@ def test_new_chunk_has_no_duplicate_links(
     bubble_chamber, target_chunk, second_target_chunk, common_space
 ):
     concept = Mock()
-    label_1 = Label(Mock(), Mock(), target_chunk, concept, common_space, Mock())
-    label_2 = Label(Mock(), Mock(), second_target_chunk, concept, common_space, Mock())
-    target_chunk.links_out.add(label_1)
-    second_target_chunk.links_out.add(label_2)
+    label_1 = Label(Mock(), Mock(), target_chunk, concept, common_space, 1)
+    label_2 = Label(Mock(), Mock(), second_target_chunk, concept, common_space, 1)
+    target_chunk.labels = StructureCollection({label_1})
+    second_target_chunk.labels = StructureCollection({label_2})
     chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
     result = chunk_builder.run()
     assert CodeletResult.SUCCESS == result

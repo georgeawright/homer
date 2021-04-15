@@ -59,14 +59,40 @@ class Word(Node):
 
     @property
     def concepts(self):
-        return self.lexeme.concepts if self.lexeme is not None else None
+        return self.lexeme.concepts
 
-    def copy(
-        self,
-        bubble_chamber: "BubbleChamber",
-        parent_id: str = "",
-        parent_space: Space = None,
-    ) -> Word:
+    @property
+    def potential_rule_mates(self) -> StructureCollection:
+        return StructureCollection.union(self.adjacent, self.super_phrases)
+
+    @property
+    def adjacent(self) -> StructureCollection:
+        """return non-overlapping but touching phrases"""
+        from .phrase import Phrase
+
+        return StructureCollection.union(
+            self.parent_space.contents.next_to(self.location).of_type(Word),
+            self.parent_space.contents.next_to(self.location).of_type(Phrase),
+        )
+
+    @property
+    def super_phrases(self) -> StructureCollection:
+        """return phrases that contain this phrase"""
+        from .phrase import Phrase
+
+        return StructureCollection(
+            {
+                phrase
+                for phrase in self.parent_space.contents.of_type(Phrase)
+                if self in phrase.members
+            }
+        )
+
+    def copy(self, **kwargs: dict) -> Word:
+        """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""
+        bubble_chamber = kwargs["bubble_chamber"]
+        parent_id = kwargs["parent_id"]
+        parent_space = kwargs["parent_space"]
         location = Location(self.location.coordinates, parent_space)
         new_word = Word(
             ID.new(Word),

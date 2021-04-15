@@ -13,15 +13,22 @@ from homer.tools import hasinstance
 def bubble_chamber():
     chamber = Mock()
     chamber.concepts = {"label": Mock(), "select": Mock()}
+    node = Mock()
+    node.value = ""
+    chamber.input_nodes = [node]
     return chamber
 
 
 def test_finds_challenger_when_not_given_one(bubble_chamber):
+    parent_concept = Mock()
+    parent_concept.instance_type = str
     champion = Mock()
     challenger = Mock()
+    champion.parent_concept = parent_concept
     champion.size = 1
     champion.quality = 1.0
     champion.activation = 1.0
+    challenger.parent_concept = parent_concept
     challenger.size = 1
     challenger.quality = 1.0
     challenger.activation = 1.0
@@ -55,11 +62,15 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
     bubble_chamber,
 ):
     with patch.object(random, "random", return_value=random_number):
+        parent_concept = Mock()
+        parent_concept.instance_type = str
         champion = Mock()
+        champion.parent_concept = parent_concept
         champion.size = 1
         champion.quality = champion_quality
         champion.activation = champion_activation
         challenger = Mock()
+        challenger.parent_concept = parent_concept
         challenger.size = 1
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation

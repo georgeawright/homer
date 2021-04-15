@@ -31,6 +31,8 @@ def bubble_chamber():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
+        StructureCollection(),
         Mock(),
     )
     word_concept = Concept(
@@ -170,7 +172,7 @@ def warm_concept(temperature_conceptual_space, bubble_chamber):
 
 @pytest.fixture
 def warm_lexeme(warm_concept):
-    lexeme = Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "warm"})
+    lexeme = Lexeme(Mock(), Mock(), Mock(), {WordForm.HEADWORD: "warm"}, Mock())
     concept_to_lexeme_relation = Relation(
         Mock(), Mock(), warm_concept, lexeme, None, None, None
     )
@@ -186,7 +188,7 @@ def template(bubble_chamber):
     parent_concept = bubble_chamber.concepts["text"]
     template = Template(Mock(), Mock(), name, parent_concept, Mock(), [], contents)
     word_form = Mock()
-    lexeme = Lexeme(Mock(), Mock(), Mock(), {word_form: Mock()})
+    lexeme = Lexeme(Mock(), Mock(), Mock(), {word_form: Mock()}, Mock())
     slot = Word(Mock(), Mock(), lexeme, word_form, Mock(), Mock(), Mock(), Mock())
     template.contents.add(slot)
     bubble_chamber.frames.add(template)
@@ -351,7 +353,7 @@ def template_slot_word(
 
 @pytest.fixture
 def template_function_word(template):
-    it_lexeme = Lexeme(Mock(), Mock(), "it", {WordForm.HEADWORD: "it"})
+    it_lexeme = Lexeme(Mock(), Mock(), "it", {WordForm.HEADWORD: "it"}, Mock())
     word = Word(
         Mock(),
         Mock(),
