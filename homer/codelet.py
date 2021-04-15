@@ -23,3 +23,9 @@ class Codelet(ABC):
 
     def run(self) -> CodeletResult:
         raise NotImplementedError
+
+    def __repr__(self) -> str:
+        if self.result is None:
+            return f"<{self.codelet_id} (urgency: {self.urgency})>"
+        else:
+            return f"<{self.codelet_id} (result: {self.result})>"
