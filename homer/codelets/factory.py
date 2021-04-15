@@ -53,11 +53,15 @@ class Factory(Codelet):
         raise NotImplementedError
 
     def _get_follow_up_type(self, action_type: Concept, structure_type: Concept):
+        # TODO: how to get ProjectionBuilders? Maybe Projection is another action type
         from homer.codelets.builders import (
             ChunkBuilder,
+            ChunkProjectionBuilder,
             CorrespondenceBuilder,
             LabelBuilder,
+            LabelProjectionBuilder,
             RelationBuilder,
+            RelationProjectionBuilder,
             WordBuilder,
             PhraseBuilder,
         )
@@ -82,6 +86,11 @@ class Factory(Codelet):
         from homer.codelets.selectors.view_selectors import SimplexViewSelector
 
         return {
+            "project": {
+                "chunk": ChunkProjectionBuilder,
+                "label": LabelProjectionBuilder,
+                "relation": RelationProjectionBuilder,
+            },
             "build": {
                 "chunk": ChunkBuilder,
                 "label": LabelBuilder,

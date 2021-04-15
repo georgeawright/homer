@@ -11,6 +11,7 @@ from homer.structures.nodes import Word
 from homer.structures.spaces import Frame
 
 
+# TODO: rename to WordProjectionBuilder?
 class WordBuilder(Builder):
     """Builds a word in an output space
     and correspondences to the items it refers to in input spaces"""
