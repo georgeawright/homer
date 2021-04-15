@@ -74,4 +74,4 @@ class Node(Structure):
         return nearby_nodes
 
     def __repr__(self) -> str:
-        return f"<{self.structure_id} {self.value} in {self.parent_space.structure_id} "
+        return f"<{self.structure_id} {self.value} in {self.parent_space.structure_id}>"

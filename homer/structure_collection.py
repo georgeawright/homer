@@ -170,6 +170,9 @@ class StructureCollection:
         """Returns a structure probabilistically according to unhappiness."""
         return self._get_structure_according_to("unhappiness", exclude)
 
+    def __repr__(self) -> str:
+        return "{" + ", ".join(repr(structure) for structure in self.structures) + "}"
+
     def _get_structure_according_to(self, attribute: str, exclude: list = None):
         """Returns a structure probabilistically according to attribute."""
         if len(self.structures) < 1:

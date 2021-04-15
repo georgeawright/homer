@@ -56,6 +56,7 @@ class Link(Structure):
             self.parent_concept.boost_activation(self.activation)
 
     def __repr__(self) -> str:
+        concept = "none" if self.parent_concept is None else self.parent_concept.name
         args = ", ".join([arg.structure_id for arg in self.arguments])
         spaces = ", ".join([location.space.name for location in self.locations])
-        return f"<{self.structure_id} {self.parent_concept.name}({args}) in {spaces}>"
+        return f"<{self.structure_id} {concept}({args}) in {spaces}>"
