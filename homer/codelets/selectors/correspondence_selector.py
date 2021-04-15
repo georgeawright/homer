@@ -4,6 +4,7 @@ from homer.codelets.selector import Selector
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.structures import Node
 from homer.structures.links import Correspondence
 
 
@@ -66,12 +67,17 @@ class CorrespondenceSelector(Selector):
 
     def _engender_follow_up(self):
         try:
-            new_target_space = self.winner.start.parent_spaces.where(
-                is_basic_level=True
-            ).get_random()
-            new_target_space_two = self.winner.end.parent_spaces.where(
-                parent_concept=new_target_space.parent_concept
-            ).get_random()
+            if isinstance(self.winner.start, Node):
+                new_target = self.winner.start.links.not_of_type(
+                    Correspondence
+                ).get_random()
+            else:
+                new_target = (
+                    self.winner.start.arguments.get_random()
+                    .links.not_of_type(Correspondence)
+                    .get_random()
+                )
+            new_target_space = new_target.parent_space
         except MissingStructureError:
             return
         self.child_codelets.append(
@@ -80,10 +86,9 @@ class CorrespondenceSelector(Selector):
                 self.bubble_chamber,
                 self.winner.parent_view,
                 new_target_space,
-                self.winner.start,
-                self.winner.start.unlinkedness,
-                target_space_two=new_target_space_two,
-                target_structure_two=self.winner.end,
+                new_target,
+                new_target.unlinkedness,
+                parent_concept=self.winner.parent_concept,
             )
         )
         self.child_codelets.append(
