@@ -88,6 +88,75 @@ class Word(Node):
             }
         )
 
+    @property
+    def potential_labeling_words(self) -> StructureCollection:
+        return StructureCollection.union(
+            StructureCollection({self}),
+            StructureCollection(
+                {
+                    relation.start
+                    for relation in self.relations
+                    if relation.parent_concept.name == "nsubj"
+                }
+            ),
+            StructureCollection(
+                {
+                    relation.start
+                    for relation in StructureCollection.union(
+                        r.start.relations
+                        for r in self.relations in r.parent_concept.name == "pobj"
+                    )
+                    if relation.parent_concept.name == "prep"
+                }
+            ),
+        )
+
+    @property
+    def potential_relating_words(self) -> StructureCollection:
+        return StructureCollection.union(
+            StructureCollection(
+                {
+                    relation.start
+                    for relation in self.relations
+                    if relation.parent_concept.name == "nsubj"
+                }
+            ),
+            StructureCollection(
+                {
+                    relation.start
+                    for relation in StructureCollection.union(
+                        r.start.relations
+                        for r in self.relations
+                        if r.parent_concept.name == "pobj"
+                    )
+                    if relation.parent_concept.name == "prep"
+                }
+            ),
+        )
+
+    @property
+    def potential_argument_words(self) -> StructureCollection:
+        return StructureCollection.union(
+            StructureCollection(
+                {
+                    relation.end
+                    for relation in self.relations
+                    if relation.parent_concept.name == "nsubj"
+                }
+            ),
+            StructureCollection(
+                {
+                    relation.end
+                    for relation in StructureCollection.union(
+                        r.end.relations
+                        for r in self.relations
+                        if r.parent_concept == "prep"
+                    )
+                    if relation.parent_concept.name == "pobj"
+                }
+            ),
+        )
+
     def copy(self, **kwargs: dict) -> Word:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""
         bubble_chamber = kwargs["bubble_chamber"]

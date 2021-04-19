@@ -21,6 +21,9 @@ from homer.structures.spaces.frames import Template
 from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
+# TODO link hot and warm to more and cold and mild to less
+# TODO make project action concept
+
 
 def setup_homer() -> Homer:
     problem = [
@@ -51,6 +54,10 @@ def setup_homer() -> Homer:
         name="input",
         parent_concept=input_concept,
         locations=[Location([], top_level_working_space)],
+    )
+    interpretation_concept = homer.def_concept(
+        name="interpretation",
+        parent_space=top_level_conceptual_space,
     )
     activity_concept = homer.def_concept(
         name="activity",

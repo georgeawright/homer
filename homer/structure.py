@@ -80,6 +80,7 @@ class Structure(ABC):
     @property
     def coordinates(self) -> list:
         for location in self.locations:
+            # TODO change to either parent space or find give spaces a is_container attribute
             if location.space.value == "input":
                 return location.coordinates
         raise Exception(f"{self.structure_id} has no location in input space")

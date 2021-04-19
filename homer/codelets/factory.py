@@ -53,7 +53,6 @@ class Factory(Codelet):
         raise NotImplementedError
 
     def _get_follow_up_type(self, action_type: Concept, structure_type: Concept):
-        # TODO: how to get ProjectionBuilders? Maybe Projection is another action type
         from homer.codelets.builders import (
             ChunkBuilder,
             ChunkProjectionBuilder,
