@@ -216,6 +216,12 @@ class Structure(ABC):
                 return True
         return False
 
+    def has_label_with_name(self, name: str) -> bool:
+        for label in self.labels:
+            if label.parent_concept.name == name:
+                return True
+        return False
+
     def label_of_type(self, concept: Structure):
         for label in self.labels:
             if label.parent_concept == concept:
@@ -243,6 +249,18 @@ class Structure(ABC):
             ):
                 return True
         return False
+
+    def has_relation_with_name(self, name: str) -> bool:
+        for relation in self.relations:
+            if relation.parent_concept.name == name:
+                return True
+        return False
+
+    def relation_with_name(self, name: str) -> Structure:
+        for relation in self.relations:
+            if relation.parent_concept.name == name:
+                return relation
+        raise MissingStructureError
 
     def relations_in_space_with(
         self, space: Structure, other: Structure

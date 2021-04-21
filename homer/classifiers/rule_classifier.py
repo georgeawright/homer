@@ -1,8 +1,7 @@
 from homer.classifier import Classifier
 
 
-# TODO
-class DependencyRelationClassifier(Classifier):
+class RuleClassifier(Classifier):
     def __init__(self, rules):
         self.rules = rules
 
