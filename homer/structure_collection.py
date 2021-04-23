@@ -113,6 +113,8 @@ class StructureCollection:
 
     @staticmethod
     def union(*collections: List[StructureCollection]) -> StructureCollection:
+        if len(collections) == 0:
+            return StructureCollection()
         return StructureCollection(
             set.union(*[collection.structures for collection in collections])
         )

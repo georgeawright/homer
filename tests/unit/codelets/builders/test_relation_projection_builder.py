@@ -51,6 +51,7 @@ def bubble_chamber(target_view):
 @pytest.fixture
 def parent_concept(bubble_chamber):
     concept = Mock()
+    concept.value = [[4]]
     relational_space = Mock()
     relational_space.contents.of_type.return_value = StructureCollection({concept})
     relational_concepts = Mock()
@@ -64,6 +65,7 @@ def parent_concept(bubble_chamber):
 @pytest.fixture
 def target_structure_two():
     structure = Mock()
+    structure.value = [[1]]
     return structure
 
 
@@ -71,6 +73,7 @@ def target_structure_two():
 def target_space():
     space = Mock()
     space.contents = StructureCollection()
+    space.parent_concept.value = [[4]]
     space.parent_concept.relevant_value = "value"
     return space
 
@@ -99,6 +102,7 @@ def test_successful_creates_relation_corresponding_to_word_and_spawns_follow_up(
     bubble_chamber, target_view, target_word
 ):
     target_structure_one = Mock()
+    target_structure_one.value = [[10]]
     target_structure_one.has_relation.return_value = False
     target_word.has_correspondence_to_space.return_value = False
     builder = RelationProjectionBuilder(
@@ -114,6 +118,7 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     bubble_chamber, target_view, target_word
 ):
     target_structure_one = Mock()
+    target_structure_one.value = [[10]]
     target_structure_one.has_label.return_value = False
     target_word.has_correspondence_to_space.return_value = True
     builder = RelationProjectionBuilder(
@@ -129,6 +134,7 @@ def test_fizzles_if_target_chunk_already_has_corresponding_relation(
     bubble_chamber, target_view, target_word
 ):
     target_structure_one = Mock()
+    target_structure_one.value = [[10]]
     target_structure_one.has_relation.return_value = True
     target_word.has_correspondence_to_space.return_value = True
     builder = RelationProjectionBuilder(

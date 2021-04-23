@@ -5,6 +5,7 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders import LabelProjectionBuilder
 from homer.codelets.evaluators import LabelEvaluator
 from homer.structure_collection import StructureCollection
+from homer.structures.links import Label
 
 
 @pytest.fixture
@@ -18,7 +19,7 @@ def target_view():
         {existing_chunk, existing_word}
     )
     potential_label_word = Mock()
-    potential_label_word.has_correspondence_to_space.return_value = False
+    potential_label_word.correspondences_to_space.return_value = StructureCollection()
     existing_word.potential_labeling_words = StructureCollection({potential_label_word})
     existing_correspondence.arguments = StructureCollection(
         {existing_chunk, existing_word}
@@ -49,7 +50,9 @@ def bubble_chamber(target_view):
 @pytest.fixture
 def parent_concept(bubble_chamber):
     concept = Mock()
-    bubble_chamber.spaces = {"label concepts": [concept]}
+    label_concepts = Mock()
+    label_concepts.contents = StructureCollection({concept.parent_space})
+    bubble_chamber.spaces = {"label concepts": label_concepts}
     target_space = Mock()
     target_space.parent_concept.relevant_value = "value"
     target_space.contents = StructureCollection()
@@ -60,6 +63,7 @@ def parent_concept(bubble_chamber):
 @pytest.fixture
 def target_word(bubble_chamber, parent_concept):
     word = Mock()
+    word.correspondences_to_space.return_value = StructureCollection()
     word.lexeme.concepts.get_random.return_value = parent_concept
     return word
 
@@ -84,7 +88,12 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
 ):
     target_chunk = Mock()
     target_chunk.has_label.return_value = False
-    target_word.has_correspondence_to_space.return_value = True
+    correspondence = Mock()
+    label = Label(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    correspondence.arguments = StructureCollection({target_word, label})
+    target_word.correspondences_to_space.return_value = StructureCollection(
+        {correspondence}
+    )
     builder = LabelProjectionBuilder(
         "", "", bubble_chamber, target_view, target_chunk, target_word, 1
     )

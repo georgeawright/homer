@@ -9,8 +9,6 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Link, Node, Space
 
-from .chunk import Chunk
-
 
 class Concept(Node):
 

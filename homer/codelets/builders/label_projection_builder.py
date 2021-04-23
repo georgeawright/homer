@@ -78,8 +78,13 @@ class LabelProjectionBuilder(Builder):
             {
                 word
                 for word in potential_labeling_words
-                if not word.has_correspondence_to_space(
-                    target_view.interpretation_space
+                if all(
+                    not isinstance(
+                        correspondence.arguments.get_random(exclude=[word]), Label
+                    )
+                    for correspondence in word.correspondences_to_space(
+                        target_view.interpretation_space
+                    )
                 )
             }
         ).get_unhappy()
@@ -98,15 +103,19 @@ class LabelProjectionBuilder(Builder):
 
     def _passes_preliminary_checks(self):
         self.parent_concept = self.target_word.lexeme.concepts.get_random()
-        return not self.target_chunk.has_label(
-            self.parent_concept
-        ) and not self.target_word.has_correspondence_to_space(
-            self.target_view.interpretation_space
+        return not self.target_chunk.has_label(self.parent_concept) and all(
+            not isinstance(
+                correspondence.arguments.get_random(exclude=[self.target_word]), Label
+            )
+            for correspondence in self.target_word.correspondences_to_space(
+                self.target_view.interpretation_space
+            )
         )
 
     def _calculate_confidence(self):
         self.confidence = FloatBetweenOneAndZero(
-            self.parent_concept in self.bubble_chamber.spaces["label concepts"]
+            self.parent_concept.parent_space
+            in self.bubble_chamber.spaces["label concepts"].contents
         )
 
     def _process_structure(self):

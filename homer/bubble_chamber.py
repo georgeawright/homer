@@ -50,6 +50,26 @@ class BubbleChamber:
         self.log_count = 0
         self.result = None
 
+    @classmethod
+    def setup(cls, logger: Logger):
+        return cls(
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            logger,
+        )
+
     @property
     def spaces(self) -> StructureCollection:
         return StructureCollection.union(
@@ -63,6 +83,12 @@ class BubbleChamber:
     @property
     def input_nodes(self) -> StructureCollection:
         return StructureCollection.union(self.chunks, self.words)
+
+    @property
+    def monitoring_views(self) -> StructureCollection:
+        return StructureCollection(
+            {view for view in self.views if hasattr(view, "interpretation_space")}
+        )
 
     @property
     def structures(self) -> StructureCollection:

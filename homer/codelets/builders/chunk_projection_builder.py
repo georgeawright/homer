@@ -7,7 +7,6 @@ from homer.structure_collection import StructureCollection
 from homer.structures import View
 from homer.structures.links import Correspondence
 from homer.structures.nodes import Chunk, Word
-from homer.structures.spaces import WorkingSpace
 
 
 class ChunkProjectionBuilder(Builder):
@@ -112,6 +111,8 @@ class ChunkProjectionBuilder(Builder):
         )
         chunk.links_in.add(correspondence)
         chunk.links_out.add(correspondence)
+        self.target_word.links_in.add(correspondence)
+        self.target_word.links_out.add(correspondence)
         start_space.add(correspondence)
         end_space.add(correspondence)
         self.target_view.members.add(correspondence)

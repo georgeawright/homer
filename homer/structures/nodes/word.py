@@ -103,8 +103,11 @@ class Word(Node):
                 {
                     relation.start
                     for relation in StructureCollection.union(
-                        r.start.relations
-                        for r in self.relations in r.parent_concept.name == "pobj"
+                        *[
+                            r.start.relations
+                            for r in self.relations
+                            if r.parent_concept.name == "pobj"
+                        ]
                     )
                     if relation.parent_concept.name == "prep"
                 }
@@ -113,49 +116,67 @@ class Word(Node):
 
     @property
     def potential_relating_words(self) -> StructureCollection:
-        return StructureCollection.union(
-            StructureCollection(
-                {
-                    relation.start
-                    for relation in self.relations
-                    if relation.parent_concept.name == "nsubj"
-                }
-            ),
-            StructureCollection(
-                {
-                    relation.start
-                    for relation in StructureCollection.union(
+        get_pobj_preds = lambda x: StructureCollection(
+            {
+                relation.start
+                for relation in StructureCollection.union(
+                    *[
                         r.start.relations
-                        for r in self.relations
+                        for r in x.relations
                         if r.parent_concept.name == "pobj"
-                    )
-                    if relation.parent_concept.name == "prep"
-                }
-            ),
+                    ]
+                )
+                if relation.parent_concept.name == "prep"
+            }
         )
+        nsubj_preds = StructureCollection(
+            {
+                relation.start
+                for relation in self.relations
+                if relation.parent_concept.name == "nsubj"
+            }
+        )
+        pobj_preds = get_pobj_preds(self)
+        dep_preds = StructureCollection.union(
+            *[
+                get_pobj_preds(relation.start)
+                for relation in self.relations
+                if relation.parent_concept.name == "dep"
+            ]
+        )
+        return StructureCollection.union(nsubj_preds, pobj_preds, dep_preds)
 
     @property
     def potential_argument_words(self) -> StructureCollection:
-        return StructureCollection.union(
-            StructureCollection(
-                {
-                    relation.end
-                    for relation in self.relations
-                    if relation.parent_concept.name == "nsubj"
-                }
-            ),
-            StructureCollection(
-                {
-                    relation.end
-                    for relation in StructureCollection.union(
+        nsubj_words = StructureCollection(
+            {
+                relation.end
+                for relation in self.relations
+                if relation.parent_concept.name == "nsubj"
+            }
+        )
+        pobj_words = StructureCollection(
+            {
+                relation.end
+                for relation in StructureCollection.union(
+                    *[
                         r.end.relations
                         for r in self.relations
-                        if r.parent_concept == "prep"
-                    )
-                    if relation.parent_concept.name == "pobj"
-                }
-            ),
+                        if r.parent_concept.name == "prep"
+                    ]
+                )
+                if relation.parent_concept.name == "pobj"
+            }
         )
+        dep_words = StructureCollection(
+            {
+                relation.end
+                for word in pobj_words
+                for relation in word.relations
+                if relation.parent_concept.name == "dep"
+            }
+        )
+        return StructureCollection.union(nsubj_words, pobj_words, dep_words)
 
     def copy(self, **kwargs: dict) -> Word:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""

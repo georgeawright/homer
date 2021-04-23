@@ -130,7 +130,7 @@ class RelationProjectionBuilder(Builder):
         if self.target_structure_two is None:
             try:
                 target_structure_two_corresponding_word = (
-                    self.target_word.potential_argument_words().get_exigent(
+                    self.target_word.potential_argument_words.get_exigent(
                         exclude=[target_structure_one_corresponding_word]
                     )
                 )
@@ -168,12 +168,12 @@ class RelationProjectionBuilder(Builder):
             project_item_into_space(self.target_structure_one, self.target_space)
         if self.target_structure_two not in self.target_space.contents:
             project_item_into_space(self.target_structure_two, self.target_space)
-        if self.target_space.relevant_value == "value":
+        if self.target_space.parent_concept.relevant_value == "value":
             self.target_structure_one.value = self.target_space.parent_concept.value
             self.target_structure_two.value = add_vectors(
                 self.target_structure_one.value, self.parent_concept.value
             )
-        if self.target_space.relevant_value == "coordinates":
+        if self.target_space.parent_concept.relevant_value == "coordinates":
             self.target_structure_one.location_in_space(
                 self.target_space
             ).coordinates = self.target_space.parent_concept.location_in_space(
