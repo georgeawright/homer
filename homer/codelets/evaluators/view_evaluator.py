@@ -1,8 +1,5 @@
-import statistics
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
-from homer.codelets.selectors import ViewSelector
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
@@ -43,19 +40,3 @@ class ViewEvaluator(Evaluator):
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["view"]
         return structure_concept.relations_with(self._evaluate_concept).get_random()
-
-    def _calculate_confidence(self):
-        proportion_of_slots_filled = len(self.target_structure.slot_values) / len(
-            self.target_structure.slots
-        )
-        average_correspondence_quality = (
-            statistics.fmean(
-                [member.quality for member in self.target_structure.members]
-            )
-            if len(self.target_structure.members) > 0
-            else 0
-        )
-        self.confidence = statistics.fmean(
-            [proportion_of_slots_filled, average_correspondence_quality]
-        )
-        self.change_in_confidence = abs(self.confidence - self.original_confidence)

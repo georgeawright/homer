@@ -5,8 +5,7 @@ from typing import Any, List
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Link, Node, Space
-from homer.tools import average_vector
+from homer.structures import Node, Space
 
 
 class Chunk(Node):
@@ -22,6 +21,7 @@ class Chunk(Node):
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
         chunks_made_from_this_chunk: StructureCollection = None,
+        is_raw: bool = False,
     ):
         Node.__init__(
             self,
@@ -40,6 +40,7 @@ class Chunk(Node):
             if chunks_made_from_this_chunk is not None
             else StructureCollection()
         )
+        self.is_raw = is_raw
 
     @classmethod
     def get_builder_class(cls):

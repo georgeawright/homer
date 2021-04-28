@@ -64,7 +64,10 @@ class Factory(Codelet):
             WordBuilder,
             PhraseBuilder,
         )
-        from homer.codelets.builders.view_builders import SimplexViewBuilder
+        from homer.codelets.builders.view_builders import (
+            MonitoringViewBuilder,
+            SimplexViewBuilder,
+        )
         from homer.codelets.evaluators import (
             ChunkEvaluator,
             CorrespondenceEvaluator,
@@ -73,7 +76,10 @@ class Factory(Codelet):
             WordEvaluator,
             PhraseEvaluator,
         )
-        from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
+        from homer.codelets.evaluators.view_evaluators import (
+            MonitoringViewEvaluator,
+            SimplexViewEvaluator,
+        )
         from homer.codelets.selectors import (
             ChunkSelector,
             CorrespondenceSelector,
@@ -82,7 +88,10 @@ class Factory(Codelet):
             WordSelector,
             PhraseSelector,
         )
-        from homer.codelets.selectors.view_selectors import SimplexViewSelector
+        from homer.codelets.selectors.view_selectors import (
+            MonitoringViewSelector,
+            SimplexViewSelector,
+        )
 
         return {
             "project": {
@@ -95,7 +104,8 @@ class Factory(Codelet):
                 "label": LabelBuilder,
                 "relation": RelationBuilder,
                 "correspondence": CorrespondenceBuilder,
-                "view": SimplexViewBuilder,
+                "simplex view": SimplexViewBuilder,
+                "monitoring view": MonitoringViewBuilder,
                 "word": WordBuilder,
                 "phrase": PhraseBuilder,
             },
@@ -104,7 +114,8 @@ class Factory(Codelet):
                 "label": LabelEvaluator,
                 "relation": RelationEvaluator,
                 "correspondence": CorrespondenceEvaluator,
-                "view": SimplexViewEvaluator,
+                "simplex view": SimplexViewEvaluator,
+                "monitoring view": MonitoringViewEvaluator,
                 "word": WordEvaluator,
                 "phrase": PhraseEvaluator,
             },
@@ -113,7 +124,8 @@ class Factory(Codelet):
                 "label": LabelSelector,
                 "relation": RelationSelector,
                 "correspondence": CorrespondenceSelector,
-                "view": SimplexViewSelector,
+                "simplex view": SimplexViewSelector,
+                "monitoring view": MonitoringViewSelector,
                 "word": WordSelector,
                 "phrase": PhraseSelector,
             },

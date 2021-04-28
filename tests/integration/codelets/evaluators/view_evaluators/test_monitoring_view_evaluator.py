@@ -4,14 +4,14 @@ from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
-from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
-from homer.codelets.selectors.view_selectors import SimplexViewSelector
+from homer.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
+from homer.codelets.selectors.view_selectors import MonitoringViewSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import Frame, WorkingSpace
-from homer.structures.views import SimplexView
+from homer.structures.views import MonitoringView
 
 
 @pytest.fixture
@@ -50,9 +50,63 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def good_view(bubble_chamber):
-    slot = Chunk(Mock(), Mock(), None, Mock(), Mock(), Mock(), Mock())
-    input_space = WorkingSpace(
+def input_concept():
+    concept = Concept("", "", "input", Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    return concept
+
+
+@pytest.fixture
+def raw_input_space(input_concept):
+    space = WorkingSpace(
+        Mock(),
+        Mock(),
+        Mock(),
+        input_concept,
+        Mock(),
+        Mock(),
+        StructureCollection({Mock()}),
+        0,
+        [],
+        [],
+    )
+    return space
+
+
+@pytest.fixture
+def raw_input_item_one(raw_input_space):
+    item = Chunk(
+        "",
+        "",
+        Mock(),
+        [Location([], raw_input_space)],
+        StructureCollection(),
+        raw_input_space,
+        Mock(),
+        is_raw=True,
+    )
+    raw_input_space.add(item)
+    return item
+
+
+@pytest.fixture
+def raw_input_item_two(raw_input_space):
+    item = Chunk(
+        "",
+        "",
+        Mock(),
+        [Location([], raw_input_space)],
+        StructureCollection(),
+        raw_input_space,
+        Mock(),
+        is_raw=True,
+    )
+    raw_input_space.add(item)
+    return item
+
+
+@pytest.fixture
+def good_view(bubble_chamber, raw_input_space, raw_input_item_one, raw_input_item_two):
+    interpretation_space = WorkingSpace(
         Mock(),
         Mock(),
         Mock(),
@@ -64,13 +118,10 @@ def good_view(bubble_chamber):
         Mock(),
         Mock(),
     )
-    frame = Frame(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), StructureCollection({slot})
-    )
     member_1 = Correspondence(
         Mock(),
         Mock(),
-        Mock(),
+        raw_input_item_one,
         Mock(),
         Mock(),
         Mock(),
@@ -83,7 +134,7 @@ def good_view(bubble_chamber):
     member_2 = Correspondence(
         Mock(),
         Mock(),
-        Mock(),
+        raw_input_item_two,
         Mock(),
         Mock(),
         Mock(),
@@ -93,23 +144,21 @@ def good_view(bubble_chamber):
         Mock(),
         1.0,
     )
-    view = SimplexView(
+    view = MonitoringView(
         Mock(),
         Mock(),
         Location([], Mock()),
         StructureCollection({member_1, member_2}),
-        StructureCollection({input_space, frame}),
+        StructureCollection({interpretation_space, raw_input_space}),
         Mock(),
         0.5,
     )
-    view.slot_values[slot.structure_id] = Mock()
     return view
 
 
 @pytest.fixture
-def bad_view(bubble_chamber):
-    slot = Chunk(Mock(), Mock(), None, Mock(), Mock(), Mock(), Mock())
-    input_space = WorkingSpace(
+def bad_view(bubble_chamber, raw_input_space, raw_input_item_one):
+    interpretation_space = WorkingSpace(
         Mock(),
         Mock(),
         Mock(),
@@ -121,13 +170,10 @@ def bad_view(bubble_chamber):
         Mock(),
         Mock(),
     )
-    frame = Frame(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), StructureCollection({slot})
-    )
     member_1 = Correspondence(
         Mock(),
         Mock(),
-        Mock(),
+        raw_input_item_one,
         Mock(),
         Mock(),
         Mock(),
@@ -137,25 +183,12 @@ def bad_view(bubble_chamber):
         Mock(),
         0.3,
     )
-    member_2 = Correspondence(
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        0.4,
-    )
-    view = SimplexView(
+    view = MonitoringView(
         Mock(),
         Mock(),
         Location([], Mock()),
-        StructureCollection({member_1, member_2}),
-        StructureCollection({input_space, frame}),
+        StructureCollection({member_1}),
+        StructureCollection({interpretation_space, raw_input_space}),
         Mock(),
         0.5,
     )
@@ -166,23 +199,25 @@ def test_increases_quality_of_good_view(bubble_chamber, good_view):
     original_quality = good_view.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = SimplexViewEvaluator.spawn(
+    evaluator = MonitoringViewEvaluator.spawn(
         parent_id, bubble_chamber, good_view, urgency
     )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert good_view.quality > original_quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], SimplexViewSelector)
+    assert isinstance(evaluator.child_codelets[0], MonitoringViewSelector)
 
 
 def test_decreases_quality_of_bad_view(bubble_chamber, bad_view):
     original_quality = bad_view.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = SimplexViewEvaluator.spawn(parent_id, bubble_chamber, bad_view, urgency)
+    evaluator = MonitoringViewEvaluator.spawn(
+        parent_id, bubble_chamber, bad_view, urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert bad_view.quality < original_quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], SimplexViewSelector)
+    assert isinstance(evaluator.child_codelets[0], MonitoringViewSelector)
