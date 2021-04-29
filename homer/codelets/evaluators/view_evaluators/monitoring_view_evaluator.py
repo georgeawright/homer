@@ -1,6 +1,7 @@
 import statistics
 
 from homer.codelets.evaluators import ViewEvaluator
+from homer.structures.nodes import Chunk
 from homer.structures.views import MonitoringView
 
 
@@ -10,18 +11,22 @@ class MonitoringViewEvaluator(ViewEvaluator):
         return MonitoringView
 
     def _calculate_confidence(self):
-        raw_input_size = sum(
-            1 for item in self.target_structure.raw_input_space.contents if item.is_raw
+        chunks_in_interpretation = (
+            self.target_structure.interpretation_space.contents.of_type(Chunk)
         )
-        amount_of_raw_input_in_interpretation = sum(
-            1
-            for correspondence in self.target_structure.members
-            if correspondence.start in self.target_structure.raw_input_space.contents
-            or correspondence.end in self.target_structure.raw_input_space.contents
+        no_of_chunks_with_correspondences_to_raw_input = sum(
+            1 for chunk in chunks_in_interpretation if not chunk.members.is_empty()
         )
-        proportion_of_raw_input_in_interpretation = (
-            amount_of_raw_input_in_interpretation / raw_input_size
+        print(no_of_chunks_with_correspondences_to_raw_input)
+        proportion_of_interpretation_corresponding_to_raw_input = (
+            (
+                no_of_chunks_with_correspondences_to_raw_input
+                / len(chunks_in_interpretation)
+            )
+            if len(chunks_in_interpretation) != 0
+            else 0
         )
+        print(proportion_of_interpretation_corresponding_to_raw_input)
         average_correspondence_quality = (
             statistics.fmean(
                 [member.quality for member in self.target_structure.members]
@@ -29,7 +34,18 @@ class MonitoringViewEvaluator(ViewEvaluator):
             if len(self.target_structure.members) > 0
             else 0
         )
-        self.confidence = statistics.fmean(
-            [proportion_of_raw_input_in_interpretation, average_correspondence_quality]
+        no_of_monitoring_views_with_text_input = len(
+            self.bubble_chamber.monitoring_views.where(
+                text_space=self.target_structure.text_space
+            )
+        )
+        self.confidence = (
+            statistics.fmean(
+                [
+                    proportion_of_interpretation_corresponding_to_raw_input,
+                    average_correspondence_quality,
+                ]
+            )
+            / no_of_monitoring_views_with_text_input
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

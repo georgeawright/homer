@@ -4,11 +4,12 @@ from unittest.mock import Mock
 from homer.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
 from homer.codelets.selectors.view_selectors import MonitoringViewSelector
 from homer.structure_collection import StructureCollection
+from homer.structures.nodes import Chunk
 
 
 @pytest.mark.parametrize(
-    "current_quality, correspondences_quality, raw_input_size, "
-    + "no_of_raw_correspondences, expected_quality",
+    "current_quality, correspondences_quality, interpretation_size, "
+    + "no_of_chunks_with_members, expected_quality",
     [
         (0, 1, 20, 20, 1),
         (1, 0, 20, 0, 0),
@@ -19,28 +20,29 @@ from homer.structure_collection import StructureCollection
 def test_changes_target_structure_quality(
     current_quality,
     correspondences_quality,
-    raw_input_size,
-    no_of_raw_correspondences,
+    interpretation_size,
+    no_of_chunks_with_members,
     expected_quality,
 ):
     bubble_chamber = Mock()
     bubble_chamber.concepts = {"evaluate": Mock(), "view": Mock()}
-    raw_input_contents = []
-    for i in range(raw_input_size):
-        raw_item = Mock()
-        raw_item.is_raw = True
-        raw_input_contents.append(raw_item)
-    view = Mock()
-    view.raw_input_space = Mock()
-    view.raw_input_space.contents = StructureCollection(set(raw_input_contents))
+    interpretation_chunks = []
+    for i in range(interpretation_size):
+        chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+        interpretation_chunks.append(chunk)
     correspondences = []
-    for i in range(no_of_raw_correspondences):
+    for i in range(no_of_chunks_with_members):
         correspondence = Mock()
-        correspondence.start = raw_input_contents[i]
         correspondence.quality = correspondences_quality
         correspondences.append(correspondence)
+        interpretation_chunks[i].members.is_empty.return_value = False
+    view = Mock()
+    view.interpretation_space = Mock()
+    view.interpretation_space.contents = StructureCollection(set(interpretation_chunks))
     view.members = StructureCollection(set(correspondences))
     view.quality = current_quality
+    monitoring_views_collection = StructureCollection({view})
+    bubble_chamber.monitoring_views.where.return_value = monitoring_views_collection
     evaluator = MonitoringViewEvaluator(Mock(), Mock(), bubble_chamber, view, Mock())
     evaluator.run()
     assert expected_quality == view.quality

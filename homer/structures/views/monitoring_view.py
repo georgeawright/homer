@@ -51,3 +51,33 @@ class MonitoringView(View):
                 if space.parent_concept.name == "interpretation"
             }
         ).get_random()
+
+    @property
+    def raw_input_in_view(self) -> StructureCollection:
+        return StructureCollection.union(
+            *[
+                correspondence.arguments.where(is_raw=True)
+                for correspondence in self.members
+            ]
+        )
+
+    def nearby(self, space: Space = None) -> StructureCollection:
+        space = space if space is not None else self.location.space
+        return StructureCollection(
+            {
+                view
+                for view in space.contents.of_type(View)
+                if len(
+                    StructureCollection.intersection(
+                        self.raw_input_in_view, view.raw_input_in_view
+                    )
+                )
+                > len(self.raw_input_in_view) * 0.5
+                or len(
+                    StructureCollection.intersection(
+                        self.raw_input_in_view, view.raw_input_in_view
+                    )
+                )
+                > len(view.raw_input_in_view) * 0.5
+            }
+        )

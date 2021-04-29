@@ -56,6 +56,20 @@ def input_concept():
 
 
 @pytest.fixture
+def text_concept():
+    concept = Concept("", "", "text", Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    return concept
+
+
+@pytest.fixture
+def interpretation_concept():
+    concept = Concept(
+        "", "", "interpretation", Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    return concept
+
+
+@pytest.fixture
 def raw_input_space(input_concept):
     space = WorkingSpace(
         Mock(),
@@ -73,7 +87,7 @@ def raw_input_space(input_concept):
 
 
 @pytest.fixture
-def raw_input_item_one(raw_input_space):
+def raw_input_item(raw_input_space):
     item = Chunk(
         "",
         "",
@@ -89,53 +103,52 @@ def raw_input_item_one(raw_input_space):
 
 
 @pytest.fixture
-def raw_input_item_two(raw_input_space):
-    item = Chunk(
-        "",
-        "",
+def good_view(
+    bubble_chamber,
+    text_concept,
+    interpretation_concept,
+    raw_input_space,
+    raw_input_item,
+):
+    text_space = WorkingSpace(
         Mock(),
-        [Location([], raw_input_space)],
+        Mock(),
+        Mock(),
+        text_concept,
+        Mock(),
+        Mock(),
         StructureCollection(),
-        raw_input_space,
-        Mock(),
-        is_raw=True,
+        1,
+        [],
+        [],
     )
-    raw_input_space.add(item)
-    return item
-
-
-@pytest.fixture
-def good_view(bubble_chamber, raw_input_space, raw_input_item_one, raw_input_item_two):
     interpretation_space = WorkingSpace(
         Mock(),
         Mock(),
         Mock(),
+        interpretation_concept,
         Mock(),
         Mock(),
+        StructureCollection(),
+        0,
+        [],
+        [],
+    )
+    interpretation_member = Chunk(
+        "",
+        "",
         Mock(),
+        [Location([], interpretation_space)],
         StructureCollection({Mock()}),
         Mock(),
         Mock(),
-        Mock(),
     )
+    interpretation_space.add(interpretation_member)
     member_1 = Correspondence(
         Mock(),
         Mock(),
-        raw_input_item_one,
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        1.0,
-    )
-    member_2 = Correspondence(
-        Mock(),
-        Mock(),
-        raw_input_item_two,
-        Mock(),
+        raw_input_item,
+        interpretation_member,
         Mock(),
         Mock(),
         Mock(),
@@ -148,21 +161,40 @@ def good_view(bubble_chamber, raw_input_space, raw_input_item_one, raw_input_ite
         Mock(),
         Mock(),
         Location([], Mock()),
-        StructureCollection({member_1, member_2}),
-        StructureCollection({interpretation_space, raw_input_space}),
+        StructureCollection({member_1}),
+        StructureCollection({text_space, interpretation_space, raw_input_space}),
         Mock(),
         0.5,
     )
+    bubble_chamber.views.add(view)
     return view
 
 
 @pytest.fixture
-def bad_view(bubble_chamber, raw_input_space, raw_input_item_one):
+def bad_view(
+    bubble_chamber,
+    text_concept,
+    interpretation_concept,
+    raw_input_space,
+    raw_input_item,
+):
+    text_space = WorkingSpace(
+        Mock(),
+        Mock(),
+        Mock(),
+        text_concept,
+        Mock(),
+        Mock(),
+        StructureCollection(),
+        1,
+        [],
+        [],
+    )
     interpretation_space = WorkingSpace(
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        interpretation_concept,
         Mock(),
         Mock(),
         StructureCollection({Mock()}),
@@ -173,7 +205,7 @@ def bad_view(bubble_chamber, raw_input_space, raw_input_item_one):
     member_1 = Correspondence(
         Mock(),
         Mock(),
-        raw_input_item_one,
+        raw_input_item,
         Mock(),
         Mock(),
         Mock(),
@@ -188,10 +220,11 @@ def bad_view(bubble_chamber, raw_input_space, raw_input_item_one):
         Mock(),
         Location([], Mock()),
         StructureCollection({member_1}),
-        StructureCollection({interpretation_space, raw_input_space}),
+        StructureCollection({text_space, interpretation_space, raw_input_space}),
         Mock(),
         0.5,
     )
+    bubble_chamber.views.add(view)
     return view
 
 
