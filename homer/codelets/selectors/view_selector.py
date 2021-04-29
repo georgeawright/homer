@@ -57,12 +57,7 @@ class ViewSelector(Selector):
             self.challenger = self.champion.nearby().get_random()
         except MissingStructureError:
             return True
-        members_intersection = StructureCollection.intersection(
-            self.champion.members, self.challenger.members
-        )
-        return len(members_intersection) > 0.5 * len(self.champion.members) and len(
-            members_intersection
-        ) > 0.5 * len(self.challenger.members)
+        return True
 
     def _fizzle(self):
         new_target = self.bubble_chamber.views.get_unhappy()

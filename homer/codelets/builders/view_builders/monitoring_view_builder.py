@@ -22,7 +22,7 @@ class MonitoringViewBuilder(ViewBuilder):
                 and not space.contents.is_empty()
             }
         ).get_exigent()
-        urgency = urgency if urgency is not None else target.exigency()
+        urgency = urgency if urgency is not None else target.exigency
         return cls.spawn(
             parent_id, bubble_chamber, StructureCollection({target}), urgency
         )
