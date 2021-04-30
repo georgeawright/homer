@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import RelationProjectionBuilder
+from homer.codelets.builders.relation_builders import RelationProjectionBuilder
 from homer.codelets.evaluators import RelationEvaluator
 from homer.structure_collection import StructureCollection
 

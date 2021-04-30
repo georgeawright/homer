@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ChunkProjectionBuilder
+from homer.codelets.builders.chunk_builders import ChunkProjectionBuilder
 from homer.codelets.evaluators import ChunkEvaluator
 from homer.structure_collection import StructureCollection
 

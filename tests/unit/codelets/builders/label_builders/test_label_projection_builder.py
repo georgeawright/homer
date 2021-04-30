@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import LabelProjectionBuilder
+from homer.codelets.builders.label_builders import LabelProjectionBuilder
 from homer.codelets.evaluators import LabelEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label

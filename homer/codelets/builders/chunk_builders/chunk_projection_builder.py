@@ -1,5 +1,5 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets import Builder
+from homer.codelets.builders import ChunkBuilder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
@@ -9,7 +9,7 @@ from homer.structures.links import Correspondence
 from homer.structures.nodes import Chunk, Word
 
 
-class ChunkProjectionBuilder(Builder):
+class ChunkProjectionBuilder(ChunkBuilder):
     """Builds a chunk in a new space with a correspondence to a node in another space.
     The chunk has no value or location coordinates."""
 
@@ -22,7 +22,9 @@ class ChunkProjectionBuilder(Builder):
         target_word: Word,
         urgency: FloatBetweenOneAndZero,
     ):
-        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        ChunkBuilder.__init__(
+            self, codelet_id, parent_id, bubble_chamber, None, urgency
+        )
         self.target_view = target_view
         self.target_word = target_word
         self.child_structure = None

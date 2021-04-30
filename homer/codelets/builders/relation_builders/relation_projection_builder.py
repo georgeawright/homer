@@ -1,7 +1,7 @@
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets import Builder
+from homer.codelets.builders import RelationBuilder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
@@ -13,7 +13,7 @@ from homer.structures.nodes import Chunk, Concept, Word
 from homer.tools import add_vectors, project_item_into_space
 
 
-class RelationProjectionBuilder(Builder):
+class RelationProjectionBuilder(RelationBuilder):
     """Builds a relation in a new space with a correspondence to a node in another space.
     Sets or alters the value or coordinates of its arguments
     according to the parent concept's prototype."""
@@ -30,14 +30,21 @@ class RelationProjectionBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
         target_structure_two: Structure = None,
     ):
-        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        target_space = None
+        RelationBuilder.__init__(
+            self,
+            codelet_id,
+            parent_id,
+            bubble_chamber,
+            target_space,
+            target_structure_one,
+            urgency,
+        )
         self.target_view = target_view
-        self.target_structure_one = target_structure_one
         self.target_structure_two = target_structure_two
         self.target_word = target_word
         self.parent_concept = None
         self.conceptual_space = None
-        self.target_space = None
         self.child_structure = None
 
     @classmethod

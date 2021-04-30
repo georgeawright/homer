@@ -1,7 +1,7 @@
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets import Builder
+from homer.codelets.builders import LabelBuilder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
@@ -11,7 +11,7 @@ from homer.structures.nodes import Chunk, Word
 from homer.tools import project_item_into_space
 
 
-class LabelProjectionBuilder(Builder):
+class LabelProjectionBuilder(LabelBuilder):
     """Builds a label in a new space with a correspondence to a node in another space.
     Sets the value or coordinates of the chunk according to the parent concept's prototyp."""
 
@@ -25,7 +25,9 @@ class LabelProjectionBuilder(Builder):
         target_word: Word,
         urgency: FloatBetweenOneAndZero,
     ):
-        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        LabelBuilder.__init__(
+            self, codelet_id, parent_id, bubble_chamber, target_chunk, urgency
+        )
         self.target_view = target_view
         self.target_chunk = target_chunk
         self.target_word = target_word
