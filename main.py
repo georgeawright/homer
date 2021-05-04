@@ -21,8 +21,7 @@ from homer.structures.spaces.frames import Template
 from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
-# TODO link hot and warm to more and cold and mild to less
-# TODO make project action concept
+# TODO make project action concept ?
 
 
 def setup_homer() -> Homer:
@@ -353,6 +352,86 @@ def setup_homer() -> Homer:
 
     # Domain Specific Knowledge
 
+    more_less_concept = homer.def_concept(
+        name="more-less",
+        parent_space=relational_concepts_space,
+        relevant_value="value",
+        distance_function=centroid_euclidean_distance,
+    )
+    more_less_space = homer.def_conceptual_space(
+        name="more-less",
+        locations=[Location([], relational_concepts_space)],
+        parent_concept=more_less_concept,
+        is_basic_level=True,
+    )
+    more = homer.def_concept(
+        name="more",
+        prototype=[[4]],
+        classifier=DifferenceClassifier(ProximityClassifier()),
+        parent_space=more_less_space,
+        relevant_value="value",
+        distance_function=centroid_euclidean_distance,
+    )
+    more_lexeme = homer.def_lexeme(
+        headword="more",
+        forms={
+            WordForm.HEADWORD: "more",
+            WordForm.COMPARATIVE: "more",
+            WordForm.SUPERLATIVE: "most",
+        },
+        parts_of_speech={
+            WordForm.HEADWORD: [adv_concept],
+            WordForm.COMPARATIVE: [adv_concept],
+            WordForm.SUPERLATIVE: [adv_concept],
+        },
+        parent_concept=more,
+    )
+    less = homer.def_concept(
+        name="less",
+        prototype=[[-4]],
+        classifier=DifferenceClassifier(ProximityClassifier()),
+        parent_space=more_less_space,
+        relevant_value="value",
+        distance_function=centroid_euclidean_distance,
+    )
+    less_lexeme = homer.def_lexeme(
+        headword="less",
+        forms={
+            WordForm.HEADWORD: "less",
+            WordForm.COMPARATIVE: "less",
+            WordForm.SUPERLATIVE: "least",
+        },
+        parts_of_speech={
+            WordForm.HEADWORD: [adv_concept],
+            WordForm.COMPARATIVE: [adv_concept],
+            WordForm.SUPERLATIVE: [adv_concept],
+        },
+        parent_concept=less,
+    )
+    same_different_concept = homer.def_concept(
+        name="same-different",
+        parent_space=correspondential_concepts_space,
+        relevant_value="value",
+        distance_function=centroid_euclidean_distance,
+    )
+    same_different_space = homer.def_conceptual_space(
+        name="same-different",
+        locations=[Location([], correspondential_concepts_space)],
+        parent_concept=same_different_concept,
+        is_basic_level=True,
+    )
+    same = homer.def_concept(
+        name="same",
+        classifier=SamenessClassifier(),
+        parent_space=same_different_space,
+        distance_function=centroid_euclidean_distance,
+    )
+    different = homer.def_concept(
+        name="different",
+        classifier=DifferentnessClassifier(),
+        parent_space=same_different_space,
+        distance_function=centroid_euclidean_distance,
+    )
     temperature_concept = homer.def_concept(
         name="temperature",
         parent_space=label_concepts_space,
@@ -374,6 +453,7 @@ def setup_homer() -> Homer:
         relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
+    homer.def_concept_link(hot, more)
     hot_lexeme = homer.def_lexeme(
         headword="hot",
         forms={
@@ -396,6 +476,7 @@ def setup_homer() -> Homer:
         relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
+    homer.def_concept_link(warm, more)
     warm_lexeme = homer.def_lexeme(
         headword="warm",
         forms={
@@ -418,6 +499,7 @@ def setup_homer() -> Homer:
         relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
+    homer.def_concept_link(mild, less)
     mild_lexeme = homer.def_lexeme(
         headword="mild",
         forms={
@@ -440,6 +522,7 @@ def setup_homer() -> Homer:
         relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
+    homer.def_concept_link(cold, less)
     cold_lexeme = homer.def_lexeme(
         headword="cold",
         forms={
@@ -706,86 +789,6 @@ def setup_homer() -> Homer:
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=midlands,
-    )
-    more_less_concept = homer.def_concept(
-        name="more-less",
-        parent_space=relational_concepts_space,
-        relevant_value="value",
-        distance_function=centroid_euclidean_distance,
-    )
-    more_less_space = homer.def_conceptual_space(
-        name="more-less",
-        locations=[Location([], relational_concepts_space)],
-        parent_concept=more_less_concept,
-        is_basic_level=True,
-    )
-    more = homer.def_concept(
-        name="more",
-        prototype=[[4]],
-        classifier=DifferenceClassifier(ProximityClassifier()),
-        parent_space=more_less_space,
-        relevant_value="value",
-        distance_function=centroid_euclidean_distance,
-    )
-    more_lexeme = homer.def_lexeme(
-        headword="more",
-        forms={
-            WordForm.HEADWORD: "more",
-            WordForm.COMPARATIVE: "more",
-            WordForm.SUPERLATIVE: "most",
-        },
-        parts_of_speech={
-            WordForm.HEADWORD: [adv_concept],
-            WordForm.COMPARATIVE: [adv_concept],
-            WordForm.SUPERLATIVE: [adv_concept],
-        },
-        parent_concept=more,
-    )
-    less = homer.def_concept(
-        name="less",
-        prototype=[[-4]],
-        classifier=DifferenceClassifier(ProximityClassifier()),
-        parent_space=more_less_space,
-        relevant_value="value",
-        distance_function=centroid_euclidean_distance,
-    )
-    less_lexeme = homer.def_lexeme(
-        headword="less",
-        forms={
-            WordForm.HEADWORD: "less",
-            WordForm.COMPARATIVE: "less",
-            WordForm.SUPERLATIVE: "least",
-        },
-        parts_of_speech={
-            WordForm.HEADWORD: [adv_concept],
-            WordForm.COMPARATIVE: [adv_concept],
-            WordForm.SUPERLATIVE: [adv_concept],
-        },
-        parent_concept=less,
-    )
-    same_different_concept = homer.def_concept(
-        name="same-different",
-        parent_space=correspondential_concepts_space,
-        relevant_value="value",
-        distance_function=centroid_euclidean_distance,
-    )
-    same_different_space = homer.def_conceptual_space(
-        name="same-different",
-        locations=[Location([], correspondential_concepts_space)],
-        parent_concept=same_different_concept,
-        is_basic_level=True,
-    )
-    same = homer.def_concept(
-        name="same",
-        classifier=SamenessClassifier(),
-        parent_space=same_different_space,
-        distance_function=centroid_euclidean_distance,
-    )
-    different = homer.def_concept(
-        name="different",
-        classifier=DifferentnessClassifier(),
-        parent_space=same_different_space,
-        distance_function=centroid_euclidean_distance,
     )
     the_lexeme = homer.def_lexeme(
         headword="the",

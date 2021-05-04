@@ -8,6 +8,7 @@ from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -198,7 +199,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     )
     result = correspondence_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert isinstance(correspondence_builder.child_structure, Correspondence)
+    assert hasinstance(correspondence_builder.child_structures, Correspondence)
     assert len(correspondence_builder.child_codelets) == 1
     assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceEvaluator)
 
@@ -227,7 +228,7 @@ def test_fails_when_structures_do_not_correspond(
     )
     result = correspondence_builder.run()
     assert CodeletResult.FAIL == result
-    assert correspondence_builder.child_structure is None
+    assert correspondence_builder.child_structures is None
     assert len(correspondence_builder.child_codelets) == 1
     assert isinstance(correspondence_builder.child_codelets[0], RelationBuilder)
 
@@ -255,6 +256,6 @@ def test_fizzles_when_correspondence_already_exists(
     )
     result = correspondence_builder.run()
     assert CodeletResult.FIZZLE == result
-    assert correspondence_builder.child_structure is None
+    assert correspondence_builder.child_structures is None
     assert len(correspondence_builder.child_codelets) == 1
     assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceBuilder)

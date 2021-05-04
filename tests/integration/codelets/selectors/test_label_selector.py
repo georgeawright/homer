@@ -156,7 +156,9 @@ def test_good_label_is_boosted_bad_label_is_decayed(
     parent_id = ""
     champion = bad_label
     urgency = 1.0
-    selector = LabelSelector.spawn(parent_id, bubble_chamber, champion, urgency)
+    selector = LabelSelector.spawn(
+        parent_id, bubble_chamber, StructureCollection({champion}), urgency
+    )
     selector.run()
     good_label.update_activation()
     bad_label.update_activation()

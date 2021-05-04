@@ -197,7 +197,7 @@ def test_increases_quality_of_good_relation(bubble_chamber, good_relation):
     parent_id = ""
     urgency = 1.0
     evaluator = RelationEvaluator.spawn(
-        parent_id, bubble_chamber, good_relation, urgency
+        parent_id, bubble_chamber, StructureCollection({good_relation}), urgency
     )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
@@ -211,7 +211,7 @@ def test_decreases_quality_of_bad_label(bubble_chamber, bad_relation):
     parent_id = ""
     urgency = 1.0
     evaluator = RelationEvaluator.spawn(
-        parent_id, bubble_chamber, bad_relation, urgency
+        parent_id, bubble_chamber, StructureCollection({bad_relation}), urgency
     )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result

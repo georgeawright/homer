@@ -18,6 +18,7 @@ from homer.structures.nodes import Chunk, Concept, Word
 from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import ConceptualSpace, Frame, WorkingSpace
 from homer.structures.spaces.frames import Template
+from homer.tools import hasinstance
 from homer.word_form import WordForm
 
 
@@ -410,9 +411,9 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert same_concept == builder.parent_concept
-    assert isinstance(builder.child_structure, Correspondence)
+    assert hasinstance(builder.child_structures, Correspondence)
     assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
-    builder.child_structure.quality = 1.0
+    builder.child_structures.get_random().quality = 1.0
 
     target_label = target_chunk.labels.get_random()
     target_slot_label = target_slot.labels.get_random()
@@ -423,7 +424,7 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
     assert same_concept == builder.parent_concept
     assert CodeletResult.SUCCESS == builder.result
     assert target_view.slot_values[target_slot_label.structure_id] == mild_concept
-    assert isinstance(builder.child_structure, Correspondence)
+    assert hasinstance(builder.child_structures, Correspondence)
     assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
 
     builder = CorrespondenceBuilder.spawn(

@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.codelets.selectors import CorrespondenceSelector
+from homer.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
@@ -15,7 +16,7 @@ def test_changes_target_structure_quality(current_quality, classification):
     correspondence.quality = current_quality
     correspondence.parent_concept = concept
     evaluator = CorrespondenceEvaluator(
-        Mock(), Mock(), bubble_chamber, correspondence, Mock()
+        Mock(), Mock(), bubble_chamber, StructureCollection({correspondence}), Mock()
     )
     evaluator.run()
     assert classification == correspondence.quality

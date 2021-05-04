@@ -6,6 +6,7 @@ from homer.codelets.builders.chunk_builders import ReverseChunkProjectionBuilder
 from homer.codelets.evaluators import ChunkEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Chunk
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -74,8 +75,17 @@ def test_successful_projects_chunk_creates_larger_chunk_and_spawns_follow_up(
     )
     result = chunk_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert isinstance(chunk_builder.child_structure, Chunk)
-    assert chunk_builder.child_structure.size > len(target_interpretation_chunk.members)
+    assert hasinstance(chunk_builder.child_structures, Chunk)
+    child_chunks = chunk_builder.child_structures.of_type(Chunk)
+    child_chunk_1 = child_chunks.pop()
+    child_chunk_2 = child_chunks.pop()
+    assert (
+        child_chunk_1 in child_chunk_2.members
+        and child_chunk_2.size > len(target_interpretation_chunk.members)
+    ) or (
+        child_chunk_2 in child_chunk_1.members
+        and child_chunk_1.size > len(target_interpretation_chunk.members)
+    )
     assert len(chunk_builder.child_codelets) == 1
     assert isinstance(chunk_builder.child_codelets[0], ChunkEvaluator)
 
@@ -100,7 +110,7 @@ def test_fails_when_raw_chunk_is_incompatible_with_links(
     )
     result = chunk_builder.run()
     assert CodeletResult.FAIL == result
-    assert chunk_builder.child_structure is None
+    assert chunk_builder.child_structures is None
     assert len(chunk_builder.child_codelets) == 1
     assert isinstance(chunk_builder.child_codelets[0], ReverseChunkProjectionBuilder)
 
@@ -121,6 +131,6 @@ def test_fizzles_when_raw_chunk_has_correspondence_to_interpretation_space(
     )
     result = chunk_builder.run()
     assert CodeletResult.FIZZLE == result
-    assert chunk_builder.child_structure is None
+    assert chunk_builder.child_structures is None
     assert len(chunk_builder.child_codelets) == 1
     assert isinstance(chunk_builder.child_codelets[0], ReverseChunkProjectionBuilder)

@@ -7,6 +7,7 @@ from homer.codelets.evaluators import ChunkEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
 from homer.structures.nodes import Chunk
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -75,7 +76,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(bubble_chamber, target_ch
     chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
     result = chunk_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert isinstance(chunk_builder.child_structure, Chunk)
+    assert hasinstance(chunk_builder.child_structures, Chunk)
     assert len(chunk_builder.child_codelets) == 1
     assert isinstance(chunk_builder.child_codelets[0], ChunkEvaluator)
 
@@ -91,7 +92,8 @@ def test_new_chunk_has_no_duplicate_links(
     chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
     result = chunk_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert len(chunk_builder.child_structure.links) == 1
+    child_structure = chunk_builder.child_structures.get_random()
+    assert len(child_structure.links) == 1
 
 
 def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common_space):
@@ -99,7 +101,7 @@ def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common
     chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
     result = chunk_builder.run()
     assert CodeletResult.FAIL == result
-    assert chunk_builder.child_structure is None
+    assert chunk_builder.child_structures is None
     assert len(chunk_builder.child_codelets) == 1
     assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)
 
@@ -110,7 +112,7 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_chunk):
     chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, urgency)
     result = chunk_builder.run()
     assert CodeletResult.FIZZLE == result
-    assert chunk_builder.child_structure is None
+    assert chunk_builder.child_structures is None
     assert len(chunk_builder.child_codelets) == 1
     assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)
 
@@ -121,6 +123,6 @@ def test_fizzles_when_chunk_already_exists(bubble_chamber, target_chunk):
     chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, urgency)
     result = chunk_builder.run()
     assert CodeletResult.FIZZLE == result
-    assert chunk_builder.child_structure is None
+    assert chunk_builder.child_structures is None
     assert len(chunk_builder.child_codelets) == 1
     assert isinstance(chunk_builder.child_codelets[0], ChunkBuilder)

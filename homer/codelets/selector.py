@@ -4,6 +4,8 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
+from homer.structure_collection import StructureCollection
 
 
 class Selector(Codelet):
@@ -12,20 +14,37 @@ class Selector(Codelet):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        champions: StructureCollection,
         urgency: FloatBetweenOneAndZero,
+        challengers: StructureCollection = None,
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
-        self.champion = None
-        self.challenger = None
-        self.winner = None
-        self.loser = None
+        self.champions = champions
+        self.challengers = challengers
+        self.winners = None
+        self.losers = None
         self.confidence = 0.0
         self.follow_up_urgency = 0.0
 
     @classmethod
-    def spawn(cls):
-        raise NotImplementedError
+    def spawn(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        champions: StructureCollection,
+        urgency: FloatBetweenOneAndZero,
+        challengers: StructureCollection = None,
+    ):
+        codelet_id = ID.new(cls)
+        return cls(
+            codelet_id,
+            parent_id,
+            bubble_chamber,
+            champions,
+            urgency,
+            challengers=challengers,
+        )
 
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
@@ -33,23 +52,27 @@ class Selector(Codelet):
             self._decay_activations()
             self.result = CodeletResult.FIZZLE
             return self.result
-        if self.challenger is not None:
+        if self.challengers is not None:
             self._hold_competition()
-            self._boost_winner()
-            self._decay_loser()
+            self._boost_winners()
+            self._decay_losers()
         else:
-            self.winner = self.champion
-            self.confidence = self.winner.quality
-            self._boost_champion()
+            self.winners = self.champions
+            self.confidence = self.winners.get_random().quality
+            self._boost_winners()
         self._boost_activations()
-        self.follow_up_urgency = self.winner.quality - self.winner.activation
+        self.follow_up_urgency = (
+            self.winners.get_random().quality - self.winners.get_random().activation
+        )
         self._engender_follow_up()
         self.result = CodeletResult.SUCCESS
         return self.result
 
     def _hold_competition(self):
-        champ_size_adjusted_quality = self.champion.quality * self.champion.size
-        chall_size_adjusted_quality = self.challenger.quality * self.challenger.size
+        champions_quality = self.champions.get_random().quality
+        challengers_quality = self.challengers.get_random().quality
+        champ_size_adjusted_quality = champions_quality * self._champions_size
+        chall_size_adjusted_quality = challengers_quality * self._challengers_size
         total_quality = champ_size_adjusted_quality + chall_size_adjusted_quality
         try:
             champ_normalized_quality = champ_size_adjusted_quality / total_quality
@@ -57,19 +80,22 @@ class Selector(Codelet):
             champ_normalized_quality = 0.0
         choice = random.random()
         if choice < champ_normalized_quality:
-            self.winner, self.loser = self.champion, self.challenger
+            self.winners, self.losers = self.champions, self.challengers
             self.confidence = FloatBetweenOneAndZero(
                 champ_size_adjusted_quality - chall_size_adjusted_quality
             )
         else:
-            self.loser, self.winner = self.champion, self.challenger
+            self.losers, self.winners = self.champions, self.challengers
             self.confidence = FloatBetweenOneAndZero(
                 chall_size_adjusted_quality - champ_size_adjusted_quality
             )
-        if self.challenger.activation > self.champion.activation:
-            tmp = self.champion
-            self.champion = self.challenger
-            self.challenger = tmp
+        if (
+            self.challengers.get_random().activation
+            > self.champions.get_random().activation
+        ):
+            tmp = self.champions
+            self.champions = self.challengers
+            self.challengers = tmp
 
     @property
     def _parent_link(self):
@@ -83,6 +109,14 @@ class Selector(Codelet):
     def _structure_concept(self):
         raise NotImplementedError
 
+    @property
+    def _champions_size(self):
+        return self.champions.get_random().size
+
+    @property
+    def _challengers_size(self):
+        return self.challengers.get_random().size
+
     def _boost_activations(self):
         self._select_concept.boost_activation(self.confidence)
         self._parent_link.boost_activation(self.confidence)
@@ -91,14 +125,13 @@ class Selector(Codelet):
         self._select_concept.decay_activation()
         self._parent_link.decay_activation(1 - self.confidence)
 
-    def _boost_winner(self):
-        self.winner.boost_activation(self.confidence)
+    def _boost_winners(self):
+        for winner in self.winners:
+            winner.boost_activation(self.confidence)
 
-    def _decay_loser(self):
-        self.loser.decay_activation(self.confidence)
-
-    def _boost_champion(self):
-        self.champion.boost_activation(self.confidence)
+    def _decay_losers(self):
+        for loser in self.losers:
+            loser.decay_activation(self.confidence)
 
     def _passes_preliminary_checks(self):
         raise NotImplementedError

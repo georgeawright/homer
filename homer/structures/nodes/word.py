@@ -38,6 +38,7 @@ class Word(Node):
         )
         self.lexeme = lexeme
         self.word_form = word_form
+        self.is_word = True
 
     @classmethod
     def get_builder_class(cls):

@@ -6,6 +6,7 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space, View
 from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
@@ -202,7 +203,7 @@ class CorrespondenceBuilder(Builder):
         self.target_structure_two.links_out.add(self.correspondence)
         self.bubble_chamber.correspondences.add(self.correspondence)
         self.bubble_chamber.logger.log(self.correspondence)
-        self.child_structure = self.correspondence
+        self.child_structures = StructureCollection({self.correspondence})
 
     def _fizzle(self):
         self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))

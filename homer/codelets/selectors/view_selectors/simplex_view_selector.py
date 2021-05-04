@@ -10,15 +10,18 @@ class SimplexViewSelector(ViewSelector):
         return SimplexView
 
     def _passes_preliminary_checks(self):
-        if self.challenger is not None:
+        if self.challengers is not None:
             return True
         try:
-            self.challenger = self.champion.nearby().get_random()
+            champion_view = self.champions.get_random()
+            challenger_view = champion_view.nearby().get_random()
+            self.challengers = StructureCollection({challenger_view})
         except MissingStructureError:
             return True
         members_intersection = StructureCollection.intersection(
-            self.champion.members, self.challenger.members
+            champion_view.members, challenger_view.members
         )
-        return len(members_intersection) > 0.5 * len(self.champion.members) and len(
-            members_intersection
-        ) > 0.5 * len(self.challenger.members)
+        return (
+            len(members_intersection) > 0.5 * champion_view.size
+            and len(members_intersection) > 0.5 * challenger_view.size
+        )

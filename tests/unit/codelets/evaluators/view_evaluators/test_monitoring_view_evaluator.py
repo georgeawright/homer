@@ -43,7 +43,9 @@ def test_changes_target_structure_quality(
     view.quality = current_quality
     monitoring_views_collection = StructureCollection({view})
     bubble_chamber.monitoring_views.where.return_value = monitoring_views_collection
-    evaluator = MonitoringViewEvaluator(Mock(), Mock(), bubble_chamber, view, Mock())
+    evaluator = MonitoringViewEvaluator(
+        Mock(), Mock(), bubble_chamber, StructureCollection({view}), Mock()
+    )
     evaluator.run()
     assert expected_quality == view.quality
     assert 1 == len(evaluator.child_codelets)

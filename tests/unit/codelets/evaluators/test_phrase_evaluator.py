@@ -21,7 +21,9 @@ def test_changes_target_structure_quality(current_quality, new_quality):
     phrase.rule.activation = new_quality
     phrase.unchunkedness = new_quality
     phrase.size = new_quality
-    evaluator = PhraseEvaluator(Mock(), Mock(), bubble_chamber, phrase, Mock())
+    evaluator = PhraseEvaluator(
+        Mock(), Mock(), bubble_chamber, StructureCollection({phrase}), Mock()
+    )
     evaluator.run()
     assert phrase.quality == new_quality
     assert 1 == len(evaluator.child_codelets)

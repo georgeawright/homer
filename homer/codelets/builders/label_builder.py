@@ -24,7 +24,6 @@ class LabelBuilder(Builder):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_node = target_node
         self.parent_concept = parent_concept
-        self.child_structure = None
 
     @classmethod
     def get_target_class(cls):
@@ -128,8 +127,8 @@ class LabelBuilder(Builder):
         space.locations.append(Location([], top_level_working_space))
         top_level_working_space.add(space)
         space.parent_spaces.add(self.bubble_chamber.spaces["top level working"])
-        self.child_structure = label
-        self.bubble_chamber.logger.log(self.child_structure)
+        self.bubble_chamber.logger.log(label)
+        self.child_structures = StructureCollection({label})
 
     def _fizzle(self):
         self._re_engender()

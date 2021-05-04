@@ -49,6 +49,7 @@ class Correspondence(Link):
         self.conceptual_space = conceptual_space
         self.parent_view = parent_view
         self.is_privileged = is_privileged
+        self.is_correspondence = True
 
     @classmethod
     def get_builder_class(cls):

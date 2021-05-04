@@ -92,7 +92,9 @@ def test_good_word_is_boosted(bubble_chamber, good_word):
     original_activation = good_word.activation
     parent_id = ""
     urgency = 1.0
-    selector = WordSelector.spawn(parent_id, bubble_chamber, good_word, urgency)
+    selector = WordSelector.spawn(
+        parent_id, bubble_chamber, StructureCollection({good_word}), urgency
+    )
     selector.run()
     good_word.update_activation()
     assert good_word.activation > original_activation
@@ -102,7 +104,9 @@ def test_bad_word_is_not_boosted(bubble_chamber, bad_word):
     original_activation = bad_word.activation
     parent_id = ""
     urgency = 1.0
-    selector = WordSelector.spawn(parent_id, bubble_chamber, bad_word, urgency)
+    selector = WordSelector.spawn(
+        parent_id, bubble_chamber, StructureCollection({bad_word}), urgency
+    )
     selector.run()
     bad_word.update_activation()
     assert bad_word.activation <= original_activation

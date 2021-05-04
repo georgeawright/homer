@@ -11,6 +11,7 @@ from homer.structures.links import Label, Relation
 from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import WorkingSpace
 from homer.structures.views import MonitoringView
+from homer.tools import hasinstance
 from homer.word_form import WordForm
 
 
@@ -121,7 +122,7 @@ def test_successful_creates_chunk_and_follow_up_and_same_chunk_cannot_be_recreat
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Chunk)
+    assert hasinstance(builder.child_structures, Chunk)
     assert isinstance(builder.child_codelets[0], ChunkEvaluator)
     builder = ChunkProjectionBuilder.spawn(
         parent_id, bubble_chamber, target_view, target_word, urgency

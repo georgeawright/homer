@@ -1,18 +1,13 @@
 from __future__ import annotations
 from abc import abstractclassmethod
 import statistics
-from typing import List, Set, Tuple
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Space, View
-from homer.structures.links import Correspondence
-from homer.structures.spaces import Frame, WorkingSpace
+from homer.structures.spaces import Frame
 
 
 class ViewBuilder(Builder):
@@ -29,7 +24,6 @@ class ViewBuilder(Builder):
         self.second_target_view = None
         self.correspondences = None
         self.correspondences_to_add = None
-        self.child_structure = None
         self.frame = None
 
     @classmethod

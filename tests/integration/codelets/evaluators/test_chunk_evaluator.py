@@ -193,7 +193,9 @@ def test_increases_quality_of_good_chunk(bubble_chamber, good_chunk):
     original_chunk_quality = good_chunk.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = ChunkEvaluator.spawn(parent_id, bubble_chamber, good_chunk, urgency)
+    evaluator = ChunkEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({good_chunk}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert good_chunk.quality > original_chunk_quality
@@ -205,7 +207,9 @@ def test_decreases_quality_of_bad_chunk(bubble_chamber, bad_chunk):
     original_chunk_quality = bad_chunk.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = ChunkEvaluator.spawn(parent_id, bubble_chamber, bad_chunk, urgency)
+    evaluator = ChunkEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({bad_chunk}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert bad_chunk.quality < original_chunk_quality

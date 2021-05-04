@@ -282,7 +282,7 @@ def test_increases_quality_of_good_correspondence(bubble_chamber, good_correspon
     parent_id = ""
     urgency = 1.0
     evaluator = CorrespondenceEvaluator.spawn(
-        parent_id, bubble_chamber, good_correspondence, urgency
+        parent_id, bubble_chamber, StructureCollection({good_correspondence}), urgency
     )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
@@ -296,7 +296,7 @@ def test_decreases_quality_of_bad_label(bubble_chamber, bad_correspondence):
     parent_id = ""
     urgency = 1.0
     evaluator = CorrespondenceEvaluator.spawn(
-        parent_id, bubble_chamber, bad_correspondence, urgency
+        parent_id, bubble_chamber, StructureCollection({bad_correspondence}), urgency
     )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result

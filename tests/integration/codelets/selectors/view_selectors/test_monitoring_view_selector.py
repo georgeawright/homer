@@ -206,7 +206,7 @@ def test_good_view_is_boosted_bad_view_is_decayed(bubble_chamber, good_view, bad
     champion = bad_view
     urgency = 1.0
     selector = MonitoringViewSelector.spawn(
-        parent_id, bubble_chamber, champion, urgency
+        parent_id, bubble_chamber, StructureCollection({champion}), urgency
     )
     selector.run()
     assert selector.result == CodeletResult.SUCCESS

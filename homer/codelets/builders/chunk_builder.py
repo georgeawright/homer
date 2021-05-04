@@ -27,7 +27,6 @@ class ChunkBuilder(Builder):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_chunk = target_chunk
         self.second_target_chunk = None
-        self.child_structure = None
 
     @classmethod
     def get_target_class(cls):
@@ -137,12 +136,12 @@ class ChunkBuilder(Builder):
         ]:
             member.chunks_made_from_this_chunk.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
-        self.child_structure = chunk
-        self.bubble_chamber.logger.log(self.child_structure)
+        self.bubble_chamber.logger.log(chunk)
         self.bubble_chamber.logger.log(self.target_chunk)
         self.bubble_chamber.logger.log(self.second_target_chunk)
         self._copy_across_links(self.target_chunk, chunk)
         self._copy_across_links(self.second_target_chunk, chunk)
+        self.child_structures = StructureCollection({chunk})
 
     def _members_from_chunk(self, chunk):
         return StructureCollection({chunk}) if chunk.size == 1 else chunk.members

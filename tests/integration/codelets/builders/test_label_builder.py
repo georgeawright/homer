@@ -12,6 +12,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Label, Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -215,7 +216,7 @@ def test_successful_adds_label_to_chunk_and_spawns_follow_up_and_same_label_cann
     builder = LabelBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Label)
+    assert hasinstance(builder.child_structures, Label)
     assert isinstance(builder.child_codelets[0], LabelEvaluator)
     builder = LabelBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
     builder.run()

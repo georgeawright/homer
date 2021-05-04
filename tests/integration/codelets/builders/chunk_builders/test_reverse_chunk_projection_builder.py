@@ -11,7 +11,7 @@ from homer.structures.links import Label, Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.views import MonitoringView
-from homer.tools import centroid_euclidean_distance
+from homer.tools import centroid_euclidean_distance, hasinstance
 
 
 @pytest.fixture
@@ -251,7 +251,7 @@ def test_successful_projects_raw_chunk_and_same_chunk_cannot_be_projected_again(
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Chunk)
+    assert hasinstance(builder.child_structures, Chunk)
     assert target_raw_chunk.has_correspondence_to_space(
         target_view.interpretation_space
     )

@@ -24,7 +24,9 @@ def test_changes_target_structure_quality(
     member_2.quality = correspondences_quality
     view.members = StructureCollection({member_1, member_2})
     view.quality = current_quality
-    evaluator = SimplexViewEvaluator(Mock(), Mock(), bubble_chamber, view, Mock())
+    evaluator = SimplexViewEvaluator(
+        Mock(), Mock(), bubble_chamber, StructureCollection({view}), Mock()
+    )
     evaluator.run()
     assert correspondences_quality == view.quality
     assert 1 == len(evaluator.child_codelets)

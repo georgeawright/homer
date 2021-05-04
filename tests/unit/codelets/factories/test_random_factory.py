@@ -50,6 +50,7 @@ def coderack():
     return rack
 
 
+@pytest.mark.skip
 def test_engenders_two_follow_ups(bubble_chamber, coderack):
     factory_codelet = RandomFactory(Mock(), Mock(), bubble_chamber, coderack, Mock())
     factory_codelet.run()

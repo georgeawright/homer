@@ -11,6 +11,7 @@ from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.views import MonitoringView
+from homer.tools import hasinstance
 from homer.word_form import WordForm
 
 
@@ -400,7 +401,7 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Relation)
+    assert hasinstance(builder.child_structures, Relation)
     assert isinstance(builder.child_codelets[0], RelationEvaluator)
 
     builder = RelationProjectionBuilder.spawn(

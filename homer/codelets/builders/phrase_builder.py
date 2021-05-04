@@ -31,7 +31,6 @@ class PhraseBuilder(Builder):
         self.target_left_branch = target_left_branch
         self.target_right_branch = target_right_branch
         self.parent_space = self.target_structures[0].parent_space
-        self.child_structure = None
 
     @classmethod
     def get_target_class(cls):
@@ -246,7 +245,7 @@ class PhraseBuilder(Builder):
             self.bubble_chamber.logger.log(chunk)
             self.bubble_chamber.logger.log(label)
             self.bubble_chamber.logger.log(phrase)
-            self.child_structure = phrase
+            self.child_structures = StructureCollection({phrase})
             if self.target_root is None:
                 self.target_root = phrase
             elif self.target_left_branch is None:
@@ -269,7 +268,7 @@ class PhraseBuilder(Builder):
                     self.target_left_branch.location, self.target_right_branch.location
                 )
             ]
-            self.child_structure = self.target_root
+            self.child_structures = StructureCollection({self.target_root})
         self.bubble_chamber.logger.log(self.target_root.chunk)
         self.bubble_chamber.logger.log(self.target_root)
 

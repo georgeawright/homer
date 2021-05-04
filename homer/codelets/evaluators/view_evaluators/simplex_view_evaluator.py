@@ -10,14 +10,13 @@ class SimplexViewEvaluator(ViewEvaluator):
         return SimplexView
 
     def _calculate_confidence(self):
-        proportion_of_slots_filled = len(self.target_structure.slot_values) / len(
-            self.target_structure.slots
+        target_view = self.target_structures.get_random()
+        proportion_of_slots_filled = len(target_view.slot_values) / len(
+            target_view.slots
         )
         average_correspondence_quality = (
-            statistics.fmean(
-                [member.quality for member in self.target_structure.members]
-            )
-            if len(self.target_structure.members) > 0
+            statistics.fmean([member.quality for member in target_view.members])
+            if len(target_view.members) > 0
             else 0
         )
         self.confidence = statistics.fmean(

@@ -32,7 +32,6 @@ class LabelProjectionBuilder(LabelBuilder):
         self.target_chunk = target_chunk
         self.target_word = target_word
         self.parent_concept = None
-        self.child_structure = None
 
     @classmethod
     def get_target_class(cls):
@@ -67,8 +66,8 @@ class LabelProjectionBuilder(LabelBuilder):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = bubble_chamber.monitoring_views.get_active()
-        target_chunk = target_view.interpretation_space.contents.of_type(
-            Chunk
+        target_chunk = target_view.interpretation_space.contents.where(
+            is_chunk=True
         ).get_unhappy()
         potential_labeling_words = (
             target_chunk.correspondences_to_space(target_view.text_space)
@@ -141,7 +140,6 @@ class LabelProjectionBuilder(LabelBuilder):
             parent_space=space,
             quality=0,
         )
-        self.child_structure = label
         self.target_chunk.links_out.add(label)
         start_space = self.target_word.parent_space
         end_space = space
@@ -168,6 +166,7 @@ class LabelProjectionBuilder(LabelBuilder):
         self.bubble_chamber.correspondences.add(correspondence)
         self.bubble_chamber.logger.log(correspondence)
         self.bubble_chamber.logger.log(self.target_view)
+        self.child_structures = StructureCollection({label, correspondence})
 
     def _fizzle(self):
         self._re_engender()

@@ -41,6 +41,7 @@ class Chunk(Node):
             else StructureCollection()
         )
         self.is_raw = is_raw
+        self.is_chunk = True
 
     @classmethod
     def get_builder_class(cls):

@@ -40,7 +40,6 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
         self.target_raw_chunk = target_raw_chunk
         self.correspondee_to_raw_chunk = None
         self.new_chunk = None
-        self.child_structure = None
         self.confidence = 0.0
 
     @classmethod
@@ -216,4 +215,6 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
         end.links_in.add(correspondence)
         self.bubble_chamber.correspondences.add(correspondence)
         self.bubble_chamber.logger.log(correspondence)
-        self.child_structure = self.new_chunk
+        self.child_structures = StructureCollection(
+            {self.new_chunk, correspondence, self.correspondee_to_raw_chunk}
+        )

@@ -25,7 +25,7 @@ def test_word_is_boosted_follow_up_is_spawned(bubble_chamber):
         Mock(),
         Mock(),
         bubble_chamber,
-        word,
+        StructureCollection({word}),
         Mock(),
     )
     selector.run()

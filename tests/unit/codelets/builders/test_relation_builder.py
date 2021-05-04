@@ -6,6 +6,7 @@ from homer.codelets.builders import ChunkBuilder, RelationBuilder
 from homer.codelets.evaluators import RelationEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -78,7 +79,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     )
     result = relation_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert isinstance(relation_builder.child_structure, Relation)
+    assert hasinstance(relation_builder.child_structures, Relation)
     assert len(relation_builder.child_codelets) == 1
     assert isinstance(relation_builder.child_codelets[0], RelationEvaluator)
 
@@ -92,7 +93,7 @@ def test_fails_when_structures_cannot_be_related(
     )
     result = relation_builder.run()
     assert CodeletResult.FAIL == result
-    assert relation_builder.child_structure is None
+    assert relation_builder.child_structures is None
     assert len(relation_builder.child_codelets) == 1
     assert isinstance(relation_builder.child_codelets[0], ChunkBuilder)
 
@@ -104,6 +105,6 @@ def test_fizzles_when_relation_already_exists(bubble_chamber, target_structure_o
     )
     result = relation_builder.run()
     assert CodeletResult.FIZZLE == result
-    assert relation_builder.child_structure is None
+    assert relation_builder.child_structures is None
     assert len(relation_builder.child_codelets) == 1
     assert isinstance(relation_builder.child_codelets[0], RelationBuilder)

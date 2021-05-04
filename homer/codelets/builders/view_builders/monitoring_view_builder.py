@@ -56,4 +56,4 @@ class MonitoringViewBuilder(ViewBuilder):
         self.bubble_chamber.logger.log(interpretation_space)
         self.bubble_chamber.logger.log(view)
         self.bubble_chamber.views.add(view)
-        self.child_structure = view
+        self.child_structures = StructureCollection({view})

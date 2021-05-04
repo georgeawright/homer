@@ -4,7 +4,7 @@ from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 from homer.id import ID
-from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 
 
 class Evaluator(Codelet):
@@ -17,18 +17,31 @@ class Evaluator(Codelet):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structure: Structure,
+        target_structures: StructureCollection,
         urgency: FloatBetweenOneAndZero,
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
-        self.target_structure = target_structure
+        self.target_structures = target_structures
+        self.original_confidence = target_structures.get_random().quality
         self.confidence = 0
         self.change_in_confidence = 0
 
+    @classmethod
+    def spawn(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_structures: StructureCollection,
+        urgency: FloatBetweenOneAndZero,
+    ):
+        codelet_id = ID.new(cls)
+        return cls(codelet_id, parent_id, bubble_chamber, target_structures, urgency)
+
     def run(self):
         self._calculate_confidence()
-        self.target_structure.quality = self.confidence
+        for structure in self.target_structures:
+            structure.quality = self.confidence
         self._engender_follow_up()
         self.result = CodeletResult.SUCCESS
         if self.change_in_confidence > self.CONFIDENCE_THRESHOLD:
@@ -62,7 +75,7 @@ class Evaluator(Codelet):
             selector_class.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.target_structure,
+                self.target_structures,
                 self.change_in_confidence,
             )
         )

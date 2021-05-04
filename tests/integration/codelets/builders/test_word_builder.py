@@ -13,6 +13,7 @@ from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 from homer.structures.spaces.frames import Template
+from homer.tools import hasinstance
 from homer.word_form import WordForm
 
 
@@ -376,7 +377,7 @@ def test_successful_creates_word_and_spawns_follow_up_and_same_word_cannot_be_re
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Word)
+    assert hasinstance(builder.child_structures, Word)
     assert isinstance(builder.child_codelets[0], WordEvaluator)
     builder = WordBuilder.spawn(
         parent_id, bubble_chamber, target_view, template_slot_word, urgency
@@ -395,7 +396,7 @@ def test_successful_creates_function_word_and_spawns_follow_up_and_same_word_can
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Word)
+    assert hasinstance(builder.child_structures, Word)
     assert isinstance(builder.child_codelets[0], WordEvaluator)
     builder = WordBuilder.spawn(
         parent_id, bubble_chamber, target_view, template_function_word, urgency

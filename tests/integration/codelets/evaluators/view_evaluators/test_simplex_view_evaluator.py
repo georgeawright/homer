@@ -167,7 +167,7 @@ def test_increases_quality_of_good_view(bubble_chamber, good_view):
     parent_id = ""
     urgency = 1.0
     evaluator = SimplexViewEvaluator.spawn(
-        parent_id, bubble_chamber, good_view, urgency
+        parent_id, bubble_chamber, StructureCollection({good_view}), urgency
     )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
@@ -180,7 +180,9 @@ def test_decreases_quality_of_bad_view(bubble_chamber, bad_view):
     original_quality = bad_view.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = SimplexViewEvaluator.spawn(parent_id, bubble_chamber, bad_view, urgency)
+    evaluator = SimplexViewEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({bad_view}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert bad_view.quality < original_quality

@@ -10,6 +10,7 @@ from homer.structures.links import Relation
 from homer.structures.nodes import Concept
 from homer.structures.spaces import Frame, WorkingSpace
 from homer.structures.views import SimplexView
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -105,7 +106,7 @@ def test_successful_creates_view_and_spawns_follow_up_and_same_view_cannot_be_re
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, SimplexView)
+    assert hasinstance(builder.child_structures, SimplexView)
     assert isinstance(builder.child_codelets[0], SimplexViewEvaluator)
     builder = SimplexViewBuilder.spawn(
         parent_id, bubble_chamber, target_spaces, urgency

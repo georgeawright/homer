@@ -7,6 +7,7 @@ from homer.codelets.evaluators import LabelEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
 from homer.structures.nodes import Concept
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -66,7 +67,7 @@ def test_successful_creates_label_and_spawns_follow_up(bubble_chamber, target_ch
     label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
     result = label_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert isinstance(label_builder.child_structure, Label)
+    assert hasinstance(label_builder.child_structures, Label)
     assert len(label_builder.child_codelets) == 1
     assert isinstance(label_builder.child_codelets[0], LabelEvaluator)
 
@@ -79,7 +80,7 @@ def test_fails_when_chunk_is_bad_example(bubble_chamber, target_chunk):
     )
     result = label_builder.run()
     assert CodeletResult.FAIL == result
-    assert label_builder.child_structure is None
+    assert label_builder.child_structures is None
     assert len(label_builder.child_codelets) == 1
     assert isinstance(label_builder.child_codelets[0], LabelBuilder)
 
@@ -89,6 +90,6 @@ def test_fizzles_when_label_exists(bubble_chamber, target_chunk):
     label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
     result = label_builder.run()
     assert CodeletResult.FIZZLE == result
-    assert label_builder.child_structure is None
+    assert label_builder.child_structures is None
     assert len(label_builder.child_codelets) == 1
     assert isinstance(label_builder.child_codelets[0], LabelBuilder)

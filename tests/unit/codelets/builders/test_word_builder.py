@@ -7,6 +7,7 @@ from homer.codelets.evaluators import WordEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Word
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -160,7 +161,7 @@ def test_successfully_creates_word_from_slot(
     )
     result = word_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert isinstance(word_builder.child_structure, Word)
+    assert hasinstance(word_builder.child_structures, Word)
     assert 1 == len(word_builder.child_codelets)
     assert isinstance(word_builder.child_codelets[0], WordEvaluator)
 
@@ -171,6 +172,6 @@ def test_successfully_creates_word_from_word(bubble_chamber, target_view, frame_
     )
     result = word_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert isinstance(word_builder.child_structure, Word)
+    assert hasinstance(word_builder.child_structures, Word)
     assert 1 == len(word_builder.child_codelets)
     assert isinstance(word_builder.child_codelets[0], WordEvaluator)

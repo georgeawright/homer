@@ -20,7 +20,7 @@ class Builder(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
-        self.child_structure = None
+        self.child_structures = None
         self.confidence = 0.0
 
     @classmethod
@@ -96,7 +96,7 @@ class Builder(Codelet):
             follow_up_class.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.child_structure,
+                self.child_structures,
                 self.confidence,
             )
         )

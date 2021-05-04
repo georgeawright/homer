@@ -128,7 +128,9 @@ def test_good_view_is_boosted_bad_view_is_decayed(bubble_chamber, good_view, bad
     parent_id = ""
     champion = bad_view
     urgency = 1.0
-    selector = SimplexViewSelector.spawn(parent_id, bubble_chamber, champion, urgency)
+    selector = SimplexViewSelector.spawn(
+        parent_id, bubble_chamber, StructureCollection({champion}), urgency
+    )
     selector.run()
     good_view.update_activation()
     bad_view.update_activation()

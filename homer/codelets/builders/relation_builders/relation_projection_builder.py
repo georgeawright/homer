@@ -203,7 +203,6 @@ class RelationProjectionBuilder(RelationBuilder):
             parent_space=self.target_space,
             quality=0,
         )
-        self.child_structure = relation
         self.target_structure_one.links_out.add(relation)
         self.target_structure_two.links_in.add(relation)
         start_space = self.target_word.parent_space
@@ -231,6 +230,7 @@ class RelationProjectionBuilder(RelationBuilder):
         self.bubble_chamber.correspondences.add(correspondence)
         self.bubble_chamber.logger.log(correspondence)
         self.bubble_chamber.logger.log(self.target_view)
+        self.child_structures = StructureCollection({relation, correspondence})
 
     def _fizzle(self):
         self._re_engender()

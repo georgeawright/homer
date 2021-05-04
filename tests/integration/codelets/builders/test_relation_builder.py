@@ -12,7 +12,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
-from homer.tools import centroid_euclidean_distance
+from homer.tools import centroid_euclidean_distance, hasinstance
 
 
 @pytest.fixture
@@ -217,11 +217,15 @@ def test_successful_adds_relation_to_chunk_and_spawns_follow_up_and_same_relatio
     urgency = 1.0
 
     builder = RelationBuilder.spawn(
-        parent_id, bubble_chamber, temperature_space, target_chunk, urgency
+        parent_id,
+        bubble_chamber,
+        temperature_space,
+        target_chunk,
+        urgency,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Relation)
+    assert hasinstance(builder.child_structures, Relation)
     assert isinstance(builder.child_codelets[0], RelationEvaluator)
     builder = RelationBuilder.spawn(
         parent_id, bubble_chamber, temperature_space, target_chunk, urgency

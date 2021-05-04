@@ -9,8 +9,10 @@ from homer.structure_collection import StructureCollection
 
 @pytest.fixture
 def target_view():
+    word = Mock()
+    word.is_word = True
     view = Mock()
-    view.text_space.contents.of_type.return_value = StructureCollection({Mock()})
+    view.text_space.contents = StructureCollection({word})
     return view
 
 

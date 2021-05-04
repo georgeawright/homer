@@ -34,10 +34,12 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     challenger.quality = 1.0
     challenger.activation = 1.0
     champion.nearby.return_value = StructureCollection({challenger})
-    selector = MonitoringViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
-    assert selector.challenger is None
+    selector = MonitoringViewSelector(
+        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
+    )
+    assert selector.challengers is None
     selector.run()
-    assert selector.challenger == challenger
+    assert selector.challengers == StructureCollection({challenger})
 
 
 @pytest.mark.parametrize(
@@ -70,7 +72,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
         selector = MonitoringViewSelector(
-            Mock(), Mock(), bubble_chamber, champion, Mock(), challenger=challenger
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            StructureCollection({champion}),
+            Mock(),
+            challengers=StructureCollection({challenger}),
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result

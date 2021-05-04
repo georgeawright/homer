@@ -10,6 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Label, Relation
 from homer.structures.nodes import Chunk, Concept, Phrase, Rule
 from homer.structures.spaces import WorkingSpace
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -148,7 +149,7 @@ def test_successful_creates_phrase_and_spawns_follow_up_and_same_phrase_cannot_b
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Phrase)
+    assert hasinstance(builder.child_structures, Phrase)
     assert isinstance(builder.child_codelets[0], PhraseEvaluator)
     builder = PhraseBuilder.spawn(
         parent_id,

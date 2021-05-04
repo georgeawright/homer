@@ -27,7 +27,6 @@ class ChunkProjectionBuilder(ChunkBuilder):
         )
         self.target_view = target_view
         self.target_word = target_word
-        self.child_structure = None
 
     @classmethod
     def get_target_class(cls):
@@ -63,7 +62,7 @@ class ChunkProjectionBuilder(ChunkBuilder):
         target_word = StructureCollection(
             {
                 word
-                for word in target_view.text_space.contents.of_type(Word)
+                for word in target_view.text_space.contents.where(is_word=True)
                 if word.has_label(bubble_chamber.concepts["noun"])
             }
         ).get_unhappy()
@@ -92,7 +91,6 @@ class ChunkProjectionBuilder(ChunkBuilder):
             parent_space=self.target_view.interpretation_space,
             quality=0.0,
         )
-        self.child_structure = chunk
         self.target_view.interpretation_space.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         self.bubble_chamber.logger.log(chunk)
@@ -121,6 +119,7 @@ class ChunkProjectionBuilder(ChunkBuilder):
         self.bubble_chamber.correspondences.add(correspondence)
         self.bubble_chamber.logger.log(correspondence)
         self.bubble_chamber.logger.log(self.target_view)
+        self.child_structures = StructureCollection({chunk, correspondence})
 
     def _fizzle(self):
         self.child_codelets.append(

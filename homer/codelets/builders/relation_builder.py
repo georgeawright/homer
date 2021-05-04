@@ -30,7 +30,6 @@ class RelationBuilder(Builder):
         self.target_structure_one = target_structure_one
         self.target_structure_two = target_structure_two
         self.parent_concept = parent_concept
-        self.child_structure = None
 
     @classmethod
     def get_target_class(cls):
@@ -162,8 +161,8 @@ class RelationBuilder(Builder):
         self.target_structure_one.links_out.add(relation)
         self.target_structure_two.links_in.add(relation)
         self.bubble_chamber.relations.add(relation)
-        self.child_structure = relation
         self.bubble_chamber.logger.log(relation)
+        self.child_structures = StructureCollection({relation})
 
     def _fizzle(self):
         self.child_codelets.append(

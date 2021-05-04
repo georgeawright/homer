@@ -130,7 +130,9 @@ def test_good_chunk_is_boosted_bad_chunk_is_decayed(
     parent_id = ""
     champion = bad_chunk
     urgency = 1.0
-    selector = ChunkSelector.spawn(parent_id, bubble_chamber, champion, urgency)
+    selector = ChunkSelector.spawn(
+        parent_id, bubble_chamber, StructureCollection({champion}), urgency
+    )
     selector.run()
     good_chunk.update_activation()
     bad_chunk.update_activation()

@@ -10,26 +10,26 @@ from homer.structures.links import Label
 
 @pytest.fixture
 def target_view():
+    potential_labeling_word = Mock()
+    potential_labeling_word.unlinkedness = 0.5
+    potential_labeling_word.correspondences_to_space.return_value = StructureCollection(
+        {Mock()}
+    )
+    potential_labeling_word.name = "potential labeling word"
+    word = Mock()
+    word.name = "existing word"
+    word.potential_labeling_words = StructureCollection({potential_labeling_word})
+    correspondence = Mock()
+    correspondence.name = "existing correspondence"
+    chunk = Mock()
+    chunk.unlinkedness = 0.5
+    chunk.name = "existing chunk"
+    correspondence.arguments = StructureCollection({chunk, word})
+    chunk.is_chunk = True
+    chunk.correspondences_to_space.return_value = StructureCollection({correspondence})
     view = Mock()
-    existing_correspondence = Mock()
-    existing_correspondence.name = "existing correspondence"
-    existing_chunk = Mock()
-    existing_word = Mock()
-    existing_correspondence.arguments = StructureCollection(
-        {existing_chunk, existing_word}
-    )
-    potential_label_word = Mock()
-    potential_label_word.correspondences_to_space.return_value = StructureCollection()
-    existing_word.potential_labeling_words = StructureCollection({potential_label_word})
-    existing_correspondence.arguments = StructureCollection(
-        {existing_chunk, existing_word}
-    )
-    existing_chunk.correspondences_to_space.return_value = StructureCollection(
-        {existing_correspondence}
-    )
-    view.interpretation_space.contents.of_type.return_value = StructureCollection(
-        {existing_chunk}
-    )
+    view.name = "monitoring view"
+    view.interpretation_space.contents = StructureCollection({chunk})
     return view
 
 

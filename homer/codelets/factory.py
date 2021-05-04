@@ -52,17 +52,26 @@ class Factory(Codelet):
     def _engender_follow_up(self):
         raise NotImplementedError
 
-    def _get_follow_up_type(self, action_type: Concept, structure_type: Concept):
+    def _get_follow_up_type(
+        self, action: Concept, structure: Concept, space: Concept, direction: Concept
+    ):
         from homer.codelets.builders import (
             ChunkBuilder,
-            ChunkProjectionBuilder,
             CorrespondenceBuilder,
             LabelBuilder,
-            LabelProjectionBuilder,
             RelationBuilder,
-            RelationProjectionBuilder,
             WordBuilder,
             PhraseBuilder,
+        )
+        from homer.codelets.builders.chunk_builders import (
+            ChunkProjectionBuilder,
+            ReverseChunkProjectionBuilder,
+        )
+        from homer.codelets.builders.label_builders import (
+            LabelProjectionBuilder,
+        )
+        from homer.codelets.builders.relation_builders import (
+            RelationProjectionBuilder,
         )
         from homer.codelets.builders.view_builders import (
             MonitoringViewBuilder,
@@ -76,6 +85,16 @@ class Factory(Codelet):
             WordEvaluator,
             PhraseEvaluator,
         )
+        from homer.codelets.evaluators.chunk_evaluators import (
+            ChunkProjectionEvaluator,
+            ReverseChunkProjectionEvaluator,
+        )
+        from homer.codelets.evaluators.label_evaluators import (
+            LabelProjectionEvaluator,
+        )
+        from homer.codelets.evaluators.relation_evaluators import (
+            RelationProjectionEvaluator,
+        )
         from homer.codelets.evaluators.view_evaluators import (
             MonitoringViewEvaluator,
             SimplexViewEvaluator,
@@ -88,45 +107,126 @@ class Factory(Codelet):
             WordSelector,
             PhraseSelector,
         )
+        from homer.codelets.selectors.chunk_selectors import (
+            ChunkProjectionSelector,
+            ReverseChunkProjectionSelector,
+        )
+        from homer.codelets.selectors.label_selectors import (
+            LabelProjectionSelector,
+        )
+        from homer.codelets.selectors.relation_selectors import (
+            RelationProjectionSelector,
+        )
         from homer.codelets.selectors.view_selectors import (
             MonitoringViewSelector,
             SimplexViewSelector,
         )
 
         return {
-            "project": {
-                "chunk": ChunkProjectionBuilder,
-                "label": LabelProjectionBuilder,
-                "relation": RelationProjectionBuilder,
-            },
             "build": {
-                "chunk": ChunkBuilder,
-                "label": LabelBuilder,
-                "relation": RelationBuilder,
-                "correspondence": CorrespondenceBuilder,
-                "simplex view": SimplexViewBuilder,
-                "monitoring view": MonitoringViewBuilder,
-                "word": WordBuilder,
-                "phrase": PhraseBuilder,
+                "inner": {
+                    "forward": {
+                        "chunk": ChunkBuilder,
+                        "correspondence": CorrespondenceBuilder,
+                        "label": LabelBuilder,
+                        "phrase": PhraseBuilder,
+                        "relation": RelationBuilder,
+                        "view-monitoring": MonitoringViewBuilder,
+                        "view-simplex": SimplexViewBuilder,
+                    },
+                },
+                "outer": {
+                    "forward": {
+                        "chunk": ChunkProjectionBuilder,
+                        "label": LabelProjectionBuilder,
+                        "relation": RelationProjectionBuilder,
+                        "word": WordBuilder,
+                    },
+                    "reverse": {
+                        "chunk": ReverseChunkProjectionBuilder,
+                    },
+                },
             },
             "evaluate": {
-                "chunk": ChunkEvaluator,
-                "label": LabelEvaluator,
-                "relation": RelationEvaluator,
-                "correspondence": CorrespondenceEvaluator,
-                "simplex view": SimplexViewEvaluator,
-                "monitoring view": MonitoringViewEvaluator,
-                "word": WordEvaluator,
-                "phrase": PhraseEvaluator,
+                "inner": {
+                    "forward": {
+                        "chunk": ChunkEvaluator,
+                        "correspondence": CorrespondenceEvaluator,
+                        "label": LabelEvaluator,
+                        "phrase": PhraseEvaluator,
+                        "relation": RelationEvaluator,
+                        "view-monitoring": MonitoringViewEvaluator,
+                        "view-simplex": SimplexViewEvaluator,
+                    },
+                },
+                "outer": {
+                    "forward": {
+                        "chunk": ChunkProjectionEvaluator,
+                        "label": LabelProjectionEvaluator,
+                        "relation": RelationProjectionEvaluator,
+                        "word": WordEvaluator,
+                    },
+                    "reverse": {
+                        "chunk": ReverseChunkProjectionEvaluator,
+                    },
+                },
             },
             "select": {
-                "chunk": ChunkSelector,
-                "label": LabelSelector,
-                "relation": RelationSelector,
-                "correspondence": CorrespondenceSelector,
-                "simplex view": SimplexViewSelector,
-                "monitoring view": MonitoringViewSelector,
-                "word": WordSelector,
-                "phrase": PhraseSelector,
+                "inner": {
+                    "forward": {
+                        "chunk": ChunkSelector,
+                        "correspondence": CorrespondenceSelector,
+                        "label": LabelSelector,
+                        "phrase": PhraseSelector,
+                        "relation": RelationSelector,
+                        "view-monitoring": MonitoringViewSelector,
+                        "view-simplex": SimplexViewSelector,
+                    },
+                },
+                "outer": {
+                    "forward": {
+                        "chunk": ChunkProjectionSelector,
+                        "label": LabelProjectionSelector,
+                        "relation": RelationProjectionSelector,
+                        "word": WordSelector,
+                    },
+                    "reverse": {
+                        "chunk": ReverseChunkProjectionSelector,
+                    },
+                },
             },
-        }[action_type.name][structure_type.name]
+        }[action.name][space.name][direction.name][structure.name]
+
+    def codelet_themes(self):
+        actions = ["build", "evaluate", "select"]
+        return {
+            "inner-or-outer": {
+                "action": actions,
+                "space": ["inner", "outer"],
+                "direction": ["forward"],
+                "structure": ["chunk", "label", "relation"],
+            },
+            "inner": {
+                "action": actions,
+                "space": ["inner"],
+                "direction": ["forward"],
+                "structure": [
+                    "phrase",
+                    "correspondence",
+                    "view-monitoring",
+                    "view-simplex",
+                ],
+            },
+            "outer": {
+                "action": actions,
+                "space": ["outer"],
+                "direction": ["forward"],
+                "structure": ["word"],
+            },
+            "reverse": {
+                "action": actions,
+                "space": ["outer"],
+                "direction": ["reverse"],
+                "structure": ["chunk"],
+            },
+        }

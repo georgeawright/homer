@@ -27,12 +27,11 @@ class WordBuilder(Builder):
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_view = target_view
-        self.frame = None
         self.non_frame = None
         self.target_word = target_word
-        self.target_non_frame_item = None
         self.target_correspondence = None
-        self.child_structure = None
+        self.word_correspondee = None
+        self.non_frame_item = None
 
     @classmethod
     def get_target_class(cls):
@@ -157,14 +156,13 @@ class WordBuilder(Builder):
             parent_space=self.target_view.output_space,
             quality=0.0,
         )
-        self.child_structure = word
         self.bubble_chamber.words.add(word)
         self.bubble_chamber.logger.log(word)
         frame_to_output_correspondence = Correspondence(
             ID.new(Correspondence),
             self.codelet_id,
             start=self.target_word,
-            end=self.child_structure,
+            end=word,
             start_space=self.target_word.parent_space,
             end_space=self.target_view.output_space,
             locations=[self.target_word.location, word.location],
@@ -172,6 +170,9 @@ class WordBuilder(Builder):
             conceptual_space=self.target_view.output_space.conceptual_space,
             parent_view=self.target_view,
             quality=0.0,
+        )
+        self.child_structures = StructureCollection(
+            {word, frame_to_output_correspondence}
         )
         self.bubble_chamber.correspondences.add(frame_to_output_correspondence)
         self.bubble_chamber.logger.log(frame_to_output_correspondence)
@@ -184,7 +185,7 @@ class WordBuilder(Builder):
                 ID.new(Correspondence),
                 self.codelet_id,
                 start=self.non_frame_item,
-                end=self.child_structure,
+                end=word,
                 start_space=self.non_frame,
                 end_space=self.target_view.output_space,
                 locations=[
@@ -196,6 +197,7 @@ class WordBuilder(Builder):
                 parent_view=self.target_view,
                 quality=0.0,
             )
+            self.child_structures.add(non_frame_to_output_correspondence)
             self.bubble_chamber.correspondences.add(non_frame_to_output_correspondence)
             self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
             word.links_in.add(non_frame_to_output_correspondence)

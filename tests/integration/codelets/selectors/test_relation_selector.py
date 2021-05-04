@@ -171,7 +171,9 @@ def test_good_relation_is_boosted_bad_relation_is_decayed(
     parent_id = ""
     champion = bad_relation
     urgency = 1.0
-    selector = RelationSelector.spawn(parent_id, bubble_chamber, champion, urgency)
+    selector = RelationSelector.spawn(
+        parent_id, bubble_chamber, StructureCollection({champion}), urgency
+    )
     for _ in range(20):
         selector.run()
         selector = selector.child_codelets[0]

@@ -10,7 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import WorkingSpace
-from homer.tools import centroid_euclidean_distance
+from homer.tools import centroid_euclidean_distance, hasinstance
 
 
 @pytest.fixture
@@ -123,7 +123,7 @@ def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_can
     builder = ChunkBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Chunk)
+    assert hasinstance(builder.child_structures, Chunk)
     assert isinstance(builder.child_codelets[0], ChunkEvaluator)
     builder = ChunkBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
     builder.run()

@@ -7,6 +7,7 @@ from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.spaces import Frame
 from homer.structures.views import SimplexView
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -45,7 +46,7 @@ def test_successful_creates_view_and_spawns_follow_up(
     )
     result = view_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert isinstance(view_builder.child_structure, SimplexView)
+    assert hasinstance(view_builder.child_structures, SimplexView)
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], SimplexViewEvaluator)
 
