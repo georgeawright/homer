@@ -4,6 +4,7 @@ from homer.codelet_result import CodeletResult
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 
 
@@ -52,7 +53,7 @@ class Factory(Codelet):
     def _engender_follow_up(self):
         raise NotImplementedError
 
-    def _get_follow_up_type(
+    def _get_codelet_type_from_concepts(
         self, action: Concept, structure: Concept, space: Concept, direction: Concept
     ):
         from homer.codelets.builders import (
@@ -198,35 +199,46 @@ class Factory(Codelet):
         }[action.name][space.name][direction.name][structure.name]
 
     def codelet_themes(self):
-        actions = ["build", "evaluate", "select"]
+        build = self.bubble_chamber.concepts["build"]
+        evaluate = self.bubble_chamber.concepts["evaluate"]
+        select = self.bubble_chamber.concepts["select"]
+        inner = self.bubble_chamber.concepts["inner"]
+        outer = self.bubble_chamber.concepts["outer"]
+        forward = self.bubble_chamber.concepts["forward"]
+        reverse = self.bubble_chamber.concepts["reverse"]
+        correspondence = self.bubble_chamber.concepts["correspondence"]
+        chunk = self.bubble_chamber.concepts["chunk"]
+        label = self.bubble_chamber.concepts["label"]
+        phrase = self.bubble_chamber.concepts["phrase"]
+        relation = self.bubble_chamber.concepts["relation"]
+        view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
+        view_simplex = self.bubble_chamber.concepts["view-simplex"]
+        word = self.bubble_chamber.concepts["word"]
         return {
             "inner-or-outer": {
-                "action": actions,
-                "space": ["inner", "outer"],
-                "direction": ["forward"],
-                "structure": ["chunk", "label", "relation"],
+                "actions": StructureCollection({build, evaluate, select}),
+                "spaces": StructureCollection({inner, outer}),
+                "directions": StructureCollection({forward}),
+                "structures": StructureCollection({chunk, label, relation}),
             },
             "inner": {
-                "action": actions,
-                "space": ["inner"],
-                "direction": ["forward"],
-                "structure": [
-                    "phrase",
-                    "correspondence",
-                    "view-monitoring",
-                    "view-simplex",
-                ],
+                "actions": StructureCollection({build, evaluate, select}),
+                "spaces": StructureCollection({inner}),
+                "directions": StructureCollection({forward}),
+                "structures": StructureCollection(
+                    {phrase, correspondence, view_monitoring, view_simplex}
+                ),
             },
             "outer": {
-                "action": actions,
-                "space": ["outer"],
-                "direction": ["forward"],
-                "structure": ["word"],
+                "actions": StructureCollection({build, evaluate, select}),
+                "spaces": StructureCollection({outer}),
+                "directions": StructureCollection({forward}),
+                "structures": StructureCollection({word}),
             },
             "reverse": {
-                "action": actions,
-                "space": ["outer"],
-                "direction": ["reverse"],
-                "structure": ["chunk"],
+                "actions": StructureCollection({build, evaluate, select}),
+                "spaces": StructureCollection({outer}),
+                "directions": StructureCollection({reverse}),
+                "structures": StructureCollection({chunk}),
             },
         }

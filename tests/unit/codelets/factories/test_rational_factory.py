@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock, patch
 
 from homer.codelets import Builder, Evaluator, Selector
-from homer.codelets.factories import RandomFactory
+from homer.codelets.factories import RationalFactory
 from homer.structure_collection import StructureCollection
 
 
@@ -38,7 +38,7 @@ def concepts():
     view_simplex_concept.name = "view-simplex"
     word_concept = Mock()
     word_concept.name = "word"
-    return StructureCollection(
+    concepts = StructureCollection(
         {
             build_concept,
             evaluate_concept,
@@ -57,6 +57,9 @@ def concepts():
             word_concept,
         }
     )
+    for concept in concepts:
+        concept.activation = 0.5
+    return concepts
 
 
 @pytest.fixture
@@ -77,7 +80,7 @@ def coderack():
 def test_decide_follow_up_class_returns_codelet_class(
     bubble_chamber, coderack, concepts
 ):
-    factory_codelet = RandomFactory(Mock(), Mock(), bubble_chamber, coderack, Mock())
+    factory_codelet = RationalFactory(Mock(), Mock(), bubble_chamber, coderack, Mock())
     follow_up_class = factory_codelet._decide_follow_up_class()
     codelet_types = [Builder, Evaluator, Selector]
     assert (

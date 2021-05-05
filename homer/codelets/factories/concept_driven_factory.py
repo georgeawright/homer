@@ -25,28 +25,55 @@ class ConceptDrivenFactory(Factory):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
     def _engender_follow_up(self):
-        action_type = self.bubble_chamber.concepts["build"]
-        links_to_structure_nodes = StructureCollection(
-            {
-                link
-                for link in action_type.links_out
-                if link.end in self.bubble_chamber.spaces["structures"].contents
-            }
+        follow_up_class = self._decide_follow_up_class()
+        follow_up_parent_concept = self._decide_follow_up_parent_concept(
+            follow_up_class
         )
-        structure_type = links_to_structure_nodes.get_active().end
-        follow_up_parent_concept = self._get_concept_for_structure_type(structure_type)
-        follow_up_type = self._get_follow_up_type(action_type, structure_type)
-        proportion_of_follow_up_type_on_coderack = (
-            self.coderack.number_of_codelets_of_type(follow_up_type) / 50
+        proportion_of_follow_up_class_on_coderack = (
+            self.coderack.number_of_codelets_of_type(follow_up_class) / 50
         )
-        if proportion_of_follow_up_type_on_coderack < random.random():
-            follow_up = follow_up_type.make_top_down(
+        if proportion_of_follow_up_class_on_coderack < random.random():
+            follow_up = follow_up_class.make_top_down(
                 self.codelet_id, self.bubble_chamber, follow_up_parent_concept
             )
             self.child_codelets.append(follow_up)
 
-    def _get_concept_for_structure_type(self, structure_type: Concept) -> Concept:
-        if structure_type == self.bubble_chamber.concepts["label"]:
+    def _decide_follow_up_class(self):
+        action_concept = self.bubble_chamber.concepts["build"]
+        space_concept = self.bubble_chamber.concepts["inner"]
+        direction_concept = self.bubble_chamber.concepts["forward"]
+        structure_concept = StructureCollection(
+            {
+                self.bubble_chamber.concepts["label"],
+                self.bubble_chamber.concepts["relation"],
+                self.bubble_chamber.concepts["correspondence"],
+                self.bubble_chamber.concepts["phrase"],
+            }
+        ).get_active()
+        return self._get_codelet_type_from_concepts(
+            action=action_concept,
+            space=space_concept,
+            direction=direction_concept,
+            structure=structure_concept,
+        )
+
+    def _decide_follow_up_parent_concept(self, follow_up_class: type) -> Concept:
+        from homer.codelets.builders import (
+            CorrespondenceBuilder,
+            LabelBuilder,
+            PhraseBuilder,
+            RelationBuilder,
+        )
+
+        if follow_up_class == CorrespondenceBuilder:
+            return (
+                self.bubble_chamber.spaces["correspondential concepts"]
+                .contents.of_type(ConceptualSpace)
+                .get_active()
+                .contents.of_type(Concept)
+                .get_active()
+            )
+        if follow_up_class == LabelBuilder:
             return (
                 self.bubble_chamber.spaces["label concepts"]
                 .contents.of_type(ConceptualSpace)
@@ -56,7 +83,10 @@ class ConceptDrivenFactory(Factory):
                 .where_not(classifier=None)
                 .get_active()
             )
-        if structure_type == self.bubble_chamber.concepts["relation"]:
+        if follow_up_class == PhraseBuilder:
+            return self.bubble_chamber.rules.get_active()
+
+        if follow_up_class == RelationBuilder:
             return (
                 self.bubble_chamber.spaces["relational concepts"]
                 .contents.of_type(ConceptualSpace)
@@ -65,14 +95,4 @@ class ConceptDrivenFactory(Factory):
                 .where_not(classifier=None)
                 .get_active()
             )
-        if structure_type == self.bubble_chamber.concepts["correspondence"]:
-            return (
-                self.bubble_chamber.spaces["correspondential concepts"]
-                .contents.of_type(ConceptualSpace)
-                .get_active()
-                .contents.of_type(Concept)
-                .get_active()
-            )
-        if structure_type == self.bubble_chamber.concepts["phrase"]:
-            return self.bubble_chamber.rules.get_active()
         return None
