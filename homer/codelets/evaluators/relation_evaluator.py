@@ -1,13 +1,14 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Relation
 
 
 class RelationEvaluator(Evaluator):
     @classmethod
-    def get_target_class(cls):
-        return Relation
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.selectors import RelationSelector
+
+        return RelationSelector
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):

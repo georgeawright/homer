@@ -9,8 +9,10 @@ from homer.structures.views import SimplexView
 
 class SimplexViewBuilder(ViewBuilder):
     @classmethod
-    def get_target_class(cls):
-        return SimplexView
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
+
+        return SimplexViewEvaluator
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):

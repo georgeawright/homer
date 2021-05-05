@@ -29,8 +29,10 @@ class ChunkBuilder(Builder):
         self.second_target_chunk = None
 
     @classmethod
-    def get_target_class(cls):
-        return Chunk
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import ChunkEvaluator
+
+        return ChunkEvaluator
 
     @classmethod
     def spawn(

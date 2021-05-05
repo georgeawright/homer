@@ -12,6 +12,12 @@ class ChunkProjectionEvaluator(ChunkEvaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         raise NotImplementedError
 
+    @classmethod
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.selectors.chunk_selectors import ChunkProjectionSelector
+
+        return ChunkProjectionSelector
+
     def _calculate_confidence(self):
         target_chunk = self.target_structures.where(is_chunk=True).get_random()
         self.confidence = (

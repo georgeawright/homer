@@ -50,6 +50,10 @@ class Evaluator(Codelet):
             self._decay_activations()
         return self.result
 
+    @classmethod
+    def get_follow_up_class(cls) -> type:
+        raise NotImplementedError
+
     @property
     def _evaluate_concept(self):
         return self.bubble_chamber.concepts["evaluate"]
@@ -70,9 +74,8 @@ class Evaluator(Codelet):
         raise NotImplementedError
 
     def _engender_follow_up(self):
-        selector_class = self.get_target_class().get_selector_class()
         self.child_codelets.append(
-            selector_class.spawn(
+            self.get_follow_up_class().spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structures,

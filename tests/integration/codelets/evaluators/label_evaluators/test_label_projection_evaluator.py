@@ -6,7 +6,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import ProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.evaluators.label_evaluators import LabelProjectionEvaluator
-from homer.codelets.selectors import LabelSelector
+from homer.codelets.selectors.label_selectors import LabelProjectionSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Label, Relation
@@ -116,7 +116,7 @@ def test_increases_quality_of_good_label(bubble_chamber, good_label_and_correspo
     assert good_label_and_correspondence.pop().quality > original_quality
     assert good_label_and_correspondence.pop().quality > original_quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], LabelSelector)
+    assert isinstance(evaluator.child_codelets[0], LabelProjectionSelector)
 
 
 def test_decreases_quality_of_bad_label(bubble_chamber, bad_label_and_correspondence):
@@ -131,4 +131,4 @@ def test_decreases_quality_of_bad_label(bubble_chamber, bad_label_and_correspond
     assert bad_label_and_correspondence.pop().quality < original_quality
     assert bad_label_and_correspondence.pop().quality < original_quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], LabelSelector)
+    assert isinstance(evaluator.child_codelets[0], LabelProjectionSelector)

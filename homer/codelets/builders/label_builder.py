@@ -26,8 +26,10 @@ class LabelBuilder(Builder):
         self.parent_concept = parent_concept
 
     @classmethod
-    def get_target_class(cls):
-        return Label
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import LabelEvaluator
+
+        return LabelEvaluator
 
     @classmethod
     def spawn(

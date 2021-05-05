@@ -43,8 +43,10 @@ class CorrespondenceBuilder(Builder):
         self.child_structure = None
 
     @classmethod
-    def get_target_class(cls):
-        return Correspondence
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import CorrespondenceEvaluator
+
+        return CorrespondenceEvaluator
 
     @classmethod
     def spawn(

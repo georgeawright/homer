@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.evaluators.chunk_evaluators import ChunkProjectionEvaluator
-from homer.codelets.selectors import ChunkSelector
+from homer.codelets.selectors.chunk_selectors import ChunkProjectionSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
@@ -139,7 +139,7 @@ def test_increases_quality_of_good_chunk(bubble_chamber, good_chunk):
     assert CodeletResult.SUCCESS == evaluator.result
     assert good_chunk.quality > original_chunk_quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], ChunkSelector)
+    assert isinstance(evaluator.child_codelets[0], ChunkProjectionSelector)
 
 
 def test_decreases_quality_of_bad_chunk(bubble_chamber, bad_chunk):
@@ -153,4 +153,4 @@ def test_decreases_quality_of_bad_chunk(bubble_chamber, bad_chunk):
     assert CodeletResult.SUCCESS == evaluator.result
     assert bad_chunk.quality < original_chunk_quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], ChunkSelector)
+    assert isinstance(evaluator.child_codelets[0], ChunkProjectionSelector)

@@ -5,6 +5,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import ProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders.chunk_builders import ReverseChunkProjectionBuilder
+from homer.codelets.evaluators.chunk_evaluators import ReverseChunkProjectionEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label, Relation
@@ -251,6 +252,7 @@ def test_successful_projects_raw_chunk_and_same_chunk_cannot_be_projected_again(
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
+    assert hasinstance(builder.child_codelets, ReverseChunkProjectionEvaluator)
     assert hasinstance(builder.child_structures, Chunk)
     assert target_raw_chunk.has_correspondence_to_space(
         target_view.interpretation_space

@@ -9,8 +9,10 @@ from homer.structures.views import MonitoringView
 
 class MonitoringViewBuilder(ViewBuilder):
     @classmethod
-    def get_target_class(cls):
-        return MonitoringView
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
+
+        return MonitoringViewEvaluator
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):

@@ -1,14 +1,19 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluators import RelationEvaluator
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence
 
 
 class RelationProjectionEvaluator(RelationEvaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         raise NotImplementedError
+
+    @classmethod
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.selectors.relation_selectors import (
+            RelationProjectionSelector,
+        )
+
+        return RelationProjectionSelector
 
     def _calculate_confidence(self):
         target_correspondence = self.target_structures.where(

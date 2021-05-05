@@ -6,7 +6,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import ProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.evaluators.relation_evaluators import RelationProjectionEvaluator
-from homer.codelets.selectors import RelationSelector
+from homer.codelets.selectors.relation_selectors import RelationProjectionSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Relation
@@ -120,7 +120,7 @@ def test_increases_quality_of_good_relation(
     assert good_relation_and_correspondence.pop().quality > original_quality
     assert good_relation_and_correspondence.pop().quality > original_quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], RelationSelector)
+    assert isinstance(evaluator.child_codelets[0], RelationProjectionSelector)
 
 
 def test_decreases_quality_of_bad_relation(
@@ -137,4 +137,4 @@ def test_decreases_quality_of_bad_relation(
     assert bad_relation_and_correspondence.pop().quality < original_quality
     assert bad_relation_and_correspondence.pop().quality < original_quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], RelationSelector)
+    assert isinstance(evaluator.child_codelets[0], RelationProjectionSelector)

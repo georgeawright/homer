@@ -43,8 +43,12 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
         self.confidence = 0.0
 
     @classmethod
-    def get_target_class(cls):
-        return Chunk
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators.chunk_evaluators import (
+            ReverseChunkProjectionEvaluator,
+        )
+
+        return ReverseChunkProjectionEvaluator
 
     @classmethod
     def spawn(

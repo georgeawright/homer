@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders.chunk_builders import ChunkProjectionBuilder
-from homer.codelets.evaluators import ChunkEvaluator
+from homer.codelets.evaluators.chunk_evaluators import ChunkProjectionEvaluator
 from homer.structure_collection import StructureCollection
 
 
@@ -46,7 +46,7 @@ def test_successful_creates_chunk_corresponding_to_word_and_spawns_follow_up(
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert len(builder.child_codelets) == 1
-    assert isinstance(builder.child_codelets[0], ChunkEvaluator)
+    assert isinstance(builder.child_codelets[0], ChunkProjectionEvaluator)
 
 
 def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(

@@ -32,8 +32,10 @@ class RelationBuilder(Builder):
         self.parent_concept = parent_concept
 
     @classmethod
-    def get_target_class(cls):
-        return Relation
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import RelationEvaluator
+
+        return RelationEvaluator
 
     @classmethod
     def spawn(

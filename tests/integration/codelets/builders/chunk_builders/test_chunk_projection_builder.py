@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders.chunk_builders import ChunkProjectionBuilder
-from homer.codelets.evaluators import ChunkEvaluator
+from homer.codelets.evaluators.chunk_evaluators import ChunkProjectionEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label, Relation
@@ -123,7 +123,7 @@ def test_successful_creates_chunk_and_follow_up_and_same_chunk_cannot_be_recreat
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert hasinstance(builder.child_structures, Chunk)
-    assert isinstance(builder.child_codelets[0], ChunkEvaluator)
+    assert isinstance(builder.child_codelets[0], ChunkProjectionEvaluator)
     builder = ChunkProjectionBuilder.spawn(
         parent_id, bubble_chamber, target_view, target_word, urgency
     )

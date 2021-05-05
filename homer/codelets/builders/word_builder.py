@@ -34,8 +34,10 @@ class WordBuilder(Builder):
         self.non_frame_item = None
 
     @classmethod
-    def get_target_class(cls):
-        return Word
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import WordEvaluator
+
+        return WordEvaluator
 
     @classmethod
     def spawn(

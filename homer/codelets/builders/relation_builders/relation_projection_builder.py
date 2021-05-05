@@ -48,8 +48,12 @@ class RelationProjectionBuilder(RelationBuilder):
         self.child_structure = None
 
     @classmethod
-    def get_target_class(cls):
-        return Relation
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators.relation_evaluators import (
+            RelationProjectionEvaluator,
+        )
+
+        return RelationProjectionEvaluator
 
     @classmethod
     def spawn(

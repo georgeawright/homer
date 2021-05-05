@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelets.evaluators.relation_evaluators import RelationProjectionEvaluator
-from homer.codelets.selectors import RelationSelector
+from homer.codelets.selectors.relation_selectors import RelationProjectionSelector
 from homer.structure_collection import StructureCollection
 
 
@@ -27,4 +27,4 @@ def test_changes_target_structure_quality(current_quality, classification):
     assert classification == relation.quality
     assert classification == correspondence.quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], RelationSelector)
+    assert isinstance(evaluator.child_codelets[0], RelationProjectionSelector)

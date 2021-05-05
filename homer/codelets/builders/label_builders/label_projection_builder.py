@@ -34,8 +34,10 @@ class LabelProjectionBuilder(LabelBuilder):
         self.parent_concept = None
 
     @classmethod
-    def get_target_class(cls):
-        return Label
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators.label_evaluators import LabelProjectionEvaluator
+
+        return LabelProjectionEvaluator
 
     @classmethod
     def spawn(

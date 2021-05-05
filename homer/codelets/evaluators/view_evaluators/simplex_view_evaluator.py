@@ -1,13 +1,14 @@
 import statistics
 
 from homer.codelets.evaluators import ViewEvaluator
-from homer.structures.views import SimplexView
 
 
 class SimplexViewEvaluator(ViewEvaluator):
     @classmethod
-    def get_target_class(cls):
-        return SimplexView
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.selectors.view_selectors import SimplexViewSelector
+
+        return SimplexViewSelector
 
     def _calculate_confidence(self):
         target_view = self.target_structures.get_random()

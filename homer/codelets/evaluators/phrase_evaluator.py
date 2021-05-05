@@ -8,8 +8,10 @@ from homer.structures.nodes import Phrase
 
 class PhraseEvaluator(Evaluator):
     @classmethod
-    def get_target_class(cls):
-        return Phrase
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.selectors import PhraseSelector
+
+        return PhraseSelector
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):

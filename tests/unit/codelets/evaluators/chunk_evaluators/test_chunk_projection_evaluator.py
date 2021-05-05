@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelets.evaluators.chunk_evaluators import ChunkProjectionEvaluator
-from homer.codelets.selectors import ChunkSelector
+from homer.codelets.selectors.chunk_selectors import ChunkProjectionSelector
 from homer.structure_collection import StructureCollection
 
 
@@ -24,4 +24,4 @@ def test_changes_target_structure_quality(current_quality, classification):
     evaluator.run()
     assert classification == chunk.quality
     assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], ChunkSelector)
+    assert isinstance(evaluator.child_codelets[0], ChunkProjectionSelector)

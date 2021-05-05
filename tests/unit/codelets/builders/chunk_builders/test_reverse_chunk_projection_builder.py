@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders.chunk_builders import ReverseChunkProjectionBuilder
-from homer.codelets.evaluators import ChunkEvaluator
+from homer.codelets.evaluators.chunk_evaluators import ReverseChunkProjectionEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Chunk
 from homer.tools import hasinstance
@@ -87,7 +87,7 @@ def test_successful_projects_chunk_creates_larger_chunk_and_spawns_follow_up(
         and child_chunk_1.size > len(target_interpretation_chunk.members)
     )
     assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ChunkEvaluator)
+    assert isinstance(chunk_builder.child_codelets[0], ReverseChunkProjectionEvaluator)
 
 
 def test_fails_when_raw_chunk_is_incompatible_with_links(

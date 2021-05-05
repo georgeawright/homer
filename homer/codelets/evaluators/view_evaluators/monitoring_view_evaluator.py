@@ -2,13 +2,14 @@ import statistics
 
 from homer.codelets.evaluators import ViewEvaluator
 from homer.structures.nodes import Chunk
-from homer.structures.views import MonitoringView
 
 
 class MonitoringViewEvaluator(ViewEvaluator):
     @classmethod
-    def get_target_class(cls):
-        return MonitoringView
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.selectors.view_selectors import MonitoringViewSelector
+
+        return MonitoringViewSelector
 
     def _calculate_confidence(self):
         target_view = self.target_structures.get_random()

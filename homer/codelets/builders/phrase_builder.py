@@ -33,8 +33,10 @@ class PhraseBuilder(Builder):
         self.parent_space = self.target_structures[0].parent_space
 
     @classmethod
-    def get_target_class(cls):
-        return Phrase
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import PhraseEvaluator
+
+        return PhraseEvaluator
 
     @classmethod
     def spawn(

@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders.label_builders import LabelProjectionBuilder
-from homer.codelets.evaluators import LabelEvaluator
+from homer.codelets.evaluators.label_evaluators import LabelProjectionEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
 
@@ -80,7 +80,7 @@ def test_successful_creates_label_corresponding_to_word_and_spawns_follow_up(
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert len(builder.child_codelets) == 1
-    assert isinstance(builder.child_codelets[0], LabelEvaluator)
+    assert isinstance(builder.child_codelets[0], LabelProjectionEvaluator)
 
 
 def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(

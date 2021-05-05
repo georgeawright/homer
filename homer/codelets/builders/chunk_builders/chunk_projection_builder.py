@@ -29,8 +29,10 @@ class ChunkProjectionBuilder(ChunkBuilder):
         self.target_word = target_word
 
     @classmethod
-    def get_target_class(cls):
-        return Chunk
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators.chunk_evaluators import ChunkProjectionEvaluator
+
+        return ChunkProjectionEvaluator
 
     @classmethod
     def spawn(

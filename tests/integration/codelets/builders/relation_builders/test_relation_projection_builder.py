@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders.relation_builders import RelationProjectionBuilder
-from homer.codelets.evaluators import RelationEvaluator
+from homer.codelets.evaluators.relation_evaluators import RelationProjectionEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Label, Relation
@@ -402,7 +402,7 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert hasinstance(builder.child_structures, Relation)
-    assert isinstance(builder.child_codelets[0], RelationEvaluator)
+    assert isinstance(builder.child_codelets[0], RelationProjectionEvaluator)
 
     builder = RelationProjectionBuilder.spawn(
         parent_id,

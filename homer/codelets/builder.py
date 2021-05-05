@@ -42,6 +42,10 @@ class Builder(Codelet):
     ):
         return cls.make(parent_id, bubble_chamber, urgency=urgency)
 
+    @classmethod
+    def get_follow_up_class(cls) -> type:
+        raise NotImplementedError
+
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
             self._decay_activations()
@@ -91,9 +95,8 @@ class Builder(Codelet):
         raise NotImplementedError
 
     def _engender_follow_up(self):
-        follow_up_class = self.get_target_class().get_evaluator_class()
         self.child_codelets.append(
-            follow_up_class.spawn(
+            self.get_follow_up_class().spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.child_structures,
