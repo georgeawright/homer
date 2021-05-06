@@ -26,6 +26,10 @@ class SimplexViewBuilder(ViewBuilder):
             urgency,
         )
 
+    @property
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["view-simplex"]
+
     def _process_structure(self):
         view_id = ID.new(SimplexView)
         view_location = Location([], self.bubble_chamber.spaces["top level working"])

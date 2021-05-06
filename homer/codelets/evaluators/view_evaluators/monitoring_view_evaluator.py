@@ -11,6 +11,11 @@ class MonitoringViewEvaluator(ViewEvaluator):
 
         return MonitoringViewSelector
 
+    @property
+    def _parent_link(self):
+        structure_concept = self.bubble_chamber.concepts["view-monitoring"]
+        return structure_concept.relations_with(self._evaluate_concept).get_random()
+
     def _calculate_confidence(self):
         target_view = self.target_structures.get_random()
         chunks_in_interpretation = target_view.interpretation_space.contents.of_type(

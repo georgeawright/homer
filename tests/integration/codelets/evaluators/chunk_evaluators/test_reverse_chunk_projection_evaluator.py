@@ -74,7 +74,7 @@ def good_chunk(bubble_chamber):
         Mock(),
         Mock(),
         [Location([], parent_space)],
-        Mock(),
+        StructureCollection(),
         parent_space,
         0.0,
     )
@@ -83,7 +83,7 @@ def good_chunk(bubble_chamber):
         Mock(),
         Mock(),
         [Location([], parent_space)],
-        Mock(),
+        StructureCollection({chunk}),
         parent_space,
         0.0,
     )
@@ -110,7 +110,7 @@ def bad_chunk(bubble_chamber):
         Mock(),
         Mock(),
         [Location([], parent_space)],
-        Mock(),
+        StructureCollection(),
         parent_space,
         1.0,
     )
@@ -119,7 +119,7 @@ def bad_chunk(bubble_chamber):
         Mock(),
         Mock(),
         [Location([], parent_space)],
-        Mock(),
+        StructureCollection({chunk}),
         parent_space,
         0.0,
     )

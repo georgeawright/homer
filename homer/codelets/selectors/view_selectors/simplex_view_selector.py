@@ -9,6 +9,10 @@ class SimplexViewSelector(ViewSelector):
     def get_target_class(cls):
         return SimplexView
 
+    @property
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["view-simplex"]
+
     def _passes_preliminary_checks(self):
         if self.challengers is not None:
             return True

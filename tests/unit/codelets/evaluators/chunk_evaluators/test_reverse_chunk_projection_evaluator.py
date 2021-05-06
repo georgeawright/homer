@@ -19,6 +19,7 @@ def test_changes_target_structure_quality(current_quality, classification):
     parent_chunk.relations = StructureCollection({relation})
     chunk = Mock()
     chunk.is_chunk = True
+    chunk.members = StructureCollection()
     chunk.quality = current_quality
     chunk.chunks_made_from_this_chunk = StructureCollection({parent_chunk})
     correspondence = Mock()

@@ -10,6 +10,11 @@ class SimplexViewEvaluator(ViewEvaluator):
 
         return SimplexViewSelector
 
+    @property
+    def _parent_link(self):
+        structure_concept = self.bubble_chamber.concepts["view-simplex"]
+        return structure_concept.relations_with(self._evaluate_concept).get_random()
+
     def _calculate_confidence(self):
         target_view = self.target_structures.get_random()
         proportion_of_slots_filled = len(target_view.slot_values) / len(

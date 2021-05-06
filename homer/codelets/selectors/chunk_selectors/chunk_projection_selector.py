@@ -1,3 +1,5 @@
+import statistics
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders.chunk_builders import ChunkProjectionBuilder
 from homer.codelets.selectors import ChunkSelector
@@ -8,7 +10,20 @@ from homer.structure_collection import StructureCollection
 class ChunkProjectionSelector(ChunkSelector):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        raise NotImplementedError
+        target_view = bubble_chamber.monitoring_views.get_active()
+        target_chunk = (
+            target_view.interpretation_space.contents.where(is_chunk=True)
+            .where_not(members=StructureCollection())
+            .get_random()
+        )
+        target_correspondence = target_chunk.correspondences_to_space(
+            target_view.text_space
+        ).get_random()
+        target_structures = StructureCollection({target_chunk, target_correspondence})
+        urgency = statistics.fmean(
+            [structure.activation for structure in target_structures]
+        )
+        return cls.spawn(parent_id, bubble_chamber, target_structures, urgency)
 
     def _passes_preliminary_checks(self):
         if self.challengers is not None:

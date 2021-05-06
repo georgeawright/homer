@@ -29,6 +29,10 @@ class MonitoringViewBuilder(ViewBuilder):
             parent_id, bubble_chamber, StructureCollection({target}), urgency
         )
 
+    @property
+    def _structure_concept(self):
+        return self.bubble_chamber.concepts["view-monitoring"]
+
     def _process_structure(self):
         view_id = ID.new(MonitoringView)
         view_location = Location([], self.bubble_chamber.spaces["top level working"])
