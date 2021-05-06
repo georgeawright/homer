@@ -1,7 +1,7 @@
 import random
 import statistics
 
-from homer import BubbleChamber, Coderack, Homer, StructureCollection
+from homer import Homer, StructureCollection
 from homer.classifiers import (
     DifferenceClassifier,
     DifferentnessClassifier,
@@ -14,14 +14,9 @@ from homer.location import Location
 
 random.seed(123)
 from homer.loggers import DjangoLogger
-from homer.structures.links import Relation
-from homer.structures.nodes import Chunk, Concept, Lexeme, Word
-from homer.structures.spaces import ConceptualSpace, WorkingSpace
-from homer.structures.spaces.frames import Template
+from homer.structures.nodes import Chunk, Word
 from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
-
-# TODO make project action concept ?
 
 
 def setup_homer() -> Homer:
@@ -80,6 +75,40 @@ def setup_homer() -> Homer:
         name="select",
         parent_space=activities_space,
     )
+    space_type_concept = homer.def_concept(
+        name="space type",
+        parent_space=top_level_conceptual_space,
+    )
+    space_types_space = homer.def_conceptual_space(
+        name="space types",
+        parent_concept=space_type_concept,
+        locations=[Location([], top_level_conceptual_space)],
+    )
+    inner_concept = homer.def_concept(
+        name="inner",
+        parent_space=space_types_space,
+    )
+    outer_concept = homer.def_concept(
+        name="outer",
+        parent_space=space_types_space,
+    )
+    direction_concept = homer.def_concept(
+        name="direction",
+        parent_space=top_level_conceptual_space,
+    )
+    directions_space = homer.def_conceptual_space(
+        name="directions",
+        parent_concept=direction_concept,
+        locations=[Location([], top_level_conceptual_space)],
+    )
+    forward_concept = homer.def_concept(
+        name="forward",
+        parent_space=directions_space,
+    )
+    reverse_concept = homer.def_concept(
+        name="reverse",
+        parent_space=directions_space,
+    )
     structure_concept = homer.def_concept(
         name="structure",
         parent_space=top_level_conceptual_space,
@@ -95,6 +124,18 @@ def setup_homer() -> Homer:
     )
     view_concept = homer.def_concept(
         name="view",
+        parent_space=structures_space,
+    )
+    view_discourse_concept = homer.def_concept(
+        name="view-discourse",
+        parent_space=structures_space,
+    )
+    view_monitoring_concept = homer.def_concept(
+        name="view-monitoring",
+        parent_space=structures_space,
+    )
+    view_simplex_concept = homer.def_concept(
+        name="view-simplex",
         parent_space=structures_space,
     )
     word_concept = homer.def_concept(
@@ -152,30 +193,62 @@ def setup_homer() -> Homer:
         parent_concept=text_concept,
         locations=[Location([], top_level_conceptual_space)],
     )
-    homer.def_concept_link(build_concept, chunk_concept)
-    homer.def_concept_link(build_concept, correspondence_concept)
-    homer.def_concept_link(build_concept, label_concept, activation=1.0)
-    homer.def_concept_link(build_concept, phrase_concept)
-    homer.def_concept_link(build_concept, relation_concept)
-    homer.def_concept_link(build_concept, view_concept)
-    homer.def_concept_link(build_concept, word_concept)
-    homer.def_concept_link(evaluate_concept, chunk_concept)
-    homer.def_concept_link(evaluate_concept, correspondence_concept)
-    homer.def_concept_link(evaluate_concept, label_concept)
-    homer.def_concept_link(evaluate_concept, phrase_concept)
-    homer.def_concept_link(evaluate_concept, relation_concept)
-    homer.def_concept_link(evaluate_concept, view_concept)
-    homer.def_concept_link(evaluate_concept, word_concept)
-    homer.def_concept_link(select_concept, chunk_concept)
-    homer.def_concept_link(select_concept, correspondence_concept)
-    homer.def_concept_link(select_concept, label_concept)
-    homer.def_concept_link(select_concept, phrase_concept)
-    homer.def_concept_link(select_concept, relation_concept)
-    homer.def_concept_link(select_concept, view_concept)
-    homer.def_concept_link(select_concept, word_concept)
+    # structure links
+    homer.def_concept_link(inner_concept, chunk_concept)
+    homer.def_concept_link(chunk_concept, inner_concept)
+    homer.def_concept_link(chunk_concept, label_concept)
+    homer.def_concept_link(chunk_concept, relation_concept)
+    homer.def_concept_link(chunk_concept, view_concept)
+    homer.def_concept_link(label_concept, inner_concept)
+    homer.def_concept_link(relation_concept, inner_concept)
+    homer.def_concept_link(view_concept, view_discourse_concept)
+    homer.def_concept_link(view_concept, view_monitoring_concept)
+    homer.def_concept_link(view_concept, view_simplex_concept)
+    homer.def_concept_link(view_monitoring_concept, reverse_concept)
+    homer.def_concept_link(view_monitoring_concept, outer_concept)
+    homer.def_concept_link(reverse_concept, chunk_concept)
+    homer.def_concept_link(view_discourse_concept, correspondence_concept)
+    homer.def_concept_link(view_discourse_concept, word_concept)
+    homer.def_concept_link(view_simplex_concept, correspondence_concept)
+    homer.def_concept_link(view_simplex_concept, word_concept)
+    homer.def_concept_link(word_concept, phrase_concept)
+    homer.def_concept_link(word_concept, view_monitoring_concept)
+    homer.def_concept_link(word_concept, label_concept)
+    homer.def_concept_link(word_concept, relation_concept)
+
+    # activity links
     homer.def_concept_link(build_concept, evaluate_concept, activation=1.0)
     homer.def_concept_link(evaluate_concept, select_concept, activation=1.0)
     homer.def_concept_link(select_concept, build_concept, activation=1.0)
+
+    # activity-structure links
+    homer.def_concept_link(build_concept, correspondence_concept)
+    homer.def_concept_link(build_concept, chunk_concept)
+    homer.def_concept_link(build_concept, label_concept, activation=1.0)
+    homer.def_concept_link(build_concept, phrase_concept)
+    homer.def_concept_link(build_concept, relation_concept)
+    homer.def_concept_link(build_concept, view_discourse_concept)
+    homer.def_concept_link(build_concept, view_monitoring_concept)
+    homer.def_concept_link(build_concept, view_simplex_concept)
+    homer.def_concept_link(build_concept, word_concept)
+    homer.def_concept_link(evaluate_concept, correspondence_concept)
+    homer.def_concept_link(evaluate_concept, chunk_concept)
+    homer.def_concept_link(evaluate_concept, label_concept)
+    homer.def_concept_link(evaluate_concept, phrase_concept)
+    homer.def_concept_link(evaluate_concept, relation_concept)
+    homer.def_concept_link(evaluate_concept, view_discourse_concept)
+    homer.def_concept_link(evaluate_concept, view_monitoring_concept)
+    homer.def_concept_link(evaluate_concept, view_simplex_concept)
+    homer.def_concept_link(evaluate_concept, word_concept)
+    homer.def_concept_link(select_concept, correspondence_concept)
+    homer.def_concept_link(select_concept, chunk_concept)
+    homer.def_concept_link(select_concept, label_concept)
+    homer.def_concept_link(select_concept, phrase_concept)
+    homer.def_concept_link(select_concept, relation_concept)
+    homer.def_concept_link(select_concept, view_discourse_concept)
+    homer.def_concept_link(select_concept, view_monitoring_concept)
+    homer.def_concept_link(select_concept, view_simplex_concept)
+    homer.def_concept_link(select_concept, word_concept)
 
     # Grammatical Knowledge
 
