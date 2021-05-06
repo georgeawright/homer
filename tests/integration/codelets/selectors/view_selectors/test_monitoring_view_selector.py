@@ -19,7 +19,7 @@ def bubble_chamber():
     view_concept = Concept(
         Mock(),
         Mock(),
-        "view",
+        "view-monitoring",
         Mock(),
         None,
         None,

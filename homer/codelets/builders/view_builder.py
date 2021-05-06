@@ -59,7 +59,7 @@ class ViewBuilder(Builder):
             for space in self.target_spaces:
                 if isinstance(space, Frame):
                     self.frame = space
-        return self.frame is not None
+        return True
 
     def _calculate_confidence(self):
         self.confidence = statistics.fmean(

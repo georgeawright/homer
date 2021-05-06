@@ -12,7 +12,7 @@ from homer.tools import hasinstance
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
-    chamber.concepts = {"view": Mock(), "select": Mock(), "text": Mock()}
+    chamber.concepts = {"view-monitoring": Mock(), "select": Mock(), "text": Mock()}
     chamber.spaces = {"input": Mock()}
     text_space = Mock()
     text_space.contents.is_empty.return_value = False

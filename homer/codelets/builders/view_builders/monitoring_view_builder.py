@@ -1,5 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import ViewBuilder
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
@@ -15,8 +16,13 @@ class MonitoringViewBuilder(ViewBuilder):
         return MonitoringViewEvaluator
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
-        target = StructureCollection(
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        text_space = StructureCollection(
             {
                 space
                 for space in bubble_chamber.working_spaces
@@ -24,9 +30,13 @@ class MonitoringViewBuilder(ViewBuilder):
                 and not space.contents.is_empty()
             }
         ).get_exigent()
-        urgency = urgency if urgency is not None else target.exigency
+        input_space = bubble_chamber.spaces["input"]
+        urgency = urgency if urgency is not None else text_space.exigency
         return cls.spawn(
-            parent_id, bubble_chamber, StructureCollection({target}), urgency
+            parent_id,
+            bubble_chamber,
+            StructureCollection({text_space, input_space}),
+            urgency,
         )
 
     @property

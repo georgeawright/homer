@@ -22,10 +22,18 @@ class SimplexViewSelector(ViewSelector):
             self.challengers = StructureCollection({challenger_view})
         except MissingStructureError:
             return True
-        members_intersection = StructureCollection.intersection(
-            champion_view.members, challenger_view.members
+        champion_members_starts = StructureCollection(
+            {
+                member.start
+                for member in champion_view.members
+                if member.start.parent_space.parent_concept.name == "input"
+            }
         )
-        return (
-            len(members_intersection) > 0.5 * champion_view.size
-            and len(members_intersection) > 0.5 * challenger_view.size
-        )
+        return not StructureCollection(
+            {
+                member.start
+                for member in challenger_view.members
+                if member.start.parent_space.parent_concept.name == "input"
+                and member.start in champion_members_starts
+            }
+        ).is_empty()

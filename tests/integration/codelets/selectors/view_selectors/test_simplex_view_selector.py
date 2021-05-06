@@ -7,35 +7,19 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Relation
-from homer.structures.nodes import Concept
-from homer.structures.spaces import WorkingSpace
+from homer.structures.links import Correspondence, Relation
+from homer.structures.nodes import Chunk, Concept
+from homer.structures.spaces import Frame, WorkingSpace
 from homer.structures.views import SimplexView
 
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     view_concept = Concept(
         Mock(),
         Mock(),
-        "view",
+        "view-simplex",
         Mock(),
         None,
         None,
@@ -61,11 +45,38 @@ def bubble_chamber():
     relation = Relation(Mock(), Mock(), view_concept, select_concept, None, None, 1)
     view_concept.links_out.add(relation)
     select_concept.links_in.add(relation)
+    text_concept = Concept(
+        Mock(),
+        Mock(),
+        "text",
+        Mock(),
+        None,
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(text_concept)
+    input_concept = Concept(
+        Mock(), Mock(), "input", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    chamber.concepts.add(input_concept)
     input_space = WorkingSpace(
-        Mock(), Mock(), "input", Mock(), Mock(), [], StructureCollection(), 0, [], []
+        Mock(),
+        Mock(),
+        "input",
+        input_concept,
+        Mock(),
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
     )
     chamber.working_spaces.add(input_space)
-    chamber.frames.add(Mock())
+    frame = Frame("", "", "frame", text_concept, Mock(), Mock(), Mock())
+    chamber.frames.add(frame)
     return chamber
 
 
@@ -78,9 +89,11 @@ def target_space():
 
 
 @pytest.fixture
-def view_members():
-    members = StructureCollection({Mock(), Mock()})
-    return members
+def common_target_space_item(bubble_chamber):
+    item = Chunk(
+        Mock(), Mock(), Mock(), Mock(), Mock(), bubble_chamber.spaces["input"], Mock()
+    )
+    return item
 
 
 @pytest.fixture
@@ -91,12 +104,25 @@ def input_spaces():
 
 
 @pytest.fixture
-def good_view(bubble_chamber, target_space, view_members, input_spaces):
+def good_view(bubble_chamber, target_space, input_spaces, common_target_space_item):
+    correspondence = Correspondence(
+        "",
+        "",
+        common_target_space_item,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
     view = SimplexView(
         Mock(),
         Mock(),
         Location([], target_space),
-        view_members,
+        StructureCollection({correspondence}),
         input_spaces,
         Mock(),
         1.0,
@@ -107,12 +133,25 @@ def good_view(bubble_chamber, target_space, view_members, input_spaces):
 
 
 @pytest.fixture
-def bad_view(bubble_chamber, target_space, view_members, input_spaces):
+def bad_view(bubble_chamber, target_space, input_spaces, common_target_space_item):
+    correspondence = Correspondence(
+        "",
+        "",
+        common_target_space_item,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
     view = SimplexView(
         Mock(),
         Mock(),
         Location([], target_space),
-        view_members,
+        StructureCollection({correspondence}),
         input_spaces,
         Mock(),
         0.0,

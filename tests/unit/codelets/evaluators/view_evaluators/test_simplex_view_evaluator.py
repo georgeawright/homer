@@ -14,7 +14,7 @@ def test_changes_target_structure_quality(
     current_quality, correspondences_quality, no_of_slots, no_of_slot_values
 ):
     bubble_chamber = Mock()
-    bubble_chamber.concepts = {"evaluate": Mock(), "view": Mock()}
+    bubble_chamber.concepts = {"evaluate": Mock(), "view-simplex": Mock()}
     view = Mock()
     view.slots = [Mock() for _ in range(no_of_slots)]
     view.slot_values = {Mock(): Mock() for _ in range(no_of_slot_values)}

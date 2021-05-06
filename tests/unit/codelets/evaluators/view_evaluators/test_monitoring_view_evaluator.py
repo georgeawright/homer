@@ -25,7 +25,7 @@ def test_changes_target_structure_quality(
     expected_quality,
 ):
     bubble_chamber = Mock()
-    bubble_chamber.concepts = {"evaluate": Mock(), "view": Mock()}
+    bubble_chamber.concepts = {"evaluate": Mock(), "view-monitoring": Mock()}
     interpretation_chunks = []
     for i in range(interpretation_size):
         chunk = Chunk(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())

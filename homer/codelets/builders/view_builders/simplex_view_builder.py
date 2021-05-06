@@ -17,7 +17,9 @@ class SimplexViewBuilder(ViewBuilder):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
         target_one = bubble_chamber.spaces["input"]
-        target_two = bubble_chamber.frames.get_active()
+        target_two = bubble_chamber.frames.where(
+            parent_concept=bubble_chamber.concepts["text"]
+        ).get_active()
         urgency = urgency if urgency is not None else target_two.activation
         return cls.spawn(
             parent_id,

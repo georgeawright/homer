@@ -15,27 +15,11 @@ from homer.tools import hasinstance
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     view_concept = Concept(
         Mock(),
         Mock(),
-        "view",
+        "view-simplex",
         Mock(),
         None,
         None,
@@ -59,6 +43,18 @@ def bubble_chamber():
     relation = Relation(Mock(), Mock(), view_concept, build_concept, None, None, 1)
     view_concept.links_out.add(relation)
     build_concept.links_in.add(relation)
+    text_concept = Concept(
+        Mock(),
+        Mock(),
+        "text",
+        Mock(),
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(text_concept)
     top_level_working_space = WorkingSpace(
         Mock(),
         Mock(),
@@ -87,7 +83,15 @@ def input_space(bubble_chamber):
 
 @pytest.fixture
 def target_frame(bubble_chamber):
-    frame = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), [], StructureCollection())
+    frame = Frame(
+        Mock(),
+        Mock(),
+        Mock(),
+        bubble_chamber.concepts["text"],
+        Mock(),
+        [],
+        StructureCollection(),
+    )
     frame._activation = 1.0
     bubble_chamber.frames.add(frame)
     return frame
