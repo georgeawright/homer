@@ -17,7 +17,7 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Concept, Lexeme, Rule, Word
+from .structures.nodes import Chunk, Concept, Lexeme, Phrase, Rule, Word
 from .structures.spaces import ConceptualSpace, WorkingSpace
 from .structures.spaces.frames import Template
 from .word_form import WordForm
@@ -272,6 +272,11 @@ class Homer:
         )
         self.logger.log(template)
         for i, item in enumerate(contents):
+            if item.is_phrase:
+                item.chunk.parent_space = template
+                item.label.parent_space = template
+                item.chunk.locations = [Location([[i]], template)]
+                item.label.locations = [Location([[i]], template)]
             item.parent_space = template
             item.locations = [Location([[i]], template)]
             template.contents.add(item)
@@ -296,6 +301,37 @@ class Homer:
             quality=quality,
         )
         return word
+
+    def def_phrase(
+        self,
+        label_concept: Concept = None,
+        quality: FloatBetweenOneAndZero = 1.0,
+    ):
+        chunk = Chunk(
+            structure_id=ID.new(Chunk),
+            parent_id="",
+            value=None,
+            locations=[],
+            members=StructureCollection(),
+            parent_space=None,
+            quality=quality,
+        )
+        label = Label(
+            structure_id=ID.new(Label),
+            parent_id="",
+            start=chunk,
+            parent_concept=label_concept,
+            parent_space=None,
+            quality=quality,
+        )
+        phrase = Phrase(
+            structure_id=ID.new(Phrase),
+            parent_id="",
+            chunk=chunk,
+            label=label,
+            quality=quality,
+        )
+        return phrase
 
     def def_working_space(
         self,
