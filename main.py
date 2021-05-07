@@ -344,6 +344,13 @@ def setup_homer() -> Homer:
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
+    conj_concept = homer.def_concept(
+        name="conj",
+        parent_space=grammatical_concept_space,
+        relevant_value="value",
+        instance_type=str,
+        classifier=PartOfSpeechClassifier(),
+    )
     null_concept = homer.def_concept(
         name="null",
         parent_space=grammatical_concept_space,
@@ -374,6 +381,7 @@ def setup_homer() -> Homer:
         right_branch=pp_concept,
         stable_activation=1.0,
     )
+    # TODO: add S --> S conj S
     np_det_noun = homer.def_rule(
         name="np --> det, noun",
         location=Location([], grammatical_concept_space),
@@ -893,6 +901,12 @@ def setup_homer() -> Homer:
         parts_of_speech={WordForm.HEADWORD: [prep_concept]},
         parent_concept=None,
     )
+    and_lexeme = homer.def_lexeme(
+        headword="and",
+        forms={WordForm.HEADWORD: "and"},
+        parts_of_speech={WordForm.HEADWORD: [conj_concept]},
+        parent_concept=None,
+    )
     template_1 = homer.def_template(
         name="the [location] is [temperature]",
         contents=[
@@ -1042,6 +1056,22 @@ def setup_homer() -> Homer:
     homer.def_correspondence(template_4_slots_temperature_relation, template_2[2])
     homer.def_correspondence(template_4_slot_1_location_label, template_4[5])
     homer.def_correspondence(template_4_slot_2_location_label, template_4[8])
+    and_template = homer.def_template(
+        name="[phrase] and [phrase]",
+        contents=[
+            homer.def_phrase(label=sentence_concept),
+            homer.def_word(and_lexeme),
+            homer.def_phrase(label=sentence_concept),
+        ],
+    )
+    list_template = homer.def_template(
+        name="[phrase], [phrase]",
+        contents=[
+            homer.def_phrase(label=sentence_concept),
+            homer.def_word(and_lexeme),
+            homer.def_phrase(label=sentence_concept),
+        ],
+    )
 
     if True:
         input_chunks = StructureCollection()
