@@ -40,6 +40,7 @@ class Phrase(Node):
         self.left_branch = left_branch
         self.right_branch = right_branch
         self.rule = rule
+        self.is_phrase = True
 
     @classmethod
     def get_builder_class(cls):

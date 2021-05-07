@@ -47,6 +47,7 @@ class WorkingSpace(Space):
             links_out=links_out,
         )
         self.conceptual_space = conceptual_space
+        self.is_working_space = True
 
     @property
     def quality(self):

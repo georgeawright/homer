@@ -33,6 +33,7 @@ class View(Structure):
         self.output_space = output_space
         self.members = members
         self.slot_values = {}
+        self.is_view = True
 
     @property
     def input_working_spaces(self):

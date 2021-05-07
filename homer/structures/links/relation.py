@@ -35,6 +35,7 @@ class Relation(Link):
             links_in=None,
             links_out=None,
         )
+        self.is_relation = True
 
     @classmethod
     def get_builder_class(cls):

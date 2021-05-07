@@ -33,6 +33,7 @@ class Node(Structure):
         )
         self._value = value
         self._parent_space = parent_space
+        self.is_node = True
 
     @property
     def value(self) -> Any:

@@ -48,6 +48,7 @@ class Space(Structure):
             if super_space_to_coordinate_function_map is not None
             else {}
         )
+        self.is_space = True
 
     @property
     def dimensions(self) -> List[Space]:

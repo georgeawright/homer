@@ -31,6 +31,7 @@ class Template(Frame):
             links_in=links_in,
             links_out=links_out,
         )
+        self.is_template = True
 
     def __getitem__(self, index: int) -> Word:
         return self.contents.at(Location([[index]], self)).get_random()
