@@ -128,6 +128,7 @@ class WordBuilder(Builder):
     def _calculate_confidence(self):
         self.confidence = (
             self.target_correspondence.activation
+            # TODO: self.target_correspondence is always None
             if self.target_correspondence is not None
             else 1.0
         )
@@ -178,6 +179,7 @@ class WordBuilder(Builder):
         )
         self.bubble_chamber.correspondences.add(frame_to_output_correspondence)
         self.bubble_chamber.logger.log(frame_to_output_correspondence)
+        self.target_view.members.add(frame_to_output_correspondence)
         self.target_word.links_in.add(frame_to_output_correspondence)
         self.target_word.links_out.add(frame_to_output_correspondence)
         word.links_in.add(frame_to_output_correspondence)
@@ -202,6 +204,7 @@ class WordBuilder(Builder):
             self.child_structures.add(non_frame_to_output_correspondence)
             self.bubble_chamber.correspondences.add(non_frame_to_output_correspondence)
             self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
+            self.target_view.members.add(non_frame_to_output_correspondence)
             word.links_in.add(non_frame_to_output_correspondence)
             word.links_out.add(non_frame_to_output_correspondence)
             self.non_frame_item.links_in.add(non_frame_to_output_correspondence)
