@@ -912,6 +912,12 @@ def setup_homer() -> Homer:
         parts_of_speech={WordForm.HEADWORD: [conj_concept]},
         parent_concept=None,
     )
+    comma_lexeme = homer.def_lexeme(
+        headword=",",
+        forms={WordForm.HEADWORD: ","},
+        parts_of_speech={WordForm.HEADWORD: [conj_concept]},
+        parent_concept=None,
+    )
     template_1 = homer.def_template(
         name="the [location] is [temperature]",
         contents=[
@@ -1064,17 +1070,17 @@ def setup_homer() -> Homer:
     and_template = homer.def_template(
         name="[phrase] and [phrase]",
         contents=[
-            homer.def_phrase(label=sentence_concept),
+            homer.def_phrase(label_concept=sentence_concept),
             homer.def_word(and_lexeme),
-            homer.def_phrase(label=sentence_concept),
+            homer.def_phrase(label_concept=sentence_concept),
         ],
     )
     list_template = homer.def_template(
         name="[phrase], [phrase]",
         contents=[
-            homer.def_phrase(label=sentence_concept),
-            homer.def_word(and_lexeme),
-            homer.def_phrase(label=sentence_concept),
+            homer.def_phrase(label_concept=sentence_concept),
+            homer.def_word(comma_lexeme),
+            homer.def_phrase(label_concept=sentence_concept),
         ],
     )
 
