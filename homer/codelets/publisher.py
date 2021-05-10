@@ -4,6 +4,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 
 
 class Publisher(Codelet):
@@ -16,6 +17,15 @@ class Publisher(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
+
+    @classmethod
+    def make(cls, codelet_id: str, bubble_chamber: BubbleChamber):
+        return cls(
+            ID.new(cls),
+            codelet_id,
+            bubble_chamber,
+            bubble_chamber.concepts["publish"].activation,
+        )
 
     def run(self) -> CodeletResult:
         target_view = self.bubble_chamber.monitoring_views.get_active()
