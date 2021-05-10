@@ -75,6 +75,10 @@ def setup_homer() -> Homer:
         name="select",
         parent_space=activities_space,
     )
+    publish_concept = homer.def_concept(
+        name="publish",
+        parent_space=activities_space,
+    )
     space_type_concept = homer.def_concept(
         name="space type",
         parent_space=top_level_conceptual_space,
@@ -215,6 +219,7 @@ def setup_homer() -> Homer:
     homer.def_concept_link(word_concept, view_monitoring_concept)
     homer.def_concept_link(word_concept, label_concept)
     homer.def_concept_link(word_concept, relation_concept)
+    homer.def_concept_link(view_monitoring_concept, publish_concept)
 
     # activity links
     homer.def_concept_link(build_concept, evaluate_concept, activation=1.0)

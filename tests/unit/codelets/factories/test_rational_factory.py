@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from homer.codelets import Builder, Evaluator, Selector
+from homer.codelets import Builder, Evaluator, Publisher, Selector
 from homer.codelets.factories import RationalFactory
 from homer.structure_collection import StructureCollection
 
@@ -38,6 +38,8 @@ def concepts():
     view_simplex_concept.name = "view-simplex"
     word_concept = Mock()
     word_concept.name = "word"
+    publish_concept = Mock()
+    publish_concept.name = "publish"
     concepts = StructureCollection(
         {
             build_concept,
@@ -55,6 +57,7 @@ def concepts():
             view_monitoring_concept,
             view_simplex_concept,
             word_concept,
+            publish_concept,
         }
     )
     for concept in concepts:
@@ -82,7 +85,7 @@ def test_decide_follow_up_class_returns_codelet_class(
 ):
     factory_codelet = RationalFactory(Mock(), Mock(), bubble_chamber, coderack, Mock())
     follow_up_class = factory_codelet._decide_follow_up_class()
-    codelet_types = [Builder, Evaluator, Selector]
+    codelet_types = [Builder, Evaluator, Publisher, Selector]
     assert (
         follow_up_class.__bases__[0] in codelet_types
         or follow_up_class.__bases__[0].__bases__[0] in codelet_types

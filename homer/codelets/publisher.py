@@ -29,4 +29,5 @@ class Publisher(Codelet):
             self.bubble_chamber.result = text
             self.result = CodeletResult.SUCCESS
         else:
+            self.bubble_chamber.concepts["publish"].decay_activation()
             self.result = CodeletResult.FAIL

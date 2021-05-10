@@ -56,6 +56,7 @@ class Factory(Codelet):
     def _get_codelet_type_from_concepts(
         self, action: Concept, structure: Concept, space: Concept, direction: Concept
     ):
+        from homer.codelets import Publisher
         from homer.codelets.builders import (
             ChunkBuilder,
             CorrespondenceBuilder,
@@ -196,6 +197,13 @@ class Factory(Codelet):
                     },
                 },
             },
+            "publish": {
+                "publish": {
+                    "publish": {
+                        "publish": Publisher,
+                    }
+                }
+            },
         }[action.name][space.name][direction.name][structure.name]
 
     def codelet_themes(self):
@@ -214,6 +222,7 @@ class Factory(Codelet):
         view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
         view_simplex = self.bubble_chamber.concepts["view-simplex"]
         word = self.bubble_chamber.concepts["word"]
+        publish = self.bubble_chamber.concepts["publish"]
         return {
             "inner-or-outer": {
                 "actions": StructureCollection({build, evaluate, select}),
@@ -240,5 +249,11 @@ class Factory(Codelet):
                 "spaces": StructureCollection({outer}),
                 "directions": StructureCollection({reverse}),
                 "structures": StructureCollection({chunk}),
+            },
+            "publish": {
+                "actions": StructureCollection({publish}),
+                "spaces": StructureCollection({publish}),
+                "directions": StructureCollection({publish}),
+                "structures": StructureCollection({publish}),
             },
         }

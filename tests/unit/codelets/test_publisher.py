@@ -35,6 +35,7 @@ def test_publishes_text_from_high_quality_active_monitoring_view(
 
     bubble_chamber = Mock()
     bubble_chamber.result = None
+    bubble_chamber.concepts = {"publish": Mock()}
     bubble_chamber.monitoring_views = StructureCollection({view})
 
     with patch.object(random, "random", return_value=random_number):
