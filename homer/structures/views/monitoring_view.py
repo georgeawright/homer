@@ -63,16 +63,6 @@ class MonitoringView(View):
 
     def nearby(self, space: Space = None) -> StructureCollection:
         space = space if space is not None else self.location.space
-        for view in space.contents.of_type(View):
-            print(view.structure_id)
-            print(len(view.raw_input_in_view))
-            print(
-                len(
-                    StructureCollection.intersection(
-                        self.raw_input_in_view, view.raw_input_in_view
-                    )
-                )
-            )
         return StructureCollection(
             {
                 view
