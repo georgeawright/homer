@@ -30,7 +30,11 @@ class PhraseBuilder(Builder):
         self.target_root = target_root
         self.target_left_branch = target_left_branch
         self.target_right_branch = target_right_branch
-        self.parent_space = self.target_structures[0].parent_space
+        self.parent_space = (
+            self.target_structures[0].parent_space
+            if self.target_structures != []
+            else None
+        )
 
     @classmethod
     def get_follow_up_class(cls) -> type:

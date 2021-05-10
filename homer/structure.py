@@ -39,6 +39,7 @@ class Structure(ABC):
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
         self._parent_concept = None
+        self.is_word = False
 
     @classmethod
     def get_builder_class(cls):

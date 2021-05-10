@@ -32,7 +32,7 @@ class PhraseProjectionEvaluator(PhraseEvaluator):
 
     @classmethod
     def get_follow_up_class(cls) -> type:
-        from homer.codelets.selectors.chunk_selectors import PhraseProjectionSelector
+        from homer.codelets.selectors.phrase_selectors import PhraseProjectionSelector
 
         return PhraseProjectionSelector
 

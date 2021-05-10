@@ -107,7 +107,7 @@ class PhraseProjectionBuilder(PhraseBuilder):
                 self.target_correspondence.location_in_space(
                     self.target_correspondence.start_space
                 ),
-                self.new_phrase.location,
+                new_phrase.location,
             ],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.target_view.output_space.conceptual_space,
@@ -132,7 +132,7 @@ class PhraseProjectionBuilder(PhraseBuilder):
                 self.target_correspondence.location_in_space(
                     self.target_correspondence.end_space
                 ),
-                self.new_phrase.location,
+                new_phrase.location,
             ],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.target_view.output_space.conceptual_space,
@@ -162,17 +162,16 @@ class PhraseProjectionBuilder(PhraseBuilder):
     def _copy_phrase_to_space(
         self, phrase: Union[Phrase, Word], space: WorkingSpace
     ) -> Phrase:
-        if isinstance(phrase, Word):
-            with phrase as word:
-                return Word(
-                    ID.new(Word),
-                    self.codelet_id,
-                    lexeme=word.lexeme,
-                    word_form=word.word_form,
-                    location=Location(word.location.coordinates, space),
-                    parent_space=space,
-                    quality=word.quality,
-                )
+        if phrase.is_word:
+            return Word(
+                ID.new(Word),
+                self.codelet_id,
+                lexeme=phrase.lexeme,
+                word_form=phrase.word_form,
+                location=Location(phrase.location.coordinates, space),
+                parent_space=space,
+                quality=phrase.quality,
+            )
         new_left_branch = self._copy_phrase_to_space(phrase.left_branch, space)
         new_right_branch = self._copy_phrase_to_space(phrase.right_branch, space)
         new_chunk = Chunk(
