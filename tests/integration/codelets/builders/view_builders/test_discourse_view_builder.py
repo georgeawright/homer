@@ -9,7 +9,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Concept
 from homer.structures.spaces import Frame, WorkingSpace
-from homer.structures.views import DiscourseView
+from homer.structures.views import DiscourseView, MonitoringView
 from homer.tools import hasinstance
 
 
@@ -108,6 +108,26 @@ def bubble_chamber():
     chamber.working_spaces.add(text_space_two)
     frame = Frame("", "", "", discourse_concept, Mock(), [], StructureCollection())
     chamber.frames.add(frame)
+    monitoring_view_one = MonitoringView(
+        "",
+        "",
+        Mock(),
+        Mock(),
+        StructureCollection({Mock(), Mock(), Mock()}),
+        text_space_one,
+        0.0,
+    )
+    chamber.views.add(monitoring_view_one)
+    monitoring_view_two = MonitoringView(
+        "",
+        "",
+        Mock(),
+        Mock(),
+        StructureCollection({Mock(), Mock(), Mock()}),
+        text_space_two,
+        0.0,
+    )
+    chamber.views.add(monitoring_view_two)
     return chamber
 
 

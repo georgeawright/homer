@@ -27,6 +27,13 @@ def bubble_chamber():
     text_space_two.parent_concept = chamber.concepts["text"]
     text_space_two.contents = StructureCollection({Mock()})
     text_space_two.activation = 1
+    monitoring_view_one = Mock()
+    monitoring_view_one.output_space = text_space_one
+    monitoring_view_two = Mock()
+    monitoring_view_two.output_space = text_space_one
+    chamber.monitoring_views = StructureCollection(
+        {monitoring_view_one, monitoring_view_two}
+    )
     frame = Mock()
     frame.parent_concept = chamber.concepts["discourse"]
     frame.activation = 1

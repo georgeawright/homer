@@ -24,11 +24,12 @@ class DiscourseViewBuilder(ViewBuilder):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        text_spaces = bubble_chamber.working_spaces.where(
-            parent_concept=bubble_chamber.concepts["text"]
-        ).where_not(contents=StructureCollection())
-        text_space_one = text_spaces.get_exigent()
-        text_space_two = text_spaces.get_exigent(exclude=[text_space_one])
+        monitoring_view_one = bubble_chamber.monitoring_views.get_active()
+        monitoring_view_two = bubble_chamber.monitoring_views.get_active(
+            exclude=[monitoring_view_one]
+        )
+        text_space_one = monitoring_view_one.output_space
+        text_space_two = monitoring_view_two.output_space
         frame = bubble_chamber.frames.where(
             parent_concept=bubble_chamber.concepts["discourse"]
         ).get_active()

@@ -86,9 +86,7 @@ class BubbleChamber:
 
     @property
     def monitoring_views(self) -> StructureCollection:
-        return StructureCollection(
-            {view for view in self.views if hasattr(view, "interpretation_space")}
-        )
+        return self.views.where(is_monitoring_view=True)
 
     @property
     def discourse_views(self) -> StructureCollection:
