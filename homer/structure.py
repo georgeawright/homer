@@ -339,6 +339,7 @@ class Structure(ABC):
         if amount is None:
             amount = self.MINIMUM_ACTIVATION_UPDATE
         self._activation_buffer += self._activation_update_coefficient * amount
+        print(self._activation_buffer)
 
     def decay_activation(self, amount: float = None):
         if self.stable:

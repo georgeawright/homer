@@ -91,6 +91,10 @@ class BubbleChamber:
         )
 
     @property
+    def discourse_views(self) -> StructureCollection:
+        return self.views.where(is_discourse_view=True)
+
+    @property
     def structures(self) -> StructureCollection:
         return StructureCollection.union(
             self.conceptual_spaces,

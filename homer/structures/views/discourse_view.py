@@ -1,8 +1,33 @@
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Space, View
+from homer.structures.spaces import WorkingSpace
 
 
 class DiscourseView(View):
+    def __init__(
+        self,
+        structure_id: str,
+        parent_id: str,
+        location: Location,
+        members: StructureCollection,
+        input_spaces: StructureCollection,
+        output_space: WorkingSpace,
+        quality: FloatBetweenOneAndZero,
+    ):
+        View.__init__(
+            self,
+            structure_id,
+            parent_id,
+            location,
+            members,
+            input_spaces,
+            output_space,
+            quality,
+        )
+        self.is_discourse_view = True
+
     def nearby(self, space: Space = None) -> StructureCollection:
         space = space if space is not None else self.location.space
         return StructureCollection(

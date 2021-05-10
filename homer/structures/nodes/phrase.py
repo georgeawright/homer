@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import Union
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node
 from homer.structures import Space

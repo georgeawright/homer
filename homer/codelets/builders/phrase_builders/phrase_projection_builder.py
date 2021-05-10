@@ -74,11 +74,8 @@ class PhraseProjectionBuilder(PhraseBuilder):
                 for member in target_view.members
                 if member.start_space != frame
                 and member.end_space != target_view.output_space
-                and not member.start.has_correspondence_to_space(
-                    target_view.output_space
-                )
             }
-        ).get_random()
+        ).get_unhappy()
         urgency = (
             urgency if urgency is not None else target_correspondence.start.unhappiness
         )
