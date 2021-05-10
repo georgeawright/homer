@@ -172,6 +172,11 @@ def setup_homer() -> Homer:
         parent_space=structures_space,
         instance_type=str,
     )
+    discourse_concept = homer.def_concept(
+        name="discourse",
+        parent_space=structures_space,
+        instance_type=str,
+    )
     label_concepts_space = homer.def_conceptual_space(
         name="label concepts",
         parent_concept=label_concept,
@@ -920,6 +925,7 @@ def setup_homer() -> Homer:
     )
     template_1 = homer.def_template(
         name="the [location] is [temperature]",
+        parent_concept=text_concept,
         contents=[
             homer.def_word(the_lexeme),
             homer.def_word(word_form=WordForm.HEADWORD),
@@ -949,6 +955,7 @@ def setup_homer() -> Homer:
     homer.def_correspondence(template_1_slot_temperature_label, template_1[3])
     template_2 = homer.def_template(
         name="it is [temperature] in the [location]",
+        parent_concept=text_concept,
         contents=[
             homer.def_word(it_lexeme),
             homer.def_word(is_lexeme),
@@ -980,6 +987,7 @@ def setup_homer() -> Homer:
     homer.def_correspondence(template_2_slot_temperature_label, template_2[5])
     template_3 = homer.def_template(
         name="it is [temperature.comparative] in the [location]",
+        parent_concept=text_concept,
         contents=[
             homer.def_word(it_lexeme),
             homer.def_word(is_lexeme),
@@ -1021,6 +1029,7 @@ def setup_homer() -> Homer:
     homer.def_correspondence(template_3_slot_1_location_label, template_3[5])
     template_4 = homer.def_template(
         name="it is [temperature.comparative] in the [location] than the [location]",
+        parent_concept=text_concept,
         contents=[
             homer.def_word(it_lexeme),
             homer.def_word(is_lexeme),
@@ -1069,6 +1078,7 @@ def setup_homer() -> Homer:
     homer.def_correspondence(template_4_slot_2_location_label, template_4[8])
     and_template = homer.def_template(
         name="[phrase] and [phrase]",
+        parent_concept=discourse_concept,
         contents=[
             homer.def_phrase(label_concept=sentence_concept),
             homer.def_word(and_lexeme),
@@ -1077,6 +1087,7 @@ def setup_homer() -> Homer:
     )
     list_template = homer.def_template(
         name="[phrase], [phrase]",
+        parent_concept=discourse_concept,
         contents=[
             homer.def_phrase(label_concept=sentence_concept),
             homer.def_word(comma_lexeme),
