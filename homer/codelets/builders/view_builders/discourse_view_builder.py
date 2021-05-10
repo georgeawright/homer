@@ -13,9 +13,9 @@ from homer.structures.views import DiscourseView
 class DiscourseViewBuilder(ViewBuilder):
     @classmethod
     def get_follow_up_class(cls) -> type:
-        from homer.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
+        from homer.codelets.evaluators.view_evaluators import DiscourseViewEvaluator
 
-        return MonitoringViewEvaluator
+        return DiscourseViewEvaluator
 
     @classmethod
     def make(
@@ -44,7 +44,7 @@ class DiscourseViewBuilder(ViewBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view-discourse"]
 
-    def _process_strucure(self):
+    def _process_structure(self):
         view_id = ID.new(DiscourseView)
         view_location = Location([], self.bubble_chamber.spaces["top level working"])
         view_output = WorkingSpace(

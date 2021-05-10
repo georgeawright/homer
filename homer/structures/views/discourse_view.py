@@ -28,6 +28,12 @@ class DiscourseView(View):
         )
         self.is_discourse_view = True
 
+    @classmethod
+    def get_builder_class(cls):
+        from homer.codelets.builders.view_builders import DiscourseViewBuilder
+
+        return DiscourseViewBuilder
+
     def nearby(self, space: Space = None) -> StructureCollection:
         space = space if space is not None else self.location.space
         return StructureCollection(
