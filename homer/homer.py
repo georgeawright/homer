@@ -274,11 +274,13 @@ class Homer:
         for i, item in enumerate(contents):
             if item.is_phrase:
                 item.chunk.parent_space = template
-                item.label.parent_space = template
                 item.chunk.locations = [Location([[i]], template)]
                 item.label.locations = [Location([[i]], template)]
-            item.parent_space = template
-            item.locations = [Location([[i]], template)]
+                item._parent_space = template
+                item._locations = [Location([[i]], template)]
+            if item.is_word:
+                item.parent_space = template
+                item.locations = [Location([[i]], template)]
             template.contents.add(item)
             self.logger.log(item)
         self.bubble_chamber.conceptual_spaces.add(template)
