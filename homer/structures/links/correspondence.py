@@ -10,7 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Link, Node, Space, View
 from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
-from homer.tools import areinstances, equivalent_space
+from homer.tools import areinstances, equivalent_space, hasinstance
 
 from .label import Label
 from .relation import Relation
@@ -134,26 +134,36 @@ class Correspondence(Link):
         common_arguments = self.common_arguments_with(other)
         if len(common_arguments) == 2:
             return False
-        if areinstances(self.arguments, Node):
+        if hasinstance(self.arguments, Node):
             self_corresponding_nodes = self.arguments
-        if areinstances(self.arguments, Label):
+            self_corresponding_links = StructureCollection()
+        elif areinstances(self.arguments, Label):
             self_corresponding_nodes = StructureCollection(
                 {self.start.start, self.end.start}
             )
-        if areinstances(self.arguments, Relation):
+            self_corresponding_links = self.arguments
+        elif areinstances(self.arguments, Relation):
             self_corresponding_nodes = StructureCollection(
                 {self.start.start, self.start.end, self.end.start, self.end.end}
             )
+            self_corresponding_links = self.arguments
         if areinstances(other.arguments, Node):
             other_corresponding_nodes = other.arguments
-        if areinstances(other.arguments, Label):
+            other_corresponding_links = StructureCollection()
+        elif areinstances(other.arguments, Label):
             other_corresponding_nodes = StructureCollection(
                 {other.start.start, other.end.start}
             )
-        if areinstances(other.arguments, Relation):
+            other_corresponding_links = other.arguments
+        elif areinstances(other.arguments, Relation):
             other_corresponding_nodes = StructureCollection(
                 {other.start.start, other.start.end, other.end.start, other.end.end}
             )
+            other_corresponding_links = other.arguments
+        if not StructureCollection.intersection(
+            self_corresponding_links, other_corresponding_links
+        ).is_empty():
+            return False
         corresponding_nodes_intersection = StructureCollection.intersection(
             self_corresponding_nodes, other_corresponding_nodes
         )
