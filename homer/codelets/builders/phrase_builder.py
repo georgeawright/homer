@@ -279,9 +279,14 @@ class PhraseBuilder(Builder):
         self.bubble_chamber.logger.log(self.target_root)
 
     def _fizzle(self):
-        self.child_codelets.append(
-            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
-        )
+        try:
+            self.child_codelets.append(
+                self.make(
+                    self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2
+                )
+            )
+        except MissingStructureError:
+            pass
 
     def _fail(self):
         pass
