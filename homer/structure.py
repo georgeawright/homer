@@ -15,6 +15,7 @@ class Structure(ABC):
 
     MINIMUM_ACTIVATION_UPDATE = HyperParameters.MINIMUM_ACTIVATION_UPDATE
     ACTIVATION_UPDATE_COEFFICIENT = HyperParameters.ACTIVATION_UPDATE_COEFFICIENT
+    DECAY_RATE = HyperParameters.DECAY_RATE
 
     def __init__(
         self,
@@ -361,7 +362,7 @@ class Structure(ABC):
 
     def update_activation(self):
         if self._activation_buffer == 0.0:
-            self.decay_activation()
+            self.decay_activation(self.DECAY_RATE)
         self._activation = FloatBetweenOneAndZero(
             self._activation + self._activation_buffer
         )
