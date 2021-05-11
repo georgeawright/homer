@@ -241,7 +241,7 @@ class ChunkBuilder(Builder):
                 new_correspondence.end.links_in.add(new_correspondence)
                 new_correspondence.end.links_out.add(new_correspondence)
                 for location in new_correspondence.locations:
-                    location.space.add(correspondence)
+                    location.space.add(new_correspondence)
         for link in new_chunk.links:
             self.bubble_chamber.add_to_collections(link)
             self.bubble_chamber.logger.log(link)

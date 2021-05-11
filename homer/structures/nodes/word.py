@@ -188,11 +188,13 @@ class Word(Node):
         new_word = Word(
             ID.new(Word),
             parent_id,
-            self.value,
-            self.lexeme,
-            location,
-            parent_space,
-            self.quality,
+            lexeme=self.lexeme,
+            word_form=self.word_form,
+            location=location,
+            parent_space=parent_space,
+            quality=self.quality,
         )
+        parent_space.add(new_word)
+        bubble_chamber.logger.log(new_word)
         bubble_chamber.words.add(new_word)
         return new_word

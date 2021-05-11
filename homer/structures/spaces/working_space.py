@@ -92,6 +92,7 @@ class WorkingSpace(Space):
             is_basic_level=self.is_basic_level,
             super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
         )
+        bubble_chamber.logger.log(new_space)
         copies = {}
         for item in self.contents:
             if isinstance(item, Node):
@@ -104,8 +105,7 @@ class WorkingSpace(Space):
                 copies[item] = new_item
                 for label in item.labels:
                     new_label = label.copy(
-                        old_arg=item,
-                        new_arg=new_item,
+                        start=new_item,
                         parent_space=new_space,
                         parent_id=parent_id,
                     )
