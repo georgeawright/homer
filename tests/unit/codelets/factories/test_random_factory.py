@@ -84,6 +84,7 @@ def test_decide_follow_up_class_returns_codelet_class(
     follow_up_class = factory_codelet._decide_follow_up_class()
     codelet_types = [Builder, Evaluator, Selector, Publisher]
     assert (
-        follow_up_class.__bases__[0] in codelet_types
+        follow_up_class in codelet_types
+        or follow_up_class.__bases__[0] in codelet_types
         or follow_up_class.__bases__[0].__bases__[0] in codelet_types
     )
