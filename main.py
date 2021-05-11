@@ -983,8 +983,8 @@ def setup_homer() -> Homer:
     template_2_slot_temperature_label = homer.def_label(
         start=template_2_slot, parent_space=template_2_temperature_space
     )
-    homer.def_correspondence(template_2_slot_location_label, template_2[2])
-    homer.def_correspondence(template_2_slot_temperature_label, template_2[5])
+    homer.def_correspondence(template_2_slot_temperature_label, template_2[2])
+    homer.def_correspondence(template_2_slot_location_label, template_2[5])
     template_3 = homer.def_template(
         name="it is [temperature.comparative] in the [location]",
         parent_concept=text_concept,
