@@ -256,7 +256,7 @@ def run_view(request, run_id):
     phrases = [
         structure
         for structure in structure_records
-        if "Phrase" in structure.structure_id
+        if "Phrase" in structure.structure_id and structure.left_branch is not None
     ]
     output += "<h2>Phrases</h2>"
     output += "".join(
