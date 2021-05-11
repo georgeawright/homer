@@ -159,6 +159,7 @@ class WordBuilder(Builder):
             parent_space=self.target_view.output_space,
             quality=0.0,
         )
+        self.target_view.output_space.add(word)
         self.bubble_chamber.words.add(word)
         self.bubble_chamber.logger.log(word)
         frame_to_output_correspondence = Correspondence(
