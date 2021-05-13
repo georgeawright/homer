@@ -18,7 +18,6 @@ class RelationProjectionBuilder(RelationBuilder):
     Sets or alters the value or coordinates of its arguments
     according to the parent concept's prototype."""
 
-    # target is a word with an adverb label in one space and the chunks in the target space
     def __init__(
         self,
         codelet_id: str,
@@ -114,6 +113,17 @@ class RelationProjectionBuilder(RelationBuilder):
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]
+
+    @property
+    def target_structures(self):
+        return StructureCollection(
+            {
+                self.target_view,
+                self.target_word,
+                self.target_structure_one,
+                self.target_structure_two,
+            }
+        )
 
     def _passes_preliminary_checks(self):
         self.conceptual_space = (

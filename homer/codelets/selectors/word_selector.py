@@ -6,13 +6,12 @@ from homer.structure_collection import StructureCollection
 class WordSelector(Selector):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        champion = bubble_chamber.words.get_active()
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            StructureCollection({champion}),
-            champion.activation,
+        word = bubble_chamber.words.get_active()
+        correspondences = word.correspondences.where(end=word)
+        champions = StructureCollection.union(
+            StructureCollection({word}), correspondences
         )
+        return cls.spawn(parent_id, bubble_chamber, champions, word.activation)
 
     @property
     def _structure_concept(self):
@@ -27,8 +26,23 @@ class WordSelector(Selector):
     def _engender_follow_up(self):
         from homer.codelets.builders import WordBuilder
 
+        correspondence_from_frame = StructureCollection(
+            {
+                correspondence
+                for correspondence in self.winners.where(is_correspondence=True)
+                if correspondence.start_space.is_frame
+            }
+        ).get_random()
+        frame = correspondence_from_frame.start_space
+        new_target = frame.contents.where(is_word=True).get_unhappy()
         self.child_codelets.append(
-            WordBuilder.make(self.codelet_id, self.bubble_chamber)
+            WordBuilder.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                correspondence_from_frame.parent_view,
+                new_target,
+                new_target.unhappiness,
+            )
         )
         self.child_codelets.append(
             self.spawn(

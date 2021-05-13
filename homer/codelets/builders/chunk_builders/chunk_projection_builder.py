@@ -75,6 +75,10 @@ class ChunkProjectionBuilder(ChunkBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
+    @property
+    def target_structures(self):
+        return StructureCollection({self.target_view, self.target_word})
+
     def _passes_preliminary_checks(self):
         return not self.target_word.has_correspondence_to_space(
             self.target_view.interpretation_space

@@ -21,6 +21,7 @@ class PhraseProjectionBuilder(PhraseBuilder):
         target_correspondence: Correspondence,
         urgency: FloatBetweenOneAndZero,
     ):
+        self.target_correspondence = target_correspondence
         PhraseBuilder.__init__(
             self,
             codelet_id,
@@ -32,7 +33,6 @@ class PhraseProjectionBuilder(PhraseBuilder):
             urgency,
         )
         self.target_view = target_correspondence.parent_view
-        self.target_correspondence = target_correspondence
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -80,6 +80,10 @@ class PhraseProjectionBuilder(PhraseBuilder):
             urgency if urgency is not None else target_correspondence.start.unhappiness
         )
         return cls.spawn(parent_id, bubble_chamber, target_correspondence, urgency)
+
+    @property
+    def target_structures(self):
+        return StructureCollection({self.target_correspondence})
 
     def _passes_preliminary_checks(self) -> bool:
         return not self.target_correspondence.start.has_correspondence_to_space(

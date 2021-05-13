@@ -14,14 +14,15 @@ class WordEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["word"]
-        target_word = bubble_chamber.words.get_random()
-        target_correspondence = target_word.correspondences.where(
-            end=target_word
-        ).get_random()
+        word = bubble_chamber.words.get_random()
+        correspondences = word.correspondences.where(end=word)
+        target_structures = StructureCollection.union(
+            StructureCollection({word}), correspondences
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            StructureCollection({target_word, target_correspondence}),
+            target_structures,
             structure_type.activation,
         )
 

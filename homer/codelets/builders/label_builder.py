@@ -86,6 +86,10 @@ class LabelBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["label"]
 
+    @property
+    def target_structures(self):
+        return StructureCollection({self.target_node})
+
     def _passes_preliminary_checks(self):
         if self.parent_concept is None:
             self.parent_concept = (

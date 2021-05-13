@@ -21,11 +21,18 @@ def test_word_is_boosted_follow_up_is_spawned(bubble_chamber):
     word.size = 1
     word.quality = 1.0
     word.activation = 0.0
+
+    correspondence_from_frame = Mock()
+    correspondence_from_frame.is_correspondence = True
+    correspondence_from_frame.start_space.is_frame = True
+    correspondence_from_frame.quality = 1.0
+    correspondence_from_frame.activation = 1.0
+
     selector = WordSelector(
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection({word}),
+        StructureCollection({word, correspondence_from_frame}),
         Mock(),
     )
     selector.run()

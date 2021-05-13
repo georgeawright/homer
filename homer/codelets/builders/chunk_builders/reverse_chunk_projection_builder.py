@@ -118,6 +118,12 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
+    @property
+    def target_structures(self):
+        return StructureCollection(
+            {self.target_view, self.target_interpretation_chunk, self.target_raw_chunk}
+        )
+
     def _passes_preliminary_checks(self):
         if self.target_raw_chunk.has_correspondence_to_space(
             self.target_interpretation_chunk.parent_space

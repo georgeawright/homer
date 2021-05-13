@@ -5,6 +5,7 @@ from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 from homer.structures import Node
 from homer.structures.links import Correspondence
+from homer.structures.spaces import WorkingSpace
 
 
 class CorrespondenceSelector(Selector):
@@ -43,18 +44,42 @@ class CorrespondenceSelector(Selector):
 
     def _engender_follow_up(self):
         winner_correspondence = self.winners.get_random()
+        target_view = winner_correspondence.parent_view
         try:
             if isinstance(winner_correspondence.start, Node):
-                new_target = winner_correspondence.start.links.not_of_type(
+                target_structure_one = winner_correspondence.start.links.not_of_type(
                     Correspondence
-                ).get_random()
+                ).get_exigent()
             else:
-                new_target = (
+                target_structure_one = (
                     winner_correspondence.start.arguments.get_random()
                     .links.not_of_type(Correspondence)
-                    .get_random()
+                    .get_exigent()
                 )
-            new_target_space = new_target.parent_space
+            target_space_one = target_structure_one.parent_space
+            target_conceptual_space = target_space_one.conceptual_space
+            target_space_two = (
+                target_view.input_spaces.get_random(
+                    exclude=list(target_space_one.parent_spaces)
+                )
+                .contents.of_type(WorkingSpace)
+                .where(is_basic_level=True)
+                .where(conceptual_space=target_conceptual_space)
+                .get_random()
+            )
+            if isinstance(winner_correspondence.end, Node):
+                target_structure_two = (
+                    winner_correspondence.end.links.of_type(type(target_structure_one))
+                    .where(parent_space=target_space_two)
+                    .get_exigent()
+                )
+            else:
+                target_structure_two = (
+                    winner_correspondence.end.arguments.get_random()
+                    .links.of_type(type(target_structure_one))
+                    .where(parent_space=target_space_two)
+                    .get_exigent()
+                )
         except MissingStructureError:
             return
         self.child_codelets.append(
@@ -62,9 +87,12 @@ class CorrespondenceSelector(Selector):
                 self.codelet_id,
                 self.bubble_chamber,
                 winner_correspondence.parent_view,
-                new_target_space,
-                new_target,
-                new_target.unlinkedness,
+                target_space_one,
+                target_structure_one,
+                target_structure_one.unlinkedness,
+                target_space_two=target_space_two,
+                target_structure_two=target_structure_two,
+                target_conceptual_space=target_conceptual_space,
                 parent_concept=winner_correspondence.parent_concept,
             )
         )

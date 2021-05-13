@@ -42,6 +42,7 @@ class Structure(ABC):
         self._parent_concept = None
         self.is_phrase = False
         self.is_word = False
+        self.is_frame = False
 
     @classmethod
     def get_builder_class(cls):

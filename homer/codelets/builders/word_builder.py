@@ -80,6 +80,10 @@ class WordBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]
 
+    @property
+    def target_structures(self):
+        return StructureCollection({self.target_view, self.target_word})
+
     def _passes_preliminary_checks(self):
         try:
             self.word_correspondee = StructureCollection(

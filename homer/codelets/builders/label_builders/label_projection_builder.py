@@ -104,6 +104,12 @@ class LabelProjectionBuilder(LabelBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["label"]
 
+    @property
+    def target_structures(self):
+        return StructureCollection(
+            {self.target_view, self.target_word, self.target_chunk}
+        )
+
     def _passes_preliminary_checks(self):
         self.parent_concept = self.target_word.lexeme.concepts.get_random()
         return not self.target_chunk.has_label(self.parent_concept) and all(

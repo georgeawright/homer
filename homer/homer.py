@@ -83,7 +83,7 @@ class Homer:
                     self.print_status_update()
                     self.bubble_chamber.spread_activations()
                     self.bubble_chamber.update_activations()
-                if self.coderack.codelets_run >= 10000:
+                if self.coderack.codelets_run >= 30000:
                     raise NoMoreCodelets
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:

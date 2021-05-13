@@ -106,6 +106,12 @@ class RelationBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]
 
+    @property
+    def target_structures(self):
+        return StructureCollection(
+            {self.target_structure_one, self.target_structure_two, self.target_space}
+        )
+
     def _passes_preliminary_checks(self):
         if self.target_structure_two is None:
             try:

@@ -117,6 +117,18 @@ class CorrespondenceBuilder(Builder):
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["correspondence"]
+        self.target_structures = None
+
+    @property
+    def target_structures(self):
+        return StructureCollection(
+            {
+                self.target_structure_one,
+                self.target_structure_two,
+                self.target_space_one,
+                self.target_space_two,
+            }
+        )
 
     def _passes_preliminary_checks(self):
         if self.target_space_two is None:

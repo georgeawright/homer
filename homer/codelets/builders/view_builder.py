@@ -51,6 +51,10 @@ class ViewBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view"]
 
+    @property
+    def target_structures(self):
+        return self.target_spaces
+
     def _passes_preliminary_checks(self):
         for view in self.bubble_chamber.views:
             if view.input_spaces == self.target_spaces:

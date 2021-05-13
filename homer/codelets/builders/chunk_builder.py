@@ -66,6 +66,10 @@ class ChunkBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
+    @property
+    def target_structures(self):
+        return StructureCollection({self.target_chunk, self.second_target_chunk})
+
     def _passes_preliminary_checks(self):
         try:
             self.second_target_chunk = self.target_chunk.nearby().get_random()

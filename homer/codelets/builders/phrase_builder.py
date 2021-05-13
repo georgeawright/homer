@@ -31,8 +31,8 @@ class PhraseBuilder(Builder):
         self.target_left_branch = target_left_branch
         self.target_right_branch = target_right_branch
         self.parent_space = (
-            self.target_structures[0].parent_space
-            if self.target_structures != []
+            self.target_structures.get_random().parent_space
+            if not self.target_structures.is_empty()
             else None
         )
 
@@ -177,13 +177,13 @@ class PhraseBuilder(Builder):
         return self.bubble_chamber.concepts["phrase"]
 
     @property
-    def target_structures(self) -> List[Structure]:
+    def target_structures(self):
         targets = [
             self.target_root,
             self.target_left_branch,
             self.target_right_branch,
         ]
-        return [target for target in targets if target is not None]
+        return StructureCollection({target for target in targets if target is not None})
 
     def _passes_preliminary_checks(self):
         if len(self.target_structures) < 2:
