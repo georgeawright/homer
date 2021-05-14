@@ -94,8 +94,10 @@ class PhraseProjectionBuilder(PhraseBuilder):
         self.confidence = self.target_correspondence.activation
 
     def _process_structure(self):
-        new_phrase = self._copy_phrase_to_space(
-            self.target_correspondence.start, self.target_view.output_space
+        new_phrase = self.target_correspondence.start.copy(
+            bubble_chamber=self.bubble_chamber,
+            parent_id=self.codelet_id,
+            parent_space=self.target_view.output_space,
         )
         input_to_output_correspondence = Correspondence(
             ID.new(Correspondence),
@@ -159,48 +161,3 @@ class PhraseProjectionBuilder(PhraseBuilder):
 
     def _fail(self):
         self._fizzle()
-
-    def _copy_phrase_to_space(
-        self, phrase: Union[Phrase, Word], space: WorkingSpace
-    ) -> Phrase:
-        if phrase.is_word:
-            return Word(
-                ID.new(Word),
-                self.codelet_id,
-                lexeme=phrase.lexeme,
-                word_form=phrase.word_form,
-                location=Location(phrase.location.coordinates, space),
-                parent_space=space,
-                quality=phrase.quality,
-            )
-        new_left_branch = self._copy_phrase_to_space(phrase.left_branch, space)
-        new_right_branch = self._copy_phrase_to_space(phrase.right_branch, space)
-        new_chunk = Chunk(
-            ID.new(Chunk),
-            self.codelet_id,
-            value=f"{new_left_branch.value} {new_right_branch.value}",
-            locations=[
-                Location.merge(new_left_branch.location, new_right_branch.location)
-            ],
-            members=StructureCollection({new_left_branch, new_right_branch}),
-            parent_space=space,
-            quality=1.0,
-        )
-        new_label = Label(
-            ID.new(Label),
-            self.codelet_id,
-            start=new_chunk,
-            parent_concept=phrase.rule.root,
-            parent_space=space,
-            quality=1.0,
-        )
-        return Phrase(
-            ID.new(Phrase),
-            self.codelet_id,
-            chunk=new_chunk,
-            label=new_label,
-            quality=phrase.quality,
-            left_branch=new_left_branch,
-            right_branch=new_right_branch,
-            rule=phrase.rule,
-        )

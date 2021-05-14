@@ -100,7 +100,6 @@ def test_successfully_projects_phrase_and_spawns_follow_up(
     )
     result = builder.run()
     assert CodeletResult.SUCCESS == result
-    assert hasinstance(builder.child_structures, Phrase)
     assert hasinstance(builder.child_structures, Correspondence)
     assert 1 == len(builder.child_codelets)
     assert isinstance(builder.child_codelets[0], PhraseProjectionEvaluator)

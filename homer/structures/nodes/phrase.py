@@ -2,9 +2,10 @@ from __future__ import annotations
 from typing import Union
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
+from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Node
-from homer.structures import Space
+from homer.structures import Node, Space
 
 from .rule import Rule
 
@@ -132,3 +133,47 @@ class Phrase(Node):
                 or self.right_branch == phrase.left_branch
             }
         )
+
+    def copy(self, **kwargs: dict) -> Phrase:
+        """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""
+        from homer.structures.links import Label
+        from homer.structures.nodes import Chunk
+
+        bubble_chamber = kwargs["bubble_chamber"]
+        parent_id = kwargs["parent_id"]
+        parent_space = kwargs["parent_space"]
+        new_left_branch = self.left_branch.copy(**kwargs)
+        new_right_branch = self.right_branch.copy(**kwargs)
+        new_chunk = Chunk(
+            ID.new(Chunk),
+            parent_id,
+            value=f"{new_left_branch.value} {new_right_branch.value}",
+            locations=[
+                Location.merge(new_left_branch.location, new_right_branch.location)
+            ],
+            members=StructureCollection({new_left_branch, new_right_branch}),
+            parent_space=parent_space,
+            quality=1.0,
+        )
+        new_label = Label(
+            ID.new(Label),
+            parent_id,
+            start=new_chunk,
+            parent_concept=self.rule.root,
+            parent_space=parent_space,
+            quality=1.0,
+        )
+        new_phrase = Phrase(
+            ID.new(Phrase),
+            parent_id,
+            chunk=new_chunk,
+            label=new_label,
+            quality=self.quality,
+            left_branch=new_left_branch,
+            right_branch=new_right_branch,
+            rule=self.rule,
+        )
+        parent_space.add(new_phrase)
+        bubble_chamber.logger.log(new_phrase)
+        bubble_chamber.phrases.add(new_phrase)
+        return new_phrase
