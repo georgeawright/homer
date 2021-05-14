@@ -85,13 +85,24 @@ def chunk(bubble_chamber, working_space):
         Mock(),
         Mock(),
         [[10]],
-        [Mock()],
+        [Location([[1, 1]], working_space)],
         Mock(),
         Mock(),
         Mock(),
     )
-    chunk.locations.append(Location([1, 1], working_space))
+    working_space.add(chunk)
     bubble_chamber.chunks.add(chunk)
+    nearby_chunk = Chunk(
+        Mock(),
+        Mock(),
+        [[10]],
+        [Location([[0, 1]], working_space)],
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    working_space.add(nearby_chunk)
+    bubble_chamber.chunks.add(nearby_chunk)
     return chunk
 
 

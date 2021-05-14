@@ -46,12 +46,16 @@ class LabelSelector(Selector):
         )
 
     def _engender_follow_up(self):
-        target_concept = self.champions.get_random().parent_concept
+        winning_label = self.winners.get_random()
+        target_concept = winning_label.parent_concept
+        target_node = winning_label.start.nearby().get_unhappy()
         self.child_codelets.append(
-            LabelBuilder.make_top_down(
+            LabelBuilder.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                target_concept,
+                target_node,
+                target_node.unlinkedness,
+                parent_concept=target_concept,
             )
         )
         self.child_codelets.append(
