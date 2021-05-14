@@ -3,6 +3,7 @@ import random
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 
@@ -28,7 +29,10 @@ class Publisher(Codelet):
         )
 
     def run(self) -> CodeletResult:
-        target_view = self.bubble_chamber.monitoring_views.get_active()
+        try:
+            target_view = self.bubble_chamber.monitoring_views.get_active()
+        except MissingStructureError:
+            return self._fail()
         if (
             target_view.quality > random.random()
             and target_view.activation > random.random()
@@ -38,6 +42,10 @@ class Publisher(Codelet):
             text = " ".join([word.value for word in words])
             self.bubble_chamber.result = text
             self.result = CodeletResult.SUCCESS
-        else:
-            self.bubble_chamber.concepts["publish"].decay_activation()
-            self.result = CodeletResult.FAIL
+            return self.result
+        return self._fail()
+
+    def _fail(self) -> CodeletResult:
+        self.bubble_chamber.concepts["publish"].decay_activation()
+        self.result = CodeletResult.FAIL
+        return self.result
