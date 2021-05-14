@@ -89,61 +89,43 @@ class DjangoLogger(Logger):
             event_type = "selection"
         if event_type is None:
             return
-        target_one = None
-        target_two = None
-        child_structure = None
-        winner = None
-        loser = None
-        if (
-            hasattr(codelet, "target_structure")
-            and codelet.target_structure is not None
-        ):
-            target_one = StructureRecord.objects.get(
-                run_id=self.run, structure_id=codelet.target_structure.structure_id
-            )
-        if hasattr(codelet, "target_chunk") and codelet.target_chunk is not None:
-            target_one = StructureRecord.objects.get(
-                run_id=self.run, structure_id=codelet.target_chunk.structure_id
-            )
-        if (
-            hasattr(codelet, "second_target_structure")
-            and codelet.second_target_structure is not None
-        ):
-            target_two = StructureRecord.objects.get(
-                run_id=self.run,
-                structure_id=codelet.second_target_structure.structure_id,
-            )
-        if (
-            hasattr(codelet, "second_target_chunk")
-            and codelet.second_target_chunk is not None
-        ):
-            target_two = StructureRecord.objects.get(
-                run_id=self.run,
-                structure_id=codelet.second_target_chunk.structure_id,
-            )
-        if hasattr(codelet, "child_structure") and codelet.child_structure is not None:
-            child_structure = StructureRecord.objects.get(
-                run_id=self.run, structure_id=codelet.child_structure.structure_id
-            )
-        if hasattr(codelet, "winner") and codelet.winner is not None:
-            winner = StructureRecord.objects.get(
-                run_id=self.run, structure_id=codelet.winner.structure_id
-            )
-        if hasattr(codelet, "loser") and codelet.loser is not None:
-            loser = StructureRecord.objects.get(
-                run_id=self.run, structure_id=codelet.loser.structure_id
-            )
-        EventRecord.objects.create(
+        event_record = EventRecord.objects.create(
             run_id=self.run,
             event_time=self.codelets_run,
             event_type=event_type,
             codelet=codelet_record,
-            target_one=target_one,
-            target_two=target_two,
-            child_structure=child_structure,
-            winner=winner,
-            loser=loser,
         )
+        if (
+            hasattr(codelet, "target_structures")
+            and codelet.target_structures is not None
+        ):
+            for structure in codelet.target_structures:
+                if structure is None:
+                    continue
+                structure_record = StructureRecord.objects.get(
+                    structure_id=structure.structure_id, run_id=self.run
+                )
+                event_record.target_structures.add(structure_record)
+        if (
+            hasattr(codelet, "child_structures")
+            and codelet.child_structures is not None
+        ):
+            for structure in codelet.child_structures:
+                if structure is None:
+                    continue
+                structure_record = StructureRecord.objects.get(
+                    structure_id=structure.structure_id, run_id=self.run
+                )
+                event_record.child_structures.add(structure_record)
+        if hasattr(codelet, "winner") and codelet.winner is not None:
+            event_record.winner = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.winner.structure_id
+            )
+        if hasattr(codelet, "loser") and codelet.loser is not None:
+            event_record.loser = StructureRecord.objects.get(
+                run_id=self.run, structure_id=codelet.loser.structure_id
+            )
+        event_record.save()
 
     def _log_codelet(self, codelet: Codelet):
         self._log_message(
@@ -158,31 +140,16 @@ class DjangoLogger(Logger):
             urgency=codelet.urgency,
         )
         if (
-            hasattr(codelet, "target_structure")
-            and codelet.target_structure is not None
+            hasattr(codelet, "target_structures")
+            and codelet.target_structures is not None
         ):
-            codelet_record.target_structure = StructureRecord.objects.get(
-                run_id=self.run, structure_id=codelet.target_structure.structure_id
-            )
-        if (
-            hasattr(codelet, "second_target_structure")
-            and codelet.second_target_structure is not None
-        ):
-            codelet_record.second_target_structure = StructureRecord.objects.get(
-                run_id=self.run,
-                structure_id=codelet.second_target_structure.structure_id,
-            )
-        if hasattr(codelet, "target_chunk") and codelet.target_chunk is not None:
-            codelet_record.target_structure = StructureRecord.objects.get(
-                run_id=self.run, structure_id=codelet.target_chunk.structure_id
-            )
-        if (
-            hasattr(codelet, "second_target_chunk")
-            and codelet.second_target_chunk is not None
-        ):
-            codelet_record.second_target_structure = StructureRecord.objects.get(
-                run_id=self.run, structure_id=codelet.second_target_chunk.structure_id
-            )
+            for structure in codelet.target_structures:
+                if structure is None:
+                    continue
+                structure_record = StructureRecord.objects.get(
+                    structure_id=structure.structure_id, run_id=self.run
+                )
+                codelet_record.target_structures.add(structure_record)
         if hasattr(codelet, "champion") and codelet.champion is not None:
             codelet_record.champion = StructureRecord.objects.get(
                 run_id=self.run, structure_id=codelet.champion.structure_id

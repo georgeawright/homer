@@ -502,22 +502,6 @@ def codelet_view(request, run_id, codelet_id):
     output += "<li>Birth Time: " + str(codelet_record.birth_time) + "</li>"
     output += "<li>Time Run: " + str(codelet_record.time_run) + "</li>"
     output += "<li>Urgency: " + str(codelet_record.urgency) + "</li>"
-    output += (
-        "<li>Result: " + codelet_result_code_to_str(codelet_record.result) + "</li>"
-    )
-    output += "<li>Target Structure: "
-    if codelet_record.target_structure is not None:
-        output += (
-            '<a href="/runs/'
-            + str(run_id)
-            + "/structures/"
-            + codelet_record.target_structure.structure_id
-            + '/">'
-            + codelet_record.target_structure.structure_id
-            + "</a></li>"
-        )
-    else:
-        output += "None</li>"
     output += "<li>Parent Codelet: "
     if codelet_record.parent is not None:
         output += (
@@ -531,6 +515,22 @@ def codelet_view(request, run_id, codelet_id):
         )
     else:
         output += "None</li>"
+    output += (
+        "<li>Result: " + codelet_result_code_to_str(codelet_record.result) + "</li>"
+    )
+    output += "<li>Target Structures: "
+    output += "<ul>"
+    for structure in codelet_record.target_structures.all():
+        output += (
+            '<li><a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + structure.structure_id
+            + '/">'
+            + structure.structure_id
+            + "</a></li>"
+        )
+    output += "</ul></li>"
     output += "<li>Follow ups: "
     try:
         follow_ups = CodeletRecord.objects.filter(run_id=run_id, parent=codelet_record)
