@@ -813,27 +813,31 @@ def structure_view(request, run_id, structure_id):
     output += "</ul>"
     output += f'<img src="/runs/{run_id}/structures-series/{structure_id}">'
     if re.match(r"^Chunk*", structure_record.structure_id):
-        structure_records = StructureRecord.objects.filter(run_id=run_id).all()
-        last_column = 0
-        last_row = 0
-        original_chunks = []
-        for record in structure_records:
-            if not re.match("^Chunk", record.structure_id):
-                continue
-            if record.parent_codelet is not None:
-                continue
-            original_chunks.append(record)
-            if record.locations["WorkingSpace2"][0] > last_row:
-                last_row = record.locations["WorkingSpace2"][0]
-            if record.locations["WorkingSpace2"][1] > last_column:
-                last_column = record.locations["WorkingSpace2"][1]
-        original_chunks_matrix = [
-            [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
-        ]
-        for original_chunk in original_chunks:
-            row = original_chunk.locations["WorkingSpace2"][0]
-            column = original_chunk.locations["WorkingSpace2"][1]
-            original_chunks_matrix[row][column] = original_chunk
+        if "WorkingSpace2" in structure_record.locations:
+            structure_records = StructureRecord.objects.filter(run_id=run_id).all()
+            last_column = 0
+            last_row = 0
+            original_chunks = []
+            for record in structure_records:
+                if not re.match("^Chunk", record.structure_id):
+                    continue
+                if record.parent_codelet is not None:
+                    continue
+                if "WorkingSpace2" not in record.locations:
+                    continue
+                original_chunks.append(record)
+                if record.locations["WorkingSpace2"][0][0] > last_row:
+                    last_row = record.locations["WorkingSpace2"][0][0]
+                if record.locations["WorkingSpace2"][0][1] > last_column:
+                    last_column = record.locations["WorkingSpace2"][0][1]
+            original_chunks_matrix = [
+                [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
+            ]
+            print(original_chunks_matrix)
+            for original_chunk in original_chunks:
+                row = original_chunk.locations["WorkingSpace2"][0][0]
+                column = original_chunk.locations["WorkingSpace2"][0][1]
+                original_chunks_matrix[row][column] = original_chunk
         output += "<h2>Members</h2>"
         output += '<table border="1">'
         for i in range(last_row + 1):
@@ -854,67 +858,66 @@ def structure_view(request, run_id, structure_id):
     events = (
         EventRecord.objects.filter(run_id=run_id)
         .filter(
-            Q(child_structure=structure_record)
-            | Q(target_one=structure_record)
-            | Q(target_two=structure_record)
+            Q(child_structures=structure_record)
+            | Q(target_structures=structure_record)
             | Q(winner=structure_record)
             | Q(loser=structure_record)
         )
         .order_by("event_time")
     )
-    for event in events:
-        one = event.target_one.structure_id if event.target_one is not None else None
-        two = event.target_two.structure_id if event.target_two is not None else None
-        child = (
-            event.child_structure.structure_id
-            if event.child_structure is not None
-            else None
-        )
-        winner = event.winner.structure_id if event.winner is not None else None
-        loser = event.loser.structure_id if event.loser is not None else None
-        codelet = event.codelet.codelet_id
-        if event.codelet.result != 0:
-            continue
-        output += f"<p>{event.event_time}: ({event.event_type}) "
-        if (
-            "ChunkBuilder" in event.codelet.codelet_id
-            or "ViewBuilder" in event.codelet.codelet_id
-        ):
-            output += (
-                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> created out of '
-                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
-                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
-            )
-        if "LabelBuilder" in event.codelet.codelet_id:
-            output += (
-                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> '
-                + f"({event.child_structure.value}) attached to "
-                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>'
-            )
-        if (
-            "RelationBuilder" in event.codelet.codelet_id
-            or "CorrespondenceBuilder" in event.codelet.codelet_id
-        ):
-            output += (
-                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> drawn between '
-                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
-                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
-            )
-        if "Evaluator" in event.codelet.codelet_id:
-            output += (
-                f'<a href="/runs/{run_id}/structures/{one}">{one}</a> evaluated by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
-            )
-        if "Selector" in event.codelet.codelet_id:
-            output += (
-                f'<a href="/runs/{run_id}/structures/{winner}">{winner}</a> selected over '
-                + f'<a href="/runs/{run_id}/structures/{loser}">{loser}</a> by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
-            )
-        output += "</p>"
+    #    for event in events:
+    #        one = event.target_one.structure_id if event.target_one is not None else None
+    #        two = event.target_two.structure_id if event.target_two is not None else None
+    #        child = (
+    #            event.child_structure.structure_id
+    #            if event.child_structure is not None
+    #            else None
+    #        )
+    #        winner = event.winner.structure_id if event.winner is not None else None
+    #        loser = event.loser.structure_id if event.loser is not None else None
+    #        codelet = event.codelet.codelet_id
+    #        if event.codelet.result != 0:
+    #            continue
+    #        output += f"<p>{event.event_time}: ({event.event_type}) "
+    #        if (
+    #            "ChunkBuilder" in event.codelet.codelet_id
+    #            or "ViewBuilder" in event.codelet.codelet_id
+    #        ):
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> created out of '
+    #                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
+    #                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+    #            )
+    #        if "LabelBuilder" in event.codelet.codelet_id:
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> '
+    #                + f"({event.child_structure.value}) attached to "
+    #                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>'
+    #            )
+    #        if (
+    #            "RelationBuilder" in event.codelet.codelet_id
+    #            or "CorrespondenceBuilder" in event.codelet.codelet_id
+    #        ):
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> drawn between '
+    #                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
+    #                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+    #            )
+    #        if "Evaluator" in event.codelet.codelet_id:
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{one}">{one}</a> evaluated by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+    #            )
+    #        if "Selector" in event.codelet.codelet_id:
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{winner}">{winner}</a> selected over '
+    #                + f'<a href="/runs/{run_id}/structures/{loser}">{loser}</a> by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+    #            )
+    #        output += "</p>"
 
     return HttpResponse(output)
 
