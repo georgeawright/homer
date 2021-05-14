@@ -137,11 +137,11 @@ class WorkingSpace(Space):
                     new_correspondence.start.links_out.add(new_correspondence)
                     new_correspondence.end.links_in.add(new_correspondence)
                     new_correspondence.end.links_out.add(new_correspondence)
+                    new_space.add(new_correspondence)
         return new_space
 
     def copy_without_contents(self, parent_id: str) -> WorkingSpace:
-        """Returns an empty working space with the same conceptual space.
-        Consider effect on ConceptualSpace.instance_in_space"""
+        """Returns an empty working space with the same conceptual space."""
         sub_space_copies = {
             sub_space: sub_space.copy_without_contents for sub_space in self.sub_spaces
         }
@@ -156,7 +156,7 @@ class WorkingSpace(Space):
             locations=self.locations,
             contents=StructureCollection(),
             no_of_dimensions=self.no_of_dimensions,
-            dimensons=new_dimensions,
+            dimensions=new_dimensions,
             sub_spaces=new_sub_spaces,
             is_basic_level=self.is_basic_level,
             super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
