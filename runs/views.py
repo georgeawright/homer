@@ -321,8 +321,23 @@ def activity_and_structure_concepts_view(request, run_id):
     evaluate_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="evaluate"
     )
+    publish_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="publish"
+    )
     select_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="select"
+    )
+    inner_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="inner"
+    )
+    outer_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="outer"
+    )
+    forward_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="forward"
+    )
+    reverse_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="reverse"
     )
     chunk_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="chunk"
@@ -333,11 +348,20 @@ def activity_and_structure_concepts_view(request, run_id):
     label_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="label"
     )
+    phrase_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="phrase"
+    )
     relation_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="relation"
     )
-    view_record = StructureRecord.objects.get(
-        run_id=run_id, structure_id__regex=r"^Concept*", value="view"
+    view_discourse_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="view-discourse"
+    )
+    view_monitoring_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="view-monitoring"
+    )
+    view_simplex_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="view-simplex"
     )
     word_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="word"
@@ -362,7 +386,12 @@ def activity_and_structure_concepts_view(request, run_id):
     figure, charts = pyplot.subplots(nrows=2, ncols=3, figsize=(22, 10))
     figure.suptitle("Activity and Structure Concept Activations")
 
-    for concept_record in [build_record, evaluate_record, select_record]:
+    for concept_record in [
+        build_record,
+        evaluate_record,
+        publish_record,
+        select_record,
+    ]:
         data = [
             (int(codelets_run), activation)
             for codelets_run, activation in concept_record.activation.items()
@@ -376,11 +405,18 @@ def activity_and_structure_concepts_view(request, run_id):
     charts[0, 0].legend(loc="best")
 
     for concept_record in [
+        inner_record,
+        outer_record,
+        forward_record,
+        reverse_record,
         chunk_record,
         correspondence_record,
         label_record,
+        phrase_record,
         relation_record,
-        view_record,
+        view_discourse_record,
+        view_monitoring_record,
+        view_simplex_record,
         word_record,
     ]:
         data = [
