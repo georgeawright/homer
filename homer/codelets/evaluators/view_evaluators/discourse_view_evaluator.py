@@ -1,9 +1,22 @@
 import statistics
 
+from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluators import ViewEvaluator
+from homer.structure_collection import StructureCollection
 
 
 class DiscourseViewEvaluator(ViewEvaluator):
+    @classmethod
+    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
+        structure_type = bubble_chamber.concepts["view-discourse"]
+        target = bubble_chamber.monitoring_views.get_active()
+        return cls.spawn(
+            parent_id,
+            bubble_chamber,
+            StructureCollection({target}),
+            structure_type.activation,
+        )
+
     @classmethod
     def get_follow_up_class(cls) -> type:
         from homer.codelets.selectors.view_selectors import DiscourseViewSelector

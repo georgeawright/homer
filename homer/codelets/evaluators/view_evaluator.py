@@ -4,17 +4,6 @@ from homer.structure_collection import StructureCollection
 
 
 class ViewEvaluator(Evaluator):
-    @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        structure_type = bubble_chamber.concepts["view"]
-        target = bubble_chamber.views.get_active()
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            StructureCollection({target}),
-            structure_type.activation,
-        )
-
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["view"]
