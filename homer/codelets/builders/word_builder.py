@@ -189,6 +189,8 @@ class WordBuilder(Builder):
         self.target_word.links_out.add(frame_to_output_correspondence)
         word.links_in.add(frame_to_output_correspondence)
         word.links_out.add(frame_to_output_correspondence)
+        for location in frame_to_output_correspondence.locations:
+            location.space.add(frame_to_output_correspondence)
         if self.target_word.is_slot:
             non_frame_to_output_correspondence = Correspondence(
                 ID.new(Correspondence),
@@ -215,6 +217,8 @@ class WordBuilder(Builder):
             self.non_frame_item.links_in.add(non_frame_to_output_correspondence)
             self.non_frame_item.links_out.add(non_frame_to_output_correspondence)
             self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
+            for location in non_frame_to_output_correspondence.locations:
+                location.space.add(non_frame_to_output_correspondence)
         self.bubble_chamber.logger.log(self.target_view)
 
     def _fizzle(self):
