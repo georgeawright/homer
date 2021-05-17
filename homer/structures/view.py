@@ -53,10 +53,21 @@ class View(Structure):
 
     @property
     def slots(self):
+        # TODO: ideally there should be a recursive call to space.slots
+        spaces = StructureCollection.union(
+            self.input_spaces,
+            StructureCollection(
+                {
+                    sub_space
+                    for space in self.input_spaces
+                    for sub_space in space.contents.where(is_space=True)
+                }
+            ),
+        )
         return StructureCollection(
             {
                 structure
-                for space in self.input_spaces
+                for space in spaces
                 for structure in space.contents
                 if structure.is_slot
             }
