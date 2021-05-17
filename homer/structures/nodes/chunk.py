@@ -87,4 +87,4 @@ class Chunk(Node):
             print(space, chunk)
             if space.proximity_between(chunk, self) - random.random() <= 0:
                 return chunk
-        return chunks.get_random(exlude=[self])
+        return chunks.get_random(exclude=[self])
