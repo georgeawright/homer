@@ -186,10 +186,14 @@ class Word(Node):
         words = space.contents.where(is_word=True)
         if len(words) == 1:
             raise MissingStructureError
-        while True:
+        for _ in range(len(words)):
             word = words.get_random(exclude=[self])
-            if space.proximity_between(word, self) + random.random() >= 1:
+            distance = abs(
+                word.location.coordinates[0][0] - self.location.coordinates[0][0]
+            )
+            if 1 / distance + random.random() >= 1:
                 return word
+        return words.get_random(exclude=[self])
 
     def copy(self, **kwargs: dict) -> Word:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""

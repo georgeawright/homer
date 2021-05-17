@@ -116,9 +116,11 @@ class RelationBuilder(Builder):
         print(f"target1: {self.target_structure_one}")
         if self.target_structure_two is None:
             try:
-                self.target_structure_two = self.target_space.contents.of_type(
-                    type(self.target_structure_one)
-                ).get_exigent(exclude=[self.target_structure_one])
+                self.target_structure_two = (
+                    self.target_structure_one.get_potential_relative(
+                        space=self.target_space
+                    )
+                )
             except MissingStructureError:
                 return False
         print(f"target2: {self.target_structure_two}")

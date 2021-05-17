@@ -82,7 +82,9 @@ class Chunk(Node):
         chunks = space.contents.where(is_chunk=True)
         if len(chunks) == 1:
             raise MissingStructureError
-        while True:
+        for _ in range(len(chunks)):
             chunk = chunks.get_random(exclude=[self])
+            print(space, chunk)
             if space.proximity_between(chunk, self) - random.random() <= 0:
                 return chunk
+        return chunks.get_random(exlude=[self])
