@@ -58,7 +58,7 @@ class LabelBuilder(Builder):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target = bubble_chamber.input_nodes.get_unhappy()
+        target = bubble_chamber.input_nodes.get_exigent()
         urgency = urgency if urgency is not None else target.unlinkedness
         return cls.spawn(parent_id, bubble_chamber, target, urgency)
 

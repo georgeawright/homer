@@ -72,7 +72,8 @@ class PhraseBuilder(Builder):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_one = bubble_chamber.text_fragments.get_unhappy()
+        target_view = bubble_chamber.production_views.get_active()
+        target_one = target_view.output_space.contents.where(is_word=True).get_unhappy()
         target_two = target_one.potential_rule_mates.get_unhappy()
         try:
             target_three = StructureCollection.intersection(
@@ -279,7 +280,18 @@ class PhraseBuilder(Builder):
         self.bubble_chamber.logger.log(self.target_root)
 
     def _fizzle(self):
-        pass
+        from homer.codelets.builders import LabelBuilder
+
+        try:
+            target = self.parent_space.contents.where(
+                is_word=True, labels=StructureCollection()
+            ).get_random()
+        except MissingStructureError:
+            return
+        urgency = target.exigency
+        self.child_codelets.append(
+            LabelBuilder.spawn(self.codelet_id, self.bubble_chamber, target, urgency)
+        )
 
     def _fail(self):
         pass

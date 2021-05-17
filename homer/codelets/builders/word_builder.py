@@ -73,7 +73,7 @@ class WordBuilder(Builder):
         )
         frame = target_view.input_spaces.of_type(Frame).get_random()
         target_word = frame.contents.of_type(Word).get_exigent()
-        urgency = urgency if urgency is not None else target_word.exigency
+        urgency = urgency if urgency is not None else target_view.activation
         return cls.spawn(parent_id, bubble_chamber, target_view, target_word, urgency)
 
     @property
