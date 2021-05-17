@@ -12,8 +12,6 @@ from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
-from .relation_builder import RelationBuilder
-
 
 class CorrespondenceBuilder(Builder):
     def __init__(
@@ -220,12 +218,7 @@ class CorrespondenceBuilder(Builder):
         self.child_structures = StructureCollection({self.correspondence})
 
     def _fizzle(self):
-        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
+        pass
 
     def _fail(self):
-        try:
-            self.child_codelets.append(
-                RelationBuilder.make(self.codelet_id, self.bubble_chamber)
-            )
-        except MissingStructureError:
-            pass
+        pass

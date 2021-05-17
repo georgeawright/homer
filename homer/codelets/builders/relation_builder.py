@@ -184,5 +184,4 @@ class RelationBuilder(Builder):
         )
 
     def _fail(self):
-        # TODO: spawn some kind of node builder which is relevant to the target space
         pass

@@ -142,12 +142,7 @@ class LabelBuilder(Builder):
         self.child_structures = StructureCollection({label})
 
     def _fizzle(self):
-        self._re_engender()
+        pass
 
     def _fail(self):
-        self._re_engender()
-
-    def _re_engender(self):
-        self.child_codelets.append(
-            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
-        )
+        pass

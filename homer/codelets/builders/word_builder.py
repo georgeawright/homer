@@ -69,7 +69,7 @@ class WordBuilder(Builder):
         target_view = (
             target_view
             if target_view is not None
-            else bubble_chamber.views.get_unhappy()
+            else bubble_chamber.views.get_active()
         )
         frame = target_view.input_spaces.of_type(Frame).get_random()
         target_word = frame.contents.of_type(Word).get_exigent()
