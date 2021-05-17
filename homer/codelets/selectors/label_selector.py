@@ -25,14 +25,12 @@ class LabelSelector(Selector):
             return True
         champion_label = self.champions.get_random()
         candidates = champion_label.start.labels_in_space(champion_label.parent_space)
-        if len(candidates) == 1:
-            return False
         try:
             challenger_label = candidates.get_active(exclude=[champion_label])
             self.challengers = StructureCollection({challenger_label})
             return True
         except MissingStructureError:
-            return False
+            return True
 
     def _fizzle(self):
         target = self.champions.get_random().start
@@ -46,23 +44,26 @@ class LabelSelector(Selector):
         )
 
     def _engender_follow_up(self):
-        winning_label = self.winners.get_random()
-        target_concept = winning_label.parent_concept.friends().get_random()
-        target_node = winning_label.start.nearby().get_unhappy()
-        if winning_label.start.is_word:
-            for node in winning_label.start.nearby():
-                print(node, node.unhappiness, node.exigency)
-                print(target_node)
-            print(f"new target: {target_node}")
-        self.child_codelets.append(
-            LabelBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                target_node,
-                target_node.unlinkedness,
-                parent_concept=target_concept,
+        try:
+            winning_label = self.winners.get_random()
+            target_concept = winning_label.parent_concept.friends().get_random()
+            target_node = winning_label.start.nearby().get_unhappy()
+            if winning_label.start.is_word:
+                for node in winning_label.start.nearby():
+                    print(node, node.unhappiness, node.exigency)
+                    print(target_node)
+                print(f"new target: {target_node}")
+            self.child_codelets.append(
+                LabelBuilder.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target_node,
+                    target_node.unlinkedness,
+                    parent_concept=target_concept,
+                )
             )
-        )
+        except MissingStructureError:
+            pass
         self.child_codelets.append(
             LabelSelector.spawn(
                 self.codelet_id,
