@@ -51,6 +51,7 @@ class RelationSelector(Selector):
 
     def _engender_follow_up(self):
         winner_relation = self.winners.get_random()
+        target_concept = winner_relation.parent_concept.friends().get_random()
         try:
             target_space = StructureCollection.intersection(
                 winner_relation.start.parent_spaces.where(no_of_dimensions=1),
@@ -64,7 +65,7 @@ class RelationSelector(Selector):
                     winner_relation.start,
                     winner_relation.unlinkedness,
                     target_structure_two=winner_relation.end,
-                    parent_concept=winner_relation.parent_concept,
+                    parent_concept=target_concept,
                 )
             )
         except MissingStructureError:

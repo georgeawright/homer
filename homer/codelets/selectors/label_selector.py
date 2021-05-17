@@ -47,8 +47,13 @@ class LabelSelector(Selector):
 
     def _engender_follow_up(self):
         winning_label = self.winners.get_random()
-        target_concept = winning_label.parent_concept
+        target_concept = winning_label.parent_concept.friends().get_random()
         target_node = winning_label.start.nearby().get_unhappy()
+        if winning_label.start.is_word:
+            for node in winning_label.start.nearby():
+                print(node, node.unhappiness, node.exigency)
+                print(target_node)
+            print(f"new target: {target_node}")
         self.child_codelets.append(
             LabelBuilder.spawn(
                 self.codelet_id,

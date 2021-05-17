@@ -80,6 +80,7 @@ class CorrespondenceSelector(Selector):
                     .where(parent_space=target_space_two)
                     .get_exigent()
                 )
+            target_concept = winner_correspondence.parent_concept.friends().get_random()
         except MissingStructureError:
             return
         self.child_codelets.append(
@@ -93,7 +94,7 @@ class CorrespondenceSelector(Selector):
                 target_space_two=target_space_two,
                 target_structure_two=target_structure_two,
                 target_conceptual_space=target_conceptual_space,
-                parent_concept=winner_correspondence.parent_concept,
+                parent_concept=target_concept,
             )
         )
         self.child_codelets.append(
