@@ -31,7 +31,6 @@ class PhraseEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_phrase = self.target_structures.get_random()
-        print(target_phrase.structure_id, target_phrase.parent_id)
         left_branch_quality = (
             target_phrase.left_branch.quality
             if isinstance(target_phrase.left_branch, Phrase)

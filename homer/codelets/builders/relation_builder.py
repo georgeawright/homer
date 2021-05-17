@@ -111,9 +111,6 @@ class RelationBuilder(Builder):
         )
 
     def _passes_preliminary_checks(self):
-        print(f"{self.codelet_id} performing preliminary checks")
-        print(f"space: {self.target_space}")
-        print(f"target1: {self.target_structure_one}")
         if self.target_structure_two is None:
             try:
                 self.target_structure_two = (
@@ -123,7 +120,6 @@ class RelationBuilder(Builder):
                 )
             except MissingStructureError:
                 return False
-        print(f"target2: {self.target_structure_two}")
         if self.parent_concept is None:
             try:
                 relational_conceptual_spaces = self.bubble_chamber.spaces[
@@ -143,7 +139,6 @@ class RelationBuilder(Builder):
                 )
             except MissingStructureError:
                 return False
-        print(f"parent concept: {self.parent_concept}")
         return not self.target_structure_one.has_relation(
             self.target_space,
             self.parent_concept,
@@ -158,7 +153,6 @@ class RelationBuilder(Builder):
             start=self.target_structure_one,
             end=self.target_structure_two,
         )
-        print(f"confidence: {self.confidence}")
 
     def _process_structure(self):
         relation = Relation(

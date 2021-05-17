@@ -91,8 +91,9 @@ class LabelBuilder(Builder):
         return StructureCollection({self.target_node})
 
     def _passes_preliminary_checks(self):
-        print("label builder checks")
-        print(self.target_node)
+        if self.target_node.is_word:
+            print(f"{self.codelet_id} performing preliminary checks")
+            print(self.target_node)
         if self.parent_concept is None:
             self.parent_concept = (
                 self.bubble_chamber.spaces["label concepts"]
@@ -107,6 +108,8 @@ class LabelBuilder(Builder):
         return not self.target_node.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
+        if self.target_node.is_word:
+            print(f"confidence: {self.confidence}")
         self.confidence = self.parent_concept.classifier.classify(
             concept=self.parent_concept, start=self.target_node
         )
