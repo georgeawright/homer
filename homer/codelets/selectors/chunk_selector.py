@@ -8,7 +8,7 @@ from homer.structure_collection import StructureCollection
 class ChunkSelector(Selector):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        champion = bubble_chamber.chunks.get_active()
+        champion = bubble_chamber.input_nodes.where(is_chunk=True).get_active()
         return cls.spawn(
             parent_id,
             bubble_chamber,
