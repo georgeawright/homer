@@ -163,6 +163,12 @@ class WorkingSpace(Space):
         )
         return new_space
 
+    def decay_activation(self, amount: float = None):
+        if amount is None:
+            amount = self.MINIMUM_ACTIVATION_UPDATE
+        for item in self.contents:
+            item.decay_activation(amount)
+
     def update_activation(self):
         self._activation = (
             statistics.median([item.activation for item in self.contents])

@@ -171,6 +171,7 @@ def good_view(
 def bad_view(bubble_chamber, target_space, raw_input_space, raw_item_one):
     text_space = Mock()
     interpretation_space = Mock()
+    interpretation_space.parent_concept.name = "interpretation"
     correspondence_to_item_one = Correspondence(
         "",
         "",

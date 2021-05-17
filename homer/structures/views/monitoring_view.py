@@ -108,3 +108,13 @@ class MonitoringView(View):
                 )
             }
         )
+
+    def decay_activation(self, amount: float = None):
+        if self.stable:
+            return
+        if amount is None:
+            amount = self.MINIMUM_ACTIVATION_UPDATE
+        self._activation_buffer -= self._activation_update_coefficient * amount
+        for member in self.members:
+            member.decay_activation(amount)
+        self.interpretation_space.decay_activation(amount)

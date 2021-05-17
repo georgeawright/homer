@@ -88,3 +88,11 @@ class SimplexView(View):
         for correspondence in new_output_space.contents.of_type(Correspondence):
             new_view.members.add(correspondence)
         return new_view
+
+    def decay_activation(self, amount: float = None):
+        if amount is None:
+            amount = self.MINIMUM_ACTIVATION_UPDATE
+        self._activation_buffer -= self._activation_update_coefficient * amount
+        for member in self.members:
+            member.decay_activation(amount)
+        self.output_space.decay_activation(amount)
