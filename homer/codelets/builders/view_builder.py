@@ -56,9 +56,6 @@ class ViewBuilder(Builder):
         return self.target_spaces
 
     def _passes_preliminary_checks(self):
-        for view in self.bubble_chamber.views:
-            if view.input_spaces == self.target_spaces:
-                return False
         if self.frame is None:
             for space in self.target_spaces:
                 if isinstance(space, Frame):

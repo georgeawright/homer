@@ -4,7 +4,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import Frame, WorkingSpace
 from homer.structures.views import MonitoringView
 
 
@@ -42,6 +42,19 @@ class MonitoringViewBuilder(ViewBuilder):
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view-monitoring"]
+
+    def _passes_preliminary_checks(self):
+        for view in self.bubble_chamber.views:
+            if (
+                StructureCollection.intersection(view.input_spaces, self.target_spaces)
+                == self.target_spaces
+            ):
+                return False
+        if self.frame is None:
+            for space in self.target_spaces:
+                if isinstance(space, Frame):
+                    self.frame = space
+        return True
 
     def _process_structure(self):
         view_id = ID.new(MonitoringView)

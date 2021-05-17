@@ -1,6 +1,8 @@
 from __future__ import annotations
+import random
 from typing import Union
 
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
@@ -178,6 +180,16 @@ class Word(Node):
             }
         )
         return StructureCollection.union(nsubj_words, pobj_words, dep_words)
+
+    def get_potential_relative(self, space: Space = None) -> Word:
+        space = self.parent_space if space is None else space
+        words = space.contents.where(is_word=True)
+        if len(words) == 1:
+            raise MissingStructureError
+        while True:
+            word = words.get_random(exclude=[self])
+            if space.proximity_between(word, self) + random.random() >= 1:
+                return word
 
     def copy(self, **kwargs: dict) -> Word:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""

@@ -94,8 +94,6 @@ def test_fails_when_structures_cannot_be_related(
     result = relation_builder.run()
     assert CodeletResult.FAIL == result
     assert relation_builder.child_structures is None
-    assert len(relation_builder.child_codelets) == 1
-    assert isinstance(relation_builder.child_codelets[0], ChunkBuilder)
 
 
 def test_fizzles_when_relation_already_exists(bubble_chamber, target_structure_one):

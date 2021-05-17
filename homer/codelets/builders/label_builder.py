@@ -91,6 +91,8 @@ class LabelBuilder(Builder):
         return StructureCollection({self.target_node})
 
     def _passes_preliminary_checks(self):
+        print("label builder checks")
+        print(self.target_node)
         if self.parent_concept is None:
             self.parent_concept = (
                 self.bubble_chamber.spaces["label concepts"]

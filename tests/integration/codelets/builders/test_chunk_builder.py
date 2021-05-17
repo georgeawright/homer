@@ -59,15 +59,18 @@ def bubble_chamber():
     relation = Relation(Mock(), Mock(), chunk_concept, build_concept, None, None, 1)
     chunk_concept.links_out.add(relation)
     build_concept.links_in.add(relation)
+    text_concept = Mock()
+    text_concept.name = "text"
+    chamber.concepts.add(text_concept)
     return chamber
 
 
 @pytest.fixture
 def target_chunk(bubble_chamber):
-    location_concept = Concept(
+    input_concept = Concept(
         Mock(),
         Mock(),
-        Mock(),
+        "input",
         Mock(),
         Mock(),
         "coordinates",
@@ -75,11 +78,12 @@ def target_chunk(bubble_chamber):
         Mock(),
         centroid_euclidean_distance,
     )
+    bubble_chamber.concepts.add(input_concept)
     input_space = WorkingSpace(
         Mock(),
         Mock(),
         "input",
-        location_concept,
+        input_concept,
         Mock(),
         [],
         StructureCollection(),
@@ -94,7 +98,7 @@ def target_chunk(bubble_chamber):
         [[10]],
         [Location([[0, 0]], input_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     second_chunk = Chunk(
@@ -103,7 +107,7 @@ def target_chunk(bubble_chamber):
         [[10]],
         [Location([[0, 1]], input_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     bubble_chamber.chunks.add(chunk)

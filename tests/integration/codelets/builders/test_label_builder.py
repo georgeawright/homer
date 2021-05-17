@@ -121,6 +121,9 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
         StructureCollection(),
         Mock(),
     )
+    text_concept = Mock()
+    text_concept.name = "text"
+    chamber.concepts.add(text_concept)
     chamber.concepts.add(mild_concept)
     chamber.conceptual_spaces.add(label_concepts_space)
     chamber.working_spaces.add(top_level_working_space)
@@ -156,10 +159,10 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
 
 @pytest.fixture
 def target_chunk(bubble_chamber):
-    location_concept = Concept(
+    input_concept = Concept(
         Mock(),
         Mock(),
-        Mock(),
+        "input",
         Mock(),
         Mock(),
         "coordinates",
@@ -167,11 +170,12 @@ def target_chunk(bubble_chamber):
         Mock(),
         math.dist,
     )
+    bubble_chamber.concepts.add(input_concept)
     input_space = WorkingSpace(
         Mock(),
         Mock(),
         "input",
-        location_concept,
+        input_concept,
         Mock(),
         [],
         StructureCollection(),

@@ -7,10 +7,8 @@ from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
 from homer.structures.links import Relation
-from homer.structures.nodes import Chunk, Concept
+from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
-
-from .chunk_builder import ChunkBuilder
 
 
 class RelationBuilder(Builder):
@@ -71,7 +69,7 @@ class RelationBuilder(Builder):
         target_space = bubble_chamber.working_spaces.where(
             no_of_dimensions=1
         ).get_random()
-        target = target_space.contents.of_type(Chunk).get_exigent()
+        target = target_space.contents.where(is_node=True).get_exigent()
         urgency = urgency if urgency is not None else target.exigency
         return cls.spawn(parent_id, bubble_chamber, target_space, target, urgency)
 
@@ -91,7 +89,7 @@ class RelationBuilder(Builder):
                 and parent_concept.is_compatible_with(space.parent_concept)
             }
         ).get_random()
-        target = target_space.contents.of_type(Chunk).get_exigent()
+        target = target_space.contents.where(is_node=True).get_exigent()
         urgency = urgency if urgency is not None else target.exigency
         return cls.spawn(
             parent_id,
@@ -113,6 +111,9 @@ class RelationBuilder(Builder):
         )
 
     def _passes_preliminary_checks(self):
+        print(f"{self.codelet_id} performing preliminary checks")
+        print(f"space: {self.target_space}")
+        print(f"target1: {self.target_structure_one}")
         if self.target_structure_two is None:
             try:
                 self.target_structure_two = self.target_space.contents.of_type(
@@ -120,6 +121,7 @@ class RelationBuilder(Builder):
                 ).get_exigent(exclude=[self.target_structure_one])
             except MissingStructureError:
                 return False
+        print(f"target2: {self.target_structure_two}")
         if self.parent_concept is None:
             try:
                 relational_conceptual_spaces = self.bubble_chamber.spaces[
@@ -139,6 +141,7 @@ class RelationBuilder(Builder):
                 )
             except MissingStructureError:
                 return False
+        print(f"parent concept: {self.parent_concept}")
         return not self.target_structure_one.has_relation(
             self.target_space,
             self.parent_concept,
@@ -153,6 +156,7 @@ class RelationBuilder(Builder):
             start=self.target_structure_one,
             end=self.target_structure_two,
         )
+        print(f"confidence: {self.confidence}")
 
     def _process_structure(self):
         relation = Relation(
@@ -184,9 +188,5 @@ class RelationBuilder(Builder):
         )
 
     def _fail(self):
-        new_target = self.target_space.contents.of_type(Chunk).get_unhappy()
-        self.child_codelets.append(
-            ChunkBuilder.spawn(
-                self.codelet_id, self.bubble_chamber, new_target, new_target.unhappiness
-            )
-        )
+        # TODO: spawn some kind of node builder which is relevant to the target space
+        pass

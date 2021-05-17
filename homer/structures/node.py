@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -73,6 +74,9 @@ class Node(Structure):
         )
         nearby_nodes.remove(self)
         return nearby_nodes
+
+    def get_potential_relative(self, space: Space = None) -> Node:
+        raise NotImplementedError
 
     def __repr__(self) -> str:
         return f"<{self.structure_id} {self.value} in {self.parent_space.structure_id}>"

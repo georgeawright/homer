@@ -85,7 +85,8 @@ class CorrespondenceBuilder(Builder):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.views.get_active()
+        print(f"{parent_id} trying to make correspondence builder")
+        target_view = bubble_chamber.production_views.get_active()
         target_space = (
             target_view.input_working_spaces.get_random()
             .contents.of_type(Space)

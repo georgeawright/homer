@@ -97,7 +97,7 @@ def target_frame(bubble_chamber):
     return frame
 
 
-def test_successful_creates_view_and_spawns_follow_up_and_same_view_cannot_be_recreated(
+def test_successful_creates_view_and_spawns_follow_up_and_same_view_can_be_recreated(
     bubble_chamber,
     input_space,
     target_frame,
@@ -116,4 +116,4 @@ def test_successful_creates_view_and_spawns_follow_up_and_same_view_cannot_be_re
         parent_id, bubble_chamber, target_spaces, urgency
     )
     builder.run()
-    assert CodeletResult.FIZZLE == builder.result
+    assert CodeletResult.SUCCESS == builder.result

@@ -1,3 +1,4 @@
+from itertools import chain
 import statistics
 from typing import List, Union
 
@@ -82,7 +83,22 @@ class BubbleChamber:
 
     @property
     def input_nodes(self) -> StructureCollection:
-        return StructureCollection.union(self.chunks, self.words)
+        return StructureCollection(
+            {
+                node
+                for node in chain(self.chunks, self.words)
+                if node.parent_space.parent_concept
+                in (self.concepts["input"], self.concepts["text"])
+            }
+        )
+
+    @property
+    def comprehension_views(self) -> StructureCollection:
+        return self.monitoring_views
+
+    @property
+    def production_views(self) -> StructureCollection:
+        return StructureCollection.union(self.discourse_views, self.simplex_views)
 
     @property
     def monitoring_views(self) -> StructureCollection:
@@ -137,7 +153,7 @@ class BubbleChamber:
     def update_activations(self) -> None:
         for structure in self.structures:
             structure.update_activation()
-            if self.log_count % 100 == 0:
+            if self.log_count % 500 == 0:
                 self.logger.log(structure)
         self.log_count += 1
 

@@ -58,7 +58,7 @@ class ChunkBuilder(Builder):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target = bubble_chamber.chunks.get_unhappy()
+        target = bubble_chamber.input_nodes.where(is_chunk=True).get_unhappy()
         urgency = urgency if urgency is not None else target.unhappiness
         return cls.spawn(parent_id, bubble_chamber, target, urgency)
 

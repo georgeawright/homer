@@ -13,11 +13,11 @@ from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import View
 from homer.structures.nodes import Chunk, Concept, Word
 from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import ConceptualSpace, Frame, WorkingSpace
 from homer.structures.spaces.frames import Template
+from homer.structures.views import SimplexView
 from homer.tools import hasinstance
 from homer.word_form import WordForm
 
@@ -326,7 +326,7 @@ def temperature_template_space(
 
 @pytest.fixture
 def target_view(bubble_chamber, input_space, template):
-    view = View(
+    view = SimplexView(
         "target_view",
         Mock(),
         Mock(),

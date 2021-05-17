@@ -230,6 +230,7 @@ class Factory(Codelet):
                 "directions": StructureCollection({forward}),
                 "structures": StructureCollection({chunk, label, relation}),
             },
+            # TODO: move phrase to inner or outer
             "inner": {
                 "actions": StructureCollection({build, evaluate, select}),
                 "spaces": StructureCollection({inner}),

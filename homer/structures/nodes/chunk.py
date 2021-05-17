@@ -1,7 +1,9 @@
 from __future__ import annotations
 from math import prod
+import random
 from typing import Any, List
 
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure_collection import StructureCollection
@@ -74,3 +76,13 @@ class Chunk(Node):
         return 0.5 * prod(
             [chunk.unchunkedness for chunk in self.chunks_made_from_this_chunk]
         )
+
+    def get_potential_relative(self, space: Space = None) -> Chunk:
+        space = self.parent_space if space is None else space
+        chunks = space.contents.where(is_chunk=True)
+        if len(chunks) == 1:
+            raise MissingStructureError
+        while True:
+            chunk = chunks.get_random(exclude=[self])
+            if space.proximity_between(chunk, self) - random.random() <= 0:
+                return chunk

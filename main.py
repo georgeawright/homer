@@ -8,6 +8,7 @@ from homer.classifiers import (
     SamenessClassifier,
     PartOfSpeechClassifier,
     ProximityClassifier,
+    RuleClassifier,
 )
 from homer.id import ID
 from homer.location import Location
@@ -270,7 +271,7 @@ def setup_homer() -> Homer:
         relevant_value="value",
         instance_type=str,
     )
-    grammatical_concept_space = homer.def_conceptual_space(
+    grammatical_concepts_space = homer.def_conceptual_space(
         name="grammar",
         parent_concept=grammar_concept,
         locations=[Location([], label_concepts_space)],
@@ -279,99 +280,106 @@ def setup_homer() -> Homer:
     )
     sentence_concept = homer.def_concept(
         name="s",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
     )
     np_concept = homer.def_concept(
         name="np",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
     )
     vp_concept = homer.def_concept(
         name="vp",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
     )
     ap_concept = homer.def_concept(
         name="ap",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
     )
     pp_concept = homer.def_concept(
         name="pp",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
     )
     noun_concept = homer.def_concept(
         name="noun",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
     verb_concept = homer.def_concept(
         name="verb",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
     adj_concept = homer.def_concept(
         name="adj",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
+        relevant_value="value",
+        instance_type=str,
+        classifier=PartOfSpeechClassifier(),
+    )
+    jjr_concept = homer.def_concept(
+        name="jjr",
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
     adv_concept = homer.def_concept(
         name="adv",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
     cop_concept = homer.def_concept(
         name="cop",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
     prep_concept = homer.def_concept(
         name="prep",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
     det_concept = homer.def_concept(
         name="det",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
     conj_concept = homer.def_concept(
         name="conj",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
         classifier=PartOfSpeechClassifier(),
     )
     null_concept = homer.def_concept(
         name="null",
-        parent_space=grammatical_concept_space,
+        parent_space=grammatical_concepts_space,
         relevant_value="value",
         instance_type=str,
     )
     s_np_vp = homer.def_rule(
         name="s --> np, vp",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=sentence_concept,
         left_branch=np_concept,
         right_branch=vp_concept,
@@ -379,7 +387,7 @@ def setup_homer() -> Homer:
     )
     s_noun_vp = homer.def_rule(
         name="s --> noun, vp",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=sentence_concept,
         left_branch=noun_concept,
         right_branch=vp_concept,
@@ -387,7 +395,7 @@ def setup_homer() -> Homer:
     )
     s_s_pp = homer.def_rule(
         name="s --> s, pp",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=sentence_concept,
         left_branch=sentence_concept,
         right_branch=pp_concept,
@@ -396,7 +404,7 @@ def setup_homer() -> Homer:
     # TODO: add S --> S conj S
     np_det_noun = homer.def_rule(
         name="np --> det, noun",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=np_concept,
         left_branch=det_concept,
         right_branch=noun_concept,
@@ -404,7 +412,7 @@ def setup_homer() -> Homer:
     )
     vp_cop_adj = homer.def_rule(
         name="vp --> cop, adj",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=vp_concept,
         left_branch=cop_concept,
         right_branch=adj_concept,
@@ -412,7 +420,7 @@ def setup_homer() -> Homer:
     )
     vp_cop_ap = homer.def_rule(
         name="vp --> cop, ap",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=vp_concept,
         left_branch=cop_concept,
         right_branch=ap_concept,
@@ -420,7 +428,7 @@ def setup_homer() -> Homer:
     )
     vp_verb = homer.def_rule(
         name="vp --> verb",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=vp_concept,
         left_branch=verb_concept,
         right_branch=null_concept,
@@ -428,7 +436,7 @@ def setup_homer() -> Homer:
     )
     ap_adj = homer.def_rule(
         name="ap --> adj",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=ap_concept,
         left_branch=adj_concept,
         right_branch=null_concept,
@@ -436,12 +444,149 @@ def setup_homer() -> Homer:
     )
     pp_prep_np = homer.def_rule(
         name="pp --> prep, np",
-        location=Location([], grammatical_concept_space),
+        location=Location([], grammatical_concepts_space),
         root=pp_concept,
         left_branch=prep_concept,
         right_branch=np_concept,
         stable_activation=1.0,
     )
+    # TODO: add dependency relation concepts to grammar and relational concepts space
+    # see tests for rule classifier
+    dependency_concept = homer.def_concept(
+        name="dependency",
+        parent_space=relational_concepts_space,
+        relevant_value="value",
+        instance_type=str,
+    )
+    dependency_concepts_space = homer.def_conceptual_space(
+        name="dependency",
+        parent_concept=dependency_concept,
+        locations=[Location([], relational_concepts_space)],
+        no_of_dimensions=1,
+        is_basic_level=True,
+    )
+    det_r_concept = homer.def_concept(
+        name="det_r",
+        parent_space=dependency_concepts_space,
+        relevant_value="value",
+        instance_type=str,
+        classifier=RuleClassifier(
+            [
+                lambda kwargs: kwargs["start"].location.coordinates[0][0]
+                == kwargs["end"].location.coordinates[0][0] + 1,
+                lambda kwargs: kwargs["start"].has_label(noun_concept),
+                lambda kwargs: kwargs["end"].has_label(det_concept),
+            ]
+        ),
+    )
+    nsubj_concept = homer.def_concept(
+        name="nsubj",
+        parent_space=dependency_concepts_space,
+        relevant_value="value",
+        instance_type=str,
+        classifier=RuleClassifier(
+            [
+                lambda kwargs: kwargs["end"].has_label(noun_concept),
+                lambda kwargs: kwargs["start"].has_label(verb_concept)
+                or (
+                    (
+                        kwargs["start"].has_label(adj_concept)
+                        or kwargs["start"].has_label(jjr_concept)
+                    )
+                    and kwargs["start"].has_relation_with_name("cop")
+                ),
+                lambda kwargs: kwargs["end"].location.coordinates[0][0]
+                < kwargs["start"].location.coordinates[0][0],
+            ]
+        ),
+    )
+    cop_r_concept = homer.def_concept(
+        name="cop_r",
+        parent_space=dependency_concepts_space,
+        relevant_value="value",
+        instance_type=str,
+        classifier=RuleClassifier(
+            [
+                lambda kwargs: kwargs["end"].has_label(cop_concept),
+                lambda kwargs: kwargs["start"].has_label(adj_concept)
+                or kwargs["start"].has_label(jjr_concept),
+                lambda kwargs: kwargs["start"].location.coordinates[0][0]
+                == kwargs["end"].location.coordinates[0][0] + 1,
+            ]
+        ),
+    )
+    prep_r_concept = homer.def_concept(
+        name="prep_r",
+        parent_space=dependency_concepts_space,
+        relevant_value="value",
+        instance_type=str,
+        classifier=RuleClassifier(
+            [
+                lambda kwargs: kwargs["end"].has_label(prep_concept),
+                lambda kwargs: kwargs["start"].has_label(verb_concept)
+                or (
+                    (
+                        kwargs["start"].has_label(adj_concept)
+                        or kwargs["start"].has_label(jjr_concept)
+                    )
+                    and kwargs["start"].has_relation_with_name("cop_r")
+                ),
+                lambda kwargs: kwargs["start"].location.coordinates[0][0]
+                < kwargs["end"].location.coordinates[0][0],
+            ]
+        ),
+    )
+    pobj_concept = homer.def_concept(
+        name="pobj",
+        parent_space=dependency_concepts_space,
+        relevant_value="value",
+        instance_type=str,
+        classifier=RuleClassifier(
+            [
+                lambda kwargs: kwargs["end"].has_label(noun_concept),
+                lambda kwargs: kwargs["start"].has_label(prep_concept),
+                lambda kwargs: kwargs["start"].location.coordinates[0][0]
+                < kwargs["end"].location.coordinates[0][0],
+            ]
+        ),
+    )
+    dep_concept = homer.def_concept(
+        name="dep",
+        parent_space=dependency_concepts_space,
+        relevant_value="value",
+        instance_type=str,
+        classifier=RuleClassifier(
+            [
+                lambda kwargs: kwargs["end"].has_label(noun_concept),
+                lambda kwargs: kwargs["start"].has_label(prep_concept),
+                lambda kwargs: kwargs["start"].has_relation_with_name("prep_r"),
+                lambda kwargs: kwargs["start"]
+                .relation_with_name("prep_r")
+                .start.has_relation_with_name("pobj"),
+                lambda kwargs: kwargs["end"].location.coordinates[0][0]
+                > kwargs["start"].location.coordinates[0][0],
+            ]
+        ),
+    )
+
+    homer.def_concept_link(det_concept, det_r_concept, activation=1.0)
+    homer.def_concept_link(noun_concept, nsubj_concept, activation=1.0)
+    homer.def_concept_link(noun_concept, pobj_concept, activation=1.0)
+    homer.def_concept_link(noun_concept, dep_concept, activation=1.0)
+    homer.def_concept_link(prep_concept, prep_r_concept, activation=1.0)
+    homer.def_concept_link(prep_concept, pobj_concept, activation=1.0)
+    homer.def_concept_link(prep_concept, dep_concept, activation=1.0)
+    homer.def_concept_link(cop_concept, cop_r_concept, activation=1.0)
+    homer.def_concept_link(cop_concept, nsubj_concept, activation=1.0)
+    homer.def_concept_link(cop_concept, prep_r_concept, activation=1.0)
+    homer.def_concept_link(verb_concept, nsubj_concept, activation=1.0)
+    homer.def_concept_link(verb_concept, prep_r_concept, activation=1.0)
+    homer.def_concept_link(adj_concept, nsubj_concept, activation=1.0)
+    homer.def_concept_link(adj_concept, cop_r_concept, activation=1.0)
+    homer.def_concept_link(adj_concept, prep_r_concept, activation=1.0)
+    homer.def_concept_link(jjr_concept, nsubj_concept, activation=1.0)
+    homer.def_concept_link(jjr_concept, cop_r_concept, activation=1.0)
+    homer.def_concept_link(jjr_concept, prep_r_concept, activation=1.0)
 
     # Domain Specific Knowledge
 
@@ -556,7 +701,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=hot,
@@ -579,7 +724,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=warm,
@@ -602,7 +747,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=mild,
@@ -625,7 +770,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=cold,
@@ -702,7 +847,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=north,
@@ -724,7 +869,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=south,
@@ -746,7 +891,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=east,
@@ -768,7 +913,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=west,
@@ -790,7 +935,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=northwest,
@@ -812,7 +957,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=northeast,
@@ -834,7 +979,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=southwest,
@@ -856,7 +1001,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=southeast,
@@ -878,7 +1023,7 @@ def setup_homer() -> Homer:
         },
         parts_of_speech={
             WordForm.HEADWORD: [adj_concept, noun_concept],
-            WordForm.COMPARATIVE: [adj_concept],
+            WordForm.COMPARATIVE: [adj_concept, jjr_concept],
             WordForm.SUPERLATIVE: [adj_concept],
         },
         parent_concept=midlands,

@@ -15,7 +15,11 @@ def bubble_chamber():
     chamber = Mock()
     chamber.concepts = {"chunk": Mock(), "build": Mock()}
     chamber.has_chunk.return_value = False
-    chamber.chunks.get_unhappy.return_value = Mock()
+    input_space = Mock()
+    chunk = Mock()
+    chunk.is_chunk = True
+    input_space.contents = StructureCollection({chunk})
+    chamber.spaces = {"input": input_space}
     return chamber
 
 
