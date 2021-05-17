@@ -209,10 +209,17 @@ def run_view(request, run_id):
     views = [
         structure for structure in structure_records if "View" in structure.structure_id
     ]
+    views.sort(key=lambda view: last_value_of_dict(view.activation), reverse=True)
     output += "<h2>Views</h2>"
     for view in views:
         output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: '
         output += "<ul>"
+        output += "<li>Activation: "
+        output += str(last_value_of_dict(view.activation))
+        output += "</li>"
+        output += "<li>Quality: "
+        output += str(last_value_of_dict(view.quality))
+        output += "</li>"
         output += "<li>Correspondences: "
         for member in view.members.all():
             output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
