@@ -128,9 +128,7 @@ class ChunkProjectionBuilder(ChunkBuilder):
         self.child_structures = StructureCollection({chunk, correspondence})
 
     def _fizzle(self):
-        self.child_codelets.append(
-            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
-        )
+        pass
 
     def _fail(self):
-        self._fizzle()
+        pass

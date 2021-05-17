@@ -179,19 +179,3 @@ class LabelProjectionBuilder(LabelBuilder):
         self.bubble_chamber.logger.log(correspondence)
         self.bubble_chamber.logger.log(self.target_view)
         self.child_structures = StructureCollection({label, correspondence})
-
-    def _fizzle(self):
-        self._re_engender()
-
-    def _fail(self):
-        self._re_engender()
-
-    def _re_engender(self):
-        try:
-            self.child_codelets.append(
-                self.make(
-                    self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2
-                )
-            )
-        except MissingStructureError:
-            return
