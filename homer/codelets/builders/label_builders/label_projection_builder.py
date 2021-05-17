@@ -2,6 +2,7 @@ import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import LabelBuilder
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
@@ -111,7 +112,10 @@ class LabelProjectionBuilder(LabelBuilder):
         )
 
     def _passes_preliminary_checks(self):
-        self.parent_concept = self.target_word.lexeme.concepts.get_random()
+        try:
+            self.parent_concept = self.target_word.lexeme.concepts.get_random()
+        except MissingStructureError:
+            return False
         return not self.target_chunk.has_label(self.parent_concept) and all(
             not isinstance(
                 correspondence.arguments.get_random(exclude=[self.target_word]), Label
@@ -183,6 +187,11 @@ class LabelProjectionBuilder(LabelBuilder):
         self._re_engender()
 
     def _re_engender(self):
-        self.child_codelets.append(
-            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
-        )
+        try:
+            self.child_codelets.append(
+                self.make(
+                    self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2
+                )
+            )
+        except MissingStructureError:
+            return
