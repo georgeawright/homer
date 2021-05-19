@@ -93,7 +93,11 @@ class RelationBuilder(Builder):
                 and parent_concept.is_compatible_with(space.parent_concept)
             }
         ).get_random()
-        target = target_space.contents.where(is_node=True).get_exigent()
+        potential_targets = StructureCollection.union(
+            target_space.contents.where(is_chunk=True),
+            target_space.contents.where(is_word=True),
+        )
+        target = potential_targets.get_exigent()
         urgency = urgency if urgency is not None else target.exigency
         return cls.spawn(
             parent_id,
