@@ -33,26 +33,13 @@ class LabelSelector(Selector):
             return True
 
     def _fizzle(self):
-        target = self.champions.get_random().start
-        self.child_codelets.append(
-            LabelBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                target,
-                target.unhappiness,
-            )
-        )
+        pass
 
     def _engender_follow_up(self):
         try:
             winning_label = self.winners.get_random()
             target_concept = winning_label.parent_concept.friends().get_random()
             target_node = winning_label.start.nearby().get_unhappy()
-            if winning_label.start.is_word:
-                for node in winning_label.start.nearby():
-                    print(node, node.unhappiness, node.exigency)
-                    print(target_node)
-                print(f"new target: {target_node}")
             self.child_codelets.append(
                 LabelBuilder.spawn(
                     self.codelet_id,

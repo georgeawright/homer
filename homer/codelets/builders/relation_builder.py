@@ -173,15 +173,7 @@ class RelationBuilder(Builder):
         self.child_structures = StructureCollection({relation})
 
     def _fizzle(self):
-        self.child_codelets.append(
-            RelationBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_space,
-                self.target_structure_one,
-                self.urgency / 2,
-            )
-        )
+        pass
 
     def _fail(self):
         pass

@@ -95,16 +95,3 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         assert 2 == len(selector.child_codelets)
         assert hasinstance(selector.child_codelets, LabelSelector)
         assert hasinstance(selector.child_codelets, LabelBuilder)
-
-
-def test_spawns_builder_when_fizzling(bubble_chamber):
-    champion = Mock()
-    champion.start.labels_in_space.return_value = StructureCollection({champion})
-    selector = LabelSelector(
-        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
-    )
-    selector.run()
-    assert selector.challengers is None
-    assert CodeletResult.FIZZLE == selector.result
-    assert 1 == len(selector.child_codelets)
-    assert isinstance(selector.child_codelets[0], LabelBuilder)

@@ -32,6 +32,7 @@ def bubble_chamber(parent_concept):
     chamber = Mock()
     chamber.concepts = {"label": Mock(), "build": Mock()}
     label_concept_space = Mock()
+    label_concept_space.parent_concept.relevant_value = "value"
     label_concept_space.is_basic_level = True
     label_concept_space.instance_type = str
     label_concept_space.contents.of_type.return_value = StructureCollection(
@@ -50,6 +51,8 @@ def bubble_chamber(parent_concept):
 @pytest.fixture
 def target_chunk():
     chunk = Mock()
+    chunk.is_chunk = True
+    chunk.is_word = False
     chunk.has_label.return_value = False
     chunk.nearby.get_unhappy.return_value = Mock()
     chunk.value = ""
@@ -81,8 +84,6 @@ def test_fails_when_chunk_is_bad_example(bubble_chamber, target_chunk):
     result = label_builder.run()
     assert CodeletResult.FAIL == result
     assert label_builder.child_structures is None
-    assert len(label_builder.child_codelets) == 1
-    assert isinstance(label_builder.child_codelets[0], LabelBuilder)
 
 
 def test_fizzles_when_label_exists(bubble_chamber, target_chunk):
@@ -91,5 +92,3 @@ def test_fizzles_when_label_exists(bubble_chamber, target_chunk):
     result = label_builder.run()
     assert CodeletResult.FIZZLE == result
     assert label_builder.child_structures is None
-    assert len(label_builder.child_codelets) == 1
-    assert isinstance(label_builder.child_codelets[0], LabelBuilder)

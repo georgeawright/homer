@@ -178,8 +178,6 @@ def test_fails_to_create_a_branch_slot_if_incompatible_with_rule(
     phrase_builder.run()
     assert CodeletResult.FIZZLE == phrase_builder.result
     assert phrase_builder.child_structures is None
-    assert len(phrase_builder.child_codelets) == 1
-    assert isinstance(phrase_builder.child_codelets[0], PhraseBuilder)
 
 
 def test_successfully_fills_in_a_root_slot(bubble_chamber, s_slot, np, vp, s_np_vp):
@@ -224,8 +222,6 @@ def test_fails_to_fill_root_slot_if_incompatible_with_rule(
     phrase_builder.run()
     assert CodeletResult.FIZZLE == phrase_builder.result
     assert phrase_builder.child_structures is None
-    assert len(phrase_builder.child_codelets) == 1
-    assert isinstance(phrase_builder.child_codelets[0], PhraseBuilder)
 
 
 def test_successfully_creates_and_fills_a_root_slot(
@@ -274,5 +270,3 @@ def test_fails_to_create_and_fill_a_root_slot_if_incompatible_with_rule(
     phrase_builder.run()
     assert CodeletResult.FIZZLE == phrase_builder.result
     assert phrase_builder.child_structures is None
-    assert len(phrase_builder.child_codelets) == 1
-    assert isinstance(phrase_builder.child_codelets[0], PhraseBuilder)

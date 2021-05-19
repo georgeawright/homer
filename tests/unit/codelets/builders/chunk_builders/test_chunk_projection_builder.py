@@ -58,5 +58,3 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result
-    assert len(builder.child_codelets) == 1
-    assert isinstance(builder.child_codelets[0], ChunkProjectionBuilder)

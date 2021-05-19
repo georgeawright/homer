@@ -64,5 +64,3 @@ def test_fails_when_space_activations_are_low(bubble_chamber, input_space, frame
     )
     result = view_builder.run()
     assert CodeletResult.FAIL == result
-    assert len(view_builder.child_codelets) == 1
-    assert isinstance(view_builder.child_codelets[0], DiscourseViewBuilder)

@@ -38,16 +38,7 @@ class RelationSelector(Selector):
             return False
 
     def _fizzle(self):
-        champion_relation = self.champions.get_random()
-        self.child_codelets.append(
-            RelationBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                champion_relation.parent_spaces.get_random(),
-                champion_relation.start,
-                champion_relation.start.unhappiness,
-            )
-        )
+        pass
 
     def _engender_follow_up(self):
         winner_relation = self.winners.get_random()

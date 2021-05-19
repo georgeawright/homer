@@ -111,8 +111,6 @@ def test_fails_when_raw_chunk_is_incompatible_with_links(
     result = chunk_builder.run()
     assert CodeletResult.FAIL == result
     assert chunk_builder.child_structures is None
-    assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ReverseChunkProjectionBuilder)
 
 
 def test_fizzles_when_raw_chunk_has_correspondence_to_interpretation_space(
@@ -132,5 +130,3 @@ def test_fizzles_when_raw_chunk_has_correspondence_to_interpretation_space(
     result = chunk_builder.run()
     assert CodeletResult.FIZZLE == result
     assert chunk_builder.child_structures is None
-    assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ReverseChunkProjectionBuilder)

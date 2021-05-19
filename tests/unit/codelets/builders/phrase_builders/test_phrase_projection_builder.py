@@ -112,5 +112,3 @@ def test_fizzles_if_phrase_already_has_correspondence_in_output(
     builder = PhraseProjectionBuilder("", "", bubble_chamber, target_correspondence, 1)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result
-    assert len(builder.child_codelets) == 1
-    assert isinstance(builder.child_codelets[0], PhraseProjectionBuilder)

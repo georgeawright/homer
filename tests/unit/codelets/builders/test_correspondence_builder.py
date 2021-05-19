@@ -229,8 +229,6 @@ def test_fails_when_structures_do_not_correspond(
     result = correspondence_builder.run()
     assert CodeletResult.FAIL == result
     assert correspondence_builder.child_structures is None
-    assert len(correspondence_builder.child_codelets) == 1
-    assert isinstance(correspondence_builder.child_codelets[0], RelationBuilder)
 
 
 def test_fizzles_when_correspondence_already_exists(
@@ -257,5 +255,3 @@ def test_fizzles_when_correspondence_already_exists(
     result = correspondence_builder.run()
     assert CodeletResult.FIZZLE == result
     assert correspondence_builder.child_structures is None
-    assert len(correspondence_builder.child_codelets) == 1
-    assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceBuilder)

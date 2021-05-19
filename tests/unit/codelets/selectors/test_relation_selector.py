@@ -96,18 +96,3 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         assert 2 == len(selector.child_codelets)
         assert hasinstance(selector.child_codelets, RelationBuilder)
         assert hasinstance(selector.child_codelets, RelationSelector)
-
-
-def test_spawns_builder_when_fizzling(bubble_chamber):
-    champion = Mock()
-    champion.start.relations_in_space_with.return_value = StructureCollection(
-        {champion}
-    )
-    selector = RelationSelector(
-        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
-    )
-    selector.run()
-    assert selector.challengers is None
-    assert CodeletResult.FIZZLE == selector.result
-    assert 1 == len(selector.child_codelets)
-    assert isinstance(selector.child_codelets[0], RelationBuilder)
