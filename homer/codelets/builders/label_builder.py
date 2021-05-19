@@ -1,5 +1,8 @@
+import random
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
@@ -91,25 +94,45 @@ class LabelBuilder(Builder):
         return StructureCollection({self.target_node})
 
     def _passes_preliminary_checks(self):
-        if self.target_node.is_word:
-            print(f"{self.codelet_id} performing preliminary checks")
-            print(self.target_node)
-        if self.parent_concept is None:
-            self.parent_concept = (
+        if self.parent_concept is None and self.target_node.is_word:
+            self.parent_concept = random.sample(
+                self.target_node.lexeme.parts_of_speech[self.target_node.word_form],
+                1,
+            )[0]
+        if self.parent_concept is None and self.target_node.is_chunk:
+            conceptual_space = (
                 self.bubble_chamber.spaces["label concepts"]
                 .contents.of_type(ConceptualSpace)
                 .where(is_basic_level=True)
                 .where(instance_type=type(self.target_node.value))
                 .get_random()
-                .contents.of_type(Concept)
-                .where_not(classifier=None)
-                .get_random()
             )
+            location = Location(
+                getattr(
+                    self.target_node, conceptual_space.parent_concept.relevant_value
+                ),
+                conceptual_space,
+            )
+            try:
+                self.parent_concept = (
+                    conceptual_space.contents.of_type(Concept)
+                    .where_not(classifier=None)
+                    .near(location)
+                    .get_random()
+                )
+            except MissingStructureError:
+                print(f"no concept near {self.target_node}, {location}")
+                print(conceptual_space.name)
+                self.parent_concept = (
+                    conceptual_space.contents.of_type(Concept)
+                    .where_not(classifier=None)
+                    .get_random()
+                )
+        if self.parent_concept is None:
+            return False
         return not self.target_node.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
-        if self.target_node.is_word:
-            print(f"confidence: {self.confidence}")
         self.confidence = self.parent_concept.classifier.classify(
             concept=self.parent_concept, start=self.target_node
         )

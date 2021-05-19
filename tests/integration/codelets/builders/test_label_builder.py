@@ -1,4 +1,3 @@
-import math
 import pytest
 from unittest.mock import Mock
 
@@ -12,7 +11,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Label, Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
-from homer.tools import hasinstance
+from homer.tools import centroid_euclidean_distance, hasinstance
 
 
 @pytest.fixture
@@ -59,7 +58,7 @@ def temperature_concept(label_concepts_space):
         "value",
         list,
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     label_concepts_space.contents.add(concept)
     return concept
@@ -91,12 +90,12 @@ def mild_concept(temperature_space):
         Mock(),
         Mock(),
         "mild",
-        Location([10], temperature_space),
+        Location([[10]], temperature_space),
         classifier,
         "value",
         Mock(),
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     temperature_space.contents.add(mild)
     return mild
@@ -168,7 +167,7 @@ def target_chunk(bubble_chamber):
         "coordinates",
         Mock(),
         Mock(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     bubble_chamber.concepts.add(input_concept)
     input_space = WorkingSpace(
@@ -186,7 +185,7 @@ def target_chunk(bubble_chamber):
     chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
+        [[10]],
         [Location([0, 0], input_space)],
         StructureCollection(),
         input_space,
@@ -195,8 +194,8 @@ def target_chunk(bubble_chamber):
     second_chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 1], input_space)],
+        [[10]],
+        [Location([[0, 1]], input_space)],
         StructureCollection(),
         Mock(),
         0.0,
