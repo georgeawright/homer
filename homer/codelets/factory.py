@@ -37,8 +37,9 @@ class Factory(Codelet):
     def run(self) -> CodeletResult:
         try:
             self._engender_follow_up()
+            self.result = CodeletResult.SUCCESS
         except MissingStructureError:
-            return self.run()
+            self.result = CodeletResult.FAIL
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
@@ -47,7 +48,6 @@ class Factory(Codelet):
                 1 - self.bubble_chamber.satisfaction,
             )
         )
-        self.result = CodeletResult.SUCCESS
         return self.result
 
     def _engender_follow_up(self):
