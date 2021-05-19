@@ -89,36 +89,34 @@ def bubble_chamber(
     chamber.input_nodes = StructureCollection({input_node})
 
     correspondence_space = Mock()
+    correspondence_space.name = "correspondence space"
     correspondence_space.contents.of_type.return_value = StructureCollection(
         {example_correspondence_concept}
     )
-    correspondence_spaces = Mock()
-    correspondence_spaces.get_active.return_value = correspondence_space
     correspondential_concepts = Mock()
     correspondential_concepts.name = "correspondential concepts"
-    correspondential_concepts.contents.of_type.return_value = correspondence_spaces
+    correspondential_concepts.contents.of_type.return_value = StructureCollection(
+        {correspondence_space}
+    )
 
     label_space = Mock()
     label_space.contents.of_type.return_value = StructureCollection(
         {example_label_concept}
     )
-    label_spaces = Mock()
-    label_spaces.where.return_value = label_spaces
-    label_spaces.get_active.return_value = label_space
     label_concepts = Mock()
     label_concepts.name = "label concepts"
-    label_concepts.contents.of_type.return_value = label_spaces
+    label_concepts.contents.of_type.return_value = StructureCollection({label_space})
 
     relation_space = Mock()
     relation_space.name = "relation space"
     relation_space.contents.of_type.return_value = StructureCollection(
         {example_relation_concept}
     )
-    relation_spaces = Mock()
-    relation_spaces.get_active.return_value = relation_space
     relational_concepts = Mock()
     relational_concepts.name = "relational concepts"
-    relational_concepts.contents.of_type.return_value = relation_spaces
+    relational_concepts.contents.of_type.return_value = StructureCollection(
+        {relation_space}
+    )
 
     chamber.spaces = StructureCollection(
         {
@@ -142,20 +140,7 @@ def coderack():
     return rack
 
 
-def test_gets_appropriate_follow_up_class(bubble_chamber, coderack):
-    factory_codelet = ConceptDrivenFactory(
-        Mock(), Mock(), bubble_chamber, coderack, Mock()
-    )
-    follow_up_class = factory_codelet._decide_follow_up_class()
-    assert follow_up_class in [
-        CorrespondenceBuilder,
-        LabelBuilder,
-        PhraseBuilder,
-        RelationBuilder,
-    ]
-
-
-def test_gets_compatible_parent_concept(
+def test_gets_appropriate_follow_up_class(
     bubble_chamber,
     coderack,
     example_correspondence_concept,
@@ -167,17 +152,12 @@ def test_gets_compatible_parent_concept(
         Mock(), Mock(), bubble_chamber, coderack, Mock()
     )
     assert (
-        factory_codelet._decide_follow_up_parent_concept(CorrespondenceBuilder)
-        == example_correspondence_concept
+        factory_codelet._get_follow_up_class(example_correspondence_concept)
+        == CorrespondenceBuilder
     )
+    assert factory_codelet._get_follow_up_class(example_label_concept) == LabelBuilder
     assert (
-        factory_codelet._decide_follow_up_parent_concept(LabelBuilder)
-        == example_label_concept
+        factory_codelet._get_follow_up_class(example_relation_concept)
+        == RelationBuilder
     )
-    assert (
-        factory_codelet._decide_follow_up_parent_concept(RelationBuilder)
-        == example_relation_concept
-    )
-    assert (
-        factory_codelet._decide_follow_up_parent_concept(PhraseBuilder) == example_rule
-    )
+    assert factory_codelet._get_follow_up_class(example_rule) == PhraseBuilder
