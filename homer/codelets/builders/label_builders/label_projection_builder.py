@@ -142,7 +142,7 @@ class LabelProjectionBuilder(LabelBuilder):
             elif self.parent_concept.relevant_value == "coordinates":
                 self.target_chunk.location_in_space(
                     self.target_view.interpretation_space
-                ).coordinates = self.parent_concept.coordinates
+                ).coordinates = self.parent_concept.value
             project_item_into_space(self.target_chunk, space)
         label = Label(
             structure_id=ID.new(Label),
