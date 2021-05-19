@@ -69,7 +69,11 @@ class RelationBuilder(Builder):
         target_space = bubble_chamber.working_spaces.where(
             no_of_dimensions=1
         ).get_random()
-        target = target_space.contents.where(is_node=True).get_exigent()
+        potential_targets = StructureCollection.union(
+            target_space.contents.where(is_chunk=True),
+            target_space.contents.where(is_word=True),
+        )
+        target = potential_targets.get_exigent()
         urgency = urgency if urgency is not None else target.exigency
         return cls.spawn(parent_id, bubble_chamber, target_space, target, urgency)
 
