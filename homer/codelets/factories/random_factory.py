@@ -20,10 +20,8 @@ class RandomFactory(Factory):
 
     def _engender_follow_up(self):
         follow_up_class = self._decide_follow_up_class()
-        proportion_of_follow_up_class_on_coderack = (
-            self.coderack.number_of_codelets_of_type(follow_up_class) / 50
-        )  # TODO this should be divided by umber of codelets on coderack
-        if proportion_of_follow_up_class_on_coderack < random.random():
+        rand = random.random()
+        if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make(self.codelet_id, self.bubble_chamber)
             self.child_codelets.append(follow_up)
 
