@@ -121,8 +121,6 @@ class LabelBuilder(Builder):
                     .get_random()
                 )
             except MissingStructureError:
-                print(f"no concept near {self.target_node}, {location}")
-                print(conceptual_space.name)
                 self.parent_concept = (
                     conceptual_space.contents.of_type(Concept)
                     .where_not(classifier=None)
