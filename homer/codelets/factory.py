@@ -72,6 +72,9 @@ class Factory(Codelet):
         from homer.codelets.builders.label_builders import (
             LabelProjectionBuilder,
         )
+        from homer.codelets.builders.phrase_builders import (
+            PhraseProjectionBuilder,
+        )
         from homer.codelets.builders.relation_builders import (
             RelationProjectionBuilder,
         )
@@ -94,6 +97,9 @@ class Factory(Codelet):
         from homer.codelets.evaluators.label_evaluators import (
             LabelProjectionEvaluator,
         )
+        from homer.codelets.evaluators.phrase_evaluators import (
+            PhraseProjectionEvaluator,
+        )
         from homer.codelets.evaluators.relation_evaluators import (
             RelationProjectionEvaluator,
         )
@@ -115,6 +121,9 @@ class Factory(Codelet):
         )
         from homer.codelets.selectors.label_selectors import (
             LabelProjectionSelector,
+        )
+        from homer.codelets.selectors.phrase_selectors import (
+            PhraseProjectionSelector,
         )
         from homer.codelets.selectors.relation_selectors import (
             RelationProjectionSelector,
@@ -141,6 +150,7 @@ class Factory(Codelet):
                     "forward": {
                         "chunk": ChunkProjectionBuilder,
                         "label": LabelProjectionBuilder,
+                        "phrase": PhraseProjectionBuilder,
                         "relation": RelationProjectionBuilder,
                         "word": WordBuilder,
                     },
@@ -165,6 +175,7 @@ class Factory(Codelet):
                     "forward": {
                         "chunk": ChunkProjectionEvaluator,
                         "label": LabelProjectionEvaluator,
+                        "phrase": PhraseProjectionEvaluator,
                         "relation": RelationProjectionEvaluator,
                         "word": WordEvaluator,
                     },
@@ -189,6 +200,7 @@ class Factory(Codelet):
                     "forward": {
                         "chunk": ChunkProjectionSelector,
                         "label": LabelProjectionSelector,
+                        "phrase": PhraseProjectionSelector,
                         "relation": RelationProjectionSelector,
                         "word": WordSelector,
                     },
@@ -228,15 +240,14 @@ class Factory(Codelet):
                 "actions": StructureCollection({build, evaluate, select}),
                 "spaces": StructureCollection({inner, outer}),
                 "directions": StructureCollection({forward}),
-                "structures": StructureCollection({chunk, label, relation}),
+                "structures": StructureCollection({chunk, label, phrase, relation}),
             },
-            # TODO: move phrase to inner or outer
             "inner": {
                 "actions": StructureCollection({build, evaluate, select}),
                 "spaces": StructureCollection({inner}),
                 "directions": StructureCollection({forward}),
                 "structures": StructureCollection(
-                    {phrase, correspondence, view_monitoring, view_simplex}
+                    {correspondence, view_monitoring, view_simplex}
                 ),
             },
             "outer": {
