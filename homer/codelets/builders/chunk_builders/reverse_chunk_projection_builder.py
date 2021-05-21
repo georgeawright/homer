@@ -153,7 +153,7 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
             StructureCollection({self.correspondee_to_raw_chunk}),
         )
         locations = [
-            self._get_average_location(new_chunk_members, space=parent_space)
+            self._get_merged_location(new_chunk_members, space=parent_space)
             for parent_space in self.target_interpretation_chunk.parent_spaces
         ]
         self.new_chunk = Chunk(

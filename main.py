@@ -787,7 +787,7 @@ def setup_homer() -> Homer:
         locations=[Location([], label_concepts_space)],
         no_of_dimensions=1,
         super_space_to_coordinate_function_map={
-            "location": lambda location: [[c[0] for c in location.coordinates]]
+            "location": lambda location: [[c[0]] for c in location.coordinates]
         },
     )
     west_east_space = homer.def_conceptual_space(
@@ -796,7 +796,7 @@ def setup_homer() -> Homer:
         locations=[Location([], label_concepts_space)],
         no_of_dimensions=1,
         super_space_to_coordinate_function_map={
-            "location": lambda location: [[c[1] for c in location.coordinates]]
+            "location": lambda location: [[c[1]] for c in location.coordinates]
         },
     )
     nw_se_space = homer.def_conceptual_space(
@@ -806,7 +806,7 @@ def setup_homer() -> Homer:
         no_of_dimensions=1,
         super_space_to_coordinate_function_map={
             "location": lambda location: [
-                [statistics.fmean(c) for c in location.coordinates]
+                [statistics.fmean(c)] for c in location.coordinates
             ]
         },
     )
@@ -817,7 +817,7 @@ def setup_homer() -> Homer:
         no_of_dimensions=1,
         super_space_to_coordinate_function_map={
             "location": lambda location: [
-                [statistics.fmean([c[0], 4 - c[1]]) for c in location.coordinates]
+                [statistics.fmean([c[0], 4 - c[1]])] for c in location.coordinates
             ]
         },
     )

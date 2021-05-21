@@ -95,7 +95,6 @@ class ChunkBuilder(Builder):
             self._members_from_chunk(self.target_chunk),
             self._members_from_chunk(self.second_target_chunk),
         )
-        locations = []
         parent_spaces = StructureCollection.union(
             self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
         )
@@ -105,10 +104,10 @@ class ChunkBuilder(Builder):
                     continue
                 if parent_space.is_basic_level:
                     project_item_into_space(member, parent_space)
-        for parent_space in parent_spaces:
-            locations.append(
-                self._get_average_location(new_chunk_members, space=parent_space)
-            )
+        locations = [
+            self._get_merged_location(new_chunk_members, space)
+            for space in parent_spaces
+        ]
         chunk = Chunk(
             ID.new(Chunk),
             self.codelet_id,
@@ -118,6 +117,8 @@ class ChunkBuilder(Builder):
             self.target_chunk.parent_space,
             0,
         )
+        for parent_space in chunk.parent_spaces:
+            parent_space.add(chunk)
         activation_from_chunk_one = (
             self.target_chunk.activation * self.target_chunk.size / chunk.size
         )
@@ -132,10 +133,6 @@ class ChunkBuilder(Builder):
         )
         self.target_chunk.activation = activation_from_chunk_one
         self.second_target_chunk.activation = activation_from_chunk_two
-        chunk.locations = [
-            self._get_average_location(chunk.members, space)
-            for space in chunk.parent_spaces
-        ]
         for member in list(new_chunk_members.structures) + [
             self.target_chunk,
             self.second_target_chunk,
@@ -257,18 +254,14 @@ class ChunkBuilder(Builder):
                 values.append(chunk.value[0])
         return [average_vector(values)]
 
-    def _get_average_location(self, chunks: StructureCollection, space: Space = None):
-        if space is not None:
-            locations = []
-            for chunk in chunks:
-                for _ in range(chunk.size):
-                    locations.append(chunk.location_in_space(space))
-            return Location.average(locations)
-        locations = []
+    def _get_merged_location(self, chunks: StructureCollection, space: Space):
+        import time
+
+        coordinates = []
         for chunk in chunks:
-            for _ in range(chunk.size):
-                locations.append(chunk.location)
-        return Location.average(locations)
+            for coords in chunk.location_in_space(space).coordinates:
+                coordinates.append(coords)
+        return Location(coordinates, space)
 
     def _fizzle(self):
         pass

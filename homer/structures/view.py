@@ -76,20 +76,6 @@ class View(Structure):
     def copy(self, **kwargs: dict):
         raise NotImplementedError
 
-    def nearby(self, space: Space = None) -> StructureCollection:
-        space = space if space is not None else self.location.space
-        return StructureCollection(
-            {
-                view
-                for view in space.contents.of_type(View)
-                if StructureCollection.intersection(
-                    view.input_spaces, self.input_working_spaces
-                )
-                == self.input_working_spaces
-                and view != self
-            }
-        )
-
     def has_member(
         self,
         parent_concept: Concept,

@@ -1,8 +1,10 @@
+import statistics
+
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import View
+from homer.structures import Space, View
 from homer.structures.spaces import WorkingSpace
 
 
@@ -46,6 +48,36 @@ class SimplexView(View):
         from homer.codelets.selectors.view_selectors import SimplexViewSelector
 
         return SimplexViewSelector
+
+    def nearby(self, space: Space = None) -> StructureCollection:
+        def input_coords(view):
+            return [
+                coord
+                for member in view.members
+                for coord in member.start.location_in_space(
+                    member.start_space
+                ).coordinates
+                if member.start_space.parent_concept.name == "input"
+            ]
+
+        def input_overlap(view_1, view_2):
+            view_1_coords = input_coords(view_1)
+            view_2_coords = input_coords(view_2)
+            coords_in_both = [
+                coord for coord in view_1_coords if coord in view_2_coords
+            ]
+            proportion_in_view_1 = len(coords_in_both) / len(view_1_coords)
+            proportion_in_view_2 = len(coords_in_both) / len(view_2_coords)
+            return statistics.fmean([proportion_in_view_1, proportion_in_view_2])
+
+        space = space if space is not None else self.location.space
+        return StructureCollection(
+            {
+                view
+                for view in space.contents.of_type(View)
+                if view != self and input_overlap(view, self) > 0.5
+            }
+        )
 
     def copy(self, **kwargs: dict):
         """Requires keyword arguments 'bubble_chamber', 'parent_id',
