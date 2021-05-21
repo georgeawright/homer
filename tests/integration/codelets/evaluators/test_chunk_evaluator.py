@@ -15,23 +15,7 @@ from homer.structures.spaces import WorkingSpace
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     chunk_concept = Concept(
         Mock(),
         Mock(),
@@ -104,7 +88,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
         [10],
         [Location([0, 0], input_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     member_2 = Chunk(
@@ -113,7 +97,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
         [10],
         [Location([0, 1], input_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     chunk = Chunk(
@@ -122,7 +106,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
         [10],
         [Location([0, 0], input_space)],
         StructureCollection({member_1, member_2}),
-        Mock(),
+        input_space,
         0.0,
     )
     bubble_chamber.chunks.add(chunk)
@@ -162,7 +146,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
         [12],
         [Location([0, 0], input_space), Location([12], temperature_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     member_2 = Chunk(
@@ -171,7 +155,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
         [5],
         [Location([0, 1], input_space), Location([5], temperature_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     chunk = Chunk(
@@ -180,7 +164,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
         [8.5],
         [Location([0, 0], input_space), Location([8.5], temperature_space)],
         StructureCollection({member_1, member_2}),
-        Mock(),
+        input_space,
         1.0,
     )
     bubble_chamber.chunks.add(chunk)

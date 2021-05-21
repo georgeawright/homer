@@ -90,15 +90,22 @@ def target_space():
 
 @pytest.fixture
 def common_target_space_item(bubble_chamber):
+    parent_space = bubble_chamber.spaces["input"]
     item = Chunk(
-        Mock(), Mock(), Mock(), Mock(), Mock(), bubble_chamber.spaces["input"], Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        [Location([[1, 1]], parent_space)],
+        Mock(),
+        parent_space,
+        Mock(),
     )
     return item
 
 
 @pytest.fixture
-def input_spaces():
-    space_1 = Mock()
+def input_spaces(bubble_chamber):
+    space_1 = bubble_chamber.spaces["input"]
     space_2 = Mock()
     return StructureCollection({space_1, space_2})
 
@@ -110,7 +117,7 @@ def good_view(bubble_chamber, target_space, input_spaces, common_target_space_it
         "",
         common_target_space_item,
         Mock(),
-        Mock(),
+        bubble_chamber.spaces["input"],
         Mock(),
         Mock(),
         Mock(),
@@ -139,7 +146,7 @@ def bad_view(bubble_chamber, target_space, input_spaces, common_target_space_ite
         "",
         common_target_space_item,
         Mock(),
-        Mock(),
+        bubble_chamber.spaces["input"],
         Mock(),
         Mock(),
         Mock(),

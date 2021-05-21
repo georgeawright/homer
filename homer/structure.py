@@ -62,12 +62,11 @@ class Structure(ABC):
 
     @property
     def location(self) -> Location:
-        try:
-            return self.locations[0]
-        except TypeError:
-            return None
-        except IndexError:
-            return None
+        return (
+            self._locations[0]
+            if len(self._locations) == 1
+            else self.location_in_space(self.parent_space)
+        )
 
     @property
     def locations(self) -> List[Location]:
@@ -83,11 +82,7 @@ class Structure(ABC):
 
     @property
     def coordinates(self) -> list:
-        for location in self.locations:
-            # TODO change to either parent space or find give spaces a is_container attribute
-            if location.space.value == "input":
-                return location.coordinates
-        raise Exception(f"{self.structure_id} has no location in input space")
+        return self.location_in_space(self.parent_space).coordinates
 
     @property
     def is_slot(self) -> bool:
