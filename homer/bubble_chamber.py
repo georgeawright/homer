@@ -20,8 +20,10 @@ class BubbleChamber:
         conceptual_spaces: StructureCollection,
         working_spaces: StructureCollection,
         frames: StructureCollection,
+        frame_instances: StructureCollection,
         chunks: StructureCollection,
         concepts: StructureCollection,
+        lexemes: StructureCollection,
         correspondences: StructureCollection,
         labels: StructureCollection,
         relations: StructureCollection,
@@ -36,8 +38,10 @@ class BubbleChamber:
         self.conceptual_spaces = conceptual_spaces
         self.working_spaces = working_spaces
         self.frames = frames
+        self.frame_instances = (frame_instances,)
         self.chunks = chunks
         self.concepts = concepts
+        self.lexemes = lexemes
         self.correspondences = correspondences
         self.labels = labels
         self.relations = relations
@@ -54,6 +58,8 @@ class BubbleChamber:
     @classmethod
     def setup(cls, logger: Logger):
         return cls(
+            StructureCollection(),
+            StructureCollection(),
             StructureCollection(),
             StructureCollection(),
             StructureCollection(),

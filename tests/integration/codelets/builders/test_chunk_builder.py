@@ -15,23 +15,7 @@ from homer.tools import centroid_euclidean_distance, hasinstance
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     chunk_concept = Concept(
         Mock(),
         Mock(),

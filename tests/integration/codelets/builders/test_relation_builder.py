@@ -105,23 +105,7 @@ def temperature_space():
 
 @pytest.fixture
 def bubble_chamber(more_concept, relational_concepts_space):
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     chamber.concepts.add(more_concept)
     chamber.conceptual_spaces.add(relational_concepts_space)
     relation_concept = Concept(
