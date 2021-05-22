@@ -39,6 +39,7 @@ class Structure(ABC):
         self.stable = stable_activation is not None
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
+        self._parent_space = None
         self._parent_concept = None
         self.is_phrase = False
         self.is_word = False
@@ -57,16 +58,20 @@ class Structure(ABC):
         raise NotImplementedError
 
     @property
+    def parent_space(self) -> Structure:
+        return self._parent_space
+
+    @property
     def parent_concept(self) -> Structure:
         return self._parent_concept
 
     @property
     def location(self) -> Location:
-        return (
-            self._locations[0]
-            if len(self._locations) == 1
-            else self.location_in_space(self.parent_space)
-        )
+        if len(self._locations) == 0:
+            return None
+        if len(self._locations) == 1:
+            return self._locations[0]
+        return self.location_in_space(self.parent_space)
 
     @property
     def locations(self) -> List[Location]:
