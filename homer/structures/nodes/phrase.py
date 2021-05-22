@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Union
+from typing import List, Union
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
@@ -67,6 +67,14 @@ class Phrase(Node):
     @property
     def locations(self):
         return self.chunk.locations
+
+    @locations.setter
+    def locations(self, locations: List[Location]):
+        self.chunk.locations = locations
+
+    @property
+    def location(self):
+        return self.chunk.location
 
     @property
     def parent_concept(self):
