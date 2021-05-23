@@ -38,7 +38,7 @@ class BubbleChamber:
         self.conceptual_spaces = conceptual_spaces
         self.working_spaces = working_spaces
         self.frames = frames
-        self.frame_instances = (frame_instances,)
+        self.frame_instances = frame_instances
         self.chunks = chunks
         self.concepts = concepts
         self.lexemes = lexemes
@@ -95,6 +95,7 @@ class BubbleChamber:
                 for node in chain(self.chunks, self.words)
                 if node.parent_space.parent_concept
                 in (self.concepts["input"], self.concepts["text"])
+                and not node.parent_space.is_frame
             }
         )
 

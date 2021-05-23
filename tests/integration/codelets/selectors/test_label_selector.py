@@ -14,23 +14,7 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection({Mock()}),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     label_concept = Concept(
         Mock(),
         Mock(),

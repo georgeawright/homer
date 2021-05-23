@@ -8,7 +8,8 @@ from homer.codelets.evaluators.view_evaluators import DiscourseViewEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Concept
-from homer.structures.spaces import Frame, WorkingSpace
+from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces.frames import Template
 from homer.structures.views import DiscourseView, MonitoringView
 from homer.tools import hasinstance
 
@@ -106,14 +107,14 @@ def bubble_chamber():
         [],
     )
     chamber.working_spaces.add(text_space_two)
-    frame = Frame("", "", "", discourse_concept, Mock(), [], StructureCollection())
+    frame = Template("", "", "", discourse_concept, Mock(), [], StructureCollection())
     chamber.frames.add(frame)
     monitoring_view_one = MonitoringView(
         "",
         "",
         Mock(),
         Mock(),
-        StructureCollection({Mock(), Mock(), Mock()}),
+        StructureCollection({text_space_one}),
         text_space_one,
         0.0,
     )
@@ -123,7 +124,7 @@ def bubble_chamber():
         "",
         Mock(),
         Mock(),
-        StructureCollection({Mock(), Mock(), Mock()}),
+        StructureCollection({text_space_two}),
         text_space_two,
         0.0,
     )
@@ -143,7 +144,7 @@ def input_space(bubble_chamber):
 
 @pytest.fixture
 def target_frame(bubble_chamber):
-    frame = Frame(
+    frame = Template(
         Mock(),
         Mock(),
         Mock(),

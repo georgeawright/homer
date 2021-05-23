@@ -14,7 +14,7 @@ class WordEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["word"]
-        word = bubble_chamber.words.get_random()
+        word = bubble_chamber.input_nodes.where(is_word=True).get_random()
         correspondences = word.correspondences.where(end=word)
         target_structures = StructureCollection.union(
             StructureCollection({word}), correspondences

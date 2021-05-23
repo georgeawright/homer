@@ -47,17 +47,34 @@ class DiscourseViewBuilder(ViewBuilder):
 
     def _passes_preliminary_checks(self):
         for view in self.bubble_chamber.views:
-            if view.input_spaces == self.target_spaces:
+            if all(
+                [
+                    input_space in self.target_spaces
+                    or any(
+                        [
+                            input_space.has_relation_with(target_space)
+                            for target_space in self.target_spaces
+                        ]
+                    )
+                    for input_space in view.input_spaces
+                ]
+            ):
                 return False
         if self.frame is None:
             for space in self.target_spaces:
-                if isinstance(space, Frame):
+                if space.is_frame:
                     self.frame = space
         return True
 
     def _process_structure(self):
         view_id = ID.new(DiscourseView)
         view_location = Location([], self.bubble_chamber.spaces["top level working"])
+        input_spaces = StructureCollection(
+            {
+                self._instantiate_frame(space) if space.is_frame else space
+                for space in self.target_spaces
+            }
+        )
         view_output = WorkingSpace(
             structure_id=ID.new(WorkingSpace),
             parent_id=self.codelet_id,
@@ -75,7 +92,7 @@ class DiscourseViewBuilder(ViewBuilder):
             parent_id=self.codelet_id,
             location=view_location,
             members=StructureCollection(),
-            input_spaces=self.target_spaces,
+            input_spaces=input_spaces,
             output_space=view_output,
             quality=0,
         )

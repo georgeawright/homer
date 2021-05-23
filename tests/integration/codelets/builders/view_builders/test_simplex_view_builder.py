@@ -8,7 +8,8 @@ from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Concept
-from homer.structures.spaces import Frame, WorkingSpace
+from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces.frames import Template
 from homer.structures.views import SimplexView
 from homer.tools import hasinstance
 
@@ -83,7 +84,7 @@ def input_space(bubble_chamber):
 
 @pytest.fixture
 def target_frame(bubble_chamber):
-    frame = Frame(
+    frame = Template(
         Mock(),
         Mock(),
         Mock(),

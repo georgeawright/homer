@@ -35,6 +35,12 @@ class SimplexViewBuilder(ViewBuilder):
     def _process_structure(self):
         view_id = ID.new(SimplexView)
         view_location = Location([], self.bubble_chamber.spaces["top level working"])
+        input_spaces = StructureCollection(
+            {
+                self._instantiate_frame(space) if space.is_frame else space
+                for space in self.target_spaces
+            }
+        )
         view_output = WorkingSpace(
             structure_id=ID.new(WorkingSpace),
             parent_id=self.codelet_id,
@@ -52,7 +58,7 @@ class SimplexViewBuilder(ViewBuilder):
             parent_id=self.codelet_id,
             location=view_location,
             members=StructureCollection(),
-            input_spaces=self.target_spaces,
+            input_spaces=input_spaces,
             output_space=view_output,
             quality=0,
         )

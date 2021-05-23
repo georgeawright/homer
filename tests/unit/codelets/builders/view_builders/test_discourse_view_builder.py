@@ -28,13 +28,15 @@ def bubble_chamber():
 @pytest.fixture
 def input_space():
     space = Mock()
+    space.is_frame = False
     space.activation = 1.0
     return space
 
 
 @pytest.fixture
 def frame():
-    space = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    space = Mock()
+    space.is_frame = True
     space.activation = 1.0
     return space
 

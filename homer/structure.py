@@ -287,6 +287,9 @@ class Structure(ABC):
             }
         )
 
+    def has_relation_with(self, other: Structure) -> StructureCollection:
+        return not self.relations_with(other).is_empty()
+
     def relation_in_space_of_type_with(
         self, space: Structure, concept: Structure, start: Structure, end: Structure
     ) -> Structure:

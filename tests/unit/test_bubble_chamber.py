@@ -20,8 +20,10 @@ def test_structures():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection({label}),
         StructureCollection({relation}),
@@ -42,6 +44,8 @@ def test_structures():
 
 def test_add_to_collections():
     bubble_chamber = BubbleChamber(
+        StructureCollection(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -142,8 +146,10 @@ def test_spread_activations():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection({label}),
         StructureCollection({relation}),
@@ -173,8 +179,10 @@ def test_update_activations():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         StructureCollection({chunk}),
         StructureCollection({concept}),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection({label}),
         StructureCollection({relation}),
@@ -202,7 +210,9 @@ def test_has_chunk():
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
+        StructureCollection(),
         StructureCollection({existing_chunk}),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),
@@ -223,6 +233,8 @@ def test_has_view():
     existing_view = Mock()
     existing_view.members = existing_view_members
     bubble_chamber = BubbleChamber(
+        StructureCollection(),
+        StructureCollection(),
         StructureCollection(),
         StructureCollection(),
         StructureCollection(),

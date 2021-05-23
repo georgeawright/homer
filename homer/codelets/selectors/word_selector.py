@@ -6,7 +6,7 @@ from homer.structure_collection import StructureCollection
 class WordSelector(Selector):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        word = bubble_chamber.words.get_active()
+        word = bubble_chamber.input_nodes.where(is_word=True).get_active()
         correspondences = word.correspondences.where(end=word)
         champions = StructureCollection.union(
             StructureCollection({word}), correspondences

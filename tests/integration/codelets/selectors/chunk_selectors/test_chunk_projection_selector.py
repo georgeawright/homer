@@ -53,23 +53,7 @@ def target_view(noun_concept):
 
 @pytest.fixture
 def bubble_chamber(target_view, noun_concept):
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     chamber.concepts.add(noun_concept)
     chamber.views.add(target_view)
     chunk_concept = Concept(

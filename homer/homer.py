@@ -54,24 +54,9 @@ class Homer:
             None, name="top level working"
         )
         logger.log(top_level_working_space)
-        bubble_chamber = BubbleChamber(
-            StructureCollection({top_level_conceptual_space}),
-            StructureCollection({top_level_working_space}),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            logger,
-        )
-        bubble_chamber.lexemes = StructureCollection()
+        bubble_chamber = BubbleChamber.setup(logger)
+        bubble_chamber.conceptual_spaces.add(top_level_conceptual_space)
+        bubble_chamber.working_spaces.add(top_level_working_space)
         coderack = Coderack.setup(bubble_chamber, logger)
         return cls(bubble_chamber, coderack, logger)
 

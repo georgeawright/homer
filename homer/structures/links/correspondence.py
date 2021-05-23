@@ -70,17 +70,23 @@ class Correspondence(Link):
         return CorrespondenceSelector
 
     def copy(self, **kwargs: dict) -> Correspondence:
-        """Requires keyword arguments 'new arg', 'old_arg', and 'parent_id'."""
-        start = (
-            kwargs["new_arg"]
-            if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.start
-            else self.start
-        )
-        end = (
-            kwargs["new_arg"]
-            if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.end
-            else self.end
-        )
+        """Requires keyword arguments 'start', 'end', and 'parent_id' OR 'new arg', 'old_arg', and 'parent_id'."""
+        if "start" in kwargs:
+            start = kwargs["start"]
+        else:
+            start = (
+                kwargs["new_arg"]
+                if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.start
+                else self.start
+            )
+        if "end" in kwargs:
+            end = kwargs["end"]
+        else:
+            end = (
+                kwargs["new_arg"]
+                if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.end
+                else self.end
+            )
         parent_id = kwargs["parent_id"]
         start_space = equivalent_space(start, self.start_space)
         end_space = equivalent_space(end, self.end_space)

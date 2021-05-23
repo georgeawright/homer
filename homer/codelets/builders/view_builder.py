@@ -58,7 +58,7 @@ class ViewBuilder(Builder):
     def _passes_preliminary_checks(self):
         if self.frame is None:
             for space in self.target_spaces:
-                if isinstance(space, Frame):
+                if space.is_frame:
                     self.frame = space
         return True
 
@@ -72,3 +72,11 @@ class ViewBuilder(Builder):
 
     def _fail(self):
         pass
+
+    def _instantiate_frame(self, frame: Frame) -> Frame:
+        frame_instance = frame.copy(
+            parent_id=self.codelet_id, bubble_chamber=self.bubble_chamber
+        )
+        self.bubble_chamber.frame_instances.add(frame_instance)
+        self.bubble_chamber.logger.log(frame_instance)
+        return frame_instance

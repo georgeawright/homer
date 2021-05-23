@@ -5,7 +5,7 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import Frame
+from homer.structures.spaces.frames import Template
 from homer.structures.views import SimplexView
 from homer.tools import hasinstance
 
@@ -23,13 +23,15 @@ def bubble_chamber():
 @pytest.fixture
 def input_space():
     space = Mock()
+    space.is_frame = False
     space.activation = 1.0
     return space
 
 
 @pytest.fixture
 def frame():
-    space = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+    space = Mock()
+    space.is_frame = True
     space.activation = 1.0
     return space
 

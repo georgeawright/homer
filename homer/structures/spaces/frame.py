@@ -1,3 +1,4 @@
+from __future__ import annotations
 import statistics
 from typing import List
 
@@ -49,3 +50,6 @@ class Frame(Space):
             if self.contents != []
             else 0.0
         )
+
+    def copy(self, **kwargs: dict) -> Frame:
+        raise NotImplementedError
