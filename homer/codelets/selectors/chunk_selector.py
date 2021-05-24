@@ -1,6 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders import ChunkBuilder
 from homer.codelets.selector import Selector
+from homer.codelets.suggesters import ChunkSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
@@ -40,24 +40,18 @@ class ChunkSelector(Selector):
         return True
 
     def _fizzle(self):
-        new_target = self.bubble_chamber.chunks.get_unhappy()
         self.child_codelets.append(
-            ChunkBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                new_target,
-                new_target.unhappiness,
-            )
+            ChunkSuggester.make(self.codelet_id, self.bubble_chamber)
         )
 
     def _engender_follow_up(self):
-        target = self.winners.get_random()
+        new_target = self.winners.get_random()
         self.child_codelets.append(
-            ChunkBuilder.spawn(
+            ChunkSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                target,
-                target.activation,
+                {"target_one": new_target},
+                new_target.activation,
             )
         )
         self.child_codelets.append(

@@ -1,6 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.selector import Selector
+from homer.codelets.suggesters import CorrespondenceSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 from homer.structures import Node
@@ -84,17 +84,19 @@ class CorrespondenceSelector(Selector):
         except MissingStructureError:
             return
         self.child_codelets.append(
-            CorrespondenceBuilder.spawn(
+            CorrespondenceSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                winner_correspondence.parent_view,
-                target_space_one,
-                target_structure_one,
+                {
+                    "target_view": winner_correspondence.parent_view,
+                    "target_space_one": target_space_one,
+                    "target_structure_one": target_structure_one,
+                    "target_space_two": target_space_two,
+                    "target_structure_two": target_structure_two,
+                    "target_conceptual_space": target_conceptual_space,
+                    "parent_concept": target_concept,
+                },
                 target_structure_one.unlinkedness,
-                target_space_two=target_space_two,
-                target_structure_two=target_structure_two,
-                target_conceptual_space=target_conceptual_space,
-                parent_concept=target_concept,
             )
         )
         self.child_codelets.append(

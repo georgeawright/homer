@@ -4,12 +4,8 @@ from homer.bubble_chamber import BubbleChamber
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.codelets.builders import PhraseBuilder
-from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import View
-from homer.structures.links import Correspondence, Label
-from homer.structures.nodes import Chunk, Phrase, Word
-from homer.structures.spaces import WorkingSpace
+from homer.structures.links import Correspondence
 
 
 class PhraseProjectionBuilder(PhraseBuilder):
@@ -18,21 +14,19 @@ class PhraseProjectionBuilder(PhraseBuilder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_correspondence: Correspondence,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
-        self.target_correspondence = target_correspondence
         PhraseBuilder.__init__(
             self,
             codelet_id,
             parent_id,
             bubble_chamber,
-            None,
-            None,
-            None,
+            target_structures,
             urgency,
         )
-        self.target_view = target_correspondence.parent_view
+        self.target_correspondence = None
+        self.target_view = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -81,17 +75,12 @@ class PhraseProjectionBuilder(PhraseBuilder):
         )
         return cls.spawn(parent_id, bubble_chamber, target_correspondence, urgency)
 
-    @property
-    def target_structures(self):
-        return StructureCollection({self.target_correspondence})
-
     def _passes_preliminary_checks(self) -> bool:
+        self.target_correspondence = self._target_structures["target_correspondence"]
+        self.target_view = self.target_correspondence.parent_view
         return not self.target_correspondence.start.has_correspondence_to_space(
             self.target_view.output_space
         )
-
-    def _calculate_confidence(self):
-        self.confidence = self.target_correspondence.activation
 
     def _process_structure(self):
         new_phrase = self.target_correspondence.start.copy(
@@ -155,7 +144,4 @@ class PhraseProjectionBuilder(PhraseBuilder):
         )
 
     def _fizzle(self):
-        pass
-
-    def _fail(self):
         pass

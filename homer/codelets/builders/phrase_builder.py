@@ -1,5 +1,5 @@
 import statistics
-from typing import List, Union
+from typing import Union
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
@@ -7,7 +7,6 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
-from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
 from homer.structures.nodes import Chunk, Concept, Phrase, Rule, Word
@@ -19,22 +18,16 @@ class PhraseBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_root: Phrase,
-        target_left_branch: Union[Phrase, Word],
-        target_right_branch: Union[Phrase, Word],
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
-        target_rule: Concept = None,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_rule = target_rule
-        self.target_root = target_root
-        self.target_left_branch = target_left_branch
-        self.target_right_branch = target_right_branch
-        self.parent_space = (
-            self.target_structures.get_random().parent_space
-            if not self.target_structures.is_empty()
-            else None
-        )
+        self._target_structures = target_structures
+        self.target_rule = None
+        self.target_root = None
+        self.target_left_branch = None
+        self.target_right_branch = None
+        self.parent_space = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -47,22 +40,16 @@ class PhraseBuilder(Builder):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_root: Phrase,
-        target_left_branch: Union[Phrase, Word],
-        target_right_branch: Union[Phrase, Word],
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
-        target_rule: Rule = None,
     ):
         codelet_id = ID.new(cls)
         return cls(
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_root,
-            target_left_branch,
-            target_right_branch,
+            target_structures,
             urgency,
-            target_rule=target_rule,
         )
 
     @classmethod
@@ -187,6 +174,15 @@ class PhraseBuilder(Builder):
         return StructureCollection({target for target in targets if target is not None})
 
     def _passes_preliminary_checks(self):
+        self.target_rule = self._target_structures["target_rule"]
+        self.target_root = self._target_structures["target_root"]
+        self.target_left_branch = self._target_structures["target_left_branch"]
+        self.target_right_branch = self._target_structures["target_right_branch"]
+        self.parent_space = (
+            self.target_structures.get_random().parent_space
+            if not self.target_structures.is_empty()
+            else None
+        )
         if len(self.target_structures) < 2:
             return False
         if self.target_rule is None:
@@ -212,12 +208,6 @@ class PhraseBuilder(Builder):
             ):
                 return False
         return True
-
-    def _calculate_confidence(self):
-        mean_quality = statistics.fmean(
-            [target.quality for target in self.target_structures if not target.is_slot]
-        )
-        self.confidence = mean_quality * self.target_rule.activation
 
     def _process_structure(self):
         if len(self.target_structures) == 2:
@@ -292,9 +282,6 @@ class PhraseBuilder(Builder):
         self.child_codelets.append(
             LabelBuilder.spawn(self.codelet_id, self.bubble_chamber, target, urgency)
         )
-
-    def _fail(self):
-        pass
 
     def _rule_is_compatible_with_targets(self, rule: Concept):
         if self.target_left_branch is not None:

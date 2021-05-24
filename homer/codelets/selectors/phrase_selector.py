@@ -2,6 +2,7 @@ import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.selector import Selector
+from homer.codelets.suggesters import PhraseSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
@@ -36,8 +37,6 @@ class PhraseSelector(Selector):
         pass
 
     def _engender_follow_up(self):
-        from homer.codelets.builders import PhraseBuilder
-
         try:
             winning_phrase = self.winners.get_random()
             text_space = winning_phrase.parent_space
@@ -54,15 +53,18 @@ class PhraseSelector(Selector):
                 targets = StructureCollection({target_one, target_two, target_three})
             except MissingStructureError:
                 targets = StructureCollection({target_one, target_two})
-            root, left_branch, right_branch = PhraseBuilder.arrange_targets(targets)
+            root, left_branch, right_branch = PhraseSuggester.arrange_targets(targets)
             urgency = statistics.fmean([target.unhappiness for target in targets])
             self.child_codelets.append(
-                PhraseBuilder.spawn(
+                PhraseSuggester.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
-                    root,
-                    left_branch,
-                    right_branch,
+                    {
+                        "target_root": root,
+                        "target_left_branch": left_branch,
+                        "target_right_branch": right_branch,
+                        "target_rule": None,
+                    },
                     urgency,
                 )
             )

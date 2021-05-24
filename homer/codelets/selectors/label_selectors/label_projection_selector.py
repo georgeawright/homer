@@ -1,8 +1,8 @@
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders.label_builders import LabelProjectionBuilder
 from homer.codelets.selectors import LabelSelector
+from homer.codelets.suggesters.label_suggesters import LabelProjectionSuggester
 from homer.structure_collection import StructureCollection
 
 
@@ -29,10 +29,14 @@ class LabelProjectionSelector(LabelSelector):
         raise NotImplementedError
 
     def _engender_follow_up(self):
+        target_view = (
+            self.winners.where(is_correspondence=True).get_random().parent_view
+        )
         self.child_codelets.append(
-            LabelProjectionBuilder.make(
+            LabelProjectionSuggester.make(
                 self.codelet_id,
                 self.bubble_chamber,
+                target_view=target_view,
             )
         )
         self.child_codelets.append(

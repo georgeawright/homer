@@ -74,9 +74,12 @@ def test_successful_creates_label_corresponding_to_word_and_spawns_follow_up(
     target_chunk = Mock()
     target_chunk.has_label.return_value = False
     target_word.has_correspondence_to_space.return_value = False
-    builder = LabelProjectionBuilder(
-        "", "", bubble_chamber, target_view, target_chunk, target_word, 1
-    )
+    target_structures = {
+        "target_view": target_view,
+        "target_chunk": target_chunk,
+        "target_word": target_word,
+    }
+    builder = LabelProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert len(builder.child_codelets) == 1
@@ -94,9 +97,12 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     target_word.correspondences_to_space.return_value = StructureCollection(
         {correspondence}
     )
-    builder = LabelProjectionBuilder(
-        "", "", bubble_chamber, target_view, target_chunk, target_word, 1
-    )
+    target_structures = {
+        "target_view": target_view,
+        "target_chunk": target_chunk,
+        "target_word": target_word,
+    }
+    builder = LabelProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result
 
@@ -107,8 +113,11 @@ def test_fizzles_if_target_chunk_already_has_corresponding_label(
     target_chunk = Mock()
     target_chunk.has_label.return_value = True
     target_word.has_correspondence_to_space.return_value = True
-    builder = LabelProjectionBuilder(
-        "", "", bubble_chamber, target_view, target_chunk, target_word, 1
-    )
+    target_structures = {
+        "target_view": target_view,
+        "target_chunk": target_chunk,
+        "target_word": target_word,
+    }
+    builder = LabelProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

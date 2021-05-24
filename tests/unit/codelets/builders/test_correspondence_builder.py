@@ -126,76 +126,27 @@ def target_view(existing_correspondence, target_space_one, target_space_two):
     return view
 
 
-def test_gets_second_target_space_and_structure_if_needed(
-    bubble_chamber,
-    target_view,
-    target_space_one,
-    target_structure_one,
-    same_concept,
-    target_space_two,
-    target_structure_two,
-):
-    correspondence_builder = CorrespondenceBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        target_view,
-        target_space_one,
-        target_structure_one,
-        Mock(),
-        parent_concept=same_concept,
-    )
-    assert correspondence_builder.target_space_two is None
-    assert correspondence_builder.target_structure_two is None
-    correspondence_builder.run()
-    assert correspondence_builder.target_space_two == target_space_two
-    assert correspondence_builder.target_structure_two == target_structure_two
-
-
-def test_gets_parent_concept_if_needed(
-    bubble_chamber,
-    target_view,
-    target_space_one,
-    target_structure_one,
-    target_space_two,
-    target_structure_two,
-):
-    correspondence_builder = CorrespondenceBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        target_view,
-        target_space_one,
-        target_structure_one,
-        Mock(),
-        target_space_two=target_space_two,
-        target_structure_two=target_structure_two,
-    )
-    assert correspondence_builder.parent_concept is None
-    correspondence_builder.run()
-    assert correspondence_builder.parent_concept is not None
-
-
 def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber,
     target_view,
     target_space_one,
     target_structure_one,
+    label_concept_space,
     same_concept,
     target_space_two,
     target_structure_two,
 ):
+    target_structures = {
+        "target_view": target_view,
+        "target_space_one": target_space_one,
+        "target_space_two": target_space_two,
+        "target_structure_one": target_structure_one,
+        "target_structure_two": target_structure_two,
+        "target_conceptual_space": label_concept_space,
+        "parent_concept": same_concept,
+    }
     correspondence_builder = CorrespondenceBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        target_view,
-        target_space_one,
-        target_structure_one,
-        Mock(),
-        target_space_two=target_space_two,
-        target_structure_two=target_structure_two,
-        parent_concept=same_concept,
+        Mock(), Mock(), bubble_chamber, target_structures, 1
     )
     result = correspondence_builder.run()
     assert CodeletResult.SUCCESS == result
@@ -204,53 +155,28 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceEvaluator)
 
 
-def test_fails_when_structures_do_not_correspond(
-    bubble_chamber,
-    target_view,
-    target_space_one,
-    target_structure_one,
-    target_space_two,
-    target_structure_two,
-):
-    concept = Mock()
-    concept.classifier.classify.return_value = 0.0
-    correspondence_builder = CorrespondenceBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        target_view,
-        target_space_one,
-        target_structure_one,
-        Mock(),
-        target_space_two=target_space_two,
-        target_structure_two=target_structure_two,
-        parent_concept=concept,
-    )
-    result = correspondence_builder.run()
-    assert CodeletResult.FAIL == result
-    assert correspondence_builder.child_structures is None
-
-
 def test_fizzles_when_correspondence_already_exists(
     bubble_chamber,
     target_view,
     target_structure_one,
+    target_space_one,
     target_space_two,
     target_structure_two,
+    label_concept_space,
     same_concept,
 ):
-    target_structure_one.has_correspondence.return_value = True
+    target_view.has_member.return_value = True
+    target_structures = {
+        "target_view": target_view,
+        "target_space_one": target_space_one,
+        "target_space_two": target_space_two,
+        "target_structure_one": target_structure_one,
+        "target_structure_two": target_structure_two,
+        "target_conceptual_space": label_concept_space,
+        "parent_concept": same_concept,
+    }
     correspondence_builder = CorrespondenceBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        target_view,
-        Mock(),
-        target_structure_one,
-        Mock(),
-        target_space_two=target_space_two,
-        target_structure_two=target_structure_two,
-        parent_concept=same_concept,
+        Mock(), Mock(), bubble_chamber, target_structures, 1
     )
     result = correspondence_builder.run()
     assert CodeletResult.FIZZLE == result

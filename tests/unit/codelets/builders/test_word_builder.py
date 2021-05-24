@@ -75,7 +75,6 @@ def frame_word(frame):
     return word
 
 
-@pytest.mark.skip
 @pytest.fixture
 def frame_slot(frame, temperature_concept, warm_lexeme):
     slot = Mock()
@@ -154,11 +153,16 @@ def target_view(
 
 
 def test_successfully_creates_word_from_slot(
-    bubble_chamber, target_view, frame_slot, chunk_slot_correspondence
+    bubble_chamber, target_view, frame_slot, chunk_slot_correspondence, frame_chunk
 ):
-    word_builder = WordBuilder(
-        Mock(), Mock(), bubble_chamber, target_view, frame_slot, 1
-    )
+    target_structures = {
+        "target_view": target_view,
+        "target_word": frame_slot,
+        "word_correspondee": frame_chunk,
+        "non_frame": Mock(),
+        "non_frame_item": Mock(),
+    }
+    word_builder = WordBuilder(Mock(), Mock(), bubble_chamber, target_structures, 1)
     result = word_builder.run()
     assert CodeletResult.SUCCESS == result
     assert hasinstance(word_builder.child_structures, Word)
@@ -167,9 +171,14 @@ def test_successfully_creates_word_from_slot(
 
 
 def test_successfully_creates_word_from_word(bubble_chamber, target_view, frame_word):
-    word_builder = WordBuilder(
-        Mock(), Mock(), bubble_chamber, target_view, frame_word, 1
-    )
+    target_structures = {
+        "target_view": target_view,
+        "target_word": frame_word,
+        "word_correspondee": None,
+        "non_frame": None,
+        "non_frame_item": None,
+    }
+    word_builder = WordBuilder(Mock(), Mock(), bubble_chamber, target_structures, 1)
     result = word_builder.run()
     assert CodeletResult.SUCCESS == result
     assert hasinstance(word_builder.child_structures, Word)

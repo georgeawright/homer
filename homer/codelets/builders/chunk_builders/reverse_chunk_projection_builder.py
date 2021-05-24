@@ -22,9 +22,7 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_interpretation_chunk: Chunk,
-        target_raw_chunk: Chunk,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         ChunkBuilder.__init__(
@@ -32,12 +30,12 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_interpretation_chunk,
+            target_structures,
             urgency,
         )
-        self.target_view = target_view
-        self.target_interpretation_chunk = target_interpretation_chunk
-        self.target_raw_chunk = target_raw_chunk
+        self.target_view = None
+        self.target_interpretation_chunk = None
+        self.target_raw_chunk = None
         self.correspondee_to_raw_chunk = None
         self.new_chunk = None
         self.confidence = 0.0
@@ -55,9 +53,7 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_interpretation_chunk: Chunk,
-        target_raw_chunk: Chunk,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -65,9 +61,7 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_view,
-            target_interpretation_chunk,
-            target_raw_chunk,
+            target_structures,
             urgency,
         )
 
@@ -118,13 +112,12 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
-    @property
-    def target_structures(self):
-        return StructureCollection(
-            {self.target_view, self.target_interpretation_chunk, self.target_raw_chunk}
-        )
-
     def _passes_preliminary_checks(self):
+        self.target_view = self._target_structures["target_view"]
+        self.target_interpretation_chunk = self._target_structures[
+            "target_interpretation_chunk"
+        ]
+        self.target_raw_chunk = self._target_structures["target_raw_chunk"]
         if self.target_raw_chunk.has_correspondence_to_space(
             self.target_interpretation_chunk.parent_space
         ):
@@ -166,27 +159,6 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
             0,
         )
         return True
-
-    def _calculate_confidence(self):
-        self.confidence = (
-            statistics.fmean(
-                [
-                    link.parent_concept.classifier.classify(
-                        start=link.start
-                        if link.start != self.target_interpretation_chunk
-                        else self.new_chunk,
-                        end=link.end
-                        if link.end != self.target_interpretation_chunk
-                        else self.new_chunk,
-                        concept=link.parent_concept,
-                        space=link.parent_space,
-                    )
-                    for link in self.target_interpretation_chunk.links
-                ]
-            )
-            if not self.target_interpretation_chunk.links.is_empty()
-            else 0
-        )
 
     def _process_structure(self):
         self.correspondee_to_raw_chunk.structure_id = ID.new(Chunk)

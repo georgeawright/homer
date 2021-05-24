@@ -95,8 +95,9 @@ def target_correspondence(target_view, input_space, frame, original_phrase):
 def test_successfully_projects_phrase_and_spawns_follow_up(
     bubble_chamber, target_correspondence
 ):
+    target_structures = {"target_correspondence": target_correspondence}
     builder = PhraseProjectionBuilder(
-        Mock(), Mock(), bubble_chamber, target_correspondence, 1
+        Mock(), Mock(), bubble_chamber, target_structures, 1
     )
     result = builder.run()
     assert CodeletResult.SUCCESS == result
@@ -109,6 +110,7 @@ def test_fizzles_if_phrase_already_has_correspondence_in_output(
     bubble_chamber, target_correspondence
 ):
     target_correspondence.start.has_correspondence_to_space.return_value = True
-    builder = PhraseProjectionBuilder("", "", bubble_chamber, target_correspondence, 1)
+    target_structures = {"target_correspondence": target_correspondence}
+    builder = PhraseProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

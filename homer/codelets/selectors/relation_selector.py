@@ -1,6 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders import RelationBuilder
 from homer.codelets.selector import Selector
+from homer.codelets.suggesters import RelationSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
@@ -42,21 +42,23 @@ class RelationSelector(Selector):
 
     def _engender_follow_up(self):
         winner_relation = self.winners.get_random()
-        target_concept = winner_relation.parent_concept.friends().get_random()
+        parent_concept = winner_relation.parent_concept.friends().get_random()
         try:
             target_space = StructureCollection.intersection(
                 winner_relation.start.parent_spaces.where(no_of_dimensions=1),
                 winner_relation.end.parent_spaces.where(no_of_dimensions=1),
             ).get_random(exclude=[winner_relation.parent_space])
             self.child_codelets.append(
-                RelationBuilder.spawn(
+                RelationSuggester.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
-                    target_space,
-                    winner_relation.start,
+                    {
+                        "target_space": target_space,
+                        "target_structure_one": winner_relation.start,
+                        "target_structure_two": winner_relation.end,
+                        "parent_concept": parent_concept,
+                    },
                     winner_relation.unlinkedness,
-                    target_structure_two=winner_relation.end,
-                    parent_concept=target_concept,
                 )
             )
         except MissingStructureError:

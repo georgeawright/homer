@@ -1,6 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders import LabelBuilder
 from homer.codelets.selector import Selector
+from homer.codelets.suggesters import LabelSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
@@ -38,15 +38,14 @@ class LabelSelector(Selector):
     def _engender_follow_up(self):
         try:
             winning_label = self.winners.get_random()
-            target_concept = winning_label.parent_concept.friends().get_random()
+            parent_concept = winning_label.parent_concept.friends().get_random()
             target_node = winning_label.start.nearby().get_unhappy()
             self.child_codelets.append(
-                LabelBuilder.spawn(
+                LabelSuggester.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
-                    target_node,
+                    {"target_node": target_node, "parent_concept": parent_concept},
                     target_node.unlinkedness,
-                    parent_concept=target_concept,
                 )
             )
         except MissingStructureError:

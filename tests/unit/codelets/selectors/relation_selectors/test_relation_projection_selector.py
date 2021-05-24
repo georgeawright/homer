@@ -3,8 +3,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders.relation_builders import RelationProjectionBuilder
 from homer.codelets.selectors.relation_selectors import RelationProjectionSelector
+from homer.codelets.suggesters.relation_suggesters import RelationProjectionSuggester
 from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
@@ -54,6 +54,8 @@ def test_chunk_and_correspondence_are_boosted_follow_up_is_spawned(
     label.quality = 1.0
     label.activation = 0.0
     correspondence = Mock()
+    correspondence.is_correspondence = True
+    correspondence.parent_view = target_view
     correspondence.quality = 1.0
     correspondence.activation = 0.0
     selector = RelationProjectionSelector(
@@ -67,5 +69,5 @@ def test_chunk_and_correspondence_are_boosted_follow_up_is_spawned(
     assert CodeletResult.SUCCESS == selector.result
     assert label.boost_activation.is_called()
     assert 2 == len(selector.child_codelets)
-    assert hasinstance(selector.child_codelets, RelationProjectionBuilder)
+    assert hasinstance(selector.child_codelets, RelationProjectionSuggester)
     assert hasinstance(selector.child_codelets, RelationProjectionSelector)

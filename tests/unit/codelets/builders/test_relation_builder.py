@@ -52,30 +52,17 @@ def target_structure_one(target_structure_two):
     return structure
 
 
-def test_bottom_up_codelet_gets_a_concept(bubble_chamber):
-    target_structure_one = Mock()
-    relation_builder = RelationBuilder(
-        Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, 1.0
-    )
-    assert relation_builder.parent_concept is None
-    relation_builder.run()
-    assert relation_builder.parent_concept is not None
-
-
-def test_codelet_gets_a_second_target_structure(bubble_chamber, target_structure_one):
-    relation_builder = RelationBuilder(
-        Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
-    )
-    assert relation_builder.target_structure_two is None
-    relation_builder.run()
-    assert relation_builder.target_structure_two is not None
-
-
 def test_successful_creates_chunk_and_spawns_follow_up(
-    bubble_chamber, target_structure_one
+    bubble_chamber, target_structure_one, target_structure_two, parent_concept
 ):
+    target_structures = {
+        "target_structure_one": target_structure_one,
+        "target_structure_two": target_structure_two,
+        "target_space": Mock(),
+        "parent_concept": parent_concept,
+    }
     relation_builder = RelationBuilder(
-        Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, Mock()
+        Mock(), Mock(), bubble_chamber, target_structures, Mock()
     )
     result = relation_builder.run()
     assert CodeletResult.SUCCESS == result
@@ -84,22 +71,18 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     assert isinstance(relation_builder.child_codelets[0], RelationEvaluator)
 
 
-def test_fails_when_structures_cannot_be_related(
-    parent_concept, bubble_chamber, target_structure_one
+def test_fizzles_when_relation_already_exists(
+    bubble_chamber, target_structure_one, target_structure_two, parent_concept
 ):
-    parent_concept.classifier.classify.return_value = 0.0
-    relation_builder = RelationBuilder(
-        Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, 1.0
-    )
-    result = relation_builder.run()
-    assert CodeletResult.FAIL == result
-    assert relation_builder.child_structures is None
-
-
-def test_fizzles_when_relation_already_exists(bubble_chamber, target_structure_one):
     target_structure_one.has_relation.return_value = True
+    target_structures = {
+        "target_structure_one": target_structure_one,
+        "target_structure_two": target_structure_two,
+        "target_space": Mock(),
+        "parent_concept": parent_concept,
+    }
     relation_builder = RelationBuilder(
-        Mock(), Mock(), bubble_chamber, Mock(), target_structure_one, 1.0
+        Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     result = relation_builder.run()
     assert CodeletResult.FIZZLE == result

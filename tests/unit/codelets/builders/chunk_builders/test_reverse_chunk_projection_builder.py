@@ -64,19 +64,22 @@ def target_raw_chunk():
 def test_successful_projects_chunk_creates_larger_chunk_and_spawns_follow_up(
     bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
 ):
-    chunk_builder = ReverseChunkProjectionBuilder(
+    target_structures = {
+        "target_view": target_view,
+        "target_interpretation_chunk": target_interpretation_chunk,
+        "target_raw_chunk": target_raw_chunk,
+    }
+    builder = ReverseChunkProjectionBuilder(
         Mock(),
         Mock(),
         bubble_chamber,
-        target_view,
-        target_interpretation_chunk,
-        target_raw_chunk,
+        target_structures,
         1,
     )
-    result = chunk_builder.run()
+    result = builder.run()
     assert CodeletResult.SUCCESS == result
-    assert hasinstance(chunk_builder.child_structures, Chunk)
-    child_chunks = chunk_builder.child_structures.of_type(Chunk)
+    assert hasinstance(builder.child_structures, Chunk)
+    child_chunks = builder.child_structures.of_type(Chunk)
     child_chunk_1 = child_chunks.pop()
     child_chunk_2 = child_chunks.pop()
     assert (
@@ -86,47 +89,27 @@ def test_successful_projects_chunk_creates_larger_chunk_and_spawns_follow_up(
         child_chunk_2 in child_chunk_1.members
         and child_chunk_1.size > len(target_interpretation_chunk.members)
     )
-    assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ReverseChunkProjectionEvaluator)
-
-
-def test_fails_when_raw_chunk_is_incompatible_with_links(
-    bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
-):
-    link_1 = Mock()
-    link_1.parent_concept.classifier.classify.return_value = 0
-    target_interpretation_chunk.links.add(link_1)
-    link_2 = Mock()
-    link_2.parent_concept.classifier.classify.return_value = 0
-    target_interpretation_chunk.links.add(link_2)
-    chunk_builder = ReverseChunkProjectionBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        target_view,
-        target_interpretation_chunk,
-        target_raw_chunk,
-        1.0,
-    )
-    result = chunk_builder.run()
-    assert CodeletResult.FAIL == result
-    assert chunk_builder.child_structures is None
+    assert len(builder.child_codelets) == 1
+    assert isinstance(builder.child_codelets[0], ReverseChunkProjectionEvaluator)
 
 
 def test_fizzles_when_raw_chunk_has_correspondence_to_interpretation_space(
     bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
 ):
     target_raw_chunk.has_correspondence_to_space.return_value = True
+    target_structures = {
+        "target_view": target_view,
+        "target_interpretation_chunk": target_interpretation_chunk,
+        "target_raw_chunk": target_raw_chunk,
+    }
     urgency = 1.0
-    chunk_builder = ReverseChunkProjectionBuilder(
+    builder = ReverseChunkProjectionBuilder(
         Mock(),
         Mock(),
         bubble_chamber,
-        target_view,
-        target_interpretation_chunk,
-        target_raw_chunk,
+        target_structures,
         urgency,
     )
-    result = chunk_builder.run()
+    result = builder.run()
     assert CodeletResult.FIZZLE == result
-    assert chunk_builder.child_structures is None
+    assert builder.child_structures is None

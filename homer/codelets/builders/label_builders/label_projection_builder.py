@@ -21,17 +21,15 @@ class LabelProjectionBuilder(LabelBuilder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_chunk: Chunk,
-        target_word: Word,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         LabelBuilder.__init__(
-            self, codelet_id, parent_id, bubble_chamber, target_chunk, urgency
+            self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_view = target_view
-        self.target_chunk = target_chunk
-        self.target_word = target_word
+        self.target_view = None
+        self.target_chunk = None
+        self.target_word = None
         self.parent_concept = None
 
     @classmethod
@@ -45,9 +43,7 @@ class LabelProjectionBuilder(LabelBuilder):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_chunk: Chunk,
-        target_word: Word,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -55,9 +51,7 @@ class LabelProjectionBuilder(LabelBuilder):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_view,
-            target_chunk,
-            target_word,
+            target_structures,
             urgency,
         )
 
@@ -105,13 +99,10 @@ class LabelProjectionBuilder(LabelBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["label"]
 
-    @property
-    def target_structures(self):
-        return StructureCollection(
-            {self.target_view, self.target_word, self.target_chunk}
-        )
-
     def _passes_preliminary_checks(self):
+        self.target_view = self._target_structures["target_view"]
+        self.target_chunk = self._target_structures["target_chunk"]
+        self.target_word = self._target_structures["target_word"]
         try:
             self.parent_concept = self.target_word.lexeme.concepts.get_random()
         except MissingStructureError:
@@ -123,12 +114,6 @@ class LabelProjectionBuilder(LabelBuilder):
             for correspondence in self.target_word.correspondences_to_space(
                 self.target_view.interpretation_space
             )
-        )
-
-    def _calculate_confidence(self):
-        self.confidence = FloatBetweenOneAndZero(
-            self.parent_concept.parent_space
-            in self.bubble_chamber.spaces["label concepts"].contents
         )
 
     def _process_structure(self):

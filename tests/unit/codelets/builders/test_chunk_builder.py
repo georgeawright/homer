@@ -76,8 +76,13 @@ def target_chunk(common_space, second_target_chunk):
     return chunk
 
 
-def test_successful_creates_chunk_and_spawns_follow_up(bubble_chamber, target_chunk):
-    chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
+def test_successful_creates_chunk_and_spawns_follow_up(
+    bubble_chamber, target_chunk, second_target_chunk
+):
+    target_structures = {"target_one": target_chunk, "target_two": second_target_chunk}
+    chunk_builder = ChunkBuilder(
+        Mock(), Mock(), bubble_chamber, target_structures, Mock()
+    )
     result = chunk_builder.run()
     assert CodeletResult.SUCCESS == result
     assert hasinstance(chunk_builder.child_structures, Chunk)
@@ -88,39 +93,30 @@ def test_successful_creates_chunk_and_spawns_follow_up(bubble_chamber, target_ch
 def test_new_chunk_has_no_duplicate_links(
     bubble_chamber, target_chunk, second_target_chunk, common_space
 ):
+    target_structures = {"target_one": target_chunk, "target_two": second_target_chunk}
     concept = Mock()
     label_1 = Label(Mock(), Mock(), target_chunk, concept, common_space, 1)
     label_2 = Label(Mock(), Mock(), second_target_chunk, concept, common_space, 1)
     target_chunk.labels = StructureCollection({label_1})
     second_target_chunk.labels = StructureCollection({label_2})
-    chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, Mock())
+    chunk_builder = ChunkBuilder(
+        Mock(), Mock(), bubble_chamber, target_structures, Mock()
+    )
     result = chunk_builder.run()
     assert CodeletResult.SUCCESS == result
     child_structure = chunk_builder.child_structures.get_random()
     assert len(child_structure.links) == 1
 
 
-def test_fails_when_chunks_are_incompatible(bubble_chamber, target_chunk, common_space):
-    common_space.proximity_between.return_value = 0.0
-    chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
-    result = chunk_builder.run()
-    assert CodeletResult.FAIL == result
-    assert chunk_builder.child_structures is None
-
-
-def test_fizzles_when_no_second_target(bubble_chamber, target_chunk):
-    target_chunk.nearby.return_value = StructureCollection()
-    urgency = 1.0
-    chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, urgency)
-    result = chunk_builder.run()
-    assert CodeletResult.FIZZLE == result
-    assert chunk_builder.child_structures is None
-
-
-def test_fizzles_when_chunk_already_exists(bubble_chamber, target_chunk):
+def test_fizzles_when_chunk_already_exists(
+    bubble_chamber, target_chunk, second_target_chunk
+):
     bubble_chamber.has_chunk.return_value = True
+    target_structures = {"target_one": target_chunk, "target_two": second_target_chunk}
     urgency = 1.0
-    chunk_builder = ChunkBuilder(Mock(), Mock(), bubble_chamber, target_chunk, urgency)
+    chunk_builder = ChunkBuilder(
+        Mock(), Mock(), bubble_chamber, target_structures, urgency
+    )
     result = chunk_builder.run()
     assert CodeletResult.FIZZLE == result
     assert chunk_builder.child_structures is None

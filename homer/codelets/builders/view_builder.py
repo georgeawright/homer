@@ -62,15 +62,7 @@ class ViewBuilder(Builder):
                     self.frame = space
         return True
 
-    def _calculate_confidence(self):
-        self.confidence = statistics.fmean(
-            [space.activation for space in self.target_spaces]
-        )
-
     def _fizzle(self):
-        pass
-
-    def _fail(self):
         pass
 
     def _instantiate_frame(self, frame: Frame) -> Frame:

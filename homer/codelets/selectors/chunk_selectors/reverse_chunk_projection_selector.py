@@ -1,7 +1,7 @@
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders.chunk_builders import ReverseChunkProjectionBuilder
+from homer.codelets.suggesters.chunk_suggesters import ReverseChunkProjectionSuggester
 from homer.codelets.selectors import ChunkSelector
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
@@ -54,12 +54,14 @@ class ReverseChunkProjectionSelector(ChunkSelector):
             ).get_random()
         target = self.winners.get_random()
         self.child_codelets.append(
-            ReverseChunkProjectionBuilder.spawn(
+            ReverseChunkProjectionSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                target_view,
-                target_interpretation_chunk,
-                target_raw_chunk,
+                {
+                    "target_view": target_view,
+                    "target_interpretation_chunk": target_interpretation_chunk,
+                    "target_raw_chunk": target_raw_chunk,
+                },
                 target.activation,
             )
         )

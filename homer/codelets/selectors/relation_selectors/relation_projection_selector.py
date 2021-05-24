@@ -1,8 +1,8 @@
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders.relation_builders import RelationProjectionBuilder
 from homer.codelets.selectors import RelationSelector
+from homer.codelets.suggesters.relation_suggesters import RelationProjectionSuggester
 from homer.structure_collection import StructureCollection
 
 
@@ -31,10 +31,14 @@ class RelationProjectionSelector(RelationSelector):
         raise NotImplementedError
 
     def _engender_follow_up(self):
+        target_view = (
+            self.winners.where(is_correspondence=True).get_random().parent_view
+        )
         self.child_codelets.append(
-            RelationProjectionBuilder.make(
+            RelationProjectionSuggester.make(
                 self.codelet_id,
                 self.bubble_chamber,
+                target_view=target_view,
             )
         )
         self.child_codelets.append(

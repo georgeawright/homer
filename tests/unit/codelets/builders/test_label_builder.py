@@ -21,6 +21,7 @@ def working_space():
 @pytest.fixture
 def parent_concept(working_space):
     concept = Mock()
+    concept.is_concept = True
     concept.relevant_value = "value"
     concept.parent_space.instance_in_space.return_value = working_space
     concept.classifier.classify.return_value = 1.0
@@ -59,15 +60,11 @@ def target_chunk():
     return chunk
 
 
-def test_bottom_up_codelet_gets_a_concept(bubble_chamber, target_chunk):
-    label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
-    assert label_builder.parent_concept is None
-    label_builder.run()
-    assert label_builder.parent_concept is not None
-
-
-def test_successful_creates_label_and_spawns_follow_up(bubble_chamber, target_chunk):
-    label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
+def test_successful_creates_label_and_spawns_follow_up(
+    bubble_chamber, target_chunk, parent_concept
+):
+    target_structures = {"target_node": target_chunk, "parent_concept": parent_concept}
+    label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_structures, 1.0)
     result = label_builder.run()
     assert CodeletResult.SUCCESS == result
     assert hasinstance(label_builder.child_structures, Label)
@@ -75,20 +72,10 @@ def test_successful_creates_label_and_spawns_follow_up(bubble_chamber, target_ch
     assert isinstance(label_builder.child_codelets[0], LabelEvaluator)
 
 
-def test_fails_when_chunk_is_bad_example(bubble_chamber, target_chunk):
-    parent_concept = Mock()
-    parent_concept.classifier.classify.return_value = 0.0
-    label_builder = LabelBuilder(
-        Mock(), Mock(), bubble_chamber, target_chunk, 1.0, parent_concept=parent_concept
-    )
-    result = label_builder.run()
-    assert CodeletResult.FAIL == result
-    assert label_builder.child_structures is None
-
-
-def test_fizzles_when_label_exists(bubble_chamber, target_chunk):
+def test_fizzles_when_label_exists(bubble_chamber, target_chunk, parent_concept):
     target_chunk.has_label.return_value = True
-    label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_chunk, 1.0)
+    target_structures = {"target_node": target_chunk, "parent_concept": parent_concept}
+    label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_structures, 1.0)
     result = label_builder.run()
     assert CodeletResult.FIZZLE == result
     assert label_builder.child_structures is None

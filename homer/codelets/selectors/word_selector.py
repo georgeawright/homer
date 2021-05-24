@@ -1,5 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.selector import Selector
+from homer.codelets.suggesters import WordSuggester
 from homer.structure_collection import StructureCollection
 
 
@@ -24,8 +25,6 @@ class WordSelector(Selector):
         pass
 
     def _engender_follow_up(self):
-        from homer.codelets.builders import WordBuilder
-
         correspondence_from_frame = StructureCollection(
             {
                 correspondence
@@ -36,11 +35,13 @@ class WordSelector(Selector):
         frame = correspondence_from_frame.start_space
         new_target = frame.contents.where(is_word=True).get_unhappy()
         self.child_codelets.append(
-            WordBuilder.spawn(
+            WordSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                correspondence_from_frame.parent_view,
-                new_target,
+                {
+                    "target_view": correspondence_from_frame.parent_view,
+                    "target_word": new_target,
+                },
                 new_target.unhappiness,
             )
         )

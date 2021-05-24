@@ -3,8 +3,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.selectors import CorrespondenceSelector
+from homer.codelets.suggesters import CorrespondenceSuggester
 from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
@@ -143,5 +143,5 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 2 == len(selector.child_codelets)
-        assert hasinstance(selector.child_codelets, CorrespondenceBuilder)
+        assert hasinstance(selector.child_codelets, CorrespondenceSuggester)
         assert hasinstance(selector.child_codelets, CorrespondenceSelector)

@@ -3,8 +3,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders.phrase_builders import PhraseProjectionBuilder
 from homer.codelets.selectors.phrase_selectors import PhraseProjectionSelector
+from homer.codelets.suggesters.phrase_suggesters import PhraseProjectionSuggester
 from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
@@ -45,23 +45,38 @@ def test_winner_is_boosted_follow_up_is_spawned(
     random_number,
     expected_winner,
     bubble_chamber,
+    target_view,
 ):
     with patch.object(random, "random", return_value=random_number):
         champion = Mock()
+        champion.is_phrase = True
         champion.size = 2
         champion.quality = champion_quality
         champion.activation = champion_activation
+        champion_correspondence = Mock()
+        champion_correspondence.is_correspondence = True
+        champion_correspondence.parent_view = target_view
+        champion_correspondence.quality = champion_quality
+        champion_correspondence.activation = champion_activation
+
         challenger = Mock()
+        challenger.is_phrase = True
         challenger.size = 2
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
+        challenger_correspondence = Mock()
+        challenger_correspondence.is_correspondence = True
+        challenger_correspondence.parent_view = target_view
+        challenger_correspondence.quality = champion_quality
+        challenger_correspondence.activation = champion_activation
+
         selector = PhraseProjectionSelector(
             Mock(),
             Mock(),
             bubble_chamber,
-            StructureCollection({champion}),
+            StructureCollection({champion, champion_correspondence}),
             Mock(),
-            challengers=StructureCollection({challenger}),
+            challengers=StructureCollection({challenger, challenger_correspondence}),
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result
@@ -72,5 +87,5 @@ def test_winner_is_boosted_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 2 == len(selector.child_codelets)
-        assert hasinstance(selector.child_codelets, PhraseProjectionBuilder)
+        assert hasinstance(selector.child_codelets, PhraseProjectionSuggester)
         assert hasinstance(selector.child_codelets, PhraseProjectionSelector)

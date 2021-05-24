@@ -58,17 +58,3 @@ def test_successful_creates_view_and_spawns_follow_up(
     assert hasinstance(view_builder.child_structures, MonitoringView)
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], MonitoringViewEvaluator)
-
-
-def test_fails_when_space_activations_are_low(bubble_chamber, input_space, text_space):
-    input_space.activation = 0.1
-    text_space.activation = 0.1
-    view_builder = MonitoringViewBuilder(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        StructureCollection({input_space, text_space}),
-        1.0,
-    )
-    result = view_builder.run()
-    assert CodeletResult.FAIL == result

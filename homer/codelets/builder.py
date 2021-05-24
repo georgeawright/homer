@@ -3,6 +3,7 @@ from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
+from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 
 
@@ -52,17 +53,11 @@ class Builder(Codelet):
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return self.result
-        self._calculate_confidence()
-        if abs(self.confidence) > self.CONFIDENCE_THRESHOLD:
-            self._boost_activations()
-            self._process_structure()
-            self._engender_follow_up()
-            self.result = CodeletResult.SUCCESS
-            return self.result
-        self._decay_activations()
-        self._fail()
-        self.result = CodeletResult.FAIL
-        return CodeletResult.FAIL
+        self._boost_activations()
+        self._process_structure()
+        self._engender_follow_up()
+        self.result = CodeletResult.SUCCESS
+        return self.result
 
     @property
     def _parent_link(self):
@@ -76,19 +71,22 @@ class Builder(Codelet):
     def _structure_concept(self):
         raise NotImplementedError
 
+    @property
+    def target_structures(self):
+        return StructureCollection(
+            {structure for structure in self._target_structures.values()}
+        )
+
     def _boost_activations(self):
         self._build_concept.boost_activation(1)
         self._structure_concept.boost_activation(1)
-        self._parent_link.boost_activation(self.confidence)
+        self._parent_link.boost_activation(self.urgency)
 
     def _decay_activations(self):
         self._build_concept.decay_activation()
-        self._parent_link.decay_activation(1 - self.confidence)
+        self._parent_link.decay_activation(1 - self.urgency)
 
     def _passes_preliminary_checks(self):
-        raise NotImplementedError
-
-    def _calculate_confidence(self):
         raise NotImplementedError
 
     def _process_structure(self):

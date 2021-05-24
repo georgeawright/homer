@@ -99,15 +99,26 @@ def target_word(bubble_chamber, parent_concept, conceptual_space):
 
 
 def test_successful_creates_relation_corresponding_to_word_and_spawns_follow_up(
-    bubble_chamber, target_view, target_word
+    bubble_chamber,
+    target_view,
+    target_word,
+    target_structure_two,
+    target_space,
+    parent_concept,
 ):
     target_structure_one = Mock()
     target_structure_one.value = [[10]]
     target_structure_one.has_relation.return_value = False
     target_word.has_correspondence_to_space.return_value = False
-    builder = RelationProjectionBuilder(
-        "", "", bubble_chamber, target_view, target_structure_one, target_word, 1
-    )
+    target_structures = {
+        "target_view": target_view,
+        "target_structure_one": target_structure_one,
+        "target_structure_two": target_structure_two,
+        "target_word": target_word,
+        "parent_concept": parent_concept,
+        "target_space": target_space,
+    }
+    builder = RelationProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert len(builder.child_codelets) == 1
@@ -115,28 +126,50 @@ def test_successful_creates_relation_corresponding_to_word_and_spawns_follow_up(
 
 
 def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
-    bubble_chamber, target_view, target_word
+    bubble_chamber,
+    target_view,
+    target_word,
+    target_structure_two,
+    target_space,
+    parent_concept,
 ):
     target_structure_one = Mock()
     target_structure_one.value = [[10]]
     target_structure_one.has_label.return_value = False
     target_word.has_correspondence_to_space.return_value = True
-    builder = RelationProjectionBuilder(
-        "", "", bubble_chamber, target_view, target_structure_one, target_word, 1
-    )
+    target_structures = {
+        "target_view": target_view,
+        "target_structure_one": target_structure_one,
+        "target_structure_two": target_structure_two,
+        "target_word": target_word,
+        "parent_concept": parent_concept,
+        "target_space": target_space,
+    }
+    builder = RelationProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result
 
 
 def test_fizzles_if_target_chunk_already_has_corresponding_relation(
-    bubble_chamber, target_view, target_word
+    bubble_chamber,
+    target_view,
+    target_word,
+    target_structure_two,
+    target_space,
+    parent_concept,
 ):
     target_structure_one = Mock()
     target_structure_one.value = [[10]]
     target_structure_one.has_relation.return_value = True
     target_word.has_correspondence_to_space.return_value = True
-    builder = RelationProjectionBuilder(
-        "", "", bubble_chamber, target_view, target_structure_one, target_word, 1
-    )
+    target_structures = {
+        "target_view": target_view,
+        "target_structure_one": target_structure_one,
+        "target_structure_two": target_structure_two,
+        "target_word": target_word,
+        "parent_concept": parent_concept,
+        "target_space": target_space,
+    }
+    builder = RelationProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

@@ -3,8 +3,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders.chunk_builders import ReverseChunkProjectionBuilder
 from homer.codelets.selectors.chunk_selectors import ReverseChunkProjectionSelector
+from homer.codelets.suggesters.chunk_suggesters import ReverseChunkProjectionSuggester
 from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
@@ -55,5 +55,5 @@ def test_chunk_and_correspondence_are_boosted_follow_up_is_spawned(
     assert CodeletResult.SUCCESS == selector.result
     assert chunk.boost_activation.is_called()
     assert 2 == len(selector.child_codelets)
-    assert hasinstance(selector.child_codelets, ReverseChunkProjectionBuilder)
+    assert hasinstance(selector.child_codelets, ReverseChunkProjectionSuggester)
     assert hasinstance(selector.child_codelets, ReverseChunkProjectionSelector)

@@ -1,7 +1,7 @@
 import statistics
 
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders.chunk_builders import ChunkProjectionBuilder
+from homer.codelets.suggesters.chunk_suggesters import ChunkProjectionSuggester
 from homer.codelets.selectors import ChunkSelector
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
@@ -29,9 +29,12 @@ class ChunkProjectionSelector(ChunkSelector):
         if self.challengers is not None:
             return True
         try:
-            champion_chunk = self.champions.get_random()
+            champion_chunk = self.champions.where(is_chunk=True).get_random()
             challenger_chunk = champion_chunk.nearby().get_active()
-            self.challengers = StructureCollection({challenger_chunk})
+            challenger_correspondence = challenger_chunk.correspondences.get_random()
+            self.challengers = StructureCollection(
+                {challenger_chunk, challenger_correspondence}
+            )
         except MissingStructureError:
             return True
         members_intersection = StructureCollection.intersection(
@@ -48,10 +51,12 @@ class ChunkProjectionSelector(ChunkSelector):
         raise NotImplementedError
 
     def _engender_follow_up(self):
+        target_view = (
+            self.winners.where(is_correspondence=True).get_random().parent_view
+        )
         self.child_codelets.append(
-            ChunkProjectionBuilder.make(
-                self.codelet_id,
-                self.bubble_chamber,
+            ChunkProjectionSuggester.make(
+                self.codelet_id, self.bubble_chamber, target_view=target_view
             )
         )
         self.child_codelets.append(
@@ -62,3 +67,11 @@ class ChunkProjectionSelector(ChunkSelector):
                 self.follow_up_urgency,
             )
         )
+
+    @property
+    def _champions_size(self):
+        return self.champions.where(is_chunk=True).get_random().size
+
+    @property
+    def _challengers_size(self):
+        return self.challengers.where(is_chunk=True).get_random().size

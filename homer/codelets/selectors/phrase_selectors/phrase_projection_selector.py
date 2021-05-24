@@ -2,6 +2,7 @@ import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.selectors import PhraseSelector
+from homer.codelets.suggesters.phrase_suggesters import PhraseProjectionSuggester
 from homer.structure_collection import StructureCollection
 
 
@@ -27,10 +28,13 @@ class PhraseProjectionSelector(PhraseSelector):
         pass
 
     def _engender_follow_up(self):
-        from homer.codelets.builders.phrase_builders import PhraseProjectionBuilder
-
+        target_view = (
+            self.winners.where(is_correspondence=True).get_random().parent_view
+        )
         self.child_codelets.append(
-            PhraseProjectionBuilder.make(self.codelet_id, self.bubble_chamber)
+            PhraseProjectionSuggester.make(
+                self.codelet_id, self.bubble_chamber, target_view=target_view
+            )
         )
         self.child_codelets.append(
             self.spawn(
@@ -40,3 +44,11 @@ class PhraseProjectionSelector(PhraseSelector):
                 self.follow_up_urgency,
             )
         )
+
+    @property
+    def _champions_size(self):
+        return self.champions.where(is_phrase=True).get_random().size
+
+    @property
+    def _challengers_size(self):
+        return self.challengers.where(is_phrase=True).get_random().size

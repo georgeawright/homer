@@ -4,3 +4,4 @@ from .builder import Builder
 from .evaluator import Evaluator
 from .publisher import Publisher
 from .selector import Selector
+from .suggester import Suggester

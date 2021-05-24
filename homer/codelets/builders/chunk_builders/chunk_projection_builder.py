@@ -18,15 +18,14 @@ class ChunkProjectionBuilder(ChunkBuilder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_word: Word,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         ChunkBuilder.__init__(
-            self, codelet_id, parent_id, bubble_chamber, None, urgency
+            self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_view = target_view
-        self.target_word = target_word
+        self.target_view = None
+        self.target_word = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -39,8 +38,7 @@ class ChunkProjectionBuilder(ChunkBuilder):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_word: Word,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -48,8 +46,7 @@ class ChunkProjectionBuilder(ChunkBuilder):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_view,
-            target_word,
+            target_structures,
             urgency,
         )
 
@@ -75,17 +72,12 @@ class ChunkProjectionBuilder(ChunkBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
-    @property
-    def target_structures(self):
-        return StructureCollection({self.target_view, self.target_word})
-
     def _passes_preliminary_checks(self):
+        self.target_view = self._target_structures["target_view"]
+        self.target_word = self._target_structures["target_word"]
         return not self.target_word.has_correspondence_to_space(
             self.target_view.interpretation_space
         )
-
-    def _calculate_confidence(self):
-        self.confidence = 1.0
 
     def _process_structure(self):
         chunk = Chunk(

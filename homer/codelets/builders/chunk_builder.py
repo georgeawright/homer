@@ -1,10 +1,8 @@
 from __future__ import annotations
 import statistics
 
-from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.id import ID
@@ -21,11 +19,11 @@ class ChunkBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_chunk: Chunk,
+        target_structures: StructureCollection,
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_chunk = target_chunk
+        self._target_structures = target_structures
         self.second_target_chunk = None
 
     @classmethod
@@ -66,37 +64,22 @@ class ChunkBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
-    @property
-    def target_structures(self):
-        return StructureCollection({self.target_chunk, self.second_target_chunk})
-
     def _passes_preliminary_checks(self):
-        try:
-            self.second_target_chunk = self.target_chunk.nearby().get_random()
-        except MissingStructureError:
-            return False
         return not self.bubble_chamber.has_chunk(
             StructureCollection.union(
-                self._members_from_chunk(self.target_chunk),
-                self._members_from_chunk(self.second_target_chunk),
+                *[self._members_from_chunk(chunk) for chunk in self.target_structures]
             )
         )
 
-    def _calculate_confidence(self):
-        distances = [
-            space.proximity_between(self.target_chunk, self.second_target_chunk)
-            for space in self.target_chunk.parent_spaces
-            if space.is_basic_level
-        ]
-        self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
-
     def _process_structure(self):
+        target_one = self._target_structures["target_one"]
+        target_two = self._target_structures["target_two"]
         new_chunk_members = StructureCollection.union(
-            self._members_from_chunk(self.target_chunk),
-            self._members_from_chunk(self.second_target_chunk),
+            self._members_from_chunk(target_one),
+            self._members_from_chunk(target_two),
         )
         parent_spaces = StructureCollection.union(
-            self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
+            target_one.parent_spaces, target_two.parent_spaces
         )
         for parent_space in parent_spaces:
             for member in new_chunk_members:
@@ -114,36 +97,27 @@ class ChunkBuilder(Builder):
             self._get_average_value(new_chunk_members),
             locations,
             new_chunk_members,
-            self.target_chunk.parent_space,
+            target_one.parent_space,
             0,
         )
         for parent_space in chunk.parent_spaces:
             parent_space.add(chunk)
-        activation_from_chunk_one = (
-            self.target_chunk.activation * self.target_chunk.size / chunk.size
-        )
-        activation_from_chunk_two = (
-            self.second_target_chunk.activation
-            * self.second_target_chunk.size
-            / chunk.size
-        )
+        activation_from_chunk_one = target_one.activation * target_one.size / chunk.size
+        activation_from_chunk_two = target_two.activation * target_two.size / chunk.size
         chunk.activation = max(
             activation_from_chunk_one + activation_from_chunk_two,
             self.INITIAL_STRUCTURE_ACTIVATION,
         )
-        self.target_chunk.activation = activation_from_chunk_one
-        self.second_target_chunk.activation = activation_from_chunk_two
-        for member in list(new_chunk_members.structures) + [
-            self.target_chunk,
-            self.second_target_chunk,
-        ]:
+        target_one.activation = activation_from_chunk_one
+        target_two.activation = activation_from_chunk_two
+        for member in list(new_chunk_members.structures) + [target_one, target_two]:
             member.chunks_made_from_this_chunk.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         self.bubble_chamber.logger.log(chunk)
-        self.bubble_chamber.logger.log(self.target_chunk)
-        self.bubble_chamber.logger.log(self.second_target_chunk)
-        self._copy_across_links(self.target_chunk, chunk)
-        self._copy_across_links(self.second_target_chunk, chunk)
+        self.bubble_chamber.logger.log(target_one)
+        self.bubble_chamber.logger.log(target_two)
+        self._copy_across_links(target_one, chunk)
+        self._copy_across_links(target_two, chunk)
         self.child_structures = StructureCollection({chunk})
 
     def _members_from_chunk(self, chunk):
@@ -255,8 +229,6 @@ class ChunkBuilder(Builder):
         return [average_vector(values)]
 
     def _get_merged_location(self, chunks: StructureCollection, space: Space):
-        import time
-
         coordinates = []
         for chunk in chunks:
             for coords in chunk.location_in_space(space).coordinates:

@@ -23,25 +23,21 @@ class RelationProjectionBuilder(RelationBuilder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_structure_one: Structure,
-        target_word: Word,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
-        target_structure_two: Structure = None,
     ):
-        target_space = None
         RelationBuilder.__init__(
             self,
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_space,
-            target_structure_one,
+            target_structures,
             urgency,
         )
-        self.target_view = target_view
-        self.target_structure_two = target_structure_two
-        self.target_word = target_word
+        self.target_view = None
+        self.target_structure_one = None
+        self.target_structure_two = None
+        self.target_word = None
         self.parent_concept = None
         self.conceptual_space = None
         self.child_structure = None
@@ -59,9 +55,7 @@ class RelationProjectionBuilder(RelationBuilder):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_structure_one: Structure,
-        target_word: Word,
+        target_structures: Structure,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -69,9 +63,7 @@ class RelationProjectionBuilder(RelationBuilder):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_view,
-            target_structure_one,
-            target_word,
+            target_structures,
             urgency,
         )
 
@@ -114,58 +106,13 @@ class RelationProjectionBuilder(RelationBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]
 
-    @property
-    def target_structures(self):
-        return StructureCollection(
-            {
-                self.target_view,
-                self.target_word,
-                self.target_structure_one,
-                self.target_structure_two,
-            }
-        )
-
     def _passes_preliminary_checks(self):
-        self.conceptual_space = (
-            self.target_word.lexeme.concepts.get_random()
-            .parent_spaces.where(no_of_dimensions=1)
-            .get_random()
-        )
-        self.parent_concept = (
-            self.bubble_chamber.spaces["relational concepts"]
-            .contents.of_type(Space)
-            .get_random()
-            .contents.of_type(Concept)
-            .get_random()
-        )
-        self.target_space = self.conceptual_space.instance_in_space(
-            self.target_view.interpretation_space
-        )
-        target_structure_one_corresponding_word = (
-            self.target_structure_one.correspondences_to_space(
-                self.target_view.text_space
-            )
-            .get_random()
-            .arguments.get_random(exclude=[self.target_structure_one])
-        )
-        if self.target_structure_two is None:
-            try:
-                target_structure_two_corresponding_word = (
-                    self.target_word.potential_argument_words.get_exigent(
-                        exclude=[target_structure_one_corresponding_word]
-                    )
-                )
-                self.target_structure_two = (
-                    target_structure_two_corresponding_word.correspondences_to_space(
-                        self.target_view.interpretation_space
-                    )
-                    .get_random()
-                    .arguments.get_random(
-                        exclude=[target_structure_two_corresponding_word]
-                    )
-                )
-            except MissingStructureError:
-                return False
+        self.target_view = self._target_structures["target_view"]
+        self.target_structure_one = self._target_structures["target_structure_one"]
+        self.target_structure_two = self._target_structures["target_structure_two"]
+        self.target_word = self._target_structures["target_word"]
+        self.target_space = self._target_structures["target_space"]
+        self.parent_concept = self._target_structures["parent_concept"]
         return not self.target_structure_one.has_relation(
             self.target_space,
             self.parent_concept,
@@ -173,14 +120,6 @@ class RelationProjectionBuilder(RelationBuilder):
             self.target_structure_two,
         ) and not self.target_word.has_correspondence_to_space(
             self.target_view.interpretation_space
-        )
-
-    def _calculate_confidence(self):
-        target_word_concept = self.target_word.lexeme.concepts.get_random()
-        self.confidence = (
-            target_word_concept.relations_with(self.parent_concept)
-            .get_random()
-            .activation
         )
 
     def _process_structure(self):

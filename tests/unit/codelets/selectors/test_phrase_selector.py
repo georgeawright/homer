@@ -3,8 +3,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import PhraseBuilder
 from homer.codelets.selectors import PhraseSelector
+from homer.codelets.suggesters import PhraseSuggester
 from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
@@ -42,7 +42,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     text_space.contents = StructureCollection({word, phrase})
 
     with patch.object(
-        PhraseBuilder, "arrange_targets", return_value=(word, phrase, None)
+        PhraseSuggester, "arrange_targets", return_value=(word, phrase, None)
     ):
         common_member = Mock()
         champion = Mock()
@@ -99,7 +99,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
     text_space = Mock()
     text_space.contents = StructureCollection({word, phrase})
     with patch.object(random, "random", return_value=random_number), patch.object(
-        PhraseBuilder, "arrange_targets", return_value=(word, phrase, None)
+        PhraseSuggester, "arrange_targets", return_value=(word, phrase, None)
     ):
         champion = Mock()
         champion.parent_space = text_space
@@ -128,5 +128,5 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 2 == len(selector.child_codelets)
-        assert hasinstance(selector.child_codelets, PhraseBuilder)
+        assert hasinstance(selector.child_codelets, PhraseSuggester)
         assert hasinstance(selector.child_codelets, PhraseSelector)

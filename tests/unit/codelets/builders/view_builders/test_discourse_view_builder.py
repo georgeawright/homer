@@ -56,13 +56,3 @@ def test_successful_creates_view_and_spawns_follow_up(
     assert hasinstance(view_builder.child_structures, DiscourseView)
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], DiscourseViewEvaluator)
-
-
-def test_fails_when_space_activations_are_low(bubble_chamber, input_space, frame):
-    input_space.activation = 0.1
-    frame.activation = 0.1
-    view_builder = DiscourseViewBuilder(
-        Mock(), Mock(), bubble_chamber, StructureCollection({input_space, frame}), 1.0
-    )
-    result = view_builder.run()
-    assert CodeletResult.FAIL == result

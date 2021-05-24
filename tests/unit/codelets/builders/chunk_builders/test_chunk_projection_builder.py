@@ -40,9 +40,8 @@ def test_successful_creates_chunk_corresponding_to_word_and_spawns_follow_up(
     bubble_chamber, target_view, target_word
 ):
     target_word.has_correspondence_to_space.return_value = False
-    builder = ChunkProjectionBuilder(
-        "", "", bubble_chamber, target_view, target_word, 1
-    )
+    target_structures = {"target_view": target_view, "target_word": target_word}
+    builder = ChunkProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert len(builder.child_codelets) == 1
@@ -53,8 +52,7 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     bubble_chamber, target_view, target_word
 ):
     target_word.has_correspondence_to_space.return_value = True
-    builder = ChunkProjectionBuilder(
-        "", "", bubble_chamber, target_view, target_word, 1
-    )
+    target_structures = {"target_view": target_view, "target_word": target_word}
+    builder = ChunkProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

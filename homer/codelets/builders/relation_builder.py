@@ -17,17 +17,15 @@ class RelationBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_space: Space,
-        target_structure_one: Structure,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
-        target_structure_two: Structure = None,
-        parent_concept: Concept = None,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_space = target_space
-        self.target_structure_one = target_structure_one
-        self.target_structure_two = target_structure_two
-        self.parent_concept = parent_concept
+        self._target_structures = target_structures
+        self.target_space = None
+        self.target_structure_one = None
+        self.target_structure_two = None
+        self.parent_concept = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -40,23 +38,16 @@ class RelationBuilder(Builder):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_space: Space,
-        target_structure_one: Structure,
+        target_structures: Structure,
         urgency: FloatBetweenOneAndZero,
-        target_structure_two: Structure = None,
-        parent_concept: Concept = None,
     ):
-        qualifier = "TopDown" if parent_concept is not None else "BottomUp"
-        codelet_id = ID.new(cls, qualifier)
+        codelet_id = ID.new(cls)
         return cls(
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_space,
-            target_structure_one,
+            target_structures,
             urgency,
-            target_structure_two=target_structure_two,
-            parent_concept=parent_concept,
         )
 
     @classmethod
@@ -112,54 +103,16 @@ class RelationBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]
 
-    @property
-    def target_structures(self):
-        return StructureCollection(
-            {self.target_structure_one, self.target_structure_two, self.target_space}
-        )
-
     def _passes_preliminary_checks(self):
-        if self.target_structure_two is None:
-            try:
-                self.target_structure_two = (
-                    self.target_structure_one.get_potential_relative(
-                        space=self.target_space
-                    )
-                )
-            except MissingStructureError:
-                return False
-        if self.parent_concept is None:
-            try:
-                relational_conceptual_spaces = self.bubble_chamber.spaces[
-                    "relational concepts"
-                ].contents.of_type(ConceptualSpace)
-                compatible_conceptual_spaces = StructureCollection(
-                    {
-                        space
-                        for space in relational_conceptual_spaces
-                        if space.is_compatible_with(self.target_space)
-                    }
-                )
-                self.parent_concept = (
-                    compatible_conceptual_spaces.get_random()
-                    .contents.of_type(Concept)
-                    .get_random()
-                )
-            except MissingStructureError:
-                return False
+        self.target_structure_one = self._target_structures["target_structure_one"]
+        self.target_structure_two = self._target_structures["target_structure_two"]
+        self.target_space = self._target_structures["target_space"]
+        self.parent_concept = self._target_structures["parent_concept"]
         return not self.target_structure_one.has_relation(
             self.target_space,
             self.parent_concept,
             self.target_structure_one,
             self.target_structure_two,
-        )
-
-    def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classifier.classify(
-            concept=self.parent_concept,
-            space=self.target_space,
-            start=self.target_structure_one,
-            end=self.target_structure_two,
         )
 
     def _process_structure(self):
@@ -181,7 +134,4 @@ class RelationBuilder(Builder):
         self.child_structures = StructureCollection({relation})
 
     def _fizzle(self):
-        pass
-
-    def _fail(self):
         pass
