@@ -89,8 +89,8 @@ class CorrespondenceSuggester(Suggester):
                 "target_view": target_view,
                 "target_space_one": target_space,
                 "target_structure_one": target,
-                "target_space_two": target_space,
-                "target_structure_two": target,
+                "target_space_two": None,
+                "target_structure_two": None,
                 "target_conceptual_space": None,
                 "parent_concept": None,
             },
@@ -125,8 +125,8 @@ class CorrespondenceSuggester(Suggester):
                 "target_view": target_view,
                 "target_space_one": target_space,
                 "target_structure_one": target,
-                "target_space_two": target_space,
-                "target_structure_two": target,
+                "target_space_two": None,
+                "target_structure_two": None,
                 "target_conceptual_space": None,
                 "parent_concept": parent_concept,
             },
@@ -138,6 +138,7 @@ class CorrespondenceSuggester(Suggester):
         return self.bubble_chamber.concepts["correspondence"]
 
     def _passes_preliminary_checks(self):
+        print(f"running suggester: {self.codelet_id}")
         self.target_view = self._target_structures["target_view"]
         self.target_structure_one = self._target_structures["target_structure_one"]
         self.target_structure_two = self._target_structures["target_structure_two"]
@@ -159,6 +160,7 @@ class CorrespondenceSuggester(Suggester):
                     .get_random()
                 )
                 self._target_structures["target_space_two"] = self.target_space_two
+                print(self._target_structures["target_space_two"])
             except MissingStructureError:
                 return False
         try:
@@ -169,6 +171,7 @@ class CorrespondenceSuggester(Suggester):
                 self._target_structures[
                     "target_structure_two"
                 ] = self.target_structure_two
+                print(self._target_structures["target_structure_two"])
         except MissingStructureError:
             return False
         if self.target_conceptual_space is None:

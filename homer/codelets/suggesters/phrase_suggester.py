@@ -223,18 +223,7 @@ class PhraseSuggester(Suggester):
         self.confidence = mean_quality * self.target_rule.activation
 
     def _fizzle(self):
-        from homer.codelets.builders import LabelBuilder
-
-        try:
-            target = self.parent_space.contents.where(
-                is_word=True, labels=StructureCollection()
-            ).get_random()
-        except MissingStructureError:
-            return
-        urgency = target.exigency
-        self.child_codelets.append(
-            LabelBuilder.spawn(self.codelet_id, self.bubble_chamber, target, urgency)
-        )
+        pass
 
     def _rule_is_compatible_with_targets(self, rule: Concept):
         if self.target_left_branch is not None:
