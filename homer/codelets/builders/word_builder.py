@@ -182,11 +182,4 @@ class WordBuilder(Builder):
         self.bubble_chamber.logger.log(self.target_view)
 
     def _fizzle(self):
-        self.child_codelets.append(
-            self.make(
-                self.codelet_id,
-                self.bubble_chamber,
-                target_view=self.target_view,
-                urgency=self.urgency / 2,
-            )
-        )
+        pass

@@ -121,35 +121,63 @@ def view(bubble_chamber):
 
 
 @pytest.fixture
-def good_relation(view):
+def good_structures(view):
     relation = Relation("", "", Mock(), Mock(), Mock(), Mock(), 1.0)
-    return relation
+    correspondence = Correspondence(
+        Mock(),
+        Mock(),
+        Mock(),
+        relation,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        view,
+        1.0,
+    )
+    return StructureCollection({relation, correspondence})
 
 
 @pytest.fixture
-def bad_relation(view):
+def bad_structures(view):
     relation = Relation("", "", Mock(), Mock(), Mock(), Mock(), 0.0)
-    return relation
+    correspondence = Correspondence(
+        Mock(),
+        Mock(),
+        Mock(),
+        relation,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        view,
+        0.0,
+    )
+    return StructureCollection({relation, correspondence})
 
 
-def test_good_relation_is_boosted(bubble_chamber, good_relation):
+def test_good_relation_is_boosted(bubble_chamber, good_structures):
+    good_relation = good_structures.where(is_relation=True).get_random()
     original_activation = good_relation.activation
     parent_id = ""
     urgency = 1.0
     selector = RelationProjectionSelector.spawn(
-        parent_id, bubble_chamber, StructureCollection({good_relation}), urgency
+        parent_id, bubble_chamber, good_structures, urgency
     )
     selector.run()
     good_relation.update_activation()
     assert good_relation.activation > original_activation
 
 
-def test_bad_relation_is_not_boosted(bubble_chamber, bad_relation):
+def test_bad_relation_is_not_boosted(bubble_chamber, bad_structures):
+    bad_relation = bad_structures.where(is_relation=True).get_random()
     original_activation = bad_relation.activation
     parent_id = ""
     urgency = 1.0
     selector = RelationProjectionSelector.spawn(
-        parent_id, bubble_chamber, StructureCollection({bad_relation}), urgency
+        parent_id, bubble_chamber, bad_structures, urgency
     )
     selector.run()
     bad_relation.update_activation()

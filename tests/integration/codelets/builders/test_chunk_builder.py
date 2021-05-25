@@ -50,7 +50,7 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def target_chunk(bubble_chamber):
+def target_chunks(bubble_chamber):
     input_concept = Concept(
         Mock(),
         Mock(),
@@ -99,20 +99,30 @@ def target_chunk(bubble_chamber):
     input_space.contents.add(chunk)
     input_space.contents.add(second_chunk)
     chunk.parent_spaces.add(input_space)
-    return chunk
+    return {"target_one": chunk, "target_two": second_chunk}
 
 
 def test_successful_adds_member_to_chunk_and_spawns_follow_up_and_same_chunk_cannot_be_recreated(
-    bubble_chamber, target_chunk
+    bubble_chamber, target_chunks
 ):
     parent_id = ""
     urgency = 1.0
 
-    builder = ChunkBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
+    builder = ChunkBuilder.spawn(
+        parent_id,
+        bubble_chamber,
+        target_chunks,
+        urgency,
+    )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert hasinstance(builder.child_structures, Chunk)
     assert isinstance(builder.child_codelets[0], ChunkEvaluator)
-    builder = ChunkBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
+    builder = ChunkBuilder.spawn(
+        parent_id,
+        bubble_chamber,
+        target_chunks,
+        urgency,
+    )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

@@ -385,12 +385,25 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
     target_view,
     temperature_working_space,
     target_chunk,
+    temperature_template_space,
     target_slot,
     same_concept,
+    temperature_conceptual_space,
     mild_concept,
 ):
     builder = CorrespondenceBuilder.spawn(
-        "", bubble_chamber, target_view, temperature_working_space, target_chunk, 1.0
+        "",
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_space_one": temperature_working_space,
+            "target_structure_one": target_chunk,
+            "target_space_two": temperature_template_space,
+            "target_structure_two": target_slot,
+            "parent_concept": same_concept,
+            "target_conceptual_space": temperature_conceptual_space,
+        },
+        1.0,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
@@ -402,7 +415,18 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
     target_label = target_chunk.labels.get_random()
     target_slot_label = target_slot.labels.get_random()
     builder = CorrespondenceBuilder.spawn(
-        "", bubble_chamber, target_view, temperature_working_space, target_label, 1.0
+        "",
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_space_one": temperature_working_space,
+            "target_structure_one": target_label,
+            "target_space_two": temperature_template_space,
+            "target_structure_two": target_slot_label,
+            "parent_concept": same_concept,
+            "target_conceptual_space": temperature_conceptual_space,
+        },
+        1.0,
     )
     builder.run()
     assert same_concept == builder.parent_concept
@@ -412,7 +436,18 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
     assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
 
     builder = CorrespondenceBuilder.spawn(
-        "", bubble_chamber, target_view, temperature_working_space, target_chunk, 1.0
+        "",
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_space_one": temperature_working_space,
+            "target_structure_one": target_chunk,
+            "target_space_two": temperature_template_space,
+            "target_structure_two": target_slot,
+            "parent_concept": same_concept,
+            "target_conceptual_space": temperature_conceptual_space,
+        },
+        1.0,
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

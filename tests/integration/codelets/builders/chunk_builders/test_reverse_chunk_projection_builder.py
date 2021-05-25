@@ -242,9 +242,11 @@ def test_successful_projects_raw_chunk_and_same_chunk_cannot_be_projected_again(
     builder = ReverseChunkProjectionBuilder.spawn(
         "",
         bubble_chamber,
-        target_view,
-        target_interpretation_chunk,
-        target_raw_chunk,
+        {
+            "target_view": target_view,
+            "target_interpretation_chunk": target_interpretation_chunk,
+            "target_raw_chunk": target_raw_chunk,
+        },
         1.0,
     )
     assert not target_raw_chunk.has_correspondence_to_space(
@@ -260,9 +262,11 @@ def test_successful_projects_raw_chunk_and_same_chunk_cannot_be_projected_again(
     builder = ReverseChunkProjectionBuilder.spawn(
         "",
         bubble_chamber,
-        target_view,
-        target_interpretation_chunk,
-        target_raw_chunk,
+        {
+            "target_view": target_view,
+            "target_interpretation_chunk": target_interpretation_chunk,
+            "target_raw_chunk": target_raw_chunk,
+        },
         1.0,
     )
     builder.run()

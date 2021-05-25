@@ -250,7 +250,10 @@ def test_successful_creates_phrase_and_spawns_follow_up_and_same_phrase_cannot_b
     parent_id = ""
     urgency = 1.0
     builder = PhraseProjectionBuilder.spawn(
-        parent_id, bubble_chamber, target_correspondence, urgency
+        parent_id,
+        bubble_chamber,
+        {"target_correspondence": target_correspondence},
+        urgency,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
@@ -258,7 +261,10 @@ def test_successful_creates_phrase_and_spawns_follow_up_and_same_phrase_cannot_b
     assert hasinstance(builder.child_structures, Correspondence)
     assert isinstance(builder.child_codelets[0], PhraseProjectionEvaluator)
     builder = PhraseProjectionBuilder.spawn(
-        parent_id, bubble_chamber, target_correspondence, urgency
+        parent_id,
+        bubble_chamber,
+        {"target_correspondence": target_correspondence},
+        urgency,
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

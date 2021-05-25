@@ -125,11 +125,13 @@ def test_successful_creates_phrase_and_spawns_follow_up_and_same_phrase_cannot_b
     builder = PhraseBuilder.spawn(
         parent_id,
         bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
+        {
+            "target_root": target_root,
+            "target_left_branch": target_left_branch,
+            "target_right_branch": target_right_branch,
+            "target_rule": target_rule,
+        },
         urgency,
-        target_rule=target_rule,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
@@ -138,9 +140,12 @@ def test_successful_creates_phrase_and_spawns_follow_up_and_same_phrase_cannot_b
     builder = PhraseBuilder.spawn(
         parent_id,
         bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
+        {
+            "target_root": target_root,
+            "target_left_branch": target_left_branch,
+            "target_right_branch": target_right_branch,
+            "target_rule": target_rule,
+        },
         urgency,
     )
     builder.run()

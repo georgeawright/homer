@@ -186,8 +186,6 @@ def target_chunk(bubble_chamber):
     )
     bubble_chamber.chunks.add(chunk)
     bubble_chamber.chunks.add(second_chunk)
-    bubble_chamber.words.add(chunk)  # TODO: need to be added to input nodes
-    bubble_chamber.words.add(second_chunk)
     input_space.contents.add(chunk)
     input_space.contents.add(second_chunk)
     chunk.parent_spaces.add(input_space)
@@ -195,16 +193,28 @@ def target_chunk(bubble_chamber):
 
 
 def test_successful_adds_label_to_chunk_and_spawns_follow_up_and_same_label_cannot_be_recreated(
-    bubble_chamber, target_chunk
+    bubble_chamber,
+    target_chunk,
+    mild_concept,
 ):
     parent_id = ""
     urgency = 1.0
 
-    builder = LabelBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
+    builder = LabelBuilder.spawn(
+        parent_id,
+        bubble_chamber,
+        {"target_node": target_chunk, "parent_concept": mild_concept},
+        urgency,
+    )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert hasinstance(builder.child_structures, Label)
     assert isinstance(builder.child_codelets[0], LabelEvaluator)
-    builder = LabelBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
+    builder = LabelBuilder.spawn(
+        parent_id,
+        bubble_chamber,
+        {"target_node": target_chunk, "parent_concept": mild_concept},
+        urgency,
+    )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

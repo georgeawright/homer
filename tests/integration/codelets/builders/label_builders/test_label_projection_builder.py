@@ -303,7 +303,14 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
     parent_id = ""
     urgency = 1.0
     builder = LabelProjectionBuilder.spawn(
-        parent_id, bubble_chamber, target_view, target_chunk, target_word, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_chunk": target_chunk,
+            "target_word": target_word,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
@@ -311,7 +318,14 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
     assert isinstance(builder.child_codelets[0], LabelProjectionEvaluator)
 
     builder = LabelProjectionBuilder.spawn(
-        parent_id, bubble_chamber, target_view, target_chunk, noun, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_chunk": target_chunk,
+            "target_word": noun,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
@@ -319,7 +333,14 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
     assert isinstance(builder.child_codelets[0], LabelProjectionEvaluator)
 
     builder = LabelProjectionBuilder.spawn(
-        parent_id, bubble_chamber, target_view, target_chunk, target_word, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_chunk": target_chunk,
+            "target_word": target_word,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

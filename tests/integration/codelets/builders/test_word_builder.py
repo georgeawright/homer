@@ -299,7 +299,7 @@ def template_chunk(
 
 @pytest.fixture
 def template_slot_word(
-    bubble_chamber, template_chunk, template, temperature_template_space, target_view
+    template,
 ):
     slot = Word(
         "template_slot_word",
@@ -310,17 +310,30 @@ def template_slot_word(
         template,
         Mock(),
     )
+    return slot
+
+
+@pytest.fixture
+def slot_word_correspondee(
+    template_chunk,
+    template_slot_word,
+    temperature_template_space,
+    template,
+    bubble_chamber,
+    temperature_conceptual_space,
+    target_view,
+):
     label = template_chunk.labels.get_random()
     label_to_slot_correspondence = Correspondence(
         "label to slot word correspondence",
         Mock(),
         label,
-        slot,
+        template_slot_word,
         temperature_template_space,
         template,
         [
             label.location_in_space(temperature_template_space),
-            slot.location_in_space(template),
+            template_slot_word.location_in_space(template),
         ],
         bubble_chamber.concepts["same"],
         temperature_conceptual_space,
@@ -328,12 +341,12 @@ def template_slot_word(
         1,
         is_privileged=True,
     )
-    slot.links_in.add(label_to_slot_correspondence)
-    slot.links_out.add(label_to_slot_correspondence)
+    template_slot_word.links_in.add(label_to_slot_correspondence)
+    template_slot_word.links_out.add(label_to_slot_correspondence)
     label.links_in.add(label_to_slot_correspondence)
     label.links_out.add(label_to_slot_correspondence)
     target_view.members.add(label_to_slot_correspondence)
-    return slot
+    return label
 
 
 @pytest.fixture
@@ -352,19 +365,42 @@ def template_function_word(template):
 
 
 def test_successful_creates_word_and_spawns_follow_up_and_same_word_cannot_be_recreated(
-    bubble_chamber, target_view, template_slot_word
+    bubble_chamber,
+    target_view,
+    template_slot_word,
+    slot_word_correspondee,
+    temperature_input_space,
+    input_space_chunk,
 ):
     parent_id = ""
     urgency = 1.0
     builder = WordBuilder.spawn(
-        parent_id, bubble_chamber, target_view, template_slot_word, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_word": template_slot_word,
+            "word_correspondee": slot_word_correspondee,
+            "non_frame": temperature_input_space,
+            "non_frame_item": input_space_chunk,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert hasinstance(builder.child_structures, Word)
     assert isinstance(builder.child_codelets[0], WordEvaluator)
     builder = WordBuilder.spawn(
-        parent_id, bubble_chamber, target_view, template_slot_word, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_word": template_slot_word,
+            "word_correspondee": slot_word_correspondee,
+            "non_frame": temperature_input_space,
+            "non_frame_item": input_space_chunk,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result
@@ -376,14 +412,32 @@ def test_successful_creates_function_word_and_spawns_follow_up_and_same_word_can
     parent_id = ""
     urgency = 1.0
     builder = WordBuilder.spawn(
-        parent_id, bubble_chamber, target_view, template_function_word, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_word": template_function_word,
+            "word_correspondee": None,
+            "non_frame": None,
+            "non_frame_item": None,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert hasinstance(builder.child_structures, Word)
     assert isinstance(builder.child_codelets[0], WordEvaluator)
     builder = WordBuilder.spawn(
-        parent_id, bubble_chamber, target_view, template_function_word, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_view": target_view,
+            "target_word": template_function_word,
+            "word_correspondee": None,
+            "non_frame": None,
+            "non_frame_item": None,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

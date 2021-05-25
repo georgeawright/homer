@@ -110,35 +110,63 @@ def view(bubble_chamber):
 
 
 @pytest.fixture
-def good_label(view):
+def good_structures(view):
     label = Label("", "", Mock(), Mock(), Mock(), 1.0)
-    return label
+    correspondence = Correspondence(
+        Mock(),
+        Mock(),
+        Mock(),
+        label,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        view,
+        1.0,
+    )
+    return StructureCollection({label, correspondence})
 
 
 @pytest.fixture
-def bad_label(view):
+def bad_structures(view):
     label = Label("", "", Mock(), Mock(), Mock(), 0.0)
-    return label
+    correspondence = Correspondence(
+        Mock(),
+        Mock(),
+        Mock(),
+        label,
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        view,
+        0.0,
+    )
+    return StructureCollection({label, correspondence})
 
 
-def test_good_label_is_boosted(bubble_chamber, good_label):
+def test_good_label_is_boosted(bubble_chamber, good_structures):
+    good_label = good_structures.where(is_label=True).get_random()
     original_activation = good_label.activation
     parent_id = ""
     urgency = 1.0
     selector = LabelProjectionSelector.spawn(
-        parent_id, bubble_chamber, StructureCollection({good_label}), urgency
+        parent_id, bubble_chamber, good_structures, urgency
     )
     selector.run()
     good_label.update_activation()
     assert good_label.activation > original_activation
 
 
-def test_bad_label_is_not_boosted(bubble_chamber, bad_label):
+def test_bad_label_is_not_boosted(bubble_chamber, bad_structures):
+    bad_label = bad_structures.where(is_label=True).get_random()
     original_activation = bad_label.activation
     parent_id = ""
     urgency = 1.0
     selector = LabelProjectionSelector.spawn(
-        parent_id, bubble_chamber, StructureCollection({bad_label}), urgency
+        parent_id, bubble_chamber, bad_structures, urgency
     )
     selector.run()
     bad_label.update_activation()

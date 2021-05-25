@@ -250,6 +250,11 @@ def temperature_space(temperature_concept):
 
 
 @pytest.fixture
+def temperature_interpretation_space(temperature_space, interpretation_space):
+    return temperature_space.instance_in_space(interpretation_space)
+
+
+@pytest.fixture
 def hot_concept(bubble_chamber, temperature_space):
     concept = Concept(
         "",
@@ -388,15 +393,22 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
     target_structure_two,
     south_word,
     target_word,
+    more_concept,
+    temperature_interpretation_space,
 ):
     parent_id = ""
     urgency = 1.0
     builder = RelationProjectionBuilder.spawn(
         parent_id,
         bubble_chamber,
-        target_view,
-        target_structure_one,
-        target_word,
+        {
+            "target_view": target_view,
+            "target_structure_one": target_structure_one,
+            "target_structure_two": target_structure_two,
+            "target_word": target_word,
+            "target_space": temperature_interpretation_space,
+            "parent_concept": more_concept,
+        },
         urgency,
     )
     builder.run()
@@ -407,9 +419,14 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
     builder = RelationProjectionBuilder.spawn(
         parent_id,
         bubble_chamber,
-        target_view,
-        target_structure_one,
-        target_word,
+        {
+            "target_view": target_view,
+            "target_structure_one": target_structure_one,
+            "target_structure_two": target_structure_two,
+            "target_word": target_word,
+            "target_space": temperature_interpretation_space,
+            "parent_concept": more_concept,
+        },
         urgency,
     )
     builder.run()

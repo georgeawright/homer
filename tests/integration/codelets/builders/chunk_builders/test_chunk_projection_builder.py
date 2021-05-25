@@ -118,14 +118,20 @@ def test_successful_creates_chunk_and_follow_up_and_same_chunk_cannot_be_recreat
     parent_id = ""
     urgency = 1.0
     builder = ChunkProjectionBuilder.spawn(
-        parent_id, bubble_chamber, target_view, target_word, urgency
+        parent_id,
+        bubble_chamber,
+        {"target_view": target_view, "target_word": target_word},
+        urgency,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
     assert hasinstance(builder.child_structures, Chunk)
     assert isinstance(builder.child_codelets[0], ChunkProjectionEvaluator)
     builder = ChunkProjectionBuilder.spawn(
-        parent_id, bubble_chamber, target_view, target_word, urgency
+        parent_id,
+        bubble_chamber,
+        {"target_view": target_view, "target_word": target_word},
+        urgency,
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

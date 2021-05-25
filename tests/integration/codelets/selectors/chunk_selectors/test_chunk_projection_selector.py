@@ -7,7 +7,7 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors.chunk_selectors import ChunkProjectionSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Label, Relation
+from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import WorkingSpace
 from homer.structures.views import MonitoringView
@@ -116,7 +116,7 @@ def chunk_members():
 
 
 @pytest.fixture
-def good_chunk(target_space, chunk_members):
+def good_structures(target_space, chunk_members, target_view):
     chunk = Chunk(
         Mock(),
         Mock(),
@@ -128,11 +128,26 @@ def good_chunk(target_space, chunk_members):
     )
     chunk._activation = 0.0
     target_space.contents.add(chunk)
-    return chunk
+    correspondence = Correspondence(
+        Mock(),
+        Mock(),
+        Mock(),
+        chunk,
+        Mock(),
+        target_space,
+        Mock(),
+        Mock(),
+        Mock(),
+        target_view,
+        1.0,
+    )
+    chunk.links_in.add(correspondence)
+    chunk.links_out.add(correspondence)
+    return StructureCollection({chunk, correspondence})
 
 
 @pytest.fixture
-def bad_chunk(target_space, chunk_members):
+def bad_structures(target_space, chunk_members, target_view):
     chunk = Chunk(
         Mock(),
         Mock(),
@@ -144,22 +159,41 @@ def bad_chunk(target_space, chunk_members):
     )
     chunk._activation = 1.0
     target_space.contents.add(chunk)
-    return chunk
+    correspondence = Correspondence(
+        Mock(),
+        Mock(),
+        Mock(),
+        chunk,
+        Mock(),
+        target_space,
+        Mock(),
+        Mock(),
+        Mock(),
+        target_view,
+        0.0,
+    )
+    chunk.links_in.add(correspondence)
+    chunk.links_out.add(correspondence)
+    return StructureCollection({chunk, correspondence})
 
 
 def test_good_chunk_is_boosted_bad_chunk_is_decayed(
-    bubble_chamber, good_chunk, bad_chunk
+    bubble_chamber, good_structures, bad_structures
 ):
+    good_chunk = good_structures.where(is_chunk=True).get_random()
+    bad_chunk = bad_structures.where(is_chunk=True).get_random()
     original_good_chunk_activation = good_chunk.activation
     original_bad_chunk_activation = bad_chunk.activation
     parent_id = ""
-    champion = bad_chunk
+    champion = bad_structures
     urgency = 1.0
     selector = ChunkProjectionSelector.spawn(
-        parent_id, bubble_chamber, StructureCollection({champion}), urgency
+        parent_id, bubble_chamber, champion, urgency
     )
     selector.run()
-    good_chunk.update_activation()
-    bad_chunk.update_activation()
+    for structure in good_structures:
+        structure.update_activation()
+    for structure in bad_structures:
+        structure.update_activation()
     assert good_chunk.activation > original_good_chunk_activation
     assert bad_chunk.activation < original_bad_chunk_activation

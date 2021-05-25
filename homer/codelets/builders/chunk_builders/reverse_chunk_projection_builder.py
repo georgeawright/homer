@@ -6,7 +6,6 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import View
 from homer.structures.links import Correspondence
 from homer.structures.nodes import Chunk
 from homer.tools import project_item_into_space
