@@ -63,6 +63,11 @@ def setup_homer() -> Homer:
         parent_concept=activity_concept,
         locations=[Location([], top_level_conceptual_space)],
     )
+    suggest_concept = homer.def_concept(
+        name="suggest",
+        parent_space=activities_space,
+        activation=1.0,
+    )
     build_concept = homer.def_concept(
         name="build",
         parent_space=activities_space,
@@ -230,11 +235,21 @@ def setup_homer() -> Homer:
     homer.def_concept_link(view_monitoring_concept, publish_concept, activation=1.0)
 
     # activity links
+    homer.def_concept_link(suggest_concept, build_concept, activation=1.0)
     homer.def_concept_link(build_concept, evaluate_concept, activation=1.0)
     homer.def_concept_link(evaluate_concept, select_concept, activation=1.0)
-    homer.def_concept_link(select_concept, build_concept, activation=1.0)
+    homer.def_concept_link(select_concept, suggest_concept, activation=1.0)
 
     # activity-structure links
+    homer.def_concept_link(suggest_concept, correspondence_concept)
+    homer.def_concept_link(suggest_concept, chunk_concept)
+    homer.def_concept_link(suggest_concept, label_concept, activation=1.0)
+    homer.def_concept_link(suggest_concept, phrase_concept)
+    homer.def_concept_link(suggest_concept, relation_concept)
+    homer.def_concept_link(suggest_concept, view_discourse_concept)
+    homer.def_concept_link(suggest_concept, view_monitoring_concept)
+    homer.def_concept_link(suggest_concept, view_simplex_concept)
+    homer.def_concept_link(suggest_concept, word_concept)
     homer.def_concept_link(build_concept, correspondence_concept)
     homer.def_concept_link(build_concept, chunk_concept)
     homer.def_concept_link(build_concept, label_concept, activation=1.0)

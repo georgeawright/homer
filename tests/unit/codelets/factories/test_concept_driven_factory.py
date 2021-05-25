@@ -1,11 +1,11 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.builders import (
-    CorrespondenceBuilder,
-    LabelBuilder,
-    PhraseBuilder,
-    RelationBuilder,
+from homer.codelets.suggesters import (
+    CorrespondenceSuggester,
+    LabelSuggester,
+    PhraseSuggester,
+    RelationSuggester,
 )
 from homer.codelets.factories import ConceptDrivenFactory
 from homer.structure_collection import StructureCollection
@@ -13,8 +13,8 @@ from homer.structure_collection import StructureCollection
 
 @pytest.fixture
 def concepts():
-    build_concept = Mock()
-    build_concept.name = "build"
+    suggest_concept = Mock()
+    suggest_concept.name = "suggest"
     inner_concept = Mock()
     inner_concept.name = "inner"
     forward_concept = Mock()
@@ -29,7 +29,7 @@ def concepts():
     phrase_concept.name = "phrase"
     concepts = StructureCollection(
         {
-            build_concept,
+            suggest_concept,
             inner_concept,
             forward_concept,
             label_concept,
@@ -153,11 +153,11 @@ def test_gets_appropriate_follow_up_class(
     )
     assert (
         factory_codelet._get_follow_up_class(example_correspondence_concept)
-        == CorrespondenceBuilder
+        == CorrespondenceSuggester
     )
-    assert factory_codelet._get_follow_up_class(example_label_concept) == LabelBuilder
+    assert factory_codelet._get_follow_up_class(example_label_concept) == LabelSuggester
     assert (
         factory_codelet._get_follow_up_class(example_relation_concept)
-        == RelationBuilder
+        == RelationSuggester
     )
-    assert factory_codelet._get_follow_up_class(example_rule) == PhraseBuilder
+    assert factory_codelet._get_follow_up_class(example_rule) == PhraseSuggester

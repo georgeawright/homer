@@ -24,7 +24,8 @@ class ConceptDrivenFactory(Factory):
     def _engender_follow_up(self):
         parent_concept = self._get_parent_concept()
         follow_up_class = self._get_follow_up_class(parent_concept)
-        if self.coderack.proportion_of_codelets_of_type(follow_up_class) < 0.5:
+        rand = random.random()
+        if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make_top_down(
                 self.codelet_id, self.bubble_chamber, parent_concept
             )
@@ -39,7 +40,7 @@ class ConceptDrivenFactory(Factory):
         ).get_active()
 
     def _get_follow_up_class(self, parent_concept: Concept):
-        action_concept = self.bubble_chamber.concepts["build"]
+        action_concept = self.bubble_chamber.concepts["suggest"]
         space_concept = self.bubble_chamber.concepts["inner"]
         direction_concept = self.bubble_chamber.concepts["forward"]
         if parent_concept in self.bubble_chamber.rules:

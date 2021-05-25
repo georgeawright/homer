@@ -87,6 +87,9 @@ class WordSuggester(Suggester):
     def _passes_preliminary_checks(self):
         self.target_view = self._target_structures["target_view"]
         self.target_word = self._target_structures["target_word"]
+        self._target_structures["word_correspondee"] = None
+        self._target_structures["non_frame"] = None
+        self._target_structures["non_frame_item"] = None
         try:
             self.word_correspondee = StructureCollection(
                 {

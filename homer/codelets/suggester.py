@@ -2,6 +2,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 
 

@@ -9,7 +9,6 @@ from homer.structures.nodes import Concept
 
 class Builder(Codelet):
 
-    CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
     INITIAL_STRUCTURE_ACTIVATION = HyperParameters.INITIAL_STRUCTURE_ACTIVATION
 
     def __init__(

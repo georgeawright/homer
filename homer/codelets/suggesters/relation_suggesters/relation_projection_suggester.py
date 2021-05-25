@@ -64,7 +64,7 @@ class RelationProjectionSuggester(RelationSuggester):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: MonitoringView,
+        target_view: MonitoringView = None,
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = (

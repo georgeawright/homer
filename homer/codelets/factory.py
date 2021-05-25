@@ -57,30 +57,30 @@ class Factory(Codelet):
         self, action: Concept, structure: Concept, space: Concept, direction: Concept
     ):
         from homer.codelets import Publisher
-        from homer.codelets.builders import (
-            ChunkBuilder,
-            CorrespondenceBuilder,
-            LabelBuilder,
-            RelationBuilder,
-            WordBuilder,
-            PhraseBuilder,
+        from homer.codelets.suggesters import (
+            ChunkSuggester,
+            CorrespondenceSuggester,
+            LabelSuggester,
+            RelationSuggester,
+            WordSuggester,
+            PhraseSuggester,
         )
-        from homer.codelets.builders.chunk_builders import (
-            ChunkProjectionBuilder,
-            ReverseChunkProjectionBuilder,
+        from homer.codelets.suggesters.chunk_suggesters import (
+            ChunkProjectionSuggester,
+            ReverseChunkProjectionSuggester,
         )
-        from homer.codelets.builders.label_builders import (
-            LabelProjectionBuilder,
+        from homer.codelets.suggesters.label_suggesters import (
+            LabelProjectionSuggester,
         )
-        from homer.codelets.builders.phrase_builders import (
-            PhraseProjectionBuilder,
+        from homer.codelets.suggesters.phrase_suggesters import (
+            PhraseProjectionSuggester,
         )
-        from homer.codelets.builders.relation_builders import (
-            RelationProjectionBuilder,
+        from homer.codelets.suggesters.relation_suggesters import (
+            RelationProjectionSuggester,
         )
-        from homer.codelets.builders.view_builders import (
-            MonitoringViewBuilder,
-            SimplexViewBuilder,
+        from homer.codelets.suggesters.view_suggesters import (
+            MonitoringViewSuggester,
+            SimplexViewSuggester,
         )
         from homer.codelets.evaluators import (
             ChunkEvaluator,
@@ -107,55 +107,30 @@ class Factory(Codelet):
             MonitoringViewEvaluator,
             SimplexViewEvaluator,
         )
-        from homer.codelets.selectors import (
-            ChunkSelector,
-            CorrespondenceSelector,
-            LabelSelector,
-            RelationSelector,
-            WordSelector,
-            PhraseSelector,
-        )
-        from homer.codelets.selectors.chunk_selectors import (
-            ChunkProjectionSelector,
-            ReverseChunkProjectionSelector,
-        )
-        from homer.codelets.selectors.label_selectors import (
-            LabelProjectionSelector,
-        )
-        from homer.codelets.selectors.phrase_selectors import (
-            PhraseProjectionSelector,
-        )
-        from homer.codelets.selectors.relation_selectors import (
-            RelationProjectionSelector,
-        )
-        from homer.codelets.selectors.view_selectors import (
-            MonitoringViewSelector,
-            SimplexViewSelector,
-        )
 
         return {
-            "build": {
+            "suggest": {
                 "inner": {
                     "forward": {
-                        "chunk": ChunkBuilder,
-                        "correspondence": CorrespondenceBuilder,
-                        "label": LabelBuilder,
-                        "phrase": PhraseBuilder,
-                        "relation": RelationBuilder,
-                        "view-monitoring": MonitoringViewBuilder,
-                        "view-simplex": SimplexViewBuilder,
+                        "chunk": ChunkSuggester,
+                        "correspondence": CorrespondenceSuggester,
+                        "label": LabelSuggester,
+                        "phrase": PhraseSuggester,
+                        "relation": RelationSuggester,
+                        "view-monitoring": MonitoringViewSuggester,
+                        "view-simplex": SimplexViewSuggester,
                     },
                 },
                 "outer": {
                     "forward": {
-                        "chunk": ChunkProjectionBuilder,
-                        "label": LabelProjectionBuilder,
-                        "phrase": PhraseProjectionBuilder,
-                        "relation": RelationProjectionBuilder,
-                        "word": WordBuilder,
+                        "chunk": ChunkProjectionSuggester,
+                        "label": LabelProjectionSuggester,
+                        "phrase": PhraseProjectionSuggester,
+                        "relation": RelationProjectionSuggester,
+                        "word": WordSuggester,
                     },
                     "reverse": {
-                        "chunk": ReverseChunkProjectionBuilder,
+                        "chunk": ReverseChunkProjectionSuggester,
                     },
                 },
             },
@@ -184,31 +159,6 @@ class Factory(Codelet):
                     },
                 },
             },
-            "select": {
-                "inner": {
-                    "forward": {
-                        "chunk": ChunkSelector,
-                        "correspondence": CorrespondenceSelector,
-                        "label": LabelSelector,
-                        "phrase": PhraseSelector,
-                        "relation": RelationSelector,
-                        "view-monitoring": MonitoringViewSelector,
-                        "view-simplex": SimplexViewSelector,
-                    },
-                },
-                "outer": {
-                    "forward": {
-                        "chunk": ChunkProjectionSelector,
-                        "label": LabelProjectionSelector,
-                        "phrase": PhraseProjectionSelector,
-                        "relation": RelationProjectionSelector,
-                        "word": WordSelector,
-                    },
-                    "reverse": {
-                        "chunk": ReverseChunkProjectionSelector,
-                    },
-                },
-            },
             "publish": {
                 "publish": {
                     "publish": {
@@ -219,9 +169,9 @@ class Factory(Codelet):
         }[action.name][space.name][direction.name][structure.name]
 
     def codelet_themes(self):
-        build = self.bubble_chamber.concepts["build"]
+        suggest = self.bubble_chamber.concepts["suggest"]
         evaluate = self.bubble_chamber.concepts["evaluate"]
-        select = self.bubble_chamber.concepts["select"]
+        publish = self.bubble_chamber.concepts["publish"]
         inner = self.bubble_chamber.concepts["inner"]
         outer = self.bubble_chamber.concepts["outer"]
         forward = self.bubble_chamber.concepts["forward"]
@@ -234,16 +184,15 @@ class Factory(Codelet):
         view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
         view_simplex = self.bubble_chamber.concepts["view-simplex"]
         word = self.bubble_chamber.concepts["word"]
-        publish = self.bubble_chamber.concepts["publish"]
         return {
             "inner-or-outer": {
-                "actions": StructureCollection({build, evaluate, select}),
+                "actions": StructureCollection({suggest, evaluate}),
                 "spaces": StructureCollection({inner, outer}),
                 "directions": StructureCollection({forward}),
                 "structures": StructureCollection({chunk, label, phrase, relation}),
             },
             "inner": {
-                "actions": StructureCollection({build, evaluate, select}),
+                "actions": StructureCollection({suggest, evaluate}),
                 "spaces": StructureCollection({inner}),
                 "directions": StructureCollection({forward}),
                 "structures": StructureCollection(
@@ -251,13 +200,13 @@ class Factory(Codelet):
                 ),
             },
             "outer": {
-                "actions": StructureCollection({build, evaluate, select}),
+                "actions": StructureCollection({suggest, evaluate}),
                 "spaces": StructureCollection({outer}),
                 "directions": StructureCollection({forward}),
                 "structures": StructureCollection({word}),
             },
             "reverse": {
-                "actions": StructureCollection({build, evaluate, select}),
+                "actions": StructureCollection({suggest, evaluate}),
                 "spaces": StructureCollection({outer}),
                 "directions": StructureCollection({reverse}),
                 "structures": StructureCollection({chunk}),

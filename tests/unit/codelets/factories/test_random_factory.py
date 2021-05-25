@@ -1,19 +1,19 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from homer.codelets import Builder, Evaluator, Publisher, Selector
+from homer.codelets import Evaluator, Publisher, Suggester
 from homer.codelets.factories import RandomFactory
 from homer.structure_collection import StructureCollection
 
 
 @pytest.fixture
 def concepts():
-    build_concept = Mock()
-    build_concept.name = "build"
+    suggest_concept = Mock()
+    suggest_concept.name = "suggest"
     evaluate_concept = Mock()
     evaluate_concept.name = "evaluate"
-    select_concept = Mock()
-    select_concept.name = "select"
+    publish_concept = Mock()
+    publish_concept.name = "publish"
     inner_concept = Mock()
     inner_concept.name = "inner"
     outer_concept = Mock()
@@ -38,13 +38,11 @@ def concepts():
     view_simplex_concept.name = "view-simplex"
     word_concept = Mock()
     word_concept.name = "word"
-    publish_concept = Mock()
-    publish_concept.name = "publish"
     return StructureCollection(
         {
-            build_concept,
+            suggest_concept,
             evaluate_concept,
-            select_concept,
+            publish_concept,
             inner_concept,
             outer_concept,
             forward_concept,
@@ -57,7 +55,6 @@ def concepts():
             view_monitoring_concept,
             view_simplex_concept,
             word_concept,
-            publish_concept,
         }
     )
 
@@ -82,7 +79,7 @@ def test_decide_follow_up_class_returns_codelet_class(
 ):
     factory_codelet = RandomFactory(Mock(), Mock(), bubble_chamber, coderack, Mock())
     follow_up_class = factory_codelet._decide_follow_up_class()
-    codelet_types = [Builder, Evaluator, Selector, Publisher]
+    codelet_types = [Suggester, Evaluator, Publisher]
     assert (
         follow_up_class in codelet_types
         or follow_up_class.__bases__[0] in codelet_types
