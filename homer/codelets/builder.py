@@ -21,7 +21,6 @@ class Builder(Codelet):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
         self.child_structures = None
-        self.confidence = 0.0
 
     @classmethod
     def make(
@@ -97,7 +96,7 @@ class Builder(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.child_structures,
-                self.confidence,
+                self.urgency,
             )
         )
 
