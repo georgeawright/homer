@@ -226,12 +226,7 @@ def run_view(request, run_id):
         output = output[:-2]
         output += "</li>"
         output += "<li>Output: "
-        output_space = [
-            structure
-            for structure in structure_records
-            if re.match(r"^WorkingSpace*", structure.structure_id)
-            and structure.parent_codelet == view.parent_codelet
-        ][0]
+        output_space = view.output_space
         output += (
             f'(<a href="structures/{output_space.structure_id}">'
             + f"{output_space.structure_id}</a>)"
