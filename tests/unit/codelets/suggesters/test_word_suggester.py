@@ -75,10 +75,10 @@ def frame_word(frame):
     return word
 
 
-@pytest.mark.skip
 @pytest.fixture
 def frame_slot(frame, temperature_concept, warm_lexeme):
     slot = Mock()
+    slot.name = "frame slot"
     slot.is_slot = True
     slot.parent_space = frame
     slot.value = temperature_concept
@@ -109,7 +109,10 @@ def output_space():
 @pytest.fixture
 def frame_chunk_label(warm_concept):
     label = Mock()
+    label.name = "frame chunk label"
+    label.is_word = False
     label.parent_concept = warm_concept
+    label.correspondences = StructureCollection()
     return label
 
 
@@ -122,40 +125,65 @@ def frame_chunk(frame_chunk_label, input_space):
 
 
 @pytest.fixture
-def chunk_slot_correspondence(
+def input_label(temperature_space_in_input, frame_chunk_label):
+    label = Mock()
+    label.is_word = False
+    label.correspondences = StructureCollection()
+    return label
+
+
+@pytest.fixture
+def input_to_frame_correspondence(input_label, frame_chunk_label):
+    correspondence = Mock()
+    correspondence.name = "input to frame"
+    correspondence.start = input_label
+    correspondence.end = frame_chunk_label
+    correspondence.activation = 1
+    input_label.correspondences.add(correspondence)
+    frame_chunk_label.correspondences.add(correspondence)
+    return correspondence
+
+
+@pytest.fixture
+def label_slot_correspondence(
     frame_slot,
-    frame_chunk,
+    frame_chunk_label,
     temperature_space_in_frame,
     temperature_space_in_input,
+    input_label,
 ):
     correspondence = Mock()
     correspondence.start = frame_slot
-    correspondence.end = frame_chunk
+    correspondence.end = frame_chunk_label
     correspondence.start_space = temperature_space_in_frame
     correspondence.end_space = temperature_space_in_input
     correspondence.activation = 1.0
-    correspondence.get_non_slot_argument.return_value = frame_chunk
     correspondence.is_privileged = False
     frame_slot.correspondences = StructureCollection({correspondence})
-    frame_chunk.correspondences = StructureCollection({correspondence})
+    frame_chunk_label.correspondences.add(correspondence)
     return correspondence
 
 
 @pytest.fixture
 def target_view(
-    input_space, output_space, frame_chunk, chunk_slot_correspondence, warm_concept
+    input_space,
+    output_space,
+    frame_chunk_label,
+    label_slot_correspondence,
+    warm_concept,
+    input_to_frame_correspondence,
 ):
     view = Mock()
     view.input_spaces.of_type.return_value = input_space
     view.output_space = output_space
-    view.members = StructureCollection({chunk_slot_correspondence})
-    view.slot_values = {frame_chunk.structure_id: warm_concept}
+    view.members = StructureCollection(
+        {label_slot_correspondence, input_to_frame_correspondence}
+    )
+    view.slot_values = {frame_chunk_label.structure_id: warm_concept}
     return view
 
 
-def test_suggests_word_from_slot(
-    bubble_chamber, target_view, frame_slot, chunk_slot_correspondence
-):
+def test_suggests_word_from_slot(bubble_chamber, target_view, frame_slot):
     target_structures = {"target_view": target_view, "target_word": frame_slot}
     word_suggester = WordSuggester(Mock(), Mock(), bubble_chamber, target_structures, 1)
     result = word_suggester.run()

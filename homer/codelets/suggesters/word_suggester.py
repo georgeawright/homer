@@ -29,6 +29,7 @@ class WordSuggester(Suggester):
         self.target_correspondence = None
         self.word_correspondee = None
         self.non_frame_item = None
+        self.correspondence_to_non_frame_item = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -101,26 +102,26 @@ class WordSuggester(Suggester):
                 }
             ).get_random()
             self._target_structures["word_correspondee"] = self.word_correspondee
-            correspondence_to_non_frame_item = StructureCollection(
+            self.correspondence_to_non_frame_item = StructureCollection(
                 {
                     correspondence
                     for correspondence in self.word_correspondee.correspondences
                     if (
-                        not isinstance(correspondence.start_space, Frame)
-                        or not isinstance(correspondence.end_space, Frame)
+                        not correspondence.start.is_word
+                        and not correspondence.end.is_word
                     )
                     and correspondence in self.target_view.members
                 }
             ).get_random()
             self.non_frame, self.non_frame_item = (
                 (
-                    correspondence_to_non_frame_item.start_space,
-                    correspondence_to_non_frame_item.start,
+                    self.correspondence_to_non_frame_item.start_space,
+                    self.correspondence_to_non_frame_item.start,
                 )
-                if correspondence_to_non_frame_item.start != self.word_correspondee
+                if self.correspondence_to_non_frame_item.start != self.word_correspondee
                 else (
-                    correspondence_to_non_frame_item.end_space,
-                    correspondence_to_non_frame_item.end,
+                    self.correspondence_to_non_frame_item.end_space,
+                    self.correspondence_to_non_frame_item.end,
                 )
             )
             self._target_structures["non_frame"] = self.non_frame
@@ -139,18 +140,10 @@ class WordSuggester(Suggester):
 
     def _calculate_confidence(self):
         self.confidence = (
-            self.target_correspondence.activation
-            # TODO: self.target_correspondence is always None
-            if self.target_correspondence is not None
+            self.correspondence_to_non_frame_item.activation
+            if self.word_correspondee is not None
             else 1.0
         )
 
     def _fizzle(self):
-        self.child_codelets.append(
-            self.make(
-                self.codelet_id,
-                self.bubble_chamber,
-                target_view=self.target_view,
-                urgency=self.urgency / 2,
-            )
-        )
+        pass
