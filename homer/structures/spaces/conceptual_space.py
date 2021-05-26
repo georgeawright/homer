@@ -49,6 +49,7 @@ class ConceptualSpace(Space):
         )
         self._instance = None
         self._instances = {}
+        self.is_conceptual_space = True
 
     @property
     def instance_type(self):

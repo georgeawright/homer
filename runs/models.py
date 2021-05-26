@@ -22,17 +22,8 @@ class CodeletRecord(models.Model):
         blank=True,
         null=True,
     )
-    target_structure = models.ForeignKey(
+    target_structures = models.ManyToManyField(
         "StructureRecord",
-        related_name="target_structure",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    second_target_structure = models.ForeignKey(
-        "StructureRecord",
-        related_name="second_target_structure",
-        on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
@@ -72,24 +63,15 @@ class EventRecord(models.Model):
     event_time = models.IntegerField("Birth Time")
     event_type = models.CharField("Codelet ID", max_length=MAX_STRING_LENGTH)
     codelet = models.ForeignKey("CodeletRecord", on_delete=models.CASCADE)
-    target_one = models.ForeignKey(
+    target_structures = models.ManyToManyField(
         "StructureRecord",
-        related_name="_target_one",
-        on_delete=models.CASCADE,
+        related_name="_target_structures",
         blank=True,
         null=True,
     )
-    target_two = models.ForeignKey(
+    child_structures = models.ManyToManyField(
         "StructureRecord",
-        related_name="_target_two",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    child_structure = models.ForeignKey(
-        "StructureRecord",
-        related_name="_child_structure",
-        on_delete=models.CASCADE,
+        related_name="_child_structures",
         blank=True,
         null=True,
     )

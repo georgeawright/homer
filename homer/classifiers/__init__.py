@@ -1,3 +1,4 @@
+from .rule_classifier import RuleClassifier
 from .difference_classifier import DifferenceClassifier
 from .differentness_classifier import DifferentnessClassifier
 from .part_of_speech_classifier import PartOfSpeechClassifier

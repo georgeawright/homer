@@ -33,6 +33,7 @@ class View(Structure):
         self.output_space = output_space
         self.members = members
         self.slot_values = {}
+        self.is_view = True
 
     @property
     def input_working_spaces(self):
@@ -52,70 +53,28 @@ class View(Structure):
 
     @property
     def slots(self):
+        # TODO: ideally there should be a recursive call to space.slots
+        spaces = StructureCollection.union(
+            self.input_spaces,
+            StructureCollection(
+                {
+                    sub_space
+                    for space in self.input_spaces
+                    for sub_space in space.contents.where(is_space=True)
+                }
+            ),
+        )
         return StructureCollection(
             {
                 structure
-                for space in self.input_spaces
+                for space in spaces
                 for structure in space.contents
                 if structure.is_slot
             }
         )
 
     def copy(self, **kwargs: dict):
-        """Requires keyword arguments 'bubble_chamber', 'parent_id',
-        'original_structure', and, 'replacement_structure'."""
-        from homer.structures.links import Correspondence
-
-        bubble_chamber = kwargs["bubble_chamber"]
-        parent_id = kwargs["parent_id"]
-        original_structure = kwargs["original_structure"]
-        replacement_structure = kwargs["replacement_structure"]
-        new_members = StructureCollection()
-        for correspondence in self.members:
-            if (
-                correspondence.start in self.output_space.contents
-                or correspondence.end in self.output_space.contents
-            ):
-                continue
-            new_correspondence = correspondence.copy(
-                old_arg=original_structure,
-                new_arg=replacement_structure,
-                parent_id=parent_id,
-            )
-            new_correspondence.start.links_in.add(new_correspondence)
-            new_correspondence.start.links_out.add(new_correspondence)
-            new_correspondence.end.links_in.add(new_correspondence)
-            new_correspondence.end.links_out.add(new_correspondence)
-            new_members.add(new_correspondence)
-        new_output_space = self.output_space.copy(
-            bubble_chamber=bubble_chamber, parent_id=parent_id
-        )
-        new_view = View(
-            ID.new(View),
-            parent_id,
-            location=self.location,
-            members=new_members,
-            input_spaces=self.input_spaces,
-            output_space=new_output_space,
-            quality=self.quality,
-        )
-        for correspondence in new_output_space.contents.of_type(Correspondence):
-            new_view.members.add(correspondence)
-        return new_view
-
-    def nearby(self, space: Space = None) -> StructureCollection:
-        space = space if space is not None else self.location.space
-        return StructureCollection(
-            {
-                view
-                for view in space.contents.of_type(View)
-                if StructureCollection.intersection(
-                    view.input_spaces, self.input_working_spaces
-                )
-                == self.input_working_spaces
-                and view != self
-            }
-        )
+        raise NotImplementedError
 
     def has_member(
         self,

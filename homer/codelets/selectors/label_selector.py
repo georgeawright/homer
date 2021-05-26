@@ -1,90 +1,61 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders import LabelBuilder
 from homer.codelets.selector import Selector
+from homer.codelets.suggesters import LabelSuggester
 from homer.errors import MissingStructureError
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
-from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 
 
 class LabelSelector(Selector):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        champion: Structure,
-        urgency: FloatBetweenOneAndZero,
-        challenger: Structure = None,
-    ):
-        Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.champion = champion
-        self.challenger = challenger
-
-    @classmethod
-    def spawn(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        champion: Structure,
-        urgency: FloatBetweenOneAndZero,
-        challenger: Structure = None,
-    ):
-        codelet_id = ID.new(cls)
-        return cls(
-            codelet_id,
-            parent_id,
-            bubble_chamber,
-            champion,
-            urgency,
-            challenger=challenger,
-        )
-
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         champion = bubble_chamber.labels.get_active()
-        return cls.spawn(parent_id, bubble_chamber, champion, champion.activation)
+        return cls.spawn(
+            parent_id,
+            bubble_chamber,
+            StructureCollection({champion}),
+            champion.activation,
+        )
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["label"]
 
     def _passes_preliminary_checks(self):
-        if self.challenger is not None:
+        if self.challengers is not None:
             return True
-        candidates = self.champion.start.labels_in_space(self.champion.parent_space)
-        if len(candidates) == 1:
-            return False
+        champion_label = self.champions.get_random()
+        candidates = champion_label.start.labels_in_space(champion_label.parent_space)
         try:
-            self.challenger = candidates.get_active(exclude=[self.champion])
+            challenger_label = candidates.get_active(exclude=[champion_label])
+            self.challengers = StructureCollection({challenger_label})
             return True
         except MissingStructureError:
-            return False
+            return True
 
     def _fizzle(self):
-        self.child_codelets.append(
-            LabelBuilder.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.champion.start,
-                self.champion.start.unhappiness,
-            )
-        )
+        pass
 
     def _engender_follow_up(self):
-        self.child_codelets.append(
-            LabelBuilder.make_top_down(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.champion.parent_concept,
+        try:
+            winning_label = self.winners.get_random()
+            parent_concept = winning_label.parent_concept.friends().get_random()
+            target_node = winning_label.start.nearby().get_unhappy()
+            self.child_codelets.append(
+                LabelSuggester.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    {"target_node": target_node, "parent_concept": parent_concept},
+                    target_node.unlinkedness,
+                )
             )
-        )
+        except MissingStructureError:
+            pass
         self.child_codelets.append(
             LabelSelector.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.winner,
+                self.winners,
                 self.follow_up_urgency,
-                challenger=self.loser,
+                challengers=self.losers,
             )
         )

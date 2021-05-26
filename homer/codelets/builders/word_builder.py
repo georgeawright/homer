@@ -11,6 +11,7 @@ from homer.structures.nodes import Word
 from homer.structures.spaces import Frame
 
 
+# TODO: rename to WordProjectionBuilder?
 class WordBuilder(Builder):
     """Builds a word in an output space
     and correspondences to the items it refers to in input spaces"""
@@ -20,30 +21,30 @@ class WordBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_word: Word,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_view = target_view
-        self.frame = None
+        self._target_structures = target_structures
+        self.target_view = None
         self.non_frame = None
-        self.target_word = target_word
-        self.target_non_frame_item = None
+        self.target_word = None
         self.target_correspondence = None
-        self.child_structure = None
+        self.word_correspondee = None
+        self.non_frame_item = None
 
     @classmethod
-    def get_target_class(cls):
-        return Word
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import WordEvaluator
+
+        return WordEvaluator
 
     @classmethod
     def spawn(
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_word: Word,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -51,8 +52,7 @@ class WordBuilder(Builder):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_view,
-            target_word,
+            target_structures,
             urgency,
         )
 
@@ -67,67 +67,34 @@ class WordBuilder(Builder):
         target_view = (
             target_view
             if target_view is not None
-            else bubble_chamber.views.get_unhappy()
+            else bubble_chamber.views.get_active()
         )
         frame = target_view.input_spaces.of_type(Frame).get_random()
         target_word = frame.contents.of_type(Word).get_exigent()
-        urgency = urgency if urgency is not None else target_word.exigency
+        urgency = urgency if urgency is not None else target_view.activation
         return cls.spawn(parent_id, bubble_chamber, target_view, target_word, urgency)
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]
 
+    @property
+    def target_structures(self):
+        return StructureCollection({self.target_view, self.target_word})
+
     def _passes_preliminary_checks(self):
-        try:
-            self.word_correspondee = StructureCollection(
-                {
-                    correspondence.start
-                    if correspondence.start != self.target_word
-                    else correspondence.end
-                    for correspondence in self.target_word.correspondences
-                    if correspondence.start.is_slot and correspondence.end.is_slot
-                }
-            ).get_random()
-            correspondence_to_non_frame_item = StructureCollection(
-                {
-                    correspondence
-                    for correspondence in self.word_correspondee.correspondences
-                    if (
-                        not isinstance(correspondence.start_space, Frame)
-                        or not isinstance(correspondence.end_space, Frame)
-                    )
-                    and correspondence in self.target_view.members
-                }
-            ).get_random()
-            self.non_frame, self.non_frame_item = (
-                (
-                    correspondence_to_non_frame_item.start_space,
-                    correspondence_to_non_frame_item.start,
-                )
-                if correspondence_to_non_frame_item.start != self.word_correspondee
-                else (
-                    correspondence_to_non_frame_item.end_space,
-                    correspondence_to_non_frame_item.end,
-                )
-            )
+        self.target_view = self._target_structures["target_view"]
+        self.target_word = self._target_structures["target_word"]
+        self.word_correspondee = self._target_structures["word_correspondee"]
+        self.non_frame = self._target_structures["non_frame"]
+        self.non_frame_item = self._target_structures["non_frame_item"]
+        if self.target_word.is_slot:
             return (
                 self.word_correspondee.structure_id in self.target_view.slot_values
                 and self.target_word.structure_id not in self.target_view.slot_values
             )
-        except MissingStructureError:
-            return (
-                not self.target_word.is_slot
-                and not self.target_word.has_correspondence_to_space(
-                    self.target_view.output_space
-                )
-            )
-
-    def _calculate_confidence(self):
-        self.confidence = (
-            self.target_correspondence.activation
-            if self.target_correspondence is not None
-            else 1.0
+        return not self.target_word.has_correspondence_to_space(
+            self.target_view.output_space
         )
 
     def _process_structure(self):
@@ -156,14 +123,14 @@ class WordBuilder(Builder):
             parent_space=self.target_view.output_space,
             quality=0.0,
         )
-        self.child_structure = word
+        self.target_view.output_space.add(word)
         self.bubble_chamber.words.add(word)
         self.bubble_chamber.logger.log(word)
         frame_to_output_correspondence = Correspondence(
             ID.new(Correspondence),
             self.codelet_id,
             start=self.target_word,
-            end=self.child_structure,
+            end=word,
             start_space=self.target_word.parent_space,
             end_space=self.target_view.output_space,
             locations=[self.target_word.location, word.location],
@@ -172,18 +139,24 @@ class WordBuilder(Builder):
             parent_view=self.target_view,
             quality=0.0,
         )
+        self.child_structures = StructureCollection(
+            {word, frame_to_output_correspondence}
+        )
         self.bubble_chamber.correspondences.add(frame_to_output_correspondence)
         self.bubble_chamber.logger.log(frame_to_output_correspondence)
+        self.target_view.members.add(frame_to_output_correspondence)
         self.target_word.links_in.add(frame_to_output_correspondence)
         self.target_word.links_out.add(frame_to_output_correspondence)
         word.links_in.add(frame_to_output_correspondence)
         word.links_out.add(frame_to_output_correspondence)
+        for location in frame_to_output_correspondence.locations:
+            location.space.add(frame_to_output_correspondence)
         if self.target_word.is_slot:
             non_frame_to_output_correspondence = Correspondence(
                 ID.new(Correspondence),
                 self.codelet_id,
                 start=self.non_frame_item,
-                end=self.child_structure,
+                end=word,
                 start_space=self.non_frame,
                 end_space=self.target_view.output_space,
                 locations=[
@@ -195,33 +168,18 @@ class WordBuilder(Builder):
                 parent_view=self.target_view,
                 quality=0.0,
             )
+            self.child_structures.add(non_frame_to_output_correspondence)
             self.bubble_chamber.correspondences.add(non_frame_to_output_correspondence)
             self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
+            self.target_view.members.add(non_frame_to_output_correspondence)
             word.links_in.add(non_frame_to_output_correspondence)
             word.links_out.add(non_frame_to_output_correspondence)
             self.non_frame_item.links_in.add(non_frame_to_output_correspondence)
             self.non_frame_item.links_out.add(non_frame_to_output_correspondence)
             self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
+            for location in non_frame_to_output_correspondence.locations:
+                location.space.add(non_frame_to_output_correspondence)
         self.bubble_chamber.logger.log(self.target_view)
 
     def _fizzle(self):
-        self.child_codelets.append(
-            self.make(
-                self.codelet_id,
-                self.bubble_chamber,
-                target_view=self.target_view,
-                urgency=self.urgency / 2,
-            )
-        )
-
-    def _fail(self):
-        from homer.codelets.selectors import CorrespondenceSelector
-
-        self.child_codelets.append(
-            CorrespondenceSelector.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.target_correspondence,
-                self.urgency,
-            )
-        )
+        pass

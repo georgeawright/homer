@@ -17,23 +17,7 @@ from homer.structures.spaces.frames import Template
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     text_concept = Concept(
         Mock(),
         Mock(),
@@ -282,7 +266,7 @@ def test_increases_quality_of_good_correspondence(bubble_chamber, good_correspon
     parent_id = ""
     urgency = 1.0
     evaluator = CorrespondenceEvaluator.spawn(
-        parent_id, bubble_chamber, good_correspondence, urgency
+        parent_id, bubble_chamber, StructureCollection({good_correspondence}), urgency
     )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
@@ -296,7 +280,7 @@ def test_decreases_quality_of_bad_label(bubble_chamber, bad_correspondence):
     parent_id = ""
     urgency = 1.0
     evaluator = CorrespondenceEvaluator.spawn(
-        parent_id, bubble_chamber, bad_correspondence, urgency
+        parent_id, bubble_chamber, StructureCollection({bad_correspondence}), urgency
     )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result

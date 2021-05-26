@@ -16,23 +16,7 @@ from homer.word_form import WordForm
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     phrase_concept = Concept(
         Mock(),
         Mock(),
@@ -233,7 +217,9 @@ def test_increases_quality_of_good_phrase(bubble_chamber, good_phrase):
     original_phrase_quality = good_phrase.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = PhraseEvaluator.spawn(parent_id, bubble_chamber, good_phrase, urgency)
+    evaluator = PhraseEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({good_phrase}), urgency
+    )
     evaluator.run()
     good_phrase.update_activation()
     assert CodeletResult.SUCCESS == evaluator.result
@@ -246,7 +232,9 @@ def test_decreases_quality_of_bad_chunk(bubble_chamber, bad_phrase):
     original_phrase_quality = bad_phrase.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = PhraseEvaluator.spawn(parent_id, bubble_chamber, bad_phrase, urgency)
+    evaluator = PhraseEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({bad_phrase}), urgency
+    )
     evaluator.run()
     bad_phrase.update_activation()
     assert CodeletResult.SUCCESS == evaluator.result

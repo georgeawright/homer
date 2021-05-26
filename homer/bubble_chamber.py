@@ -1,3 +1,4 @@
+from itertools import chain
 import statistics
 from typing import List, Union
 
@@ -19,8 +20,10 @@ class BubbleChamber:
         conceptual_spaces: StructureCollection,
         working_spaces: StructureCollection,
         frames: StructureCollection,
+        frame_instances: StructureCollection,
         chunks: StructureCollection,
         concepts: StructureCollection,
+        lexemes: StructureCollection,
         correspondences: StructureCollection,
         labels: StructureCollection,
         relations: StructureCollection,
@@ -35,8 +38,10 @@ class BubbleChamber:
         self.conceptual_spaces = conceptual_spaces
         self.working_spaces = working_spaces
         self.frames = frames
+        self.frame_instances = frame_instances
         self.chunks = chunks
         self.concepts = concepts
+        self.lexemes = lexemes
         self.correspondences = correspondences
         self.labels = labels
         self.relations = relations
@@ -50,6 +55,28 @@ class BubbleChamber:
         self.log_count = 0
         self.result = None
 
+    @classmethod
+    def setup(cls, logger: Logger):
+        return cls(
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            StructureCollection(),
+            logger,
+        )
+
     @property
     def spaces(self) -> StructureCollection:
         return StructureCollection.union(
@@ -62,7 +89,35 @@ class BubbleChamber:
 
     @property
     def input_nodes(self) -> StructureCollection:
-        return StructureCollection.union(self.chunks, self.words)
+        return StructureCollection(
+            {
+                node
+                for node in chain(self.chunks, self.words)
+                if node.parent_space.parent_concept
+                in (self.concepts["input"], self.concepts["text"])
+                and not node.parent_space.is_frame
+            }
+        )
+
+    @property
+    def comprehension_views(self) -> StructureCollection:
+        return self.monitoring_views
+
+    @property
+    def production_views(self) -> StructureCollection:
+        return StructureCollection.union(self.discourse_views, self.simplex_views)
+
+    @property
+    def monitoring_views(self) -> StructureCollection:
+        return self.views.where(is_monitoring_view=True)
+
+    @property
+    def discourse_views(self) -> StructureCollection:
+        return self.views.where(is_discourse_view=True)
+
+    @property
+    def simplex_views(self) -> StructureCollection:
+        return self.views.where(is_simplex_view=True)
 
     @property
     def structures(self) -> StructureCollection:
@@ -105,7 +160,7 @@ class BubbleChamber:
     def update_activations(self) -> None:
         for structure in self.structures:
             structure.update_activation()
-            if self.log_count % 25 == 0:
+            if self.log_count % 500 == 0:
                 self.logger.log(structure)
         self.log_count += 1
 

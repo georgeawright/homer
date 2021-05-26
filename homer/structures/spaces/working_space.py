@@ -47,6 +47,7 @@ class WorkingSpace(Space):
             links_out=links_out,
         )
         self.conceptual_space = conceptual_space
+        self.is_working_space = True
 
     @property
     def quality(self):
@@ -91,6 +92,7 @@ class WorkingSpace(Space):
             is_basic_level=self.is_basic_level,
             super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
         )
+        bubble_chamber.logger.log(new_space)
         copies = {}
         for item in self.contents:
             if isinstance(item, Node):
@@ -103,8 +105,7 @@ class WorkingSpace(Space):
                 copies[item] = new_item
                 for label in item.labels:
                     new_label = label.copy(
-                        old_arg=item,
-                        new_arg=new_item,
+                        start=new_item,
                         parent_space=new_space,
                         parent_id=parent_id,
                     )
@@ -136,15 +137,20 @@ class WorkingSpace(Space):
                     new_correspondence.start.links_out.add(new_correspondence)
                     new_correspondence.end.links_in.add(new_correspondence)
                     new_correspondence.end.links_out.add(new_correspondence)
+                    new_space.add(new_correspondence)
         return new_space
 
     def copy_without_contents(self, parent_id: str) -> WorkingSpace:
-        """Returns an empty working space with the same conceptual space.
-        Consider effect on ConceptualSpace.instance_in_space"""
+        """Returns an empty working space with the same conceptual space."""
         sub_space_copies = {
-            sub_space: sub_space.copy_without_contents for sub_space in self.sub_spaces
+            sub_space: sub_space.copy_without_contents(parent_id)
+            for sub_space in self.sub_spaces
         }
-        new_dimensions = [sub_space_copies[dimension] for dimension in self.dimensions]
+        new_dimensions = (
+            [sub_space_copies[dimension] for dimension in self.dimensions]
+            if self.no_of_dimensions > 1
+            else []
+        )
         new_sub_spaces = [sub_space_copies[sub_space] for sub_space in self.sub_spaces]
         new_space = WorkingSpace(
             structure_id=ID.new(WorkingSpace),
@@ -155,12 +161,18 @@ class WorkingSpace(Space):
             locations=self.locations,
             contents=StructureCollection(),
             no_of_dimensions=self.no_of_dimensions,
-            dimensons=new_dimensions,
+            dimensions=new_dimensions,
             sub_spaces=new_sub_spaces,
             is_basic_level=self.is_basic_level,
             super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
         )
         return new_space
+
+    def decay_activation(self, amount: float = None):
+        if amount is None:
+            amount = self.MINIMUM_ACTIVATION_UPDATE
+        for item in self.contents:
+            item.decay_activation(amount)
 
     def update_activation(self):
         self._activation = (

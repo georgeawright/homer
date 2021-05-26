@@ -1,6 +1,8 @@
 from __future__ import annotations
+import random
 from typing import Union
 
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
@@ -38,6 +40,7 @@ class Word(Node):
         )
         self.lexeme = lexeme
         self.word_form = word_form
+        self.is_word = True
 
     @classmethod
     def get_builder_class(cls):
@@ -88,6 +91,110 @@ class Word(Node):
             }
         )
 
+    @property
+    def potential_labeling_words(self) -> StructureCollection:
+        return StructureCollection.union(
+            StructureCollection({self}),
+            StructureCollection(
+                {
+                    relation.start
+                    for relation in self.relations
+                    if relation.parent_concept.name == "nsubj"
+                }
+            ),
+            StructureCollection(
+                {
+                    relation.start
+                    for relation in StructureCollection.union(
+                        *[
+                            r.start.relations
+                            for r in self.relations
+                            if r.parent_concept.name == "pobj"
+                        ]
+                    )
+                    if relation.parent_concept.name == "prep"
+                }
+            ),
+        )
+
+    @property
+    def potential_relating_words(self) -> StructureCollection:
+        get_pobj_preds = lambda x: StructureCollection(
+            {
+                relation.start
+                for relation in StructureCollection.union(
+                    *[
+                        r.start.relations
+                        for r in x.relations
+                        if r.parent_concept.name == "pobj"
+                    ]
+                )
+                if relation.parent_concept.name == "prep"
+            }
+        )
+        nsubj_preds = StructureCollection(
+            {
+                relation.start
+                for relation in self.relations
+                if relation.parent_concept.name == "nsubj"
+            }
+        )
+        pobj_preds = get_pobj_preds(self)
+        dep_preds = StructureCollection.union(
+            *[
+                get_pobj_preds(relation.start)
+                for relation in self.relations
+                if relation.parent_concept.name == "dep"
+            ]
+        )
+        return StructureCollection.union(nsubj_preds, pobj_preds, dep_preds)
+
+    @property
+    def potential_argument_words(self) -> StructureCollection:
+        nsubj_words = StructureCollection(
+            {
+                relation.end
+                for relation in self.relations
+                if relation.parent_concept.name == "nsubj"
+            }
+        )
+        pobj_words = StructureCollection(
+            {
+                relation.end
+                for relation in StructureCollection.union(
+                    *[
+                        r.end.relations
+                        for r in self.relations
+                        if r.parent_concept.name == "prep"
+                    ]
+                )
+                if relation.parent_concept.name == "pobj"
+            }
+        )
+        dep_words = StructureCollection(
+            {
+                relation.end
+                for word in pobj_words
+                for relation in word.relations
+                if relation.parent_concept.name == "dep"
+            }
+        )
+        return StructureCollection.union(nsubj_words, pobj_words, dep_words)
+
+    def get_potential_relative(self, space: Space = None) -> Word:
+        space = self.parent_space if space is None else space
+        words = space.contents.where(is_word=True)
+        if len(words) == 1:
+            raise MissingStructureError
+        for _ in range(len(words)):
+            word = words.get_random(exclude=[self])
+            distance = abs(
+                word.location.coordinates[0][0] - self.location.coordinates[0][0]
+            )
+            if 1 / distance + random.random() >= 1:
+                return word
+        return words.get_random(exclude=[self])
+
     def copy(self, **kwargs: dict) -> Word:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""
         bubble_chamber = kwargs["bubble_chamber"]
@@ -97,11 +204,13 @@ class Word(Node):
         new_word = Word(
             ID.new(Word),
             parent_id,
-            self.value,
-            self.lexeme,
-            location,
-            parent_space,
-            self.quality,
+            lexeme=self.lexeme,
+            word_form=self.word_form,
+            location=location,
+            parent_space=parent_space,
+            quality=self.quality,
         )
+        parent_space.add(new_word)
+        bubble_chamber.logger.log(new_word)
         bubble_chamber.words.add(new_word)
         return new_word

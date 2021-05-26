@@ -17,10 +17,13 @@ def test_changes_target_structure_quality(current_quality, label_quality):
     chunk = Mock()
     chunk.labels = StructureCollection({label})
     word = Mock()
+    word.is_word = True
     word.quality = current_quality
     word.concepts = StructureCollection({concept})
     word.correspondees = StructureCollection({chunk})
-    evaluator = WordEvaluator(Mock(), Mock(), bubble_chamber, word, Mock())
+    evaluator = WordEvaluator(
+        Mock(), Mock(), bubble_chamber, StructureCollection({word}), Mock()
+    )
     evaluator.run()
     assert word.quality == label_quality
     assert 1 == len(evaluator.child_codelets)
@@ -31,11 +34,14 @@ def test_gives_function_word_maximum_quality():
     bubble_chamber = Mock()
     bubble_chamber.concepts = {"evaluate": Mock(), "word": Mock()}
     word = Mock()
+    word.is_word = True
     word.quality = 0
     correspondee = Mock()
     correspondee.labels = StructureCollection()
     word.correspondees = StructureCollection({correspondee})
-    evaluator = WordEvaluator(Mock(), Mock(), bubble_chamber, word, Mock())
+    evaluator = WordEvaluator(
+        Mock(), Mock(), bubble_chamber, StructureCollection({word}), Mock()
+    )
     evaluator.run()
     assert 1 == word.quality
     assert 1 == len(evaluator.child_codelets)

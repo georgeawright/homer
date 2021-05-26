@@ -1,10 +1,8 @@
 from __future__ import annotations
 import statistics
 
-from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.id import ID
@@ -21,17 +19,18 @@ class ChunkBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_chunk: Chunk,
+        target_structures: StructureCollection,
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_chunk = target_chunk
+        self._target_structures = target_structures
         self.second_target_chunk = None
-        self.child_structure = None
 
     @classmethod
-    def get_target_class(cls):
-        return Chunk
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import ChunkEvaluator
+
+        return ChunkEvaluator
 
     @classmethod
     def spawn(
@@ -57,7 +56,7 @@ class ChunkBuilder(Builder):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target = bubble_chamber.chunks.get_unhappy()
+        target = bubble_chamber.input_nodes.where(is_chunk=True).get_unhappy()
         urgency = urgency if urgency is not None else target.unhappiness
         return cls.spawn(parent_id, bubble_chamber, target, urgency)
 
@@ -66,33 +65,21 @@ class ChunkBuilder(Builder):
         return self.bubble_chamber.concepts["chunk"]
 
     def _passes_preliminary_checks(self):
-        try:
-            self.second_target_chunk = self.target_chunk.nearby().get_random()
-        except MissingStructureError:
-            return False
         return not self.bubble_chamber.has_chunk(
             StructureCollection.union(
-                self._members_from_chunk(self.target_chunk),
-                self._members_from_chunk(self.second_target_chunk),
+                *[self._members_from_chunk(chunk) for chunk in self.target_structures]
             )
         )
 
-    def _calculate_confidence(self):
-        distances = [
-            space.proximity_between(self.target_chunk, self.second_target_chunk)
-            for space in self.target_chunk.parent_spaces
-            if space.is_basic_level
-        ]
-        self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
-
     def _process_structure(self):
+        target_one = self._target_structures["target_one"]
+        target_two = self._target_structures["target_two"]
         new_chunk_members = StructureCollection.union(
-            self._members_from_chunk(self.target_chunk),
-            self._members_from_chunk(self.second_target_chunk),
+            self._members_from_chunk(target_one),
+            self._members_from_chunk(target_two),
         )
-        locations = []
         parent_spaces = StructureCollection.union(
-            self.target_chunk.parent_spaces, self.second_target_chunk.parent_spaces
+            target_one.parent_spaces, target_two.parent_spaces
         )
         for parent_space in parent_spaces:
             for member in new_chunk_members:
@@ -100,49 +87,38 @@ class ChunkBuilder(Builder):
                     continue
                 if parent_space.is_basic_level:
                     project_item_into_space(member, parent_space)
-        for parent_space in parent_spaces:
-            locations.append(
-                self._get_average_location(new_chunk_members, space=parent_space)
-            )
+        locations = [
+            self._get_merged_location(new_chunk_members, space)
+            for space in parent_spaces
+        ]
         chunk = Chunk(
             ID.new(Chunk),
             self.codelet_id,
             self._get_average_value(new_chunk_members),
             locations,
             new_chunk_members,
-            self.target_chunk.parent_space,
+            target_one.parent_space,
             0,
         )
-        activation_from_chunk_one = (
-            self.target_chunk.activation * self.target_chunk.size / chunk.size
-        )
-        activation_from_chunk_two = (
-            self.second_target_chunk.activation
-            * self.second_target_chunk.size
-            / chunk.size
-        )
+        for parent_space in chunk.parent_spaces:
+            parent_space.add(chunk)
+        activation_from_chunk_one = target_one.activation * target_one.size / chunk.size
+        activation_from_chunk_two = target_two.activation * target_two.size / chunk.size
         chunk.activation = max(
             activation_from_chunk_one + activation_from_chunk_two,
             self.INITIAL_STRUCTURE_ACTIVATION,
         )
-        self.target_chunk.activation = activation_from_chunk_one
-        self.second_target_chunk.activation = activation_from_chunk_two
-        chunk.locations = [
-            self._get_average_location(chunk.members, space)
-            for space in chunk.parent_spaces
-        ]
-        for member in list(new_chunk_members.structures) + [
-            self.target_chunk,
-            self.second_target_chunk,
-        ]:
+        target_one.activation = activation_from_chunk_one
+        target_two.activation = activation_from_chunk_two
+        for member in list(new_chunk_members.structures) + [target_one, target_two]:
             member.chunks_made_from_this_chunk.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
-        self.child_structure = chunk
-        self.bubble_chamber.logger.log(self.child_structure)
-        self.bubble_chamber.logger.log(self.target_chunk)
-        self.bubble_chamber.logger.log(self.second_target_chunk)
-        self._copy_across_links(self.target_chunk, chunk)
-        self._copy_across_links(self.second_target_chunk, chunk)
+        self.bubble_chamber.logger.log(chunk)
+        self.bubble_chamber.logger.log(target_one)
+        self.bubble_chamber.logger.log(target_two)
+        self._copy_across_links(target_one, chunk)
+        self._copy_across_links(target_two, chunk)
+        self.child_structures = StructureCollection({chunk})
 
     def _members_from_chunk(self, chunk):
         return StructureCollection({chunk}) if chunk.size == 1 else chunk.members
@@ -240,7 +216,7 @@ class ChunkBuilder(Builder):
                 new_correspondence.end.links_in.add(new_correspondence)
                 new_correspondence.end.links_out.add(new_correspondence)
                 for location in new_correspondence.locations:
-                    location.space.add(correspondence)
+                    location.space.add(new_correspondence)
         for link in new_chunk.links:
             self.bubble_chamber.add_to_collections(link)
             self.bubble_chamber.logger.log(link)
@@ -252,23 +228,15 @@ class ChunkBuilder(Builder):
                 values.append(chunk.value[0])
         return [average_vector(values)]
 
-    def _get_average_location(self, chunks: StructureCollection, space: Space = None):
-        if space is not None:
-            locations = []
-            for chunk in chunks:
-                for _ in range(chunk.size):
-                    locations.append(chunk.location_in_space(space))
-            return Location.average(locations)
-        locations = []
+    def _get_merged_location(self, chunks: StructureCollection, space: Space):
+        coordinates = []
         for chunk in chunks:
-            for _ in range(chunk.size):
-                locations.append(chunk.location)
-        return Location.average(locations)
+            for coords in chunk.location_in_space(space).coordinates:
+                coordinates.append(coords)
+        return Location(coordinates, space)
 
     def _fizzle(self):
-        self.child_codelets.append(
-            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
-        )
+        pass
 
     def _fail(self):
-        self._fizzle()
+        pass

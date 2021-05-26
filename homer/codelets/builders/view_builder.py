@@ -1,18 +1,13 @@
 from __future__ import annotations
 from abc import abstractclassmethod
 import statistics
-from typing import List, Set, Tuple
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Space, View
-from homer.structures.links import Correspondence
-from homer.structures.spaces import Frame, WorkingSpace
+from homer.structures.spaces import Frame
 
 
 class ViewBuilder(Builder):
@@ -29,7 +24,6 @@ class ViewBuilder(Builder):
         self.second_target_view = None
         self.correspondences = None
         self.correspondences_to_add = None
-        self.child_structure = None
         self.frame = None
 
     @classmethod
@@ -57,27 +51,24 @@ class ViewBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view"]
 
+    @property
+    def target_structures(self):
+        return self.target_spaces
+
     def _passes_preliminary_checks(self):
-        for view in self.bubble_chamber.views:
-            if view.input_spaces == self.target_spaces:
-                return False
         if self.frame is None:
             for space in self.target_spaces:
-                if isinstance(space, Frame):
+                if space.is_frame:
                     self.frame = space
-        return self.frame is not None
-
-    def _calculate_confidence(self):
-        self.confidence = statistics.fmean(
-            [space.activation for space in self.target_spaces]
-        )
+        return True
 
     def _fizzle(self):
-        from homer.codelets.builders import CorrespondenceBuilder
+        pass
 
-        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
-
-    def _fail(self):
-        self.child_codelets.append(
-            self.make(self.codelet_id, self.bubble_chamber, urgency=self.urgency / 2)
+    def _instantiate_frame(self, frame: Frame) -> Frame:
+        frame_instance = frame.copy(
+            parent_id=self.codelet_id, bubble_chamber=self.bubble_chamber
         )
+        self.bubble_chamber.frame_instances.add(frame_instance)
+        self.bubble_chamber.logger.log(frame_instance)
+        return frame_instance

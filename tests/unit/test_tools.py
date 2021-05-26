@@ -12,6 +12,18 @@ def test_average_vector(vectors, expected_average):
     assert average_vector(vectors) == expected_average
 
 
+@pytest.mark.parametrize(
+    "a, b, result",
+    [
+        ([[10]], [[10]], [[20]]),
+        ([[0], [1]], [[2], [3]], [[2], [4]]),
+        ([[0, 1]], [[2, 2]], [[2, 3]]),
+    ],
+)
+def test_add_vectors(a, b, result):
+    assert add_vectors(a, b) == result
+
+
 def test_has_instance():
     list_with_int = [1, "a", "b"]
     assert hasinstance(list_with_int, int)

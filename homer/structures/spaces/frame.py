@@ -1,3 +1,4 @@
+from __future__ import annotations
 import statistics
 from typing import List
 
@@ -41,6 +42,7 @@ class Frame(Space):
             links_out=links_out,
         )
         self.conceptual_space = conceptual_space
+        self.is_frame = True
 
     def update_activation(self):
         self._activation = (
@@ -48,3 +50,6 @@ class Frame(Space):
             if self.contents != []
             else 0.0
         )
+
+    def copy(self, **kwargs: dict) -> Frame:
+        raise NotImplementedError

@@ -16,23 +16,7 @@ from homer.word_form import WordForm
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     word_concept = Concept(
         Mock(),
         Mock(),
@@ -247,7 +231,9 @@ def test_increases_quality_of_good_word(bubble_chamber, good_word):
     original_word_quality = good_word.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = WordEvaluator.spawn(parent_id, bubble_chamber, good_word, urgency)
+    evaluator = WordEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({good_word}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert good_word.quality > original_word_quality
@@ -259,7 +245,9 @@ def test_decreases_quality_of_bad_word(bubble_chamber, bad_word):
     original_word_quality = bad_word.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = WordEvaluator.spawn(parent_id, bubble_chamber, bad_word, urgency)
+    evaluator = WordEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({bad_word}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert bad_word.quality < original_word_quality

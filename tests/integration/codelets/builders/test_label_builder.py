@@ -1,4 +1,3 @@
-import math
 import pytest
 from unittest.mock import Mock
 
@@ -12,6 +11,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Label, Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
+from homer.tools import centroid_euclidean_distance, hasinstance
 
 
 @pytest.fixture
@@ -58,7 +58,7 @@ def temperature_concept(label_concepts_space):
         "value",
         list,
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     label_concepts_space.contents.add(concept)
     return concept
@@ -90,12 +90,12 @@ def mild_concept(temperature_space):
         Mock(),
         Mock(),
         "mild",
-        Location([10], temperature_space),
+        Location([[10]], temperature_space),
         classifier,
         "value",
         Mock(),
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     temperature_space.contents.add(mild)
     return mild
@@ -103,23 +103,10 @@ def mild_concept(temperature_space):
 
 @pytest.fixture
 def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
+    text_concept = Mock()
+    text_concept.name = "text"
+    chamber.concepts.add(text_concept)
     chamber.concepts.add(mild_concept)
     chamber.conceptual_spaces.add(label_concepts_space)
     chamber.working_spaces.add(top_level_working_space)
@@ -155,22 +142,23 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
 
 @pytest.fixture
 def target_chunk(bubble_chamber):
-    location_concept = Concept(
+    input_concept = Concept(
         Mock(),
         Mock(),
-        Mock(),
+        "input",
         Mock(),
         Mock(),
         "coordinates",
         Mock(),
         Mock(),
-        math.dist,
+        centroid_euclidean_distance,
     )
+    bubble_chamber.concepts.add(input_concept)
     input_space = WorkingSpace(
         Mock(),
         Mock(),
         "input",
-        location_concept,
+        input_concept,
         Mock(),
         [],
         StructureCollection(),
@@ -181,7 +169,7 @@ def target_chunk(bubble_chamber):
     chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
+        [[10]],
         [Location([0, 0], input_space)],
         StructureCollection(),
         input_space,
@@ -190,16 +178,14 @@ def target_chunk(bubble_chamber):
     second_chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 1], input_space)],
+        [[10]],
+        [Location([[0, 1]], input_space)],
         StructureCollection(),
         Mock(),
         0.0,
     )
     bubble_chamber.chunks.add(chunk)
     bubble_chamber.chunks.add(second_chunk)
-    bubble_chamber.words.add(chunk)  # TODO: need to be added to input nodes
-    bubble_chamber.words.add(second_chunk)
     input_space.contents.add(chunk)
     input_space.contents.add(second_chunk)
     chunk.parent_spaces.add(input_space)
@@ -207,16 +193,28 @@ def target_chunk(bubble_chamber):
 
 
 def test_successful_adds_label_to_chunk_and_spawns_follow_up_and_same_label_cannot_be_recreated(
-    bubble_chamber, target_chunk
+    bubble_chamber,
+    target_chunk,
+    mild_concept,
 ):
     parent_id = ""
     urgency = 1.0
 
-    builder = LabelBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
+    builder = LabelBuilder.spawn(
+        parent_id,
+        bubble_chamber,
+        {"target_node": target_chunk, "parent_concept": mild_concept},
+        urgency,
+    )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Label)
+    assert hasinstance(builder.child_structures, Label)
     assert isinstance(builder.child_codelets[0], LabelEvaluator)
-    builder = LabelBuilder.spawn(parent_id, bubble_chamber, target_chunk, urgency)
+    builder = LabelBuilder.spawn(
+        parent_id,
+        bubble_chamber,
+        {"target_node": target_chunk, "parent_concept": mild_concept},
+        urgency,
+    )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

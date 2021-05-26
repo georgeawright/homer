@@ -48,6 +48,7 @@ class Space(Structure):
             if super_space_to_coordinate_function_map is not None
             else {}
         )
+        self.is_space = True
 
     @property
     def dimensions(self) -> List[Space]:
@@ -70,14 +71,6 @@ class Space(Structure):
 
     def is_compatible_with(self, other: Space) -> bool:
         return self.parent_concept.is_compatible_with(other.parent_concept)
-
-    def get_relevant_value(self, chunk) -> Any:
-        relevant_value = getattr(chunk, self.parent_concept.relevant_value)
-        if self.coordinates_from_super_space_location is not None:
-            relevant_value = self.coordinates_from_super_space_location(
-                Location(relevant_value, None)
-            )
-        return relevant_value
 
     def location_from_super_space_location(self, location: Location) -> Location:
         coordinates_function = self.super_space_to_coordinate_function_map[

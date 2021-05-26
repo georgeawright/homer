@@ -79,6 +79,42 @@ def run_view(request, run_id):
             output += "</td>"
         output += "</tr>"
     output += "</table>"
+    views = [
+        structure for structure in structure_records if "View" in structure.structure_id
+    ]
+    views.sort(key=lambda view: last_value_of_dict(view.activation), reverse=True)
+    output += "<h2>Views</h2>"
+    for view in views:
+        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: '
+        output += "<ul>"
+        output += "<li>Activation: "
+        output += str(last_value_of_dict(view.activation))
+        output += "</li>"
+        output += "<li>Quality: "
+        output += str(last_value_of_dict(view.quality))
+        output += "</li>"
+        output += "<li>Correspondences: "
+        for member in view.members.all():
+            output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
+        output = output[:-2]
+        output += "</li>"
+        output += "<li>Output: "
+        output_space = view.output_space
+        output += (
+            f'(<a href="structures/{output_space.structure_id}">'
+            + f"{output_space.structure_id}</a>)"
+        )
+        words = [
+            structure
+            for structure in structure_records
+            if re.match(r"^Word*", structure.structure_id)
+            and structure.parent_space == output_space
+        ]
+        words = sorted(words, key=lambda x: list(x.locations.values())[0])
+        for word in words:
+            output += f"{word.value} "
+        output += "</li>"
+        output += "</ul>"
     output += "<h2>Labels</h2>"
     output += '<table border="1">'
     for i in range(last_row + 1):
@@ -206,40 +242,6 @@ def run_view(request, run_id):
             + str(last_value_of_dict(correspondence.quality))
         )
         output += "<br>"
-    views = [
-        structure for structure in structure_records if "View" in structure.structure_id
-    ]
-    output += "<h2>Views</h2>"
-    for view in views:
-        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: '
-        output += "<ul>"
-        output += "<li>Correspondences: "
-        for member in view.members.all():
-            output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
-        output = output[:-2]
-        output += "</li>"
-        output += "<li>Output: "
-        output_space = [
-            structure
-            for structure in structure_records
-            if re.match(r"^WorkingSpace*", structure.structure_id)
-            and structure.parent_codelet == view.parent_codelet
-        ][0]
-        output += (
-            f'(<a href="structures/{output_space.structure_id}">'
-            + f"{output_space.structure_id}</a>)"
-        )
-        words = [
-            structure
-            for structure in structure_records
-            if re.match(r"^Word*", structure.structure_id)
-            and structure.parent_space == output_space
-        ]
-        words = sorted(words, key=lambda x: list(x.locations.values())[0])
-        for word in words:
-            output += f"{word.value} "
-        output += "</li>"
-        output += "</ul>"
     templates = [
         structure
         for structure in structure_records
@@ -256,7 +258,7 @@ def run_view(request, run_id):
     phrases = [
         structure
         for structure in structure_records
-        if "Phrase" in structure.structure_id
+        if "Phrase" in structure.structure_id and structure.left_branch is not None
     ]
     output += "<h2>Phrases</h2>"
     output += "".join(
@@ -321,8 +323,23 @@ def activity_and_structure_concepts_view(request, run_id):
     evaluate_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="evaluate"
     )
+    publish_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="publish"
+    )
     select_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="select"
+    )
+    inner_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="inner"
+    )
+    outer_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="outer"
+    )
+    forward_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="forward"
+    )
+    reverse_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="reverse"
     )
     chunk_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="chunk"
@@ -333,11 +350,20 @@ def activity_and_structure_concepts_view(request, run_id):
     label_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="label"
     )
+    phrase_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="phrase"
+    )
     relation_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="relation"
     )
-    view_record = StructureRecord.objects.get(
-        run_id=run_id, structure_id__regex=r"^Concept*", value="view"
+    view_discourse_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="view-discourse"
+    )
+    view_monitoring_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="view-monitoring"
+    )
+    view_simplex_record = StructureRecord.objects.get(
+        run_id=run_id, structure_id__regex=r"^Concept*", value="view-simplex"
     )
     word_record = StructureRecord.objects.get(
         run_id=run_id, structure_id__regex=r"^Concept*", value="word"
@@ -362,7 +388,12 @@ def activity_and_structure_concepts_view(request, run_id):
     figure, charts = pyplot.subplots(nrows=2, ncols=3, figsize=(22, 10))
     figure.suptitle("Activity and Structure Concept Activations")
 
-    for concept_record in [build_record, evaluate_record, select_record]:
+    for concept_record in [
+        build_record,
+        evaluate_record,
+        publish_record,
+        select_record,
+    ]:
         data = [
             (int(codelets_run), activation)
             for codelets_run, activation in concept_record.activation.items()
@@ -376,11 +407,18 @@ def activity_and_structure_concepts_view(request, run_id):
     charts[0, 0].legend(loc="best")
 
     for concept_record in [
+        inner_record,
+        outer_record,
+        forward_record,
+        reverse_record,
         chunk_record,
         correspondence_record,
         label_record,
+        phrase_record,
         relation_record,
-        view_record,
+        view_discourse_record,
+        view_monitoring_record,
+        view_simplex_record,
         word_record,
     ]:
         data = [
@@ -502,22 +540,6 @@ def codelet_view(request, run_id, codelet_id):
     output += "<li>Birth Time: " + str(codelet_record.birth_time) + "</li>"
     output += "<li>Time Run: " + str(codelet_record.time_run) + "</li>"
     output += "<li>Urgency: " + str(codelet_record.urgency) + "</li>"
-    output += (
-        "<li>Result: " + codelet_result_code_to_str(codelet_record.result) + "</li>"
-    )
-    output += "<li>Target Structure: "
-    if codelet_record.target_structure is not None:
-        output += (
-            '<a href="/runs/'
-            + str(run_id)
-            + "/structures/"
-            + codelet_record.target_structure.structure_id
-            + '/">'
-            + codelet_record.target_structure.structure_id
-            + "</a></li>"
-        )
-    else:
-        output += "None</li>"
     output += "<li>Parent Codelet: "
     if codelet_record.parent is not None:
         output += (
@@ -531,6 +553,22 @@ def codelet_view(request, run_id, codelet_id):
         )
     else:
         output += "None</li>"
+    output += (
+        "<li>Result: " + codelet_result_code_to_str(codelet_record.result) + "</li>"
+    )
+    output += "<li>Target Structures: "
+    output += "<ul>"
+    for structure in codelet_record.target_structures.all():
+        output += (
+            '<li><a href="/runs/'
+            + str(run_id)
+            + "/structures/"
+            + structure.structure_id
+            + '/">'
+            + structure.structure_id
+            + "</a></li>"
+        )
+    output += "</ul></li>"
     output += "<li>Follow ups: "
     try:
         follow_ups = CodeletRecord.objects.filter(run_id=run_id, parent=codelet_record)
@@ -777,27 +815,31 @@ def structure_view(request, run_id, structure_id):
     output += "</ul>"
     output += f'<img src="/runs/{run_id}/structures-series/{structure_id}">'
     if re.match(r"^Chunk*", structure_record.structure_id):
-        structure_records = StructureRecord.objects.filter(run_id=run_id).all()
-        last_column = 0
-        last_row = 0
-        original_chunks = []
-        for record in structure_records:
-            if not re.match("^Chunk", record.structure_id):
-                continue
-            if record.parent_codelet is not None:
-                continue
-            original_chunks.append(record)
-            if record.locations["WorkingSpace2"][0] > last_row:
-                last_row = record.locations["WorkingSpace2"][0]
-            if record.locations["WorkingSpace2"][1] > last_column:
-                last_column = record.locations["WorkingSpace2"][1]
-        original_chunks_matrix = [
-            [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
-        ]
-        for original_chunk in original_chunks:
-            row = original_chunk.locations["WorkingSpace2"][0]
-            column = original_chunk.locations["WorkingSpace2"][1]
-            original_chunks_matrix[row][column] = original_chunk
+        if "WorkingSpace2" in structure_record.locations:
+            structure_records = StructureRecord.objects.filter(run_id=run_id).all()
+            last_column = 0
+            last_row = 0
+            original_chunks = []
+            for record in structure_records:
+                if not re.match("^Chunk", record.structure_id):
+                    continue
+                if record.parent_codelet is not None:
+                    continue
+                if "WorkingSpace2" not in record.locations:
+                    continue
+                original_chunks.append(record)
+                if record.locations["WorkingSpace2"][0][0] > last_row:
+                    last_row = record.locations["WorkingSpace2"][0][0]
+                if record.locations["WorkingSpace2"][0][1] > last_column:
+                    last_column = record.locations["WorkingSpace2"][0][1]
+            original_chunks_matrix = [
+                [None for _ in range(last_column + 1)] for _ in range(last_row + 1)
+            ]
+            print(original_chunks_matrix)
+            for original_chunk in original_chunks:
+                row = original_chunk.locations["WorkingSpace2"][0][0]
+                column = original_chunk.locations["WorkingSpace2"][0][1]
+                original_chunks_matrix[row][column] = original_chunk
         output += "<h2>Members</h2>"
         output += '<table border="1">'
         for i in range(last_row + 1):
@@ -818,67 +860,66 @@ def structure_view(request, run_id, structure_id):
     events = (
         EventRecord.objects.filter(run_id=run_id)
         .filter(
-            Q(child_structure=structure_record)
-            | Q(target_one=structure_record)
-            | Q(target_two=structure_record)
+            Q(child_structures=structure_record)
+            | Q(target_structures=structure_record)
             | Q(winner=structure_record)
             | Q(loser=structure_record)
         )
         .order_by("event_time")
     )
-    for event in events:
-        one = event.target_one.structure_id if event.target_one is not None else None
-        two = event.target_two.structure_id if event.target_two is not None else None
-        child = (
-            event.child_structure.structure_id
-            if event.child_structure is not None
-            else None
-        )
-        winner = event.winner.structure_id if event.winner is not None else None
-        loser = event.loser.structure_id if event.loser is not None else None
-        codelet = event.codelet.codelet_id
-        if event.codelet.result != 0:
-            continue
-        output += f"<p>{event.event_time}: ({event.event_type}) "
-        if (
-            "ChunkBuilder" in event.codelet.codelet_id
-            or "ViewBuilder" in event.codelet.codelet_id
-        ):
-            output += (
-                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> created out of '
-                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
-                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
-            )
-        if "LabelBuilder" in event.codelet.codelet_id:
-            output += (
-                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> '
-                + f"({event.child_structure.value}) attached to "
-                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>'
-            )
-        if (
-            "RelationBuilder" in event.codelet.codelet_id
-            or "CorrespondenceBuilder" in event.codelet.codelet_id
-        ):
-            output += (
-                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> drawn between '
-                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
-                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
-            )
-        if "Evaluator" in event.codelet.codelet_id:
-            output += (
-                f'<a href="/runs/{run_id}/structures/{one}">{one}</a> evaluated by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
-            )
-        if "Selector" in event.codelet.codelet_id:
-            output += (
-                f'<a href="/runs/{run_id}/structures/{winner}">{winner}</a> selected over '
-                + f'<a href="/runs/{run_id}/structures/{loser}">{loser}</a> by '
-                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
-            )
-        output += "</p>"
+    #    for event in events:
+    #        one = event.target_one.structure_id if event.target_one is not None else None
+    #        two = event.target_two.structure_id if event.target_two is not None else None
+    #        child = (
+    #            event.child_structure.structure_id
+    #            if event.child_structure is not None
+    #            else None
+    #        )
+    #        winner = event.winner.structure_id if event.winner is not None else None
+    #        loser = event.loser.structure_id if event.loser is not None else None
+    #        codelet = event.codelet.codelet_id
+    #        if event.codelet.result != 0:
+    #            continue
+    #        output += f"<p>{event.event_time}: ({event.event_type}) "
+    #        if (
+    #            "ChunkBuilder" in event.codelet.codelet_id
+    #            or "ViewBuilder" in event.codelet.codelet_id
+    #        ):
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> created out of '
+    #                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
+    #                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+    #            )
+    #        if "LabelBuilder" in event.codelet.codelet_id:
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> '
+    #                + f"({event.child_structure.value}) attached to "
+    #                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>'
+    #            )
+    #        if (
+    #            "RelationBuilder" in event.codelet.codelet_id
+    #            or "CorrespondenceBuilder" in event.codelet.codelet_id
+    #        ):
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{child}">{child}</a> drawn between '
+    #                + f'<a href="/runs/{run_id}/structures/{one}">{one}</a> and '
+    #                + f'<a href="/runs/{run_id}/structures/{two}">{two}</a> by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+    #            )
+    #        if "Evaluator" in event.codelet.codelet_id:
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{one}">{one}</a> evaluated by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+    #            )
+    #        if "Selector" in event.codelet.codelet_id:
+    #            output += (
+    #                f'<a href="/runs/{run_id}/structures/{winner}">{winner}</a> selected over '
+    #                + f'<a href="/runs/{run_id}/structures/{loser}">{loser}</a> by '
+    #                + f'<a href="/runs/{run_id}/codelets/{codelet}">{codelet}</a>.'
+    #            )
+    #        output += "</p>"
 
     return HttpResponse(output)
 

@@ -1,4 +1,4 @@
-.PHONY: clear-logs integration lint migrate migrations unit run runserver tests
+.PHONY: clear-logs integration lint migrate migrations unit run runserver runsyncdb setup tests
 
 clear-logs:
 	rm -rf logs/
@@ -24,6 +24,12 @@ run:
 
 runserver:
 	pipenv run python manage.py runserver
+
+runsyncdb:
+	pipenv run python manage.py migrate --run-syncdb
+
+setup:
+	export DJANGO_SETTINGS_MODULE=runrecord.settings
 
 tests:
 	pipenv run python -m pytest tests/unit

@@ -12,7 +12,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
-from homer.tools import centroid_euclidean_distance
+from homer.tools import centroid_euclidean_distance, hasinstance
 
 
 @pytest.fixture
@@ -105,23 +105,7 @@ def temperature_space():
 
 @pytest.fixture
 def bubble_chamber(more_concept, relational_concepts_space):
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     chamber.concepts.add(more_concept)
     chamber.conceptual_spaces.add(relational_concepts_space)
     relation_concept = Concept(
@@ -155,7 +139,7 @@ def bubble_chamber(more_concept, relational_concepts_space):
 
 
 @pytest.fixture
-def target_chunk(bubble_chamber, temperature_space):
+def input_space():
     location_concept = Concept(
         Mock(),
         Mock(),
@@ -179,6 +163,11 @@ def target_chunk(bubble_chamber, temperature_space):
         [],
         [],
     )
+    return input_space
+
+
+@pytest.fixture
+def target_chunk(bubble_chamber, input_space, temperature_space):
     chunk = Chunk(
         Mock(),
         Mock(),
@@ -188,6 +177,16 @@ def target_chunk(bubble_chamber, temperature_space):
         Mock(),
         0.0,
     )
+    bubble_chamber.chunks.add(chunk)
+    input_space.contents.add(chunk)
+    temperature_space.contents.add(chunk)
+    chunk.parent_spaces.add(input_space)
+    chunk.parent_spaces.add(temperature_space)
+    return chunk
+
+
+@pytest.fixture
+def second_chunk(bubble_chamber, input_space, temperature_space):
     second_chunk = Chunk(
         Mock(),
         Mock(),
@@ -197,34 +196,45 @@ def target_chunk(bubble_chamber, temperature_space):
         Mock(),
         0.0,
     )
-    bubble_chamber.chunks.add(chunk)
     bubble_chamber.chunks.add(second_chunk)
-    input_space.contents.add(chunk)
     input_space.contents.add(second_chunk)
-    temperature_space.contents.add(chunk)
     temperature_space.contents.add(second_chunk)
-    chunk.parent_spaces.add(input_space)
     second_chunk.parent_spaces.add(input_space)
-    chunk.parent_spaces.add(temperature_space)
     second_chunk.parent_spaces.add(temperature_space)
-    return chunk
+    return second_chunk
 
 
 def test_successful_adds_relation_to_chunk_and_spawns_follow_up_and_same_relation_cannot_be_recreated(
-    bubble_chamber, temperature_space, target_chunk
+    bubble_chamber, temperature_space, target_chunk, second_chunk, more_concept
 ):
     parent_id = ""
     urgency = 1.0
 
     builder = RelationBuilder.spawn(
-        parent_id, bubble_chamber, temperature_space, target_chunk, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_space": temperature_space,
+            "target_structure_one": target_chunk,
+            "target_structure_two": second_chunk,
+            "parent_concept": more_concept,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, Relation)
+    assert hasinstance(builder.child_structures, Relation)
     assert isinstance(builder.child_codelets[0], RelationEvaluator)
     builder = RelationBuilder.spawn(
-        parent_id, bubble_chamber, temperature_space, target_chunk, urgency
+        parent_id,
+        bubble_chamber,
+        {
+            "target_space": temperature_space,
+            "target_structure_one": target_chunk,
+            "target_structure_two": second_chunk,
+            "parent_concept": more_concept,
+        },
+        urgency,
     )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

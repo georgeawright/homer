@@ -10,7 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Link, Node, Space, View
 from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
-from homer.tools import areinstances, equivalent_space
+from homer.tools import areinstances, equivalent_space, hasinstance
 
 from .label import Label
 from .relation import Relation
@@ -49,6 +49,7 @@ class Correspondence(Link):
         self.conceptual_space = conceptual_space
         self.parent_view = parent_view
         self.is_privileged = is_privileged
+        self.is_correspondence = True
 
     @classmethod
     def get_builder_class(cls):
@@ -69,17 +70,23 @@ class Correspondence(Link):
         return CorrespondenceSelector
 
     def copy(self, **kwargs: dict) -> Correspondence:
-        """Requires keyword arguments 'new arg', 'old_arg', and 'parent_id'."""
-        start = (
-            kwargs["new_arg"]
-            if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.start
-            else self.start
-        )
-        end = (
-            kwargs["new_arg"]
-            if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.end
-            else self.end
-        )
+        """Requires keyword arguments 'start', 'end', and 'parent_id' OR 'new arg', 'old_arg', and 'parent_id'."""
+        if "start" in kwargs:
+            start = kwargs["start"]
+        else:
+            start = (
+                kwargs["new_arg"]
+                if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.start
+                else self.start
+            )
+        if "end" in kwargs:
+            end = kwargs["end"]
+        else:
+            end = (
+                kwargs["new_arg"]
+                if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.end
+                else self.end
+            )
         parent_id = kwargs["parent_id"]
         start_space = equivalent_space(start, self.start_space)
         end_space = equivalent_space(end, self.end_space)
@@ -133,26 +140,36 @@ class Correspondence(Link):
         common_arguments = self.common_arguments_with(other)
         if len(common_arguments) == 2:
             return False
-        if areinstances(self.arguments, Node):
+        if hasinstance(self.arguments, Node):
             self_corresponding_nodes = self.arguments
-        if areinstances(self.arguments, Label):
+            self_corresponding_links = StructureCollection()
+        elif areinstances(self.arguments, Label):
             self_corresponding_nodes = StructureCollection(
                 {self.start.start, self.end.start}
             )
-        if areinstances(self.arguments, Relation):
+            self_corresponding_links = self.arguments
+        elif areinstances(self.arguments, Relation):
             self_corresponding_nodes = StructureCollection(
                 {self.start.start, self.start.end, self.end.start, self.end.end}
             )
+            self_corresponding_links = self.arguments
         if areinstances(other.arguments, Node):
             other_corresponding_nodes = other.arguments
-        if areinstances(other.arguments, Label):
+            other_corresponding_links = StructureCollection()
+        elif areinstances(other.arguments, Label):
             other_corresponding_nodes = StructureCollection(
                 {other.start.start, other.end.start}
             )
-        if areinstances(other.arguments, Relation):
+            other_corresponding_links = other.arguments
+        elif areinstances(other.arguments, Relation):
             other_corresponding_nodes = StructureCollection(
                 {other.start.start, other.start.end, other.end.start, other.end.end}
             )
+            other_corresponding_links = other.arguments
+        if not StructureCollection.intersection(
+            self_corresponding_links, other_corresponding_links
+        ).is_empty():
+            return False
         corresponding_nodes_intersection = StructureCollection.intersection(
             self_corresponding_nodes, other_corresponding_nodes
         )

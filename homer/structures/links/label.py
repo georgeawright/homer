@@ -35,6 +35,7 @@ class Label(Link):
             links_in=None,
             links_out=None,
         )
+        self.is_label = True
 
     @classmethod
     def get_builder_class(cls):

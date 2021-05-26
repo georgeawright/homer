@@ -12,7 +12,7 @@ from homer.tools import hasinstance
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
-    chamber.concepts = {"view": Mock(), "select": Mock()}
+    chamber.concepts = {"view-simplex": Mock(), "select": Mock(), "text": Mock()}
     chamber.spaces = {"input": Mock()}
     return chamber
 
@@ -30,10 +30,12 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     challenger.quality = 1.0
     challenger.activation = 1.0
     champion.nearby.return_value = StructureCollection({challenger})
-    selector = SimplexViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
-    assert selector.challenger is None
+    selector = SimplexViewSelector(
+        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
+    )
+    assert selector.challengers is None
     selector.run()
-    assert selector.challenger == challenger
+    assert selector.challengers == StructureCollection({challenger})
 
 
 @pytest.mark.parametrize(
@@ -66,7 +68,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
         selector = SimplexViewSelector(
-            Mock(), Mock(), bubble_chamber, champion, Mock(), challenger=challenger
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            StructureCollection({champion}),
+            Mock(),
+            challengers=StructureCollection({challenger}),
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result
@@ -83,12 +90,15 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
 
 def test_spawns_builder_when_fizzling(bubble_chamber):
     champion = Mock()
+    champion.size = 2
     champion.members = StructureCollection({Mock(), Mock()})
     challenger = Mock()
     challenger.size = 1
     challenger.members = StructureCollection()
     champion.nearby.return_value = StructureCollection({challenger})
-    selector = SimplexViewSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
+    selector = SimplexViewSelector(
+        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
+    )
     selector.run()
     assert CodeletResult.FIZZLE == selector.result
     assert 1 == len(selector.child_codelets)

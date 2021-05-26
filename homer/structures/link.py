@@ -33,6 +33,7 @@ class Link(Structure):
         self.end = end
         self._parent_concept = parent_concept
         self.value = parent_concept.name if hasattr(parent_concept, "name") else None
+        self.is_link = True
 
     @property
     def parent_space(self) -> Space:

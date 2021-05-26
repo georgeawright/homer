@@ -9,8 +9,6 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Link, Node, Space
 
-from .chunk import Chunk
-
 
 class Concept(Node):
 
@@ -90,6 +88,16 @@ class Concept(Node):
 
     def is_compatible_with(self, other: Concept) -> bool:
         return self.instance_type == other.instance_type
+
+    # TODO use this in selector follow ups
+    def friends(self, space: Space = None) -> StructureCollection:
+        space = self.parent_space if space is None else space
+        if space.no_of_dimensions == 0:
+            concepts = StructureCollection(
+                {link.end for link in self.links_out if link.end in space.contents}
+            )
+            return concepts if not concepts.is_empty() else StructureCollection({self})
+        return StructureCollection({self})
 
     def distance_from(self, other: Node):
         other_value = (

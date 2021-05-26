@@ -15,23 +15,7 @@ from homer.structures.spaces import WorkingSpace
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     chunk_concept = Concept(
         Mock(),
         Mock(),
@@ -104,7 +88,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
         [10],
         [Location([0, 0], input_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     member_2 = Chunk(
@@ -113,7 +97,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
         [10],
         [Location([0, 1], input_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     chunk = Chunk(
@@ -122,7 +106,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
         [10],
         [Location([0, 0], input_space)],
         StructureCollection({member_1, member_2}),
-        Mock(),
+        input_space,
         0.0,
     )
     bubble_chamber.chunks.add(chunk)
@@ -162,7 +146,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
         [12],
         [Location([0, 0], input_space), Location([12], temperature_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     member_2 = Chunk(
@@ -171,7 +155,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
         [5],
         [Location([0, 1], input_space), Location([5], temperature_space)],
         StructureCollection(),
-        Mock(),
+        input_space,
         0.0,
     )
     chunk = Chunk(
@@ -180,7 +164,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
         [8.5],
         [Location([0, 0], input_space), Location([8.5], temperature_space)],
         StructureCollection({member_1, member_2}),
-        Mock(),
+        input_space,
         1.0,
     )
     bubble_chamber.chunks.add(chunk)
@@ -193,7 +177,9 @@ def test_increases_quality_of_good_chunk(bubble_chamber, good_chunk):
     original_chunk_quality = good_chunk.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = ChunkEvaluator.spawn(parent_id, bubble_chamber, good_chunk, urgency)
+    evaluator = ChunkEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({good_chunk}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert good_chunk.quality > original_chunk_quality
@@ -205,7 +191,9 @@ def test_decreases_quality_of_bad_chunk(bubble_chamber, bad_chunk):
     original_chunk_quality = bad_chunk.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = ChunkEvaluator.spawn(parent_id, bubble_chamber, bad_chunk, urgency)
+    evaluator = ChunkEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({bad_chunk}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert bad_chunk.quality < original_chunk_quality

@@ -10,13 +10,22 @@ from homer.structures.nodes import Lexeme
 def test_unlinkedness():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     assert 1 == structure.unlinkedness
-    structure.links_in.add(Mock())
+    link_in = Mock()
+    link_in.activation = 1
+    structure.links_in.add(link_in)
     assert 0.5 == structure.unlinkedness
-    structure.links_out.add(Mock())
+    link_out = Mock()
+    link_out.activation = 1
+    structure.links_out.add(link_out)
     assert 0.25 == structure.unlinkedness
-    link = Mock()
-    structure.links_in.add(link)
-    structure.links_out.add(link)
+    link_in_and_out = Mock()
+    link_in_and_out.activation = 1
+    structure.links_in.add(link_in_and_out)
+    structure.links_out.add(link_in_and_out)
+    assert 0.125 == structure.unlinkedness
+    inactive_link = Mock()
+    inactive_link.activation = 0
+    structure.links_out.add(inactive_link)
     assert 0.125 == structure.unlinkedness
 
 

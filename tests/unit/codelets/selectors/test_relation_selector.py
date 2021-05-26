@@ -3,8 +3,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import RelationBuilder
 from homer.codelets.selectors import RelationSelector
+from homer.codelets.suggesters import RelationSuggester
 from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
@@ -34,10 +34,12 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion.end.parent_spaces = StructureCollection({space})
     challenger.start.parent_spaces = StructureCollection({space})
     challenger.end.parent_spaces = StructureCollection({space})
-    selector = RelationSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
-    assert selector.challenger is None
+    selector = RelationSelector(
+        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
+    )
+    assert selector.challengers is None
     selector.run()
-    assert selector.challenger == challenger
+    assert selector.challengers == StructureCollection({challenger})
 
 
 @pytest.mark.parametrize(
@@ -76,7 +78,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.start.parent_spaces = StructureCollection({space})
         challenger.end.parent_spaces = StructureCollection({space})
         selector = RelationSelector(
-            Mock(), Mock(), bubble_chamber, champion, Mock(), challenger=challenger
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            StructureCollection({champion}),
+            Mock(),
+            challengers=StructureCollection({challenger}),
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result
@@ -87,18 +94,5 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 2 == len(selector.child_codelets)
-        assert hasinstance(selector.child_codelets, RelationBuilder)
+        assert hasinstance(selector.child_codelets, RelationSuggester)
         assert hasinstance(selector.child_codelets, RelationSelector)
-
-
-def test_spawns_builder_when_fizzling(bubble_chamber):
-    champion = Mock()
-    champion.start.relations_in_space_with.return_value = StructureCollection(
-        {champion}
-    )
-    selector = RelationSelector(Mock(), Mock(), bubble_chamber, champion, Mock())
-    selector.run()
-    assert selector.challenger is None
-    assert CodeletResult.FIZZLE == selector.result
-    assert 1 == len(selector.child_codelets)
-    assert isinstance(selector.child_codelets[0], RelationBuilder)

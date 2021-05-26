@@ -15,23 +15,7 @@ from homer.word_form import WordForm
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     phrase_concept = Concept(
         Mock(),
         Mock(),
@@ -189,7 +173,9 @@ def test_good_phrase_is_boosted_bad_phrase_is_decayed(
     parent_id = ""
     champion = bad_phrase
     urgency = 1.0
-    selector = PhraseSelector.spawn(parent_id, bubble_chamber, champion, urgency)
+    selector = PhraseSelector.spawn(
+        parent_id, bubble_chamber, StructureCollection({champion}), urgency
+    )
     selector.run()
     good_phrase.update_activation()
     bad_phrase.update_activation()

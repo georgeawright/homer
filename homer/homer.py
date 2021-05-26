@@ -17,7 +17,7 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Concept, Lexeme, Rule, Word
+from .structures.nodes import Chunk, Concept, Lexeme, Phrase, Rule, Word
 from .structures.spaces import ConceptualSpace, WorkingSpace
 from .structures.spaces.frames import Template
 from .word_form import WordForm
@@ -54,24 +54,9 @@ class Homer:
             None, name="top level working"
         )
         logger.log(top_level_working_space)
-        bubble_chamber = BubbleChamber(
-            StructureCollection({top_level_conceptual_space}),
-            StructureCollection({top_level_working_space}),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            StructureCollection(),
-            logger,
-        )
-        bubble_chamber.lexemes = StructureCollection()
+        bubble_chamber = BubbleChamber.setup(logger)
+        bubble_chamber.conceptual_spaces.add(top_level_conceptual_space)
+        bubble_chamber.working_spaces.add(top_level_working_space)
         coderack = Coderack.setup(bubble_chamber, logger)
         return cls(bubble_chamber, coderack, logger)
 
@@ -83,7 +68,7 @@ class Homer:
                     self.print_status_update()
                     self.bubble_chamber.spread_activations()
                     self.bubble_chamber.update_activations()
-                if self.coderack.codelets_run >= 10000:
+                if self.coderack.codelets_run >= 30000:
                     raise NoMoreCodelets
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
@@ -272,8 +257,15 @@ class Homer:
         )
         self.logger.log(template)
         for i, item in enumerate(contents):
-            item.parent_space = template
-            item.locations = [Location([[i]], template)]
+            if item.is_phrase:
+                item.chunk.parent_space = template
+                item.chunk.locations = [Location([[i]], template)]
+                item.label.locations = [Location([[i]], template)]
+                item._parent_space = template
+                item._locations = [Location([[i]], template)]
+            if item.is_word:
+                item.parent_space = template
+                item.locations = [Location([[i]], template)]
             template.contents.add(item)
             self.logger.log(item)
         self.bubble_chamber.conceptual_spaces.add(template)
@@ -296,6 +288,37 @@ class Homer:
             quality=quality,
         )
         return word
+
+    def def_phrase(
+        self,
+        label_concept: Concept = None,
+        quality: FloatBetweenOneAndZero = 1.0,
+    ):
+        chunk = Chunk(
+            structure_id=ID.new(Chunk),
+            parent_id="",
+            value=None,
+            locations=[],
+            members=StructureCollection(),
+            parent_space=None,
+            quality=quality,
+        )
+        label = Label(
+            structure_id=ID.new(Label),
+            parent_id="",
+            start=chunk,
+            parent_concept=label_concept,
+            parent_space=None,
+            quality=quality,
+        )
+        phrase = Phrase(
+            structure_id=ID.new(Phrase),
+            parent_id="",
+            chunk=chunk,
+            label=label,
+            quality=quality,
+        )
+        return phrase
 
     def def_working_space(
         self,

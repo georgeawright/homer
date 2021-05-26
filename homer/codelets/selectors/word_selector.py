@@ -1,48 +1,18 @@
 from homer.bubble_chamber import BubbleChamber
-from homer.codelets.builders import ChunkBuilder
 from homer.codelets.selector import Selector
-from homer.errors import MissingStructureError
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
+from homer.codelets.suggesters import WordSuggester
 from homer.structure_collection import StructureCollection
-from homer.structures import Space
-from homer.structures.nodes import Word
 
 
 class WordSelector(Selector):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        champion: Word,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        Selector.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.champion = champion
-        self.challenger = None
-
-    @classmethod
-    def spawn(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        champion: Word,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        codelet_id = ID.new(cls)
-        return cls(
-            codelet_id,
-            parent_id,
-            bubble_chamber,
-            champion,
-            urgency,
-        )
-
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        champion = bubble_chamber.words.get_active()
-        return cls.spawn(parent_id, bubble_chamber, champion, champion.activation)
+        word = bubble_chamber.input_nodes.where(is_word=True).get_active()
+        correspondences = word.correspondences.where(end=word)
+        champions = StructureCollection.union(
+            StructureCollection({word}), correspondences
+        )
+        return cls.spawn(parent_id, bubble_chamber, champions, word.activation)
 
     @property
     def _structure_concept(self):
@@ -55,16 +25,31 @@ class WordSelector(Selector):
         pass
 
     def _engender_follow_up(self):
-        from homer.codelets.builders import WordBuilder
-
+        correspondence_from_frame = StructureCollection(
+            {
+                correspondence
+                for correspondence in self.winners.where(is_correspondence=True)
+                if correspondence.start_space.is_frame
+            }
+        ).get_random()
+        frame = correspondence_from_frame.start_space
+        new_target = frame.contents.where(is_word=True).get_unhappy()
         self.child_codelets.append(
-            WordBuilder.make(self.codelet_id, self.bubble_chamber)
+            WordSuggester.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                {
+                    "target_view": correspondence_from_frame.parent_view,
+                    "target_word": new_target,
+                },
+                new_target.unhappiness,
+            )
         )
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.winner,
+                self.winners,
                 self.follow_up_urgency,
             )
         )

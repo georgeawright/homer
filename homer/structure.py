@@ -15,6 +15,7 @@ class Structure(ABC):
 
     MINIMUM_ACTIVATION_UPDATE = HyperParameters.MINIMUM_ACTIVATION_UPDATE
     ACTIVATION_UPDATE_COEFFICIENT = HyperParameters.ACTIVATION_UPDATE_COEFFICIENT
+    DECAY_RATE = HyperParameters.DECAY_RATE
 
     def __init__(
         self,
@@ -38,7 +39,11 @@ class Structure(ABC):
         self.stable = stable_activation is not None
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
+        self._parent_space = None
         self._parent_concept = None
+        self.is_phrase = False
+        self.is_word = False
+        self.is_frame = False
 
     @classmethod
     def get_builder_class(cls):
@@ -53,17 +58,20 @@ class Structure(ABC):
         raise NotImplementedError
 
     @property
+    def parent_space(self) -> Structure:
+        return self._parent_space
+
+    @property
     def parent_concept(self) -> Structure:
         return self._parent_concept
 
     @property
     def location(self) -> Location:
-        try:
-            return self.locations[0]
-        except TypeError:
+        if len(self._locations) == 0:
             return None
-        except IndexError:
-            return None
+        if len(self._locations) == 1:
+            return self._locations[0]
+        return self.location_in_space(self.parent_space)
 
     @property
     def locations(self) -> List[Location]:
@@ -79,10 +87,7 @@ class Structure(ABC):
 
     @property
     def coordinates(self) -> list:
-        for location in self.locations:
-            if location.space.value == "input":
-                return location.coordinates
-        raise Exception(f"{self.structure_id} has no location in input space")
+        return self.location_in_space(self.parent_space).coordinates
 
     @property
     def is_slot(self) -> bool:
@@ -123,7 +128,7 @@ class Structure(ABC):
 
     @property
     def unlinkedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** len(self.links)
+        return 0.5 ** sum(link.activation for link in self.links)
 
     @property
     def links(self) -> StructureCollection:
@@ -215,6 +220,12 @@ class Structure(ABC):
                 return True
         return False
 
+    def has_label_with_name(self, name: str) -> bool:
+        for label in self.labels:
+            if label.parent_concept.name == name:
+                return True
+        return False
+
     def label_of_type(self, concept: Structure):
         for label in self.labels:
             if label.parent_concept == concept:
@@ -243,6 +254,18 @@ class Structure(ABC):
                 return True
         return False
 
+    def has_relation_with_name(self, name: str) -> bool:
+        for relation in self.relations:
+            if relation.parent_concept.name == name:
+                return True
+        return False
+
+    def relation_with_name(self, name: str) -> Structure:
+        for relation in self.relations:
+            if relation.parent_concept.name == name:
+                return relation
+        raise MissingStructureError
+
     def relations_in_space_with(
         self, space: Structure, other: Structure
     ) -> StructureCollection:
@@ -263,6 +286,9 @@ class Structure(ABC):
                 if other in {relation.start, relation.end}
             }
         )
+
+    def has_relation_with(self, other: Structure) -> StructureCollection:
+        return not self.relations_with(other).is_empty()
 
     def relation_in_space_of_type_with(
         self, space: Structure, concept: Structure, start: Structure, end: Structure
@@ -340,7 +366,7 @@ class Structure(ABC):
 
     def update_activation(self):
         if self._activation_buffer == 0.0:
-            self.decay_activation()
+            self.decay_activation(self.DECAY_RATE)
         self._activation = FloatBetweenOneAndZero(
             self._activation + self._activation_buffer
         )

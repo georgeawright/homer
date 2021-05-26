@@ -14,23 +14,7 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     correspondence_concept = Concept(
         Mock(),
         Mock(),
@@ -195,7 +179,7 @@ def test_good_correspondence_is_boosted_bad_correspondence_is_decayed(
     champion = bad_correspondence
     urgency = 1.0
     selector = CorrespondenceSelector.spawn(
-        parent_id, bubble_chamber, champion, urgency
+        parent_id, bubble_chamber, StructureCollection({champion}), urgency
     )
     selector.run()
     good_correspondence.update_activation()

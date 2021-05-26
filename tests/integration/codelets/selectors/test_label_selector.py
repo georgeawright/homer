@@ -14,23 +14,7 @@ from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection({Mock()}),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     label_concept = Concept(
         Mock(),
         Mock(),
@@ -85,13 +69,24 @@ def chunk(bubble_chamber, working_space):
         Mock(),
         Mock(),
         [[10]],
-        [Mock()],
+        [Location([[1, 1]], working_space)],
         Mock(),
         Mock(),
         Mock(),
     )
-    chunk.locations.append(Location([1, 1], working_space))
+    working_space.add(chunk)
     bubble_chamber.chunks.add(chunk)
+    nearby_chunk = Chunk(
+        Mock(),
+        Mock(),
+        [[10]],
+        [Location([[0, 1]], working_space)],
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    working_space.add(nearby_chunk)
+    bubble_chamber.chunks.add(nearby_chunk)
     return chunk
 
 
@@ -156,7 +151,9 @@ def test_good_label_is_boosted_bad_label_is_decayed(
     parent_id = ""
     champion = bad_label
     urgency = 1.0
-    selector = LabelSelector.spawn(parent_id, bubble_chamber, champion, urgency)
+    selector = LabelSelector.spawn(
+        parent_id, bubble_chamber, StructureCollection({champion}), urgency
+    )
     selector.run()
     good_label.update_activation()
     bad_label.update_activation()

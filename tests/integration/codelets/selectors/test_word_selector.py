@@ -8,31 +8,15 @@ from homer.codelets.selectors import WordSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import View
-from homer.structures.links import Relation
+from homer.structures.links import Correspondence, Relation
 from homer.structures.nodes import Concept, Lexeme, Word
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import Frame, WorkingSpace
 from homer.word_form import WordForm
 
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     word_concept = Concept(
         Mock(),
         Mock(),
@@ -75,10 +59,24 @@ def view(bubble_chamber):
 
 
 @pytest.fixture
+def frame():
+    frame = Frame("", "", Mock(), Mock(), Mock(), Mock(), Mock())
+    return frame
+
+
+@pytest.fixture
 def good_word(view):
     lexeme = Lexeme(Mock(), Mock(), "word", {WordForm.HEADWORD: "word"}, Mock())
     word = Word(Mock(), Mock(), lexeme, WordForm.HEADWORD, Mock(), Mock(), 1.0)
     return word
+
+
+@pytest.fixture
+def good_correspondence_from_frame(good_word, frame):
+    correspondence = Correspondence(
+        "", "", Mock(), good_word, Mock(), frame, Mock(), Mock(), Mock(), Mock(), 1.0
+    )
+    return correspondence
 
 
 @pytest.fixture
@@ -88,21 +86,43 @@ def bad_word(view):
     return word
 
 
-def test_good_word_is_boosted(bubble_chamber, good_word):
+@pytest.fixture
+def bad_correspondence_from_frame(bad_word, frame):
+    correspondence = Correspondence(
+        "", "", Mock(), bad_word, Mock(), frame, Mock(), Mock(), Mock(), Mock(), 0.0
+    )
+    return correspondence
+
+
+def test_good_word_is_boosted(
+    bubble_chamber, good_word, good_correspondence_from_frame
+):
     original_activation = good_word.activation
     parent_id = ""
     urgency = 1.0
-    selector = WordSelector.spawn(parent_id, bubble_chamber, good_word, urgency)
+    selector = WordSelector.spawn(
+        parent_id,
+        bubble_chamber,
+        StructureCollection({good_word, good_correspondence_from_frame}),
+        urgency,
+    )
     selector.run()
     good_word.update_activation()
     assert good_word.activation > original_activation
 
 
-def test_bad_word_is_not_boosted(bubble_chamber, bad_word):
+def test_bad_word_is_not_boosted(
+    bubble_chamber, bad_word, bad_correspondence_from_frame
+):
     original_activation = bad_word.activation
     parent_id = ""
     urgency = 1.0
-    selector = WordSelector.spawn(parent_id, bubble_chamber, bad_word, urgency)
+    selector = WordSelector.spawn(
+        parent_id,
+        bubble_chamber,
+        StructureCollection({bad_word, bad_correspondence_from_frame}),
+        urgency,
+    )
     selector.run()
     bad_word.update_activation()
     assert bad_word.activation <= original_activation

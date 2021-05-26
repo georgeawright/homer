@@ -1,44 +1,68 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+from homer.codelets import Evaluator, Publisher, Suggester
 from homer.codelets.factories import RandomFactory
 from homer.structure_collection import StructureCollection
 
 
 @pytest.fixture
-def build_concept():
-    concept = Mock()
-    concept.name = "build"
-    return concept
+def concepts():
+    suggest_concept = Mock()
+    suggest_concept.name = "suggest"
+    evaluate_concept = Mock()
+    evaluate_concept.name = "evaluate"
+    publish_concept = Mock()
+    publish_concept.name = "publish"
+    inner_concept = Mock()
+    inner_concept.name = "inner"
+    outer_concept = Mock()
+    outer_concept.name = "outer"
+    forward_concept = Mock()
+    forward_concept.name = "forward"
+    reverse_concept = Mock()
+    reverse_concept.name = "reverse"
+    correspondence_concept = Mock()
+    correspondence_concept.name = "correspondence"
+    chunk_concept = Mock()
+    chunk_concept.name = "chunk"
+    label_concept = Mock()
+    label_concept.name = "label"
+    phrase_concept = Mock()
+    phrase_concept.name = "phrase"
+    relation_concept = Mock()
+    relation_concept.name = "relation"
+    view_monitoring_concept = Mock()
+    view_monitoring_concept.name = "view-monitoring"
+    view_simplex_concept = Mock()
+    view_simplex_concept.name = "view-simplex"
+    word_concept = Mock()
+    word_concept.name = "word"
+    return StructureCollection(
+        {
+            suggest_concept,
+            evaluate_concept,
+            publish_concept,
+            inner_concept,
+            outer_concept,
+            forward_concept,
+            reverse_concept,
+            correspondence_concept,
+            chunk_concept,
+            label_concept,
+            phrase_concept,
+            relation_concept,
+            view_monitoring_concept,
+            view_simplex_concept,
+            word_concept,
+        }
+    )
 
 
 @pytest.fixture
-def label_concept():
-    concept = Mock()
-    concept.name = "label"
-    return concept
-
-
-@pytest.fixture
-def bubble_chamber(
-    build_concept,
-    label_concept,
-):
+def bubble_chamber(concepts):
     bubble_chamber = Mock()
-    bubble_chamber.concepts = {
-        "build": build_concept,
-        "label": label_concept,
-    }
-    build_label_link = Mock()
-    build_label_link.end = label_concept
-    build_concept.links_out = StructureCollection({build_label_link})
-    activities = Mock()
-    activities.name = "activities"
-    activities.contents = StructureCollection({build_concept})
-    structures = Mock()
-    structures.name = "structures"
-    structures.contents = StructureCollection({label_concept})
-    bubble_chamber.spaces = StructureCollection({activities, structures})
+    bubble_chamber.concepts = concepts
     bubble_chamber.satisfaction = 0
     return bubble_chamber
 
@@ -50,7 +74,14 @@ def coderack():
     return rack
 
 
-def test_engenders_two_follow_ups(bubble_chamber, coderack):
+def test_decide_follow_up_class_returns_codelet_class(
+    bubble_chamber, coderack, concepts
+):
     factory_codelet = RandomFactory(Mock(), Mock(), bubble_chamber, coderack, Mock())
-    factory_codelet.run()
-    assert 2 == len(factory_codelet.child_codelets)
+    follow_up_class = factory_codelet._decide_follow_up_class()
+    codelet_types = [Suggester, Evaluator, Publisher]
+    assert (
+        follow_up_class in codelet_types
+        or follow_up_class.__bases__[0] in codelet_types
+        or follow_up_class.__bases__[0].__bases__[0] in codelet_types
+    )

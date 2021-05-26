@@ -3,12 +3,12 @@ from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
+from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 
 
 class Builder(Codelet):
 
-    CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
     INITIAL_STRUCTURE_ACTIVATION = HyperParameters.INITIAL_STRUCTURE_ACTIVATION
 
     def __init__(
@@ -20,8 +20,7 @@ class Builder(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
-        self.child_structure = None
-        self.confidence = 0.0
+        self.child_structures = None
 
     @classmethod
     def make(
@@ -42,23 +41,21 @@ class Builder(Codelet):
     ):
         return cls.make(parent_id, bubble_chamber, urgency=urgency)
 
+    @classmethod
+    def get_follow_up_class(cls) -> type:
+        raise NotImplementedError
+
     def run(self) -> CodeletResult:
         if not self._passes_preliminary_checks():
             self._decay_activations()
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return self.result
-        self._calculate_confidence()
-        if abs(self.confidence) > self.CONFIDENCE_THRESHOLD:
-            self._boost_activations()
-            self._process_structure()
-            self._engender_follow_up()
-            self.result = CodeletResult.SUCCESS
-            return self.result
-        self._decay_activations()
-        self._fail()
-        self.result = CodeletResult.FAIL
-        return CodeletResult.FAIL
+        self._boost_activations()
+        self._process_structure()
+        self._engender_follow_up()
+        self.result = CodeletResult.SUCCESS
+        return self.result
 
     @property
     def _parent_link(self):
@@ -72,32 +69,34 @@ class Builder(Codelet):
     def _structure_concept(self):
         raise NotImplementedError
 
+    @property
+    def target_structures(self):
+        return StructureCollection(
+            {structure for structure in self._target_structures.values()}
+        )
+
     def _boost_activations(self):
         self._build_concept.boost_activation(1)
         self._structure_concept.boost_activation(1)
-        self._parent_link.boost_activation(self.confidence)
+        self._parent_link.boost_activation(self.urgency)
 
     def _decay_activations(self):
         self._build_concept.decay_activation()
-        self._parent_link.decay_activation(1 - self.confidence)
+        self._parent_link.decay_activation(1 - self.urgency)
 
     def _passes_preliminary_checks(self):
-        raise NotImplementedError
-
-    def _calculate_confidence(self):
         raise NotImplementedError
 
     def _process_structure(self):
         raise NotImplementedError
 
     def _engender_follow_up(self):
-        follow_up_class = self.get_target_class().get_evaluator_class()
         self.child_codelets.append(
-            follow_up_class.spawn(
+            self.get_follow_up_class().spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.child_structure,
-                self.confidence,
+                self.child_structures,
+                self.urgency,
             )
         )
 

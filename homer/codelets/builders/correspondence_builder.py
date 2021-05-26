@@ -6,12 +6,11 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space, View
 from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
-
-from .relation_builder import RelationBuilder
 
 
 class CorrespondenceBuilder(Builder):
@@ -20,59 +19,43 @@ class CorrespondenceBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_space_one: Space,
-        target_structure_one: Structure,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
-        target_space_two: Space = None,
-        target_structure_two: Structure = None,
-        target_conceptual_space: ConceptualSpace = None,
-        parent_concept: Concept = None,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_view = target_view
-        self.target_space_one = target_space_one
-        self.target_structure_one = target_structure_one
-        self.target_space_two = target_space_two
-        self.target_structure_two = target_structure_two
-        self.target_conceptual_space = target_conceptual_space
-        self.parent_concept = parent_concept
+        self._target_structures = target_structures
+        self.target_view = None
+        self.target_space_one = None
+        self.target_structure_one = None
+        self.target_space_two = None
+        self.target_structure_two = None
+        self.target_conceptual_space = None
+        self.parent_concept = None
         self.parent_space = None
         self.correspondence = None
         self.child_structure = None
 
     @classmethod
-    def get_target_class(cls):
-        return Correspondence
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.evaluators import CorrespondenceEvaluator
+
+        return CorrespondenceEvaluator
 
     @classmethod
     def spawn(
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_view: View,
-        target_space_one: Space,
-        target_structure_one: Structure,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
-        target_space_two: Space = None,
-        target_structure_two: Structure = None,
-        target_conceptual_space: ConceptualSpace = None,
-        parent_concept: Concept = None,
     ):
-        qualifier = "TopDown" if parent_concept is not None else "BottomUp"
-        codelet_id = ID.new(cls, qualifier)
+        codelet_id = ID.new(cls)
         return cls(
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_view,
-            target_space_one,
-            target_structure_one,
+            target_structures,
             urgency,
-            target_space_two,
-            target_structure_two,
-            target_conceptual_space,
-            parent_concept,
         )
 
     @classmethod
@@ -82,7 +65,7 @@ class CorrespondenceBuilder(Builder):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.views.get_active()
+        target_view = bubble_chamber.production_views.get_active()
         target_space = (
             target_view.input_working_spaces.get_random()
             .contents.of_type(Space)
@@ -116,38 +99,15 @@ class CorrespondenceBuilder(Builder):
         return self.bubble_chamber.concepts["correspondence"]
 
     def _passes_preliminary_checks(self):
-        if self.target_space_two is None:
-            try:
-                self.target_space_two = (
-                    self.target_view.input_spaces.get_active(
-                        exclude=list(self.target_space_one.parent_spaces)
-                    )
-                    .contents.of_type(WorkingSpace)
-                    .where(is_basic_level=True)
-                    .where(conceptual_space=self.target_space_one.conceptual_space)
-                    .get_random()
-                )
-            except MissingStructureError:
-                return False
-        try:
-            if self.target_structure_two is None:
-                self.target_structure_two = self.target_space_two.contents.of_type(
-                    type(self.target_structure_one)
-                ).get_exigent()
-        except MissingStructureError:
-            return False
-        if self.target_conceptual_space is None:
-            self.target_conceptual_space = self.target_space_one.conceptual_space
-        if self.target_conceptual_space != self.target_space_two.conceptual_space:
-            return False
-        if self.parent_concept is None:
-            self.parent_concept = (
-                self.bubble_chamber.spaces["correspondential concepts"]
-                .contents.of_type(ConceptualSpace)
-                .get_random()
-                .contents.of_type(Concept)
-                .get_random()
-            )
+        self.target_structure_one = self._target_structures["target_structure_one"]
+        self.target_structure_two = self._target_structures["target_structure_two"]
+        self.target_space_one = self._target_structures["target_space_one"]
+        self.target_space_two = self._target_structures["target_space_two"]
+        self.target_conceptual_space = self._target_structures[
+            "target_conceptual_space"
+        ]
+        self.parent_concept = self._target_structures["parent_concept"]
+        self.target_view = self._target_structures["target_view"]
         if self.target_view.has_member(
             self.parent_concept,
             self.target_structure_one,
@@ -177,15 +137,6 @@ class CorrespondenceBuilder(Builder):
                 return False
         return True
 
-    def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classifier.classify(
-            concept=self.parent_concept,
-            space=self.target_conceptual_space,
-            start=self.target_structure_one,
-            end=self.target_structure_two,
-            view=self.target_view,
-        )
-
     def _process_structure(self):
         self.correspondence.structure_id = ID.new(Correspondence)
         self.target_view.slot_values[self.correspondence.slot_argument.structure_id] = (
@@ -202,15 +153,7 @@ class CorrespondenceBuilder(Builder):
         self.target_structure_two.links_out.add(self.correspondence)
         self.bubble_chamber.correspondences.add(self.correspondence)
         self.bubble_chamber.logger.log(self.correspondence)
-        self.child_structure = self.correspondence
+        self.child_structures = StructureCollection({self.correspondence})
 
     def _fizzle(self):
-        self.child_codelets.append(self.make(self.codelet_id, self.bubble_chamber))
-
-    def _fail(self):
-        try:
-            self.child_codelets.append(
-                RelationBuilder.make(self.codelet_id, self.bubble_chamber)
-            )
-        except MissingStructureError:
-            pass
+        pass

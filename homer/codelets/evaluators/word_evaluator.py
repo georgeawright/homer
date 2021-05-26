@@ -1,47 +1,30 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
-from homer.codelets.selectors import LabelSelector
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Label
 from homer.structures.nodes import Word
 
 
 class WordEvaluator(Evaluator):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        target_structure: Word,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        Evaluator.__init__(
-            self, codelet_id, parent_id, bubble_chamber, target_structure, urgency
-        )
-        self.original_confidence = self.target_structure.quality
-
     @classmethod
-    def get_target_class(cls):
-        return Word
+    def get_follow_up_class(cls) -> type:
+        from homer.codelets.selectors import WordSelector
 
-    @classmethod
-    def spawn(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        target_structure: Word,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        codelet_id = ID.new(cls)
-        return cls(codelet_id, parent_id, bubble_chamber, target_structure, urgency)
+        return WordSelector
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["word"]
-        target = bubble_chamber.words.get_random()
-        return cls.spawn(parent_id, bubble_chamber, target, structure_type.activation)
+        word = bubble_chamber.input_nodes.where(is_word=True).get_random()
+        correspondences = word.correspondences.where(end=word)
+        target_structures = StructureCollection.union(
+            StructureCollection({word}), correspondences
+        )
+        return cls.spawn(
+            parent_id,
+            bubble_chamber,
+            target_structures,
+            structure_type.activation,
+        )
 
     @property
     def _parent_link(self):
@@ -49,16 +32,12 @@ class WordEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get_random()
 
     def _calculate_confidence(self):
+        target_word = self.target_structures.where(is_word=True).get_random()
         labels = StructureCollection.union(
-            *[
-                correspondee.labels
-                for correspondee in self.target_structure.correspondees
-            ]
+            *[correspondee.labels for correspondee in target_word.correspondees]
         )
         compatible_labels = [
-            label
-            for label in labels
-            if label.parent_concept in self.target_structure.concepts
+            label for label in labels if label.parent_concept in target_word.concepts
         ]
         self.confidence = (
             max(label.quality for label in compatible_labels)

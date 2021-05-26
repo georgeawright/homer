@@ -7,6 +7,7 @@ from homer.codelets.evaluators import PhraseEvaluator
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Phrase
+from homer.tools import hasinstance
 
 
 @pytest.fixture
@@ -116,161 +117,68 @@ def vp(vp_concept):
     return phrase
 
 
-def test_gets_a_rule_if_necessary(bubble_chamber, s_slot, np, vp):
-    target_root = s_slot
-    target_left_branch = np
-    target_right_branch = vp
-    target_rule = None
-    phrase_builder = PhraseBuilder(
-        "",
-        "",
-        bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
-        1.0,
-        target_rule=target_rule,
-    )
-    phrase_builder.run()
-    assert phrase_builder.target_rule is not None
-
-
 def test_successfully_creates_a_branch_slot(bubble_chamber, s, np, s_np_vp):
-    target_root = s
-    target_left_branch = np
-    target_right_branch = None
-    target_rule = s_np_vp
+    target_structures = {
+        "target_root": s,
+        "target_left_branch": np,
+        "target_right_branch": None,
+        "target_rule": s_np_vp,
+    }
     phrase_builder = PhraseBuilder(
         "",
         "",
         bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
+        target_structures,
         1.0,
-        target_rule=target_rule,
     )
     phrase_builder.run()
     assert CodeletResult.SUCCESS == phrase_builder.result
-    assert isinstance(phrase_builder.child_structure, Phrase)
+    assert hasinstance(phrase_builder.child_structures, Phrase)
     assert len(phrase_builder.child_codelets) == 1
     assert isinstance(phrase_builder.child_codelets[0], PhraseEvaluator)
-
-
-def test_fails_to_create_a_branch_slot_if_incompatible_with_rule(
-    bubble_chamber, s, np, s_np_vp
-):
-    target_root = s
-    target_left_branch = None
-    target_right_branch = np
-    target_rule = s_np_vp
-    phrase_builder = PhraseBuilder(
-        "",
-        "",
-        bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
-        1.0,
-        target_rule=target_rule,
-    )
-    phrase_builder.run()
-    assert CodeletResult.FIZZLE == phrase_builder.result
-    assert phrase_builder.child_structure is None
-    assert len(phrase_builder.child_codelets) == 1
-    assert isinstance(phrase_builder.child_codelets[0], PhraseBuilder)
 
 
 def test_successfully_fills_in_a_root_slot(bubble_chamber, s_slot, np, vp, s_np_vp):
-    target_root = s_slot
-    target_left_branch = np
-    target_right_branch = vp
-    target_rule = s_np_vp
+    target_structures = {
+        "target_root": s_slot,
+        "target_left_branch": np,
+        "target_right_branch": vp,
+        "target_rule": s_np_vp,
+    }
     phrase_builder = PhraseBuilder(
         "",
         "",
         bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
+        target_structures,
         1.0,
-        target_rule=target_rule,
     )
     phrase_builder.run()
     assert CodeletResult.SUCCESS == phrase_builder.result
-    assert phrase_builder.child_structure == s_slot
+    assert phrase_builder.child_structures.get_random() == s_slot
     assert len(phrase_builder.child_codelets) == 1
     assert isinstance(phrase_builder.child_codelets[0], PhraseEvaluator)
-
-
-def test_fails_to_fill_root_slot_if_incompatible_with_rule(
-    bubble_chamber, s_slot, vp, np, s_np_vp
-):
-    target_root = s_slot
-    target_left_branch = vp
-    target_right_branch = np
-    target_rule = s_np_vp
-    phrase_builder = PhraseBuilder(
-        "",
-        "",
-        bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
-        1.0,
-        target_rule=target_rule,
-    )
-    phrase_builder.run()
-    assert CodeletResult.FIZZLE == phrase_builder.result
-    assert phrase_builder.child_structure is None
-    assert len(phrase_builder.child_codelets) == 1
-    assert isinstance(phrase_builder.child_codelets[0], PhraseBuilder)
 
 
 def test_successfully_creates_and_fills_a_root_slot(
     bubble_chamber, np, vp, s_np_vp, s_concept
 ):
-    target_root = None
-    target_left_branch = np
-    target_right_branch = vp
-    target_rule = s_np_vp
+    target_structures = {
+        "target_root": None,
+        "target_left_branch": np,
+        "target_right_branch": vp,
+        "target_rule": s_np_vp,
+    }
     phrase_builder = PhraseBuilder(
         "",
         "",
         bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
+        target_structures,
         1.0,
-        target_rule=target_rule,
     )
     phrase_builder.run()
     assert CodeletResult.SUCCESS == phrase_builder.result
-    assert isinstance(phrase_builder.child_structure, Phrase)
-    assert phrase_builder.child_structure.parent_concept == s_concept
+    child_structure = phrase_builder.child_structures.get_random()
+    assert isinstance(child_structure, Phrase)
+    assert child_structure.parent_concept == s_concept
     assert len(phrase_builder.child_codelets) == 1
     assert isinstance(phrase_builder.child_codelets[0], PhraseEvaluator)
-
-
-def test_fails_to_create_and_fill_a_root_slot_if_incompatible_with_rule(
-    bubble_chamber, vp, np, s_np_vp
-):
-    target_root = None
-    target_left_branch = vp
-    target_right_branch = np
-    target_rule = s_np_vp
-    phrase_builder = PhraseBuilder(
-        "",
-        "",
-        bubble_chamber,
-        target_root,
-        target_left_branch,
-        target_right_branch,
-        1.0,
-        target_rule=target_rule,
-    )
-    phrase_builder.run()
-    assert CodeletResult.FIZZLE == phrase_builder.result
-    assert phrase_builder.child_structure is None
-    assert len(phrase_builder.child_codelets) == 1
-    assert isinstance(phrase_builder.child_codelets[0], PhraseBuilder)

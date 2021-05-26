@@ -38,8 +38,6 @@ class Coderack:
     def add_codelet(self, codelet: Codelet):
         if codelet.urgency < self.MINIMUM_CODELET_URGENCY:
             return
-        while len(self._codelets) >= self.MAXIMUM_POPULATION:
-            self._remove_a_codelet()
         self.logger.log(codelet)
         self._codelets.append(codelet)
 
@@ -57,6 +55,14 @@ class Coderack:
             self.add_codelet(child_codelet)
 
     def _select_a_codelet(self) -> Codelet:
+        if len(self._codelets) >= self.MAXIMUM_POPULATION:
+            codelet_choice = [
+                codelet
+                for codelet in self._codelets
+                if isinstance(codelet, CoderackCleaner)
+            ][0]
+            self._codelets.remove(codelet_choice)
+            return codelet_choice
         codelet_choice = None
         highest_weight = 0
         randomness = self._randomness()

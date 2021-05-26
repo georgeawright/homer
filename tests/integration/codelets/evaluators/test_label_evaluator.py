@@ -16,23 +16,7 @@ from homer.structures.spaces import WorkingSpace
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     label_concept = Concept(
         Mock(),
         Mock(),
@@ -183,7 +167,9 @@ def test_increases_quality_of_good_label(bubble_chamber, good_label):
     original_quality = good_label.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = LabelEvaluator.spawn(parent_id, bubble_chamber, good_label, urgency)
+    evaluator = LabelEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({good_label}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert good_label.quality > original_quality
@@ -195,7 +181,9 @@ def test_decreases_quality_of_bad_label(bubble_chamber, bad_label):
     original_quality = bad_label.quality
     parent_id = ""
     urgency = 1.0
-    evaluator = LabelEvaluator.spawn(parent_id, bubble_chamber, bad_label, urgency)
+    evaluator = LabelEvaluator.spawn(
+        parent_id, bubble_chamber, StructureCollection({bad_label}), urgency
+    )
     evaluator.run()
     assert CodeletResult.SUCCESS == evaluator.result
     assert bad_label.quality < original_quality

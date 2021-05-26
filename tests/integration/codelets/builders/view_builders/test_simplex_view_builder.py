@@ -8,33 +8,19 @@ from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Concept
-from homer.structures.spaces import Frame, WorkingSpace
+from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces.frames import Template
 from homer.structures.views import SimplexView
+from homer.tools import hasinstance
 
 
 @pytest.fixture
 def bubble_chamber():
-    chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
+    chamber = BubbleChamber.setup(Mock())
     view_concept = Concept(
         Mock(),
         Mock(),
-        "view",
+        "view-simplex",
         Mock(),
         None,
         None,
@@ -58,6 +44,18 @@ def bubble_chamber():
     relation = Relation(Mock(), Mock(), view_concept, build_concept, None, None, 1)
     view_concept.links_out.add(relation)
     build_concept.links_in.add(relation)
+    text_concept = Concept(
+        Mock(),
+        Mock(),
+        "text",
+        Mock(),
+        None,
+        None,
+        "value",
+        StructureCollection(),
+        None,
+    )
+    chamber.concepts.add(text_concept)
     top_level_working_space = WorkingSpace(
         Mock(),
         Mock(),
@@ -86,13 +84,21 @@ def input_space(bubble_chamber):
 
 @pytest.fixture
 def target_frame(bubble_chamber):
-    frame = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), [], StructureCollection())
+    frame = Template(
+        Mock(),
+        Mock(),
+        Mock(),
+        bubble_chamber.concepts["text"],
+        Mock(),
+        [],
+        StructureCollection(),
+    )
     frame._activation = 1.0
     bubble_chamber.frames.add(frame)
     return frame
 
 
-def test_successful_creates_view_and_spawns_follow_up_and_same_view_cannot_be_recreated(
+def test_successful_creates_view_and_spawns_follow_up_and_same_view_can_be_recreated(
     bubble_chamber,
     input_space,
     target_frame,
@@ -105,10 +111,10 @@ def test_successful_creates_view_and_spawns_follow_up_and_same_view_cannot_be_re
     )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
-    assert isinstance(builder.child_structure, SimplexView)
+    assert hasinstance(builder.child_structures, SimplexView)
     assert isinstance(builder.child_codelets[0], SimplexViewEvaluator)
     builder = SimplexViewBuilder.spawn(
         parent_id, bubble_chamber, target_spaces, urgency
     )
     builder.run()
-    assert CodeletResult.FIZZLE == builder.result
+    assert CodeletResult.SUCCESS == builder.result

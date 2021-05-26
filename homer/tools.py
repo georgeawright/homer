@@ -14,6 +14,11 @@ def average_vector(vectors: List[List[Union[float, int]]]):
     ]
 
 
+def add_vectors(a: list, b: list) -> list:
+    """adds the corresponding numbers in two lists of lists"""
+    return [[a[i][j] + b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
+
+
 def first_key_of_dict(dictionary: dict):
     try:
         return min(int(k) for k in dictionary.keys())
