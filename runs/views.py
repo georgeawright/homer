@@ -79,6 +79,42 @@ def run_view(request, run_id):
             output += "</td>"
         output += "</tr>"
     output += "</table>"
+    views = [
+        structure for structure in structure_records if "View" in structure.structure_id
+    ]
+    views.sort(key=lambda view: last_value_of_dict(view.activation), reverse=True)
+    output += "<h2>Views</h2>"
+    for view in views:
+        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: '
+        output += "<ul>"
+        output += "<li>Activation: "
+        output += str(last_value_of_dict(view.activation))
+        output += "</li>"
+        output += "<li>Quality: "
+        output += str(last_value_of_dict(view.quality))
+        output += "</li>"
+        output += "<li>Correspondences: "
+        for member in view.members.all():
+            output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
+        output = output[:-2]
+        output += "</li>"
+        output += "<li>Output: "
+        output_space = view.output_space
+        output += (
+            f'(<a href="structures/{output_space.structure_id}">'
+            + f"{output_space.structure_id}</a>)"
+        )
+        words = [
+            structure
+            for structure in structure_records
+            if re.match(r"^Word*", structure.structure_id)
+            and structure.parent_space == output_space
+        ]
+        words = sorted(words, key=lambda x: list(x.locations.values())[0])
+        for word in words:
+            output += f"{word.value} "
+        output += "</li>"
+        output += "</ul>"
     output += "<h2>Labels</h2>"
     output += '<table border="1">'
     for i in range(last_row + 1):
@@ -206,42 +242,6 @@ def run_view(request, run_id):
             + str(last_value_of_dict(correspondence.quality))
         )
         output += "<br>"
-    views = [
-        structure for structure in structure_records if "View" in structure.structure_id
-    ]
-    views.sort(key=lambda view: last_value_of_dict(view.activation), reverse=True)
-    output += "<h2>Views</h2>"
-    for view in views:
-        output += f'<a href="structures/{view.structure_id}">{view.structure_id}</a>: '
-        output += "<ul>"
-        output += "<li>Activation: "
-        output += str(last_value_of_dict(view.activation))
-        output += "</li>"
-        output += "<li>Quality: "
-        output += str(last_value_of_dict(view.quality))
-        output += "</li>"
-        output += "<li>Correspondences: "
-        for member in view.members.all():
-            output += f'<a href="structures/{member.structure_id}">{member.structure_id}</a>, '
-        output = output[:-2]
-        output += "</li>"
-        output += "<li>Output: "
-        output_space = view.output_space
-        output += (
-            f'(<a href="structures/{output_space.structure_id}">'
-            + f"{output_space.structure_id}</a>)"
-        )
-        words = [
-            structure
-            for structure in structure_records
-            if re.match(r"^Word*", structure.structure_id)
-            and structure.parent_space == output_space
-        ]
-        words = sorted(words, key=lambda x: list(x.locations.values())[0])
-        for word in words:
-            output += f"{word.value} "
-        output += "</li>"
-        output += "</ul>"
     templates = [
         structure
         for structure in structure_records
