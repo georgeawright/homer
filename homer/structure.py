@@ -128,7 +128,7 @@ class Structure(ABC):
 
     @property
     def unlinkedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** len(self.links)
+        return 0.5 ** sum(link.activation for link in self.links)
 
     @property
     def links(self) -> StructureCollection:
