@@ -70,31 +70,46 @@ class Template(Frame):
             new_space.add(new_node)
             copies[node] = new_node
             for label in node.labels:
+                new_label_space = new_node.parent_spaces.where(
+                    conceptual_space=label.parent_space.conceptual_space
+                ).get_random()
                 new_label = label.copy(
                     start=new_node,
-                    parent_space=new_space,
+                    parent_space=(new_label_space),
                     parent_id=parent_id,
                 )
                 new_node.links_out.add(new_label)
-                new_space.add(new_label)
+                new_label_space.add(new_label)
+                bubble_chamber.logger.log(new_label)
+                copies[label] = new_label
             for relation in node.links_out.where(is_relation=True):
                 if relation.end not in copies:
                     continue
                 new_end = copies[relation.end]
+                new_relation_space = new_node.parent_spaces.where(
+                    conceptual_space=relation.parent_space.conceptual_space
+                ).get_random()
                 new_relation = relation.copy(
-                    start=new_node, end=new_end, parent_space=new_space
+                    start=new_node, end=new_end, parent_space=new_relation_space
                 )
                 new_node.links_out.add(new_relation)
-                new_space.add(new_relation)
+                new_relation_space.add(new_relation)
+                bubble_chamber.logger.log(new_relation)
+                copies[relation] = new_relation
             for relation in node.links_in.where(is_relation=True):
                 if relation.start not in copies:
                     continue
                 new_start = copies[relation.start]
+                new_relation_space = new_node.parent_spaces.where(
+                    conceptual_space=relation.parent_space.conceptual_space
+                ).get_random()
                 new_relation = relation.copy(
-                    start=new_start, end=new_node, parent_space=new_space
+                    start=new_start, end=new_node, parent_space=new_relation_space
                 )
                 new_node.links_in.add(new_relation)
-                new_space.add(new_relation)
+                new_relation_space.add(new_relation)
+                bubble_chamber.logger.log(new_relation)
+                copies[relation] = new_relation
             for correspondence in node.correspondences:
                 if correspondence.start_space not in [self] + list(
                     sub_spaces
@@ -102,22 +117,30 @@ class Template(Frame):
                     new_correspondence = correspondence.copy(
                         old_arg=node, new_arg=new_node, parent_id=parent_id
                     )
-                elif (
-                    correspondence.start not in copies
-                    or correspondence.end not in copies
-                ):
+                    new_correspondence.start.links_in.add(new_correspondence)
+                    new_correspondence.start.links_out.add(new_correspondence)
+                    new_correspondence.end.links_in.add(new_correspondence)
+                    new_correspondence.end.links_out.add(new_correspondence)
+                    new_correspondence.start_space.add(new_correspondence)
+                    new_correspondence.end_space.add(new_correspondence)
+                    bubble_chamber.logger.log(new_correspondence)
+                    copies[correspondence] = new_correspondence
+        for structure in copies.keys():
+            for correspondence in structure.correspondences:
+                if correspondence in copies:
                     continue
-                else:
-                    new_start = copies[correspondence.start]
-                    new_end = copies[correspondence.end]
-                    new_correspondence = correspondence.copy(
-                        start=new_start, end=new_end, parent_id=parent_id
-                    )
+                new_start = copies[correspondence.start]
+                new_end = copies[correspondence.end]
+                new_correspondence = correspondence.copy(
+                    start=new_start, end=new_end, parent_id=parent_id
+                )
                 new_correspondence.start.links_in.add(new_correspondence)
                 new_correspondence.start.links_out.add(new_correspondence)
                 new_correspondence.end.links_in.add(new_correspondence)
                 new_correspondence.end.links_out.add(new_correspondence)
-                new_space.add(new_correspondence)
+                new_correspondence.start_space.add(new_correspondence)
+                new_correspondence.end_space.add(new_correspondence)
+                bubble_chamber.logger.log(correspondence)
         instance_to_type_link = Relation(
             ID.new(Relation),
             parent_id,
