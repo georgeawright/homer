@@ -41,7 +41,7 @@ class Publisher(Codelet):
             words.sort(key=lambda word: word.location.coordinates[0][0])
             text = " ".join([word.value for word in words])
             view_texts.append(text)
-        result_text = ". ".join(view_texts)
+        result_text = ". ".join(view_texts) + "."
         self.bubble_chamber.result = result_text
         self.result = CodeletResult.SUCCESS
         return self.result
