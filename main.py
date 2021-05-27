@@ -1161,7 +1161,7 @@ def setup_homer() -> Homer:
     )
     template_3_location_space = location_space.instance_in_space(template_3)
     homer.logger.log(template_3_location_space)
-    template_3_temperature_space = location_space.instance_in_space(template_3)
+    template_3_temperature_space = temperature_space.instance_in_space(template_3)
     homer.logger.log(template_3_temperature_space)
     template_3_slot_1 = homer.def_chunk(
         locations=[
@@ -1206,7 +1206,7 @@ def setup_homer() -> Homer:
     )
     template_4_location_space = location_space.instance_in_space(template_4)
     homer.logger.log(template_4_location_space)
-    template_4_temperature_space = location_space.instance_in_space(template_4)
+    template_4_temperature_space = temperature_space.instance_in_space(template_4)
     homer.logger.log(template_4_temperature_space)
     template_4_slot_1 = homer.def_chunk(
         locations=[

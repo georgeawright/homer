@@ -77,6 +77,7 @@ class Homer:
                 break
             except Exception as e:
                 raise e
+        self.print_results()
         return {
             "result": self.bubble_chamber.result,
             "satisfaction": self.bubble_chamber.satisfaction,
@@ -104,7 +105,9 @@ class Homer:
         )
 
     def print_results(self):
-        print("results go here")
+        print(f"codelets run: {self.coderack.codelets_run}")
+        print(f"satisfaction: {self.bubble_chamber.satisfaction}")
+        print(f"result: {self.bubble_chamber.result}")
 
     def def_concept(
         self,
