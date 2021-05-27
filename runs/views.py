@@ -43,6 +43,8 @@ def run_view(request, run_id):
     output += "<ul>"
     output += "<li>Codelets Run: " + str(coderack_record.codelets_run[-1])
     output += "</ul>"
+    output += "<h2>Generated Text</h2>"
+    output += f"<p>{coderack_record.result}</p>"
     output += '<p><a href="activity-and-structure-concepts">Activity and structure concepts</a></p>'
     output += '<p><a href="codelets">Codelets</a></p>'
     output += '<p><a href="structures">Structures</a></p>'

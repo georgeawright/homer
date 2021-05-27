@@ -1,9 +1,6 @@
-import random
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 
@@ -29,21 +26,25 @@ class Publisher(Codelet):
         )
 
     def run(self) -> CodeletResult:
-        try:
-            target_view = self.bubble_chamber.monitoring_views.get_active()
-        except MissingStructureError:
+        full_views = []
+        for view in self.bubble_chamber.production_views:
+            if view.activation == 0:
+                continue
+            proportion_of_slots_filled = len(view.slot_values) / len(view.slots)
+            if proportion_of_slots_filled == 1:
+                full_views.append(view)
+        if len(full_views) == 0:
             return self._fail()
-        if (
-            target_view.quality > random.random()
-            and target_view.activation > random.random()
-        ):
-            words = list(target_view.output_space.contents.where(is_word=True))
+        view_texts = []
+        for view in full_views:
+            words = list(view.output_space.contents.where(is_word=True))
             words.sort(key=lambda word: word.location.coordinates[0][0])
             text = " ".join([word.value for word in words])
-            self.bubble_chamber.result = text
-            self.result = CodeletResult.SUCCESS
-            return self.result
-        return self._fail()
+            view_texts.append(text)
+        result_text = ". ".join(view_texts)
+        self.bubble_chamber.result = result_text
+        self.result = CodeletResult.SUCCESS
+        return self.result
 
     def _fail(self) -> CodeletResult:
         self.bubble_chamber.concepts["publish"].decay_activation()
