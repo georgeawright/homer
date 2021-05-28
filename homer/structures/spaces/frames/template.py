@@ -57,8 +57,9 @@ class Template(Frame):
         copies = {}
         sub_spaces = self.contents.where(is_space=True, is_basic_level=True)
         for space in sub_spaces:
-            sub_space_copy = space.copy_without_contents(parent_id)
-            sub_space_copy.locations = [Location([], new_space)]
+            sub_space_copy = space.copy_without_contents(
+                parent_id, parent_space=new_space
+            )
             new_space.add(sub_space_copy)
             bubble_chamber.logger.log(sub_space_copy)
         for node in self.contents.where(is_node=True):

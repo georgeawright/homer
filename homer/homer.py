@@ -484,7 +484,7 @@ class Homer:
             quality=quality,
         )
         start.links_out.add(relation)
-        start.links_in.add(relation)
+        end.links_in.add(relation)
         if not relation.is_slot:
             self.bubble_chamber.relations.add(relation)
         self.logger.log(relation)

@@ -140,10 +140,15 @@ class WorkingSpace(Space):
                     new_space.add(new_correspondence)
         return new_space
 
-    def copy_without_contents(self, parent_id: str) -> WorkingSpace:
+    def copy_without_contents(
+        self, parent_id: str, parent_space: WorkingSpace = None
+    ) -> WorkingSpace:
         """Returns an empty working space with the same conceptual space."""
+        parent_space = self.parent_space if parent_space is None else parent_space
         sub_space_copies = {
-            sub_space: sub_space.copy_without_contents(parent_id)
+            sub_space: sub_space.copy_without_contents(
+                parent_id, parent_space=parent_space
+            )
             for sub_space in self.sub_spaces
         }
         new_dimensions = (
@@ -152,13 +157,19 @@ class WorkingSpace(Space):
             else []
         )
         new_sub_spaces = [sub_space_copies[sub_space] for sub_space in self.sub_spaces]
+        locations = [
+            Location(location.coordinates, parent_space)
+            if location.space.conceptual_space == parent_space.conceptual_space
+            else location
+            for location in self.locations
+        ]
         new_space = WorkingSpace(
             structure_id=ID.new(WorkingSpace),
             parent_id=parent_id,
             name=self.name,
             parent_concept=self.parent_concept,
             conceptual_space=self.conceptual_space,
-            locations=self.locations,
+            locations=locations,
             contents=StructureCollection(),
             no_of_dimensions=self.no_of_dimensions,
             dimensions=new_dimensions,
