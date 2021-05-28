@@ -7,7 +7,7 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures.nodes import Chunk
+from homer.structure_collection_keys import chunking_exigency
 
 
 class ChunkSuggester(Suggester):
@@ -55,8 +55,10 @@ class ChunkSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target = bubble_chamber.input_nodes.where(is_chunk=True).get_unhappy()
-        urgency = urgency if urgency is not None else target.unhappiness
+        target = bubble_chamber.input_nodes.where(is_chunk=True).get(
+            key=chunking_exigency
+        )
+        urgency = urgency if urgency is not None else target.unchunkedness
         return cls.spawn(parent_id, bubble_chamber, {"target_one": target}, urgency)
 
     @property
@@ -66,7 +68,7 @@ class ChunkSuggester(Suggester):
     def _passes_preliminary_checks(self):
         self.target_one = self._target_structures["target_one"]
         try:
-            self.target_two = self.target_one.nearby().get_random()
+            self.target_two = self.target_one.nearby().get()
             self._target_structures["target_two"] = self.target_two
         except MissingStructureError:
             return False

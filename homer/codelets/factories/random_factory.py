@@ -28,8 +28,8 @@ class RandomFactory(Factory):
     def _decide_follow_up_class(self):
         follow_up_theme = random.sample(list(self.codelet_themes().values()), 1)[0]
         return self._get_codelet_type_from_concepts(
-            action=follow_up_theme["actions"].get_random(),
-            space=follow_up_theme["spaces"].get_random(),
-            direction=follow_up_theme["directions"].get_random(),
-            structure=follow_up_theme["structures"].get_random(),
+            action=follow_up_theme["actions"].get(),
+            space=follow_up_theme["spaces"].get(),
+            direction=follow_up_theme["directions"].get(),
+            structure=follow_up_theme["structures"].get(),
         )

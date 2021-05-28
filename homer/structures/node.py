@@ -1,4 +1,5 @@
 from __future__ import annotations
+import statistics
 from typing import Any, List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -57,8 +58,15 @@ class Node(Structure):
         return self.value is None
 
     @property
-    def unchunkedness(self) -> FloatBetweenOneAndZero:
-        return 0
+    def unhappiness(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean(
+            [
+                self.unchunkedness,
+                self.unlabeledness,
+                self.unrelatedness,
+                self.uncorrespondedness,
+            ]
+        )
 
     def nearby(self, space: Space = None) -> StructureCollection:
         if space is not None:

@@ -84,10 +84,10 @@ class Chunk(Node):
         if len(chunks) == 1:
             raise MissingStructureError
         for _ in range(len(chunks)):
-            chunk = chunks.get_random(exclude=[self])
+            chunk = chunks.get(exclude=[self])
             if space.proximity_between(chunk, self) - random.random() <= 0:
                 return chunk
-        return chunks.get_random(exclude=[self])
+        return chunks.get(exclude=[self])
 
     def copy(self, **kwargs: dict) -> Chunk:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""

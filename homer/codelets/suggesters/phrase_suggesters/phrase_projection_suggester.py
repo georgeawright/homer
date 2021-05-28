@@ -3,6 +3,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.codelets.suggesters import PhraseSuggester
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
 from homer.structures.views import DiscourseView
 
 
@@ -58,11 +59,11 @@ class PhraseProjectionSuggester(PhraseSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = (
-            bubble_chamber.discourse_views.get_active()
+            bubble_chamber.discourse_views.get(key=activation)
             if target_view is None
             else target_view
         )
-        frame = target_view.input_frames.get_random()
+        frame = target_view.input_frames.get()
         target_correspondence = StructureCollection(
             {
                 member
@@ -70,9 +71,11 @@ class PhraseProjectionSuggester(PhraseSuggester):
                 if member.start_space != frame
                 and member.end_space != target_view.output_space
             }
-        ).get_unhappy()
+        ).get(key=activation)
         urgency = (
-            urgency if urgency is not None else target_correspondence.start.unhappiness
+            urgency
+            if urgency is not None
+            else target_correspondence.start.uncorrespondedness
         )
         return cls.spawn(
             parent_id,

@@ -1,16 +1,13 @@
 import statistics
-from typing import List, Union
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
-from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Label
-from homer.structures.nodes import Chunk, Concept, Phrase, Rule, Word
+from homer.structure_collection_keys import activation, chunking_exigency
+from homer.structures.nodes import Concept, Rule, Word
 
 
 class PhraseSuggester(Suggester):
@@ -64,13 +61,15 @@ class PhraseSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get_active()
-        target_one = target_view.output_space.contents.where(is_word=True).get_unhappy()
-        target_two = target_one.potential_rule_mates.get_unhappy()
+        target_view = bubble_chamber.production_views.get(key=activation)
+        target_one = target_view.output_space.contents.where(is_word=True).get(
+            key=chunking_exigency
+        )
+        target_two = target_one.potential_rule_mates.get(key=chunking_exigency)
         try:
             target_three = StructureCollection.intersection(
                 target_one.potential_rule_mates, target_two.potential_rule_mates
-            ).get_unhappy()
+            ).get(key=chunking_exigency)
             targets = StructureCollection({target_one, target_two, target_three})
         except MissingStructureError:
             targets = StructureCollection({target_one, target_two})
@@ -78,7 +77,7 @@ class PhraseSuggester(Suggester):
         urgency = (
             urgency
             if urgency is not None
-            else statistics.fmean([target.unhappiness for target in targets])
+            else statistics.fmean([target.unchunkedness for target in targets])
         )
         return cls.spawn(
             parent_id,
@@ -106,14 +105,14 @@ class PhraseSuggester(Suggester):
                 for fragment in bubble_chamber.text_fragments
                 if target_rule.is_compatible_with(fragment)
             }
-        ).get_unhappy()
+        ).get(key=chunking_exigency)
         target_two = StructureCollection(
             {
                 fragment
                 for fragment in target_one.potential_rule_mates
                 if target_rule.is_compatible_with(target_one, fragment)
             }
-        ).get_unhappy()
+        ).get(key=chunking_exigency)
         try:
             target_three = StructureCollection(
                 {
@@ -123,7 +122,7 @@ class PhraseSuggester(Suggester):
                     )
                     if target_rule.is_compatible_with(target_one, target_two, fragment)
                 }
-            ).get_unhappy()
+            ).get(key=chunking_exigency)
             targets = StructureCollection({target_one, target_two, target_three})
         except MissingStructureError:
             targets = StructureCollection({target_one, target_two})
@@ -131,7 +130,7 @@ class PhraseSuggester(Suggester):
         urgency = (
             urgency
             if urgency is not None
-            else statistics.fmean([target.unhappiness for target in targets])
+            else statistics.fmean([target.unchunkedness for target in targets])
         )
         return cls.spawn(
             parent_id,
@@ -157,8 +156,8 @@ class PhraseSuggester(Suggester):
                 left_branch = root.left_branch
                 right_branch = root.right_branch
         if root is None:
-            branch_one = targets.get_random()
-            branch_two = targets.get_random(exclude=[branch_one])
+            branch_one = targets.get()
+            branch_two = targets.get(exclude=[branch_one])
             if (
                 branch_one.location.coordinates[0][0]
                 < branch_two.location.coordinates[0][0]
@@ -188,7 +187,7 @@ class PhraseSuggester(Suggester):
         self.target_left_branch = self._target_structures["target_left_branch"]
         self.target_right_branch = self._target_structures["target_right_branch"]
         self.target_rule = self._target_structures["target_rule"]
-        self.parent_space = self.target_structures.get_random().parent_space
+        self.parent_space = self.target_structures.get().parent_space
         if len(self.target_structures) < 2:
             return False
         if self.target_rule is None:
@@ -199,7 +198,7 @@ class PhraseSuggester(Suggester):
                         for rule in self.bubble_chamber.rules
                         if self._rule_is_compatible_with_targets(rule)
                     }
-                ).get_random()
+                ).get()
                 self._target_structures["target_rule"] = self.target_rule
             except MissingStructureError:
                 return False

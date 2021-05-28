@@ -93,7 +93,7 @@ def target_word(bubble_chamber, parent_concept, conceptual_space):
     link = Mock()
     link.activation = 1
     word_concept.relations_with.return_value = StructureCollection({link})
-    word.lexeme.concepts.get_random.return_value = word_concept
+    word.lexeme.concepts.get.return_value = word_concept
     word_concept.parent_spaces = StructureCollection({conceptual_space})
     return word
 

@@ -6,7 +6,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Space, View
+from homer.structure_collection_keys import activation, corresponding_exigency
+from homer.structures import Space
 from homer.structures.nodes import Chunk
 from homer.tools import average_vector, project_item_into_space
 
@@ -65,10 +66,10 @@ class ReverseChunkProjectionSuggester(ChunkSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.monitoring_views.get_active()
+        target_view = bubble_chamber.monitoring_views.get(key=activation)
         target_interpretation_chunk = target_view.interpretation_space.contents.of_type(
             Chunk
-        ).get_exigent()
+        ).get(key=lambda x: -x.size)
         target_members_raw_correspondees = StructureCollection(
             {
                 argument
@@ -79,19 +80,26 @@ class ReverseChunkProjectionSuggester(ChunkSuggester):
             }
         )
         if target_members_raw_correspondees.is_empty():
-            target_raw_chunk = (
-                target_view.raw_input_space.contents.of_type(Chunk)
-                .where(is_raw=True)
-                .get_exigent()
-            )
+            target_raw_chunk = target_view.raw_input_space.contents.where(
+                is_chunk=True, is_raw=True
+            ).get(key=corresponding_exigency)
         else:
             target_raw_chunk = (
-                target_members_raw_correspondees.get_random()
+                target_members_raw_correspondees.get()
                 .nearby(space=target_view.input_space)
-                .of_type(Chunk)
-                .where(is_raw=True)
-                .get_exigent()
+                .where(is_chunk=True, is_raw=True)
+                .get(key=corresponding_exigency)
             )
+        urgency = (
+            urgency
+            if urgency is not None
+            else statistics.fmean(
+                [
+                    target_interpretation_chunk.uncorrespondedness,
+                    target_raw_chunk.uncorrespondedness,
+                ]
+            )
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,

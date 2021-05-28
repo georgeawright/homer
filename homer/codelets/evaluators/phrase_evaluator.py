@@ -16,7 +16,7 @@ class PhraseEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["phrase"]
-        target = bubble_chamber.phrases.get_random()
+        target = bubble_chamber.phrases.get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -27,10 +27,10 @@ class PhraseEvaluator(Evaluator):
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["phrase"]
-        return structure_concept.relations_with(self._evaluate_concept).get_random()
+        return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_phrase = self.target_structures.get_random()
+        target_phrase = self.target_structures.get()
         left_branch_quality = (
             target_phrase.left_branch.quality
             if isinstance(target_phrase.left_branch, Phrase)

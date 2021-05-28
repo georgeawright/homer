@@ -29,7 +29,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     challenger.quality = 1.0
     challenger.activation = 1.0
     collection = Mock()
-    collection.get_active.return_value = challenger
+    collection.get.return_value = challenger
     champion.nearby.return_value = collection
     selector = ChunkSelector(
         Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()

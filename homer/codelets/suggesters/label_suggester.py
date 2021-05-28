@@ -7,11 +7,9 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Node
-from homer.structures.links import Label
+from homer.structure_collection_keys import labeling_exigency
 from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
-from homer.tools import project_item_into_space
 
 
 class LabelSuggester(Suggester):
@@ -62,8 +60,8 @@ class LabelSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target = bubble_chamber.input_nodes.get_exigent()
-        urgency = urgency if urgency is not None else target.unlinkedness
+        target = bubble_chamber.input_nodes.get(key=labeling_exigency)
+        urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -85,8 +83,8 @@ class LabelSuggester(Suggester):
                 for node in bubble_chamber.input_nodes
                 if isinstance(node.value, parent_concept.instance_type)
             }
-        ).get_unhappy()
-        urgency = urgency if urgency is not None else target.unlinkedness
+        ).get(key=labeling_exigency)
+        urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -116,7 +114,7 @@ class LabelSuggester(Suggester):
                 .contents.of_type(ConceptualSpace)
                 .where(is_basic_level=True)
                 .where(instance_type=type(self.target_node.value))
-                .get_random()
+                .get()
             )
             location = Location(
                 getattr(
@@ -129,13 +127,13 @@ class LabelSuggester(Suggester):
                     conceptual_space.contents.of_type(Concept)
                     .where_not(classifier=None)
                     .near(location)
-                    .get_random()
+                    .get()
                 )
             except MissingStructureError:
                 self.parent_concept = (
                     conceptual_space.contents.of_type(Concept)
                     .where_not(classifier=None)
-                    .get_random()
+                    .get()
                 )
         if self.parent_concept is None:
             return False

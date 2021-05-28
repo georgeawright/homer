@@ -2,6 +2,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
 
 
 class MonitoringViewSuggester(ViewSuggester):
@@ -25,9 +26,9 @@ class MonitoringViewSuggester(ViewSuggester):
                 if space.parent_concept == bubble_chamber.concepts["text"]
                 and not space.contents.is_empty()
             }
-        ).get_exigent()
+        ).get(key=activation)
         input_space = bubble_chamber.spaces["input"]
-        urgency = urgency if urgency is not None else text_space.exigency
+        urgency = urgency if urgency is not None else text_space.activation
         return cls.spawn(
             parent_id,
             bubble_chamber,

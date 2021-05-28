@@ -1,15 +1,10 @@
-import statistics
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import RelationBuilder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Space, View
 from homer.structures.links import Correspondence, Relation
-from homer.structures.nodes import Chunk, Concept, Word
 from homer.tools import add_vectors, project_item_into_space
 
 
@@ -65,41 +60,6 @@ class RelationProjectionBuilder(RelationBuilder):
             bubble_chamber,
             target_structures,
             urgency,
-        )
-
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target_view = bubble_chamber.monitoring_views.get_active()
-        target_chunk = target_view.interpretation_space.contents.of_type(
-            Chunk
-        ).get_unhappy()
-        potential_relating_words = (
-            target_chunk.correspondences_to_space(target_view.text_space)
-            .get_random()
-            .arguments.get_random(exclude=[target_chunk])
-            .potential_relating_words
-        )
-        target_word = StructureCollection(
-            {
-                word
-                for word in potential_relating_words
-                if not word.has_correspondence_to_space(
-                    target_view.interpretation_space
-                )
-            }
-        ).get_unhappy()
-        urgency = (
-            urgency
-            if urgency is not None
-            else statistics.fmean([target_chunk.unlinkedness, target_word.unlinkedness])
-        )
-        return cls.spawn(
-            parent_id, bubble_chamber, target_view, target_chunk, target_word, urgency
         )
 
     @property

@@ -1,19 +1,10 @@
-from homer.bubble_chamber import BubbleChamber
 from homer.codelets.selector import Selector
 from homer.codelets.suggesters import WordSuggester
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import uncorrespondedness
 
 
 class WordSelector(Selector):
-    @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        word = bubble_chamber.input_nodes.where(is_word=True).get_active()
-        correspondences = word.correspondences.where(end=word)
-        champions = StructureCollection.union(
-            StructureCollection({word}), correspondences
-        )
-        return cls.spawn(parent_id, bubble_chamber, champions, word.activation)
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]
@@ -31,9 +22,9 @@ class WordSelector(Selector):
                 for correspondence in self.winners.where(is_correspondence=True)
                 if correspondence.start_space.is_frame
             }
-        ).get_random()
+        ).get()
         frame = correspondence_from_frame.start_space
-        new_target = frame.contents.where(is_word=True).get_unhappy()
+        new_target = frame.contents.where(is_word=True).get(key=uncorrespondedness)
         self.child_codelets.append(
             WordSuggester.spawn(
                 self.codelet_id,

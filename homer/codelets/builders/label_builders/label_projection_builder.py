@@ -6,9 +6,7 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import View
 from homer.structures.links import Correspondence, Label
-from homer.structures.nodes import Chunk, Word
 from homer.tools import project_item_into_space
 
 
@@ -55,46 +53,6 @@ class LabelProjectionBuilder(LabelBuilder):
             urgency,
         )
 
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target_view = bubble_chamber.monitoring_views.get_active()
-        target_chunk = target_view.interpretation_space.contents.where(
-            is_chunk=True
-        ).get_unhappy()
-        potential_labeling_words = (
-            target_chunk.correspondences_to_space(target_view.text_space)
-            .get_random()
-            .arguments.get_random(exclude=[target_chunk])
-            .potential_labeling_words
-        )
-        target_word = StructureCollection(
-            {
-                word
-                for word in potential_labeling_words
-                if all(
-                    not isinstance(
-                        correspondence.arguments.get_random(exclude=[word]), Label
-                    )
-                    for correspondence in word.correspondences_to_space(
-                        target_view.interpretation_space
-                    )
-                )
-            }
-        ).get_unhappy()
-        urgency = (
-            urgency
-            if urgency is not None
-            else statistics.fmean([target_chunk.unlinkedness, target_word.unlinkedness])
-        )
-        return cls.spawn(
-            parent_id, bubble_chamber, target_view, target_chunk, target_word, urgency
-        )
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["label"]
@@ -104,12 +62,12 @@ class LabelProjectionBuilder(LabelBuilder):
         self.target_chunk = self._target_structures["target_chunk"]
         self.target_word = self._target_structures["target_word"]
         try:
-            self.parent_concept = self.target_word.lexeme.concepts.get_random()
+            self.parent_concept = self.target_word.lexeme.concepts.get()
         except MissingStructureError:
             return False
         return not self.target_chunk.has_label(self.parent_concept) and all(
             not isinstance(
-                correspondence.arguments.get_random(exclude=[self.target_word]), Label
+                correspondence.arguments.get(exclude=[self.target_word]), Label
             )
             for correspondence in self.target_word.correspondences_to_space(
                 self.target_view.interpretation_space

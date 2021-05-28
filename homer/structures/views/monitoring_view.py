@@ -54,7 +54,7 @@ class MonitoringView(View):
                 for space in self.input_spaces
                 if space.parent_concept.name == "input"
             }
-        ).get_random()
+        ).get()
 
     @property
     def text_space(self) -> Space:
@@ -64,7 +64,7 @@ class MonitoringView(View):
                 for space in self.input_spaces
                 if space.parent_concept.name == "text"
             }
-        ).get_random()
+        ).get()
 
     @property
     def interpretation_space(self) -> Space:
@@ -74,7 +74,7 @@ class MonitoringView(View):
                 for space in self.input_spaces
                 if space.parent_concept.name == "interpretation"
             }
-        ).get_random()
+        ).get()
 
     @property
     def raw_input_in_view(self) -> StructureCollection:

@@ -46,13 +46,13 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion.size = 1
     champion.quality = 1.0
     champion.activation = 1.0
-    champion.start.arguments.get_random.return_value = start_argument
+    champion.start.arguments.get.return_value = start_argument
     champion.parent_view = view
 
     challenger.size = 1
     challenger.quality = 1.0
     challenger.activation = 1.0
-    challenger.start.arguments.get_random.return_value = start_argument
+    challenger.start.arguments.get.return_value = start_argument
     challenger.parent_view = view
 
     champion.start.correspondences_to_space.return_value = StructureCollection(
@@ -116,14 +116,14 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         champion.size = 1
         champion.quality = champion_quality
         champion.activation = champion_activation
-        champion.start.arguments.get_random.return_value = start_argument
+        champion.start.arguments.get.return_value = start_argument
         champion.parent_view = view
 
         challenger = Mock()
         challenger.size = 1
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
-        challenger.start.arguments.get_random.return_value = start_argument
+        challenger.start.arguments.get.return_value = start_argument
         challenger.parent_view = view
 
         selector = CorrespondenceSelector(

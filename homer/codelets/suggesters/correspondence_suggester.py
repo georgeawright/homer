@@ -5,9 +5,8 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure import Structure
-from homer.structure_collection import StructureCollection
-from homer.structures import Space, View
+from homer.structure_collection_keys import activation, corresponding_exigency, exigency
+from homer.structures import Space
 from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
@@ -69,19 +68,19 @@ class CorrespondenceSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get_active()
+        target_view = bubble_chamber.production_views.get(key=activation)
         target_space = (
-            target_view.input_working_spaces.get_random()
+            target_view.input_working_spaces.get()
             .contents.of_type(Space)
             .where(is_basic_level=True)
-            .get_active()
+            .get(key=activation)
         )
         target = (
             target_space.contents.not_of_type(Space)
             .not_of_type(Correspondence)
-            .get_exigent()
+            .get(key=corresponding_exigency)
         )
-        urgency = urgency if urgency is not None else target.exigency
+        urgency = urgency if urgency is not None else target.uncorrespondedness
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -105,19 +104,19 @@ class CorrespondenceSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get_active()
+        target_view = bubble_chamber.production_views.get(key=activation)
         target_space = (
-            target_view.input_working_spaces.get_random()
+            target_view.input_working_spaces.get()
             .contents.of_type(Space)
             .where(is_basic_level=True)
-            .get_active()
+            .get(key=activation)
         )
         target = (
             target_space.contents.not_of_type(Space)
             .not_of_type(Correspondence)
-            .get_exigent()
+            .get(key=corresponding_exigency)
         )
-        urgency = urgency if urgency is not None else target.exigency
+        urgency = urgency if urgency is not None else target.uncorrespondedness
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -150,13 +149,14 @@ class CorrespondenceSuggester(Suggester):
         if self.target_space_two is None:
             try:
                 self.target_space_two = (
-                    self.target_view.input_spaces.get_active(
-                        exclude=list(self.target_space_one.parent_spaces)
+                    self.target_view.input_spaces.get(
+                        key=activation,
+                        exclude=list(self.target_space_one.parent_spaces),
                     )
                     .contents.of_type(WorkingSpace)
                     .where(is_basic_level=True)
                     .where(conceptual_space=self.target_space_one.conceptual_space)
-                    .get_random()
+                    .get()
                 )
                 self._target_structures["target_space_two"] = self.target_space_two
             except MissingStructureError:
@@ -165,7 +165,7 @@ class CorrespondenceSuggester(Suggester):
             if self.target_structure_two is None:
                 self.target_structure_two = self.target_space_two.contents.of_type(
                     type(self.target_structure_one)
-                ).get_exigent()
+                ).get(key=exigency)
                 self._target_structures[
                     "target_structure_two"
                 ] = self.target_structure_two
@@ -182,9 +182,9 @@ class CorrespondenceSuggester(Suggester):
             self.parent_concept = (
                 self.bubble_chamber.spaces["correspondential concepts"]
                 .contents.of_type(ConceptualSpace)
-                .get_random()
+                .get()
                 .contents.of_type(Concept)
-                .get_random()
+                .get()
             )
             self._target_structures["parent_concept"] = self.parent_concept
         if self.target_view.has_member(

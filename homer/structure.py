@@ -102,6 +102,22 @@ class Structure(ABC):
         return statistics.fmean([self.activation, self.unhappiness])
 
     @property
+    def chunking_exigency(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean([self.activation, self.unchunkedness])
+
+    @property
+    def labeling_exigency(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean([self.activation, self.unlabeledness])
+
+    @property
+    def relating_exigency(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean([self.activation, self.unrelatedness])
+
+    @property
+    def corresponding_exigency(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean([self.activation, self.uncorrespondedness])
+
+    @property
     def quality(self) -> FloatBetweenOneAndZero:
         return self._quality
 
@@ -119,16 +135,25 @@ class Structure(ABC):
 
     @property
     def unhappiness(self) -> FloatBetweenOneAndZero:
-        # probably should just return unlinkedness
-        return statistics.fmean([self.unchunkedness, self.unlinkedness])
+        return statistics.fmean(
+            [self.unlabeledness, self.unrelatedness, self.uncorrespondedness]
+        )
 
     @property
     def unchunkedness(self) -> FloatBetweenOneAndZero:
         return 0
 
     @property
-    def unlinkedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** sum(link.activation for link in self.links)
+    def unlabeledness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** sum(link.activation for link in self.labels)
+
+    @property
+    def unrelatedness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** sum(link.activation for link in self.relations)
+
+    @property
+    def uncorrespondedness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** sum(link.activation for link in self.correspondences)
 
     @property
     def links(self) -> StructureCollection:
@@ -295,7 +320,7 @@ class Structure(ABC):
     ) -> Structure:
         return self.relations.where(
             parent_space=space, parent_concept=concept, start=start, end=end
-        ).get_random()
+        ).get()
 
     def has_correspondence(
         self, space: Structure, concept: Structure, second_argument: Structure

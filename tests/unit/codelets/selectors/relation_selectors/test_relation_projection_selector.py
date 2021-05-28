@@ -15,13 +15,13 @@ def target_view():
     existing_correspondence = Mock()
     existing_correspondence.name = "existing correspondence"
     existing_chunk = Mock()
-    existing_chunk.unlinkedness = 0.5
+    existing_chunk.unrelatedness = 0.5
     existing_word = Mock()
     existing_correspondence.arguments = StructureCollection(
         {existing_chunk, existing_word}
     )
     potential_relating_word = Mock()
-    potential_relating_word.unlinkedness = 0.5
+    potential_relating_word.uncorrespondedness = 0.5
     potential_relating_word.has_correspondence_to_space.return_value = False
     existing_word.potential_relating_words = StructureCollection(
         {potential_relating_word}

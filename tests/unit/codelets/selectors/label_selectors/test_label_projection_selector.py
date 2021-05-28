@@ -12,7 +12,7 @@ from homer.tools import hasinstance
 @pytest.fixture
 def target_view():
     potential_labeling_word = Mock()
-    potential_labeling_word.unlinkedness = 0.5
+    potential_labeling_word.uncorrespondedness = 0.5
     potential_labeling_word.correspondences_to_space.return_value = StructureCollection(
         {Mock()}
     )
@@ -23,7 +23,7 @@ def target_view():
     correspondence = Mock()
     correspondence.name = "existing correspondence"
     chunk = Mock()
-    chunk.unlinkedness = 0.5
+    chunk.unlabeledness = 0.5
     chunk.name = "existing chunk"
     correspondence.arguments = StructureCollection({chunk, word})
     chunk.is_chunk = True

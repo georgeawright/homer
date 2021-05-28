@@ -19,9 +19,9 @@ def bubble_chamber():
     target_one.members = StructureCollection({target_two, target_three})
     target_two.members = StructureCollection({Mock(), Mock()})
     target_three.members = StructureCollection({Mock(), Mock()})
-    target_one.unhappiness = 1.0
-    target_two.unhappiness = 1.0
-    target_three.unhappiness = 1.0
+    target_one.unchunkedness = 1.0
+    target_two.unchunkedness = 1.0
+    target_three.unchunkedness = 1.0
     chamber.text_fragments = StructureCollection({target_one, target_two, target_three})
     target_one.potential_rule_mates = StructureCollection({target_two, target_three})
     target_two.potential_rule_mates = StructureCollection({target_one, target_three})
@@ -32,10 +32,10 @@ def bubble_chamber():
 def test_finds_challenger_when_not_given_one(bubble_chamber):
     word = Mock()
     word.is_word = True
-    word.unhappiness = 1.0
+    word.unchunkedness = 1.0
     phrase = Mock()
     phrase.is_phrase = True
-    phrase.unhappiness = 1.0
+    phrase.unchunkedness = 1.0
     word.potential_rule_mates = StructureCollection({phrase})
     phrase.potential_rule_mates = StructureCollection({word})
     text_space = Mock()
@@ -58,7 +58,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
         challenger.quality = 1.0
         challenger.activation = 1.0
         collection = Mock()
-        collection.get_active.return_value = challenger
+        collection.get.return_value = challenger
         champion.nearby.return_value = collection
         selector = PhraseSelector(
             Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
@@ -90,10 +90,10 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
 ):
     word = Mock()
     word.is_word = True
-    word.unhappiness = 1.0
+    word.unchunkedness = 1.0
     phrase = Mock()
     phrase.is_phrase = True
-    phrase.unhappiness = 1.0
+    phrase.unchunkedness = 1.0
     word.potential_rule_mates = StructureCollection({phrase})
     phrase.potential_rule_mates = StructureCollection({word})
     text_space = Mock()

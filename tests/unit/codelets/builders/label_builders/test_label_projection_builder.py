@@ -11,7 +11,6 @@ from homer.structures.links import Label
 @pytest.fixture
 def target_view():
     potential_labeling_word = Mock()
-    potential_labeling_word.unlinkedness = 0.5
     potential_labeling_word.correspondences_to_space.return_value = StructureCollection(
         {Mock()}
     )
@@ -22,7 +21,6 @@ def target_view():
     correspondence = Mock()
     correspondence.name = "existing correspondence"
     chunk = Mock()
-    chunk.unlinkedness = 0.5
     chunk.name = "existing chunk"
     correspondence.arguments = StructureCollection({chunk, word})
     chunk.is_chunk = True
@@ -64,7 +62,7 @@ def parent_concept(bubble_chamber):
 def target_word(bubble_chamber, parent_concept):
     word = Mock()
     word.correspondences_to_space.return_value = StructureCollection()
-    word.lexeme.concepts.get_random.return_value = parent_concept
+    word.lexeme.concepts.get.return_value = parent_concept
     return word
 
 

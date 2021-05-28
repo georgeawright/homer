@@ -1,37 +1,18 @@
-import statistics
-
-from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters.chunk_suggesters import ChunkProjectionSuggester
 from homer.codelets.selectors import ChunkSelector
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
 
 
 class ChunkProjectionSelector(ChunkSelector):
-    @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        target_view = bubble_chamber.monitoring_views.get_active()
-        target_chunk = (
-            target_view.interpretation_space.contents.where(is_chunk=True)
-            .where_not(members=StructureCollection())
-            .get_random()
-        )
-        target_correspondence = target_chunk.correspondences_to_space(
-            target_view.text_space
-        ).get_random()
-        target_structures = StructureCollection({target_chunk, target_correspondence})
-        urgency = statistics.fmean(
-            [structure.activation for structure in target_structures]
-        )
-        return cls.spawn(parent_id, bubble_chamber, target_structures, urgency)
-
     def _passes_preliminary_checks(self):
         if self.challengers is not None:
             return True
         try:
-            champion_chunk = self.champions.where(is_chunk=True).get_random()
-            challenger_chunk = champion_chunk.nearby().get_active()
-            challenger_correspondence = challenger_chunk.correspondences.get_random()
+            champion_chunk = self.champions.where(is_chunk=True).get()
+            challenger_chunk = champion_chunk.nearby().get(key=activation)
+            challenger_correspondence = challenger_chunk.correspondences.get()
             self.challengers = StructureCollection(
                 {challenger_chunk, challenger_correspondence}
             )
@@ -51,9 +32,7 @@ class ChunkProjectionSelector(ChunkSelector):
         raise NotImplementedError
 
     def _engender_follow_up(self):
-        target_view = (
-            self.winners.where(is_correspondence=True).get_random().parent_view
-        )
+        target_view = self.winners.where(is_correspondence=True).get().parent_view
         self.child_codelets.append(
             ChunkProjectionSuggester.make(
                 self.codelet_id, self.bubble_chamber, target_view=target_view
@@ -70,8 +49,8 @@ class ChunkProjectionSelector(ChunkSelector):
 
     @property
     def _champions_size(self):
-        return self.champions.where(is_chunk=True).get_random().size
+        return self.champions.where(is_chunk=True).get().size
 
     @property
     def _challengers_size(self):
-        return self.challengers.where(is_chunk=True).get_random().size
+        return self.challengers.where(is_chunk=True).get().size

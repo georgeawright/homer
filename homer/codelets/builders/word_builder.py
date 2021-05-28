@@ -56,24 +56,6 @@ class WordBuilder(Builder):
             urgency,
         )
 
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        target_view: View = None,
-        urgency: float = None,
-    ):
-        target_view = (
-            target_view
-            if target_view is not None
-            else bubble_chamber.views.get_active()
-        )
-        frame = target_view.input_spaces.of_type(Frame).get_random()
-        target_word = frame.contents.of_type(Word).get_exigent()
-        urgency = urgency if urgency is not None else target_view.activation
-        return cls.spawn(parent_id, bubble_chamber, target_view, target_word, urgency)
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]
@@ -102,7 +84,7 @@ class WordBuilder(Builder):
             word_concept = self.target_view.slot_values[
                 self.word_correspondee.structure_id
             ]
-            lexeme = word_concept.lexemes.get_random()
+            lexeme = word_concept.lexemes.get()
             word_form = self.target_word.word_form
             self.target_view.slot_values[self.target_word.structure_id] = lexeme.forms[
                 word_form

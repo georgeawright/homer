@@ -6,9 +6,12 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import View
+from homer.structure_collection_keys import (
+    activation,
+    corresponding_exigency,
+    labeling_exigency,
+)
 from homer.structures.links import Label
-from homer.structures.nodes import Chunk, Word
 from homer.structures.views import MonitoringView
 
 
@@ -61,17 +64,17 @@ class LabelProjectionSuggester(LabelSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = (
-            bubble_chamber.monitoring_views.get_active()
+            bubble_chamber.monitoring_views.get(key=activation)
             if target_view is None
             else target_view
         )
         target_chunk = target_view.interpretation_space.contents.where(
             is_chunk=True
-        ).get_unhappy()
+        ).get(key=labeling_exigency)
         potential_labeling_words = (
             target_chunk.correspondences_to_space(target_view.text_space)
-            .get_random()
-            .arguments.get_random(exclude=[target_chunk])
+            .get()
+            .arguments.get(exclude=[target_chunk])
             .potential_labeling_words
         )
         target_word = StructureCollection(
@@ -79,19 +82,19 @@ class LabelProjectionSuggester(LabelSuggester):
                 word
                 for word in potential_labeling_words
                 if all(
-                    not isinstance(
-                        correspondence.arguments.get_random(exclude=[word]), Label
-                    )
+                    not isinstance(correspondence.arguments.get(exclude=[word]), Label)
                     for correspondence in word.correspondences_to_space(
                         target_view.interpretation_space
                     )
                 )
             }
-        ).get_unhappy()
+        ).get(key=corresponding_exigency)
         urgency = (
             urgency
             if urgency is not None
-            else statistics.fmean([target_chunk.unlinkedness, target_word.unlinkedness])
+            else statistics.fmean(
+                [target_chunk.unlabeledness, target_word.uncorrespondedness]
+            )
         )
         return cls.spawn(
             parent_id,
@@ -119,13 +122,13 @@ class LabelProjectionSuggester(LabelSuggester):
         self.target_word = self._target_structures["target_word"]
         self.target_chunk = self._target_structures["target_chunk"]
         try:
-            self.parent_concept = self.target_word.lexeme.concepts.get_random()
+            self.parent_concept = self.target_word.lexeme.concepts.get()
             self._target_structures["parent_concept"] = self.parent_concept
         except MissingStructureError:
             return False
         return not self.target_chunk.has_label(self.parent_concept) and all(
             not isinstance(
-                correspondence.arguments.get_random(exclude=[self.target_word]), Label
+                correspondence.arguments.get(exclude=[self.target_word]), Label
             )
             for correspondence in self.target_word.correspondences_to_space(
                 self.target_view.interpretation_space

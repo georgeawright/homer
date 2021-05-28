@@ -4,6 +4,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Factory
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
 from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
 
@@ -37,7 +38,7 @@ class ConceptDrivenFactory(Factory):
             self._get_correspondential_concepts(),
             self._get_label_concepts(),
             self._get_relational_concepts(),
-        ).get_active()
+        ).get(key=activation)
 
     def _get_follow_up_class(self, parent_concept: Concept):
         action_concept = self.bubble_chamber.concepts["suggest"]

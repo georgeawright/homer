@@ -23,7 +23,7 @@ class Evaluator(Codelet):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
         self.target_structures = target_structures
-        self.original_confidence = target_structures.get_random().quality
+        self.original_confidence = target_structures.get().quality
         self.confidence = 0
         self.change_in_confidence = 0
 

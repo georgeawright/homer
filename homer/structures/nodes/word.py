@@ -1,4 +1,5 @@
 from __future__ import annotations
+from math import prod
 import random
 from typing import Union
 
@@ -63,6 +64,12 @@ class Word(Node):
     @property
     def concepts(self):
         return self.lexeme.concepts
+
+    @property
+    def unchunkedness(self):
+        if len(self.super_phrases) == 0:
+            return 1
+        return 0.5 * prod([chunk.unchunkedness for chunk in self.super_phrases])
 
     @property
     def potential_rule_mates(self) -> StructureCollection:
@@ -187,13 +194,13 @@ class Word(Node):
         if len(words) == 1:
             raise MissingStructureError
         for _ in range(len(words)):
-            word = words.get_random(exclude=[self])
+            word = words.get(exclude=[self])
             distance = abs(
                 word.location.coordinates[0][0] - self.location.coordinates[0][0]
             )
             if 1 / distance + random.random() >= 1:
                 return word
-        return words.get_random(exclude=[self])
+        return words.get(exclude=[self])
 
     def copy(self, **kwargs: dict) -> Word:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""

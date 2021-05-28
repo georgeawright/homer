@@ -3,15 +3,14 @@ import statistics
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluators import PhraseEvaluator
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
 
 
 class PhraseProjectionEvaluator(PhraseEvaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        view = bubble_chamber.discourse_views.get_random()
-        target_correspondence = view.members.where(
-            end_space=view.output_space
-        ).get_random()
+        view = bubble_chamber.discourse_views.get(key=activation)
+        target_correspondence = view.members.where(end_space=view.output_space).get()
         target_phrase = target_correspondence.end
         target_correspondences = target_phrase.correspondences.where(end=target_phrase)
         targets = StructureCollection.union(
@@ -38,7 +37,7 @@ class PhraseProjectionEvaluator(PhraseEvaluator):
 
     def _calculate_confidence(self):
         correspondences = self.target_structures.where(is_correspondence=True)
-        target_view = correspondences.get_random().parent_view
+        target_view = correspondences.get().parent_view
         correspondence_starts = StructureCollection(
             {correspondence.start for correspondence in correspondences}
         )
@@ -47,7 +46,7 @@ class PhraseProjectionEvaluator(PhraseEvaluator):
         correspondence = (
             correspondence_start_1.correspondences_with(correspondence_start_2)
             .where(parent_view=target_view)
-            .get_random()
+            .get()
         )
         self.confidence = correspondence.quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

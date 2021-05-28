@@ -59,9 +59,7 @@ class Suggester(Codelet):
 
     @property
     def _parent_link(self):
-        return self._structure_concept.relations_with(
-            self._suggest_concept
-        ).get_random()
+        return self._structure_concept.relations_with(self._suggest_concept).get()
 
     @property
     def _suggest_concept(self):

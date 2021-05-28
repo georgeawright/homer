@@ -9,7 +9,7 @@ class SimplexViewEvaluator(ViewEvaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["view-simplex"]
-        target = bubble_chamber.simplex_views.get_active()
+        target = bubble_chamber.simplex_views.get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -26,10 +26,10 @@ class SimplexViewEvaluator(ViewEvaluator):
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["view-simplex"]
-        return structure_concept.relations_with(self._evaluate_concept).get_random()
+        return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_view = self.target_structures.get_random()
+        target_view = self.target_structures.get()
         proportion_of_slots_filled = len(target_view.slot_values) / len(
             target_view.slots
         )

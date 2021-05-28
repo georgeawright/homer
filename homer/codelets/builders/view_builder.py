@@ -1,6 +1,4 @@
 from __future__ import annotations
-from abc import abstractclassmethod
-import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
@@ -42,10 +40,6 @@ class ViewBuilder(Builder):
             target_spaces,
             urgency,
         )
-
-    @abstractclassmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
-        pass
 
     @property
     def _structure_concept(self):
