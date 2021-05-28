@@ -171,6 +171,7 @@ class DjangoLogger(Logger):
             coderack_record.codelets_run.append(self.codelets_run)
             coderack_record.population.append(len(coderack._codelets))
             coderack_record.satisfaction.append(coderack.bubble_chamber.satisfaction)
+            coderack_record.result = coderack.bubble_chamber.result
             coderack_record.save()
         except CoderackRecord.DoesNotExist:
             CoderackRecord.objects.create(
