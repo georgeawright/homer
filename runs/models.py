@@ -56,7 +56,9 @@ class CoderackRecord(models.Model):
     codelets_run = models.JSONField("Codelets Run")
     population = models.JSONField("Population")
     satisfaction = models.JSONField("Satisfaction")
-    result = models.CharField("result", max_length=MAX_STRING_LENGTH)
+    result = models.CharField(
+        "result", max_length=MAX_STRING_LENGTH, blank=True, null=True
+    )
 
 
 class EventRecord(models.Model):
