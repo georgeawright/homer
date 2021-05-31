@@ -34,16 +34,11 @@ class CorrespondenceSelector(Selector):
         winner_correspondence = self.winners.get()
         target_view = winner_correspondence.parent_view
         try:
-            if isinstance(winner_correspondence.start, Node):
-                target_structure_one = winner_correspondence.start.links.not_of_type(
-                    Correspondence
-                ).get(key=corresponding_exigency)
-            else:
-                target_structure_one = (
-                    winner_correspondence.start.arguments.get()
-                    .links.not_of_type(Correspondence)
-                    .get(key=corresponding_exigency)
-                )
+            target_structure_one = (
+                winner_correspondence.start.arguments.get()
+                .links.where(is_correspondence=False)
+                .get(key=corresponding_exigency)
+            )
             target_space_one = target_structure_one.parent_space
             target_conceptual_space = target_space_one.conceptual_space
             target_space_two = (
@@ -55,19 +50,12 @@ class CorrespondenceSelector(Selector):
                 .where(conceptual_space=target_conceptual_space)
                 .get()
             )
-            if isinstance(winner_correspondence.end, Node):
-                target_structure_two = (
-                    winner_correspondence.end.links.of_type(type(target_structure_one))
-                    .where(parent_space=target_space_two)
-                    .get()
-                )
-            else:
-                target_structure_two = (
-                    winner_correspondence.end.arguments.get()
-                    .links.of_type(type(target_structure_one))
-                    .where(parent_space=target_space_two)
-                    .get(key=corresponding_exigency)
-                )
+            target_structure_two = (
+                winner_correspondence.end.arguments.get()
+                .links.of_type(type(target_structure_one))
+                .where(parent_space=target_space_two)
+                .get(key=corresponding_exigency)
+            )
             target_concept = winner_correspondence.parent_concept.friends().get()
         except MissingStructureError:
             return

@@ -7,7 +7,7 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.selectors import CorrespondenceSelector
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence, Relation
+from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
@@ -85,13 +85,18 @@ def end_space():
 def start(start_space):
     chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock(), Mock())
     chunk.locations.append(Location([1, 1], start_space))
-    return chunk
+    label = Label(Mock(), Mock(), chunk, Mock(), start_space, Mock())
+    chunk.links_out.add(label)
+    return label
 
 
 @pytest.fixture
-def end():
+def end(end_space):
     chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock(), Mock())
-    return chunk
+    chunk.locations.append(Location([], end_space))
+    label = Label(Mock(), Mock(), chunk, Mock(), end_space, Mock())
+    chunk.links_out.add(label)
+    return label
 
 
 @pytest.fixture

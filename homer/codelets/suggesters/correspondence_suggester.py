@@ -75,10 +75,8 @@ class CorrespondenceSuggester(Suggester):
             .where(is_basic_level=True)
             .get(key=activation)
         )
-        target = (
-            target_space.contents.not_of_type(Space)
-            .not_of_type(Correspondence)
-            .get(key=corresponding_exigency)
+        target = target_space.contents.where(is_link=True, is_correspondence=False).get(
+            key=corresponding_exigency
         )
         urgency = urgency if urgency is not None else target.uncorrespondedness
         return cls.spawn(
@@ -111,10 +109,8 @@ class CorrespondenceSuggester(Suggester):
             .where(is_basic_level=True)
             .get(key=activation)
         )
-        target = (
-            target_space.contents.not_of_type(Space)
-            .not_of_type(Correspondence)
-            .get(key=corresponding_exigency)
+        target = target_space.contents.where(is_link=True, is_correspondence=False).get(
+            key=corresponding_exigency
         )
         urgency = urgency if urgency is not None else target.uncorrespondedness
         return cls.spawn(

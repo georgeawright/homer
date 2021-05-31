@@ -1,6 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
 
 
 class CorrespondenceEvaluator(Evaluator):
@@ -13,7 +14,8 @@ class CorrespondenceEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["correspondence"]
-        target = bubble_chamber.correspondences.get()
+        view = bubble_chamber.production_views.get(key=activation)
+        target = view.members.where(start_space=view.raw_input_space).get()
         return cls.spawn(
             parent_id,
             bubble_chamber,

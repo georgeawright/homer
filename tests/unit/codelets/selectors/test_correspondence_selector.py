@@ -28,6 +28,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     new_space_one.parent_spaces = StructureCollection({space_1})
     new_space_one.conceptual_space = new_conceptual_space
     new_space_two = Mock()
+    new_space_two.parent_spaces = StructureCollection({space_2})
     new_space_two.conceptual_space = new_conceptual_space
     new_space_two.is_basic_level = True
     space_2.contents.of_type.return_value = StructureCollection({new_space_two})
@@ -36,9 +37,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     view.input_spaces = StructureCollection({space_1, space_2})
 
     start_argument = Mock()
-    start_argument.links.not_of_type.return_value = StructureCollection(
-        {new_target_one}
-    )
+    start_argument.links.where.return_value = StructureCollection({new_target_one})
     start_argument.parent_space = new_space_one
 
     champion = Mock()
@@ -93,26 +92,28 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
 
         new_conceptual_space = Mock()
         new_target_one = Mock()
+        new_target_one.name = "target1"
         new_target_two = Mock()
         new_space_one = Mock()
         new_target_one.parent_space = new_space_one
         new_space_one.parent_spaces = StructureCollection({space_1})
         new_space_one.conceptual_space = new_conceptual_space
         new_space_two = Mock()
+        new_space_two.parent_spaces = StructureCollection({space_2})
         new_space_two.conceptual_space = new_conceptual_space
         new_space_two.is_basic_level = True
         space_2.contents.of_type.return_value = StructureCollection({new_space_two})
 
         view = Mock()
+        view.name = "view"
         view.input_spaces = StructureCollection({space_1, space_2})
 
         start_argument = Mock()
-        start_argument.links.not_of_type.return_value = StructureCollection(
-            {new_target_one}
-        )
+        start_argument.links.where.return_value = StructureCollection({new_target_one})
         start_argument.parent_space = new_space_one
 
         champion = Mock()
+        champion.name = "champion"
         champion.size = 1
         champion.quality = champion_quality
         champion.activation = champion_activation
@@ -120,6 +121,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         champion.parent_view = view
 
         challenger = Mock()
+        challenger.name = "challenger"
         challenger.size = 1
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
