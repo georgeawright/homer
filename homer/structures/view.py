@@ -36,6 +36,16 @@ class View(Structure):
         self.is_view = True
 
     @property
+    def raw_input_space(self) -> Space:
+        return StructureCollection(
+            {
+                space
+                for space in self.input_spaces
+                if space.parent_concept.name == "input"
+            }
+        ).get()
+
+    @property
     def input_working_spaces(self):
         return StructureCollection(
             {space for space in self.input_spaces if not isinstance(space, Frame)}
