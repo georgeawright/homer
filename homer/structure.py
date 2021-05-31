@@ -41,9 +41,21 @@ class Structure(ABC):
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
         self._parent_space = None
         self._parent_concept = None
+
+        self.is_node = False
+        self.is_chunk = False
         self.is_phrase = False
         self.is_word = False
+        self.is_link = False
+        self.is_correspondence = False
+        self.is_label = False
+        self.is_relation = False
+        self.is_view = False
+        self.is_space = False
+        self.is_conceptual_space = False
+        self.is_working_space = False
         self.is_frame = False
+        self.is_template = False
 
     @classmethod
     def get_builder_class(cls):
