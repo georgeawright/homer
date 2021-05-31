@@ -1,4 +1,4 @@
-random import
+import random
 import statistics
 
 from homer import Homer, StructureCollection
