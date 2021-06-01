@@ -61,10 +61,7 @@ class LabelProjectionBuilder(LabelBuilder):
         self.target_view = self._target_structures["target_view"]
         self.target_chunk = self._target_structures["target_chunk"]
         self.target_word = self._target_structures["target_word"]
-        try:
-            self.parent_concept = self.target_word.lexeme.concepts.get()
-        except MissingStructureError:
-            return False
+        self.parent_concept = self._target_structures["parent_concept"]
         return not self.target_chunk.has_label(self.parent_concept) and all(
             not isinstance(
                 correspondence.arguments.get(exclude=[self.target_word]), Label
@@ -81,11 +78,11 @@ class LabelProjectionBuilder(LabelBuilder):
         self.bubble_chamber.logger.log(space)
         if self.target_chunk not in space.contents:
             if self.parent_concept.relevant_value == "value":
-                self.target_chunk.value = self.parent_concept.value
+                self.target_chunk.value = self.parent_concept.prototype
             elif self.parent_concept.relevant_value == "coordinates":
                 self.target_chunk.location_in_space(
                     self.target_view.interpretation_space
-                ).coordinates = self.parent_concept.value
+                ).coordinates = self.parent_concept.prototype
             project_item_into_space(self.target_chunk, space)
         label = Label(
             structure_id=ID.new(Label),
@@ -96,6 +93,7 @@ class LabelProjectionBuilder(LabelBuilder):
             quality=0,
         )
         self.target_chunk.links_out.add(label)
+        self.bubble_chamber.logger.log(label)
         start_space = self.target_word.parent_space
         end_space = space
         correspondence = Correspondence(

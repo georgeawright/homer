@@ -83,7 +83,9 @@ class Node(Structure):
         nearby_nodes.remove(self)
         return nearby_nodes
 
-    def get_potential_relative(self, space: Space = None) -> Node:
+    def get_potential_relative(
+        self, space: Space = None, concept: "Concept" = None
+    ) -> Node:
         raise NotImplementedError
 
     def __repr__(self) -> str:

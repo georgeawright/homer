@@ -10,6 +10,8 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
 
+from .concept import Concept
+
 
 class Chunk(Node):
     def __init__(
@@ -78,7 +80,9 @@ class Chunk(Node):
             [chunk.unchunkedness for chunk in self.chunks_made_from_this_chunk]
         )
 
-    def get_potential_relative(self, space: Space = None) -> Chunk:
+    def get_potential_relative(
+        self, space: Space = None, concept: Concept = None
+    ) -> Chunk:
         space = self.parent_space if space is None else space
         chunks = space.contents.where(is_chunk=True)
         if len(chunks) == 1:

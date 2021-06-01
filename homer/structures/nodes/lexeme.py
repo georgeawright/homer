@@ -53,5 +53,20 @@ class Lexeme(Node):
             {link.start for link in self.links_in if isinstance(link.start, Concept)}
         )
 
+    @property
+    def syntactic_concepts(self) -> StructureCollection:
+        return StructureCollection(
+            {
+                concept
+                for concept in self.concepts
+                if concept.parent_space.name == "grammar"
+                or concept.parent_space.name == "dependency"
+            }
+        )
+
+    @property
+    def semantic_concepts(self) -> StructureCollection:
+        return StructureCollection.difference(self.concepts, self.syntactic_concepts)
+
     def get_form(self, form: WordForm) -> str:
         return self.forms[form]

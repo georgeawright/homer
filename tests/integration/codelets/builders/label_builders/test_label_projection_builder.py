@@ -298,7 +298,13 @@ def target_word(text_space, noun, adj_concept, hot_concept):
 
 
 def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreated(
-    bubble_chamber, target_view, target_chunk, noun, target_word
+    bubble_chamber,
+    target_view,
+    target_chunk,
+    noun,
+    target_word,
+    hot_concept,
+    south_concept,
 ):
     parent_id = ""
     urgency = 1.0
@@ -309,6 +315,7 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
             "target_view": target_view,
             "target_chunk": target_chunk,
             "target_word": target_word,
+            "parent_concept": hot_concept,
         },
         urgency,
     )
@@ -324,6 +331,7 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
             "target_view": target_view,
             "target_chunk": target_chunk,
             "target_word": noun,
+            "parent_concept": south_concept,
         },
         urgency,
     )
@@ -339,6 +347,7 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
             "target_view": target_view,
             "target_chunk": target_chunk,
             "target_word": target_word,
+            "parent_concept": hot_concept,
         },
         urgency,
     )

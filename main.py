@@ -176,6 +176,7 @@ def setup_homer() -> Homer:
     text_concept = homer.def_concept(
         name="text",
         parent_space=structures_space,
+        relevant_value="coordinates",
         instance_type=str,
     )
     discourse_concept = homer.def_concept(
@@ -508,7 +509,7 @@ def setup_homer() -> Homer:
                         kwargs["start"].has_label(adj_concept)
                         or kwargs["start"].has_label(jjr_concept)
                     )
-                    and kwargs["start"].has_relation_with_name("cop")
+                    and kwargs["start"].has_relation_with_name("cop_r")
                 ),
                 lambda kwargs: kwargs["end"].location.coordinates[0][0]
                 < kwargs["start"].location.coordinates[0][0],
@@ -639,6 +640,7 @@ def setup_homer() -> Homer:
         },
         parent_concept=more,
     )
+    homer.def_concept_link(adv_concept, more_lexeme)
     less = homer.def_concept(
         name="less",
         prototype=[[-4]],
@@ -661,6 +663,7 @@ def setup_homer() -> Homer:
         },
         parent_concept=less,
     )
+    homer.def_concept_link(adv_concept, less_lexeme)
     same_different_concept = homer.def_concept(
         name="same-different",
         parent_space=correspondential_concepts_space,
@@ -721,6 +724,7 @@ def setup_homer() -> Homer:
         },
         parent_concept=hot,
     )
+    homer.def_concept_link(adj_concept, hot_lexeme)
     warm = homer.def_concept(
         name="warm",
         prototype=[[16]],
@@ -744,6 +748,7 @@ def setup_homer() -> Homer:
         },
         parent_concept=warm,
     )
+    homer.def_concept_link(adj_concept, warm_lexeme)
     mild = homer.def_concept(
         name="mild",
         prototype=[[10]],
@@ -767,6 +772,7 @@ def setup_homer() -> Homer:
         },
         parent_concept=mild,
     )
+    homer.def_concept_link(adj_concept, mild_lexeme)
     cold = homer.def_concept(
         name="cold",
         prototype=[[4]],
@@ -790,6 +796,7 @@ def setup_homer() -> Homer:
         },
         parent_concept=cold,
     )
+    homer.def_concept_link(adj_concept, cold_lexeme)
     location_concept = homer.def_concept(
         name="location",
         parent_space=label_concepts_space,
@@ -867,6 +874,10 @@ def setup_homer() -> Homer:
         },
         parent_concept=north,
     )
+    homer.def_concept_link(adj_concept, north_lexeme)
+    homer.def_concept_link(noun_concept, north_lexeme)
+    homer.def_concept_link(nsubj_concept, north_lexeme)
+    homer.def_concept_link(pobj_concept, north_lexeme)
     south = homer.def_concept(
         name="south",
         prototype=[[5, 2]],
@@ -889,6 +900,10 @@ def setup_homer() -> Homer:
         },
         parent_concept=south,
     )
+    homer.def_concept_link(adj_concept, south_lexeme)
+    homer.def_concept_link(noun_concept, south_lexeme)
+    homer.def_concept_link(nsubj_concept, south_lexeme)
+    homer.def_concept_link(pobj_concept, south_lexeme)
     east = homer.def_concept(
         name="east",
         prototype=[[2.5, 4]],
@@ -911,6 +926,10 @@ def setup_homer() -> Homer:
         },
         parent_concept=east,
     )
+    homer.def_concept_link(adj_concept, east_lexeme)
+    homer.def_concept_link(noun_concept, east_lexeme)
+    homer.def_concept_link(nsubj_concept, east_lexeme)
+    homer.def_concept_link(pobj_concept, east_lexeme)
     west = homer.def_concept(
         name="west",
         prototype=[[2.5, 0]],
@@ -933,6 +952,10 @@ def setup_homer() -> Homer:
         },
         parent_concept=west,
     )
+    homer.def_concept_link(adj_concept, west_lexeme)
+    homer.def_concept_link(noun_concept, west_lexeme)
+    homer.def_concept_link(nsubj_concept, west_lexeme)
+    homer.def_concept_link(pobj_concept, west_lexeme)
     northwest = homer.def_concept(
         name="northwest",
         prototype=[[0, 0]],
@@ -955,6 +978,10 @@ def setup_homer() -> Homer:
         },
         parent_concept=northwest,
     )
+    homer.def_concept_link(adj_concept, northwest_lexeme)
+    homer.def_concept_link(noun_concept, northwest_lexeme)
+    homer.def_concept_link(nsubj_concept, northwest_lexeme)
+    homer.def_concept_link(pobj_concept, northwest_lexeme)
     northeast = homer.def_concept(
         name="northeast",
         prototype=[[0, 4]],
@@ -977,6 +1004,10 @@ def setup_homer() -> Homer:
         },
         parent_concept=northeast,
     )
+    homer.def_concept_link(adj_concept, northeast_lexeme)
+    homer.def_concept_link(noun_concept, northeast_lexeme)
+    homer.def_concept_link(nsubj_concept, northeast_lexeme)
+    homer.def_concept_link(pobj_concept, northeast_lexeme)
     southwest = homer.def_concept(
         name="southwest",
         prototype=[[5, 0]],
@@ -999,6 +1030,10 @@ def setup_homer() -> Homer:
         },
         parent_concept=southwest,
     )
+    homer.def_concept_link(adj_concept, southwest_lexeme)
+    homer.def_concept_link(noun_concept, southwest_lexeme)
+    homer.def_concept_link(nsubj_concept, southwest_lexeme)
+    homer.def_concept_link(pobj_concept, southwest_lexeme)
     southeast = homer.def_concept(
         name="southeast",
         prototype=[[5, 4]],
@@ -1021,6 +1056,10 @@ def setup_homer() -> Homer:
         },
         parent_concept=southeast,
     )
+    homer.def_concept_link(adj_concept, southeast_lexeme)
+    homer.def_concept_link(noun_concept, southeast_lexeme)
+    homer.def_concept_link(nsubj_concept, southeast_lexeme)
+    homer.def_concept_link(pobj_concept, southeast_lexeme)
     midlands = homer.def_concept(
         name="midlands",
         prototype=[[2.5, 2]],
@@ -1043,48 +1082,65 @@ def setup_homer() -> Homer:
         },
         parent_concept=midlands,
     )
+    homer.def_concept_link(adj_concept, midlands_lexeme)
+    homer.def_concept_link(noun_concept, midlands_lexeme)
+    homer.def_concept_link(nsubj_concept, midlands_lexeme)
+    homer.def_concept_link(pobj_concept, midlands_lexeme)
     the_lexeme = homer.def_lexeme(
         headword="the",
         forms={WordForm.HEADWORD: "the"},
         parts_of_speech={WordForm.HEADWORD: [det_concept]},
         parent_concept=None,
     )
+    homer.def_concept_link(det_concept, midlands_lexeme)
+    homer.def_concept_link(det_r_concept, midlands_lexeme)
     is_lexeme = homer.def_lexeme(
         headword="is",
         forms={WordForm.HEADWORD: "is"},
         parts_of_speech={WordForm.HEADWORD: [cop_concept]},
         parent_concept=None,
     )
+    homer.def_concept_link(cop_concept, midlands_lexeme)
+    homer.def_concept_link(cop_r_concept, midlands_lexeme)
     it_lexeme = homer.def_lexeme(
         headword="it",
         forms={WordForm.HEADWORD: "it"},
         parts_of_speech={WordForm.HEADWORD: [noun_concept]},
         parent_concept=None,
     )
+    homer.def_concept_link(noun_concept, midlands_lexeme)
+    homer.def_concept_link(nsubj_concept, midlands_lexeme)
+    homer.def_concept_link(pobj_concept, midlands_lexeme)
     in_lexeme = homer.def_lexeme(
         headword="in",
         forms={WordForm.HEADWORD: "in"},
         parts_of_speech={WordForm.HEADWORD: [prep_concept]},
         parent_concept=None,
     )
+    homer.def_concept_link(prep_concept, midlands_lexeme)
+    homer.def_concept_link(prep_r_concept, midlands_lexeme)
     than_lexeme = homer.def_lexeme(
         headword="than",
         forms={WordForm.HEADWORD: "than"},
         parts_of_speech={WordForm.HEADWORD: [prep_concept]},
         parent_concept=None,
     )
+    homer.def_concept_link(prep_concept, midlands_lexeme)
+    homer.def_concept_link(prep_r_concept, midlands_lexeme)
     and_lexeme = homer.def_lexeme(
         headword="and",
         forms={WordForm.HEADWORD: "and"},
         parts_of_speech={WordForm.HEADWORD: [conj_concept]},
         parent_concept=None,
     )
+    homer.def_concept_link(conj_concept, midlands_lexeme)
     comma_lexeme = homer.def_lexeme(
         headword=",",
         forms={WordForm.HEADWORD: ","},
         parts_of_speech={WordForm.HEADWORD: [conj_concept]},
         parent_concept=None,
     )
+    homer.def_concept_link(conj_concept, midlands_lexeme)
     template_1 = homer.def_template(
         name="the [location] is [temperature]",
         parent_concept=text_concept,

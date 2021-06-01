@@ -11,6 +11,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
 from homer.word_form import WordForm
 
+from .concept import Concept
 from .lexeme import Lexeme
 
 
@@ -188,7 +189,9 @@ class Word(Node):
         )
         return StructureCollection.union(nsubj_words, pobj_words, dep_words)
 
-    def get_potential_relative(self, space: Space = None) -> Word:
+    def get_potential_relative(
+        self, space: Space = None, concept: Concept = None
+    ) -> Word:
         space = self.parent_space if space is None else space
         words = space.contents.where(is_word=True)
         if len(words) == 1:
@@ -198,7 +201,10 @@ class Word(Node):
             distance = abs(
                 word.location.coordinates[0][0] - self.location.coordinates[0][0]
             )
-            if 1 / distance + random.random() >= 1:
+            if (
+                concept in word.lexeme.syntactic_concepts
+                and 1 / distance + random.random() >= 1
+            ):
                 return word
         return words.get(exclude=[self])
 
