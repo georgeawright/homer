@@ -77,13 +77,28 @@ class LabelSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target = StructureCollection(
+        potential_targets = StructureCollection(
             {
                 node
                 for node in bubble_chamber.input_nodes
                 if isinstance(node.value, parent_concept.instance_type)
             }
-        ).get(key=labeling_exigency)
+        )
+        if parent_concept.instance_type == list:
+            target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
+        else:
+            target = StructureCollection(
+                {
+                    target
+                    for target in potential_targets
+                    if parent_concept
+                    in [
+                        concept
+                        for list_of_concepts in target.lexeme.parts_of_speech.values()
+                        for concept in list_of_concepts
+                    ]
+                }
+            ).get(key=labeling_exigency)
         urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(
             parent_id,
