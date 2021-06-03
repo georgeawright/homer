@@ -83,7 +83,7 @@ def end_space():
 
 @pytest.fixture
 def start(start_space):
-    chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), [], Mock(), Mock(), Mock())
     chunk.locations.append(Location([1, 1], start_space))
     label = Label(Mock(), Mock(), chunk, Mock(), start_space, Mock())
     chunk.links_out.add(label)
@@ -92,7 +92,7 @@ def start(start_space):
 
 @pytest.fixture
 def end(end_space):
-    chunk = Chunk(Mock(), Mock(), Mock(), [], Mock(), Mock(), Mock())
+    chunk = Chunk(Mock(), Mock(), [], Mock(), Mock(), Mock())
     chunk.locations.append(Location([], end_space))
     label = Label(Mock(), Mock(), chunk, Mock(), end_space, Mock())
     chunk.links_out.add(label)

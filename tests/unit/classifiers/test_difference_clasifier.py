@@ -12,9 +12,13 @@ def test_classify(start_value, end_value, expected):
     scalar_classifier.classify = lambda **x: 1 if x["start"].value[0][0] > 0 else 0
     classifier = DifferenceClassifier(scalar_classifier)
     start = Mock()
-    start.value = start_value
+    start_location = Mock()
+    start_location.coordinates = start_value
+    start.location_in_space.return_value = start_location
     end = Mock()
-    end.value = end_value
+    end_location = Mock()
+    end_location.coordinates = end_value
+    end.location_in_space.return_value = end_location
     space = Mock()
     space.parent_concept.relevant_value = "value"
     assert expected == classifier.classify(start=start, end=end, space=space)

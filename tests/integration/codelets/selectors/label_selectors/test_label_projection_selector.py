@@ -68,7 +68,6 @@ def view(bubble_chamber):
     existing_chunk = Chunk(
         "",
         "",
-        Mock(),
         [Location([], interpretation_space)],
         Mock(),
         interpretation_space,

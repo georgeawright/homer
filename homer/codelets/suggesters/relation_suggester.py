@@ -1,6 +1,8 @@
+import statistics
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
-from homer.errors import MissingStructureError
+from homer.errors import MissingStructureError, NoLocationError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
@@ -86,6 +88,7 @@ class RelationSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
+        print(f"making top down relation suggester for {parent_concept}")
         target_space = StructureCollection(
             {
                 space
@@ -98,15 +101,37 @@ class RelationSuggester(Suggester):
             target_space.contents.where(is_chunk=True),
             target_space.contents.where(is_word=True),
         )
-        target = potential_targets.get(key=relating_exigency)
-        urgency = urgency if urgency is not None else target.unrelatedness
+        if parent_concept.instance_type == list:
+            target_structure_one = potential_targets.get(key=relating_exigency)
+            target_structure_two = target_structure_one.get_potential_relative(
+                space=target_space, concept=parent_concept
+            )
+        else:
+            try:
+                target_structure_one = potential_targets.get(
+                    key=lambda x: parent_concept.proximity_to_start(x)
+                )
+                target_structure_two = potential_targets.get(
+                    key=lambda x: parent_concept.proximity_to_end(
+                        x, start=target_structure_one.location_in_space(target_space)
+                    )
+                )
+            except NoLocationError:
+                raise MissingStructureError
+        urgency = (
+            urgency
+            if urgency is not None
+            else statistics.fmean(
+                [target_structure_one.unrelatedness, target_structure_two.unrelatedness]
+            )
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,
             {
                 "target_space": target_space,
-                "target_structure_one": target,
-                "target_structure_two": None,
+                "target_structure_one": target_structure_one,
+                "target_structure_two": target_structure_two,
                 "parent_concept": parent_concept,
             },
             urgency,
@@ -117,24 +142,21 @@ class RelationSuggester(Suggester):
         return self.bubble_chamber.concepts["relation"]
 
     def _passes_preliminary_checks(self):
+        print(f"suggesting relation {self.codelet_id} spawned by {self.parent_id}")
         self.target_space = self._target_structures["target_space"]
         self.target_structure_one = self._target_structures["target_structure_one"]
         self.target_structure_two = self._target_structures["target_structure_two"]
         self.parent_concept = self._target_structures["parent_concept"]
-        if self.target_structure_two is None:
-            try:
-                self.target_structure_two = (
-                    self.target_structure_one.get_potential_relative(
-                        space=self.target_space
-                    )
-                )
-            except MissingStructureError:
-                return False
+        print(f"    target space: {self.target_space}")
+        print(f"    target structure one: {self.target_structure_one}")
+        print(f"    target structure two: {self.target_structure_two}")
+        print(f"    parent concept: {self.parent_concept}")
         if self.parent_concept is None:
             try:
                 relational_conceptual_spaces = self.bubble_chamber.spaces[
                     "relational concepts"
                 ].contents.of_type(ConceptualSpace)
+                print(relational_conceptual_spaces)
                 compatible_conceptual_spaces = StructureCollection(
                     {
                         space
@@ -142,10 +164,26 @@ class RelationSuggester(Suggester):
                         if space.is_compatible_with(self.target_space)
                     }
                 )
+                print(
+                    f"    compatible conceptual spaces: {compatible_conceptual_spaces}"
+                )
+                print(compatible_conceptual_spaces.get().contents)
                 self.parent_concept = (
                     compatible_conceptual_spaces.get().contents.of_type(Concept).get()
                 )
+                print(f"    found parent concept: {self.parent_concept}")
             except MissingStructureError:
+                return False
+        if self.target_structure_two is None:
+            try:
+                self.target_structure_two = (
+                    self.target_structure_one.get_potential_relative(
+                        space=self.target_space, concept=self.parent_concept
+                    )
+                )
+                print(f"    found target structure two: {self.target_structure_two}")
+            except MissingStructureError:
+                print("    couldn't find second target structure")
                 return False
         self._target_structures["target_structure_two"] = self.target_structure_two
         self._target_structures["parent_concept"] = self.parent_concept
@@ -163,6 +201,7 @@ class RelationSuggester(Suggester):
             start=self.target_structure_one,
             end=self.target_structure_two,
         )
+        print(f"    confidence: {self.confidence}")
 
     def _fizzle(self):
         pass

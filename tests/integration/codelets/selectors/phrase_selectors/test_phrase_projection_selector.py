@@ -187,7 +187,6 @@ def good_phrase_projection(
     chunk = Chunk(
         "",
         "",
-        "word word",
         [Location([[0], [1]], parent_view.output_space)],
         StructureCollection({word_1, word_2}),
         parent_view.output_space,
@@ -270,7 +269,6 @@ def bad_phrase_projection(
     chunk = Chunk(
         "",
         "",
-        "word word",
         [Location([[0], [1]], parent_view.output_space)],
         StructureCollection({word_1, word_2}),
         parent_view.output_space,

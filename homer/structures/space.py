@@ -22,6 +22,7 @@ class Space(Structure):
         sub_spaces: List[Space],
         quality: FloatBetweenOneAndZero,
         is_basic_level: bool = False,
+        is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
@@ -43,6 +44,7 @@ class Space(Structure):
         self._dimensions = dimensions
         self.sub_spaces = sub_spaces
         self.is_basic_level = is_basic_level
+        self.is_symbolic = is_symbolic
         self.super_space_to_coordinate_function_map = (
             (super_space_to_coordinate_function_map)
             if super_space_to_coordinate_function_map is not None
@@ -59,31 +61,34 @@ class Space(Structure):
         return self._dimensions
 
     def add(self, structure: Structure):
-        self.contents.add(structure)
         location_in_this_space = structure.location_in_space(self)
-        for sub_space in self.sub_spaces:
-            location_in_sub_space = sub_space.location_from_super_space_location(
-                location_in_this_space
-            )
-            structure.locations.append(location_in_sub_space)
-            sub_space.add(structure)
-            structure.parent_spaces.add(sub_space)
+        if structure not in self.contents:
+            self.contents.add(structure)
+            for sub_space in self.sub_spaces:
+                location_in_sub_space = sub_space.location_from_super_space_location(
+                    location_in_this_space
+                )
+                structure.locations.append(location_in_sub_space)
+                sub_space.add(structure)
 
     def is_compatible_with(self, other: Space) -> bool:
         return self.parent_concept.is_compatible_with(other.parent_concept)
 
     def location_from_super_space_location(self, location: Location) -> Location:
-        coordinates_function = self.super_space_to_coordinate_function_map[
-            location.space.name
-        ]
-        coordinates = coordinates_function(location)
+        if location.coordinates[0][0] is None:
+            coordinates = [[None for _ in range(self.no_of_dimensions)]]
+        else:
+            coordinates_function = self.super_space_to_coordinate_function_map[
+                location.space.name
+            ]
+            coordinates = coordinates_function(location)
         return Location(coordinates, self)
 
     def distance_between(self, a: Structure, b: Structure):
-        return self.parent_concept.distance_between(a, b)
+        return self.parent_concept.distance_between(a, b, space=self)
 
     def proximity_between(self, a: Structure, b: Structure):
-        return self.parent_concept.proximity_between(a, b)
+        return self.parent_concept.proximity_between(a, b, space=self)
 
     def __repr__(self) -> str:
         return f"<{self.structure_id} {self.name}>"

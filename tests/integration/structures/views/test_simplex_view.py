@@ -26,7 +26,6 @@ def test_copy():
     working_chunk = Chunk(
         "",
         "",
-        Mock(),
         [Location([], working_input), Location([], working_temperature_space)],
         Mock(),
         working_input,
@@ -55,7 +54,6 @@ def test_copy():
     frame_chunk = Chunk(
         "",
         "",
-        None,
         [Location([], frame_input), Location([], frame_temperature_space)],
         Mock(),
         working_input,
@@ -122,7 +120,6 @@ def test_copy():
     replacement_chunk = Chunk(
         "",
         "",
-        Mock(),
         [Location([], working_input), Location([], working_temperature_space)],
         Mock(),
         working_input,

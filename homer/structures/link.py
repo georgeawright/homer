@@ -37,6 +37,8 @@ class Link(Structure):
 
     @property
     def parent_space(self) -> Space:
+        if len(self.locations) == 0:
+            return None
         return self.locations[0].space
 
     @property

@@ -5,10 +5,9 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import labeling_exigency
-from homer.structures.nodes import Concept
+from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace
 
 
@@ -81,10 +80,10 @@ class LabelSuggester(Suggester):
             {
                 node
                 for node in bubble_chamber.input_nodes
-                if isinstance(node.value, parent_concept.instance_type)
+                if isinstance(node, parent_concept.instance_type)
             }
         )
-        if parent_concept.instance_type == list:
+        if parent_concept.instance_type == Chunk:
             target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
         else:
             target = StructureCollection(
@@ -128,15 +127,10 @@ class LabelSuggester(Suggester):
                 self.bubble_chamber.spaces["label concepts"]
                 .contents.of_type(ConceptualSpace)
                 .where(is_basic_level=True)
-                .where(instance_type=type(self.target_node.value))
+                .where(instance_type=type(self.target_node))
                 .get()
             )
-            location = Location(
-                getattr(
-                    self.target_node, conceptual_space.parent_concept.relevant_value
-                ),
-                conceptual_space,
-            )
+            location = self.target_node.location_in_conceptual_space(conceptual_space)
             try:
                 self.parent_concept = (
                     conceptual_space.contents.of_type(Concept)

@@ -1,16 +1,10 @@
 from __future__ import annotations
-import math
-import statistics
-from typing import List, Set
+from typing import List
 
-from .hyper_parameters import HyperParameters
 from .tools import average_vector
 
 
 class Location:
-
-    NEARNESS = HyperParameters.HOW_FAR_IS_NEAR
-
     def __init__(self, coordinates: List[List[float]], space: "Space"):
         self.coordinates = coordinates
         self.space = space
@@ -43,6 +37,7 @@ class Location:
     def is_near(self, other: Location) -> bool:
         if self.space != other.space:
             return False
-        self_average_location = average_vector(self.coordinates)
-        other_average_location = average_vector(other.coordinates)
-        return math.dist(self_average_location, other_average_location) <= self.NEARNESS
+        distance = self.space.parent_concept.distance_function(
+            self.coordinates, other.coordinates
+        )
+        return distance <= self.space.parent_concept.distance_to_proximity_weight

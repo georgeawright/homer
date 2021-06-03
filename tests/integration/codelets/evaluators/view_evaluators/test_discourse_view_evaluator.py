@@ -50,8 +50,24 @@ def bubble_chamber():
 
 
 @pytest.fixture
-def good_view(bubble_chamber):
-    slot = Chunk(Mock(), Mock(), None, Mock(), Mock(), Mock(), Mock())
+def temperature_space():
+    space = WorkingSpace(
+        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), 1, [], []
+    )
+    return space
+
+
+@pytest.fixture
+def good_view(bubble_chamber, temperature_space):
+    slot = Chunk(
+        Mock(),
+        Mock(),
+        [Location([[None]], temperature_space)],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
     input_space = WorkingSpace(
         Mock(),
         Mock(),
@@ -107,8 +123,16 @@ def good_view(bubble_chamber):
 
 
 @pytest.fixture
-def bad_view(bubble_chamber):
-    slot = Chunk(Mock(), Mock(), None, Mock(), Mock(), Mock(), Mock())
+def bad_view(bubble_chamber, temperature_space):
+    slot = Chunk(
+        Mock(),
+        Mock(),
+        [Location([[None]], temperature_space)],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
     input_space = WorkingSpace(
         Mock(),
         Mock(),

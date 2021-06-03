@@ -194,17 +194,12 @@ class DjangoLogger(Logger):
                 structure_id=structure.structure_id,
                 run_id=self.run,
                 time_created=self.codelets_run,
-                value=structure.value,
                 locations={},
                 activation={},
                 unhappiness={},
                 quality={},
             )
-            self._log_message(
-                f"{structure.structure_id} created "
-                + f" by {structure.parent_id} - value: {structure.value}; "
-                + f"location: {structure.location}; activation: {structure.activation}"
-            )
+            self._log_message(f"Created {structure}")
             if structure.parent_id != "":
                 parent_codelet = CodeletRecord.objects.get(
                     codelet_id=structure.parent_id, run_id=self.run
@@ -217,6 +212,8 @@ class DjangoLogger(Logger):
                     structure_id=structure_record.id,
                     action="Created",
                 )
+            if hasattr(structure, "value"):
+                structure_record.value = structure.value
             if hasattr(structure, "no_of_dimensions"):
                 structure_record.no_of_dimensions = structure.no_of_dimensions
             if hasattr(structure, "is_basic_level"):

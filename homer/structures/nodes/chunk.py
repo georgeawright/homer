@@ -1,7 +1,7 @@
 from __future__ import annotations
 from math import prod
 import random
-from typing import Any, List
+from typing import List
 
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -18,7 +18,6 @@ class Chunk(Node):
         self,
         structure_id: str,
         parent_id: str,
-        value: Any,
         locations: List[Location],
         members: StructureCollection,
         parent_space: Space,
@@ -32,7 +31,6 @@ class Chunk(Node):
             self,
             structure_id,
             parent_id,
-            value=value,
             locations=locations,
             parent_space=parent_space,
             quality=quality,
@@ -116,7 +114,6 @@ class Chunk(Node):
         new_chunk = Chunk(
             ID.new(Chunk),
             parent_id,
-            value=self.value,
             locations=locations,
             members=StructureCollection(),
             parent_space=parent_space,

@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.location import Location
+from homer.tools import centroid_euclidean_distance
 
 
 @pytest.mark.parametrize(
@@ -68,8 +69,9 @@ def test_eq(self_coordinates, other_coordinates, expected):
     ],
 )
 def test_is_near(self_coordinates, other_coordinates, nearness, expected):
-    Location.NEARNESS = nearness
     space = Mock()
+    space.parent_concept.distance_to_proximity_weight = nearness
+    space.parent_concept.distance_function = centroid_euclidean_distance
     location_1 = Location(self_coordinates, space)
     location_2 = Location(other_coordinates, space)
     assert expected == location_1.is_near(location_2)

@@ -34,7 +34,7 @@ class ConceptDrivenFactory(Factory):
 
     def _get_parent_concept(self) -> Concept:
         return StructureCollection.union(
-            self.bubble_chamber.rules,
+            # self.bubble_chamber.rules,
             self._get_correspondential_concepts(),
             self._get_label_concepts(),
             self._get_relational_concepts(),

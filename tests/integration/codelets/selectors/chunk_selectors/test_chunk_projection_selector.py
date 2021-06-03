@@ -11,6 +11,7 @@ from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.nodes import Chunk, Concept, Lexeme, Word
 from homer.structures.spaces import WorkingSpace
 from homer.structures.views import MonitoringView
+from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
 
@@ -90,11 +91,23 @@ def bubble_chamber(target_view, noun_concept):
 
 @pytest.fixture
 def target_space():
+    parent_concept = Concept(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        centroid_euclidean_distance,
+        distance_to_proximity_weight=1.5,
+    )
     space = WorkingSpace(
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        parent_concept,
         Mock(),
         [],
         StructureCollection(),
@@ -118,7 +131,6 @@ def chunk_members():
 @pytest.fixture
 def good_structures(target_space, chunk_members, target_view):
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([[0, 0]], target_space)],
@@ -149,7 +161,6 @@ def good_structures(target_space, chunk_members, target_view):
 @pytest.fixture
 def bad_structures(target_space, chunk_members, target_view):
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([[0, 1]], target_space)],

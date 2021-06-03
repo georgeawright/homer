@@ -12,6 +12,7 @@ from homer.classifiers import (
 )
 from homer.id import ID
 from homer.location import Location
+from homer.locations import TwoPointLocation
 
 random.seed(123)
 from homer.loggers import DjangoLogger
@@ -42,7 +43,6 @@ def setup_homer() -> Homer:
     input_concept = homer.def_concept(
         name="input",
         parent_space=top_level_conceptual_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     input_space = homer.def_working_space(
@@ -176,13 +176,13 @@ def setup_homer() -> Homer:
     text_concept = homer.def_concept(
         name="text",
         parent_space=structures_space,
-        relevant_value="coordinates",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     discourse_concept = homer.def_concept(
         name="discourse",
         parent_space=structures_space,
-        instance_type=str,
+        instance_type=Word,
     )
     label_concepts_space = homer.def_conceptual_space(
         name="label concepts",
@@ -281,11 +281,44 @@ def setup_homer() -> Homer:
 
     # Grammatical Knowledge
 
+    grammar_vectors = {
+        "sentence": [],
+        "np": [],
+        "vp": [],
+        "ap": [],
+        "pp": [],
+        "noun": [],
+        "verb": [],
+        "adj": [],
+        "jjr": [],
+        "adv": [],
+        "cop": [],
+        "prep": [],
+        "det": [],
+        "conj": [],
+        "null": [],
+    }
+    for index, concept in enumerate(grammar_vectors):
+        grammar_vectors[concept] = [0 for _ in grammar_vectors]
+        grammar_vectors[concept][index] = 1
+
+    dependency_vectors = {
+        "det_r": [],
+        "nsubj": [],
+        "cop_r": [],
+        "prep_r": [],
+        "pobj": [],
+        "dep": [],
+    }
+    for index, concept in enumerate(dependency_vectors):
+        dependency_vectors[concept] = [0 for _ in dependency_vectors]
+        dependency_vectors[concept][index] = 1
+
     grammar_concept = homer.def_concept(
         name="grammar",
         parent_space=label_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     grammatical_concepts_space = homer.def_conceptual_space(
         name="grammar",
@@ -293,105 +326,121 @@ def setup_homer() -> Homer:
         locations=[Location([], label_concepts_space)],
         no_of_dimensions=1,
         is_basic_level=True,
+        is_symbolic=True,
     )
     sentence_concept = homer.def_concept(
         name="s",
+        locations=[Location([grammar_vectors["sentence"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     np_concept = homer.def_concept(
         name="np",
+        locations=[Location([grammar_vectors["np"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     vp_concept = homer.def_concept(
         name="vp",
+        locations=[Location([grammar_vectors["vp"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     ap_concept = homer.def_concept(
         name="ap",
+        locations=[Location([grammar_vectors["ap"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     pp_concept = homer.def_concept(
         name="pp",
+        locations=[Location([grammar_vectors["pp"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     noun_concept = homer.def_concept(
         name="noun",
+        locations=[Location([grammar_vectors["noun"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     verb_concept = homer.def_concept(
         name="verb",
+        locations=[Location([grammar_vectors["verb"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     adj_concept = homer.def_concept(
         name="adj",
+        locations=[Location([grammar_vectors["adj"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     jjr_concept = homer.def_concept(
         name="jjr",
+        locations=[Location([grammar_vectors["jjr"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     adv_concept = homer.def_concept(
         name="adv",
+        locations=[Location([grammar_vectors["adv"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     cop_concept = homer.def_concept(
         name="cop",
+        locations=[Location([grammar_vectors["cop"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     prep_concept = homer.def_concept(
         name="prep",
+        locations=[Location([grammar_vectors["prep"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     det_concept = homer.def_concept(
         name="det",
+        locations=[Location([grammar_vectors["det"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     conj_concept = homer.def_concept(
         name="conj",
+        locations=[Location([grammar_vectors["conj"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
         classifier=PartOfSpeechClassifier(),
+        distance_function=centroid_euclidean_distance,
     )
     null_concept = homer.def_concept(
         name="null",
+        locations=[Location([grammar_vectors["null"]], grammatical_concepts_space)],
         parent_space=grammatical_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     s_np_vp = homer.def_rule(
         name="s --> np, vp",
@@ -466,13 +515,11 @@ def setup_homer() -> Homer:
         right_branch=np_concept,
         stable_activation=1.0,
     )
-    # TODO: add dependency relation concepts to grammar and relational concepts space
-    # see tests for rule classifier
     dependency_concept = homer.def_concept(
         name="dependency",
         parent_space=relational_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        instance_type=Word,
+        distance_function=centroid_euclidean_distance,
     )
     dependency_concepts_space = homer.def_conceptual_space(
         name="dependency",
@@ -480,12 +527,23 @@ def setup_homer() -> Homer:
         locations=[Location([], relational_concepts_space)],
         no_of_dimensions=1,
         is_basic_level=True,
+        is_symbolic=True,
     )
     det_r_concept = homer.def_concept(
         name="det_r",
-        parent_space=dependency_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        locations=[
+            TwoPointLocation(
+                [grammar_vectors["noun"]],
+                [grammar_vectors["det"]],
+                grammatical_concepts_space,
+            ),
+            Location(
+                [dependency_vectors["det_r"]],
+                dependency_concepts_space,
+            ),
+        ],
+        parent_space=grammatical_concepts_space,
+        instance_type=Word,
         classifier=RuleClassifier(
             [
                 lambda kwargs: kwargs["start"].location.coordinates[0][0]
@@ -494,12 +552,33 @@ def setup_homer() -> Homer:
                 lambda kwargs: kwargs["end"].has_label(det_concept),
             ]
         ),
+        distance_function=centroid_euclidean_distance,
     )
     nsubj_concept = homer.def_concept(
         name="nsubj",
-        parent_space=dependency_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        locations=[
+            TwoPointLocation(
+                [grammar_vectors["verb"]],
+                [grammar_vectors["noun"]],
+                grammatical_concepts_space,
+            ),
+            TwoPointLocation(
+                [grammar_vectors["adj"]],
+                [grammar_vectors["noun"]],
+                grammatical_concepts_space,
+            ),
+            TwoPointLocation(
+                [grammar_vectors["jjr"]],
+                [grammar_vectors["noun"]],
+                grammatical_concepts_space,
+            ),
+            Location(
+                [dependency_vectors["nsubj"]],
+                dependency_concepts_space,
+            ),
+        ],
+        parent_space=grammatical_concepts_space,
+        instance_type=Word,
         classifier=RuleClassifier(
             [
                 lambda kwargs: kwargs["end"].has_label(noun_concept),
@@ -515,12 +594,28 @@ def setup_homer() -> Homer:
                 < kwargs["start"].location.coordinates[0][0],
             ]
         ),
+        distance_function=centroid_euclidean_distance,
     )
     cop_r_concept = homer.def_concept(
         name="cop_r",
-        parent_space=dependency_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        locations=[
+            TwoPointLocation(
+                [grammar_vectors["adj"]],
+                [grammar_vectors["cop"]],
+                grammatical_concepts_space,
+            ),
+            TwoPointLocation(
+                [grammar_vectors["jjr"]],
+                [grammar_vectors["cop"]],
+                grammatical_concepts_space,
+            ),
+            Location(
+                [dependency_vectors["cop_r"]],
+                dependency_concepts_space,
+            ),
+        ],
+        parent_space=grammatical_concepts_space,
+        instance_type=Word,
         classifier=RuleClassifier(
             [
                 lambda kwargs: kwargs["end"].has_label(cop_concept),
@@ -530,12 +625,33 @@ def setup_homer() -> Homer:
                 == kwargs["end"].location.coordinates[0][0] + 1,
             ]
         ),
+        distance_function=centroid_euclidean_distance,
     )
     prep_r_concept = homer.def_concept(
         name="prep_r",
-        parent_space=dependency_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        locations=[
+            TwoPointLocation(
+                [grammar_vectors["verb"]],
+                [grammar_vectors["prep"]],
+                grammatical_concepts_space,
+            ),
+            TwoPointLocation(
+                [grammar_vectors["adj"]],
+                [grammar_vectors["prep"]],
+                grammatical_concepts_space,
+            ),
+            TwoPointLocation(
+                [grammar_vectors["jjr"]],
+                [grammar_vectors["prep"]],
+                grammatical_concepts_space,
+            ),
+            Location(
+                [dependency_vectors["prep_r"]],
+                dependency_concepts_space,
+            ),
+        ],
+        parent_space=grammatical_concepts_space,
+        instance_type=Word,
         classifier=RuleClassifier(
             [
                 lambda kwargs: kwargs["end"].has_label(prep_concept),
@@ -551,12 +667,23 @@ def setup_homer() -> Homer:
                 < kwargs["end"].location.coordinates[0][0],
             ]
         ),
+        distance_function=centroid_euclidean_distance,
     )
     pobj_concept = homer.def_concept(
         name="pobj",
-        parent_space=dependency_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        locations=[
+            TwoPointLocation(
+                [grammar_vectors["prep"]],
+                [grammar_vectors["noun"]],
+                grammatical_concepts_space,
+            ),
+            Location(
+                [dependency_vectors["pobj"]],
+                dependency_concepts_space,
+            ),
+        ],
+        parent_space=grammatical_concepts_space,
+        instance_type=Word,
         classifier=RuleClassifier(
             [
                 lambda kwargs: kwargs["end"].has_label(noun_concept),
@@ -565,12 +692,23 @@ def setup_homer() -> Homer:
                 < kwargs["end"].location.coordinates[0][0],
             ]
         ),
+        distance_function=centroid_euclidean_distance,
     )
     dep_concept = homer.def_concept(
         name="dep",
-        parent_space=dependency_concepts_space,
-        relevant_value="value",
-        instance_type=str,
+        locations=[
+            TwoPointLocation(
+                [grammar_vectors["prep"]],
+                [grammar_vectors["noun"]],
+                grammatical_concepts_space,
+            ),
+            Location(
+                [dependency_vectors["dep"]],
+                dependency_concepts_space,
+            ),
+        ],
+        parent_space=grammatical_concepts_space,
+        instance_type=Word,
         classifier=RuleClassifier(
             [
                 lambda kwargs: kwargs["end"].has_label(noun_concept),
@@ -583,6 +721,7 @@ def setup_homer() -> Homer:
                 > kwargs["start"].location.coordinates[0][0],
             ]
         ),
+        distance_function=centroid_euclidean_distance,
     )
 
     homer.def_concept_link(det_concept, det_r_concept, activation=1.0)
@@ -606,68 +745,64 @@ def setup_homer() -> Homer:
 
     # Domain Specific Knowledge
 
-    more_less_concept = homer.def_concept(
-        name="more-less",
-        parent_space=relational_concepts_space,
-        relevant_value="value",
-        distance_function=centroid_euclidean_distance,
-    )
-    more_less_space = homer.def_conceptual_space(
-        name="more-less",
-        locations=[Location([], relational_concepts_space)],
-        parent_concept=more_less_concept,
-        is_basic_level=True,
-    )
-    more = homer.def_concept(
-        name="more",
-        prototype=[[4]],
-        classifier=DifferenceClassifier(ProximityClassifier()),
-        parent_space=more_less_space,
-        relevant_value="value",
-        distance_function=centroid_euclidean_distance,
-    )
-    more_lexeme = homer.def_lexeme(
-        headword="more",
-        forms={
-            WordForm.HEADWORD: "more",
-            WordForm.COMPARATIVE: "more",
-            WordForm.SUPERLATIVE: "most",
-        },
-        parts_of_speech={
-            WordForm.HEADWORD: [adv_concept],
-            WordForm.COMPARATIVE: [adv_concept],
-            WordForm.SUPERLATIVE: [adv_concept],
-        },
-        parent_concept=more,
-    )
-    homer.def_concept_link(adv_concept, more_lexeme)
-    less = homer.def_concept(
-        name="less",
-        prototype=[[-4]],
-        classifier=DifferenceClassifier(ProximityClassifier()),
-        parent_space=more_less_space,
-        relevant_value="value",
-        distance_function=centroid_euclidean_distance,
-    )
-    less_lexeme = homer.def_lexeme(
-        headword="less",
-        forms={
-            WordForm.HEADWORD: "less",
-            WordForm.COMPARATIVE: "less",
-            WordForm.SUPERLATIVE: "least",
-        },
-        parts_of_speech={
-            WordForm.HEADWORD: [adv_concept],
-            WordForm.COMPARATIVE: [adv_concept],
-            WordForm.SUPERLATIVE: [adv_concept],
-        },
-        parent_concept=less,
-    )
-    homer.def_concept_link(adv_concept, less_lexeme)
+    #    more_less_concept = homer.def_concept(
+    #        name="more-less",
+    #        parent_space=relational_concepts_space,
+    #        distance_function=centroid_euclidean_distance,
+    #    )
+    #    more_less_space = homer.def_conceptual_space(
+    #        name="more-less",
+    #        locations=[Location([], relational_concepts_space)],
+    #        parent_concept=more_less_concept,
+    #        is_basic_level=True,
+    #    )
+    #    more = homer.def_concept(
+    #        name="more",
+    #        locations=[Location([[4]], more_less_space)],
+    #        classifier=DifferenceClassifier(ProximityClassifier()),
+    #        parent_space=more_less_space,
+    #        distance_function=centroid_euclidean_distance,
+    #    )
+    #    more_lexeme = homer.def_lexeme(
+    #        headword="more",
+    #        forms={
+    #            WordForm.HEADWORD: "more",
+    #            WordForm.COMPARATIVE: "more",
+    #            WordForm.SUPERLATIVE: "most",
+    #        },
+    #        parts_of_speech={
+    #            WordForm.HEADWORD: [adv_concept],
+    #            WordForm.COMPARATIVE: [adv_concept],
+    #            WordForm.SUPERLATIVE: [adv_concept],
+    #        },
+    #        parent_concept=more,
+    #    )
+    #    homer.def_concept_link(adv_concept, more_lexeme)
+    #    less = homer.def_concept(
+    #        name="less",
+    #        locations=[Location([[-4]], more_less_space)],
+    #        classifier=DifferenceClassifier(ProximityClassifier()),
+    #        parent_space=more_less_space,
+    #        distance_function=centroid_euclidean_distance,
+    #    )
+    #    less_lexeme = homer.def_lexeme(
+    #        headword="less",
+    #        forms={
+    #            WordForm.HEADWORD: "less",
+    #            WordForm.COMPARATIVE: "less",
+    #            WordForm.SUPERLATIVE: "least",
+    #        },
+    #        parts_of_speech={
+    #            WordForm.HEADWORD: [adv_concept],
+    #            WordForm.COMPARATIVE: [adv_concept],
+    #            WordForm.SUPERLATIVE: [adv_concept],
+    #        },
+    #        parent_concept=less,
+    #    )
+    #    homer.def_concept_link(adv_concept, less_lexeme)
     same_different_concept = homer.def_concept(
         name="same-different",
         parent_space=correspondential_concepts_space,
-        relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
     same_different_space = homer.def_conceptual_space(
@@ -691,7 +826,6 @@ def setup_homer() -> Homer:
     temperature_concept = homer.def_concept(
         name="temperature",
         parent_space=label_concepts_space,
-        relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
     temperature_space = homer.def_conceptual_space(
@@ -703,13 +837,12 @@ def setup_homer() -> Homer:
     )
     hot = homer.def_concept(
         name="hot",
-        prototype=[[22]],
+        locations=[Location([[22]], temperature_space)],
         classifier=ProximityClassifier(),
         parent_space=temperature_space,
-        relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
-    homer.def_concept_link(hot, more)
+    # homer.def_concept_link(hot, more)
     hot_lexeme = homer.def_lexeme(
         headword="hot",
         forms={
@@ -724,16 +857,15 @@ def setup_homer() -> Homer:
         },
         parent_concept=hot,
     )
-    homer.def_concept_link(adj_concept, hot_lexeme)
+    # homer.def_concept_link(adj_concept, hot_lexeme)
     warm = homer.def_concept(
         name="warm",
-        prototype=[[16]],
+        locations=[Location([[16]], temperature_space)],
         classifier=ProximityClassifier(),
         parent_space=temperature_space,
-        relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
-    homer.def_concept_link(warm, more)
+    # homer.def_concept_link(warm, more)
     warm_lexeme = homer.def_lexeme(
         headword="warm",
         forms={
@@ -748,16 +880,15 @@ def setup_homer() -> Homer:
         },
         parent_concept=warm,
     )
-    homer.def_concept_link(adj_concept, warm_lexeme)
+    # homer.def_concept_link(adj_concept, warm_lexeme)
     mild = homer.def_concept(
         name="mild",
-        prototype=[[10]],
+        locations=[Location([[10]], temperature_space)],
         classifier=ProximityClassifier(),
         parent_space=temperature_space,
-        relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
-    homer.def_concept_link(mild, less)
+    # homer.def_concept_link(mild, less)
     mild_lexeme = homer.def_lexeme(
         headword="mild",
         forms={
@@ -772,16 +903,15 @@ def setup_homer() -> Homer:
         },
         parent_concept=mild,
     )
-    homer.def_concept_link(adj_concept, mild_lexeme)
+    # homer.def_concept_link(adj_concept, mild_lexeme)
     cold = homer.def_concept(
         name="cold",
-        prototype=[[4]],
+        locations=[Location([[4]], temperature_space)],
         classifier=ProximityClassifier(),
         parent_space=temperature_space,
-        relevant_value="value",
         distance_function=centroid_euclidean_distance,
     )
-    homer.def_concept_link(cold, less)
+    # homer.def_concept_link(cold, less)
     cold_lexeme = homer.def_lexeme(
         headword="cold",
         forms={
@@ -797,10 +927,45 @@ def setup_homer() -> Homer:
         parent_concept=cold,
     )
     homer.def_concept_link(adj_concept, cold_lexeme)
+    # hotter = homer.def_concept(
+    #    name="more",
+    #    locations=[TwoPointLocation([[None]], [[None]], temperature_space)],
+    #    classifier=DifferenceClassifier(ProximityClassifier()),
+    #    parent_space=temperature_space,
+    #    distance_function=lambda x, y: True,
+    # )
+    # hotter_lexeme = homer.def_lexeme(
+    #    headword="hotter",
+    #    forms={
+    #        WordForm.HEADWORD: "hotter",
+    #    },
+    #    parts_of_speech={
+    #        WordForm.HEADWORD: [jjr_concept],
+    #    },
+    #    parent_concept=hotter,
+    # )
+    # homer.def_concept_link(jjr_concept, hotter_lexeme)
+    # colder = homer.def_concept(
+    #    name="colder",
+    #    locations=[TwoPointLocation([[None]], [[None]], temperature_space)],
+    #    classifier=DifferenceClassifier(ProximityClassifier()),
+    #    parent_space=temperature_space,
+    #    distance_function=lambda x, y: True,
+    # )
+    # colder_lexeme = homer.def_lexeme(
+    #    headword="colder",
+    #    forms={
+    #        WordForm.HEADWORD: "colder",
+    #    },
+    #    parts_of_speech={
+    #        WordForm.HEADWORD: [jjr_concept],
+    #    },
+    #    parent_concept=colder,
+    # )
+    # homer.def_concept_link(jjr_concept, colder_lexeme)
     location_concept = homer.def_concept(
         name="location",
         parent_space=label_concepts_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     north_south_space = homer.def_conceptual_space(
@@ -854,10 +1019,9 @@ def setup_homer() -> Homer:
     )
     north = homer.def_concept(
         name="north",
-        prototype=[[0, 2]],
+        locations=[Location([[0, 2]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     north_lexeme = homer.def_lexeme(
@@ -880,10 +1044,9 @@ def setup_homer() -> Homer:
     homer.def_concept_link(pobj_concept, north_lexeme)
     south = homer.def_concept(
         name="south",
-        prototype=[[5, 2]],
+        locations=[Location([[5, 2]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     south_lexeme = homer.def_lexeme(
@@ -906,10 +1069,9 @@ def setup_homer() -> Homer:
     homer.def_concept_link(pobj_concept, south_lexeme)
     east = homer.def_concept(
         name="east",
-        prototype=[[2.5, 4]],
+        locations=[Location([[2.5, 4]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     east_lexeme = homer.def_lexeme(
@@ -932,10 +1094,9 @@ def setup_homer() -> Homer:
     homer.def_concept_link(pobj_concept, east_lexeme)
     west = homer.def_concept(
         name="west",
-        prototype=[[2.5, 0]],
+        locations=[Location([[2.5, 0]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     west_lexeme = homer.def_lexeme(
@@ -958,10 +1119,9 @@ def setup_homer() -> Homer:
     homer.def_concept_link(pobj_concept, west_lexeme)
     northwest = homer.def_concept(
         name="northwest",
-        prototype=[[0, 0]],
+        locations=[Location([[0, 0]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     northwest_lexeme = homer.def_lexeme(
@@ -984,10 +1144,9 @@ def setup_homer() -> Homer:
     homer.def_concept_link(pobj_concept, northwest_lexeme)
     northeast = homer.def_concept(
         name="northeast",
-        prototype=[[0, 4]],
+        locations=[Location([[0, 4]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     northeast_lexeme = homer.def_lexeme(
@@ -1010,10 +1169,9 @@ def setup_homer() -> Homer:
     homer.def_concept_link(pobj_concept, northeast_lexeme)
     southwest = homer.def_concept(
         name="southwest",
-        prototype=[[5, 0]],
+        locations=[Location([[5, 0]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     southwest_lexeme = homer.def_lexeme(
@@ -1036,10 +1194,9 @@ def setup_homer() -> Homer:
     homer.def_concept_link(pobj_concept, southwest_lexeme)
     southeast = homer.def_concept(
         name="southeast",
-        prototype=[[5, 4]],
+        locations=[Location([[5, 4]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     southeast_lexeme = homer.def_lexeme(
@@ -1062,10 +1219,9 @@ def setup_homer() -> Homer:
     homer.def_concept_link(pobj_concept, southeast_lexeme)
     midlands = homer.def_concept(
         name="midlands",
-        prototype=[[2.5, 2]],
+        locations=[Location([[2.5, 2]], location_space)],
         classifier=ProximityClassifier(),
         parent_space=location_space,
-        relevant_value="coordinates",
         distance_function=centroid_euclidean_distance,
     )
     midlands_lexeme = homer.def_lexeme(
@@ -1152,22 +1308,29 @@ def setup_homer() -> Homer:
         ],
     )
     template_1_location_space = location_space.instance_in_space(template_1)
+    print(template_1_location_space)
+    print(template_1_location_space.sub_spaces)
     homer.logger.log(template_1_location_space)
     template_1_temperature_space = temperature_space.instance_in_space(template_1)
     homer.logger.log(template_1_temperature_space)
     template_1_slot = homer.def_chunk(
         locations=[
             Location([], template_1),
-            Location([[0, 0]], template_1_location_space),
-            Location([[0]], template_1_temperature_space),
+            Location([[None, None]], template_1_location_space),
+            Location([[None]], template_1_temperature_space),
         ],
         parent_space=template_1,
     )
     template_1_slot_location_label = homer.def_label(
         start=template_1_slot, parent_space=template_1_location_space
     )
+    print("location label parent space:", template_1_slot_location_label.parent_space)
     template_1_slot_temperature_label = homer.def_label(
         start=template_1_slot, parent_space=template_1_temperature_space
+    )
+    print(
+        "temperature label parent space:",
+        template_1_slot_temperature_label.parent_space,
     )
     homer.def_correspondence(template_1_slot_location_label, template_1[1])
     homer.def_correspondence(template_1_slot_temperature_label, template_1[3])
@@ -1184,14 +1347,15 @@ def setup_homer() -> Homer:
         ],
     )
     template_2_location_space = location_space.instance_in_space(template_2)
+    print(template_2_location_space)
     homer.logger.log(template_2_location_space)
     template_2_temperature_space = temperature_space.instance_in_space(template_2)
     homer.logger.log(template_2_temperature_space)
     template_2_slot = homer.def_chunk(
         locations=[
             Location([], template_2),
-            Location([[0, 0]], template_2_location_space),
-            Location([[0]], template_2_temperature_space),
+            Location([[None, None]], template_2_location_space),
+            Location([[None]], template_2_temperature_space),
         ],
         parent_space=template_2,
     )
@@ -1222,16 +1386,16 @@ def setup_homer() -> Homer:
     template_3_slot_1 = homer.def_chunk(
         locations=[
             Location([], template_3),
-            Location([[0, 0]], template_3_location_space),
-            Location([[0]], template_3_temperature_space),
+            Location([[None, None]], template_3_location_space),
+            Location([[None]], template_3_temperature_space),
         ],
         parent_space=template_3,
     )
     template_3_slot_2 = homer.def_chunk(
         locations=[
             Location([], template_3),
-            Location([[0, 0]], template_3_location_space),
-            Location([[0]], template_3_temperature_space),
+            Location([[None, None]], template_3_location_space),
+            Location([[None]], template_3_temperature_space),
         ],
         parent_space=template_3,
     )
@@ -1267,16 +1431,16 @@ def setup_homer() -> Homer:
     template_4_slot_1 = homer.def_chunk(
         locations=[
             Location([], template_4),
-            Location([[0, 0]], template_4_location_space),
-            Location([[0]], template_4_temperature_space),
+            Location([[None, None]], template_4_location_space),
+            Location([[None]], template_4_temperature_space),
         ],
         parent_space=template_4,
     )
     template_4_slot_2 = homer.def_chunk(
         locations=[
             Location([], template_4),
-            Location([[0, 0]], template_4_location_space),
-            Location([[0]], template_4_temperature_space),
+            Location([[None, None]], template_4_location_space),
+            Location([[None]], template_4_temperature_space),
         ],
         parent_space=template_4,
     )
@@ -1312,20 +1476,26 @@ def setup_homer() -> Homer:
             homer.def_phrase(label_concept=sentence_concept),
         ],
     )
+    location_space_in_input = location_space.instance_in_space(input_space)
+    homer.logger.log(location_space_in_input)
+    temperature_space_in_input = temperature_space.instance_in_space(input_space)
+    homer.logger.log(temperature_space_in_input)
 
     if True:
         input_chunks = StructureCollection()
         for i, row in enumerate(problem):
             for j, cell in enumerate(row):
-                value = [[cell]]
-                location = Location([[i, j]], homer.bubble_chamber.spaces["input"])
+                locations = [
+                    Location([[i, j]], input_space),
+                    Location([[i, j]], location_space_in_input),
+                    Location([[cell]], temperature_space_in_input),
+                ]
                 members = StructureCollection()
                 quality = 0.0
                 chunk = Chunk(
                     ID.new(Chunk),
                     "",
-                    value,
-                    [location],
+                    locations,
                     members,
                     input_space,
                     quality,
@@ -1333,7 +1503,9 @@ def setup_homer() -> Homer:
                 logger.log(chunk)
                 input_chunks.add(chunk)
                 homer.bubble_chamber.chunks.add(chunk)
-                input_space.contents.add(chunk)
+                input_space.add(chunk)
+                location_space_in_input.add(chunk)
+                temperature_space_in_input.add(chunk)
 
     if False:
         input_words = StructureCollection(

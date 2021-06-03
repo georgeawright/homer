@@ -83,7 +83,6 @@ class ChunkBuilder(Builder):
         chunk = Chunk(
             ID.new(Chunk),
             self.codelet_id,
-            self._get_average_value(new_chunk_members),
             locations,
             new_chunk_members,
             target_one.parent_space,
@@ -209,13 +208,6 @@ class ChunkBuilder(Builder):
         for link in new_chunk.links:
             self.bubble_chamber.add_to_collections(link)
             self.bubble_chamber.logger.log(link)
-
-    def _get_average_value(self, chunks: StructureCollection):
-        values = []
-        for chunk in chunks:
-            for _ in range(chunk.size):
-                values.append(chunk.value[0])
-        return [average_vector(values)]
 
     def _get_merged_location(self, chunks: StructureCollection, space: Space):
         coordinates = []

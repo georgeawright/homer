@@ -1,4 +1,3 @@
-import math
 import pytest
 from unittest.mock import Mock
 
@@ -11,6 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import WorkingSpace
+from homer.tools import centroid_euclidean_distance
 
 
 @pytest.fixture
@@ -57,7 +57,7 @@ def location_concept():
         "coordinates",
         Mock(),
         Mock(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     return concept
 
@@ -85,8 +85,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
     member_1 = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 0], input_space)],
+        [Location([[0, 0]], input_space)],
         StructureCollection(),
         input_space,
         0.0,
@@ -94,8 +93,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
     member_2 = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 1], input_space)],
+        [Location([[0, 1]], input_space)],
         StructureCollection(),
         input_space,
         0.0,
@@ -103,8 +101,7 @@ def good_chunk(bubble_chamber, location_concept, input_space):
     chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 0], input_space)],
+        [Location([[0, 0]], input_space)],
         StructureCollection({member_1, member_2}),
         input_space,
         0.0,
@@ -125,7 +122,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
         "value",
         Mock(),
         Mock(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     temperature_space = WorkingSpace(
         Mock(),
@@ -143,8 +140,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
     member_1 = Chunk(
         Mock(),
         Mock(),
-        [12],
-        [Location([0, 0], input_space), Location([12], temperature_space)],
+        [Location([[0, 0]], input_space), Location([[12]], temperature_space)],
         StructureCollection(),
         input_space,
         0.0,
@@ -152,8 +148,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
     member_2 = Chunk(
         Mock(),
         Mock(),
-        [5],
-        [Location([0, 1], input_space), Location([5], temperature_space)],
+        [Location([[0, 1]], input_space), Location([[5]], temperature_space)],
         StructureCollection(),
         input_space,
         0.0,
@@ -161,8 +156,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
     chunk = Chunk(
         Mock(),
         Mock(),
-        [8.5],
-        [Location([0, 0], input_space), Location([8.5], temperature_space)],
+        [Location([[0, 0]], input_space), Location([[8.5]], temperature_space)],
         StructureCollection({member_1, member_2}),
         input_space,
         1.0,

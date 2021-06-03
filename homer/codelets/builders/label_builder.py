@@ -5,8 +5,7 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
-from homer.structures.nodes import Concept
-from homer.tools import project_item_into_space
+from homer.tools import add_vectors
 
 
 class LabelBuilder(Builder):
@@ -59,9 +58,20 @@ class LabelBuilder(Builder):
         space = self.parent_concept.parent_space.instance_in_space(
             self.target_node.parent_space
         )
+        parent_concept_coordinates = self.parent_concept.location_in_space(
+            space.conceptual_space
+        ).coordinates
+        if not self.target_node.has_location_in_space(space):
+            self.target_node.locations.append(
+                Location(parent_concept_coordinates, space)
+            )
+            space.add(self.target_node)
+        elif space.is_symbolic:
+            self.target_node.location_in_space(space).coordinates = add_vectors(
+                self.target_node.location_in_space(space).coordinates,
+                parent_concept_coordinates,
+            )
         self.bubble_chamber.logger.log(space)
-        if self.target_node not in space.contents:
-            project_item_into_space(self.target_node, space)
         label = Label(
             ID.new(Label),
             self.codelet_id,

@@ -68,7 +68,7 @@ def temperature_concept():
         "temperature",
         Mock(),
         Mock(),
-        "value",
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -99,9 +99,9 @@ def mild_concept(temperature_space):
         "",
         "",
         "mild",
-        Location([[10]], temperature_space),
+        [Location([[10]], temperature_space)],
         ProximityClassifier(),
-        "value",
+        Mock(),
         Mock(),
         Mock(),
         distance_function=centroid_euclidean_distance,
@@ -203,7 +203,6 @@ def target_interpretation_chunk(
     chunk = Chunk(
         "",
         "",
-        Mock(),
         [
             Location([], interpretation_space),
             Location([[10]], interpretation_temperature_space),
@@ -225,7 +224,6 @@ def target_raw_chunk(input_space):
     chunk = Chunk(
         "",
         "",
-        [[10]],
         [Location([[0, 0]], input_space)],
         StructureCollection(),
         input_space,
@@ -236,8 +234,48 @@ def target_raw_chunk(input_space):
     return chunk
 
 
+@pytest.fixture
+def new_chunk(interpretation_space, interpretation_temperature_space):
+    chunk = Chunk(
+        "",
+        "",
+        [
+            Location([[0, 0]], interpretation_space),
+            Location([[10]], interpretation_temperature_space),
+        ],
+        StructureCollection(),
+        interpretation_space,
+        Mock(),
+        is_raw=True,
+    )
+    interpretation_space.add(chunk)
+    return chunk
+
+
+@pytest.fixture
+def correspondee_to_raw_chunk(interpretation_space):
+    chunk = Chunk(
+        "",
+        "",
+        [
+            Location([[0, 0]], interpretation_space),
+        ],
+        StructureCollection(),
+        interpretation_space,
+        Mock(),
+        is_raw=True,
+    )
+    interpretation_space.add(chunk)
+    return chunk
+
+
 def test_successful_projects_raw_chunk_and_same_chunk_cannot_be_projected_again(
-    bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
+    bubble_chamber,
+    target_view,
+    target_interpretation_chunk,
+    target_raw_chunk,
+    correspondee_to_raw_chunk,
+    new_chunk,
 ):
     builder = ReverseChunkProjectionBuilder.spawn(
         "",
@@ -246,6 +284,8 @@ def test_successful_projects_raw_chunk_and_same_chunk_cannot_be_projected_again(
             "target_view": target_view,
             "target_interpretation_chunk": target_interpretation_chunk,
             "target_raw_chunk": target_raw_chunk,
+            "correspondee_to_raw_chunk": correspondee_to_raw_chunk,
+            "new_chunk": new_chunk,
         },
         1.0,
     )
@@ -266,6 +306,8 @@ def test_successful_projects_raw_chunk_and_same_chunk_cannot_be_projected_again(
             "target_view": target_view,
             "target_interpretation_chunk": target_interpretation_chunk,
             "target_raw_chunk": target_raw_chunk,
+            "correspondee_to_raw_chunk": correspondee_to_raw_chunk,
+            "new_chunk": new_chunk,
         },
         1.0,
     )

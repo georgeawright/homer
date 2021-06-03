@@ -79,7 +79,6 @@ def target_chunks(bubble_chamber):
     chunk = Chunk(
         Mock(),
         Mock(),
-        [[10]],
         [Location([[0, 0]], input_space)],
         StructureCollection(),
         input_space,
@@ -88,7 +87,6 @@ def target_chunks(bubble_chamber):
     second_chunk = Chunk(
         Mock(),
         Mock(),
-        [[10]],
         [Location([[0, 1]], input_space)],
         StructureCollection(),
         input_space,

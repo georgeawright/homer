@@ -103,12 +103,17 @@ class CorrespondenceBuilder(Builder):
 
     def _process_structure(self):
         self.correspondence.structure_id = ID.new(Correspondence)
-        self.target_view.slot_values[self.correspondence.slot_argument.structure_id] = (
-            self.correspondence.non_slot_argument.value
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.structure_id
+        ] = self.correspondence.non_slot_argument.parent_concept
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.start.structure_id
+        ] = (
+            self.correspondence.non_slot_argument.start.value
             if self.correspondence.non_slot_argument.is_node
-            else self.correspondence.non_slot_argument.parent_concept
+            else self.correspondence.non_slot_argument.start.parent_concept
         )
-        if self.correspondence.slot_argument.is_link:
+        if self.correspondence.slot_argument.end is not None:
             self.target_view.slot_values[
                 self.correspondence.slot_argument.start.structure_id
             ] = (
@@ -116,14 +121,6 @@ class CorrespondenceBuilder(Builder):
                 if self.correspondence.non_slot_argument.is_node
                 else self.correspondence.non_slot_argument.start.parent_concept
             )
-            if self.correspondence.slot_argument.end is not None:
-                self.target_view.slot_values[
-                    self.correspondence.slot_argument.start.structure_id
-                ] = (
-                    self.correspondence.non_slot_argument.start.value
-                    if self.correspondence.non_slot_argument.is_node
-                    else self.correspondence.non_slot_argument.start.parent_concept
-                )
         self.target_view.members.add(self.correspondence)
         self.target_space_one.add(self.correspondence)
         self.target_space_two.add(self.correspondence)

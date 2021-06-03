@@ -28,12 +28,10 @@ class Word(Node):
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
-        value = lexeme.forms[word_form] if lexeme is not None else None
         Node.__init__(
             self,
             structure_id,
             parent_id,
-            value=value,
             locations=[location],
             parent_space=parent_space,
             quality=quality,
@@ -61,6 +59,14 @@ class Word(Node):
         from homer.codelets.selectors import WordSelector
 
         return WordSelector
+
+    @property
+    def value(self):
+        return self.lexeme.forms[self.word_form] if self.lexeme is not None else None
+
+    @property
+    def is_slot(self):
+        return self.value is None
 
     @property
     def concepts(self):
@@ -189,6 +195,19 @@ class Word(Node):
         )
         return StructureCollection.union(nsubj_words, pobj_words, dep_words)
 
+    def nearby(self, space: Space = None) -> StructureCollection:
+        if space is not None:
+            return StructureCollection.difference(
+                space.contents.of_type(type(self)).near(self.location_in_space(space)),
+                StructureCollection({self}),
+            )
+        return StructureCollection.difference(
+            self.parent_space.contents.of_type(type(self)).near(
+                self.location_in_space(self.parent_space)
+            ),
+            StructureCollection({self}),
+        )
+
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
     ) -> Word:
@@ -227,3 +246,9 @@ class Word(Node):
         bubble_chamber.logger.log(new_word)
         bubble_chamber.words.add(new_word)
         return new_word
+
+    def __repr__(self) -> str:
+        return (
+            f'<{self.structure_id} "{self.value}" '
+            + " in {self.parent_space.structure_id} {self.locations}>"
+        )

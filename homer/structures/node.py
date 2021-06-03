@@ -1,6 +1,6 @@
 from __future__ import annotations
 import statistics
-from typing import Any, List
+from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
@@ -15,7 +15,6 @@ class Node(Structure):
         self,
         structure_id: str,
         parent_id: str,
-        value: Any,
         locations: List[Location],
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
@@ -33,17 +32,8 @@ class Node(Structure):
             links_out=links_out,
             stable_activation=stable_activation,
         )
-        self._value = value
         self._parent_space = parent_space
         self.is_node = True
-
-    @property
-    def value(self) -> Any:
-        return self._value
-
-    @value.setter
-    def value(self, value: Any):
-        self._value = value
 
     @property
     def parent_space(self) -> Space:
@@ -55,7 +45,13 @@ class Node(Structure):
 
     @property
     def is_slot(self):
-        return self.value is None
+        return any(
+            [
+                None in coordinates
+                for location in self.locations
+                for coordinates in location.coordinates
+            ]
+        )
 
     @property
     def unhappiness(self) -> FloatBetweenOneAndZero:
@@ -89,4 +85,4 @@ class Node(Structure):
         raise NotImplementedError
 
     def __repr__(self) -> str:
-        return f"<{self.structure_id} {self.value} in {self.parent_space.structure_id}>"
+        return f"<{self.structure_id} in {self.parent_space.structure_id} {self.locations}>"

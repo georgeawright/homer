@@ -131,8 +131,12 @@ class PhraseBuilder(Builder):
             chunk = Chunk(
                 structure_id=ID.new(Chunk),
                 parent_id=self.codelet_id,
-                value=None,
-                locations=[Location([], self.parent_space)],
+                locations=[
+                    Location(
+                        [[None for _ in range(self.parent_space.no_of_dimensions)]],
+                        self.parent_space,
+                    )
+                ],
                 members=StructureCollection(),
                 parent_space=self.parent_space,
                 quality=1.0,

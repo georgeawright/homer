@@ -24,6 +24,7 @@ class WorkingSpace(Space):
         dimensions: List[WorkingSpace],
         sub_spaces: List[WorkingSpace],
         is_basic_level: bool = False,
+        is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
@@ -42,6 +43,7 @@ class WorkingSpace(Space):
             sub_spaces,
             quality,
             is_basic_level=is_basic_level,
+            is_symbolic=is_symbolic,
             super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
@@ -90,6 +92,7 @@ class WorkingSpace(Space):
             dimensions=new_dimensions,
             sub_spaces=new_sub_spaces,
             is_basic_level=self.is_basic_level,
+            is_symbolic=self.is_symbolic,
             super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
         )
         bubble_chamber.logger.log(new_space)
@@ -175,6 +178,7 @@ class WorkingSpace(Space):
             dimensions=new_dimensions,
             sub_spaces=new_sub_spaces,
             is_basic_level=self.is_basic_level,
+            is_symbolic=self.is_symbolic,
             super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
         )
         return new_space
@@ -198,6 +202,9 @@ class WorkingSpace(Space):
             if location.space.conceptual_space is None
             else location.space.conceptual_space.name
         )
-        coordinates_function = self.super_space_to_coordinate_function_map[space]
-        coordinates = coordinates_function(location)
+        if location.coordinates[0][0] is None:
+            coordinates = [[None for _ in range(self.no_of_dimensions)]]
+        else:
+            coordinates_function = self.super_space_to_coordinate_function_map[space]
+            coordinates = coordinates_function(location)
         return Location(coordinates, self)

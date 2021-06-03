@@ -29,7 +29,6 @@ class Phrase(Node):
             self,
             structure_id,
             parent_id,
-            value=label.value,
             locations=chunk.locations,
             parent_space=chunk.parent_space,
             quality=quality,
@@ -158,7 +157,6 @@ class Phrase(Node):
         new_chunk = Chunk(
             ID.new(Chunk),
             parent_id,
-            value=f"{new_left_branch.value} {new_right_branch.value}",
             locations=[
                 Location.merge(new_left_branch.location, new_right_branch.location)
             ],

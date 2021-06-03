@@ -1,13 +1,10 @@
-import statistics
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import LabelBuilder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Label
-from homer.tools import project_item_into_space
 
 
 class LabelProjectionBuilder(LabelBuilder):
@@ -77,13 +74,15 @@ class LabelProjectionBuilder(LabelBuilder):
         )
         self.bubble_chamber.logger.log(space)
         if self.target_chunk not in space.contents:
-            if self.parent_concept.relevant_value == "value":
-                self.target_chunk.value = self.parent_concept.prototype
-            elif self.parent_concept.relevant_value == "coordinates":
-                self.target_chunk.location_in_space(
-                    self.target_view.interpretation_space
-                ).coordinates = self.parent_concept.prototype
-            project_item_into_space(self.target_chunk, space)
+            self.target_chunk.locations.append(
+                Location(
+                    self.parent_concept.location_in_space(
+                        self.parent_concept.parent_space
+                    ).coordinates,
+                    space,
+                )
+            )
+            space.add(self.target_chunk)
         label = Label(
             structure_id=ID.new(Label),
             parent_id=self.codelet_id,

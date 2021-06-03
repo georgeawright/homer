@@ -140,7 +140,6 @@ class ReverseChunkProjectionSuggester(ChunkSuggester):
         self.correspondee_to_raw_chunk = Chunk(
             "",
             self.codelet_id,
-            self.target_raw_chunk.value,
             [correspondee_location],
             StructureCollection(),
             self.target_interpretation_chunk.parent_space,
@@ -149,7 +148,13 @@ class ReverseChunkProjectionSuggester(ChunkSuggester):
         for space in self.target_interpretation_chunk.parent_spaces:
             if not space.is_basic_level:
                 continue
-            project_item_into_space(self.correspondee_to_raw_chunk, space)
+            raw_chunk_location = self.target_raw_chunk.location_in_conceptual_space(
+                space.conceptual_space
+            )
+            self.correspondee_to_raw_chunk.locations.append(
+                Location(raw_chunk_location.coordinates, space)
+            )
+            space.add(self.correspondee_to_raw_chunk)
         new_chunk_members = StructureCollection.union(
             self.target_interpretation_chunk.members,
             StructureCollection({self.correspondee_to_raw_chunk}),
@@ -161,7 +166,6 @@ class ReverseChunkProjectionSuggester(ChunkSuggester):
         self.new_chunk = Chunk(
             "",
             self.codelet_id,
-            self._get_average_value(new_chunk_members),
             locations,
             new_chunk_members,
             self.target_interpretation_chunk.parent_space,
@@ -189,13 +193,6 @@ class ReverseChunkProjectionSuggester(ChunkSuggester):
             if not self.target_interpretation_chunk.links.is_empty()
             else 0
         )
-
-    def _get_average_value(self, chunks: StructureCollection):
-        values = []
-        for chunk in chunks:
-            for _ in range(chunk.size):
-                values.append(chunk.value[0])
-        return [average_vector(values)]
 
     def _get_merged_location(self, chunks: StructureCollection, space: Space):
         coordinates = []

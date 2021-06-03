@@ -2,6 +2,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import RelationBuilder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Relation
@@ -83,30 +84,32 @@ class RelationProjectionBuilder(RelationBuilder):
         )
 
     def _process_structure(self):
+        # TODO: work out how locations should be calculated if at all
+        # relational concept ought to have start and end prototype locations
         self.bubble_chamber.logger.log(self.target_space)
         if self.target_structure_one not in self.target_space.contents:
-            project_item_into_space(self.target_structure_one, self.target_space)
+            self.target_structure_one.locations.append(
+                Location(
+                    self.parent_concept.location_in_space(
+                        self.conceptual_space
+                    ).coordinates,
+                    self.target_space,
+                )
+            )
+            self.target_space.add(self.target_structure_one)
         if self.target_structure_two not in self.target_space.contents:
-            project_item_into_space(self.target_structure_two, self.target_space)
-        if self.target_space.parent_concept.relevant_value == "value":
-            self.target_structure_one.value = self.target_space.parent_concept.value
-            self.target_structure_two.value = add_vectors(
-                self.target_structure_one.value, self.parent_concept.value
+            self.target_structure_two.locations.append(
+                Location(
+                    add_vectors(
+                        self.parent_concept.location_in_space(
+                            self.conceptual_space
+                        ).coordinates,
+                        self.parent_concept.value,
+                    ),
+                    self.target_space,
+                )
             )
-        if self.target_space.parent_concept.relevant_value == "coordinates":
-            self.target_structure_one.location_in_space(
-                self.target_space
-            ).coordinates = self.target_space.parent_concept.location_in_space(
-                self.conceptual_space
-            ).coordinates
-            self.target_structure_two.location_in_space(
-                self.target_space
-            ).coordinates = add_vectors(
-                self.target_space.parent_concept.location_in_space(
-                    self.conceptual_space
-                ).coordinates,
-                self.parent_concept.value,
-            )
+            self.target_space.add(self.target_structure_two)
         relation = Relation(
             structure_id=ID.new(Relation),
             parent_id=self.codelet_id,

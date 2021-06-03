@@ -98,6 +98,7 @@ def target_word(bubble_chamber, parent_concept, conceptual_space):
     return word
 
 
+@pytest.mark.skip
 def test_successful_creates_relation_corresponding_to_word_and_spawns_follow_up(
     bubble_chamber,
     target_view,
@@ -125,6 +126,7 @@ def test_successful_creates_relation_corresponding_to_word_and_spawns_follow_up(
     assert isinstance(builder.child_codelets[0], RelationProjectionEvaluator)
 
 
+@pytest.mark.skip
 def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     bubble_chamber,
     target_view,

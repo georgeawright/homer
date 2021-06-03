@@ -64,7 +64,6 @@ class ChunkProjectionBuilder(ChunkBuilder):
         chunk = Chunk(
             structure_id=ID.new(Chunk),
             parent_id=self.codelet_id,
-            value=None,
             locations=[Location([], self.target_view.interpretation_space)],
             members=StructureCollection(),
             parent_space=self.target_view.interpretation_space,

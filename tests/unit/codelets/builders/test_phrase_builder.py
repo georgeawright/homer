@@ -36,29 +36,39 @@ def s_np_vp(s_concept, np_concept, vp_concept):
 
 
 @pytest.fixture
-def prep():
+def text_working_space():
+    space = Mock()
+    space.no_of_dimensions = 1
+    return space
+
+
+@pytest.fixture
+def prep(text_working_space):
     word = Mock()
     word.name = "prep"
     word.unhappiness = 1
     word.members = StructureCollection()
+    word.parent_space = text_working_space
     return word
 
 
 @pytest.fixture
-def noun():
+def noun(text_working_space):
     word = Mock()
     word.name = "noun"
     word.unhappiness = 1
     word.members = StructureCollection()
+    word.parent_space = text_working_space
     return word
 
 
 @pytest.fixture
-def pp_slot(prep, noun):
+def pp_slot(prep, noun, text_working_space):
     phrase = Mock()
     phrase.name = "pp_slot"
     phrase.unhappiness = 1
     phrase.members = StructureCollection({prep, noun})
+    phrase.parent_space = text_working_space
     return phrase
 
 
@@ -76,44 +86,48 @@ def bubble_chamber(s_np_vp, pp_slot, prep, noun):
 
 
 @pytest.fixture
-def s(s_concept):
+def s(s_concept, text_working_space):
     phrase = Mock()
     phrase.name = "s"
     phrase.is_slot = False
     phrase.quality = 1
     phrase.parent_concept = s_concept
+    phrase.parent_space = text_working_space
     return phrase
 
 
 @pytest.fixture
-def s_slot(s_concept):
+def s_slot(s_concept, text_working_space):
     phrase = Mock()
     phrase.name = "s_slot"
     phrase.is_slot = True
     phrase.quality = 1
     phrase.parent_concept = s_concept
+    phrase.parent_space = text_working_space
     return phrase
 
 
 @pytest.fixture
-def np(np_concept):
+def np(np_concept, text_working_space):
     phrase = Mock()
     phrase.name = "np"
     phrase.is_slot = False
     phrase.quality = 1
     phrase.location = Location([[0], [1]], Mock())
     phrase.parent_concept = np_concept
+    phrase.parent_space = text_working_space
     return phrase
 
 
 @pytest.fixture
-def vp(vp_concept):
+def vp(vp_concept, text_working_space):
     phrase = Mock()
     phrase.name = "vp"
     phrase.is_slot = False
     phrase.quality = 1
     phrase.location = Location([[2], [3]], Mock())
     phrase.parent_concept = vp_concept
+    phrase.parent_space = text_working_space
     return phrase
 
 

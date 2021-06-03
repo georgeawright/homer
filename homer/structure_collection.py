@@ -182,7 +182,7 @@ class StructureCollection:
         comparison_operator: callable = operator.gt,
         exclude: list = None,
     ):
-        """Returns a structure probabilistically according to attribute."""
+        """Returns a structure probabilistically according to key."""
         if len(self.structures) < 1:
             raise MissingStructureError
         if exclude is not None:

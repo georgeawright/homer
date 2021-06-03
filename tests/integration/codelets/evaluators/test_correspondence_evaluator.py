@@ -175,14 +175,12 @@ def good_correspondence(
     start = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([], temperature_working_space)],
         Mock(),
         temperature_working_space,
         Mock(),
     )
     end = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([], temperature_working_space)],
@@ -225,14 +223,12 @@ def bad_correspondence(
     start = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([], temperature_working_space)],
         Mock(),
         temperature_working_space,
         Mock(),
     )
     end = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([], temperature_working_space)],

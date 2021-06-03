@@ -61,13 +61,29 @@ def target_raw_chunk():
     return chunk
 
 
+@pytest.fixture
+def new_chunk():
+    chunk = Mock()
+    chunk.members = StructureCollection()
+    chunk.has_label.return_value = False
+    chunk.has_correspondence.return_value = False
+    chunk.links = StructureCollection()
+    return chunk
+
+
 def test_successful_projects_chunk_creates_larger_chunk_and_spawns_follow_up(
-    bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
+    bubble_chamber,
+    target_view,
+    target_interpretation_chunk,
+    target_raw_chunk,
+    new_chunk,
 ):
     target_structures = {
         "target_view": target_view,
         "target_interpretation_chunk": target_interpretation_chunk,
         "target_raw_chunk": target_raw_chunk,
+        "correspondee_to_raw_chunk": Mock(),
+        "new_chunk": new_chunk,
     }
     builder = ReverseChunkProjectionBuilder(
         Mock(),
@@ -78,17 +94,6 @@ def test_successful_projects_chunk_creates_larger_chunk_and_spawns_follow_up(
     )
     result = builder.run()
     assert CodeletResult.SUCCESS == result
-    assert hasinstance(builder.child_structures, Chunk)
-    child_chunks = builder.child_structures.of_type(Chunk)
-    child_chunk_1 = child_chunks.pop()
-    child_chunk_2 = child_chunks.pop()
-    assert (
-        child_chunk_1 in child_chunk_2.members
-        and child_chunk_2.size > len(target_interpretation_chunk.members)
-    ) or (
-        child_chunk_2 in child_chunk_1.members
-        and child_chunk_1.size > len(target_interpretation_chunk.members)
-    )
     assert len(builder.child_codelets) == 1
     assert isinstance(builder.child_codelets[0], ReverseChunkProjectionEvaluator)
 
@@ -101,6 +106,8 @@ def test_fizzles_when_raw_chunk_has_correspondence_to_interpretation_space(
         "target_view": target_view,
         "target_interpretation_chunk": target_interpretation_chunk,
         "target_raw_chunk": target_raw_chunk,
+        "correspondee_to_raw_chunk": Mock(),
+        "new_chunk": Mock(),
     }
     urgency = 1.0
     builder = ReverseChunkProjectionBuilder(

@@ -31,7 +31,6 @@ def target_view(bubble_chamber):
 @pytest.fixture
 def temperature_interpretation_space():
     space = Mock()
-    space.parent_concept.relevant_value = "value"
     return space
 
 
@@ -57,7 +56,7 @@ def target_raw_chunk():
     chunk.value = [[10]]
     location = Mock()
     location.coordinates = [[0, 0]]
-    chunk.location_in_space.return_value = location
+    chunk.location_in_conceptual_space.return_value = location
     return chunk
 
 

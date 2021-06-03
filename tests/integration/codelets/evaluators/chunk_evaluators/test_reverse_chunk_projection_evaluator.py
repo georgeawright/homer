@@ -56,14 +56,12 @@ def good_chunk(bubble_chamber):
     chunk = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([], parent_space)],
         StructureCollection(),
         parent_space,
         0.0,
     )
     parent_chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([], parent_space)],
@@ -92,14 +90,12 @@ def bad_chunk(bubble_chamber):
     chunk = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([], parent_space)],
         StructureCollection(),
         parent_space,
         1.0,
     )
     parent_chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([], parent_space)],

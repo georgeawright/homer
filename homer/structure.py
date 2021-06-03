@@ -4,7 +4,7 @@ import random
 import statistics
 from typing import List
 
-from .errors import MissingStructureError
+from .errors import MissingStructureError, NoLocationError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .location import Location
@@ -240,15 +240,38 @@ class Structure(ABC):
         try:
             self.location_in_space(space)
             return True
-        except Exception:
+        except NoLocationError:
             return False
 
-    def location_in_space(self, space: Structure) -> Location:
-        for location in self.locations:
+    def location_in_space(
+        self, space: Structure, start: Location = None, end: Location = None
+    ) -> Location:
+        locations = self.locations
+        random.shuffle(locations)
+        for location in locations:
             if location is not None and location.space == space:
+                if (
+                    start is not None
+                    and location.start_coordinates != start.coordinates
+                ):
+                    continue
+                if end is not None and location.end_coordinates != end.coordinates:
+                    continue
                 return location
-        raise Exception(
+        raise NoLocationError(
             f"{self.structure_id} has no location in space {space.structure_id}"
+        )
+
+    def location_in_conceptual_space(self, space: Structure) -> Location:
+        locations = self.locations
+        random.shuffle(locations)
+        for location in locations:
+            if location is not None and (
+                location.space == space or location.space.conceptual_space == space
+            ):
+                return location
+        raise NoLocationError(
+            f"{self.structure_id} has no location for conceputal space {space.structure_id}"
         )
 
     def has_label(self, concept: Structure) -> bool:

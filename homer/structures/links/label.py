@@ -25,16 +25,13 @@ class Label(Link):
             parent_id,
             start,
             end,
-            [
-                start.location_in_space(parent_space)
-                if parent_space is not None
-                else None
-            ],
+            [start.location_in_space(parent_space)] if parent_space is not None else [],
             parent_concept,
             quality,
             links_in=None,
             links_out=None,
         )
+        self._parent_space = parent_space
         self.is_label = True
 
     @classmethod
@@ -54,6 +51,10 @@ class Label(Link):
         from homer.codelets.selectors import LabelSelector
 
         return LabelSelector
+
+    @property
+    def parent_space(self) -> Space:
+        return self._parent_space
 
     @property
     def is_slot(self) -> bool:
