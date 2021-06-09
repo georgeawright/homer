@@ -1257,91 +1257,26 @@ def setup_homer() -> Homer:
         ],
     )
 
-    if True:
-        input_chunks = StructureCollection()
-        for i, row in enumerate(problem):
-            for j, cell in enumerate(row):
-                value = [[cell]]
-                location = Location([[i, j]], homer.bubble_chamber.spaces["input"])
-                members = StructureCollection()
-                quality = 0.0
-                chunk = Chunk(
-                    ID.new(Chunk),
-                    "",
-                    value,
-                    [location],
-                    members,
-                    input_space,
-                    quality,
-                )
-                logger.log(chunk)
-                input_chunks.add(chunk)
-                homer.bubble_chamber.chunks.add(chunk)
-                input_space.contents.add(chunk)
-
-    if False:
-        input_words = StructureCollection(
-            {
-                Word(
-                    ID.new(Word),
-                    "",
-                    it_lexeme,
-                    WordForm.HEADWORD,
-                    Location([[0]], homer.bubble_chamber.spaces["input"]),
-                    input_space,
-                    1.0,
-                ),
-                Word(
-                    ID.new(Word),
-                    "",
-                    is_lexeme,
-                    WordForm.HEADWORD,
-                    Location([[1]], homer.bubble_chamber.spaces["input"]),
-                    input_space,
-                    1.0,
-                ),
-                Word(
-                    ID.new(Word),
-                    "",
-                    warm_lexeme,
-                    WordForm.HEADWORD,
-                    Location([[2]], homer.bubble_chamber.spaces["input"]),
-                    input_space,
-                    1.0,
-                ),
-                Word(
-                    ID.new(Word),
-                    "",
-                    in_lexeme,
-                    WordForm.HEADWORD,
-                    Location([[3]], homer.bubble_chamber.spaces["input"]),
-                    input_space,
-                    1.0,
-                ),
-                Word(
-                    ID.new(Word),
-                    "",
-                    the_lexeme,
-                    WordForm.HEADWORD,
-                    Location([[4]], homer.bubble_chamber.spaces["input"]),
-                    input_space,
-                    1.0,
-                ),
-                Word(
-                    ID.new(Word),
-                    "",
-                    south_lexeme,
-                    WordForm.HEADWORD,
-                    Location([[5]], homer.bubble_chamber.spaces["input"]),
-                    input_space,
-                    1.0,
-                ),
-            }
-        )
-        for word in input_words:
-            homer.logger.log(word)
-            homer.bubble_chamber.words.add(word)
-            input_space.add(word)
+    input_chunks = StructureCollection()
+    for i, row in enumerate(problem):
+        for j, cell in enumerate(row):
+            value = [[cell]]
+            location = Location([[i, j]], homer.bubble_chamber.spaces["input"])
+            members = StructureCollection()
+            quality = 0.0
+            chunk = Chunk(
+                ID.new(Chunk),
+                "",
+                value,
+                [location],
+                members,
+                input_space,
+                quality,
+            )
+            logger.log(chunk)
+            input_chunks.add(chunk)
+            homer.bubble_chamber.chunks.add(chunk)
+            input_space.contents.add(chunk)
 
     return homer
 
