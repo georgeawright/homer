@@ -77,6 +77,7 @@ class Homer:
                 break
             except Exception as e:
                 raise e
+        self.logger.log(self.coderack)
         self.print_results()
         return {
             "result": self.bubble_chamber.result,
