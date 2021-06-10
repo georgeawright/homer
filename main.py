@@ -1290,6 +1290,6 @@ for _ in range(10):
             + ","
             + str(result["satisfaction"])
             + ","
-            + result["result"]
+            + str(result["result"])
             + "\n"
         )
