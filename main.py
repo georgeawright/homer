@@ -1281,8 +1281,15 @@ def setup_homer() -> Homer:
     return homer
 
 
-for _ in range(1):
+for _ in range(10):
     homer = setup_homer()
     result = homer.run()
     with open("results.csv", "a") as f:
-        f.write(str(result["codelets_run"]) + "\n")
+        f.write(
+            str(result["codelets_run"])
+            + ","
+            + str(result["satisfaction"])
+            + ","
+            + result["result"]
+            + "\n"
+        )
