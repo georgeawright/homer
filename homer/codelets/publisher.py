@@ -6,6 +6,8 @@ from homer.codelet_result import CodeletResult
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
 
 
 class Publisher(Codelet):
@@ -30,7 +32,18 @@ class Publisher(Codelet):
 
     def run(self) -> CodeletResult:
         try:
-            target_view = self.bubble_chamber.monitoring_views.get_active()
+            target_view = StructureCollection(
+                {
+                    view
+                    for view in self.bubble_chamber.monitoring_views
+                    if any(
+                        [
+                            structure.has_label_with_name("s")
+                            for structure in view.output_space.contents
+                        ]
+                    )
+                }
+            ).get(key=activation)
         except MissingStructureError:
             return self._fail()
         if (

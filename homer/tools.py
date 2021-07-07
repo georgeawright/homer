@@ -4,7 +4,8 @@ from typing import Iterable, List, Union
 
 
 def centroid_euclidean_distance(a, b) -> float:
-    return math.dist(average_vector(a), average_vector(b))
+    distance = math.dist(average_vector(a), average_vector(b))
+    return distance if distance != math.nan else 0
 
 
 def average_vector(vectors: List[List[Union[float, int]]]):

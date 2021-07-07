@@ -36,7 +36,7 @@ class Template(Frame):
         self.is_template = True
 
     def __getitem__(self, index: int) -> Word:
-        return self.contents.at(Location([[index]], self)).get_random()
+        return self.contents.at(Location([[index]], self)).get()
 
     def copy(self, **kwargs: dict) -> Frame:
         """Requires keyword arguments 'bubble_chamber' and 'parent_id'."""
@@ -57,8 +57,9 @@ class Template(Frame):
         copies = {}
         sub_spaces = self.contents.where(is_space=True, is_basic_level=True)
         for space in sub_spaces:
-            sub_space_copy = space.copy_without_contents(parent_id)
-            sub_space_copy.locations = [Location([], new_space)]
+            sub_space_copy = space.copy_without_contents(
+                parent_id, parent_space=new_space
+            )
             new_space.add(sub_space_copy)
             bubble_chamber.logger.log(sub_space_copy)
         for node in self.contents.where(is_node=True):
@@ -72,7 +73,7 @@ class Template(Frame):
             for label in node.labels:
                 new_label_space = new_node.parent_spaces.where(
                     conceptual_space=label.parent_space.conceptual_space
-                ).get_random()
+                ).get()
                 new_label = label.copy(
                     start=new_node,
                     parent_space=(new_label_space),
@@ -88,7 +89,7 @@ class Template(Frame):
                 new_end = copies[relation.end]
                 new_relation_space = new_node.parent_spaces.where(
                     conceptual_space=relation.parent_space.conceptual_space
-                ).get_random()
+                ).get()
                 new_relation = relation.copy(
                     start=new_node, end=new_end, parent_space=new_relation_space
                 )
@@ -102,7 +103,7 @@ class Template(Frame):
                 new_start = copies[relation.start]
                 new_relation_space = new_node.parent_spaces.where(
                     conceptual_space=relation.parent_space.conceptual_space
-                ).get_random()
+                ).get()
                 new_relation = relation.copy(
                     start=new_start, end=new_node, parent_space=new_relation_space
                 )

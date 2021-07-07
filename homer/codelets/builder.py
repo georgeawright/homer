@@ -59,7 +59,7 @@ class Builder(Codelet):
 
     @property
     def _parent_link(self):
-        return self._structure_concept.relations_with(self._build_concept).get_random()
+        return self._structure_concept.relations_with(self._build_concept).get()
 
     @property
     def _build_concept(self):

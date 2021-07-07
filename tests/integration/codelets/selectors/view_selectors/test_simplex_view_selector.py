@@ -94,7 +94,6 @@ def common_target_space_item(bubble_chamber):
     item = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([[1, 1]], parent_space)],
         Mock(),
         parent_space,

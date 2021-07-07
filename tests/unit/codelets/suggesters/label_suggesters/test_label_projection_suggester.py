@@ -64,7 +64,7 @@ def parent_concept(bubble_chamber):
 def target_word(bubble_chamber, parent_concept):
     word = Mock()
     word.correspondences_to_space.return_value = StructureCollection()
-    word.lexeme.concepts.get_random.return_value = parent_concept
+    word.lexeme.semantic_concepts.get.return_value = parent_concept
     return word
 
 

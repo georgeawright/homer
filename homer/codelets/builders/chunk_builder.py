@@ -49,17 +49,6 @@ class ChunkBuilder(Builder):
             urgency,
         )
 
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target = bubble_chamber.input_nodes.where(is_chunk=True).get_unhappy()
-        urgency = urgency if urgency is not None else target.unhappiness
-        return cls.spawn(parent_id, bubble_chamber, target, urgency)
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
@@ -94,7 +83,6 @@ class ChunkBuilder(Builder):
         chunk = Chunk(
             ID.new(Chunk),
             self.codelet_id,
-            self._get_average_value(new_chunk_members),
             locations,
             new_chunk_members,
             target_one.parent_space,
@@ -193,7 +181,7 @@ class ChunkBuilder(Builder):
                 new_chunk.links_in.add(new_relation)
                 new_relation.parent_space.add(new_relation)
         for correspondence in original_chunk.correspondences:
-            other_arg = correspondence.arguments.get_random(exclude=[new_chunk])
+            other_arg = correspondence.arguments.get(exclude=[new_chunk])
             if new_chunk.has_correspondence(
                 correspondence.conceptual_space,
                 correspondence.parent_concept,
@@ -203,7 +191,7 @@ class ChunkBuilder(Builder):
                     conceptual_space=correspondence.conceptual_space,
                     parent_concept=correspondence.parent_concept,
                     arguments=StructureCollection({new_chunk, other_arg}),
-                ).get_random()
+                ).get()
                 existing_correspondence.quality = statistics.fmean(
                     [existing_correspondence.quality, correspondence.quality]
                 )
@@ -220,13 +208,6 @@ class ChunkBuilder(Builder):
         for link in new_chunk.links:
             self.bubble_chamber.add_to_collections(link)
             self.bubble_chamber.logger.log(link)
-
-    def _get_average_value(self, chunks: StructureCollection):
-        values = []
-        for chunk in chunks:
-            for _ in range(chunk.size):
-                values.append(chunk.value[0])
-        return [average_vector(values)]
 
     def _get_merged_location(self, chunks: StructureCollection, space: Space):
         coordinates = []

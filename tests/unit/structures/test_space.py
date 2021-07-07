@@ -94,7 +94,7 @@ def test_add(
         is_basic_level=True,
     )
     location = Location(coordinates, location_space)
-    chunk = Chunk("", "", Mock(), [location], Mock(), Mock(), Mock())
+    chunk = Chunk("", "", [location], Mock(), Mock(), Mock())
     location_space.add(chunk)
 
     assert chunk in location_space.contents

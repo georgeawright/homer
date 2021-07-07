@@ -77,6 +77,7 @@ class Homer:
                 break
             except Exception as e:
                 raise e
+        self.logger.log(self.coderack)
         self.print_results()
         return {
             "result": self.bubble_chamber.result,
@@ -112,31 +113,29 @@ class Homer:
     def def_concept(
         self,
         name: str = "",
-        prototype: Any = None,
+        locations: List[Location] = None,
         classifier: Classifier = None,
         parent_space: ConceptualSpace = None,
-        relevant_value: str = "",
-        instance_type: type = list,
+        instance_type: type = Chunk,
+        structure_type: type = None,
         child_spaces: StructureCollection = None,
         distance_function: Callable = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
         depth: int = 1,
         activation: float = 0.0,
+        distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
     ) -> Concept:
-        location = (
-            Location(prototype, parent_space)
-            if prototype is not None
-            else Location([], parent_space)
-        )
+        locations = [Location([], parent_space)] if locations is None else locations
         concept = Concept(
             structure_id=ID.new(Concept),
             parent_id="",
             name=name,
-            location=location,
+            locations=locations,
             classifier=classifier,
-            relevant_value=relevant_value,
             instance_type=instance_type,
+            structure_type=structure_type,
+            parent_space=parent_space,
             child_spaces=(
                 child_spaces if child_spaces is not None else StructureCollection()
             ),
@@ -144,9 +143,11 @@ class Homer:
             links_in=links_in,
             links_out=links_out,
             depth=depth,
+            distance_to_proximity_weight=distance_to_proximity_weight,
         )
         concept._activation = activation
-        parent_space.add(concept)
+        for space in concept.parent_spaces:
+            space.add(concept)
         self.logger.log(concept)
         self.bubble_chamber.concepts.add(concept)
         return concept
@@ -161,6 +162,7 @@ class Homer:
         dimensions: List[ConceptualSpace] = None,
         sub_spaces: List[ConceptualSpace] = None,
         is_basic_level: bool = False,
+        is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
@@ -176,6 +178,7 @@ class Homer:
             dimensions=(dimensions if dimensions is not None else []),
             sub_spaces=(sub_spaces if sub_spaces is not None else []),
             is_basic_level=is_basic_level,
+            is_symbolic=is_symbolic,
             super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
@@ -217,20 +220,13 @@ class Homer:
     def def_lexeme(
         self,
         headword: str = "",
-        forms: Dict[str, str] = None,
-        parts_of_speech: Dict[WordForm, List[Concept]] = None,
         parent_concept: Concept = None,
     ) -> Lexeme:
-        if operator.xor(forms is None, parts_of_speech is None) or (
-            forms.keys() != parts_of_speech.keys()
-        ):
-            raise Exception("lexeme forms and parts of speech do not match")
         lexeme = Lexeme(
             structure_id=ID.new(Lexeme),
             parent_id="",
             headword=headword,
-            forms=forms,
-            parts_of_speech=parts_of_speech,
+            word_forms={},
         )
         self.logger.log(lexeme)
         self.bubble_chamber.lexemes.add(lexeme)
@@ -266,9 +262,13 @@ class Homer:
                 item.label.locations = [Location([[i]], template)]
                 item._parent_space = template
                 item._locations = [Location([[i]], template)]
-            if item.is_word:
+            if item.is_word and not item.is_slot:
+                item = item.copy_to_location(Location([[i]], template))
+                for location in item.locations:
+                    self.logger.log(location.space)
+            if item.is_word and item.is_slot:
+                item.locations.append(Location([[i]], template))
                 item.parent_space = template
-                item.locations = [Location([[i]], template)]
             template.contents.add(item)
             self.logger.log(item)
         self.bubble_chamber.conceptual_spaces.add(template)
@@ -277,19 +277,28 @@ class Homer:
 
     def def_word(
         self,
+        name: str = None,
         lexeme: Lexeme = None,
         word_form: WordForm = WordForm.HEADWORD,
+        locations: List[Location] = None,
         quality: FloatBetweenOneAndZero = 1.0,
     ):
+        locations = [] if locations is None else locations
         word = Word(
             structure_id=ID.new(Word),
             parent_id="",
+            name=name,
             lexeme=lexeme,
             word_form=word_form,
-            location=None,
+            locations=locations,
             parent_space=None,
             quality=quality,
         )
+        if lexeme is not None:
+            lexeme.word_forms[word_form] = word
+        for location in locations:
+            location.space.add(word)
+        self.logger.log(word)
         return word
 
     def def_phrase(
@@ -300,7 +309,6 @@ class Homer:
         chunk = Chunk(
             structure_id=ID.new(Chunk),
             parent_id="",
-            value=None,
             locations=[],
             members=StructureCollection(),
             parent_space=None,
@@ -334,6 +342,7 @@ class Homer:
         dimensions: List[WorkingSpace] = None,
         sub_spaces: List[WorkingSpace] = None,
         is_basic_level: bool = False,
+        is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
@@ -350,6 +359,7 @@ class Homer:
             dimensions=(dimensions if dimensions is not None else []),
             sub_spaces=(sub_spaces if sub_spaces is not None else []),
             is_basic_level=is_basic_level,
+            is_symbolic=is_symbolic,
             super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
@@ -377,6 +387,8 @@ class Homer:
     ) -> Correspondence:
         start_space = start.location.space if start_space is None else start_space
         end_space = end.location.space if end_space is None else end_space
+        print(start_space)
+        print(end_space)
         locations = (
             [start.location_in_space(start_space), end.location_in_space(end_space)]
             if locations is None
@@ -419,7 +431,6 @@ class Homer:
 
     def def_chunk(
         self,
-        value: Any = None,
         locations: List[Location] = None,
         members: StructureCollection = None,
         parent_space: WorkingSpace = None,
@@ -430,7 +441,6 @@ class Homer:
         chunk = Chunk(
             ID.new(Chunk),
             "",
-            value=value,
             locations=locations,
             members=members,
             parent_space=parent_space,
@@ -483,7 +493,7 @@ class Homer:
             quality=quality,
         )
         start.links_out.add(relation)
-        start.links_in.add(relation)
+        end.links_in.add(relation)
         if not relation.is_slot:
             self.bubble_chamber.relations.add(relation)
         self.logger.log(relation)

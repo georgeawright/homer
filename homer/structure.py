@@ -4,7 +4,7 @@ import random
 import statistics
 from typing import List
 
-from .errors import MissingStructureError
+from .errors import MissingStructureError, NoLocationError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .location import Location
@@ -41,9 +41,21 @@ class Structure(ABC):
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
         self._parent_space = None
         self._parent_concept = None
+
+        self.is_node = False
+        self.is_chunk = False
         self.is_phrase = False
         self.is_word = False
+        self.is_link = False
+        self.is_correspondence = False
+        self.is_label = False
+        self.is_relation = False
+        self.is_view = False
+        self.is_space = False
+        self.is_conceptual_space = False
+        self.is_working_space = False
         self.is_frame = False
+        self.is_template = False
 
     @classmethod
     def get_builder_class(cls):
@@ -102,6 +114,22 @@ class Structure(ABC):
         return statistics.fmean([self.activation, self.unhappiness])
 
     @property
+    def chunking_exigency(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean([self.activation, self.unchunkedness])
+
+    @property
+    def labeling_exigency(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean([self.activation, self.unlabeledness])
+
+    @property
+    def relating_exigency(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean([self.activation, self.unrelatedness])
+
+    @property
+    def corresponding_exigency(self) -> FloatBetweenOneAndZero:
+        return statistics.fmean([self.activation, self.uncorrespondedness])
+
+    @property
     def quality(self) -> FloatBetweenOneAndZero:
         return self._quality
 
@@ -119,16 +147,25 @@ class Structure(ABC):
 
     @property
     def unhappiness(self) -> FloatBetweenOneAndZero:
-        # probably should just return unlinkedness
-        return statistics.fmean([self.unchunkedness, self.unlinkedness])
+        return statistics.fmean(
+            [self.unlabeledness, self.unrelatedness, self.uncorrespondedness]
+        )
 
     @property
     def unchunkedness(self) -> FloatBetweenOneAndZero:
         return 0
 
     @property
-    def unlinkedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** sum(link.activation for link in self.links)
+    def unlabeledness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** sum(link.activation for link in self.labels)
+
+    @property
+    def unrelatedness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** sum(link.activation for link in self.relations)
+
+    @property
+    def uncorrespondedness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** sum(link.activation for link in self.correspondences)
 
     @property
     def links(self) -> StructureCollection:
@@ -203,28 +240,58 @@ class Structure(ABC):
         try:
             self.location_in_space(space)
             return True
-        except Exception:
+        except NoLocationError:
             return False
 
-    def location_in_space(self, space: Structure) -> Location:
-        for location in self.locations:
+    def has_location_in_conceptual_space(self, space: Structure) -> bool:
+        try:
+            self.location_in_conceptual_space(space)
+            return True
+        except NoLocationError:
+            return False
+
+    def location_in_space(
+        self, space: Structure, start: Location = None, end: Location = None
+    ) -> Location:
+        locations = self.locations
+        random.shuffle(locations)
+        for location in locations:
             if location is not None and location.space == space:
+                if (
+                    start is not None
+                    and location.start_coordinates != start.coordinates
+                ):
+                    continue
+                if end is not None and location.end_coordinates != end.coordinates:
+                    continue
                 return location
-        raise Exception(
+        raise NoLocationError(
             f"{self.structure_id} has no location in space {space.structure_id}"
         )
 
-    def has_label(self, concept: Structure) -> bool:
+    def location_in_conceptual_space(self, space: Structure) -> Location:
+        locations = self.locations
+        random.shuffle(locations)
+        for location in locations:
+            if location is not None and (
+                location.space == space or location.space.conceptual_space == space
+            ):
+                return location
+        raise NoLocationError(
+            f"{self.structure_id} has no location for conceputal space {space.structure_id}"
+        )
+
+    def has_label(self, concept: Structure) -> FloatBetweenOneAndZero:
         for label in self.labels:
             if label.parent_concept == concept:
-                return True
-        return False
+                return label.activation
+        return 0.0
 
-    def has_label_with_name(self, name: str) -> bool:
+    def has_label_with_name(self, name: str) -> FloatBetweenOneAndZero:
         for label in self.labels:
             if label.parent_concept.name == name:
-                return True
-        return False
+                return label.activation
+        return 0.0
 
     def label_of_type(self, concept: Structure):
         for label in self.labels:
@@ -243,7 +310,7 @@ class Structure(ABC):
         concept: Structure,
         first_argument: Structure,
         second_argument: Structure,
-    ) -> bool:
+    ) -> FloatBetweenOneAndZero:
         for relation in self.relations:
             if (
                 relation.parent_concept == concept
@@ -251,14 +318,14 @@ class Structure(ABC):
                 and relation.end == second_argument
                 and relation.parent_space == space
             ):
-                return True
-        return False
+                return relation.activation
+        return 0.0
 
-    def has_relation_with_name(self, name: str) -> bool:
+    def has_relation_with_name(self, name: str) -> FloatBetweenOneAndZero:
         for relation in self.relations:
             if relation.parent_concept.name == name:
-                return True
-        return False
+                return relation.activation
+        return 0.0
 
     def relation_with_name(self, name: str) -> Structure:
         for relation in self.relations:
@@ -295,7 +362,7 @@ class Structure(ABC):
     ) -> Structure:
         return self.relations.where(
             parent_space=space, parent_concept=concept, start=start, end=end
-        ).get_random()
+        ).get()
 
     def has_correspondence(
         self, space: Structure, concept: Structure, second_argument: Structure

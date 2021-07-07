@@ -1,5 +1,3 @@
-from typing import Union
-
 from homer.bubble_chamber import BubbleChamber
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
@@ -52,28 +50,6 @@ class PhraseProjectionBuilder(PhraseBuilder):
             target_correspondence,
             urgency,
         )
-
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target_view = bubble_chamber.discourse_views.get_active()
-        frame = target_view.input_frames.get_random()
-        target_correspondence = StructureCollection(
-            {
-                member
-                for member in target_view.members
-                if member.start_space != frame
-                and member.end_space != target_view.output_space
-            }
-        ).get_unhappy()
-        urgency = (
-            urgency if urgency is not None else target_correspondence.start.unhappiness
-        )
-        return cls.spawn(parent_id, bubble_chamber, target_correspondence, urgency)
 
     def _passes_preliminary_checks(self) -> bool:
         self.target_correspondence = self._target_structures["target_correspondence"]

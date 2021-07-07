@@ -52,7 +52,6 @@ def good_chunk(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
         StructureCollection(),
         Mock(),
         1.0,
@@ -61,13 +60,11 @@ def good_chunk(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
         StructureCollection(),
         Mock(),
         1.0,
     )
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -85,7 +82,6 @@ def bad_chunk(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
         StructureCollection(),
         Mock(),
         0.0,
@@ -94,13 +90,11 @@ def bad_chunk(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
         StructureCollection(),
         Mock(),
         0.0,
     )
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         Mock(),

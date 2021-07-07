@@ -53,89 +53,6 @@ class PhraseBuilder(Builder):
         )
 
     @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target_view = bubble_chamber.production_views.get_active()
-        target_one = target_view.output_space.contents.where(is_word=True).get_unhappy()
-        target_two = target_one.potential_rule_mates.get_unhappy()
-        try:
-            target_three = StructureCollection.intersection(
-                target_one.potential_rule_mates, target_two.potential_rule_mates
-            ).get_unhappy()
-            targets = StructureCollection({target_one, target_two, target_three})
-        except MissingStructureError:
-            targets = StructureCollection({target_one, target_two})
-        root, left_branch, right_branch = cls.arrange_targets(targets)
-        urgency = (
-            urgency
-            if urgency is not None
-            else statistics.fmean([target.unhappiness for target in targets])
-        )
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            root,
-            left_branch,
-            right_branch,
-            urgency,
-        )
-
-    @classmethod
-    def make_top_down(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        target_rule: Rule,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target_one = StructureCollection(
-            {
-                fragment
-                for fragment in bubble_chamber.text_fragments
-                if target_rule.is_compatible_with(fragment)
-            }
-        ).get_unhappy()
-        target_two = StructureCollection(
-            {
-                fragment
-                for fragment in target_one.potential_rule_mates
-                if target_rule.is_compatible_with(target_one, fragment)
-            }
-        ).get_unhappy()
-        try:
-            target_three = StructureCollection(
-                {
-                    fragment
-                    for fragment in StructureCollection.intersection(
-                        target_one.potential_rule_mates, target_two.potential_rule_mates
-                    )
-                    if target_rule.is_compatible_with(target_one, target_two, fragment)
-                }
-            ).get_unhappy()
-            targets = StructureCollection({target_one, target_two, target_three})
-        except MissingStructureError:
-            targets = StructureCollection({target_one, target_two})
-        root, left_branch, right_branch = cls.arrange_targets(targets)
-        urgency = (
-            urgency
-            if urgency is not None
-            else statistics.fmean([target.unhappiness for target in targets])
-        )
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            root,
-            left_branch,
-            right_branch,
-            urgency,
-            target_rule=target_rule,
-        )
-
-    @classmethod
     def arrange_targets(cls, targets: StructureCollection):
         root = None
         for target in targets:
@@ -147,8 +64,8 @@ class PhraseBuilder(Builder):
                 left_branch = root.left_branch
                 right_branch = root.right_branch
         if root is None:
-            branch_one = targets.get_random()
-            branch_two = targets.get_random(exclude=[branch_one])
+            branch_one = targets.get()
+            branch_two = targets.get(exclude=[branch_one])
             if (
                 branch_one.location.coordinates[0][0]
                 < branch_two.location.coordinates[0][0]
@@ -179,7 +96,7 @@ class PhraseBuilder(Builder):
         self.target_left_branch = self._target_structures["target_left_branch"]
         self.target_right_branch = self._target_structures["target_right_branch"]
         self.parent_space = (
-            self.target_structures.get_random().parent_space
+            self.target_structures.get().parent_space
             if not self.target_structures.is_empty()
             else None
         )
@@ -193,7 +110,7 @@ class PhraseBuilder(Builder):
                         for rule in self.bubble_chamber.rules
                         if self._rule_is_compatible_with_targets(rule)
                     }
-                ).get_random()
+                ).get()
             except MissingStructureError:
                 return False
         elif not self._rule_is_compatible_with_targets(self.target_rule):
@@ -214,8 +131,12 @@ class PhraseBuilder(Builder):
             chunk = Chunk(
                 structure_id=ID.new(Chunk),
                 parent_id=self.codelet_id,
-                value=None,
-                locations=[Location([], self.parent_space)],
+                locations=[
+                    Location(
+                        [[None for _ in range(self.parent_space.no_of_dimensions)]],
+                        self.parent_space,
+                    )
+                ],
                 members=StructureCollection(),
                 parent_space=self.parent_space,
                 quality=1.0,

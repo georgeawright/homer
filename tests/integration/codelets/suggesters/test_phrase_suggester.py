@@ -74,8 +74,8 @@ def working_space():
 
 @pytest.fixture
 def target_root(bubble_chamber, s_concept, working_space):
-    location = Location([], working_space)
-    chunk = Chunk("", "", None, [location], StructureCollection(), working_space, 1.0)
+    location = Location([[None]], working_space)
+    chunk = Chunk("", "", [location], StructureCollection(), working_space, 1.0)
     label = Label("", "", chunk, s_concept, working_space, 1.0)
     root = Phrase("", "", chunk, label, 1.0)
     bubble_chamber.phrases.add(root)
@@ -86,9 +86,7 @@ def target_root(bubble_chamber, s_concept, working_space):
 @pytest.fixture
 def target_left_branch(bubble_chamber, np_concept, working_space):
     location = Location([[0], [1]], working_space)
-    chunk = Chunk(
-        "", "", "the man", [location], StructureCollection(), working_space, 1.0
-    )
+    chunk = Chunk("", "", [location], StructureCollection(), working_space, 1.0)
     label = Label("", "", chunk, np_concept, working_space, 1.0)
     branch = Phrase("", "", chunk, label, 1.0)
     bubble_chamber.phrases.add(branch)
@@ -99,7 +97,7 @@ def target_left_branch(bubble_chamber, np_concept, working_space):
 @pytest.fixture
 def target_right_branch(bubble_chamber, vp_concept, working_space):
     location = Location([[2]], working_space)
-    chunk = Chunk("", "", "ate", [location], StructureCollection(), working_space, 1.0)
+    chunk = Chunk("", "", [location], StructureCollection(), working_space, 1.0)
     label = Label("", "", chunk, vp_concept, working_space, 1.0)
     branch = Phrase("", "", chunk, label, 1.0)
     bubble_chamber.phrases.add(branch)

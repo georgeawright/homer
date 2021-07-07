@@ -4,6 +4,8 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Factory
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
+from homer.structures.links import Label, Relation
 from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
 
@@ -33,11 +35,11 @@ class ConceptDrivenFactory(Factory):
 
     def _get_parent_concept(self) -> Concept:
         return StructureCollection.union(
-            self.bubble_chamber.rules,
+            # self.bubble_chamber.rules,
             self._get_correspondential_concepts(),
             self._get_label_concepts(),
             self._get_relational_concepts(),
-        ).get_active()
+        ).get(key=activation)
 
     def _get_follow_up_class(self, parent_concept: Concept):
         action_concept = self.bubble_chamber.concepts["suggest"]
@@ -70,23 +72,11 @@ class ConceptDrivenFactory(Factory):
         ).where_not(classifier=None)
 
     def _get_label_concepts(self) -> StructureCollection:
-        return StructureCollection(
-            {
-                concept
-                for conceptual_space in self.bubble_chamber.spaces[
-                    "label concepts"
-                ].contents.of_type(ConceptualSpace)
-                for concept in conceptual_space.contents.of_type(Concept)
-            }
-        ).where_not(classifier=None)
+        return self.bubble_chamber.concepts.where(structure_type=Label).where_not(
+            classifier=None
+        )
 
     def _get_relational_concepts(self) -> StructureCollection:
-        return StructureCollection(
-            {
-                concept
-                for conceptual_space in self.bubble_chamber.spaces[
-                    "relational concepts"
-                ].contents.of_type(ConceptualSpace)
-                for concept in conceptual_space.contents.of_type(Concept)
-            }
-        ).where_not(classifier=None)
+        return self.bubble_chamber.concepts.where(structure_type=Relation).where_not(
+            classifier=None
+        )

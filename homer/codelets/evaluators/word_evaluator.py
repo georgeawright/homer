@@ -1,7 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
 from homer.structure_collection import StructureCollection
-from homer.structures.nodes import Word
 
 
 class WordEvaluator(Evaluator):
@@ -14,7 +13,7 @@ class WordEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["word"]
-        word = bubble_chamber.input_nodes.where(is_word=True).get_random()
+        word = bubble_chamber.input_nodes.where(is_word=True).get()
         correspondences = word.correspondences.where(end=word)
         target_structures = StructureCollection.union(
             StructureCollection({word}), correspondences
@@ -29,10 +28,10 @@ class WordEvaluator(Evaluator):
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["word"]
-        return structure_concept.relations_with(self._evaluate_concept).get_random()
+        return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_word = self.target_structures.where(is_word=True).get_random()
+        target_word = self.target_structures.where(is_word=True).get()
         labels = StructureCollection.union(
             *[correspondee.labels for correspondee in target_word.correspondees]
         )

@@ -1,9 +1,8 @@
-import math
 import pytest
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
-from homer.classifiers import ProximityClassifier
+from homer.classifiers import DifferenceClassifier, ProximityClassifier
 from homer.codelet_result import CodeletResult
 from homer.codelets.evaluators import RelationEvaluator
 from homer.codelets.selectors import RelationSelector
@@ -12,6 +11,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import WorkingSpace
+from homer.tools import centroid_euclidean_distance
 
 
 @pytest.fixture
@@ -60,7 +60,7 @@ def location_concept():
         "coordinates",
         Mock(),
         Mock(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     return concept
 
@@ -76,31 +76,52 @@ def temperature_concept():
         "value",
         Mock(),
         Mock(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     return concept
 
 
 @pytest.fixture
 def more_concept():
+    more_less_space = Mock()
     concept = Concept(
         Mock(),
         Mock(),
         "more",
-        Location([5], Mock()),
-        ProximityClassifier(),
-        "value",
+        [Location([[5]], more_less_space)],
+        DifferenceClassifier(ProximityClassifier()),
         Mock(),
+        more_less_space,
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     return concept
 
 
 @pytest.fixture
 def input_space(location_concept):
+    parent_concept = Concept(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        centroid_euclidean_distance,
+    )
     space = WorkingSpace(
-        Mock(), Mock(), "input", Mock(), Mock(), [], StructureCollection(), 0, [], []
+        Mock(),
+        Mock(),
+        "input",
+        parent_concept,
+        Mock(),
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
     )
     return space
 
@@ -111,7 +132,7 @@ def temperature_space(temperature_concept):
         Mock(),
         Mock(),
         "temperature",
-        Mock(),
+        temperature_concept,
         Mock(),
         [],
         StructureCollection(),
@@ -127,8 +148,7 @@ def good_relation(bubble_chamber, input_space, temperature_space, more_concept):
     start = Chunk(
         Mock(),
         Mock(),
-        [15],
-        [Location([0, 0], input_space), Location([15], temperature_space)],
+        [Location([[0, 0]], input_space), Location([[15]], temperature_space)],
         StructureCollection(),
         Mock(),
         0.0,
@@ -136,8 +156,7 @@ def good_relation(bubble_chamber, input_space, temperature_space, more_concept):
     end = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 0], input_space), Location([10], temperature_space)],
+        [Location([[0, 0]], input_space), Location([[10]], temperature_space)],
         StructureCollection(),
         Mock(),
         0.0,
@@ -154,8 +173,7 @@ def bad_relation(bubble_chamber, input_space, temperature_space, more_concept):
     start = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 0], input_space), Location([10], temperature_space)],
+        [Location([[0, 0]], input_space), Location([[10]], temperature_space)],
         StructureCollection(),
         Mock(),
         0.0,
@@ -163,8 +181,7 @@ def bad_relation(bubble_chamber, input_space, temperature_space, more_concept):
     end = Chunk(
         Mock(),
         Mock(),
-        [15],
-        [Location([0, 0], input_space), Location([15], temperature_space)],
+        [Location([[0, 0]], input_space), Location([[15]], temperature_space)],
         StructureCollection(),
         Mock(),
         0.0,

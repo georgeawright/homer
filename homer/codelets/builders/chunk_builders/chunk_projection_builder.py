@@ -4,9 +4,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import View
 from homer.structures.links import Correspondence
-from homer.structures.nodes import Chunk, Word
+from homer.structures.nodes import Chunk
 
 
 class ChunkProjectionBuilder(ChunkBuilder):
@@ -50,24 +49,6 @@ class ChunkProjectionBuilder(ChunkBuilder):
             urgency,
         )
 
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target_view = bubble_chamber.monitoring_views.get_active()
-        target_word = StructureCollection(
-            {
-                word
-                for word in target_view.text_space.contents.where(is_word=True)
-                if word.has_label(bubble_chamber.concepts["noun"])
-            }
-        ).get_unhappy()
-        urgency = urgency if urgency is not None else target_word.unhappiness
-        return cls.spawn(parent_id, bubble_chamber, target_view, target_word, urgency)
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
@@ -83,7 +64,6 @@ class ChunkProjectionBuilder(ChunkBuilder):
         chunk = Chunk(
             structure_id=ID.new(Chunk),
             parent_id=self.codelet_id,
-            value=None,
             locations=[Location([], self.target_view.interpretation_space)],
             members=StructureCollection(),
             parent_space=self.target_view.interpretation_space,

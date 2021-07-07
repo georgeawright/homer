@@ -10,6 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import WorkingSpace
+from homer.tools import centroid_euclidean_distance
 
 
 @pytest.fixture
@@ -49,11 +50,23 @@ def bubble_chamber():
 
 @pytest.fixture
 def target_space():
+    parent_concept = Concept(
+        "",
+        "",
+        "",
+        [],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        centroid_euclidean_distance,
+        distance_to_proximity_weight=1.5,
+    )
     space = WorkingSpace(
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        parent_concept,
         Mock(),
         [],
         StructureCollection(),
@@ -79,7 +92,6 @@ def good_chunk(target_space, chunk_members):
     chunk = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([[0, 0]], target_space)],
         chunk_members,
         Mock(),
@@ -93,7 +105,6 @@ def good_chunk(target_space, chunk_members):
 @pytest.fixture
 def bad_chunk(target_space, chunk_members):
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([[0, 1]], target_space)],

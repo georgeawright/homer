@@ -10,6 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Label, Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import ConceptualSpace, WorkingSpace
+from homer.tools import centroid_euclidean_distance
 
 
 @pytest.fixture
@@ -51,14 +52,49 @@ def bubble_chamber():
 
 @pytest.fixture
 def conceptual_space():
-    space = ConceptualSpace(Mock(), Mock(), Mock(), Mock(), [], Mock(), 1, [], [])
+    parent_concept = Concept(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        centroid_euclidean_distance,
+        distance_to_proximity_weight=1.5,
+    )
+    space = ConceptualSpace(
+        Mock(), Mock(), Mock(), parent_concept, [], Mock(), 1, [], []
+    )
     return space
 
 
 @pytest.fixture
 def working_space():
+    parent_concept = Concept(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        centroid_euclidean_distance,
+        distance_to_proximity_weight=1.5,
+    )
     space = WorkingSpace(
-        Mock(), Mock(), Mock(), Mock(), Mock(), [], StructureCollection(), 0, [], []
+        Mock(),
+        Mock(),
+        Mock(),
+        parent_concept,
+        Mock(),
+        [],
+        StructureCollection(),
+        0,
+        [],
+        [],
     )
     return space
 
@@ -68,7 +104,6 @@ def chunk(bubble_chamber, working_space):
     chunk = Chunk(
         Mock(),
         Mock(),
-        [[10]],
         [Location([[1, 1]], working_space)],
         Mock(),
         Mock(),
@@ -79,7 +114,6 @@ def chunk(bubble_chamber, working_space):
     nearby_chunk = Chunk(
         Mock(),
         Mock(),
-        [[10]],
         [Location([[0, 1]], working_space)],
         Mock(),
         Mock(),
@@ -99,7 +133,7 @@ def good_label(chunk, conceptual_space, working_space):
         Location(Mock(), conceptual_space),
         Mock(),
         Mock(),
-        list,
+        conceptual_space,
         Mock(),
         Mock(),
     )
@@ -125,7 +159,7 @@ def bad_label(chunk, conceptual_space, working_space):
         Location(Mock(), conceptual_space),
         Mock(),
         Mock(),
-        list,
+        conceptual_space,
         Mock(),
         Mock(),
     )

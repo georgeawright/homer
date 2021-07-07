@@ -25,16 +25,13 @@ class Relation(Link):
             parent_id,
             start,
             end,
-            [
-                start.location_in_space(parent_space)
-                if parent_space is not None
-                else None
-            ],
+            [start.location_in_space(parent_space)] if parent_space is not None else [],
             parent_concept,
             quality,
             links_in=None,
             links_out=None,
         )
+        self._parent_space = parent_space
         self.is_relation = True
 
     @classmethod
@@ -54,6 +51,10 @@ class Relation(Link):
         from homer.codelets.selectors import RelationSelector
 
         return RelationSelector
+
+    @property
+    def parent_space(self) -> Space:
+        return self._parent_space
 
     def copy(self, **kwargs) -> Relation:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""

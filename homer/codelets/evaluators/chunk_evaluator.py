@@ -15,7 +15,7 @@ class ChunkEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["chunk"]
-        target = bubble_chamber.input_nodes.where(is_chunk=True).get_random()
+        target = bubble_chamber.input_nodes.where(is_chunk=True).get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -26,10 +26,10 @@ class ChunkEvaluator(Evaluator):
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["chunk"]
-        return structure_concept.relations_with(self._evaluate_concept).get_random()
+        return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_chunk = self.target_structures.get_random()
+        target_chunk = self.target_structures.get()
         proximities = [
             space.proximity_between(member, target_chunk)
             for space in target_chunk.parent_spaces

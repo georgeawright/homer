@@ -1,4 +1,5 @@
 from __future__ import annotations
+import operator
 import random
 from typing import List, Optional, Set, Union
 
@@ -147,6 +148,22 @@ class StructureCollection:
     def number_with_label(self, concept):
         return sum(1 for structure in self.structures if structure.has_label(concept))
 
+    def get(
+        self,
+        key: callable = None,
+        comparison_operator: callable = operator.gt,
+        exclude: list = None,
+        sample_proportion: float = 0.5,
+    ):
+        if key is None:
+            return self.get_random(exclude=exclude)
+        return self._get_structure_according_to(
+            key,
+            comparison_operator=comparison_operator,
+            exclude=exclude,
+            sample_proportion=sample_proportion,
+        )
+
     def get_random(self, exclude: list = None):
         """Returns a random structure"""
         if len(self.structures) < 1:
@@ -157,38 +174,34 @@ class StructureCollection:
             ).get_random()
         return random.sample(self.structures, 1)[0]
 
-    def get_exigent(self, exclude: list = None):
-        """Returns a structure probabilistically according to exigency."""
-        return self._get_structure_according_to("exigency", exclude)
-
-    def get_active(self, exclude: list = None):
-        """Returns a structure probabilistically according to activation."""
-        return self._get_structure_according_to("activation", exclude)
-
     def get_most_active(self):
         return self._get_structure_with_highest("activation")
-
-    def get_unhappy(self, exclude: list = None):
-        """Returns a structure probabilistically according to unhappiness."""
-        return self._get_structure_according_to("unhappiness", exclude)
 
     def __repr__(self) -> str:
         return "{" + ", ".join(repr(structure) for structure in self.structures) + "}"
 
-    def _get_structure_according_to(self, attribute: str, exclude: list = None):
-        """Returns a structure probabilistically according to attribute."""
+    def _get_structure_according_to(
+        self,
+        key: callable,
+        comparison_operator: callable = operator.gt,
+        exclude: list = None,
+        sample_proportion: float = 0.5,
+    ):
+        """Returns a structure probabilistically according to key."""
         if len(self.structures) < 1:
             raise MissingStructureError
         if exclude is not None:
             return StructureCollection.difference(
                 self, StructureCollection(set(exclude))
-            )._get_structure_according_to(attribute)
+            )._get_structure_according_to(key)
         if len(self.structures) == 1:
             return list(self.structures)[0]
-        structures = random.sample(self.structures, len(self.structures) // 2)
+        structures = random.sample(
+            self.structures, len(self.structures) // int(1 / sample_proportion)
+        )
         structure_choice = structures[0]
         for structure in structures[1:]:
-            if getattr(structure, attribute) > getattr(structure_choice, attribute):
+            if comparison_operator(key(structure), key(structure_choice)):
                 structure_choice = structure
         return structure_choice
 

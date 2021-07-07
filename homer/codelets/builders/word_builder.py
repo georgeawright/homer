@@ -56,24 +56,6 @@ class WordBuilder(Builder):
             urgency,
         )
 
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        target_view: View = None,
-        urgency: float = None,
-    ):
-        target_view = (
-            target_view
-            if target_view is not None
-            else bubble_chamber.views.get_active()
-        )
-        frame = target_view.input_spaces.of_type(Frame).get_random()
-        target_word = frame.contents.of_type(Word).get_exigent()
-        urgency = urgency if urgency is not None else target_view.activation
-        return cls.spawn(parent_id, bubble_chamber, target_view, target_word, urgency)
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]
@@ -102,29 +84,52 @@ class WordBuilder(Builder):
             word_concept = self.target_view.slot_values[
                 self.word_correspondee.structure_id
             ]
-            lexeme = word_concept.lexemes.get_random()
+            lexeme = word_concept.lexemes.get()
             word_form = self.target_word.word_form
-            self.target_view.slot_values[self.target_word.structure_id] = lexeme.forms[
-                word_form
+            abstract_word = lexeme.word_forms[word_form]
+            word_name = abstract_word.name
+            self.target_view.slot_values[self.target_word.structure_id] = word_name
+            word_locations = [
+                Location(
+                    location.coordinates,
+                    location.space.instance_in_space(self.target_view.output_space),
+                )
+                for location in abstract_word.locations
             ]
         else:
             lexeme = self.target_word.lexeme
             word_form = self.target_word.word_form
-        word_location = Location(
-            self.target_word.location.coordinates,
-            self.target_view.output_space,
-        )
+            word_name = self.target_word.name
+            word_locations = [
+                Location(
+                    location.coordinates,
+                    location.space.conceptual_space.instance_in_space(
+                        self.target_view.output_space
+                    ),
+                )
+                for location in self.target_word.locations
+                if not location.space.is_frame
+            ]
+        word_locations += [
+            Location(
+                self.target_word.location.coordinates,
+                self.target_view.output_space,
+            )
+        ]
         word = Word(
             ID.new(Word),
             self.codelet_id,
+            name=word_name,
             lexeme=lexeme,
             word_form=word_form,
-            location=word_location,
+            locations=word_locations,
             parent_space=self.target_view.output_space,
             quality=0.0,
         )
         self.target_view.output_space.add(word)
         self.bubble_chamber.words.add(word)
+        for location in word_locations:
+            self.bubble_chamber.logger.log(location.space)
         self.bubble_chamber.logger.log(word)
         frame_to_output_correspondence = Correspondence(
             ID.new(Correspondence),

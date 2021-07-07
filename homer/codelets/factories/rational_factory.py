@@ -3,6 +3,7 @@ import random
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Factory
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.structure_collection_keys import activation
 
 
 class RationalFactory(Factory):
@@ -28,8 +29,8 @@ class RationalFactory(Factory):
     def _decide_follow_up_class(self):
         follow_up_theme = random.sample(list(self.codelet_themes().values()), 1)[0]
         return self._get_codelet_type_from_concepts(
-            action=follow_up_theme["actions"].get_active(),
-            space=follow_up_theme["spaces"].get_active(),
-            direction=follow_up_theme["directions"].get_active(),
-            structure=follow_up_theme["structures"].get_active(),
+            action=follow_up_theme["actions"].get(key=activation),
+            space=follow_up_theme["spaces"].get(key=activation),
+            direction=follow_up_theme["directions"].get(key=activation),
+            structure=follow_up_theme["structures"].get(key=activation),
         )

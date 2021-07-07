@@ -91,7 +91,6 @@ def raw_item_one(raw_input_space):
     item = Chunk(
         "",
         "",
-        Mock(),
         [Location([], raw_input_space)],
         Mock(),
         raw_input_space,
@@ -107,7 +106,6 @@ def raw_item_two(raw_input_space):
     item = Chunk(
         "",
         "",
-        Mock(),
         [Location([], raw_input_space)],
         Mock(),
         raw_input_space,

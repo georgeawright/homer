@@ -14,8 +14,7 @@ class Lexeme(Node):
         structure_id: str,
         parent_id: str,
         headword: str,
-        forms: Dict[WordForm, str],
-        parts_of_speech: Dict[WordForm, List[Concept]],
+        word_forms: dict,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
     ):
@@ -23,7 +22,6 @@ class Lexeme(Node):
             self,
             structure_id,
             parent_id,
-            value=headword,
             locations=[],
             parent_space=None,
             quality=None,
@@ -31,21 +29,7 @@ class Lexeme(Node):
             links_out=links_out,
         )
         self.headword = headword
-        self.forms = forms
-        self.parts_of_speech = parts_of_speech
-
-    @classmethod
-    def new(cls, headword: str, forms: Dict[WordForm, str], parent_concept):
-        from homer.structures.links import Relation
-
-        lexeme = cls(ID.new(cls), "", headword, forms)
-        link_to_concept = Relation(
-            ID.new(Relation), "", parent_concept, lexeme, None, None, 0.0
-        )
-        link_to_concept._activation = 1.0
-        parent_concept.links_out.add(link_to_concept)
-        lexeme.links_in.add(link_to_concept)
-        return lexeme
+        self.word_forms = word_forms
 
     @property
     def concepts(self) -> StructureCollection:
@@ -54,4 +38,7 @@ class Lexeme(Node):
         )
 
     def get_form(self, form: WordForm) -> str:
-        return self.forms[form]
+        return self.word_forms[form]
+
+    def __repr__(self) -> str:
+        return f"<{self.structure_id} {self.headword}>"

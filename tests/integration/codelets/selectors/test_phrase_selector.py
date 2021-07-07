@@ -113,7 +113,6 @@ def good_phrase(bubble_chamber, input_space, word_1, word_2):
     chunk = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([[0], [1]], input_space)],
         StructureCollection({word_1, word_2}),
         input_space,
@@ -141,7 +140,6 @@ def bad_phrase(bubble_chamber, input_space, word_2, null_phrase):
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), stable_activation=1.0
     )
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([[1]], input_space)],

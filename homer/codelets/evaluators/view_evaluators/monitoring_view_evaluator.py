@@ -10,7 +10,7 @@ class MonitoringViewEvaluator(ViewEvaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["view-monitoring"]
-        target = bubble_chamber.monitoring_views.get_active()
+        target = bubble_chamber.monitoring_views.get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -27,10 +27,10 @@ class MonitoringViewEvaluator(ViewEvaluator):
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["view-monitoring"]
-        return structure_concept.relations_with(self._evaluate_concept).get_random()
+        return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_view = self.target_structures.get_random()
+        target_view = self.target_structures.get()
         chunks_in_interpretation = target_view.interpretation_space.contents.of_type(
             Chunk
         )

@@ -11,7 +11,6 @@ from homer.structures.links import Label
 @pytest.fixture
 def target_view():
     potential_labeling_word = Mock()
-    potential_labeling_word.unlinkedness = 0.5
     potential_labeling_word.correspondences_to_space.return_value = StructureCollection(
         {Mock()}
     )
@@ -22,7 +21,6 @@ def target_view():
     correspondence = Mock()
     correspondence.name = "existing correspondence"
     chunk = Mock()
-    chunk.unlinkedness = 0.5
     chunk.name = "existing chunk"
     correspondence.arguments = StructureCollection({chunk, word})
     chunk.is_chunk = True
@@ -64,12 +62,12 @@ def parent_concept(bubble_chamber):
 def target_word(bubble_chamber, parent_concept):
     word = Mock()
     word.correspondences_to_space.return_value = StructureCollection()
-    word.lexeme.concepts.get_random.return_value = parent_concept
+    word.lexeme.concepts.get.return_value = parent_concept
     return word
 
 
 def test_successful_creates_label_corresponding_to_word_and_spawns_follow_up(
-    bubble_chamber, target_view, target_word
+    bubble_chamber, target_view, target_word, parent_concept
 ):
     target_chunk = Mock()
     target_chunk.has_label.return_value = False
@@ -78,6 +76,7 @@ def test_successful_creates_label_corresponding_to_word_and_spawns_follow_up(
         "target_view": target_view,
         "target_chunk": target_chunk,
         "target_word": target_word,
+        "parent_concept": parent_concept,
     }
     builder = LabelProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
@@ -87,7 +86,7 @@ def test_successful_creates_label_corresponding_to_word_and_spawns_follow_up(
 
 
 def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
-    bubble_chamber, target_view, target_word
+    bubble_chamber, target_view, target_word, parent_concept
 ):
     target_chunk = Mock()
     target_chunk.has_label.return_value = False
@@ -101,6 +100,7 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
         "target_view": target_view,
         "target_chunk": target_chunk,
         "target_word": target_word,
+        "parent_concept": parent_concept,
     }
     builder = LabelProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()
@@ -108,7 +108,10 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
 
 
 def test_fizzles_if_target_chunk_already_has_corresponding_label(
-    bubble_chamber, target_view, target_word
+    bubble_chamber,
+    target_view,
+    target_word,
+    parent_concept,
 ):
     target_chunk = Mock()
     target_chunk.has_label.return_value = True
@@ -117,6 +120,7 @@ def test_fizzles_if_target_chunk_already_has_corresponding_label(
         "target_view": target_view,
         "target_chunk": target_chunk,
         "target_word": target_word,
+        "parent_concept": parent_concept,
     }
     builder = LabelProjectionBuilder("", "", bubble_chamber, target_structures, 1)
     builder.run()

@@ -1,4 +1,3 @@
-import math
 import pytest
 from unittest.mock import Mock
 
@@ -12,6 +11,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Label, Relation
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.spaces import WorkingSpace
+from homer.tools import centroid_euclidean_distance
 
 
 @pytest.fixture
@@ -121,12 +121,12 @@ def warm_concept(temperature_space):
         Mock(),
         Mock(),
         "warm",
-        Location([15], temperature_space),
+        [Location([[15]], temperature_space)],
         ProximityClassifier(),
-        "value",
         Mock(),
+        temperature_space,
         StructureCollection(),
-        math.dist,
+        centroid_euclidean_distance,
     )
     return warm
 
@@ -136,8 +136,7 @@ def good_label(bubble_chamber, input_space, temperature_space, warm_concept):
     start = Chunk(
         Mock(),
         Mock(),
-        [15],
-        [Location([0, 0], input_space), Location([15], temperature_space)],
+        [Location([[0, 0]], input_space), Location([[15]], temperature_space)],
         StructureCollection(),
         Mock(),
         0.0,
@@ -152,8 +151,7 @@ def bad_label(bubble_chamber, input_space, temperature_space, warm_concept):
     start = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([0, 0], input_space), Location([10], temperature_space)],
+        [Location([[0, 0]], input_space), Location([[10]], temperature_space)],
         StructureCollection(),
         Mock(),
         0.0,

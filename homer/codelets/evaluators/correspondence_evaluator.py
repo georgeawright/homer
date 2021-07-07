@@ -1,7 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence
+from homer.structure_collection_keys import activation
 
 
 class CorrespondenceEvaluator(Evaluator):
@@ -14,7 +14,8 @@ class CorrespondenceEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["correspondence"]
-        target = bubble_chamber.correspondences.get_active()
+        view = bubble_chamber.production_views.get(key=activation)
+        target = view.members.where(start_space=view.raw_input_space).get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -25,10 +26,10 @@ class CorrespondenceEvaluator(Evaluator):
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["correspondence"]
-        return structure_concept.relations_with(self._evaluate_concept).get_random()
+        return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_correspondence = self.target_structures.get_random()
+        target_correspondence = self.target_structures.get()
         self.confidence = target_correspondence.parent_concept.classifier.classify(
             space=target_correspondence.conceptual_space,
             concept=target_correspondence.parent_concept,

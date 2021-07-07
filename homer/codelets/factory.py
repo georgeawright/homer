@@ -189,7 +189,8 @@ class Factory(Codelet):
                 "actions": StructureCollection({suggest, evaluate}),
                 "spaces": StructureCollection({inner, outer}),
                 "directions": StructureCollection({forward}),
-                "structures": StructureCollection({chunk, label, phrase, relation}),
+                # "structures": StructureCollection({chunk, label, phrase, relation}),
+                "structures": StructureCollection({chunk, label, relation}),
             },
             "inner": {
                 "actions": StructureCollection({suggest, evaluate}),

@@ -106,7 +106,7 @@ def warm_concept(bubble_chamber, temperature_conceptual_space):
         Mock(),
         Mock(),
         "warm",
-        Location([16], temperature_conceptual_space),
+        [Location([16], temperature_conceptual_space)],
         Mock(),
         Mock(),
         Mock(),
@@ -130,7 +130,6 @@ def warm_lexeme(warm_concept):
 @pytest.fixture
 def good_word_correspondee(bubble_chamber, warm_concept, temperature_input_space):
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([16], temperature_input_space)],
@@ -180,7 +179,6 @@ def good_word(bubble_chamber, warm_lexeme, output_space, good_word_correspondee)
 @pytest.fixture
 def bad_word_correspondee(bubble_chamber, warm_concept, temperature_input_space):
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([10], temperature_input_space)],

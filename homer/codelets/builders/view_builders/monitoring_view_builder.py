@@ -1,6 +1,4 @@
-from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import ViewBuilder
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
@@ -14,30 +12,6 @@ class MonitoringViewBuilder(ViewBuilder):
         from homer.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
 
         return MonitoringViewEvaluator
-
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        text_space = StructureCollection(
-            {
-                space
-                for space in bubble_chamber.working_spaces
-                if space.parent_concept == bubble_chamber.concepts["text"]
-                and not space.contents.is_empty()
-            }
-        ).get_exigent()
-        input_space = bubble_chamber.spaces["input"]
-        urgency = urgency if urgency is not None else text_space.exigency
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            StructureCollection({text_space, input_space}),
-            urgency,
-        )
 
     @property
     def _structure_concept(self):
@@ -59,7 +33,7 @@ class MonitoringViewBuilder(ViewBuilder):
     def _process_structure(self):
         view_id = ID.new(MonitoringView)
         view_location = Location([], self.bubble_chamber.spaces["top level working"])
-        view_output = self.target_spaces.get_random()
+        view_output = self.target_spaces.get()
         interpretation_space = WorkingSpace(
             structure_id=ID.new(WorkingSpace),
             parent_id=self.codelet_id,

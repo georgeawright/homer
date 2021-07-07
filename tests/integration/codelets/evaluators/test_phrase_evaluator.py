@@ -150,7 +150,6 @@ def good_phrase(
     chunk = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([[0], [1]], input_space)],
         StructureCollection({the_word, man_word}),
         input_space,
@@ -189,7 +188,6 @@ def bad_phrase(
         stable_activation=0.0,
     )
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([[0], [1]], input_space)],

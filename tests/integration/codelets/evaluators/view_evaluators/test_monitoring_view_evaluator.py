@@ -91,7 +91,6 @@ def raw_input_item(raw_input_space):
     item = Chunk(
         "",
         "",
-        Mock(),
         [Location([], raw_input_space)],
         StructureCollection(),
         raw_input_space,
@@ -137,7 +136,6 @@ def good_view(
     interpretation_member = Chunk(
         "",
         "",
-        Mock(),
         [Location([], interpretation_space)],
         StructureCollection({Mock()}),
         Mock(),

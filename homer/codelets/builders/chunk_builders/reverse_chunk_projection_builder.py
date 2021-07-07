@@ -1,5 +1,3 @@
-import statistics
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import ChunkBuilder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -64,49 +62,6 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
             urgency,
         )
 
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target_view = bubble_chamber.monitoring_views.get_active()
-        target_interpretation_chunk = target_view.interpretation_space.contents.of_type(
-            Chunk
-        ).get_exigent()
-        target_members_raw_correspondees = StructureCollection(
-            {
-                argument
-                for member in target_interpretation_chunk.members
-                for correspondence in member.correspondences
-                for argument in correspondence.arguments
-                if argument.parent_space != target_interpretation_chunk.parent_space
-            }
-        )
-        if target_members_raw_correspondees.is_empty():
-            target_raw_chunk = (
-                target_view.raw_input_space.contents.of_type(Chunk)
-                .where(is_raw=True)
-                .get_exigent()
-            )
-        else:
-            target_raw_chunk = (
-                target_members_raw_correspondees.get_random()
-                .nearby(space=target_view.input_space)
-                .of_type(Chunk)
-                .where(is_raw=True)
-                .get_exigent()
-            )
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            target_view,
-            target_interpretation_chunk,
-            target_raw_chunk,
-            urgency,
-        )
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
@@ -117,46 +72,14 @@ class ReverseChunkProjectionBuilder(ChunkBuilder):
             "target_interpretation_chunk"
         ]
         self.target_raw_chunk = self._target_structures["target_raw_chunk"]
+        self.correspondee_to_raw_chunk = self._target_structures[
+            "correspondee_to_raw_chunk"
+        ]
+        self.new_chunk = self._target_structures["new_chunk"]
         if self.target_raw_chunk.has_correspondence_to_space(
             self.target_interpretation_chunk.parent_space
         ):
             return False
-        correspondee_location = Location(
-            self.target_raw_chunk.location_in_space(
-                self.target_raw_chunk.parent_space
-            ).coordinates,
-            self.target_interpretation_chunk.parent_space,
-        )
-        self.correspondee_to_raw_chunk = Chunk(
-            "",
-            self.codelet_id,
-            self.target_raw_chunk.value,
-            [correspondee_location],
-            StructureCollection(),
-            self.target_interpretation_chunk.parent_space,
-            0,
-        )
-        for space in self.target_interpretation_chunk.parent_spaces:
-            if not space.is_basic_level:
-                continue
-            project_item_into_space(self.correspondee_to_raw_chunk, space)
-        new_chunk_members = StructureCollection.union(
-            self.target_interpretation_chunk.members,
-            StructureCollection({self.correspondee_to_raw_chunk}),
-        )
-        locations = [
-            self._get_merged_location(new_chunk_members, space=parent_space)
-            for parent_space in self.target_interpretation_chunk.parent_spaces
-        ]
-        self.new_chunk = Chunk(
-            "",
-            self.codelet_id,
-            self._get_average_value(new_chunk_members),
-            locations,
-            new_chunk_members,
-            self.target_interpretation_chunk.parent_space,
-            0,
-        )
         return True
 
     def _process_structure(self):

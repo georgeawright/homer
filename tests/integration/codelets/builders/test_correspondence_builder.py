@@ -124,9 +124,9 @@ def same_different_concept(bubble_chamber):
         Mock(),
         Mock(),
         "same",
-        Location([], bubble_chamber.spaces["correspondential concepts"]),
+        [Location([], bubble_chamber.spaces["correspondential concepts"])],
         Mock(),
-        "value",
+        Mock(),
         Mock(),
         StructureCollection(),
         math.dist,
@@ -160,9 +160,9 @@ def same_concept(same_different_space, bubble_chamber):
         "same concept",
         Mock(),
         "same",
-        Location([1], same_different_space),
+        [Location([1], same_different_space)],
         SamenessClassifier(),
-        "value",
+        Mock(),
         Mock(),
         StructureCollection(),
         math.dist,
@@ -178,10 +178,10 @@ def temperature_concept(bubble_chamber):
         Mock(),
         Mock(),
         "temperature",
-        Location([], bubble_chamber.spaces["label concepts"]),
+        [Location([], bubble_chamber.spaces["label concepts"])],
         Mock(),
-        "value",
-        list,
+        Mock(),
+        Mock(),
         StructureCollection(),
         math.dist,
     )
@@ -216,10 +216,10 @@ def mild_concept(temperature_conceptual_space, bubble_chamber):
         "mild concept",
         Mock(),
         "mild",
-        Location([10], temperature_conceptual_space),
+        [Location([10], temperature_conceptual_space)],
         Mock(),
-        "value",
-        list,
+        Mock(),
+        Mock(),
         StructureCollection(),
         math.dist,
     )
@@ -328,8 +328,7 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
     chunk = Chunk(
         "target chunk",
         Mock(),
-        [10],
-        [Location([10], temperature_working_space)],
+        [Location([[10]], temperature_working_space)],
         StructureCollection(),
         Mock(),
         1.0,
@@ -344,8 +343,7 @@ def target_chunk(temperature_working_space, mild_concept, bubble_chamber):
     nearby_chunk = Chunk(
         Mock(),
         Mock(),
-        [10],
-        [Location([10], temperature_working_space)],
+        [Location([[10]], temperature_working_space)],
         StructureCollection(),
         Mock(),
         1.0,
@@ -362,8 +360,7 @@ def target_slot(
     slot = Chunk(
         "target slot",
         Mock(),
-        None,
-        [Location([0], template), Location([], temperature_template_space)],
+        [Location([[0]], template), Location([[None]], temperature_template_space)],
         StructureCollection(),
         template,
         1.0,
@@ -391,27 +388,6 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
     temperature_conceptual_space,
     mild_concept,
 ):
-    builder = CorrespondenceBuilder.spawn(
-        "",
-        bubble_chamber,
-        {
-            "target_view": target_view,
-            "target_space_one": temperature_working_space,
-            "target_structure_one": target_chunk,
-            "target_space_two": temperature_template_space,
-            "target_structure_two": target_slot,
-            "parent_concept": same_concept,
-            "target_conceptual_space": temperature_conceptual_space,
-        },
-        1.0,
-    )
-    builder.run()
-    assert CodeletResult.SUCCESS == builder.result
-    assert same_concept == builder.parent_concept
-    assert hasinstance(builder.child_structures, Correspondence)
-    assert isinstance(builder.child_codelets[0], CorrespondenceEvaluator)
-    builder.child_structures.get_random().quality = 1.0
-
     target_label = target_chunk.labels.get_random()
     target_slot_label = target_slot.labels.get_random()
     builder = CorrespondenceBuilder.spawn(
@@ -441,9 +417,9 @@ def test_successful_adds_correspondence_to_chunk_and_spawns_follow_up_and_same_c
         {
             "target_view": target_view,
             "target_space_one": temperature_working_space,
-            "target_structure_one": target_chunk,
+            "target_structure_one": target_label,
             "target_space_two": temperature_template_space,
-            "target_structure_two": target_slot,
+            "target_structure_two": target_slot_label,
             "parent_concept": same_concept,
             "target_conceptual_space": temperature_conceptual_space,
         },

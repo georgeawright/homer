@@ -54,7 +54,6 @@ def good_chunk():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
         StructureCollection({Mock()}),
         Mock(),
         1.0,
@@ -66,7 +65,6 @@ def good_chunk():
 @pytest.fixture
 def bad_chunk():
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         Mock(),

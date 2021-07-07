@@ -70,7 +70,6 @@ def start(working_space):
     chunk = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location([1, 1], working_space)],
         Mock(),
         Mock(),
@@ -82,7 +81,6 @@ def start(working_space):
 @pytest.fixture
 def end(working_space):
     chunk = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location([1, 2], working_space)],

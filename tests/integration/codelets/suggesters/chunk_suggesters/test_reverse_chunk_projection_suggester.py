@@ -68,7 +68,7 @@ def temperature_concept():
         "temperature",
         Mock(),
         Mock(),
-        "value",
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -99,10 +99,10 @@ def mild_concept(temperature_space):
         "",
         "",
         "mild",
-        Location([[10]], temperature_space),
+        [Location([[10]], temperature_space)],
         ProximityClassifier(),
-        "value",
         Mock(),
+        temperature_space,
         Mock(),
         distance_function=centroid_euclidean_distance,
     )
@@ -182,6 +182,11 @@ def interpretation_temperature_space(interpretation_space, temperature_space):
 
 
 @pytest.fixture
+def input_temperature_space(input_space, temperature_space):
+    return temperature_space.instance_in_space(input_space)
+
+
+@pytest.fixture
 def target_view(bubble_chamber, input_space, interpretation_space):
     view = MonitoringView(
         "",
@@ -203,7 +208,6 @@ def target_interpretation_chunk(
     chunk = Chunk(
         "",
         "",
-        Mock(),
         [
             Location([], interpretation_space),
             Location([[10]], interpretation_temperature_space),
@@ -221,12 +225,11 @@ def target_interpretation_chunk(
 
 
 @pytest.fixture
-def target_raw_chunk(input_space):
+def target_raw_chunk(input_space, input_temperature_space):
     chunk = Chunk(
         "",
         "",
-        [[10]],
-        [Location([[0, 0]], input_space)],
+        [Location([[0, 0]], input_space), Location([[10]], input_temperature_space)],
         StructureCollection(),
         input_space,
         Mock(),

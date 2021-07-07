@@ -24,6 +24,7 @@ class WorkingSpace(Space):
         dimensions: List[WorkingSpace],
         sub_spaces: List[WorkingSpace],
         is_basic_level: bool = False,
+        is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
@@ -42,6 +43,7 @@ class WorkingSpace(Space):
             sub_spaces,
             quality,
             is_basic_level=is_basic_level,
+            is_symbolic=is_symbolic,
             super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
             links_in=links_in,
             links_out=links_out,
@@ -90,6 +92,7 @@ class WorkingSpace(Space):
             dimensions=new_dimensions,
             sub_spaces=new_sub_spaces,
             is_basic_level=self.is_basic_level,
+            is_symbolic=self.is_symbolic,
             super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
         )
         bubble_chamber.logger.log(new_space)
@@ -140,10 +143,15 @@ class WorkingSpace(Space):
                     new_space.add(new_correspondence)
         return new_space
 
-    def copy_without_contents(self, parent_id: str) -> WorkingSpace:
+    def copy_without_contents(
+        self, parent_id: str, parent_space: WorkingSpace = None
+    ) -> WorkingSpace:
         """Returns an empty working space with the same conceptual space."""
+        parent_space = self.parent_space if parent_space is None else parent_space
         sub_space_copies = {
-            sub_space: sub_space.copy_without_contents(parent_id)
+            sub_space: sub_space.copy_without_contents(
+                parent_id, parent_space=parent_space
+            )
             for sub_space in self.sub_spaces
         }
         new_dimensions = (
@@ -152,18 +160,25 @@ class WorkingSpace(Space):
             else []
         )
         new_sub_spaces = [sub_space_copies[sub_space] for sub_space in self.sub_spaces]
+        locations = [
+            Location(location.coordinates, parent_space)
+            if location.space.conceptual_space == parent_space.conceptual_space
+            else location
+            for location in self.locations
+        ]
         new_space = WorkingSpace(
             structure_id=ID.new(WorkingSpace),
             parent_id=parent_id,
             name=self.name,
             parent_concept=self.parent_concept,
             conceptual_space=self.conceptual_space,
-            locations=self.locations,
+            locations=locations,
             contents=StructureCollection(),
             no_of_dimensions=self.no_of_dimensions,
             dimensions=new_dimensions,
             sub_spaces=new_sub_spaces,
             is_basic_level=self.is_basic_level,
+            is_symbolic=self.is_symbolic,
             super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
         )
         return new_space
@@ -187,6 +202,9 @@ class WorkingSpace(Space):
             if location.space.conceptual_space is None
             else location.space.conceptual_space.name
         )
-        coordinates_function = self.super_space_to_coordinate_function_map[space]
-        coordinates = coordinates_function(location)
+        if location.coordinates[0][0] is None:
+            coordinates = [[None for _ in range(self.no_of_dimensions)]]
+        else:
+            coordinates_function = self.super_space_to_coordinate_function_map[space]
+            coordinates = coordinates_function(location)
         return Location(coordinates, self)

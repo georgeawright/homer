@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 
 import django
 
@@ -171,6 +172,7 @@ class DjangoLogger(Logger):
             coderack_record.codelets_run.append(self.codelets_run)
             coderack_record.population.append(len(coderack._codelets))
             coderack_record.satisfaction.append(coderack.bubble_chamber.satisfaction)
+            coderack_record.result = coderack.bubble_chamber.result
             coderack_record.save()
         except CoderackRecord.DoesNotExist:
             CoderackRecord.objects.create(
@@ -193,17 +195,12 @@ class DjangoLogger(Logger):
                 structure_id=structure.structure_id,
                 run_id=self.run,
                 time_created=self.codelets_run,
-                value=structure.value,
                 locations={},
                 activation={},
                 unhappiness={},
                 quality={},
             )
-            self._log_message(
-                f"{structure.structure_id} created "
-                + f" by {structure.parent_id} - value: {structure.value}; "
-                + f"location: {structure.location}; activation: {structure.activation}"
-            )
+            self._log_message(f"Created {structure}")
             if structure.parent_id != "":
                 parent_codelet = CodeletRecord.objects.get(
                     codelet_id=structure.parent_id, run_id=self.run
@@ -216,6 +213,10 @@ class DjangoLogger(Logger):
                     structure_id=structure_record.id,
                     action="Created",
                 )
+            if hasattr(structure, "value"):
+                structure_record.value = structure.value
+            if not hasattr(structure, "value") and hasattr(structure, "name"):
+                structure_record.value = structure.name
             if hasattr(structure, "no_of_dimensions"):
                 structure_record.no_of_dimensions = structure.no_of_dimensions
             if hasattr(structure, "is_basic_level"):
@@ -309,7 +310,12 @@ class DjangoLogger(Logger):
                 space_name = location.space.structure_id
                 if space_name not in structure_record.locations:
                     print(f"Adding {structure.structure_id} to {space_name}")
-                structure_record.locations[space_name] = location.coordinates
+                coordinates = (
+                    location.coordinates
+                    if [math.nan] not in location.coordinates
+                    else [[]]
+                )
+                structure_record.locations[space_name] = coordinates
                 space_record = StructureRecord.objects.get(
                     structure_id=space_name, run_id=self.run
                 )

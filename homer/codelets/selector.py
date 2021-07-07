@@ -58,19 +58,19 @@ class Selector(Codelet):
             self._decay_losers()
         else:
             self.winners = self.champions
-            self.confidence = self.winners.get_random().quality
+            self.confidence = self.winners.get().quality
             self._boost_winners()
         self._boost_activations()
         self.follow_up_urgency = (
-            self.winners.get_random().quality - self.winners.get_random().activation
+            self.winners.get().quality - self.winners.get().activation
         )
         self._engender_follow_up()
         self.result = CodeletResult.SUCCESS
         return self.result
 
     def _hold_competition(self):
-        champions_quality = self.champions.get_random().quality
-        challengers_quality = self.challengers.get_random().quality
+        champions_quality = self.champions.get().quality
+        challengers_quality = self.challengers.get().quality
         champ_size_adjusted_quality = champions_quality * self._champions_size
         chall_size_adjusted_quality = challengers_quality * self._challengers_size
         total_quality = champ_size_adjusted_quality + chall_size_adjusted_quality
@@ -89,17 +89,14 @@ class Selector(Codelet):
             self.confidence = FloatBetweenOneAndZero(
                 chall_size_adjusted_quality - champ_size_adjusted_quality
             )
-        if (
-            self.challengers.get_random().activation
-            > self.champions.get_random().activation
-        ):
+        if self.challengers.get().activation > self.champions.get().activation:
             tmp = self.champions
             self.champions = self.challengers
             self.challengers = tmp
 
     @property
     def _parent_link(self):
-        return self._structure_concept.relations_with(self._select_concept).get_random()
+        return self._structure_concept.relations_with(self._select_concept).get()
 
     @property
     def _select_concept(self):
@@ -111,11 +108,11 @@ class Selector(Codelet):
 
     @property
     def _champions_size(self):
-        return self.champions.get_random().size
+        return self.champions.get().size
 
     @property
     def _challengers_size(self):
-        return self.challengers.get_random().size
+        return self.challengers.get().size
 
     def _boost_activations(self):
         self._select_concept.boost_activation(self.confidence)

@@ -1,21 +1,11 @@
-from homer.bubble_chamber import BubbleChamber
 from homer.codelets.selector import Selector
 from homer.codelets.suggesters import ChunkSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation
 
 
 class ChunkSelector(Selector):
-    @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        champion = bubble_chamber.input_nodes.where(is_chunk=True).get_active()
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            StructureCollection({champion}),
-            champion.activation,
-        )
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
@@ -24,8 +14,8 @@ class ChunkSelector(Selector):
         if self.challengers is not None:
             return True
         try:
-            champion_chunk = self.champions.get_random()
-            challenger_chunk = champion_chunk.nearby().get_active()
+            champion_chunk = self.champions.get()
+            challenger_chunk = champion_chunk.nearby().get(key=activation)
             self.challengers = StructureCollection({challenger_chunk})
         except MissingStructureError:
             return True
@@ -45,7 +35,7 @@ class ChunkSelector(Selector):
         )
 
     def _engender_follow_up(self):
-        new_target = self.winners.get_random()
+        new_target = self.winners.get()
         self.child_codelets.append(
             ChunkSuggester.spawn(
                 self.codelet_id,

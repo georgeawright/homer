@@ -53,10 +53,10 @@ def temperature_concept(label_concepts_space):
         Mock(),
         Mock(),
         "temperature",
-        Location([], label_concepts_space),
+        [Location([], label_concepts_space)],
         None,
-        "value",
-        list,
+        Chunk,
+        Mock(),
         StructureCollection(),
         centroid_euclidean_distance,
     )
@@ -90,10 +90,10 @@ def mild_concept(temperature_space):
         Mock(),
         Mock(),
         "mild",
-        Location([[10]], temperature_space),
+        [Location([[10]], temperature_space)],
         classifier,
-        "value",
-        Mock(),
+        Chunk,
+        temperature_space,
         StructureCollection(),
         centroid_euclidean_distance,
     )
@@ -141,7 +141,7 @@ def bubble_chamber(mild_concept, label_concepts_space, top_level_working_space):
 
 
 @pytest.fixture
-def target_chunk(bubble_chamber):
+def target_chunk(bubble_chamber, temperature_space):
     input_concept = Concept(
         Mock(),
         Mock(),
@@ -166,11 +166,11 @@ def target_chunk(bubble_chamber):
         [],
         [],
     )
+    temperature_space_in_input = temperature_space.instance_in_space(input_space)
     chunk = Chunk(
         Mock(),
         Mock(),
-        [[10]],
-        [Location([0, 0], input_space)],
+        [Location([0, 0], input_space), Location([[10]], temperature_space_in_input)],
         StructureCollection(),
         input_space,
         0.0,
@@ -178,8 +178,7 @@ def target_chunk(bubble_chamber):
     second_chunk = Chunk(
         Mock(),
         Mock(),
-        [[10]],
-        [Location([[0, 1]], input_space)],
+        [Location([[0, 1]], input_space), Location([[10]], temperature_space_in_input)],
         StructureCollection(),
         Mock(),
         0.0,

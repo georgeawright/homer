@@ -4,10 +4,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Node
 from homer.structures.links import Label
-from homer.structures.nodes import Concept
-from homer.tools import project_item_into_space
+from homer.tools import add_vectors
 
 
 class LabelBuilder(Builder):
@@ -47,37 +45,6 @@ class LabelBuilder(Builder):
             urgency,
         )
 
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target = bubble_chamber.input_nodes.get_exigent()
-        urgency = urgency if urgency is not None else target.unlinkedness
-        return cls.spawn(parent_id, bubble_chamber, target, urgency)
-
-    @classmethod
-    def make_top_down(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        parent_concept: Concept,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target = StructureCollection(
-            {
-                node
-                for node in bubble_chamber.input_nodes
-                if isinstance(node.value, parent_concept.instance_type)
-            }
-        ).get_unhappy()
-        urgency = urgency if urgency is not None else target.unlinkedness
-        return cls.spawn(
-            parent_id, bubble_chamber, target, urgency, parent_concept=parent_concept
-        )
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["label"]
@@ -91,9 +58,15 @@ class LabelBuilder(Builder):
         space = self.parent_concept.parent_space.instance_in_space(
             self.target_node.parent_space
         )
+        parent_concept_coordinates = self.parent_concept.location_in_space(
+            space.conceptual_space
+        ).coordinates
+        if not self.target_node.has_location_in_space(space):
+            self.target_node.locations.append(
+                Location(parent_concept_coordinates, space)
+            )
+            space.add(self.target_node)
         self.bubble_chamber.logger.log(space)
-        if self.target_node not in space.contents:
-            project_item_into_space(self.target_node, space)
         label = Label(
             ID.new(Label),
             self.codelet_id,

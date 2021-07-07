@@ -23,7 +23,7 @@ def target_view():
 def bubble_chamber(target_view):
     chamber = Mock()
     chamber.concepts = {"chunk": Mock(), "select": Mock(), "noun": Mock()}
-    chamber.monitoring_views.get_active.return_value = target_view
+    chamber.monitoring_views.get.return_value = target_view
     return chamber
 
 
@@ -53,7 +53,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber, target_view):
     challenger_correspondence.quality = 1.0
     challenger_correspondence.activation = 1.0
     collection = Mock()
-    collection.get_active.return_value = challenger
+    collection.get.return_value = challenger
     champion.nearby.return_value = collection
     selector = ChunkProjectionSelector(
         Mock(),

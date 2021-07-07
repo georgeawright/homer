@@ -11,7 +11,6 @@ def test_nearby():
     space_1_object = Node(
         Mock(),
         Mock(),
-        Mock(),
         [space_1_object_location],
         space_1,
         Mock(),
@@ -27,7 +26,6 @@ def test_nearby():
     space_2_object = Node(
         Mock(),
         Mock(),
-        Mock(),
         [space_2_object_location],
         space_2,
         Mock(),
@@ -40,7 +38,6 @@ def test_nearby():
     )
     space_2.contents.of_type.return_value = space_2_contents_of_type
     node = Node(
-        Mock(),
         Mock(),
         Mock(),
         [space_1_object_location, space_2_object_location],

@@ -29,7 +29,6 @@ class Rule(Node):
             self,
             structure_id,
             parent_id,
-            value=location.coordinates,
             locations=[location],
             parent_space=location.space,
             quality=quality,

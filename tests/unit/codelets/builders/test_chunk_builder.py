@@ -38,7 +38,6 @@ def second_target_chunk(common_space):
     location.coordinates = [[1, 1]]
     location.space = common_space
     chunk = Mock()
-    chunk.value = [[20]]
     chunk.size = 1
     chunk.activation = 0.5
     chunk.quality = 0.5
@@ -59,7 +58,6 @@ def target_chunk(common_space, second_target_chunk):
     location.coordinates = [[2, 2]]
     location.space = common_space
     chunk = Mock()
-    chunk.value = [[20]]
     chunk.size = 1
     chunk.activation = 0.5
     chunk.quality = 0.5

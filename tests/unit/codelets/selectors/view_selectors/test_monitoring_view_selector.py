@@ -3,8 +3,8 @@ import random
 from unittest.mock import Mock, patch
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders.view_builders import MonitoringViewBuilder
 from homer.codelets.selectors.view_selectors import MonitoringViewSelector
+from homer.codelets.suggesters.view_suggesters import MonitoringViewSuggester
 from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
@@ -88,5 +88,5 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 2 == len(selector.child_codelets)
-        assert hasinstance(selector.child_codelets, MonitoringViewBuilder)
+        assert hasinstance(selector.child_codelets, MonitoringViewSuggester)
         assert hasinstance(selector.child_codelets, MonitoringViewSelector)

@@ -6,6 +6,11 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import (
+    activation,
+    corresponding_exigency,
+    relating_exigency,
+)
 from homer.structures import Space
 from homer.structures.nodes import Chunk, Concept
 from homer.structures.views import MonitoringView
@@ -68,17 +73,17 @@ class RelationProjectionSuggester(RelationSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = (
-            bubble_chamber.monitoring_views.get_active()
+            bubble_chamber.monitoring_views.get(key=activation)
             if target_view is None
             else target_view
         )
-        target_chunk = target_view.interpretation_space.contents.of_type(
-            Chunk
-        ).get_unhappy()
+        target_chunk = target_view.interpretation_space.contents.of_type(Chunk).get(
+            key=relating_exigency
+        )
         potential_relating_words = (
             target_chunk.correspondences_to_space(target_view.text_space)
-            .get_random()
-            .arguments.get_random(exclude=[target_chunk])
+            .get()
+            .arguments.get(exclude=[target_chunk])
             .potential_relating_words
         )
         target_word = StructureCollection(
@@ -89,11 +94,13 @@ class RelationProjectionSuggester(RelationSuggester):
                     target_view.interpretation_space
                 )
             }
-        ).get_unhappy()
+        ).get(key=corresponding_exigency)
         urgency = (
             urgency
             if urgency is not None
-            else statistics.fmean([target_chunk.unlinkedness, target_word.unlinkedness])
+            else statistics.fmean(
+                [target_chunk.unrelatedness, target_word.uncorrespondedness]
+            )
         )
         return cls.spawn(
             parent_id,
@@ -127,19 +134,22 @@ class RelationProjectionSuggester(RelationSuggester):
         self.target_word = self._target_structures["target_word"]
         self.target_structure_one = self._target_structures["target_structure_one"]
         self.target_structure_two = self._target_structures["target_structure_two"]
-        self.conceptual_space = (
-            self.target_word.lexeme.concepts.get_random()
-            .parent_spaces.where(no_of_dimensions=1)
-            .get_random()
-        )
-        self.parent_concept = (
-            self.bubble_chamber.spaces["relational concepts"]
-            .contents.of_type(Space)
-            .get_random()
-            .contents.of_type(Concept)
-            .get_random()
-        )
-        self._target_structures["parent_concept"] = self.parent_concept
+        try:
+            self.conceptual_space = (
+                self.target_word.lexeme.concepts.get()
+                .parent_spaces.where(no_of_dimensions=1)
+                .get()
+            )
+            self.parent_concept = (
+                self.bubble_chamber.spaces["relational concepts"]
+                .contents.of_type(Space)
+                .get()
+                .contents.of_type(Concept)
+                .get()
+            )
+            self._target_structures["parent_concept"] = self.parent_concept
+        except MissingStructureError:
+            return False
         self.target_space = self.conceptual_space.instance_in_space(
             self.target_view.interpretation_space
         )
@@ -148,24 +158,23 @@ class RelationProjectionSuggester(RelationSuggester):
             self.target_structure_one.correspondences_to_space(
                 self.target_view.text_space
             )
-            .get_random()
-            .arguments.get_random(exclude=[self.target_structure_one])
+            .get()
+            .arguments.get(exclude=[self.target_structure_one])
         )
         if self.target_structure_two is None:
             try:
                 target_structure_two_corresponding_word = (
-                    self.target_word.potential_argument_words.get_exigent(
-                        exclude=[target_structure_one_corresponding_word]
+                    self.target_word.potential_argument_words.get(
+                        key=relating_exigency,
+                        exclude=[target_structure_one_corresponding_word],
                     )
                 )
                 self.target_structure_two = (
                     target_structure_two_corresponding_word.correspondences_to_space(
                         self.target_view.interpretation_space
                     )
-                    .get_random()
-                    .arguments.get_random(
-                        exclude=[target_structure_two_corresponding_word]
-                    )
+                    .get()
+                    .arguments.get(exclude=[target_structure_two_corresponding_word])
                 )
                 self._target_structures[
                     "target_structure_two"
@@ -182,9 +191,7 @@ class RelationProjectionSuggester(RelationSuggester):
         )
 
     def _calculate_confidence(self):
-        target_word_concept = self.target_word.lexeme.concepts.get_random()
+        target_word_concept = self.target_word.lexeme.concepts.get()
         self.confidence = (
-            target_word_concept.relations_with(self.parent_concept)
-            .get_random()
-            .activation
+            target_word_concept.relations_with(self.parent_concept).get().activation
         )

@@ -143,10 +143,10 @@ def warm_concept(temperature_conceptual_space, bubble_chamber):
         Mock(),
         Mock(),
         "warm",
-        Location([16], temperature_conceptual_space),
+        [Location([16], temperature_conceptual_space)],
         Mock(),
-        "value",
         Mock(),
+        temperature_conceptual_space,
         StructureCollection(),
         Mock(),
     )
@@ -235,7 +235,6 @@ def input_space_chunk(input_space, temperature_input_space, warm_concept, warm_l
     chunk = Chunk(
         "input space chunk",
         Mock(),
-        Mock(),
         [Location([], input_space), Location([0], temperature_input_space)],
         Mock(),
         input_space,
@@ -264,8 +263,7 @@ def template_chunk(
     chunk = Chunk(
         "template chunk",
         Mock(),
-        None,
-        [Location([], template), Location([], temperature_template_space)],
+        [Location([], template), Location([[None]], temperature_template_space)],
         StructureCollection(),
         template,
         1,
@@ -306,7 +304,7 @@ def template_slot_word(
         Mock(),
         None,
         WordForm.HEADWORD,
-        Location([0], template),
+        Location([[0]], template),
         template,
         Mock(),
     )

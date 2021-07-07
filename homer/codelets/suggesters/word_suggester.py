@@ -3,10 +3,9 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation, corresponding_exigency
 from homer.structures import View
-from homer.structures.links import Correspondence
 from homer.structures.nodes import Word
 from homer.structures.spaces import Frame
 
@@ -65,10 +64,10 @@ class WordSuggester(Suggester):
         target_view = (
             target_view
             if target_view is not None
-            else bubble_chamber.views.get_active()
+            else bubble_chamber.views.get(key=activation)
         )
-        frame = target_view.input_spaces.of_type(Frame).get_random()
-        target_word = frame.contents.of_type(Word).get_exigent()
+        frame = target_view.input_spaces.of_type(Frame).get()
+        target_word = frame.contents.of_type(Word).get(key=corresponding_exigency)
         urgency = urgency if urgency is not None else target_view.activation
         return cls.spawn(
             parent_id,
@@ -100,7 +99,7 @@ class WordSuggester(Suggester):
                     for correspondence in self.target_word.correspondences
                     if correspondence.start.is_slot and correspondence.end.is_slot
                 }
-            ).get_random()
+            ).get()
             self._target_structures["word_correspondee"] = self.word_correspondee
             self.correspondence_to_non_frame_item = StructureCollection(
                 {
@@ -112,7 +111,7 @@ class WordSuggester(Suggester):
                     )
                     and correspondence in self.target_view.members
                 }
-            ).get_random()
+            ).get()
             self.non_frame, self.non_frame_item = (
                 (
                     self.correspondence_to_non_frame_item.start_space,

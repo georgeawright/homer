@@ -1,15 +1,11 @@
-import statistics
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import RelationBuilder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Space, View
 from homer.structures.links import Correspondence, Relation
-from homer.structures.nodes import Chunk, Concept, Word
 from homer.tools import add_vectors, project_item_into_space
 
 
@@ -67,41 +63,6 @@ class RelationProjectionBuilder(RelationBuilder):
             urgency,
         )
 
-    @classmethod
-    def make(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        target_view = bubble_chamber.monitoring_views.get_active()
-        target_chunk = target_view.interpretation_space.contents.of_type(
-            Chunk
-        ).get_unhappy()
-        potential_relating_words = (
-            target_chunk.correspondences_to_space(target_view.text_space)
-            .get_random()
-            .arguments.get_random(exclude=[target_chunk])
-            .potential_relating_words
-        )
-        target_word = StructureCollection(
-            {
-                word
-                for word in potential_relating_words
-                if not word.has_correspondence_to_space(
-                    target_view.interpretation_space
-                )
-            }
-        ).get_unhappy()
-        urgency = (
-            urgency
-            if urgency is not None
-            else statistics.fmean([target_chunk.unlinkedness, target_word.unlinkedness])
-        )
-        return cls.spawn(
-            parent_id, bubble_chamber, target_view, target_chunk, target_word, urgency
-        )
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]
@@ -123,30 +84,32 @@ class RelationProjectionBuilder(RelationBuilder):
         )
 
     def _process_structure(self):
+        # TODO: work out how locations should be calculated if at all
+        # relational concept ought to have start and end prototype locations
         self.bubble_chamber.logger.log(self.target_space)
         if self.target_structure_one not in self.target_space.contents:
-            project_item_into_space(self.target_structure_one, self.target_space)
+            self.target_structure_one.locations.append(
+                Location(
+                    self.parent_concept.location_in_space(
+                        self.conceptual_space
+                    ).coordinates,
+                    self.target_space,
+                )
+            )
+            self.target_space.add(self.target_structure_one)
         if self.target_structure_two not in self.target_space.contents:
-            project_item_into_space(self.target_structure_two, self.target_space)
-        if self.target_space.parent_concept.relevant_value == "value":
-            self.target_structure_one.value = self.target_space.parent_concept.value
-            self.target_structure_two.value = add_vectors(
-                self.target_structure_one.value, self.parent_concept.value
+            self.target_structure_two.locations.append(
+                Location(
+                    add_vectors(
+                        self.parent_concept.location_in_space(
+                            self.conceptual_space
+                        ).coordinates,
+                        self.parent_concept.value,
+                    ),
+                    self.target_space,
+                )
             )
-        if self.target_space.parent_concept.relevant_value == "coordinates":
-            self.target_structure_one.location_in_space(
-                self.target_space
-            ).coordinates = self.target_space.parent_concept.location_in_space(
-                self.conceptual_space
-            ).coordinates
-            self.target_structure_two.location_in_space(
-                self.target_space
-            ).coordinates = add_vectors(
-                self.target_space.parent_concept.location_in_space(
-                    self.conceptual_space
-                ).coordinates,
-                self.parent_concept.value,
-            )
+            self.target_space.add(self.target_structure_two)
         relation = Relation(
             structure_id=ID.new(Relation),
             parent_id=self.codelet_id,

@@ -173,7 +173,6 @@ def original_phrase(word_1, word_2, input_space):
     chunk = Chunk(
         "",
         "",
-        "word word",
         [Location([[0], [1]], input_space)],
         StructureCollection({word_1, word_2}),
         input_space,
@@ -191,7 +190,7 @@ def original_phrase(word_1, word_2, input_space):
 @pytest.fixture
 def frame_phrase_1(template):
     chunk = Chunk(
-        "", "", None, [Location([], template)], StructureCollection(), template, 1.0
+        "", "", [Location([[None]], template)], StructureCollection(), template, 1.0
     )
     label = Label("", "", chunk, Mock(), template, 1.0)
     phrase = Phrase("", "", chunk, label, 1.0)
@@ -201,7 +200,7 @@ def frame_phrase_1(template):
 @pytest.fixture
 def frame_phrase_2(template):
     chunk = Chunk(
-        "", "", None, [Location([], template)], StructureCollection(), template, 1.0
+        "", "", [Location([[None]], template)], StructureCollection(), template, 1.0
     )
     label = Label("", "", chunk, Mock(), template, 1.0)
     phrase = Phrase("", "", chunk, label, 1.0)
@@ -242,7 +241,6 @@ def good_phrase_projection(
     chunk = Chunk(
         "",
         "",
-        "word word",
         [Location([[0], [1]], parent_view.output_space)],
         StructureCollection({word_1, word_2}),
         parent_view.output_space,
@@ -325,7 +323,6 @@ def bad_phrase_projection(
     chunk = Chunk(
         "",
         "",
-        "word word",
         [Location([[0], [1]], parent_view.output_space)],
         StructureCollection({word_1, word_2}),
         parent_view.output_space,

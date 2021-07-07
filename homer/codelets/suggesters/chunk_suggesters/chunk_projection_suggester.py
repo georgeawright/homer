@@ -3,6 +3,7 @@ from homer.codelets.suggesters import ChunkSuggester
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation, corresponding_exigency
 from homer.structures.views import MonitoringView
 
 
@@ -53,7 +54,7 @@ class ChunkProjectionSuggester(ChunkSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = (
-            bubble_chamber.monitoring_views.get_active()
+            bubble_chamber.monitoring_views.get(key=activation)
             if target_view is None
             else target_view
         )
@@ -63,8 +64,8 @@ class ChunkProjectionSuggester(ChunkSuggester):
                 for word in target_view.text_space.contents.where(is_word=True)
                 if word.has_label(bubble_chamber.concepts["noun"])
             }
-        ).get_unhappy()
-        urgency = urgency if urgency is not None else target_word.unhappiness
+        ).get(key=corresponding_exigency)
+        urgency = urgency if urgency is not None else target_word.uncorrespondedness
         return cls.spawn(
             parent_id,
             bubble_chamber,

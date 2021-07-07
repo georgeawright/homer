@@ -50,14 +50,12 @@ def test_equivalent_space():
     structure_with_equivalent_space = Chunk(
         Mock(),
         Mock(),
-        Mock(),
         [Location(Mock(), original_space_copy), Location(Mock(), other_space)],
         Mock(),
         Mock(),
         Mock(),
     )
     structure_without_equivalent_space = Chunk(
-        Mock(),
         Mock(),
         Mock(),
         [Location(Mock(), other_space)],

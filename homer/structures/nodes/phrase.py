@@ -1,4 +1,5 @@
 from __future__ import annotations
+from math import prod
 from typing import List, Union
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -28,7 +29,6 @@ class Phrase(Node):
             self,
             structure_id,
             parent_id,
-            value=label.value,
             locations=chunk.locations,
             parent_space=chunk.parent_space,
             quality=quality,
@@ -98,7 +98,9 @@ class Phrase(Node):
 
     @property
     def unchunkedness(self):
-        return self.chunk.unchunkedness
+        if len(self.super_phrases) == 0:
+            return 1
+        return 0.5 * prod([chunk.unchunkedness for chunk in self.super_phrases])
 
     @property
     def potential_rule_mates(self) -> StructureCollection:
@@ -155,7 +157,6 @@ class Phrase(Node):
         new_chunk = Chunk(
             ID.new(Chunk),
             parent_id,
-            value=f"{new_left_branch.value} {new_right_branch.value}",
             locations=[
                 Location.merge(new_left_branch.location, new_right_branch.location)
             ],

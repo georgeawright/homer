@@ -189,7 +189,6 @@ def original_phrase(word_1, word_2, input_space):
     chunk = Chunk(
         "",
         "",
-        "word word",
         [Location([[0], [1]], input_space)],
         StructureCollection({word_1, word_2}),
         input_space,
@@ -207,7 +206,7 @@ def original_phrase(word_1, word_2, input_space):
 @pytest.fixture
 def frame_phrase(template):
     chunk = Chunk(
-        "", "", None, [Location([], template)], StructureCollection(), template, 1.0
+        "", "", [Location([], template)], StructureCollection(), template, 1.0
     )
     label = Label("", "", chunk, Mock(), template, 1.0)
     phrase = Phrase("", "", chunk, label, 1.0)

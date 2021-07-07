@@ -1,10 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
-from homer.id import ID
-from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import WorkingSpace
-from homer.structures.views import SimplexView
+from homer.structure_collection_keys import activation
 
 
 class SimplexViewSuggester(ViewSuggester):
@@ -19,7 +16,7 @@ class SimplexViewSuggester(ViewSuggester):
         target_one = bubble_chamber.spaces["input"]
         target_two = bubble_chamber.frames.where(
             parent_concept=bubble_chamber.concepts["text"]
-        ).get_active()
+        ).get(key=activation)
         urgency = urgency if urgency is not None else target_two.activation
         return cls.spawn(
             parent_id,

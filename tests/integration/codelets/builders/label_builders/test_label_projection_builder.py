@@ -116,9 +116,9 @@ def location_concept():
         "",
         "",
         "location",
-        Location([], Mock()),
+        [Location([], Mock())],
         Mock(),
-        "value",
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -149,10 +149,10 @@ def south_concept(bubble_chamber, location_space):
         "",
         "",
         "south",
-        Location([[5, 2]], location_space),
+        [Location([[5, 2]], location_space)],
         Mock(),
         Mock(),
-        Mock(),
+        location_space,
         Mock(),
         Mock(),
     )
@@ -193,7 +193,6 @@ def target_chunk(interpretation_space, noun, target_view):
     chunk = Chunk(
         "chunk",
         "",
-        Mock(),
         [Location([], interpretation_space)],
         Mock(),
         interpretation_space,
@@ -226,9 +225,9 @@ def temperature_concept():
         "",
         "",
         "",
-        Location([], Mock()),
+        [Location([], Mock())],
         Mock(),
-        "value",
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -259,10 +258,10 @@ def hot_concept(bubble_chamber, temperature_space):
         "",
         "",
         "hot",
-        Location([[20]], temperature_space),
+        [Location([[20]], temperature_space)],
         Mock(),
         Mock(),
-        Mock(),
+        temperature_space,
         Mock(),
         Mock(),
     )
@@ -298,7 +297,13 @@ def target_word(text_space, noun, adj_concept, hot_concept):
 
 
 def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreated(
-    bubble_chamber, target_view, target_chunk, noun, target_word
+    bubble_chamber,
+    target_view,
+    target_chunk,
+    noun,
+    target_word,
+    hot_concept,
+    south_concept,
 ):
     parent_id = ""
     urgency = 1.0
@@ -309,6 +314,7 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
             "target_view": target_view,
             "target_chunk": target_chunk,
             "target_word": target_word,
+            "parent_concept": hot_concept,
         },
         urgency,
     )
@@ -324,6 +330,7 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
             "target_view": target_view,
             "target_chunk": target_chunk,
             "target_word": noun,
+            "parent_concept": south_concept,
         },
         urgency,
     )
@@ -339,6 +346,7 @@ def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreate
             "target_view": target_view,
             "target_chunk": target_chunk,
             "target_word": target_word,
+            "parent_concept": hot_concept,
         },
         urgency,
     )

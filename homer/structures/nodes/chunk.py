@@ -1,7 +1,7 @@
 from __future__ import annotations
 from math import prod
 import random
-from typing import Any, List
+from typing import List
 
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -10,13 +10,14 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
 
+from .concept import Concept
+
 
 class Chunk(Node):
     def __init__(
         self,
         structure_id: str,
         parent_id: str,
-        value: Any,
         locations: List[Location],
         members: StructureCollection,
         parent_space: Space,
@@ -30,7 +31,6 @@ class Chunk(Node):
             self,
             structure_id,
             parent_id,
-            value=value,
             locations=locations,
             parent_space=parent_space,
             quality=quality,
@@ -78,16 +78,18 @@ class Chunk(Node):
             [chunk.unchunkedness for chunk in self.chunks_made_from_this_chunk]
         )
 
-    def get_potential_relative(self, space: Space = None) -> Chunk:
+    def get_potential_relative(
+        self, space: Space = None, concept: Concept = None
+    ) -> Chunk:
         space = self.parent_space if space is None else space
         chunks = space.contents.where(is_chunk=True)
         if len(chunks) == 1:
             raise MissingStructureError
         for _ in range(len(chunks)):
-            chunk = chunks.get_random(exclude=[self])
+            chunk = chunks.get(exclude=[self])
             if space.proximity_between(chunk, self) - random.random() <= 0:
                 return chunk
-        return chunks.get_random(exclude=[self])
+        return chunks.get(exclude=[self])
 
     def copy(self, **kwargs: dict) -> Chunk:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""
@@ -112,7 +114,6 @@ class Chunk(Node):
         new_chunk = Chunk(
             ID.new(Chunk),
             parent_id,
-            value=self.value,
             locations=locations,
             members=StructureCollection(),
             parent_space=parent_space,

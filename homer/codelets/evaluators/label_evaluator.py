@@ -13,7 +13,7 @@ class LabelEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["label"]
-        target = bubble_chamber.labels.get_active()
+        target = bubble_chamber.labels.get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -24,10 +24,10 @@ class LabelEvaluator(Evaluator):
     @property
     def _parent_link(self):
         structure_concept = self.bubble_chamber.concepts["label"]
-        return structure_concept.relations_with(self._evaluate_concept).get_random()
+        return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_label = self.target_structures.get_random()
+        target_label = self.target_structures.get()
         self.confidence = target_label.parent_concept.classifier.classify(
             start=target_label.start,
             concept=target_label.parent_concept,
