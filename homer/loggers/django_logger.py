@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 
 import django
 
@@ -214,6 +215,8 @@ class DjangoLogger(Logger):
                 )
             if hasattr(structure, "value"):
                 structure_record.value = structure.value
+            if not hasattr(structure, "value") and hasattr(structure, "name"):
+                structure_record.value = structure.name
             if hasattr(structure, "no_of_dimensions"):
                 structure_record.no_of_dimensions = structure.no_of_dimensions
             if hasattr(structure, "is_basic_level"):
@@ -307,7 +310,12 @@ class DjangoLogger(Logger):
                 space_name = location.space.structure_id
                 if space_name not in structure_record.locations:
                     print(f"Adding {structure.structure_id} to {space_name}")
-                structure_record.locations[space_name] = location.coordinates
+                coordinates = (
+                    location.coordinates
+                    if [math.nan] not in location.coordinates
+                    else [[]]
+                )
+                structure_record.locations[space_name] = coordinates
                 space_record = StructureRecord.objects.get(
                     structure_id=space_name, run_id=self.run
                 )

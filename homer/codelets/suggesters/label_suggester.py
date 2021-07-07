@@ -1,5 +1,3 @@
-import random
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
 from homer.errors import MissingStructureError
@@ -7,8 +5,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import labeling_exigency
-from homer.structures.nodes import Chunk, Concept
-from homer.structures.spaces import ConceptualSpace
+from homer.structures.links import Label
+from homer.structures.nodes import Concept
 
 
 class LabelSuggester(Suggester):
@@ -83,21 +81,7 @@ class LabelSuggester(Suggester):
                 if isinstance(node, parent_concept.instance_type)
             }
         )
-        if parent_concept.instance_type == Chunk:
-            target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
-        else:
-            target = StructureCollection(
-                {
-                    target
-                    for target in potential_targets
-                    if parent_concept
-                    in [
-                        concept
-                        for list_of_concepts in target.lexeme.parts_of_speech.values()
-                        for concept in list_of_concepts
-                    ]
-                }
-            ).get(key=labeling_exigency)
+        target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
         urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(
             parent_id,
@@ -117,33 +101,34 @@ class LabelSuggester(Suggester):
     def _passes_preliminary_checks(self):
         self.target_node = self._target_structures["target_node"]
         self.parent_concept = self._target_structures["parent_concept"]
-        if self.parent_concept is None and self.target_node.is_word:
-            self.parent_concept = random.sample(
-                self.target_node.lexeme.parts_of_speech[self.target_node.word_form],
-                1,
-            )[0]
-        if self.parent_concept is None and self.target_node.is_chunk:
-            conceptual_space = (
-                self.bubble_chamber.spaces["label concepts"]
-                .contents.of_type(ConceptualSpace)
-                .where(is_basic_level=True)
-                .where(instance_type=type(self.target_node))
-                .get()
-            )
+        if self.parent_concept is None:
+            conceptual_space = StructureCollection(
+                {
+                    space
+                    for space in self.bubble_chamber.conceptual_spaces.where(
+                        is_basic_level=True
+                    ).where(instance_type=type(self.target_node))
+                    if self.target_node.has_location_in_conceptual_space(space)
+                }
+            ).get()
             location = self.target_node.location_in_conceptual_space(conceptual_space)
             try:
                 self.parent_concept = (
                     conceptual_space.contents.of_type(Concept)
-                    .where_not(classifier=None)
+                    .where(structure_type=Label)
                     .near(location)
                     .get()
                 )
             except MissingStructureError:
-                self.parent_concept = (
-                    conceptual_space.contents.of_type(Concept)
-                    .where_not(classifier=None)
-                    .get()
-                )
+                try:
+                    self.parent_concept = (
+                        conceptual_space.contents.of_type(Concept)
+                        .where(structure_type=Label)
+                        .where_not(classifier=None)
+                        .get()
+                    )
+                except MissingStructureError:
+                    return False
         if self.parent_concept is None:
             return False
         self._target_structures["parent_concept"] = self.parent_concept

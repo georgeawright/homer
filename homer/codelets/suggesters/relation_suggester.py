@@ -7,8 +7,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import relating_exigency
+from homer.structures.links import Relation
 from homer.structures.nodes import Concept
-from homer.structures.spaces import ConceptualSpace
 
 
 class RelationSuggester(Suggester):
@@ -88,7 +88,6 @@ class RelationSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        print(f"making top down relation suggester for {parent_concept}")
         target_space = StructureCollection(
             {
                 space
@@ -101,23 +100,18 @@ class RelationSuggester(Suggester):
             target_space.contents.where(is_chunk=True),
             target_space.contents.where(is_word=True),
         )
-        if parent_concept.instance_type == list:
-            target_structure_one = potential_targets.get(key=relating_exigency)
+        sample_proportion = 1 if potential_targets.get().is_word else 0.5
+        # maximize chances of finding right word for dependency relation
+        try:
+            target_structure_one = potential_targets.get(
+                key=lambda x: parent_concept.proximity_to_start(x),
+                sample_proportion=sample_proportion,
+            )
             target_structure_two = target_structure_one.get_potential_relative(
                 space=target_space, concept=parent_concept
             )
-        else:
-            try:
-                target_structure_one = potential_targets.get(
-                    key=lambda x: parent_concept.proximity_to_start(x)
-                )
-                target_structure_two = potential_targets.get(
-                    key=lambda x: parent_concept.proximity_to_end(
-                        x, start=target_structure_one.location_in_space(target_space)
-                    )
-                )
-            except NoLocationError:
-                raise MissingStructureError
+        except NoLocationError:
+            raise MissingStructureError
         urgency = (
             urgency
             if urgency is not None
@@ -142,38 +136,49 @@ class RelationSuggester(Suggester):
         return self.bubble_chamber.concepts["relation"]
 
     def _passes_preliminary_checks(self):
-        print(f"suggesting relation {self.codelet_id} spawned by {self.parent_id}")
         self.target_space = self._target_structures["target_space"]
         self.target_structure_one = self._target_structures["target_structure_one"]
         self.target_structure_two = self._target_structures["target_structure_two"]
         self.parent_concept = self._target_structures["parent_concept"]
-        print(f"    target space: {self.target_space}")
-        print(f"    target structure one: {self.target_structure_one}")
-        print(f"    target structure two: {self.target_structure_two}")
-        print(f"    parent concept: {self.parent_concept}")
         if self.parent_concept is None:
+            conceptual_space = StructureCollection(
+                {
+                    space
+                    for space in self.bubble_chamber.conceptual_spaces.where(
+                        is_basic_level=True
+                    ).where(instance_type=type(self.target_structure_one))
+                    if self.target_structure_one.has_location_in_conceptual_space(space)
+                }
+            ).get()
+            location = self.target_structure_one.location_in_conceptual_space(
+                conceptual_space
+            )
             try:
-                relational_conceptual_spaces = self.bubble_chamber.spaces[
-                    "relational concepts"
-                ].contents.of_type(ConceptualSpace)
-                print(relational_conceptual_spaces)
-                compatible_conceptual_spaces = StructureCollection(
+                self.parent_concept = StructureCollection(
                     {
-                        space
-                        for space in relational_conceptual_spaces
-                        if space.is_compatible_with(self.target_space)
+                        concept
+                        for concept in conceptual_space.contents.of_type(Concept).where(
+                            structure_type=Relation
+                        )
+                        if any(
+                            [
+                                location.start_is_near(location)
+                                for location in concept.locations
+                                if location.space == conceptual_space
+                            ]
+                        )
                     }
-                )
-                print(
-                    f"    compatible conceptual spaces: {compatible_conceptual_spaces}"
-                )
-                print(compatible_conceptual_spaces.get().contents)
-                self.parent_concept = (
-                    compatible_conceptual_spaces.get().contents.of_type(Concept).get()
-                )
-                print(f"    found parent concept: {self.parent_concept}")
+                ).get()
             except MissingStructureError:
-                return False
+                try:
+                    self.parent_concept = (
+                        conceptual_space.contents.of_type(Concept)
+                        .where(structure_type=Relation)
+                        .where_not(classifier=None)
+                        .get()
+                    )
+                except MissingStructureError:
+                    return False
         if self.target_structure_two is None:
             try:
                 self.target_structure_two = (
@@ -181,12 +186,10 @@ class RelationSuggester(Suggester):
                         space=self.target_space, concept=self.parent_concept
                     )
                 )
-                print(f"    found target structure two: {self.target_structure_two}")
             except MissingStructureError:
-                print("    couldn't find second target structure")
                 return False
-        self._target_structures["target_structure_two"] = self.target_structure_two
         self._target_structures["parent_concept"] = self.parent_concept
+        self._target_structures["target_structure_two"] = self.target_structure_two
         return not self.target_structure_one.has_relation(
             self.target_space,
             self.parent_concept,
@@ -201,7 +204,6 @@ class RelationSuggester(Suggester):
             start=self.target_structure_one,
             end=self.target_structure_two,
         )
-        print(f"    confidence: {self.confidence}")
 
     def _fizzle(self):
         pass

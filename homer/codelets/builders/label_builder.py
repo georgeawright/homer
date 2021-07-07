@@ -66,11 +66,6 @@ class LabelBuilder(Builder):
                 Location(parent_concept_coordinates, space)
             )
             space.add(self.target_node)
-        elif space.is_symbolic:
-            self.target_node.location_in_space(space).coordinates = add_vectors(
-                self.target_node.location_in_space(space).coordinates,
-                parent_concept_coordinates,
-            )
         self.bubble_chamber.logger.log(space)
         label = Label(
             ID.new(Label),

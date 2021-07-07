@@ -57,7 +57,6 @@ class CoderackCleaner(Codelet):
         probability_of_codelet_deletion = 1 - statistics.fmean(
             [current_satisfaction_score, transposed_change_in_satisfaction_score]
         )
-        print(f"probability of codelet deletion: {probability_of_codelet_deletion}")
         for codelet in list(self.coderack._codelets):
             if type(codelet) not in self.coderack.recently_run:
                 continue

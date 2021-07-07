@@ -153,11 +153,15 @@ class StructureCollection:
         key: callable = None,
         comparison_operator: callable = operator.gt,
         exclude: list = None,
+        sample_proportion: float = 0.5,
     ):
         if key is None:
             return self.get_random(exclude=exclude)
         return self._get_structure_according_to(
-            key, comparison_operator=comparison_operator, exclude=exclude
+            key,
+            comparison_operator=comparison_operator,
+            exclude=exclude,
+            sample_proportion=sample_proportion,
         )
 
     def get_random(self, exclude: list = None):
@@ -181,6 +185,7 @@ class StructureCollection:
         key: callable,
         comparison_operator: callable = operator.gt,
         exclude: list = None,
+        sample_proportion: float = 0.5,
     ):
         """Returns a structure probabilistically according to key."""
         if len(self.structures) < 1:
@@ -191,7 +196,9 @@ class StructureCollection:
             )._get_structure_according_to(key)
         if len(self.structures) == 1:
             return list(self.structures)[0]
-        structures = random.sample(self.structures, len(self.structures) // 2)
+        structures = random.sample(
+            self.structures, len(self.structures) // int(1 / sample_proportion)
+        )
         structure_choice = structures[0]
         for structure in structures[1:]:
             if comparison_operator(key(structure), key(structure_choice)):

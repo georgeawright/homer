@@ -2,8 +2,8 @@ from homer.classifier import Classifier
 
 
 class RuleClassifier(Classifier):
-    def __init__(self, rules):
-        self.rules = rules
+    def __init__(self, rule):
+        self.rule = rule
 
     def classify(self, **kwargs: dict):
-        return all(rule(kwargs) for rule in self.rules)
+        return self.rule(kwargs)

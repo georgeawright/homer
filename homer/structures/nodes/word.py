@@ -1,7 +1,7 @@
 from __future__ import annotations
 from math import prod
 import random
-from typing import Union
+from typing import List, Union
 
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -20,9 +20,10 @@ class Word(Node):
         self,
         structure_id: str,
         parent_id: str,
+        name: str,
         lexeme: Union[Lexeme, None],
         word_form: WordForm,
-        location: Location,
+        locations: List[Location],
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
@@ -32,12 +33,13 @@ class Word(Node):
             self,
             structure_id,
             parent_id,
-            locations=[location],
+            locations=locations,
             parent_space=parent_space,
             quality=quality,
             links_in=links_in,
             links_out=links_out,
         )
+        self.name = name
         self.lexeme = lexeme
         self.word_form = word_form
         self.is_word = True
@@ -61,12 +63,12 @@ class Word(Node):
         return WordSelector
 
     @property
-    def value(self):
-        return self.lexeme.forms[self.word_form] if self.lexeme is not None else None
+    def is_slot(self):
+        return self.name is None
 
     @property
-    def is_slot(self):
-        return self.value is None
+    def is_abstract(self):
+        return self.parent_space is None
 
     @property
     def concepts(self):
@@ -74,6 +76,8 @@ class Word(Node):
 
     @property
     def unchunkedness(self):
+        if self.is_abstract:
+            return 0
         if len(self.super_phrases) == 0:
             return 1
         return 0.5 * prod([chunk.unchunkedness for chunk in self.super_phrases])
@@ -217,12 +221,8 @@ class Word(Node):
             raise MissingStructureError
         for _ in range(len(words)):
             word = words.get(exclude=[self])
-            distance = abs(
-                word.location.coordinates[0][0] - self.location.coordinates[0][0]
-            )
-            if (
-                concept in word.lexeme.syntactic_concepts
-                and 1 / distance + random.random() >= 1
+            if concept.location_in_space(concept.parent_space).end_is_near(
+                word.location_in_conceptual_space(concept.parent_space)
             ):
                 return word
         return words.get(exclude=[self])
@@ -232,13 +232,23 @@ class Word(Node):
         bubble_chamber = kwargs["bubble_chamber"]
         parent_id = kwargs["parent_id"]
         parent_space = kwargs["parent_space"]
-        location = Location(self.location.coordinates, parent_space)
+        locations = [
+            Location(
+                location.coordinates,
+                location.space.conceptual_space.instance_in_space(parent_space),
+            )
+            for location in self.locations
+            if not location.space.is_frame
+        ] + [Location(self.location.coordinates, parent_space)]
+        for location in locations:
+            bubble_chamber.logger.log(location.space)
         new_word = Word(
             ID.new(Word),
             parent_id,
+            name=self.name,
             lexeme=self.lexeme,
             word_form=self.word_form,
-            location=location,
+            locations=locations,
             parent_space=parent_space,
             quality=self.quality,
         )
@@ -247,8 +257,29 @@ class Word(Node):
         bubble_chamber.words.add(new_word)
         return new_word
 
+    def copy_to_location(self, location: Location) -> Word:
+        parent_space = location.space
+        locations = [
+            Location(
+                location.coordinates, location.space.instance_in_space(parent_space)
+            )
+            for location in self.locations
+        ] + [location]
+        new_word = Word(
+            ID.new(Word),
+            parent_id="",
+            name=self.name,
+            lexeme=self.lexeme,
+            word_form=self.word_form,
+            locations=locations,
+            parent_space=location.space,
+            quality=self.quality,
+        )
+        parent_space.add(new_word)
+        return new_word
+
     def __repr__(self) -> str:
         return (
-            f'<{self.structure_id} "{self.value}" '
+            f'<{self.structure_id} "{self.name}" '
             + " in {self.parent_space.structure_id} {self.locations}>"
         )

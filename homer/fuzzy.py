@@ -5,8 +5,13 @@ def NOT(a: float) -> float:
     return 1.0 - a
 
 
-def AND(*arg):
-    return reduce(_AND, arg)
+def AND(*args):
+    result = 1
+    for arg in args:
+        result = _AND(result, arg)
+        if result == 0:
+            return result
+    return result
 
 
 def OR(*arg):

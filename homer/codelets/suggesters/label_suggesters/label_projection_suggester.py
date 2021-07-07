@@ -122,7 +122,7 @@ class LabelProjectionSuggester(LabelSuggester):
         self.target_word = self._target_structures["target_word"]
         self.target_chunk = self._target_structures["target_chunk"]
         try:
-            self.parent_concept = self.target_word.lexeme.semantic_concepts.get()
+            self.parent_concept = self.target_word.concepts.get()
             self._target_structures["parent_concept"] = self.parent_concept
         except MissingStructureError:
             return False

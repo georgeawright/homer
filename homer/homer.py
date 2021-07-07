@@ -117,6 +117,7 @@ class Homer:
         classifier: Classifier = None,
         parent_space: ConceptualSpace = None,
         instance_type: type = Chunk,
+        structure_type: type = None,
         child_spaces: StructureCollection = None,
         distance_function: Callable = None,
         links_in: StructureCollection = None,
@@ -133,6 +134,7 @@ class Homer:
             locations=locations,
             classifier=classifier,
             instance_type=instance_type,
+            structure_type=structure_type,
             parent_space=parent_space,
             child_spaces=(
                 child_spaces if child_spaces is not None else StructureCollection()
@@ -218,20 +220,13 @@ class Homer:
     def def_lexeme(
         self,
         headword: str = "",
-        forms: Dict[str, str] = None,
-        parts_of_speech: Dict[WordForm, List[Concept]] = None,
         parent_concept: Concept = None,
     ) -> Lexeme:
-        if operator.xor(forms is None, parts_of_speech is None) or (
-            forms.keys() != parts_of_speech.keys()
-        ):
-            raise Exception("lexeme forms and parts of speech do not match")
         lexeme = Lexeme(
             structure_id=ID.new(Lexeme),
             parent_id="",
             headword=headword,
-            forms=forms,
-            parts_of_speech=parts_of_speech,
+            word_forms={},
         )
         self.logger.log(lexeme)
         self.bubble_chamber.lexemes.add(lexeme)
@@ -267,9 +262,13 @@ class Homer:
                 item.label.locations = [Location([[i]], template)]
                 item._parent_space = template
                 item._locations = [Location([[i]], template)]
-            if item.is_word:
+            if item.is_word and not item.is_slot:
+                item = item.copy_to_location(Location([[i]], template))
+                for location in item.locations:
+                    self.logger.log(location.space)
+            if item.is_word and item.is_slot:
+                item.locations.append(Location([[i]], template))
                 item.parent_space = template
-                item.locations = [Location([[i]], template)]
             template.contents.add(item)
             self.logger.log(item)
         self.bubble_chamber.conceptual_spaces.add(template)
@@ -278,19 +277,28 @@ class Homer:
 
     def def_word(
         self,
+        name: str = None,
         lexeme: Lexeme = None,
         word_form: WordForm = WordForm.HEADWORD,
+        locations: List[Location] = None,
         quality: FloatBetweenOneAndZero = 1.0,
     ):
+        locations = [] if locations is None else locations
         word = Word(
             structure_id=ID.new(Word),
             parent_id="",
+            name=name,
             lexeme=lexeme,
             word_form=word_form,
-            location=None,
+            locations=locations,
             parent_space=None,
             quality=quality,
         )
+        if lexeme is not None:
+            lexeme.word_forms[word_form] = word
+        for location in locations:
+            location.space.add(word)
+        self.logger.log(word)
         return word
 
     def def_phrase(

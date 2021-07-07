@@ -134,19 +134,22 @@ class RelationProjectionSuggester(RelationSuggester):
         self.target_word = self._target_structures["target_word"]
         self.target_structure_one = self._target_structures["target_structure_one"]
         self.target_structure_two = self._target_structures["target_structure_two"]
-        self.conceptual_space = (
-            self.target_word.lexeme.concepts.get()
-            .parent_spaces.where(no_of_dimensions=1)
-            .get()
-        )
-        self.parent_concept = (
-            self.bubble_chamber.spaces["relational concepts"]
-            .contents.of_type(Space)
-            .get()
-            .contents.of_type(Concept)
-            .get()
-        )
-        self._target_structures["parent_concept"] = self.parent_concept
+        try:
+            self.conceptual_space = (
+                self.target_word.lexeme.concepts.get()
+                .parent_spaces.where(no_of_dimensions=1)
+                .get()
+            )
+            self.parent_concept = (
+                self.bubble_chamber.spaces["relational concepts"]
+                .contents.of_type(Space)
+                .get()
+                .contents.of_type(Concept)
+                .get()
+            )
+            self._target_structures["parent_concept"] = self.parent_concept
+        except MissingStructureError:
+            return False
         self.target_space = self.conceptual_space.instance_in_space(
             self.target_view.interpretation_space
         )

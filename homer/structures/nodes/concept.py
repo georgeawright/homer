@@ -17,6 +17,7 @@ class Concept(Node):
         locations: List[Location],
         classifier: Classifier,
         instance_type: type,
+        structure_type: type,
         parent_space: Space,
         child_spaces: StructureCollection,
         distance_function: Callable,
@@ -39,6 +40,7 @@ class Concept(Node):
         self.name = name
         self.classifier = classifier
         self.instance_type = instance_type
+        self.structure_type = structure_type
         self.child_spaces = child_spaces
         self.distance_function = distance_function
         self.depth = depth
@@ -74,7 +76,7 @@ class Concept(Node):
 
     def distance_from_end(self, other: Node, start: Location = None):
         return self.distance_function(
-            self.location_in_space(self.parent_space, start=start).start_coordinates,
+            self.location_in_space(self.parent_space, start=start).end_coordinates,
             other.location_in_conceptual_space(self.parent_space).coordinates,
         )
 
@@ -105,8 +107,16 @@ class Concept(Node):
         return self._distance_to_proximity(self.distance_between(a, b, space=space))
 
     def _distance_to_proximity(self, value: float) -> float:
+        # TODO: consider using a distance_to_proximity function instead of weight
         if value == 0:
             return 1.0
+        # return min(self.distance_to_proximity_function(value), 1.0)
         inverse = 1.0 / value
         proximity = inverse * self.distance_to_proximity_weight
         return min(proximity, 1.0)
+
+    def __repr__(self) -> str:
+        return (
+            f"<{self.structure_id} {self.name} in "
+            + f"{self.parent_space.structure_id} {self.locations}>"
+        )

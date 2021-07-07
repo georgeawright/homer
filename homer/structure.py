@@ -243,6 +243,13 @@ class Structure(ABC):
         except NoLocationError:
             return False
 
+    def has_location_in_conceptual_space(self, space: Structure) -> bool:
+        try:
+            self.location_in_conceptual_space(space)
+            return True
+        except NoLocationError:
+            return False
+
     def location_in_space(
         self, space: Structure, start: Location = None, end: Location = None
     ) -> Location:
@@ -274,17 +281,17 @@ class Structure(ABC):
             f"{self.structure_id} has no location for conceputal space {space.structure_id}"
         )
 
-    def has_label(self, concept: Structure) -> bool:
+    def has_label(self, concept: Structure) -> FloatBetweenOneAndZero:
         for label in self.labels:
             if label.parent_concept == concept:
-                return True
-        return False
+                return label.activation
+        return 0.0
 
-    def has_label_with_name(self, name: str) -> bool:
+    def has_label_with_name(self, name: str) -> FloatBetweenOneAndZero:
         for label in self.labels:
             if label.parent_concept.name == name:
-                return True
-        return False
+                return label.activation
+        return 0.0
 
     def label_of_type(self, concept: Structure):
         for label in self.labels:
@@ -303,7 +310,7 @@ class Structure(ABC):
         concept: Structure,
         first_argument: Structure,
         second_argument: Structure,
-    ) -> bool:
+    ) -> FloatBetweenOneAndZero:
         for relation in self.relations:
             if (
                 relation.parent_concept == concept
@@ -311,14 +318,14 @@ class Structure(ABC):
                 and relation.end == second_argument
                 and relation.parent_space == space
             ):
-                return True
-        return False
+                return relation.activation
+        return 0.0
 
-    def has_relation_with_name(self, name: str) -> bool:
+    def has_relation_with_name(self, name: str) -> FloatBetweenOneAndZero:
         for relation in self.relations:
             if relation.parent_concept.name == name:
-                return True
-        return False
+                return relation.activation
+        return 0.0
 
     def relation_with_name(self, name: str) -> Structure:
         for relation in self.relations:
