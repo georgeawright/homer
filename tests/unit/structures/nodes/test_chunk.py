@@ -6,13 +6,11 @@ from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Chunk
 
 
-@pytest.mark.skip
 def test_size_no_members():
     chunk = Chunk(Mock(), Mock(), Mock(), StructureCollection(), Mock(), Mock(), Mock())
     assert chunk.size == 1
 
 
-@pytest.mark.skip
 def test_size_recursive():
     size = 10
     members = StructureCollection()
@@ -24,7 +22,6 @@ def test_size_recursive():
     assert size == chunk.size
 
 
-@pytest.mark.skip
 def test_location_in_space():
     space_1 = Mock()
     space_1_location = Mock()

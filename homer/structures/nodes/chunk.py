@@ -11,6 +11,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
 
 from .concept import Concept
+from .rule import Rule
 
 
 class Chunk(Node):
@@ -22,6 +23,9 @@ class Chunk(Node):
         members: StructureCollection,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
+        left_branch: Node = None,
+        right_branch: Node = None,
+        rule: Rule = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
         chunks_made_from_this_chunk: StructureCollection = None,
@@ -38,6 +42,9 @@ class Chunk(Node):
             links_out=links_out,
         )
         self.members = members
+        self.left_branch = left_branch
+        self.right_branch = right_branch
+        self.rule = rule
         self.chunks_made_from_this_chunk = (
             chunks_made_from_this_chunk
             if chunks_made_from_this_chunk is not None
@@ -78,6 +85,16 @@ class Chunk(Node):
             [chunk.unchunkedness for chunk in self.chunks_made_from_this_chunk]
         )
 
+    @property
+    def potential_chunk_mates(self) -> StructureCollection:
+        return StructureCollection.union(
+            self.adjacent, self.chunks_made_from_this_chunk, self.members
+        )
+
+    @property
+    def adjacent(self) -> StructureCollection:
+        return self.parent_space.contents.next_to(self.location).where(is_node=True)
+
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:
@@ -90,6 +107,9 @@ class Chunk(Node):
             if space.proximity_between(chunk, self) - random.random() <= 0:
                 return chunk
         return chunks.get(exclude=[self])
+
+    def nearby(self, space: Space = None) -> StructureCollection:
+        pass
 
     def copy(self, **kwargs: dict) -> Chunk:
         """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""
