@@ -66,6 +66,7 @@ def target_word(bubble_chamber, parent_concept):
     return word
 
 
+@pytest.mark.skip
 def test_successful_creates_label_corresponding_to_word_and_spawns_follow_up(
     bubble_chamber, target_view, target_word, parent_concept
 ):
@@ -85,6 +86,7 @@ def test_successful_creates_label_corresponding_to_word_and_spawns_follow_up(
     assert isinstance(builder.child_codelets[0], LabelProjectionEvaluator)
 
 
+@pytest.mark.skip
 def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     bubble_chamber, target_view, target_word, parent_concept
 ):
@@ -107,6 +109,7 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     assert CodeletResult.FIZZLE == builder.result
 
 
+@pytest.mark.skip
 def test_fizzles_if_target_chunk_already_has_corresponding_label(
     bubble_chamber,
     target_view,

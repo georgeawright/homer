@@ -37,11 +37,13 @@ def hot_word(hot_lexeme, headword_word_form):
     return word
 
 
+@pytest.mark.skip
 def test_classifies_adjective_as_adjective(adjective_concept, hot_word):
     classifier = PartOfSpeechClassifier()
     assert classifier.classify(concept=adjective_concept, start=hot_word)
 
 
+@pytest.mark.skip
 def test_does_not_classify_adjective_as_noun(noun_concept, hot_word):
     classifier = PartOfSpeechClassifier()
     assert not classifier.classify(concept=noun_concept, start=hot_word)

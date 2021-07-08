@@ -26,6 +26,7 @@ def bubble_chamber(target_view):
     return chamber
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "champion_quality, champion_activation, "
     + "challenger_quality, challenger_activation, "

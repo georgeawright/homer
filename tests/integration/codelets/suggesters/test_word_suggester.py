@@ -350,6 +350,7 @@ def template_function_word(template):
     return word
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_content_word_and_spawns_follow_up(
     bubble_chamber, target_view, template_slot_word
 ):
@@ -367,6 +368,7 @@ def test_gives_high_confidence_for_content_word_and_spawns_follow_up(
     assert isinstance(suggester.child_codelets[0], WordBuilder)
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_function_word_and_spawns_follow_up(
     bubble_chamber, target_view, template_function_word
 ):

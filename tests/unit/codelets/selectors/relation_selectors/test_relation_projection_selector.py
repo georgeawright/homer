@@ -46,6 +46,7 @@ def bubble_chamber(target_view):
     return chamber
 
 
+@pytest.mark.skip
 def test_chunk_and_correspondence_are_boosted_follow_up_is_spawned(
     bubble_chamber, target_view
 ):

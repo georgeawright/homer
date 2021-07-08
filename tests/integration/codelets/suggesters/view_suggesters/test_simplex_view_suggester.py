@@ -98,6 +98,7 @@ def target_frame(bubble_chamber):
     return frame
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_active_spaces_and_spawns_follow_up(
     bubble_chamber,
     input_space,

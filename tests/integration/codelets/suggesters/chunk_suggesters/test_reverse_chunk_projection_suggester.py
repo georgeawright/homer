@@ -239,6 +239,7 @@ def target_raw_chunk(input_space, input_temperature_space):
     return chunk
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_compatible_chunks_and_spawns_follow_up(
     bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
 ):

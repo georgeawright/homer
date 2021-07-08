@@ -131,6 +131,7 @@ def vp(vp_concept, text_working_space):
     return phrase
 
 
+@pytest.mark.skip
 def test_successfully_creates_a_branch_slot(bubble_chamber, s, np, s_np_vp):
     target_structures = {
         "target_root": s,
@@ -152,6 +153,7 @@ def test_successfully_creates_a_branch_slot(bubble_chamber, s, np, s_np_vp):
     assert isinstance(phrase_builder.child_codelets[0], PhraseEvaluator)
 
 
+@pytest.mark.skip
 def test_successfully_fills_in_a_root_slot(bubble_chamber, s_slot, np, vp, s_np_vp):
     target_structures = {
         "target_root": s_slot,
@@ -173,6 +175,7 @@ def test_successfully_fills_in_a_root_slot(bubble_chamber, s_slot, np, vp, s_np_
     assert isinstance(phrase_builder.child_codelets[0], PhraseEvaluator)
 
 
+@pytest.mark.skip
 def test_successfully_creates_and_fills_a_root_slot(
     bubble_chamber, np, vp, s_np_vp, s_concept
 ):

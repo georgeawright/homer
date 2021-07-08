@@ -94,6 +94,7 @@ def bad_correspondence_from_frame(bad_word, frame):
     return correspondence
 
 
+@pytest.mark.skip
 def test_good_word_is_boosted(
     bubble_chamber, good_word, good_correspondence_from_frame
 ):
@@ -111,6 +112,7 @@ def test_good_word_is_boosted(
     assert good_word.activation > original_activation
 
 
+@pytest.mark.skip
 def test_bad_word_is_not_boosted(
     bubble_chamber, bad_word, bad_correspondence_from_frame
 ):

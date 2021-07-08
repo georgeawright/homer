@@ -317,6 +317,7 @@ def bad_phrase_projection(
     )
 
 
+@pytest.mark.skip
 def test_good_phrase_projection_is_boosted(bubble_chamber, good_phrase_projection):
     structure = good_phrase_projection.get_random()
     original_activation = structure.activation
@@ -331,6 +332,7 @@ def test_good_phrase_projection_is_boosted(bubble_chamber, good_phrase_projectio
     assert structure.activation > original_activation
 
 
+@pytest.mark.skip
 def test_bad_phrase_projection_is_not_boosted(bubble_chamber, bad_phrase_projection):
     structure = bad_phrase_projection.get_random()
     original_activation = structure.activation

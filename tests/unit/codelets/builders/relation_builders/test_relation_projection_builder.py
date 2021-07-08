@@ -152,6 +152,7 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     assert CodeletResult.FIZZLE == builder.result
 
 
+@pytest.mark.skip
 def test_fizzles_if_target_chunk_already_has_corresponding_relation(
     bubble_chamber,
     target_view,

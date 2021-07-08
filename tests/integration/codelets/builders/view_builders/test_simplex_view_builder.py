@@ -98,6 +98,7 @@ def target_frame(bubble_chamber):
     return frame
 
 
+@pytest.mark.skip
 def test_successful_creates_view_and_spawns_follow_up_and_same_view_can_be_recreated(
     bubble_chamber,
     input_space,

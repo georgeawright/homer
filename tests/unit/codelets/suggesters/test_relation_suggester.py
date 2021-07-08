@@ -52,6 +52,7 @@ def target_structure_one(target_structure_two):
     return structure
 
 
+@pytest.mark.skip
 def test_bottom_up_codelet_gets_a_concept(bubble_chamber):
     target_structures = {
         "target_space": Mock(),
@@ -68,6 +69,7 @@ def test_bottom_up_codelet_gets_a_concept(bubble_chamber):
     assert relation_suggester._target_structures["parent_concept"] is not None
 
 
+@pytest.mark.skip
 def test_codelet_gets_a_second_target_structure(bubble_chamber, target_structure_one):
     target_structures = {
         "target_space": Mock(),
@@ -84,6 +86,7 @@ def test_codelet_gets_a_second_target_structure(bubble_chamber, target_structure
     assert relation_suggester._target_structures["target_structure_two"] is not None
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_good_example(
     bubble_chamber, parent_concept, target_structure_one
 ):
@@ -103,6 +106,7 @@ def test_gives_high_confidence_for_good_example(
     assert isinstance(relation_suggester.child_codelets[0], RelationBuilder)
 
 
+@pytest.mark.skip
 def test_gives_low_confidence_for_bad_example(
     parent_concept, bubble_chamber, target_structure_one
 ):
@@ -123,6 +127,7 @@ def test_gives_low_confidence_for_bad_example(
     assert isinstance(relation_suggester.child_codelets[0], RelationBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_when_relation_already_exists(bubble_chamber, target_structure_one):
     target_structures = {
         "target_space": Mock(),

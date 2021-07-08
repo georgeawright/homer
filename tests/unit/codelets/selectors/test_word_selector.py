@@ -16,6 +16,7 @@ def bubble_chamber():
     return chamber
 
 
+@pytest.mark.skip
 def test_word_is_boosted_follow_up_is_spawned(bubble_chamber):
     word = Mock()
     word.size = 1

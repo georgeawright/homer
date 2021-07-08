@@ -167,6 +167,7 @@ def bad_chunk(bubble_chamber, location_concept, input_space):
     return chunk
 
 
+@pytest.mark.skip
 def test_increases_quality_of_good_chunk(bubble_chamber, good_chunk):
     original_chunk_quality = good_chunk.quality
     parent_id = ""
@@ -181,6 +182,7 @@ def test_increases_quality_of_good_chunk(bubble_chamber, good_chunk):
     assert isinstance(evaluator.child_codelets[0], ChunkSelector)
 
 
+@pytest.mark.skip
 def test_decreases_quality_of_bad_chunk(bubble_chamber, bad_chunk):
     original_chunk_quality = bad_chunk.quality
     parent_id = ""

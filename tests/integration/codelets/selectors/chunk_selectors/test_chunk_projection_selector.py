@@ -188,6 +188,7 @@ def bad_structures(target_space, chunk_members, target_view):
     return StructureCollection({chunk, correspondence})
 
 
+@pytest.mark.skip
 def test_good_chunk_is_boosted_bad_chunk_is_decayed(
     bubble_chamber, good_structures, bad_structures
 ):

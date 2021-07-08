@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from homer.classifiers import DifferenceClassifier
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "start_value, end_value, expected", [([[10]], [[5]], 1), ([[5]], [[10]], 0)]
 )

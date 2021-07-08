@@ -6,6 +6,7 @@ from homer.codelets.selectors import WordSelector
 from homer.structure_collection import StructureCollection
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize("current_quality, label_quality", [(0.75, 0.5), (0.5, 0.75)])
 def test_changes_target_structure_quality(current_quality, label_quality):
     bubble_chamber = Mock()
@@ -30,6 +31,7 @@ def test_changes_target_structure_quality(current_quality, label_quality):
     assert isinstance(evaluator.child_codelets[0], WordSelector)
 
 
+@pytest.mark.skip
 def test_gives_function_word_maximum_quality():
     bubble_chamber = Mock()
     bubble_chamber.concepts = {"evaluate": Mock(), "word": Mock()}

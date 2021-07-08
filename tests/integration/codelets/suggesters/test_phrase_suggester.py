@@ -114,6 +114,7 @@ def target_rule(bubble_chamber, s_concept, np_concept, vp_concept):
     return rule
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_compatible_phrase_and_spawns_follow_up(
     bubble_chamber, target_root, target_left_branch, target_right_branch, target_rule
 ):

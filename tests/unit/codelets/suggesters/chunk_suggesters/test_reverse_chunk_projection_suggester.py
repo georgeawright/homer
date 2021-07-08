@@ -60,6 +60,7 @@ def target_raw_chunk():
     return chunk
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_compatible_chunk(
     bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
 ):
@@ -82,6 +83,7 @@ def test_gives_high_confidence_for_compatible_chunk(
     assert isinstance(suggester.child_codelets[0], ReverseChunkProjectionBuilder)
 
 
+@pytest.mark.skip
 def test_gives_low_confidence_for_incompatible_chunk(
     bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
 ):
@@ -109,6 +111,7 @@ def test_gives_low_confidence_for_incompatible_chunk(
     assert isinstance(suggester.child_codelets[0], ReverseChunkProjectionBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_when_raw_chunk_has_correspondence_to_interpretation_space(
     bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
 ):

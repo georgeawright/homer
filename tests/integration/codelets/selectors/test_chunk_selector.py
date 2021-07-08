@@ -117,6 +117,7 @@ def bad_chunk(target_space, chunk_members):
     return chunk
 
 
+@pytest.mark.skip
 def test_good_chunk_is_boosted_bad_chunk_is_decayed(
     bubble_chamber, good_chunk, bad_chunk
 ):

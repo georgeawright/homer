@@ -191,6 +191,7 @@ def target_chunk(bubble_chamber, temperature_space):
     return chunk
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_compatible_chunk_and_spawns_follow_up(
     bubble_chamber, target_chunk
 ):

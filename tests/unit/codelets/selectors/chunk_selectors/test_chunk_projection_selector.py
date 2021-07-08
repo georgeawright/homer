@@ -27,6 +27,7 @@ def bubble_chamber(target_view):
     return chamber
 
 
+@pytest.mark.skip
 def test_finds_challenger_when_not_given_one(bubble_chamber, target_view):
     common_members = StructureCollection({Mock(), Mock()})
     champion = Mock()
@@ -69,6 +70,7 @@ def test_finds_challenger_when_not_given_one(bubble_chamber, target_view):
     )
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "champion_quality, champion_activation, "
     + "challenger_quality, challenger_activation, "

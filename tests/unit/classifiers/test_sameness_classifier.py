@@ -1,8 +1,10 @@
+import pytest
 from unittest.mock import Mock
 
 from homer.classifiers import SamenessClassifier
 
 
+@pytest.mark.skip
 def test_same_concepts_classified_as_same():
     common_concept = Mock()
     start = Mock()
@@ -19,6 +21,7 @@ def test_same_concepts_classified_as_same():
     assert 0 == classifier.classify(start=start, end=end)
 
 
+@pytest.mark.skip
 def test_compatible_concepts_classified_as_same():
     start_concept = Mock()
     start = Mock()
@@ -38,6 +41,7 @@ def test_compatible_concepts_classified_as_same():
     assert 0 == classifier.classify(start=start, end=end)
 
 
+@pytest.mark.skip
 def test_incompatible_concepts_not_classified_as_same():
     start_concept = Mock()
     start = Mock()

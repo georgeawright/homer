@@ -2,14 +2,11 @@ from __future__ import annotations
 
 from typing import Callable, Dict, List
 
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
 from homer.location import Location
+from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
 from homer.structures.nodes import Concept
-
-from .working_space import WorkingSpace
 
 
 class ConceptualSpace(Space):
@@ -19,7 +16,6 @@ class ConceptualSpace(Space):
         parent_id: str,
         name: str,
         parent_concept: Concept,
-        locations: List[Location],
         contents: StructureCollection,
         no_of_dimensions: int,
         dimensions: List[ConceptualSpace],
@@ -27,75 +23,60 @@ class ConceptualSpace(Space):
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
     ):
-        quality = 1
         Space.__init__(
             self,
-            structure_id,
-            parent_id,
-            name,
-            parent_concept,
-            locations,
-            contents,
-            no_of_dimensions,
-            dimensions,
-            sub_spaces,
-            quality,
-            is_basic_level=is_basic_level,
-            is_symbolic=is_symbolic,
-            super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
-            links_in=links_in,
-            links_out=links_out,
+            structure_id=structure_id,
+            parent_id=parent_id,
+            name=name,
+            parent_concept=parent_concept,
+            contents=contents,
+            quality=1.0,
         )
-        self._instance = None
-        self._instances = {}
+        self.no_of_dimensions = no_of_dimensions
+        self._dimensions = dimensions
+        self.sub_spaces = sub_spaces
+        self.is_basic_level = is_basic_level
+        self.is_symbolic = is_symbolic
+        self.super_space_to_coordinate_function_map = (
+            (super_space_to_coordinate_function_map)
+            if super_space_to_coordinate_function_map is not None
+            else {}
+        )
         self.is_conceptual_space = True
 
     @property
     def instance_type(self):
         return self.parent_concept.instance_type
 
-    def instance_in_space(
-        self, containing_space: Space, name: str = None
-    ) -> WorkingSpace:
-        if containing_space not in self._instances:
-            locations = (
-                [Location([], containing_space)] if containing_space is not None else []
-            )
-            dimensions = (
-                [
-                    dimension.instance_in_space(containing_space)
-                    for dimension in self.dimensions
-                ]
-                if self.no_of_dimensions > 1
-                else []
-            )
-            sub_spaces = [
-                sub_space.instance_in_space(containing_space)
-                for sub_space in self.sub_spaces
+    @property
+    def dimensions(self) -> List[Space]:
+        if self.no_of_dimensions < 1:
+            return []
+        if self.no_of_dimensions == 1:
+            return [self]
+        return self._dimensions
+
+    def add(self, structure: Structure):
+        location_in_this_space = structure.location_in_space(self)
+        if structure not in self.contents:
+            self.contents.add(structure)
+            for sub_space in self.sub_spaces:
+                location_in_sub_space = sub_space.location_from_super_space_location(
+                    location_in_this_space
+                )
+                structure.locations.append(location_in_sub_space)
+                sub_space.add(structure)
+
+    def location_from_super_space_location(self, location: Location) -> Location:
+        if location.coordinates[0][0] is None:
+            coordinates = [[None for _ in range(self.no_of_dimensions)]]
+        else:
+            coordinates_function = self.super_space_to_coordinate_function_map[
+                location.space.name
             ]
-            self._instances[containing_space] = WorkingSpace(
-                ID.new(WorkingSpace),
-                "",
-                self.name + " IN " + containing_space.name if name is None else name,
-                self.parent_concept,
-                self,
-                locations,
-                StructureCollection(),
-                self.no_of_dimensions,
-                dimensions,
-                sub_spaces,
-                is_basic_level=self.is_basic_level,
-                is_symbolic=self.is_symbolic,
-                super_space_to_coordinate_function_map=self.super_space_to_coordinate_function_map,
-                links_in=StructureCollection(),
-                links_out=StructureCollection(),
-            )
-            if containing_space is not None:
-                containing_space.add(self._instances[containing_space])
-        return self._instances[containing_space]
+            coordinates = coordinates_function(location)
+        return Location(coordinates, self)
 
     def update_activation(self):
         if len(self.contents) == 0:

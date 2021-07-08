@@ -377,6 +377,7 @@ def target_slot(
     return slot
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_compatible_chunks_and_spawns_follow_up(
     bubble_chamber,
     target_view,

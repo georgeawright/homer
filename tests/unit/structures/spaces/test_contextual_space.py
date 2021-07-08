@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import ContextualSpace
 
 
 @pytest.mark.parametrize(
@@ -23,17 +23,12 @@ def test_update_activation(
     structure_2.activation = activation_2
     structure_3 = Mock()
     structure_3.activation = activation_3
-    working_space = WorkingSpace(
+    contextual_space = ContextualSpace(
         Mock(),
         Mock(),
         "name",
         Mock(),
-        Mock(),
-        Mock(),
         StructureCollection({structure_1, structure_2, structure_3}),
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    working_space.update_activation()
-    assert expected_activation == working_space.activation
+    contextual_space.update_activation()
+    assert expected_activation == contextual_space.activation

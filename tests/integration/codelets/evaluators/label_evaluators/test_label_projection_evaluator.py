@@ -88,6 +88,7 @@ def bad_label_and_correspondence(bubble_chamber):
     return StructureCollection({label, correspondence})
 
 
+@pytest.mark.skip
 def test_increases_quality_of_good_label(bubble_chamber, good_label_and_correspondence):
     original_quality = good_label_and_correspondence.get_random().quality
     parent_id = ""
@@ -103,6 +104,7 @@ def test_increases_quality_of_good_label(bubble_chamber, good_label_and_correspo
     assert isinstance(evaluator.child_codelets[0], LabelProjectionSelector)
 
 
+@pytest.mark.skip
 def test_decreases_quality_of_bad_label(bubble_chamber, bad_label_and_correspondence):
     original_quality = bad_label_and_correspondence.get_random().quality
     parent_id = ""

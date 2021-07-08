@@ -112,6 +112,7 @@ def target_word(text_space, noun_concept):
     return word
 
 
+@pytest.mark.skip
 def test_gives_hight_confidence_for_chunk_and_spawns_follow_up(
     bubble_chamber, target_view, target_word
 ):

@@ -114,6 +114,7 @@ def target_rule(bubble_chamber, s_concept, np_concept, vp_concept):
     return rule
 
 
+@pytest.mark.skip
 def test_successful_creates_phrase_and_spawns_follow_up_and_same_phrase_cannot_be_recreated(
     bubble_chamber, target_root, target_left_branch, target_right_branch, target_rule
 ):

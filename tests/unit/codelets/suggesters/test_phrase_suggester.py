@@ -117,6 +117,7 @@ def vp(vp_concept):
     return phrase
 
 
+@pytest.mark.skip
 def test_gets_a_rule_if_necessary(bubble_chamber, s_slot, np, vp):
     target_structures = {
         "target_root": s_slot,
@@ -135,6 +136,7 @@ def test_gets_a_rule_if_necessary(bubble_chamber, s_slot, np, vp):
     assert phrase_suggester.target_rule is not None
 
 
+@pytest.mark.skip
 def test_suggests_a_branch_slot(bubble_chamber, s, np, s_np_vp):
     target_structures = {
         "target_root": s,
@@ -155,6 +157,7 @@ def test_suggests_a_branch_slot(bubble_chamber, s, np, s_np_vp):
     assert isinstance(phrase_suggester.child_codelets[0], PhraseBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_if_incompatible_with_rule(bubble_chamber, s, np, s_np_vp):
     target_structures = {
         "target_root": s,
@@ -173,6 +176,7 @@ def test_fizzles_if_incompatible_with_rule(bubble_chamber, s, np, s_np_vp):
     assert CodeletResult.FIZZLE == phrase_suggester.result
 
 
+@pytest.mark.skip
 def test_suggests_filling_in_a_root_slot(bubble_chamber, s_slot, np, vp, s_np_vp):
     target_structures = {
         "target_root": s_slot,
@@ -193,6 +197,7 @@ def test_suggests_filling_in_a_root_slot(bubble_chamber, s_slot, np, vp, s_np_vp
     assert isinstance(phrase_suggester.child_codelets[0], PhraseBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_if_root_slot_is_incompatible_with_rule(
     bubble_chamber, s_slot, vp, np, s_np_vp
 ):

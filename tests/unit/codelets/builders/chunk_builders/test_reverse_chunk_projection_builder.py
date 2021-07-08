@@ -71,6 +71,7 @@ def new_chunk():
     return chunk
 
 
+@pytest.mark.skip
 def test_successful_projects_chunk_creates_larger_chunk_and_spawns_follow_up(
     bubble_chamber,
     target_view,
@@ -98,6 +99,7 @@ def test_successful_projects_chunk_creates_larger_chunk_and_spawns_follow_up(
     assert isinstance(builder.child_codelets[0], ReverseChunkProjectionEvaluator)
 
 
+@pytest.mark.skip
 def test_fizzles_when_raw_chunk_has_correspondence_to_interpretation_space(
     bubble_chamber, target_view, target_interpretation_chunk, target_raw_chunk
 ):

@@ -163,6 +163,7 @@ def bad_phrase(bubble_chamber, input_space, word_2, null_phrase):
     return phrase
 
 
+@pytest.mark.skip
 def test_good_phrase_is_boosted_bad_phrase_is_decayed(
     bubble_chamber, good_phrase, bad_phrase
 ):

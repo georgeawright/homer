@@ -5,6 +5,7 @@ from homer.classifiers import StretchyProximityClassifier
 from homer.structure_collection import StructureCollection
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "proximity_weight, neighbours_weight, "
     + "proximity, example_has_neighbours, proportion_of_neighbours, expected",

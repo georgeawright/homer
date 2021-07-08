@@ -7,6 +7,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Chunk
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "current_quality, correspondences_quality, interpretation_size, "
     + "no_of_chunks_with_members, expected_quality",

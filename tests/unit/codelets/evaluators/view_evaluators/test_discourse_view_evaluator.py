@@ -6,6 +6,7 @@ from homer.codelets.selectors.view_selectors import DiscourseViewSelector
 from homer.structure_collection import StructureCollection
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "current_quality, correspondences_quality, no_of_slots, no_of_slot_values",
     [(0.75, 0.5, 4, 2), (0.5, 0.75, 4, 3)],

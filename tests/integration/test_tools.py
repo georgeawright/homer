@@ -7,6 +7,7 @@ from homer.structures.spaces import WorkingSpace
 from homer.tools import equivalent_space
 
 
+@pytest.mark.skip
 def test_equivalent_space():
     common_concept = Concept(
         Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()

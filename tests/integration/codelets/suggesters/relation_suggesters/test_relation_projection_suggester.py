@@ -381,6 +381,7 @@ def target_word(
     return hotter_word
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_word_and_spawns_follow_up(
     bubble_chamber,
     target_view,

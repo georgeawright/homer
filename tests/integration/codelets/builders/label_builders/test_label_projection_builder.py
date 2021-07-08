@@ -296,6 +296,7 @@ def target_word(text_space, noun, adj_concept, hot_concept):
     return word
 
 
+@pytest.mark.skip
 def test_successful_labels_chunk_and_follow_up_and_same_label_cannot_be_recreated(
     bubble_chamber,
     target_view,

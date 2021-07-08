@@ -269,6 +269,7 @@ def correspondee_to_raw_chunk(interpretation_space):
     return chunk
 
 
+@pytest.mark.skip
 def test_successful_projects_raw_chunk_and_same_chunk_cannot_be_projected_again(
     bubble_chamber,
     target_view,

@@ -68,6 +68,7 @@ def target_word(bubble_chamber, parent_concept):
     return word
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_word_with_labeling_concept(
     bubble_chamber, target_view, target_word
 ):
@@ -87,6 +88,7 @@ def test_gives_high_confidence_for_word_with_labeling_concept(
     assert isinstance(suggester.child_codelets[0], LabelProjectionBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     bubble_chamber, target_view, target_word
 ):
@@ -108,6 +110,7 @@ def test_fizzles_if_target_word_already_has_correspondence_in_interpretation(
     assert CodeletResult.FIZZLE == suggester.result
 
 
+@pytest.mark.skip
 def test_fizzles_if_target_chunk_already_has_corresponding_label(
     bubble_chamber, target_view, target_word
 ):

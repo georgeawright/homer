@@ -1,40 +1,114 @@
 import pytest
+import statistics
 from unittest.mock import Mock
 
+from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import ConceptualSpace, WorkingSpace
+from homer.structures.nodes import Chunk
+from homer.structures.spaces import ConceptualSpace
 
 
-def test_instance_returns_working_space():
-    conceptual_space = ConceptualSpace(
-        "id", "", "name", Mock(), [Mock()], Mock(), 0, [], []
-    )
-    instance = conceptual_space.instance_in_space(None, name="")
-    assert isinstance(instance, WorkingSpace)
+@pytest.mark.parametrize(
+    "coordinates, n_s_coordinates, w_e_coordinates, nw_se_coordinates, ne_sw_coordinates",
+    [([[0, 0]], [[0]], [[0]], [[0]], [[2]])],
+)
+def test_add(
+    coordinates, n_s_coordinates, w_e_coordinates, nw_se_coordinates, ne_sw_coordinates
+):
 
-
-def test_instance_returns_working_space_with_working_sub_spaces():
-    parent_space = Mock()
-    parent_space.name = "parent"
-    sub_space = ConceptualSpace("sub", "", "sub", Mock(), [Mock()], Mock(), 1, [], [])
-    super_space = ConceptualSpace(
-        "super",
+    north_south_space = ConceptualSpace(
+        "",
+        "",
+        "north-south",
+        Mock(),
+        StructureCollection(),
+        1,
         [],
-        "super",
-        Mock(),
-        [Mock()],
-        Mock(),
-        2,
-        [sub_space, Mock()],
-        [sub_space, Mock()],
+        [],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [[c[0]] for c in location.coordinates]
+        },
     )
-    super_instance = super_space.instance_in_space(parent_space)
-    assert isinstance(super_instance, WorkingSpace)
-    assert "super IN parent" == super_instance.name
-    assert len(super_space.sub_spaces) == len(super_instance.sub_spaces)
-    sub_instance = super_instance.sub_spaces[0]
-    assert isinstance(sub_instance, WorkingSpace)
-    assert "sub IN parent" == sub_instance.name
+    west_east_space = ConceptualSpace(
+        "",
+        "",
+        "west-east",
+        Mock(),
+        StructureCollection(),
+        1,
+        [],
+        [],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [[c[1]] for c in location.coordinates]
+        },
+    )
+    nw_se_space = ConceptualSpace(
+        "",
+        "",
+        "nw-se",
+        Mock(),
+        StructureCollection(),
+        1,
+        [],
+        [],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [
+                [statistics.fmean(c)] for c in location.coordinates
+            ]
+        },
+    )
+    ne_sw_space = ConceptualSpace(
+        "",
+        "",
+        "ne-sw",
+        Mock(),
+        StructureCollection(),
+        1,
+        [],
+        [],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [
+                [statistics.fmean([c[0], 4 - c[1]])] for c in location.coordinates
+            ]
+        },
+    )
+    location_concept = Mock()
+    location_concept.name = "location"
+    location_space = ConceptualSpace(
+        "",
+        "",
+        "location",
+        location_concept,
+        StructureCollection(),
+        2,
+        [north_south_space, west_east_space],
+        [north_south_space, west_east_space, nw_se_space, ne_sw_space],
+        is_basic_level=True,
+    )
+    location = Location(coordinates, location_space)
+    chunk = Chunk("", "", [location], Mock(), Mock(), Mock())
+    location_space.add(chunk)
+
+    assert chunk in location_space.contents
+    assert chunk.location_in_space(location_space) == Location(
+        coordinates, location_space
+    )
+    assert chunk in north_south_space.contents
+    assert chunk.location_in_space(north_south_space) == Location(
+        n_s_coordinates, north_south_space
+    )
+    assert chunk in west_east_space.contents
+    assert chunk.location_in_space(west_east_space) == Location(
+        w_e_coordinates, west_east_space
+    )
+    assert chunk in nw_se_space.contents
+    assert chunk.location_in_space(nw_se_space) == Location(
+        nw_se_coordinates, nw_se_space
+    )
+    assert chunk in ne_sw_space.contents
+    assert chunk.location_in_space(ne_sw_space) == Location(
+        ne_sw_coordinates, ne_sw_space
+    )
 
 
 @pytest.mark.parametrize(
@@ -54,7 +128,6 @@ def test_update_activation(
         "",
         "",
         "name",
-        Mock(),
         Mock(),
         StructureCollection({concept_1, concept_2, concept_3}),
         Mock(),

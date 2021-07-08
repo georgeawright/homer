@@ -5,6 +5,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence
 
 
+@pytest.mark.skip
 def test_copy():
     start_space = Mock()
     start_space.parent_concept = Mock()
@@ -60,6 +61,7 @@ def test_copy():
     assert copy.parent_id == parent_id
 
 
+@pytest.mark.skip
 def test_nearby():
     start = Mock()
     start.correspondences = StructureCollection({Mock()})
@@ -93,6 +95,7 @@ def test_nearby():
     assert correspondence not in neighbours
 
 
+@pytest.mark.skip
 def test_get_slot_argument_returns_slot():
     location = Mock()
     slot = Mock()
@@ -129,6 +132,7 @@ def test_get_slot_argument_returns_slot():
     assert slot == correspondence.slot_argument
 
 
+@pytest.mark.skip
 def test_get_non_slot_argument_returns_non_slot():
     location = Mock()
     slot = Mock()
@@ -165,6 +169,7 @@ def test_get_non_slot_argument_returns_non_slot():
     assert non_slot == correspondence.non_slot_argument
 
 
+@pytest.mark.skip
 def test_common_arguments_with():
     arg_1 = Mock()
     arg_2 = Mock()

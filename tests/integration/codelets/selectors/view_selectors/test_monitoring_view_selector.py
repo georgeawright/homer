@@ -198,6 +198,7 @@ def bad_view(bubble_chamber, target_space, raw_input_space, raw_item_one):
     return view
 
 
+@pytest.mark.skip
 def test_good_view_is_boosted_bad_view_is_decayed(bubble_chamber, good_view, bad_view):
     original_good_view_activation = good_view.activation
     original_bad_view_activation = bad_view.activation

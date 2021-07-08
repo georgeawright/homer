@@ -243,6 +243,7 @@ def target_correspondence(
     return correspondence
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_compatible_phrase_and_spawns_follow_up(
     bubble_chamber, target_correspondence
 ):

@@ -157,6 +157,7 @@ def bad_structures(view):
     return StructureCollection({relation, correspondence})
 
 
+@pytest.mark.skip
 def test_good_relation_is_boosted(bubble_chamber, good_structures):
     good_relation = good_structures.where(is_relation=True).get_random()
     original_activation = good_relation.activation
@@ -170,6 +171,7 @@ def test_good_relation_is_boosted(bubble_chamber, good_structures):
     assert good_relation.activation > original_activation
 
 
+@pytest.mark.skip
 def test_bad_relation_is_not_boosted(bubble_chamber, bad_structures):
     bad_relation = bad_structures.where(is_relation=True).get_random()
     original_activation = bad_relation.activation

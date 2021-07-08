@@ -24,6 +24,7 @@ def structure():
     return s
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "prototype, space_name, distance_function, expected",
     [
@@ -52,6 +53,7 @@ def test_distance_from(prototype, space_name, distance_function, expected, struc
     assert expected == concept.distance_from(structure)
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "prototype, space_name, distance_function, distance_to_proximity_weight, expected",
     [

@@ -92,6 +92,7 @@ def target_correspondence(target_view, input_space, frame, original_phrase):
     return correspondence
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_highly_activated_correspondence(
     bubble_chamber, target_correspondence
 ):
@@ -106,6 +107,7 @@ def test_gives_high_confidence_for_highly_activated_correspondence(
     assert isinstance(suggester.child_codelets[0], PhraseProjectionBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_if_phrase_already_has_correspondence_in_output(
     bubble_chamber, target_correspondence
 ):

@@ -7,6 +7,7 @@ from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.nodes import Lexeme
 
 
+@pytest.mark.skip
 def test_correspondences_returns_correspondences():
     number_of_correspondences = 10
     links_in = StructureCollection()
@@ -51,6 +52,7 @@ def test_correspondences_returns_correspondences():
         assert isinstance(correspondence, Correspondence)
 
 
+@pytest.mark.skip
 def test_labels_returns_labels():
     number_of_labels = 10
     links_out = StructureCollection()
@@ -65,6 +67,7 @@ def test_labels_returns_labels():
         assert isinstance(label, Label)
 
 
+@pytest.mark.skip
 def test_lexemes_returns_lexemes():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     number_of_lexemes = 10
@@ -79,6 +82,7 @@ def test_lexemes_returns_lexemes():
         assert isinstance(lexeme, Lexeme)
 
 
+@pytest.mark.skip
 def test_labels_in_space():
     structure = Structure(
         Mock(), Mock(), Mock(), Mock(), links_out=StructureCollection()
@@ -94,6 +98,7 @@ def test_labels_in_space():
     assert label_not_in_space not in structure.labels_in_space(space)
 
 
+@pytest.mark.skip
 def test_relations_in_space_with():
     structure = Structure(
         Mock(), Mock(), Mock(), Mock(), links_out=StructureCollection()
@@ -124,6 +129,7 @@ def test_relations_in_space_with():
     )
 
 
+@pytest.mark.skip
 def test_correspondences_to_space():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     space = Mock()
@@ -189,6 +195,7 @@ def test_correspondences_to_space():
     assert correspondence_4 not in structure.correspondences_to_space(space)
 
 
+@pytest.mark.skip
 def test_boost_and_update_activation():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     structure._activation = 0.0
@@ -206,6 +213,7 @@ def test_boost_and_update_activation():
     assert 1.0 == structure.activation
 
 
+@pytest.mark.skip
 def test_decay_and_update_activation():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     structure._activation = 0.0
@@ -223,6 +231,7 @@ def test_decay_and_update_activation():
     assert 0.0 == structure.activation
 
 
+@pytest.mark.skip
 def test_spread_activations():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     structure._activation_update_coefficient = 1

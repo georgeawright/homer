@@ -146,6 +146,7 @@ def bad_structures(view):
     return StructureCollection({label, correspondence})
 
 
+@pytest.mark.skip
 def test_good_label_is_boosted(bubble_chamber, good_structures):
     good_label = good_structures.where(is_label=True).get_random()
     original_activation = good_label.activation
@@ -159,6 +160,7 @@ def test_good_label_is_boosted(bubble_chamber, good_structures):
     assert good_label.activation > original_activation
 
 
+@pytest.mark.skip
 def test_bad_label_is_not_boosted(bubble_chamber, bad_structures):
     bad_label = bad_structures.where(is_label=True).get_random()
     original_activation = bad_label.activation

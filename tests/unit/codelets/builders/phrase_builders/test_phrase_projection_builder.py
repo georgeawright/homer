@@ -92,6 +92,7 @@ def target_correspondence(target_view, input_space, frame, original_phrase):
     return correspondence
 
 
+@pytest.mark.skip
 def test_successfully_projects_phrase_and_spawns_follow_up(
     bubble_chamber, target_correspondence
 ):
@@ -106,6 +107,7 @@ def test_successfully_projects_phrase_and_spawns_follow_up(
     assert isinstance(builder.child_codelets[0], PhraseProjectionEvaluator)
 
 
+@pytest.mark.skip
 def test_fizzles_if_phrase_already_has_correspondence_in_output(
     bubble_chamber, target_correspondence
 ):

@@ -1,4 +1,6 @@
+import pytest
 from unittest.mock import Mock
+
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Label, Relation
@@ -7,6 +9,7 @@ from homer.structures.spaces import Frame, WorkingSpace
 from homer.structures.views import SimplexView
 
 
+@pytest.mark.skip
 def test_copy():
     working_input = WorkingSpace(
         "", "", "working_input", Mock(), Mock(), [], StructureCollection(), 0, [], []

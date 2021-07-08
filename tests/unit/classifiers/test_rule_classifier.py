@@ -1,9 +1,11 @@
+import pytest
 from unittest.mock import Mock
 
 from homer.classifiers import RuleClassifier
 from homer.structure_collection import StructureCollection
 
 
+@pytest.mark.skip
 def test_classify_det_relation():
     det_classifier = RuleClassifier(
         [
@@ -27,6 +29,7 @@ def test_classify_det_relation():
     assert not det_classifier.classify(start=verb_word, end=noun_word)
 
 
+@pytest.mark.skip
 def test_classify_nsubj_relation():
     nsubj_classifier = RuleClassifier(
         [
@@ -58,6 +61,7 @@ def test_classify_nsubj_relation():
     assert not nsubj_classifier.classify(start=verb, end=adj)
 
 
+@pytest.mark.skip
 def test_classify_cop_relation():
     cop_classifier = RuleClassifier(
         [
@@ -78,6 +82,7 @@ def test_classify_cop_relation():
     assert not cop_classifier.classify(start=cop, end=adj)
 
 
+@pytest.mark.skip
 def test_classify_prep_relation():
     prep_classifier = RuleClassifier(
         [
@@ -104,6 +109,7 @@ def test_classify_prep_relation():
     assert not prep_classifier.classify(start=prep, end=verb)
 
 
+@pytest.mark.skip
 def test_classify_pobj_relation():
     pobj_classifier = RuleClassifier(
         [
@@ -126,6 +132,7 @@ def test_classify_pobj_relation():
     assert not pobj_classifier.classify(start=prep, end=det)
 
 
+@pytest.mark.skip
 def test_classify_dep_relation():
     dep_classifier = RuleClassifier(
         [

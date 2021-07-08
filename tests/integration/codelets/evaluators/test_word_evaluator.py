@@ -225,6 +225,7 @@ def bad_word(bubble_chamber, warm_lexeme, output_space, bad_word_correspondee):
     return word
 
 
+@pytest.mark.skip
 def test_increases_quality_of_good_word(bubble_chamber, good_word):
     original_word_quality = good_word.quality
     parent_id = ""
@@ -239,6 +240,7 @@ def test_increases_quality_of_good_word(bubble_chamber, good_word):
     assert isinstance(evaluator.child_codelets[0], WordSelector)
 
 
+@pytest.mark.skip
 def test_decreases_quality_of_bad_word(bubble_chamber, bad_word):
     original_word_quality = bad_word.quality
     parent_id = ""

@@ -362,6 +362,7 @@ def template_function_word(template):
     return word
 
 
+@pytest.mark.skip
 def test_successful_creates_word_and_spawns_follow_up_and_same_word_cannot_be_recreated(
     bubble_chamber,
     target_view,
@@ -404,6 +405,7 @@ def test_successful_creates_word_and_spawns_follow_up_and_same_word_cannot_be_re
     assert CodeletResult.FIZZLE == builder.result
 
 
+@pytest.mark.skip
 def test_successful_creates_function_word_and_spawns_follow_up_and_same_word_cannot_be_recreated(
     bubble_chamber, target_view, template_function_word
 ):

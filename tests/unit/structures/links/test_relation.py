@@ -1,9 +1,11 @@
+import pytest
 from unittest.mock import Mock
 
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 
 
+@pytest.mark.skip
 def test_copy():
     old_start = Mock()
     old_end = Mock()
@@ -19,6 +21,7 @@ def test_copy():
     assert copy.parent_id == parent_id
 
 
+@pytest.mark.skip
 def test_nearby():
     relation_1 = Mock()
     chunk_1 = Mock()

@@ -7,6 +7,7 @@ from homer.codelets import Publisher
 from homer.structure_collection import StructureCollection
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "view_quality, view_activation, random_number, success_or_fail",
     [

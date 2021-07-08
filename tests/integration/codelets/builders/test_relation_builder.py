@@ -202,6 +202,7 @@ def second_chunk(bubble_chamber, input_space, temperature_space):
     return second_chunk
 
 
+@pytest.mark.skip
 def test_successful_adds_relation_to_chunk_and_spawns_follow_up_and_same_relation_cannot_be_recreated(
     bubble_chamber, temperature_space, target_chunk, second_chunk, more_concept
 ):

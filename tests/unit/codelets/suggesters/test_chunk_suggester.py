@@ -76,6 +76,7 @@ def target_chunk(common_space, second_target_chunk):
     return chunk
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_to_compatible_chunks(bubble_chamber, target_chunk):
     target_structures = {"target_one": target_chunk}
     chunk_suggester = ChunkSuggester(
@@ -88,6 +89,7 @@ def test_gives_high_confidence_to_compatible_chunks(bubble_chamber, target_chunk
     assert isinstance(chunk_suggester.child_codelets[0], ChunkBuilder)
 
 
+@pytest.mark.skip
 def test_gives_low_confidence_incompatible_chunks(
     bubble_chamber, target_chunk, common_space
 ):
@@ -103,6 +105,7 @@ def test_gives_low_confidence_incompatible_chunks(
     assert isinstance(chunk_suggester.child_codelets[0], ChunkBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_when_no_second_target(bubble_chamber, target_chunk):
     target_chunk.nearby.return_value = StructureCollection()
     urgency = 1.0
@@ -114,6 +117,7 @@ def test_fizzles_when_no_second_target(bubble_chamber, target_chunk):
     assert CodeletResult.FIZZLE == result
 
 
+@pytest.mark.skip
 def test_fizzles_when_chunk_already_exists(bubble_chamber, target_chunk):
     bubble_chamber.has_chunk.return_value = True
     urgency = 1.0

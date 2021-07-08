@@ -371,6 +371,7 @@ def bad_phrase_projection(
     )
 
 
+@pytest.mark.skip
 def test_increases_quality_of_good_phrase_projection(
     bubble_chamber, good_phrase_projection
 ):
@@ -388,6 +389,7 @@ def test_increases_quality_of_good_phrase_projection(
     assert isinstance(evaluator.child_codelets[0], PhraseProjectionSelector)
 
 
+@pytest.mark.skip
 def test_decreases_quality_of_bad_phrase_projection(
     bubble_chamber, bad_phrase_projection
 ):

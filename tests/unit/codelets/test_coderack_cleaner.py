@@ -6,6 +6,7 @@ from homer.codelets import CoderackCleaner
 from homer.coderack import Coderack
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "last_satisfaction_score, current_satisfaction_score, "
     + "expected_no_of_codelets, minimum_urgency",

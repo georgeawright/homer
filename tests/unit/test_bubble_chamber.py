@@ -10,6 +10,7 @@ from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import WorkingSpace
 
 
+@pytest.mark.skip
 def test_structures():
     chunk = Mock()
     concept = Mock()
@@ -42,6 +43,7 @@ def test_structures():
     assert word in bubble_chamber.structures
 
 
+@pytest.mark.skip
 def test_add_to_collections():
     bubble_chamber = BubbleChamber(
         StructureCollection(),
@@ -136,6 +138,7 @@ def test_add_to_collections():
     assert word in bubble_chamber.words
 
 
+@pytest.mark.skip
 def test_spread_activations():
     chunk = Mock()
     concept = Mock()
@@ -169,6 +172,7 @@ def test_spread_activations():
     word.spread_activation.assert_called()
 
 
+@pytest.mark.skip
 def test_update_activations():
     chunk = Mock()
     concept = Mock()
@@ -202,6 +206,7 @@ def test_update_activations():
     word.update_activation.assert_called()
 
 
+@pytest.mark.skip
 def test_has_chunk():
     existing_chunk_members = StructureCollection({Mock(), Mock()})
     existing_chunk = Mock()
@@ -228,6 +233,7 @@ def test_has_chunk():
     assert bubble_chamber.has_chunk(existing_chunk_members)
 
 
+@pytest.mark.skip
 def test_has_view():
     existing_view_members = StructureCollection({Mock(), Mock()})
     existing_view = Mock()
