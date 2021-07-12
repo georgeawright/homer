@@ -30,11 +30,16 @@ class ChunkEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_chunk = self.target_structures.get()
-        proximities = [
-            space.proximity_between(member, target_chunk)
-            for space in target_chunk.parent_spaces
-            for member in target_chunk.members
-            if space.is_basic_level
+        compatibilities = [
+            target_chunk.rule.compatibility_with(
+                root=target_chunk, child=target_chunk.left_branch, branch="left"
+            )
         ]
-        self.confidence = statistics.fmean(proximities) if proximities != [] else 0
+        if target_chunk.rule.right_concept is not None:
+            compatibilities.append(
+                target_chunk.rule.compatibility_with(
+                    root=target_chunk, child=target_chunk.right_branch, branch="right"
+                )
+            )
+        self.confidence = statistics.fmean(compatibilities)
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
