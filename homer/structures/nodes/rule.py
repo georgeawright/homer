@@ -17,9 +17,9 @@ class Rule(Node):
         parent_id: str,
         name: str,
         location: Location,
-        root: Concept,
-        left_branch: Concept,
-        right_branch: Concept,
+        root_concept: Concept,
+        left_concept: Concept,
+        right_concept: Concept,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
         stable_activation: FloatBetweenOneAndZero = None,
@@ -38,15 +38,42 @@ class Rule(Node):
         )
         self.name = name
         self._value = name
-        self.root = root
-        self.left_branch = left_branch
-        self.right_branch = right_branch
+        self.root_concept = root_concept
+        self.left_concept = left_concept
+        self.right_concept = right_concept
 
     @property
     def rule_constituents(self) -> StructureCollection:
-        return StructureCollection({self.root, self.left_branch, self.right_branch})
+        return StructureCollection(
+            {self.root_concept, self.left_concept, self.right_concept}
+        )
+
+    def compatibility_with(
+        self, root: Node = None, child: Node = None, branch: str = "left"
+    ) -> FloatBetweenOneAndZero:
+        if root is None:
+            if branch == "left":
+                return self.left_concept.compatibility_with(child)
+            if branch == "right" and self.right_concept is not None:
+                return self.right_concept.compatibility_with(child)
+            return 0.0
+        if branch == "left":
+            if self.left_branch_is_free(root):
+                return self.left_concept.compatibility_with(child)
+            return 0.0
+        if self.right_branch_is_free(root):
+            return self.right_concept.compatibility_with(child)
+        return 0.0
+
+    def left_branch_is_free(self, root: Node):
+        raise NotImplementedError
+
+    def right_branch_is_free(self, root: Node):
+        raise NotImplementedError
 
     def is_compatible_with(self, *fragments: List[Structure]) -> bool:
+        # TODO: update for chunks
+        raise NotImplementedError
         if len(fragments) == 1:
             fragment = fragments[0]
             return (

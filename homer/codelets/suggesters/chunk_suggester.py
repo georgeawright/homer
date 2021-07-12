@@ -1,13 +1,17 @@
 from __future__ import annotations
+import random
 
-from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structure_collection_keys import chunking_exigency
+from homer.structure_collection_keys import activation, chunking_exigency
+from homer.structures.nodes import Rule
+
+# unchunkedness therefore needs to depend on being in chunks with members/no slots
+# chunking exigency needs to depend on rule - high level grammar rules, sameness, have low exigency
 
 
 class ChunkSuggester(Suggester):
@@ -22,8 +26,12 @@ class ChunkSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_one = None
-        self.target_two = None
+        self.target_space = None
+        self.target_rule = None
+        self.target_root = None
+        self.target_node = None
+        self.target_slot = None
+        self.target_slot_filler = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -39,7 +47,10 @@ class ChunkSuggester(Suggester):
         target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
-        codelet_id = ID.new(cls)
+        qualifier = (
+            "TopDown" if target_structures["target_rule"] is not None else "BottomUp"
+        )
+        codelet_id = ID.new(cls, qualifier)
         return cls(
             codelet_id,
             parent_id,
@@ -55,40 +66,133 @@ class ChunkSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target = bubble_chamber.input_nodes.where(is_chunk=True).get(
+        target_view = bubble_chamber.production_views.get(key=activation)
+        target_space = target_view.spaces.where_not(is_frame=True).get()
+        target_node = target_space.contents.where(is_node=True).get(
             key=chunking_exigency
         )
-        urgency = urgency if urgency is not None else target.unchunkedness
-        return cls.spawn(parent_id, bubble_chamber, {"target_one": target}, urgency)
+        urgency = urgency if urgency is not None else target_node.unchunkedness
+        return cls.spawn(
+            parent_id,
+            bubble_chamber,
+            {
+                "target_space": target_space,
+                "target_node": target_node,
+                "target_rule": None,
+            },
+            urgency,
+        )
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_rule: Rule,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        target_view = bubble_chamber.production_views.get(key=activation)
+        target_space = target_view.spaces.where_not(is_frame=True).get()
+        target_node = StructureCollection(
+            {
+                node
+                for node in target_space.contents.where(is_node=True)
+                if target_rule.is_compatible_with(node)
+            }
+        ).get(key=chunking_exigency)
+        return cls.spawn(
+            parent_id,
+            bubble_chamber,
+            {
+                "target_space": target_space,
+                "target_node": target_node,
+                "target_rule": target_rule,
+            },
+            urgency,
+        )
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
     def _passes_preliminary_checks(self):
-        self.target_one = self._target_structures["target_one"]
-        try:
-            self.target_two = self.target_one.nearby().get()
-            self._target_structures["target_two"] = self.target_two
-        except MissingStructureError:
-            return False
-        return not self.bubble_chamber.has_chunk(
-            StructureCollection.union(
-                self._members_from_chunk(self.target_one),
-                self._members_from_chunk(self.target_two),
-            )
+        self.target_space = self._target_structures["target_space"]
+        self.target_rule = self._target_structures["target_rule"]
+        self.target_node = self._target_structures["target_node"]
+        if self.target_rule is None:
+            try:
+                self.target_root = self.target_node.super_chunks.get()
+                self.target_rule = self.target_root.rule
+            except MissingStructureError:
+                self.target_root = None
+        else:
+            try:
+                self.target_root = StructureCollection(
+                    {
+                        chunk
+                        for chunk in self.target_node.super_chunks
+                        if chunk.rule == self.target_rule
+                    }
+                ).get()
+            except MissingStructureError:
+                self.target_root = None
+        if self.target_root is not None:
+            try:
+                self.target_slot = self.target_root.members.where(is_slot=True).get()
+                self.target_slot_filler = (
+                    self.target_space.contents.where(is_node=True)
+                    .at(self.target_slot.locations)
+                    .get(key=chunking_exigency)
+                )
+            except MissingStructureError:
+                return False
+        self._target_structures["target_rule"] = self.target_rule
+        self._target_structures["target_root"] = self.target_root
+        self._target_structures["target_slot"] = self.target_slot
+        self._target_structures["target_slot_filler"] = self.target_slot_filler
+        suggested_members = StructureCollection.union(
+            self.target_root.members.where(is_slot=False)
+            if self.target_root is not None
+            else StructureCollection(),
+            StructureCollection({self.target_node}),
+            StructureCollection({self.target_slot_filler})
+            if self.target_slot_filler is not None
+            else StructureCollection(),
         )
+        for chunk in self.bubble_chamber.chunks:
+            if (
+                chunk.rule == self.target_rule
+                and chunk.members.where(is_slot=False) == suggested_members
+            ):
+                return False
+        return True
 
     def _calculate_confidence(self):
-        distances = [
-            space.proximity_between(self.target_one, self.target_two)
-            for space in self.target_one.parent_spaces
-            if space.is_basic_level
-        ]
-        self.confidence = 0.0 if distances == [] else fuzzy.AND(*distances)
+        def randomized_compatibility(compatibility, randomness, satisfaction):
+            return compatibility * (
+                compatibility * satisfaction + randomness * (1 - satisfaction)
+            )
+
+        left_randomness = random.random()
+        right_randomness = random.random()
+        left_compatibility = self.target_rule.compatibility_with(
+            root=self.target_root, child=self.target_slot_filler, branch="left"
+        )
+        right_compatibility = self.target_rule.compatibility_with(
+            root=self.target_root, child=self.target_slot_filler, branch="right"
+        )
+        left_probability = randomized_compatibility(
+            left_compatibility, left_randomness, self.bubble_chamber.satisfaction
+        )
+        right_probability = randomized_compatibility(
+            right_compatibility, right_randomness, self.bubble_chamber.satisfaction
+        )
+        if left_probability > right_probability:
+            self._target_structures["target_branch"] = "left"
+            self.confidence = left_compatibility
+        else:
+            self._target_structures["target_branch"] = "right"
+            self.confidence = right_compatibility
 
     def _fizzle(self):
         pass
-
-    def _members_from_chunk(self, chunk):
-        return StructureCollection({chunk}) if chunk.size == 1 else chunk.members
