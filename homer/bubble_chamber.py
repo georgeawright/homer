@@ -18,7 +18,7 @@ class BubbleChamber:
     def __init__(
         self,
         conceptual_spaces: StructureCollection,
-        working_spaces: StructureCollection,
+        contextual_spaces: StructureCollection,
         frames: StructureCollection,
         frame_instances: StructureCollection,
         chunks: StructureCollection,
@@ -36,7 +36,7 @@ class BubbleChamber:
         logger: Logger,
     ):
         self.conceptual_spaces = conceptual_spaces
-        self.working_spaces = working_spaces
+        self.contextual_spaces = contextual_spaces
         self.frames = frames
         self.frame_instances = frame_instances
         self.chunks = chunks
@@ -140,7 +140,7 @@ class BubbleChamber:
 
     @property
     def satisfaction(self):
-        return self.working_spaces["top level working"].quality
+        return statistics.fmean([space.quality for space in self.contextual_spaces])
 
     def add_to_collections(self, item):
         collections = {
