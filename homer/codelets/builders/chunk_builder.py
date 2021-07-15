@@ -83,14 +83,20 @@ class ChunkBuilder(Builder):
 
     def _process_structure(self):
         if self.target_root is None:
-            slot = Node(
-                structure_id=ID.new(Node),
+            slot = Chunk(
+                structure_id=ID.new(Chunk),
                 parent_id=self.codelet_id,
-                locations=[Location([None], self.target_space)],
+                locations=[Location([], self.target_space)]
+                + [
+                    Location([[None]], space)
+                    for space in self.target_space.conceptual_spaces
+                ],
+                members=StructureCollection(),
                 parent_space=self.target_space,
                 quality=0.0,
-                links_in=StructureCollection(),
-                links_out=StructureCollection(),
+                left_branch=None,
+                right_branch=None,
+                rule=None,
             )
             locations = self.target_node.locations
             left_branch, right_branch = (
@@ -109,10 +115,12 @@ class ChunkBuilder(Builder):
                 right_branch=right_branch,
                 rule=self.target_rule,
             )
+            slot.super_chunks.add(chunk)
             chunk.free_branch.add(slot)
             self.child_structures = StructureCollection({slot, chunk})
         if self.target_slot is not None and self.target_slot_filler is not None:
             self.target_root.members.add(self.target_slot_filler)
+            self.target_slot_filler.super_chunks.add(self.target_root)
             self.child_structures = StructureCollection(
                 {self.target_root, self.target_slot}
             )

@@ -53,23 +53,35 @@ class Rule(Node):
     ) -> FloatBetweenOneAndZero:
         if root is None:
             if branch == "left":
-                return self.left_concept.compatibility_with(child)
+                return self.left_concept.classifier.classify_chunk(
+                    root=root, child=child
+                )
             if branch == "right" and self.right_concept is not None:
-                return self.right_concept.compatibility_with(child)
+                return self.right_concept.classifier.classify_chunk(
+                    root=root, child=child
+                )
             return 0.0
         if branch == "left":
             if self.left_branch_is_free(root):
-                return self.left_concept.compatibility_with(child)
+                return self.left_concept.classifier.classify_chunk(
+                    root=root, child=child
+                )
             return 0.0
         if self.right_branch_is_free(root):
-            return self.right_concept.compatibility_with(child)
+            return self.right_concept.classifier.classify_chunk(root=root, child=child)
         return 0.0
 
-    def left_branch_is_free(self, root: Node):
-        raise NotImplementedError
+    def left_branch_is_free(self, root: Node) -> bool:
+        return (
+            self.left_concept is not None
+            and not root.left_branch.where(is_slot=True).is_empty()
+        )
 
-    def right_branch_is_free(self, root: Node):
-        raise NotImplementedError
+    def right_branch_is_free(self, root: Node) -> bool:
+        return (
+            self.right_concept is not None
+            and not root.right_branch.where(is_slot=True).is_empty()
+        )
 
     def is_compatible_with(self, *fragments: List[Structure]) -> bool:
         # TODO: update for chunks

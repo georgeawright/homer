@@ -16,13 +16,15 @@ def bubble_chamber():
     return chamber
 
 
-@pytest.mark.skip
 def test_finds_challenger_when_not_given_one(bubble_chamber):
     common_members = StructureCollection({Mock(), Mock()})
     champion = Mock()
+    champion.is_chunk = True
+    champion.is_slot = False
     champion.members = common_members
     champion.size = 2
     challenger = Mock()
+    challenger.is_slot = False
     challenger.members = common_members
     challenger.size = 2
     champion.quality = 1.0
@@ -40,7 +42,6 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     assert selector.challengers == StructureCollection({challenger})
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "champion_quality, champion_activation, "
     + "challenger_quality, challenger_activation, "
@@ -63,10 +64,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
 ):
     with patch.object(random, "random", return_value=random_number):
         champion = Mock()
+        champion.is_slot = False
         champion.size = 2
         champion.quality = champion_quality
         champion.activation = champion_activation
         challenger = Mock()
+        challenger.is_slot = False
         challenger.size = 2
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation

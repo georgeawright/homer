@@ -29,17 +29,22 @@ class ChunkEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_chunk = self.target_structures.get()
-        compatibilities = [
-            target_chunk.rule.compatibility_with(
-                root=target_chunk, child=target_chunk.left_branch, branch="left"
+        target_chunk = self.target_structures.where(is_slot=False).get()
+        if target_chunk.rule.right_concept is None:
+            self.confidence = target_chunk.rule.left_concept.classifier.classify_chunk(
+                root=target_chunk, child=None
             )
-        ]
-        if target_chunk.rule.right_concept is not None:
-            compatibilities.append(
-                target_chunk.rule.compatibility_with(
-                    root=target_chunk, child=target_chunk.right_branch, branch="right"
-                )
+        else:
+            self.confidence = statistics.fmean(
+                [
+                    target_chunk.rule.left_concept.classifier.classify_chunk(
+                        root=target_chunk,
+                        child=target_chunk.left_branch.get(),
+                    ),
+                    target_chunk.rule.right_concept.classifier.classify_chunk(
+                        root=target_chunk,
+                        child=target_chunk.right_branch.get(),
+                    ),
+                ]
             )
-        self.confidence = statistics.fmean(compatibilities)
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

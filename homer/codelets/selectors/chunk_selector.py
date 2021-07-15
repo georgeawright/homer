@@ -2,7 +2,7 @@ from homer.codelets.selector import Selector
 from homer.codelets.suggesters import ChunkSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
-from homer.structure_collection_keys import activation
+from homer.structure_collection_keys import activation, chunking_exigency
 
 
 class ChunkSelector(Selector):
@@ -14,7 +14,7 @@ class ChunkSelector(Selector):
         if self.challengers is not None:
             return True
         try:
-            champion_chunk = self.champions.get()
+            champion_chunk = self.champions.where(is_chunk=True, is_slot=False).get()
             challenger_chunk = champion_chunk.nearby().get(key=activation)
             self.challengers = StructureCollection({challenger_chunk})
         except MissingStructureError:
@@ -35,20 +35,30 @@ class ChunkSelector(Selector):
         )
 
     def _engender_follow_up(self):
-        new_target = self.winners.get()
-        self.child_codelets.append(
+        try:
+            new_target = self.winners.where(is_slot=True).get()
+            target_space = new_target.parent_space
+            target_rule = None
+        except MissingStructureError:
+            winning_chunk = self.winners.where(is_slot=False).get()
+            target_space = winning_chunk.parent_space
+            new_target = target_space.contents.get(key=chunking_exigency)
+            target_rule = winning_chunk.rule
+        self.child_codelets = [
             ChunkSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                {"target_one": new_target},
+                {
+                    "target_space": target_space,
+                    "target_node": new_target,
+                    "target_rule": target_rule,
+                },
                 new_target.activation,
-            )
-        )
-        self.child_codelets.append(
+            ),
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,
                 self.follow_up_urgency,
-            )
-        )
+            ),
+        ]

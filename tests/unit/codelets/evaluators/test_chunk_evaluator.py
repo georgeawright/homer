@@ -11,7 +11,9 @@ def test_changes_target_structure_quality(current_quality, classification):
     bubble_chamber = Mock()
     bubble_chamber.concepts = {"evaluate": Mock(), "chunk": Mock()}
     chunk = Mock()
-    chunk.rule.compatibility_with.return_value = classification
+    chunk.is_slot = False
+    chunk.rule.right_concept = None
+    chunk.rule.left_concept.classifier.classify_chunk.return_value = classification
     chunk.quality = current_quality
     evaluator = ChunkEvaluator(
         Mock(), Mock(), bubble_chamber, StructureCollection({chunk}), Mock()

@@ -20,6 +20,13 @@ def bubble_chamber():
 
 
 @pytest.fixture
+def target_space():
+    space = Mock()
+    space.conceptual_spaces = [Mock()]
+    return space
+
+
+@pytest.fixture
 def target_slot():
     chunk = Mock()
     chunk.is_slot = True
@@ -84,9 +91,11 @@ def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
     assert CodeletResult.FIZZLE == builder.result
 
 
-def test_creates_new_chunk_if_necessary(bubble_chamber, target_rule, target_node):
+def test_creates_new_chunk_if_necessary(
+    bubble_chamber, target_space, target_rule, target_node
+):
     target_structures = {
-        "target_space": Mock(),
+        "target_space": target_space,
         "target_rule": target_rule,
         "target_root": None,
         "target_node": target_node,

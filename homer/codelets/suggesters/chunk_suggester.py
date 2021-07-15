@@ -139,11 +139,21 @@ class ChunkSuggester(Suggester):
         if self.target_root is not None:
             try:
                 self.target_slot = self.target_root.members.where(is_slot=True).get()
-                self.target_slot_filler = (
-                    self.target_space.contents.where(is_node=True)
-                    .at(self.target_slot.locations)
-                    .get(key=chunking_exigency)
-                )
+                if (
+                    self.target_slot.location_in_space(self.target_space).coordinates
+                    == []
+                ):
+                    self.target_slot_filler = (
+                        self.target_root.nearby()
+                        .where(is_slot=False)
+                        .get(key=chunking_exigency)
+                    )
+                else:
+                    self.target_slot_filler = (
+                        self.target_space.contents.where(is_node=True, is_slot=False)
+                        .at(self.target_slot.location)
+                        .get(key=chunking_exigency)
+                    )
             except MissingStructureError:
                 return False
         self._target_structures["target_rule"] = self.target_rule

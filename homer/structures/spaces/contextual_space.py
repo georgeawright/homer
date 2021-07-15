@@ -14,6 +14,7 @@ class ContextualSpace(Space):
         name: str,
         parent_concept: Concept,
         contents: StructureCollection,
+        conceptual_spaces: StructureCollection = None,
     ):
         Space.__init__(
             self,
@@ -23,6 +24,9 @@ class ContextualSpace(Space):
             parent_concept=parent_concept,
             contents=contents,
             quality=0.0,
+        )
+        self.conceptual_spaces = (
+            StructureCollection() if conceptual_spaces is None else conceptual_spaces
         )
         self.is_contextual_space = True
 

@@ -5,7 +5,6 @@ from typing import List
 
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
@@ -132,6 +131,3 @@ class Chunk(Node):
             if space.proximity_between(chunk, self) - random.random() <= 0:
                 return chunk
         return chunks.get(exclude=[self])
-
-    def nearby(self, space: Space = None) -> StructureCollection:
-        pass
