@@ -70,10 +70,11 @@ class Node(Structure):
                 space.contents.of_type(type(self)).near(self.location_in_space(space)),
                 StructureCollection({self}),
             )
-        nearby_nodes = StructureCollection.union(
+        nearby_nodes = StructureCollection.intersection(
             *[
                 location.space.contents.of_type(type(self)).near(location)
                 for location in self.locations
+                if location.space.is_conceptual_space and location.space.is_basic_level
             ]
         )
         nearby_nodes.remove(self)
