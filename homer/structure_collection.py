@@ -70,7 +70,7 @@ class StructureCollection:
             {
                 structure
                 for structure in self.structures
-                if structure.location.is_near(location)
+                if structure.location_in_space(location.space).is_near(location)
             }
         )
 
