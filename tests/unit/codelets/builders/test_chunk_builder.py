@@ -36,6 +36,10 @@ def target_slot():
 @pytest.fixture
 def target_rule():
     rule = Mock()
+    root_concept = Mock()
+    rule.root_concept = root_concept
+    rule.left_concept = root_concept
+    rule.right_concept = None
     rule.compatibility_with.return_value = 1.0
     return rule
 

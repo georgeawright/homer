@@ -6,7 +6,6 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures import Node
 from homer.structures.nodes import Chunk
 
 
@@ -83,14 +82,59 @@ class ChunkBuilder(Builder):
 
     def _process_structure(self):
         if self.target_root is None:
+            if (
+                self.target_rule.right_concept is None
+                and self.target_rule.root_concept == self.target_rule.left_concept
+            ):
+                slot_locations = [Location([], self.target_space)] + [
+                    Location([[None]], space)
+                    for space in self.target_space.conceptual_spaces
+                ]
+                chunk_locations = self.target_node.locations
+            elif self.target_rule.right_concept is None:
+                root_location = self.target_node.location_in_space(self.target_space)
+                root_conceptual_location = (
+                    self.target_rule.root_concept.location_in_space(
+                        self.target_rule.parent_space
+                    )
+                )
+                slot_locations = []
+                chunk_locations = [root_location, root_conceptual_location]
+            else:
+                target_node_location = self.target_node.location_in_space(
+                    self.target_space
+                )
+                adjacent_location = (
+                    target_node_location.get_adjacent_location_right()
+                    if self.target_branch == "left"
+                    else target_node_location.get_adjacent_location_left()
+                )
+                slot_conceptual_locations = [
+                    Location([[None]], space)
+                    for space in self.target_space.conceptual_spaces
+                ]
+                root_location = (
+                    Location.merge(
+                        self.target_node.location_in_space(self.target_space),
+                        adjacent_location,
+                    )
+                    if self.target_branch == "left"
+                    else Location.merge(
+                        adjacent_location,
+                        self.target_node.location_in_space(self.target_space),
+                    )
+                )
+                root_conceptual_location = (
+                    self.target_rule.root_concept.location_in_space(
+                        self.target_rule.parent_space
+                    )
+                )
+                slot_locations = [adjacent_location] + slot_conceptual_locations
+                chunk_locations = [root_location, root_conceptual_location]
             slot = Chunk(
                 structure_id=ID.new(Chunk),
                 parent_id=self.codelet_id,
-                locations=[Location([], self.target_space)]
-                + [
-                    Location([[None]], space)
-                    for space in self.target_space.conceptual_spaces
-                ],
+                locations=slot_locations,
                 members=StructureCollection(),
                 parent_space=self.target_space,
                 quality=0.0,
@@ -98,7 +142,6 @@ class ChunkBuilder(Builder):
                 right_branch=None,
                 rule=None,
             )
-            locations = self.target_node.locations
             left_branch, right_branch = (
                 (StructureCollection({self.target_node}), None)
                 if self.target_branch == "left"
@@ -107,17 +150,21 @@ class ChunkBuilder(Builder):
             chunk = Chunk(
                 structure_id=ID.new(Chunk),
                 parent_id=self.codelet_id,
-                locations=locations,
-                members=StructureCollection({self.target_node, slot}),
+                locations=chunk_locations,
+                members=StructureCollection({self.target_node}),
                 parent_space=self.target_space,
                 quality=0.0,
                 left_branch=left_branch,
                 right_branch=right_branch,
                 rule=self.target_rule,
             )
+            self.child_structures = StructureCollection({chunk})
+            self.target_node.super_chunks.add(chunk)
             slot.super_chunks.add(chunk)
-            chunk.free_branch.add(slot)
-            self.child_structures = StructureCollection({slot, chunk})
+            if chunk.has_free_branch:
+                chunk.free_branch.add(slot)
+                chunk.members.add(slot)
+                self.child_structures.add(slot)
         if self.target_slot is not None and self.target_slot_filler is not None:
             self.target_root.members.add(self.target_slot_filler)
             self.target_slot_filler.super_chunks.add(self.target_root)

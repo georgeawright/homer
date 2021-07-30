@@ -28,6 +28,7 @@ class Word(Node):
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
+        super_chunks: StructureCollection = None,
     ):
         Node.__init__(
             self,
@@ -43,6 +44,9 @@ class Word(Node):
         self.lexeme = lexeme
         self.word_form = word_form
         self.is_word = True
+        self.super_chunks = (
+            super_chunks if super_chunks is not None else StructureCollection()
+        )
 
     @classmethod
     def get_builder_class(cls):

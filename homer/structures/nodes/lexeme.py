@@ -1,9 +1,9 @@
 from typing import Dict, List
 
 from homer.id import ID
-from homer.word_form import WordForm
 from homer.structure_collection import StructureCollection
 from homer.structures import Node
+from homer.word_form import WordForm
 
 from .concept import Concept
 

@@ -41,11 +41,35 @@ class Rule(Node):
         self.root_concept = root_concept
         self.left_concept = left_concept
         self.right_concept = right_concept
+        self.is_rule = True
 
     @property
     def rule_constituents(self) -> StructureCollection:
         return StructureCollection(
             {self.root_concept, self.left_concept, self.right_concept}
+        )
+
+    @property
+    def instance_type(self) -> type:
+        return self.left_concept.instance_type
+
+    @property
+    def friends(self) -> StructureCollection:
+        return StructureCollection.union(
+            StructureCollection(
+                {
+                    link_link.start
+                    for link in self.links_in
+                    for link_link in link.start.links_in
+                }
+            ).where(is_rule=True, parent_space=self.parent_space),
+            StructureCollection(
+                {
+                    link_link.end
+                    for link in self.links_out
+                    for link_link in link.end.links_out
+                }
+            ).where(is_rule=True, parent_space=self.parent_space),
         )
 
     def compatibility_with(
@@ -115,3 +139,6 @@ class Rule(Node):
                 or arranged_fragments["right"].has_label(self.right_branch)
             )
         )
+
+    def __repr__(self) -> str:
+        return f'<{self.structure_id} "{self.name}" in {self.parent_space.name}>'

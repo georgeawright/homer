@@ -91,17 +91,10 @@ class Concept(Node):
 
     def distance_between(self, a: Node, b: Node, space: "Space" = None):
         space = self.parent_space if space is None else space
-        a_location = (
-            a.location_in_space(space)
-            if a.has_location_in_space(space)
-            else a.location_in_conceptual_space(space)
+        return self.distance_function(
+            a.location_in_space(space).coordinates,
+            b.location_in_space(space).coordinates,
         )
-        b_location = (
-            b.location_in_space(space)
-            if b.has_location_in_space(space)
-            else b.location_in_conceptual_space(space)
-        )
-        return self.distance_function(a_location.coordinates, b_location.coordinates)
 
     def proximity_between(self, a: Node, b: Node, space: "Space" = None):
         return self._distance_to_proximity(self.distance_between(a, b, space=space))

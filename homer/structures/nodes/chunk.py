@@ -86,21 +86,21 @@ class Chunk(Node):
 
     @property
     def free_branch_concept(self):
-        if self.left_branch == self.members:
+        if self.rule.root_concept == self.rule.left_concept:
             return self.rule.left_concept
         if self.left_branch.is_empty():
             return self.rule.left_concept
-        if self.right_branch.is_empty():
+        if self.right_branch.is_empty() and self.rule.right_concept is not None:
             return self.rule.right_concept
         raise MissingStructureError
 
     @property
     def free_branch(self):
-        if self.left_branch == self.members:
+        if self.rule.root_concept == self.rule.left_concept:
             return self.left_branch
         if self.left_branch.is_empty():
             return self.left_branch
-        if self.right_branch.is_empty():
+        if self.right_branch.is_empty() and self.rule.right_concept is not None:
             return self.right_branch
         raise MissingStructureError
 

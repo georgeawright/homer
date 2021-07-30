@@ -10,7 +10,6 @@ from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation, chunking_exigency
 from homer.structures.nodes import Rule
 
-# unchunkedness therefore needs to depend on being in chunks with members/no slots
 # chunking exigency needs to depend on rule - high level grammar rules, sameness, have low exigency
 
 
@@ -125,6 +124,9 @@ class ChunkSuggester(Suggester):
                 self.target_rule = self.target_root.rule
             except MissingStructureError:
                 self.target_root = None
+                self.target_rule = self.bubble_chamber.rules.where(
+                    instance_type=type(self.target_node)
+                ).get(key=activation)
         else:
             try:
                 self.target_root = StructureCollection(
@@ -185,11 +187,16 @@ class ChunkSuggester(Suggester):
 
         left_randomness = random.random()
         right_randomness = random.random()
+        child = (
+            self.target_node
+            if self.target_slot_filler is None
+            else self.target_slot_filler
+        )
         left_compatibility = self.target_rule.compatibility_with(
-            root=self.target_root, child=self.target_slot_filler, branch="left"
+            root=self.target_root, child=child, branch="left"
         )
         right_compatibility = self.target_rule.compatibility_with(
-            root=self.target_root, child=self.target_slot_filler, branch="right"
+            root=self.target_root, child=child, branch="right"
         )
         left_probability = randomized_compatibility(
             left_compatibility, left_randomness, self.bubble_chamber.satisfaction
