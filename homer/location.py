@@ -41,3 +41,9 @@ class Location:
             self.coordinates, other.coordinates
         )
         return distance <= self.space.parent_concept.distance_to_proximity_weight
+
+    def get_adjacent_location_right(self) -> Location:
+        return Location([[self.coordinates[-1][0] + 1]], self.space)
+
+    def get_adjacent_location_left(self) -> Location:
+        return Location([[self.coordinates[0][0] - 1]], self.space)
