@@ -108,7 +108,7 @@ class LabelSuggester(Suggester):
                     for space in self.bubble_chamber.conceptual_spaces.where(
                         is_basic_level=True
                     ).where(instance_type=type(self.target_node))
-                    if self.target_node.has_location_in_conceptual_space(space)
+                    if self.target_node.has_location_in_space(space)
                 }
             ).get()
             location = self.target_node.location_in_space(conceptual_space)
