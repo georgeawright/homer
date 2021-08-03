@@ -111,7 +111,7 @@ class LabelSuggester(Suggester):
                     if self.target_node.has_location_in_conceptual_space(space)
                 }
             ).get()
-            location = self.target_node.location_in_conceptual_space(conceptual_space)
+            location = self.target_node.location_in_space(conceptual_space)
             try:
                 self.parent_concept = (
                     conceptual_space.contents.where(
@@ -136,7 +136,7 @@ class LabelSuggester(Suggester):
         return not self.target_node.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classifier.classify(
+        self.confidence = self.parent_concept.classifier.classify_link(
             concept=self.parent_concept, start=self.target_node
         )
 
