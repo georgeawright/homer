@@ -12,26 +12,27 @@ from homer.tools import hasinstance
 @pytest.fixture
 def parent_concept():
     concept = Mock()
-    concept.classifier.classify.return_value = 1.0
+    concept.is_concept = True
+    concept.structure_type = Relation
+    concept.classifier.classify_link.return_value = 1.0
     return concept
 
 
 @pytest.fixture
-def bubble_chamber(parent_concept):
+def conceptual_space(parent_concept):
+    space = Mock()
+    space.contents = StructureCollection({parent_concept})
+    return space
+
+
+@pytest.fixture
+def bubble_chamber(conceptual_space):
     chamber = Mock()
     chamber.concepts = {"relation": Mock(), "suggest": Mock()}
-    relational_concept_space = Mock()
-    relational_concept_space.contents.of_type.return_value = StructureCollection(
-        {parent_concept}
-    )
-    relational_concept = Mock()
-    relational_concept.child_spaces = StructureCollection({relational_concept_space})
-    space = Mock()
-    space.name = "relational concepts"
-    space.contents.of_type.return_value = StructureCollection(
-        {relational_concept_space}
-    )
-    chamber.spaces = StructureCollection({space})
+    conceptual_spaces = StructureCollection({conceptual_space})
+    conceptual_spaces_where = Mock()
+    conceptual_spaces_where.where.return_value = conceptual_spaces
+    chamber.conceptual_spaces.where.return_value = conceptual_spaces_where
     return chamber
 
 
@@ -52,7 +53,6 @@ def target_structure_one(target_structure_two):
     return structure
 
 
-@pytest.mark.skip
 def test_bottom_up_codelet_gets_a_concept(bubble_chamber):
     target_structures = {
         "target_space": Mock(),
@@ -69,7 +69,6 @@ def test_bottom_up_codelet_gets_a_concept(bubble_chamber):
     assert relation_suggester._target_structures["parent_concept"] is not None
 
 
-@pytest.mark.skip
 def test_codelet_gets_a_second_target_structure(bubble_chamber, target_structure_one):
     target_structures = {
         "target_space": Mock(),
@@ -86,7 +85,6 @@ def test_codelet_gets_a_second_target_structure(bubble_chamber, target_structure
     assert relation_suggester._target_structures["target_structure_two"] is not None
 
 
-@pytest.mark.skip
 def test_gives_high_confidence_for_good_example(
     bubble_chamber, parent_concept, target_structure_one
 ):
@@ -106,7 +104,6 @@ def test_gives_high_confidence_for_good_example(
     assert isinstance(relation_suggester.child_codelets[0], RelationBuilder)
 
 
-@pytest.mark.skip
 def test_gives_low_confidence_for_bad_example(
     parent_concept, bubble_chamber, target_structure_one
 ):
@@ -116,7 +113,7 @@ def test_gives_low_confidence_for_bad_example(
         "target_structure_two": None,
         "parent_concept": parent_concept,
     }
-    parent_concept.classifier.classify.return_value = 0.0
+    parent_concept.classifier.classify_link.return_value = 0.0
     relation_suggester = RelationSuggester(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
@@ -127,7 +124,6 @@ def test_gives_low_confidence_for_bad_example(
     assert isinstance(relation_suggester.child_codelets[0], RelationBuilder)
 
 
-@pytest.mark.skip
 def test_fizzles_when_relation_already_exists(bubble_chamber, target_structure_one):
     target_structures = {
         "target_space": Mock(),

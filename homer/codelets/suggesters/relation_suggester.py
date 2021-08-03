@@ -147,12 +147,10 @@ class RelationSuggester(Suggester):
                     for space in self.bubble_chamber.conceptual_spaces.where(
                         is_basic_level=True
                     ).where(instance_type=type(self.target_structure_one))
-                    if self.target_structure_one.has_location_in_conceptual_space(space)
+                    if self.target_structure_one.has_location_in_space(space)
                 }
             ).get()
-            location = self.target_structure_one.location_in_conceptual_space(
-                conceptual_space
-            )
+            location = self.target_structure_one.location_in_space(conceptual_space)
             try:
                 self.parent_concept = StructureCollection(
                     {
@@ -172,8 +170,9 @@ class RelationSuggester(Suggester):
             except MissingStructureError:
                 try:
                     self.parent_concept = (
-                        conceptual_space.contents.of_type(Concept)
-                        .where(structure_type=Relation)
+                        conceptual_space.contents.where(
+                            is_concept=True, structure_type=Relation
+                        )
                         .where_not(classifier=None)
                         .get()
                     )
@@ -198,7 +197,7 @@ class RelationSuggester(Suggester):
         )
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classifier.classify(
+        self.confidence = self.parent_concept.classifier.classify_link(
             concept=self.parent_concept,
             space=self.target_space,
             start=self.target_structure_one,
