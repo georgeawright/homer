@@ -10,7 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation, chunking_exigency
 from homer.structures.nodes import Rule
 
-# chunking exigency needs to depend on rule - high level grammar rules, sameness, have low exigency
+# TODO: chunking exigency needs to depend on rule - high level grammar rules, sameness, have low exigency
 
 
 class ChunkSuggester(Suggester):

@@ -4,7 +4,6 @@ from unittest.mock import Mock
 from homer.codelets.suggesters import (
     CorrespondenceSuggester,
     LabelSuggester,
-    PhraseSuggester,
     RelationSuggester,
 )
 from homer.codelets.factories import ConceptDrivenFactory
