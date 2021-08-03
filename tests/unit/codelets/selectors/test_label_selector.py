@@ -19,7 +19,6 @@ def bubble_chamber():
     return chamber
 
 
-@pytest.mark.skip
 def test_finds_challenger_when_not_given_one(bubble_chamber):
     parent_concept = Mock()
     parent_concept.instance_type = str
@@ -44,7 +43,6 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     assert selector.challengers == StructureCollection({challenger})
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "champion_quality, champion_activation, "
     + "challenger_quality, challenger_activation, "
