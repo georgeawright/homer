@@ -52,7 +52,6 @@ def target_structure_one(target_structure_two):
     return structure
 
 
-@pytest.mark.skip
 def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber, target_structure_one, target_structure_two, parent_concept
 ):
@@ -72,7 +71,6 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     assert isinstance(relation_builder.child_codelets[0], RelationEvaluator)
 
 
-@pytest.mark.skip
 def test_fizzles_when_relation_already_exists(
     bubble_chamber, target_structure_one, target_structure_two, parent_concept
 ):
