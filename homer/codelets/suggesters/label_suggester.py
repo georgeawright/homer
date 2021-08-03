@@ -114,8 +114,9 @@ class LabelSuggester(Suggester):
             location = self.target_node.location_in_conceptual_space(conceptual_space)
             try:
                 self.parent_concept = (
-                    conceptual_space.contents.of_type(Concept)
-                    .where(structure_type=Label)
+                    conceptual_space.contents.where(
+                        is_concept=True, structure_type=Label
+                    )
                     .near(location)
                     .get()
                 )
