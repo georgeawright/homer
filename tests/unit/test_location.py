@@ -5,7 +5,6 @@ from homer.location import Location
 from homer.tools import centroid_euclidean_distance
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "sets_of_coordinates, expected_coordinates",
     [
@@ -23,7 +22,6 @@ def test_average(sets_of_coordinates, expected_coordinates):
     assert [expected_coordinates] == average.coordinates
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "coordinates_one, coordinates_two, expected_coordinates",
     [
@@ -39,7 +37,6 @@ def test_merge(coordinates_one, coordinates_two, expected_coordinates):
     assert expected_coordinates == merged_location.coordinates
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "coordinates_one, coordinates_two",
     [([[0], [1]], [[3], [4]]), ([[3], [4]], [[0], [1]])],
@@ -52,7 +49,6 @@ def test_will_not_merge_non_adjacent_locations(coordinates_one, coordinates_two)
         Location.merge(location_one, location_two)
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "self_coordinates, other_coordinates, expected",
     [([1, 1], [1, 1], True), ([1, 1], [1, 2], False)],
@@ -64,7 +60,6 @@ def test_eq(self_coordinates, other_coordinates, expected):
     assert expected == (location_1 == location_2)
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "self_coordinates, other_coordinates, nearness, expected",
     [
