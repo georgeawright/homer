@@ -6,13 +6,12 @@ from homer.codelets.selectors import RelationSelector
 from homer.structure_collection import StructureCollection
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
 def test_changes_target_structure_quality(current_quality, classification):
     bubble_chamber = Mock()
     bubble_chamber.concepts = {"evaluate": Mock(), "relation": Mock()}
     concept = Mock()
-    concept.classifier.classify.return_value = classification
+    concept.classifier.classify_link.return_value = classification
     relation = Mock()
     relation.quality = current_quality
     relation.parent_concept = concept
