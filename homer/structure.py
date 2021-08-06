@@ -423,13 +423,22 @@ class Structure(ABC):
     def spread_activation(self):
         if not self.is_fully_active():
             return
-        if self.parent_concept is not None:
+        try:
             self.parent_concept.boost_activation(self.activation)
+        except AttributeError:
+            pass
+        try:
+            self.rule.boost_activation(self.activation)
+        except AttributeError:
+            pass
         for link in self.links:
-            try:
+            print(link.start, link.end)
+            if not link.is_bidirectional:
+                continue
+            if link.start != self:
+                link.start.boost_activation(link.activation)
+            else:
                 link.end.boost_activation(link.activation)
-            except AttributeError:  # labels have no end
-                pass
 
     def update_activation(self):
         if self._activation_buffer == 0.0:

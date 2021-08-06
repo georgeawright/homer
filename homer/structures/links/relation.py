@@ -18,6 +18,7 @@ class Relation(Link):
         parent_concept: Concept,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
+        is_bidirectional: bool = True,
     ):
         Link.__init__(
             self,
@@ -33,6 +34,7 @@ class Relation(Link):
         )
         self._parent_space = parent_space
         self.is_relation = True
+        self.is_bidirectional = is_bidirectional
 
     @classmethod
     def get_builder_class(cls):

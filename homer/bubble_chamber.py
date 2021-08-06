@@ -123,7 +123,7 @@ class BubbleChamber:
     def structures(self) -> StructureCollection:
         return StructureCollection.union(
             self.conceptual_spaces,
-            self.working_spaces,
+            self.contextual_spaces,
             self.frames,
             self.chunks,
             self.concepts,
