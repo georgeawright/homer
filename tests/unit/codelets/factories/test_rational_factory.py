@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from homer.codelets import Evaluator, Publisher, Suggester
 from homer.codelets.factories import RationalFactory
@@ -77,7 +77,6 @@ def coderack():
     return rack
 
 
-@pytest.mark.skip
 def test_decide_follow_up_class_returns_codelet_class(
     bubble_chamber, coderack, concepts
 ):

@@ -63,7 +63,6 @@ class Factory(Codelet):
             LabelSuggester,
             RelationSuggester,
             WordSuggester,
-            PhraseSuggester,
         )
         from homer.codelets.suggesters.chunk_suggesters import (
             ChunkProjectionSuggester,
@@ -71,9 +70,6 @@ class Factory(Codelet):
         )
         from homer.codelets.suggesters.label_suggesters import (
             LabelProjectionSuggester,
-        )
-        from homer.codelets.suggesters.phrase_suggesters import (
-            PhraseProjectionSuggester,
         )
         from homer.codelets.suggesters.relation_suggesters import (
             RelationProjectionSuggester,
@@ -88,7 +84,6 @@ class Factory(Codelet):
             LabelEvaluator,
             RelationEvaluator,
             WordEvaluator,
-            PhraseEvaluator,
         )
         from homer.codelets.evaluators.chunk_evaluators import (
             ChunkProjectionEvaluator,
@@ -96,9 +91,6 @@ class Factory(Codelet):
         )
         from homer.codelets.evaluators.label_evaluators import (
             LabelProjectionEvaluator,
-        )
-        from homer.codelets.evaluators.phrase_evaluators import (
-            PhraseProjectionEvaluator,
         )
         from homer.codelets.evaluators.relation_evaluators import (
             RelationProjectionEvaluator,
@@ -115,7 +107,6 @@ class Factory(Codelet):
                         "chunk": ChunkSuggester,
                         "correspondence": CorrespondenceSuggester,
                         "label": LabelSuggester,
-                        "phrase": PhraseSuggester,
                         "relation": RelationSuggester,
                         "view-monitoring": MonitoringViewSuggester,
                         "view-simplex": SimplexViewSuggester,
@@ -125,7 +116,6 @@ class Factory(Codelet):
                     "forward": {
                         "chunk": ChunkProjectionSuggester,
                         "label": LabelProjectionSuggester,
-                        "phrase": PhraseProjectionSuggester,
                         "relation": RelationProjectionSuggester,
                         "word": WordSuggester,
                     },
@@ -140,7 +130,6 @@ class Factory(Codelet):
                         "chunk": ChunkEvaluator,
                         "correspondence": CorrespondenceEvaluator,
                         "label": LabelEvaluator,
-                        "phrase": PhraseEvaluator,
                         "relation": RelationEvaluator,
                         "view-monitoring": MonitoringViewEvaluator,
                         "view-simplex": SimplexViewEvaluator,
@@ -150,7 +139,6 @@ class Factory(Codelet):
                     "forward": {
                         "chunk": ChunkProjectionEvaluator,
                         "label": LabelProjectionEvaluator,
-                        "phrase": PhraseProjectionEvaluator,
                         "relation": RelationProjectionEvaluator,
                         "word": WordEvaluator,
                     },
@@ -179,7 +167,6 @@ class Factory(Codelet):
         correspondence = self.bubble_chamber.concepts["correspondence"]
         chunk = self.bubble_chamber.concepts["chunk"]
         label = self.bubble_chamber.concepts["label"]
-        phrase = self.bubble_chamber.concepts["phrase"]
         relation = self.bubble_chamber.concepts["relation"]
         view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
         view_simplex = self.bubble_chamber.concepts["view-simplex"]
@@ -189,7 +176,6 @@ class Factory(Codelet):
                 "actions": StructureCollection({suggest, evaluate}),
                 "spaces": StructureCollection({inner, outer}),
                 "directions": StructureCollection({forward}),
-                # "structures": StructureCollection({chunk, label, phrase, relation}),
                 "structures": StructureCollection({chunk, label, relation}),
             },
             "inner": {
