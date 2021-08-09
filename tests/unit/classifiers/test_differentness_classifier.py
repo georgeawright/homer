@@ -4,7 +4,6 @@ from unittest.mock import Mock
 from homer.classifiers import DifferentnessClassifier
 
 
-@pytest.mark.skip
 def test_classifies_slots_as_not_different():
     start_slot = Mock()
     start_slot.is_slot = True
@@ -15,6 +14,6 @@ def test_classifies_slots_as_not_different():
     end_non_slot = Mock()
     end_non_slot.is_slot = False
     classifier = DifferentnessClassifier()
-    assert 0 == classifier.classify(start=start_slot, end=end_slot)
-    assert 0 == classifier.classify(start=start_non_slot, end=end_slot)
-    assert 0 == classifier.classify(start=start_slot, end=end_non_slot)
+    assert 0 == classifier.classify_link(start=start_slot, end=end_slot)
+    assert 0 == classifier.classify_link(start=start_non_slot, end=end_slot)
+    assert 0 == classifier.classify_link(start=start_slot, end=end_non_slot)

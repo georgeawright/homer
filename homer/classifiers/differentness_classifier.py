@@ -5,7 +5,7 @@ class DifferentnessClassifier(Classifier):
     def __init__(self):
         pass
 
-    def classify(self, **kwargs: dict):
+    def classify_link(self, **kwargs: dict):
         start = kwargs["start"]
         end = kwargs["end"]
         if start.is_slot or end.is_slot:
