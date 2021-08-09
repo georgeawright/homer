@@ -5,7 +5,6 @@ from unittest.mock import Mock, patch
 from homer.coderack import Coderack
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "urgency_values, bubble_chamber_satisfaction, random_numbers, expected_urgency",
     [
