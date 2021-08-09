@@ -1,19 +1,19 @@
 import pytest
 from unittest.mock import Mock
 
+from homer import fuzzy
 from homer.classifiers import RuleClassifier
 from homer.structure_collection import StructureCollection
 
 
-@pytest.mark.skip
 def test_classify_det_relation():
     det_classifier = RuleClassifier(
-        [
-            lambda kwargs: kwargs["start"].location.coordinates[0][0]
+        lambda kwargs: fuzzy.AND(
+            kwargs["start"].location.coordinates[0][0]
             == kwargs["end"].location.coordinates[0][0] + 1,
-            lambda kwargs: kwargs["start"].has_label_with_name("noun"),
-            lambda kwargs: kwargs["end"].has_label_with_name("det"),
-        ]
+            kwargs["start"].has_label_with_name("noun"),
+            kwargs["end"].has_label_with_name("det"),
+        )
     )
     det_word = Mock()
     det_word.location.coordinates = [[0]]
@@ -29,22 +29,23 @@ def test_classify_det_relation():
     assert not det_classifier.classify(start=verb_word, end=noun_word)
 
 
-@pytest.mark.skip
 def test_classify_nsubj_relation():
     nsubj_classifier = RuleClassifier(
-        [
-            lambda kwargs: kwargs["end"].has_label_with_name("noun"),
-            lambda kwargs: kwargs["start"].has_label_with_name("vbz")
-            or (
-                (
-                    kwargs["start"].has_label_with_name("jj")
-                    or kwargs["start"].has_label_with_name("jjr")
-                )
-                and kwargs["start"].has_relation_with_name("cop")
+        lambda kwargs: fuzzy.AND(
+            kwargs["end"].has_label_with_name("noun"),
+            fuzzy.OR(
+                kwargs["start"].has_label_with_name("vbz"),
+                fuzzy.AND(
+                    fuzzy.OR(
+                        kwargs["start"].has_label_with_name("jj"),
+                        kwargs["start"].has_label_with_name("jjr"),
+                    ),
+                    kwargs["start"].has_relation_with_name("cop"),
+                ),
             ),
-            lambda kwargs: kwargs["end"].location.coordinates[0][0]
+            kwargs["end"].location.coordinates[0][0]
             < kwargs["start"].location.coordinates[0][0],
-        ]
+        ),
     )
     noun = Mock()
     noun.location.coordinates = [[0]]
@@ -61,16 +62,17 @@ def test_classify_nsubj_relation():
     assert not nsubj_classifier.classify(start=verb, end=adj)
 
 
-@pytest.mark.skip
 def test_classify_cop_relation():
     cop_classifier = RuleClassifier(
-        [
-            lambda kwargs: kwargs["end"].has_label_with_name("cop"),
-            lambda kwargs: kwargs["start"].has_label_with_name("jj")
-            or kwargs["start"].has_label_with_name("jjr"),
-            lambda kwargs: kwargs["start"].location.coordinates[0][0]
+        lambda kwargs: fuzzy.AND(
+            kwargs["end"].has_label_with_name("cop"),
+            fuzzy.OR(
+                kwargs["start"].has_label_with_name("jj"),
+                kwargs["start"].has_label_with_name("jjr"),
+            ),
+            kwargs["start"].location.coordinates[0][0]
             == kwargs["end"].location.coordinates[0][0] + 1,
-        ]
+        )
     )
     cop = Mock()
     cop.location.coordinates = [[1]]
@@ -82,22 +84,23 @@ def test_classify_cop_relation():
     assert not cop_classifier.classify(start=cop, end=adj)
 
 
-@pytest.mark.skip
 def test_classify_prep_relation():
     prep_classifier = RuleClassifier(
-        [
-            lambda kwargs: kwargs["end"].has_label_with_name("prep"),
-            lambda kwargs: kwargs["start"].has_label_with_name("vbz")
-            or (
-                (
-                    kwargs["start"].has_label_with_name("jj")
-                    or kwargs["start"].has_label_with_name("jjr")
-                )
-                and kwargs["start"].has_relation_with_name("cop")
+        lambda kwargs: fuzzy.AND(
+            kwargs["end"].has_label_with_name("prep"),
+            fuzzy.OR(
+                kwargs["start"].has_label_with_name("vbz"),
+                fuzzy.AND(
+                    fuzzy.OR(
+                        kwargs["start"].has_label_with_name("jj"),
+                        kwargs["start"].has_label_with_name("jjr"),
+                    ),
+                    kwargs["start"].has_relation_with_name("cop"),
+                ),
             ),
-            lambda kwargs: kwargs["start"].location.coordinates[0][0]
+            kwargs["start"].location.coordinates[0][0]
             < kwargs["end"].location.coordinates[0][0],
-        ]
+        )
     )
     verb = Mock()
     verb.location.coordinates = [[9]]
@@ -109,15 +112,14 @@ def test_classify_prep_relation():
     assert not prep_classifier.classify(start=prep, end=verb)
 
 
-@pytest.mark.skip
 def test_classify_pobj_relation():
     pobj_classifier = RuleClassifier(
-        [
-            lambda kwargs: kwargs["end"].has_label_with_name("noun"),
-            lambda kwargs: kwargs["start"].has_label_with_name("prep"),
-            lambda kwargs: kwargs["start"].location.coordinates[0][0]
+        lambda kwargs: fuzzy.AND(
+            kwargs["end"].has_label_with_name("noun"),
+            kwargs["start"].has_label_with_name("prep"),
+            kwargs["start"].location.coordinates[0][0]
             < kwargs["end"].location.coordinates[0][0],
-        ]
+        )
     )
     prep = Mock()
     prep.location.coordinates = [[10]]
@@ -132,27 +134,30 @@ def test_classify_pobj_relation():
     assert not pobj_classifier.classify(start=prep, end=det)
 
 
-@pytest.mark.skip
 def test_classify_dep_relation():
     dep_classifier = RuleClassifier(
-        [
-            lambda kwargs: kwargs["end"].has_label_with_name("noun"),
-            lambda kwargs: kwargs["start"].has_label_with_name("prep"),
-            lambda kwargs: kwargs["start"]
-            .relation_with_name("prep")
-            .start.has_relation_with_name("pobj"),
-            lambda kwargs: kwargs["end"].location.coordinates[0][0]
+        lambda kwargs: fuzzy.AND(
+            kwargs["end"].has_label_with_name("noun"),
+            kwargs["start"].has_label_with_name("prep"),
+            (
+                lambda: kwargs["start"]
+                .relation_with_name("prep")
+                .start.has_relation_with_name("pobj")
+            )(),
+            kwargs["end"].location.coordinates[0][0]
             > kwargs["start"].location.coordinates[0][0],
-        ]
+        )
     )
     south = Mock()
     south.location.coordinates = [[10]]
     south.has_label_with_name = lambda x: x == "noun"
     south.has_relation_with_name = lambda x: x == "pobj"
+    than_south_relation = Mock()
+    than_south_relation.start = south
     than = Mock()
     than.location.coordinates = [[11]]
     than.has_label_with_name = lambda x: x == "prep"
-    than.relation_with_name.return_value = south
+    than.relation_with_name.return_value = than_south_relation
     the = Mock()
     the.location.coordinates = [[12]]
     the.has_label_with_name = lambda x: x == "det"
