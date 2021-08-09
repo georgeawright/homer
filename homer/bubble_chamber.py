@@ -1,6 +1,5 @@
 from itertools import chain
 import statistics
-from typing import List, Union
 
 from .errors import MissingStructureError
 from .id import ID
@@ -163,15 +162,3 @@ class BubbleChamber:
             if self.log_count % 500 == 0:
                 self.logger.log(structure)
         self.log_count += 1
-
-    def has_chunk(self, members: StructureCollection) -> bool:
-        for chunk in self.chunks:
-            if chunk.members == members:
-                return True
-        return False
-
-    def has_view(self, members: StructureCollection) -> bool:
-        for view in self.views:
-            if view.members == members:
-                return True
-        return False

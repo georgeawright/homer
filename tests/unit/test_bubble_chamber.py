@@ -10,7 +10,6 @@ from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.spaces import WorkingSpace
 
 
-@pytest.mark.skip
 def test_structures():
     chunk = Mock()
     concept = Mock()
@@ -43,7 +42,6 @@ def test_structures():
     assert word in bubble_chamber.structures
 
 
-@pytest.mark.skip
 def test_add_to_collections():
     bubble_chamber = BubbleChamber(
         StructureCollection(),
@@ -123,6 +121,7 @@ def test_add_to_collections():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     bubble_chamber.add_to_collections(chunk)
     bubble_chamber.add_to_collections(correspondence)
@@ -136,125 +135,3 @@ def test_add_to_collections():
     assert relation in bubble_chamber.relations
     assert view in bubble_chamber.views
     assert word in bubble_chamber.words
-
-
-@pytest.mark.skip
-def test_spread_activations():
-    chunk = Mock()
-    concept = Mock()
-    label = Mock()
-    relation = Mock()
-    word = Mock()
-    bubble_chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection({chunk}),
-        StructureCollection({concept}),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection({label}),
-        StructureCollection({relation}),
-        StructureCollection(),
-        StructureCollection({word}),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
-    bubble_chamber.spread_activations()
-    chunk.spread_activation.assert_called()
-    concept.spread_activation.assert_called()
-    label.spread_activation.assert_called()
-    relation.spread_activation.assert_called()
-    word.spread_activation.assert_called()
-
-
-@pytest.mark.skip
-def test_update_activations():
-    chunk = Mock()
-    concept = Mock()
-    label = Mock()
-    relation = Mock()
-    word = Mock()
-    bubble_chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection({chunk}),
-        StructureCollection({concept}),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection({label}),
-        StructureCollection({relation}),
-        StructureCollection(),
-        StructureCollection({word}),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
-    bubble_chamber.update_activations()
-    chunk.update_activation.assert_called()
-    concept.update_activation.assert_called()
-    label.update_activation.assert_called()
-    relation.update_activation.assert_called()
-    word.update_activation.assert_called()
-
-
-@pytest.mark.skip
-def test_has_chunk():
-    existing_chunk_members = StructureCollection({Mock(), Mock()})
-    existing_chunk = Mock()
-    existing_chunk.members = existing_chunk_members
-    bubble_chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection({existing_chunk}),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
-    assert bubble_chamber.has_chunk(existing_chunk_members)
-
-
-@pytest.mark.skip
-def test_has_view():
-    existing_view_members = StructureCollection({Mock(), Mock()})
-    existing_view = Mock()
-    existing_view.members = existing_view_members
-    bubble_chamber = BubbleChamber(
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection({existing_view}),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        StructureCollection(),
-        Mock(),
-    )
-    assert bubble_chamber.has_view(existing_view_members)
