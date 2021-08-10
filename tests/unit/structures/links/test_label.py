@@ -5,7 +5,6 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
 
 
-@pytest.mark.skip
 def test_copy():
     old_start = Mock()
     new_start = Mock()
@@ -17,7 +16,6 @@ def test_copy():
     assert copy.parent_id == parent_id
 
 
-@pytest.mark.skip
 def test_nearby():
     label_1 = Mock()
     chunk_1 = Mock()
