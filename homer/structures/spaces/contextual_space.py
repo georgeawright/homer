@@ -1,5 +1,7 @@
+from __future__ import annotations
 import statistics
 
+from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
@@ -57,3 +59,56 @@ class ContextualSpace(Space):
             if len(self.contents) != 0
             else 0.0
         )
+
+    def copy(self, **kwargs: dict) -> ContextualSpace:
+        """Requires keyword arguments 'bubble_chamber' and 'parent_id'."""
+        bubble_chamber = kwargs["bubble_chamber"]
+        parent_id = kwargs["parent_id"]
+        new_space = ContextualSpace(
+            structure_id=ID.new(ContextualSpace),
+            parent_id=parent_id,
+            name=self.name,
+            parent_concept=self.parent_concept,
+            contents=StructureCollection(),
+            conceptual_spaces=self.conceptual_spaces,
+        )
+        bubble_chamber.logger.log(new_space)
+        copies = {}
+        for item in self.contents.where(is_node=True):
+            new_item = item.copy(
+                bubble_chamber=bubble_chamber,
+                parent_id=parent_id,
+                parent_space=new_space,
+            )
+            new_space.add(new_item)
+            copies[item] = new_item
+            for label in item.labels:
+                new_label = label.copy(
+                    start=new_item,
+                    parent_space=new_space,
+                    parent_id=parent_id,
+                )
+                new_item.links_out.add(new_label)
+                new_space.add(new_label)
+                copies[label] = new_label
+            for relation in item.links_out.where(is_relation=True):
+                if relation.end not in copies:
+                    continue
+                new_end = copies[relation.end]
+                new_relation = relation.copy(
+                    start=new_item, end=new_end, parent_space=new_space
+                )
+                new_item.links_out.add(new_relation)
+                new_space.add(new_relation)
+                copies[relation] = new_relation
+            for relation in item.links_in.where(is_relation=True):
+                if relation.start not in copies:
+                    continue
+                new_start = copies[relation.start]
+                new_relation = relation.copy(
+                    start=new_start, end=new_item, parent_space=new_space
+                )
+                new_item.links_in.add(new_relation)
+                new_space.add(new_relation)
+                copies[relation] = new_relation
+        return new_space, copies
