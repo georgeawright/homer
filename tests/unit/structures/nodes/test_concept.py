@@ -1,4 +1,3 @@
-import math
 import pytest
 from unittest.mock import Mock
 
@@ -24,7 +23,6 @@ def structure():
     return s
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "prototype, space_name, distance_function, expected",
     [
@@ -46,6 +44,7 @@ def test_distance_from(prototype, space_name, distance_function, expected, struc
         [location],
         Mock(),
         Mock(),
+        Mock(),
         parent_space,
         Mock(),
         distance_function,
@@ -53,7 +52,6 @@ def test_distance_from(prototype, space_name, distance_function, expected, struc
     assert expected == concept.distance_from(structure)
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "prototype, space_name, distance_function, distance_to_proximity_weight, expected",
     [
@@ -80,6 +78,7 @@ def test_proximity_to(
         Mock(),
         Mock(),
         [location],
+        Mock(),
         Mock(),
         Mock(),
         parent_space,
