@@ -36,7 +36,6 @@ def frame():
     return space
 
 
-@pytest.mark.skip
 def test_gives_high_confidence_for_highly_activated_spaces(
     bubble_chamber, input_space, frame
 ):
@@ -54,7 +53,6 @@ def test_gives_high_confidence_for_highly_activated_spaces(
     assert isinstance(view_suggester.child_codelets[0], SimplexViewBuilder)
 
 
-@pytest.mark.skip
 def test_gives_low_confidence_for_low_activated_spaces(
     bubble_chamber, input_space, frame
 ):
