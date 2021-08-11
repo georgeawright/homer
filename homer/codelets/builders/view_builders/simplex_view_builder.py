@@ -2,7 +2,7 @@ from homer.codelets.builders import ViewBuilder
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import ContextualSpace
 from homer.structures.views import SimplexView
 
 
@@ -20,23 +20,31 @@ class SimplexViewBuilder(ViewBuilder):
     def _process_structure(self):
         view_id = ID.new(SimplexView)
         view_location = Location([], self.bubble_chamber.spaces["top level working"])
-        input_spaces = StructureCollection(
-            {
-                self._instantiate_frame(space) if space.is_frame else space
-                for space in self.target_spaces
-            }
+        frame = self.target_spaces.where(is_frame=True).get()
+        input_space_concept = (
+            self.target_spaces.where(is_frame=False).get().parent_concept
         )
-        view_output = WorkingSpace(
-            structure_id=ID.new(WorkingSpace),
+        frame_input_space = (
+            frame.input_space
+            if frame.input_space.parent_concept == input_space_concept
+            else frame.output_space
+        )
+        frame_instance = frame.instantiate(
+            input_space=frame_input_space,
+            parent_id=self.codelet_id,
+            bubble_chamber=self.bubble_chamber,
+        )
+        input_spaces = StructureCollection.union(
+            self.target_spaces.where(is_frame=False),
+            StructureCollection({frame_instance}),
+        )
+        view_output = ContextualSpace(
+            structure_id=ID.new(ContextualSpace),
             parent_id=self.codelet_id,
             name=f"output for {view_id}",
-            parent_concept=self.frame.parent_concept,
-            conceptual_space=self.frame.conceptual_space,
-            locations=[view_location],
+            parent_concept=self.frame.output_space.parent_concept,
             contents=StructureCollection(),
-            no_of_dimensions=1,
-            dimensions=[],
-            sub_spaces=[],
+            conceptual_spaces=self.frame.output_space.conceptual_spaces,
         )
         view = SimplexView(
             structure_id=view_id,

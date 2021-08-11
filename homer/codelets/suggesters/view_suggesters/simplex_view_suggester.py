@@ -13,10 +13,8 @@ class SimplexViewSuggester(ViewSuggester):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
-        target_one = bubble_chamber.spaces["input"]
-        target_two = bubble_chamber.frames.where(
-            parent_concept=bubble_chamber.concepts["text"]
-        ).get(key=activation)
+        target_one = bubble_chamber.contextual_spaces.get(key=activation)
+        target_two = bubble_chamber.frames.get(key=activation)
         urgency = urgency if urgency is not None else target_two.activation
         return cls.spawn(
             parent_id,
