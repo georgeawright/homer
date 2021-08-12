@@ -1,8 +1,9 @@
 import pytest
+import statistics
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
-from homer.classifiers import ProximityClassifier
+from homer.classifiers import ProximityClassifier, SamenessClassifier
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
@@ -374,3 +375,185 @@ def warm_word(grammar_vectors, grammar_space, warm_lexeme):
         grammar_space,
         1,
     )
+
+
+@pytest.fixture(scope="module")
+def location_concept(bubble_chamber):
+    concept = Concept(
+        "",
+        "",
+        "location",
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        centroid_euclidean_distance,
+    )
+    bubble_chamber.concepts.add(concept)
+    return concept
+
+
+@pytest.fixture(scope="module")
+def north_south_space(bubble_chamber, location_concept):
+    space = ConceptualSpace(
+        "",
+        "",
+        "north-south",
+        location_concept,
+        StructureCollection(),
+        1,
+        [],
+        [],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [[c[0]] for c in location.coordinates]
+        },
+    )
+    bubble_chamber.conceptual_spaces.add(space)
+    return space
+
+
+@pytest.fixture(scope="module")
+def west_east_space(bubble_chamber, location_concept):
+    space = ConceptualSpace(
+        "",
+        "",
+        "west-east",
+        location_concept,
+        StructureCollection(),
+        1,
+        [],
+        [],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [[c[1]] for c in location.coordinates]
+        },
+    )
+    bubble_chamber.conceptual_spaces.add(space)
+    return space
+
+
+@pytest.fixture(scope="module")
+def nw_se_space(bubble_chamber, location_concept):
+    space = ConceptualSpace(
+        "",
+        "",
+        "nw-se",
+        location_concept,
+        StructureCollection(),
+        1,
+        [],
+        [],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [
+                [statistics.fmean(c)] for c in location.coordinates
+            ]
+        },
+    )
+    bubble_chamber.conceptual_spaces.add(space)
+    return space
+
+
+@pytest.fixture(scope="module")
+def ne_sw_space(bubble_chamber, location_concept):
+    space = ConceptualSpace(
+        "",
+        "",
+        "ne-sw",
+        location_concept,
+        StructureCollection(),
+        1,
+        [],
+        [],
+        super_space_to_coordinate_function_map={
+            "location": lambda location: [
+                [statistics.fmean([c[0], 4 - c[1]])] for c in location.coordinates
+            ]
+        },
+    )
+    bubble_chamber.conceptual_spaces.add(space)
+    return space
+
+
+@pytest.fixture(scope="module")
+def location_space(
+    bubble_chamber,
+    location_concept,
+    north_south_space,
+    west_east_space,
+    nw_se_space,
+    ne_sw_space,
+):
+    space = ConceptualSpace(
+        "",
+        "",
+        "location",
+        location_concept,
+        StructureCollection(),
+        2,
+        [north_south_space, west_east_space],
+        [north_south_space, west_east_space, nw_se_space, ne_sw_space],
+        is_basic_level=True,
+    )
+    bubble_chamber.conceptual_spaces.add(space)
+    return space
+
+
+@pytest.fixture(scope="module")
+def temperature_concept(bubble_chamber):
+    concept = Concept(
+        "",
+        "",
+        "temperature",
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        centroid_euclidean_distance,
+    )
+    bubble_chamber.concepts.add(concept)
+    return concept
+
+
+@pytest.fixture(scope="module")
+def temperature_space(bubble_chamber, temperature_concept):
+    space = ConceptualSpace(
+        "",
+        "",
+        "temperature",
+        temperature_concept,
+        StructureCollection(),
+        1,
+        [],
+        [],
+        is_basic_level=True,
+    )
+    bubble_chamber.conceptual_spaces.add(space)
+    return space
+
+
+@pytest.fixture(scope="module")
+def sameness_concept(bubble_chamber):
+    concept = Concept(
+        "",
+        "",
+        "sameness",
+        [],
+        SamenessClassifier(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    bubble_chamber.concepts.add(concept)
+    return concept
+
+
+@pytest.fixture(scope="module")
+def sameness_rule(bubble_chamber, sameness_concept):
+    rule = Rule("", "", "sameness", Mock(), sameness_concept, sameness_concept, None)
+    bubble_chamber.rules.add(rule)
+    return rule
