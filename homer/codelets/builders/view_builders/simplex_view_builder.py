@@ -1,6 +1,5 @@
 from homer.codelets.builders import ViewBuilder
 from homer.id import ID
-from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.spaces import ContextualSpace
 from homer.structures.views import SimplexView

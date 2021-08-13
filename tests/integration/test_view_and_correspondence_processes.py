@@ -25,6 +25,7 @@ from homer.word_form import WordForm
 
 def test_view_and_correspondence_processes(
     bubble_chamber,
+    input_concept,
     location_space,
     temperature_space,
     grammar_space,
@@ -42,7 +43,7 @@ def test_view_and_correspondence_processes(
         "",
         "",
         "input",
-        Mock(),
+        input_concept,
         StructureCollection(),
         conceptual_spaces=StructureCollection({temperature_space, location_space}),
     )
@@ -50,7 +51,12 @@ def test_view_and_correspondence_processes(
 
     # setup frame
     frame_input_space = ContextualSpace(
-        "", "", "", None, StructureCollection(), [location_space, temperature_space]
+        "",
+        "",
+        "",
+        input_concept,
+        StructureCollection(),
+        [location_space, temperature_space],
     )
     chunk_one = Chunk(
         ID.new(Chunk),
@@ -78,12 +84,35 @@ def test_view_and_correspondence_processes(
         1.0,
     )
     frame_input_space.add(chunk_two)
-    label_one = Label(ID.new(Label), "", chunk_one, None, frame_input_space, 1.0)
+    label_one = Label(
+        ID.new(Label),
+        "",
+        chunk_one,
+        None,
+        [Location([[]], frame_input_space), Location([[None, None]], location_space)],
+        1.0,
+    )
     chunk_one.links_out.add(label_one)
-    label_two = Label(ID.new(Label), "", chunk_two, None, frame_input_space, 1.0)
+    label_two = Label(
+        ID.new(Label),
+        "",
+        chunk_two,
+        None,
+        [Location([[]], frame_input_space), Location([[None, None]], location_space)],
+        1.0,
+    )
     chunk_two.links_out.add(label_two)
     one_to_two_relation = Relation(
-        ID.new(Relation), "", chunk_one, chunk_two, None, frame_input_space, 1.0
+        ID.new(Relation),
+        "",
+        chunk_one,
+        chunk_two,
+        None,
+        [
+            TwoPointLocation([[]], [[]], frame_input_space),
+            TwoPointLocation([[None]], [[None]], temperature_space),
+        ],
+        1.0,
     )
     chunk_one.links_out.add(one_to_two_relation)
     chunk_two.links_in.add(one_to_two_relation)
@@ -196,7 +225,14 @@ def test_view_and_correspondence_processes(
     input_space.add(hot_chunk)
     location_space.add(hot_chunk)
     temperature_space.add(hot_chunk)
-    hot_label = Label(ID.new(Label), "", hot_chunk, hot_concept, input_space, 1.0)
+    hot_label = Label(
+        ID.new(Label),
+        "",
+        hot_chunk,
+        hot_concept,
+        [Location([[]], input_space), Location([[22]], temperature_space)],
+        1.0,
+    )
     hot_chunk.links_out.add(hot_label)
     cold_chunk = Chunk(
         ID.new(Chunk),
@@ -213,35 +249,67 @@ def test_view_and_correspondence_processes(
     input_space.add(cold_chunk)
     location_space.add(cold_chunk)
     temperature_space.add(cold_chunk)
-    cold_label = Label(ID.new(Label), "", cold_chunk, cold_concept, input_space, 1.0)
+    cold_label = Label(
+        ID.new(Label),
+        "",
+        cold_chunk,
+        cold_concept,
+        [Location([[]], input_space), Location([[4]], temperature_space)],
+        1.0,
+    )
     cold_chunk.links_out.add(cold_label)
     hot_to_cold_relation = Relation(
-        ID.new(Relation), "", hot_chunk, cold_chunk, hotter_concept, input_space, 1.0
+        ID.new(Relation),
+        "",
+        hot_chunk,
+        cold_chunk,
+        hotter_concept,
+        [
+            TwoPointLocation([[]], [[]], input_space),
+            TwoPointLocation([[22]], [[4]], temperature_space),
+        ],
+        1.0,
     )
     hot_chunk.links_out.add(hot_to_cold_relation)
     cold_chunk.links_in.add(hot_to_cold_relation)
 
     # suggest and build view for input space and frame
-    suggester = SimplexViewSuggester.spawn(
+    view_suggester = SimplexViewSuggester.spawn(
         "", bubble_chamber, StructureCollection({input_space, frame}), 1
     )
-    suggester.run()
-    assert CodeletResult.SUCCESS == suggester.result
+    view_suggester.run()
+    assert CodeletResult.SUCCESS == view_suggester.result
 
-    builder = suggester.child_codelets[0]
-    assert isinstance(builder, SimplexViewBuilder)
-    builder.run()
-    assert CodeletResult.SUCCESS == builder.result
-    view = builder.child_structures.where(is_simplex_view=True).get()
+    view_builder = view_suggester.child_codelets[0]
+    assert isinstance(view_builder, SimplexViewBuilder)
+    view_builder.run()
+    assert CodeletResult.SUCCESS == view_builder.result
+    view = view_builder.child_structures.where(is_simplex_view=True).get()
     original_view_quality = view.quality
     original_view_activation = view.activation
 
-    evaluator = builder.child_codelets[0]
-    assert isinstance(evaluator, SimplexViewEvaluator)
-    evaluator.run()
-    assert CodeletResult.SUCCESS == evaluator.result
+    view_evaluator = view_builder.child_codelets[0]
+    assert isinstance(view_evaluator, SimplexViewEvaluator)
+    view_evaluator.run()
+    assert CodeletResult.SUCCESS == view_evaluator.result
     assert view.quality == original_view_quality
 
     # build correspondences
+    correspondence_suggester_1 = CorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view,
+            "target_space_one": input_space,
+            "target_structure_one": hot_to_cold_relation,
+            "target_space_two": None,
+            "target_structure_two": None,
+            "target_conceptual_space": None,
+            "parent_concept": None,
+        },
+        1.0,
+    )
+    correspondence_suggester_1.run()
+    assert CodeletResult.SUCCESS == correspondence_suggester_1.result
 
     # re-evaluate and select view as correspondences are added

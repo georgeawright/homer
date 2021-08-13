@@ -37,9 +37,12 @@ class Link(Structure):
 
     @property
     def parent_space(self) -> Space:
-        if len(self.locations) == 0:
-            return None
-        return self.locations[0].space
+        contextual_spaces = [
+            location.space
+            for location in self.locations
+            if location.space.is_contextual_space
+        ]
+        return contextual_spaces[0] if len(contextual_spaces) > 0 else None
 
     @property
     def arguments(self) -> StructureCollection:

@@ -8,7 +8,7 @@ from homer.classifiers import ProximityClassifier, SamenessClassifier
 from homer.location import Location
 from homer.locations import TwoPointLocation
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Relation
+from homer.structures.links import Correspondence, Relation
 from homer.structures.nodes import Concept, Lexeme, Rule, Word
 from homer.structures.spaces import ConceptualSpace
 from homer.tools import centroid_euclidean_distance
@@ -21,6 +21,9 @@ def bubble_chamber():
     chamber = BubbleChamber.setup(logger)
     chunk_concept = Concept(
         "", "", "chunk", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
+    correspondence_concept = Concept(
+        "", "", "correspondence", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
     view_simplex_concept = Concept(
         "", "", "view-simplex", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
@@ -38,6 +41,7 @@ def bubble_chamber():
         "", "", "select", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
     chamber.concepts.add(chunk_concept)
+    chamber.concepts.add(correspondence_concept)
     chamber.concepts.add(view_simplex_concept)
     chamber.concepts.add(suggest_concept)
     chamber.concepts.add(build_concept)
@@ -63,6 +67,26 @@ def bubble_chamber():
     )
     chunk_concept.links_out.add(chunk_select_link)
     select_concept.links_in.add(chunk_select_link)
+    correspondence_suggest_link = Relation(
+        "", "", correspondence_concept, suggest_concept, Mock(), None, Mock()
+    )
+    correspondence_concept.links_out.add(correspondence_suggest_link)
+    suggest_concept.links_in.add(correspondence_suggest_link)
+    correspondence_build_link = Relation(
+        "", "", correspondence_concept, build_concept, Mock(), None, Mock()
+    )
+    correspondence_concept.links_out.add(correspondence_build_link)
+    build_concept.links_in.add(correspondence_build_link)
+    correspondence_evaluate_link = Relation(
+        "", "", correspondence_concept, evaluate_concept, Mock(), None, Mock()
+    )
+    correspondence_concept.links_out.add(correspondence_evaluate_link)
+    evaluate_concept.links_in.add(correspondence_evaluate_link)
+    correspondence_select_link = Relation(
+        "", "", correspondence_concept, select_concept, Mock(), None, Mock()
+    )
+    correspondence_concept.links_out.add(correspondence_select_link)
+    select_concept.links_in.add(correspondence_select_link)
     view_simplex_suggest_link = Relation(
         "", "", view_simplex_concept, suggest_concept, Mock(), None, Mock()
     )
@@ -84,6 +108,23 @@ def bubble_chamber():
     view_simplex_concept.links_out.add(view_simplex_select_link)
     select_concept.links_in.add(view_simplex_select_link)
     return chamber
+
+
+@pytest.fixture(scope="module")
+def input_concept():
+    concept = Concept(
+        "",
+        "",
+        "input",
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    return concept
 
 
 @pytest.fixture(scope="module")
@@ -648,7 +689,7 @@ def sameness_concept(bubble_chamber):
         [],
         SamenessClassifier(),
         Mock(),
-        Mock(),
+        Correspondence,
         Mock(),
         Mock(),
         Mock(),

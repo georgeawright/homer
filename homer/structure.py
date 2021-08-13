@@ -53,7 +53,7 @@ class Structure(ABC):
         self.is_view = False
         self.is_space = False
         self.is_conceptual_space = False
-        self.is_working_space = False
+        self.is_contextual_space = False
         self.is_frame = False
         self.is_template = False
 
