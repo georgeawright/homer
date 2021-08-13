@@ -1,7 +1,9 @@
 from __future__ import annotations
+from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Link, Space
@@ -15,23 +17,21 @@ class Label(Link):
         parent_id: str,
         start: Structure,
         parent_concept: Concept,
-        parent_space: Space,
+        locations: List[Location],
         quality: FloatBetweenOneAndZero,
     ):
-        end = None
         Link.__init__(
             self,
-            structure_id,
-            parent_id,
-            start,
-            end,
-            [start.location_in_space(parent_space)] if parent_space is not None else [],
-            parent_concept,
-            quality,
+            structure_id=structure_id,
+            parent_id=parent_id,
+            start=start,
+            end=None,
+            locations=locations,
+            parent_concept=parent_concept,
+            quality=quality,
             links_in=None,
             links_out=None,
         )
-        self._parent_space = parent_space
         self.is_label = True
 
     @classmethod
@@ -53,10 +53,6 @@ class Label(Link):
         return LabelSelector
 
     @property
-    def parent_space(self) -> Space:
-        return self._parent_space
-
-    @property
     def is_slot(self) -> bool:
         return self.parent_concept is None
 
@@ -66,14 +62,20 @@ class Label(Link):
         parent_space = (
             kwargs["parent_space"] if "parent_space" in kwargs else self.parent_space
         )
+        new_locations = [
+            location
+            for location in self.locations
+            if location.space.is_conceptual_space
+        ]
+        new_locations.append(Location(self.location.coordinates, parent_space))
         parent_id = kwargs["parent_id"] if "parent_id" in kwargs else ""
         new_label = Label(
-            ID.new(Label),
-            parent_id,
-            start,
-            self.parent_concept,
-            parent_space,
-            self.quality,
+            structure_id=ID.new(Label),
+            parent_id=parent_id,
+            start=start,
+            parent_concept=self.parent_concept,
+            locations=new_locations,
+            quality=self.quality,
         )
         return new_label
 

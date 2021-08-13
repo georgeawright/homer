@@ -11,7 +11,9 @@ def test_copy():
     new_start = Mock()
     new_end = Mock()
     parent_id = "id"
-    relation = Relation(Mock(), Mock(), old_start, old_end, Mock(), Mock(), Mock())
+    relation = Relation(
+        Mock(), Mock(), old_start, old_end, Mock(), [Mock(), Mock()], Mock()
+    )
     copy = relation.copy(start=new_start, end=new_end, parent_id=parent_id)
     assert relation.start == old_start
     assert relation.end == old_end
@@ -32,7 +34,7 @@ def test_nearby():
     start.nearby.return_value = nearby_chunks
     end = Mock()
     end.nearby.return_value = nearby_chunks
-    relation = Relation(Mock(), Mock(), start, end, Mock(), Mock(), Mock())
+    relation = Relation(Mock(), Mock(), start, end, Mock(), [Mock(), Mock()], Mock())
     start.relations = StructureCollection({relation})
     end.relations = StructureCollection({relation})
     assert StructureCollection({relation_1, relation_2}) == relation.nearby()

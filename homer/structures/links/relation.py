@@ -1,7 +1,10 @@
 from __future__ import annotations
+from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
+from homer.locations import TwoPointLocation
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Link, Space
@@ -16,23 +19,22 @@ class Relation(Link):
         start: Structure,
         end: Structure,
         parent_concept: Concept,
-        parent_space: Space,
+        locations: List[Location],
         quality: FloatBetweenOneAndZero,
         is_bidirectional: bool = True,
     ):
         Link.__init__(
             self,
-            structure_id,
-            parent_id,
-            start,
-            end,
-            [start.location_in_space(parent_space)] if parent_space is not None else [],
-            parent_concept,
-            quality,
+            structure_id=structure_id,
+            parent_id=parent_id,
+            start=start,
+            end=end,
+            locations=locations,
+            parent_concept=parent_concept,
+            quality=quality,
             links_in=None,
             links_out=None,
         )
-        self._parent_space = parent_space
         self.is_relation = True
         self.is_bidirectional = is_bidirectional
 
@@ -54,10 +56,6 @@ class Relation(Link):
 
         return RelationSelector
 
-    @property
-    def parent_space(self) -> Space:
-        return self._parent_space
-
     def copy(self, **kwargs) -> Relation:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
         start = kwargs["start"] if "start" in kwargs else self.start
@@ -65,15 +63,27 @@ class Relation(Link):
         parent_space = (
             kwargs["parent_space"] if "parent_space" in kwargs else self.parent_space
         )
+        new_locations = [
+            location
+            for location in self.locations
+            if location.space.is_conceptual_space
+        ]
+        new_locations.append(
+            TwoPointLocation(
+                self.location.start_coordinates,
+                self.location.end_coordinates,
+                parent_space,
+            )
+        )
         parent_id = kwargs["parent_id"] if "parent_id" in kwargs else ""
         new_relation = Relation(
-            ID.new(Relation),
-            parent_id,
-            start,
-            end,
-            self.parent_concept,
-            parent_space,
-            self.quality,
+            structure_id=ID.new(Relation),
+            parent_id=parent_id,
+            start=start,
+            end=end,
+            parent_concept=self.parent_concept,
+            locations=new_locations,
+            quality=self.quality,
         )
         return new_relation
 
