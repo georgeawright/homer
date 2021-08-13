@@ -312,4 +312,9 @@ def test_view_and_correspondence_processes(
     correspondence_suggester_1.run()
     assert CodeletResult.SUCCESS == correspondence_suggester_1.result
 
+    correspondence_builder_1 = correspondence_suggester_1.child_codelets[0]
+    assert isinstance(correspondence_builder_1, CorrespondenceBuilder)
+    correspondence_builder_1.run()
+    assert CodeletResult.SUCCESS == correspondence_builder_1.result
+
     # re-evaluate and select view as correspondences are added

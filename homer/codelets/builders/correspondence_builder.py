@@ -85,12 +85,7 @@ class CorrespondenceBuilder(Builder):
             self.codelet_id,
             self.target_structure_one,
             self.target_structure_two,
-            self.target_space_one,
-            self.target_space_two,
-            [
-                self.target_structure_one.location_in_space(self.target_space_one),
-                self.target_structure_two.location_in_space(self.target_space_two),
-            ],
+            [self.target_structure_one.location, self.target_structure_two.location],
             self.parent_concept,
             self.target_conceptual_space,
             self.target_view,
