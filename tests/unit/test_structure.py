@@ -22,13 +22,9 @@ def test_correspondences_returns_correspondences():
             Mock(),
             Mock(),
             Mock(),
-            Mock(),
-            Mock(),
         )
         links_out.add(correspondence)
         correspondence = Correspondence(
-            Mock(),
-            Mock(),
             Mock(),
             Mock(),
             Mock(),
@@ -127,13 +123,13 @@ def test_relations_in_space_with():
 def test_correspondences_to_space():
     structure = Structure(Mock(), Mock(), Mock(), Mock())
     space = Mock()
+    structure_in_space = Mock()
+    structure_in_space.parent_space = space
     correspondence_1 = Correspondence(
         Mock(),
         Mock(),
         start=structure,
-        end=Mock(),
-        start_space=Mock(),
-        end_space=space,
+        end=structure_in_space,
         locations=Mock(),
         parent_concept=None,
         conceptual_space=Mock(),
@@ -143,10 +139,8 @@ def test_correspondences_to_space():
     correspondence_2 = Correspondence(
         Mock(),
         Mock(),
-        start=structure,
-        end=Mock(),
-        start_space=Mock(),
-        end_space=space,
+        start=structure_in_space,
+        end=structure,
         locations=Mock(),
         parent_concept=Mock(),
         conceptual_space=Mock(),
@@ -158,8 +152,6 @@ def test_correspondences_to_space():
         Mock(),
         start=structure,
         end=Mock(),
-        start_space=Mock(),
-        end_space=Mock(),
         locations=Mock(),
         parent_concept=None,
         conceptual_space=Mock(),
@@ -171,8 +163,6 @@ def test_correspondences_to_space():
         Mock(),
         start=Mock(),
         end=Mock(),
-        start_space=Mock(),
-        end_space=Mock(),
         locations=Mock(),
         parent_concept=Mock(),
         conceptual_space=Mock(),
@@ -180,7 +170,7 @@ def test_correspondences_to_space():
         quality=Mock(),
     )
     structure.links_out.add(correspondence_1)
-    structure.links_out.add(correspondence_2)
+    structure.links_in.add(correspondence_2)
     structure.links_out.add(correspondence_3)
     structure.links_out.add(correspondence_4)
     assert correspondence_1 in structure.correspondences_to_space(space)

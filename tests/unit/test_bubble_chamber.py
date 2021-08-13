@@ -81,8 +81,6 @@ def test_add_to_collections():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
     )
     label = Label(
         Mock(),

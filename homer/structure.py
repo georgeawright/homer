@@ -397,9 +397,9 @@ class Structure(ABC):
                 correspondence
                 for correspondence in self.correspondences
                 if correspondence.start == self
-                and correspondence.end_space == space
+                and correspondence.end.parent_space == space
                 or correspondence.end == self
-                and correspondence.start_space == space
+                and correspondence.start.parent_space == space
             }
         )
 

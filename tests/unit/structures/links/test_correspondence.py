@@ -36,8 +36,6 @@ def test_copy():
         Mock(),
         old_start,
         old_end,
-        start_space,
-        end_space,
         [start_location, end_location],
         Mock(),
         Mock(),
@@ -78,8 +76,6 @@ def test_nearby():
         Mock(),
         start,
         end,
-        start_space,
-        end_space,
         [start_location, end_location],
         Mock(),
         Mock(),
@@ -109,8 +105,6 @@ def test_get_slot_argument_returns_slot():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
     )
     assert slot == correspondence.slot_argument
     correspondence = Correspondence(
@@ -118,8 +112,6 @@ def test_get_slot_argument_returns_slot():
         Mock(),
         non_slot,
         slot,
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -145,8 +137,6 @@ def test_get_non_slot_argument_returns_non_slot():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
     )
     assert non_slot == correspondence.non_slot_argument
     correspondence = Correspondence(
@@ -154,8 +144,6 @@ def test_get_non_slot_argument_returns_non_slot():
         Mock(),
         non_slot,
         slot,
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -180,16 +168,12 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
     )
     correspondence_2 = Correspondence(
         Mock(),
         Mock(),
         arg_1,
         arg_2,
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -206,8 +190,6 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
     )
     correspondence_4 = Correspondence(
         Mock(),
@@ -219,16 +201,12 @@ def test_common_arguments_with():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
     )
     correspondence_5 = Correspondence(
         Mock(),
         Mock(),
         arg_3,
         arg_4,
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),

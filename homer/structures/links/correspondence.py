@@ -10,7 +10,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures import Link, Node, Space, View
 from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
-from homer.tools import areinstances, equivalent_space, hasinstance
+from homer.tools import areinstances, hasinstance
 
 from .label import Label
 from .relation import Relation
@@ -23,8 +23,6 @@ class Correspondence(Link):
         parent_id: str,
         start: Structure,
         end: Structure,
-        start_space: Space,
-        end_space: Space,
         locations: List[Location],
         parent_concept: Concept,
         conceptual_space: ConceptualSpace,
@@ -44,8 +42,6 @@ class Correspondence(Link):
             links_in=None,
             links_out=None,
         )
-        self.start_space = start_space
-        self.end_space = end_space
         self.conceptual_space = conceptual_space
         self.parent_view = parent_view
         self.is_privileged = is_privileged
@@ -88,16 +84,15 @@ class Correspondence(Link):
                 else self.end
             )
         parent_id = kwargs["parent_id"]
-        start_space = start.parent_space
-        end_space = end.parent_space
         new_correspondence = Correspondence(
             ID.new(Correspondence),
             parent_id,
             start,
             end,
-            start_space,
-            end_space,
-            [start.location_in_space(start_space), end.location_in_space(end_space)],
+            [
+                start.location_in_space(start.parent_space),
+                end.location_in_space(end.parent_space),
+            ],
             self.parent_concept,
             self.conceptual_space,
             self.parent_view,

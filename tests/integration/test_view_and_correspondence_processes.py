@@ -136,8 +136,6 @@ def test_view_and_correspondence_processes(
         "",
         one_to_two_relation,
         word_2,
-        temperature_space,
-        temperature_space,
         [
             one_to_two_relation.location_in_space(one_to_two_relation.parent_space),
             word_2.location_in_space(word_2.parent_space),
@@ -152,8 +150,6 @@ def test_view_and_correspondence_processes(
         "",
         label_one,
         word_5,
-        location_space,
-        location_space,
         [
             label_one.location_in_space(label_one.parent_space),
             word_5.location_in_space(word_5.parent_space),
@@ -168,8 +164,6 @@ def test_view_and_correspondence_processes(
         "",
         label_two,
         word_8,
-        location_space,
-        location_space,
         [
             label_two.location_in_space(label_two.parent_space),
             word_8.location_in_space(word_8.parent_space),
