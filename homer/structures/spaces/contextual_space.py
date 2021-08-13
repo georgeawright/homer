@@ -75,7 +75,8 @@ class ContextualSpace(Space):
         bubble_chamber.logger.log(new_space)
         copies = {}
         for item in self.contents.where(is_node=True):
-            new_item = item.copy(
+            new_item, copies = item.copy_with_contents(
+                copies=copies,
                 bubble_chamber=bubble_chamber,
                 parent_id=parent_id,
                 parent_space=new_space,

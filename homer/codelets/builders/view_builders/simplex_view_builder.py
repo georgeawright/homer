@@ -54,7 +54,7 @@ class SimplexViewBuilder(ViewBuilder):
             quality=0,
         )
         self.bubble_chamber.logger.log(view_output)
-        self.bubble_chamber.working_spaces.add(view_output)
+        self.bubble_chamber.contextual_spaces.add(view_output)
         self.bubble_chamber.logger.log(view)
         self.bubble_chamber.views.add(view)
         self.child_structures = StructureCollection({view})

@@ -38,6 +38,13 @@ class Frame(Space):
         self.output_space = output_space
         self.is_frame = True
 
+    @property
+    def slots(self) -> StructureCollection:
+        return StructureCollection.union(
+            self.input_space.contents.where(is_slot=True),
+            self.output_space.contents.where(is_slot=True),
+        )
+
     def update_activation(self):
         self._activation = (
             statistics.fmean([structure.activation for structure in self.contents])
@@ -63,6 +70,7 @@ class Frame(Space):
                 end=output_items_map[correspondence.end]
                 if correspondence.end in output_items_map
                 else input_items_map[correspondence.end],
+                parent_id=parent_id,
             )
             for correspondence in self.contents
         )

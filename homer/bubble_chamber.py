@@ -79,7 +79,7 @@ class BubbleChamber:
     @property
     def spaces(self) -> StructureCollection:
         return StructureCollection.union(
-            self.conceptual_spaces, self.working_spaces, self.frames
+            self.conceptual_spaces, self.contextual_spaces, self.frames
         )
 
     @property

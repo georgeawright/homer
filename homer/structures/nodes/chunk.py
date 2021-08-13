@@ -5,9 +5,11 @@ from typing import List
 
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
+from homer.structures.spaces import ContextualSpace
 
 from .concept import Concept
 from .rule import Rule
@@ -131,3 +133,54 @@ class Chunk(Node):
             if space.proximity_between(chunk, self) - random.random() <= 0:
                 return chunk
         return chunks.get(exclude=[self])
+
+    def copy_with_contents(
+        self,
+        copies: dict,
+        bubble_chamber: "BubbleChamber",
+        parent_id: str,
+        parent_space: ContextualSpace,
+    ):
+        new_locations = [
+            location
+            for location in self.locations
+            if location.space.is_conceptual_space
+        ]
+        new_locations.append(
+            Location(
+                self.location_in_space(self.parent_space).coordinates, parent_space
+            )
+        )
+        new_members = StructureCollection()
+        for member in self.members:
+            if member not in copies:
+                copies[member] = member.copy(
+                    copies=copies,
+                    bubble_chamber=bubble_chamber,
+                    parent_id=parent_id,
+                    parent_space=parent_space,
+                )
+            new_members.add(copies[member])
+        new_left_branch = StructureCollection(
+            {copies[member] for member in self.left_branch}
+        )
+        new_right_branch = StructureCollection(
+            {copies[member] for member in self.right_branch}
+        )
+        chunk_copy = Chunk(
+            structure_id=ID.new(Chunk),
+            parent_id=parent_id,
+            locations=new_locations,
+            members=new_members,
+            parent_space=parent_space,
+            quality=self.quality,
+            left_branch=new_left_branch,
+            right_branch=new_right_branch,
+            rule=self.rule,
+            is_raw=self.is_raw,
+        )
+        bubble_chamber.logger.log(chunk_copy)
+        for member in chunk_copy.members:
+            member.super_chunks.add(chunk_copy)
+            bubble_chamber.logger.log(member)
+        return (chunk_copy, copies)

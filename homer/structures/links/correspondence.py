@@ -88,8 +88,8 @@ class Correspondence(Link):
                 else self.end
             )
         parent_id = kwargs["parent_id"]
-        start_space = equivalent_space(start, self.start_space)
-        end_space = equivalent_space(end, self.end_space)
+        start_space = start.parent_space
+        end_space = end.parent_space
         new_correspondence = Correspondence(
             ID.new(Correspondence),
             parent_id,

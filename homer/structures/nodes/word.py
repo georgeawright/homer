@@ -9,6 +9,7 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
+from homer.structures.spaces import ContextualSpace
 from homer.word_form import WordForm
 
 from .concept import Concept
@@ -261,26 +262,57 @@ class Word(Node):
         bubble_chamber.words.add(new_word)
         return new_word
 
-    def copy_to_location(self, location: Location) -> Word:
+    def copy_to_location(
+        self, location: Location, parent_id: str = "", quality: float = 0.0
+    ) -> Word:
         parent_space = location.space
         locations = [
-            Location(
-                location.coordinates, location.space.instance_in_space(parent_space)
-            )
+            location
             for location in self.locations
+            if location.space.is_conceptual_space
         ] + [location]
         new_word = Word(
             ID.new(Word),
-            parent_id="",
+            parent_id=parent_id,
             name=self.name,
             lexeme=self.lexeme,
             word_form=self.word_form,
             locations=locations,
             parent_space=location.space,
-            quality=self.quality,
+            quality=quality,
         )
         parent_space.add(new_word)
         return new_word
+
+    def copy_with_contents(
+        self,
+        copies: dict,
+        bubble_chamber: "BubbleChamber",
+        parent_id: str,
+        parent_space: ContextualSpace,
+    ):
+        new_locations = [
+            location
+            for location in self.locations
+            if location.space.is_conceptual_space
+        ]
+        new_locations.append(
+            Location(
+                self.location_in_space(self.parent_space).coordinates, parent_space
+            )
+        )
+        word_copy = Word(
+            structure_id=ID.new(Word),
+            parent_id=parent_id,
+            name=self.name,
+            lexeme=self.lexeme,
+            word_form=self.word_form,
+            locations=new_locations,
+            parent_space=parent_space,
+            quality=self.quality,
+        )
+        bubble_chamber.logger.log(word_copy)
+        return (word_copy, copies)
 
     def __repr__(self) -> str:
         return (
