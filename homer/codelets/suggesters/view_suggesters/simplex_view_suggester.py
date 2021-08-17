@@ -1,6 +1,5 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation
 
 
@@ -13,13 +12,13 @@ class SimplexViewSuggester(ViewSuggester):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
-        target_one = bubble_chamber.contextual_spaces.get(key=activation)
-        target_two = bubble_chamber.frames.get(key=activation)
-        urgency = urgency if urgency is not None else target_two.activation
+        contextual_space = bubble_chamber.contextual_spaces.get(key=activation)
+        frame = bubble_chamber.frames.get(key=activation)
+        urgency = urgency if urgency is not None else frame.activation
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            StructureCollection({target_one, target_two}),
+            {"frame": frame, "contextual_space": contextual_space},
             urgency,
         )
 

@@ -3,9 +3,6 @@ from homer.codelets.suggesters import CorrespondenceSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation, corresponding_exigency
-from homer.structures import Node
-from homer.structures.links import Correspondence
-from homer.structures.spaces import WorkingSpace
 
 
 class CorrespondenceSelector(Selector):
@@ -18,7 +15,7 @@ class CorrespondenceSelector(Selector):
             return True
         champion_correspondence = self.champions.get()
         candidates = champion_correspondence.start.correspondences_to_space(
-            champion_correspondence.end_space
+            champion_correspondence.end.parent_space
         )
         if len(candidates) > 1:
             challenger_correspondence = candidates.get(
@@ -40,16 +37,8 @@ class CorrespondenceSelector(Selector):
                 .get(key=corresponding_exigency)
             )
             target_space_one = target_structure_one.parent_space
-            target_conceptual_space = target_space_one.conceptual_space
-            target_space_two = (
-                target_view.input_spaces.get(
-                    exclude=list(target_space_one.parent_spaces)
-                )
-                .contents.of_type(WorkingSpace)
-                .where(is_basic_level=True)
-                .where(conceptual_space=target_conceptual_space)
-                .get()
-            )
+            target_conceptual_space = target_space_one.conceptual_spaces.get()
+            target_space_two = target_view.input_spaces.get(exclude=[target_space_one])
             target_structure_two = (
                 winner_correspondence.end.arguments.get()
                 .links.of_type(type(target_structure_one))

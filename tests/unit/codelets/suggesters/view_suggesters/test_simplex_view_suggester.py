@@ -43,7 +43,7 @@ def test_gives_high_confidence_for_highly_activated_spaces(
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection({input_space, frame}),
+        {"contextual_space": input_space, "frame": frame},
         Mock(),
     )
     result = view_suggester.run()
@@ -59,7 +59,11 @@ def test_gives_low_confidence_for_low_activated_spaces(
     input_space.activation = 0.0
     frame.activation = 0.0
     view_suggester = SimplexViewSuggester(
-        Mock(), Mock(), bubble_chamber, StructureCollection({input_space, frame}), 1.0
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        {"contextual_space": input_space, "frame": frame},
+        1.0,
     )
     result = view_suggester.run()
     assert CodeletResult.SUCCESS == result

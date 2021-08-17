@@ -15,7 +15,7 @@ def bubble_chamber():
     chamber = Mock()
     chamber.has_view.return_value = False
     chamber.concepts = {"build": Mock(), "view-simplex": Mock(), "text": Mock()}
-    chamber.spaces = {"text": Mock(), "top level working": Mock(), "input": Mock()}
+    chamber.spaces = {"text": Mock(), "views": Mock(), "input": Mock()}
     chamber.views = StructureCollection()
     return chamber
 
@@ -43,7 +43,7 @@ def test_successful_creates_view_and_spawns_follow_up(
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection({input_space, frame}),
+        {"contextual_space": input_space, "frame": frame},
         Mock(),
     )
     result = view_builder.run()

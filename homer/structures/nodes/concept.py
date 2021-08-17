@@ -51,7 +51,11 @@ class Concept(Node):
         return self.location.coordinates
 
     def is_compatible_with(self, other: Concept) -> bool:
-        return self.instance_type == other.instance_type
+        return (
+            self.parent_space == other.parent_space
+            or self.parent_space.parent_concept == other
+            or other.parent_space.parent_concept == self
+        )
 
     def friends(self, space: Space = None) -> StructureCollection:
         space = self.parent_space if space is None else space

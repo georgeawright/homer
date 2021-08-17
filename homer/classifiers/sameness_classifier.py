@@ -15,12 +15,14 @@ class SamenessClassifier(Classifier):
         start_concept = (
             start.parent_concept
             if start.parent_concept is not None
-            else start.parent_space.parent_concept
+            else start.parent_spaces.where(is_conceptual_space=True)
+            .get()
+            .parent_concept
         )
         end_concept = (
             end.parent_concept
             if end.parent_concept is not None
-            else end.parent_space.parent_concept
+            else end.parent_spaces.where(is_conceptual_space=True).get().parent_concept
         )
         if start_concept.is_compatible_with(end_concept):
             return statistics.fmean([start.quality, end.quality])

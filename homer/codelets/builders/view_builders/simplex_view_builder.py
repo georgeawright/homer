@@ -1,5 +1,6 @@
 from homer.codelets.builders import ViewBuilder
 from homer.id import ID
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.spaces import ContextualSpace
 from homer.structures.views import SimplexView
@@ -18,24 +19,18 @@ class SimplexViewBuilder(ViewBuilder):
 
     def _process_structure(self):
         view_id = ID.new(SimplexView)
-        frame = self.target_spaces.where(is_frame=True).get()
-        input_space_concept = (
-            self.target_spaces.where(is_frame=False).get().parent_concept
-        )
+        input_space_concept = self.contextual_space.parent_concept
         frame_input_space = (
-            frame.input_space
-            if frame.input_space.parent_concept == input_space_concept
-            else frame.output_space
+            self.frame.input_space
+            if self.frame.input_space.parent_concept == input_space_concept
+            else self.frame.output_space
         )
-        frame_instance = frame.instantiate(
+        frame_instance = self.frame.instantiate(
             input_space=frame_input_space,
             parent_id=self.codelet_id,
             bubble_chamber=self.bubble_chamber,
         )
-        input_spaces = StructureCollection.union(
-            self.target_spaces.where(is_frame=False),
-            StructureCollection({frame_instance}),
-        )
+        input_spaces = StructureCollection({self.contextual_space, frame_instance})
         view_output = ContextualSpace(
             structure_id=ID.new(ContextualSpace),
             parent_id=self.codelet_id,
@@ -47,6 +42,7 @@ class SimplexViewBuilder(ViewBuilder):
         view = SimplexView(
             structure_id=view_id,
             parent_id=self.codelet_id,
+            locations=[Location([], self.bubble_chamber.spaces["views"])],
             members=StructureCollection(),
             input_spaces=input_spaces,
             output_space=view_output,

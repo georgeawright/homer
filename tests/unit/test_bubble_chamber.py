@@ -106,6 +106,7 @@ def test_add_to_collections():
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     word_form = Mock()
     lexeme = Mock()

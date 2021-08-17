@@ -1,4 +1,5 @@
 import statistics
+from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
@@ -13,6 +14,7 @@ class SimplexView(View):
         self,
         structure_id: str,
         parent_id: str,
+        locations: List[Location],
         members: StructureCollection,
         input_spaces: StructureCollection,
         output_space: WorkingSpace,
@@ -22,6 +24,7 @@ class SimplexView(View):
             self,
             structure_id,
             parent_id,
+            locations,
             members,
             input_spaces,
             output_space,

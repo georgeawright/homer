@@ -10,7 +10,7 @@ from homer.locations import TwoPointLocation
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Relation
 from homer.structures.nodes import Concept, Lexeme, Rule, Word
-from homer.structures.spaces import ConceptualSpace
+from homer.structures.spaces import ConceptualSpace, ContextualSpace
 from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
@@ -107,6 +107,8 @@ def bubble_chamber():
     )
     view_simplex_concept.links_out.add(view_simplex_select_link)
     select_concept.links_in.add(view_simplex_select_link)
+    views_space = ContextualSpace("", "", "views", None, StructureCollection())
+    chamber.contextual_spaces.add(views_space)
     return chamber
 
 
@@ -715,7 +717,7 @@ def hot_concept(bubble_chamber, temperature_space):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        temperature_space,
         Mock(),
         centroid_euclidean_distance,
     )
@@ -734,7 +736,7 @@ def cold_concept(bubble_chamber, temperature_space):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        temperature_space,
         Mock(),
         centroid_euclidean_distance,
     )
@@ -753,7 +755,7 @@ def hotter_concept(bubble_chamber, temperature_space):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        temperature_space,
         Mock(),
         centroid_euclidean_distance,
     )

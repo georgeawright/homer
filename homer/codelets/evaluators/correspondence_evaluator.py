@@ -30,7 +30,7 @@ class CorrespondenceEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_correspondence = self.target_structures.get()
-        self.confidence = target_correspondence.parent_concept.classifier.classify(
+        self.confidence = target_correspondence.parent_concept.classifier.classify_link(
             space=target_correspondence.conceptual_space,
             concept=target_correspondence.parent_concept,
             start=target_correspondence.start,

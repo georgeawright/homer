@@ -208,6 +208,7 @@ def test_view_and_correspondence_processes(
     frame = Frame(
         "", "", "", Mock(), frame_contents, frame_input_space, frame_output_space
     )
+    bubble_chamber.frames.add(frame)
 
     # setup input space with chunks, labels, relations
     hot_chunk = Chunk(
@@ -275,7 +276,7 @@ def test_view_and_correspondence_processes(
 
     # suggest and build view for input space and frame
     view_suggester = SimplexViewSuggester.spawn(
-        "", bubble_chamber, StructureCollection({input_space, frame}), 1
+        "", bubble_chamber, {"contextual_space": input_space, "frame": frame}, 1
     )
     view_suggester.run()
     assert CodeletResult.SUCCESS == view_suggester.result
@@ -316,5 +317,34 @@ def test_view_and_correspondence_processes(
     assert isinstance(correspondence_builder_1, CorrespondenceBuilder)
     correspondence_builder_1.run()
     assert CodeletResult.SUCCESS == correspondence_builder_1.result
+    correspondence_1 = correspondence_builder_1.child_structures.get()
+    original_correspondence_1_quality = correspondence_1.quality
+    original_correspondence_1_activation = correspondence_1.activation
+
+    correspondence_evaluator_1 = correspondence_builder_1.child_codelets[0]
+    assert isinstance(correspondence_evaluator_1, CorrespondenceEvaluator)
+    correspondence_evaluator_1.run()
+    assert CodeletResult.SUCCESS == correspondence_evaluator_1.result
+    assert correspondence_1.quality > original_correspondence_1_quality
+
+    correspondence_selector_1 = correspondence_evaluator_1.child_codelets[0]
+    assert isinstance(correspondence_selector_1, CorrespondenceSelector)
+    correspondence_selector_1.run()
+    assert CodeletResult.SUCCESS == correspondence_selector_1.result
+    correspondence_1.update_activation()
+    assert correspondence_1.activation > original_correspondence_1_activation
 
     # re-evaluate and select view as correspondences are added
+    view_evaluator_2 = SimplexViewEvaluator.spawn(
+        "", bubble_chamber, StructureCollection({view}), 1.0
+    )
+    view_evaluator_2.run()
+    assert CodeletResult.SUCCESS == view_evaluator_2.result
+    assert view.quality > original_view_quality
+
+    view_selector_2 = view_evaluator_2.child_codelets[0]
+    assert isinstance(view_selector_2, SimplexViewSelector)
+    view_selector_2.run()
+    assert CodeletResult.SUCCESS == view_selector_2.result
+    view.update_activation()
+    assert view.activation > original_view_activation
