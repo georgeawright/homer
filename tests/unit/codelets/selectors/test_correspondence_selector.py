@@ -16,7 +16,6 @@ def bubble_chamber():
     return chamber
 
 
-@pytest.mark.skip
 def test_finds_challenger_when_not_given_one(bubble_chamber):
     space_1 = Mock()
     space_2 = Mock()
@@ -67,7 +66,6 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     assert selector.challengers == StructureCollection({challenger})
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "champion_quality, champion_activation, "
     + "challenger_quality, challenger_activation, "
