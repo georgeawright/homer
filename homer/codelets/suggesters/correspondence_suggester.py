@@ -6,10 +6,8 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection_keys import activation, corresponding_exigency, exigency
-from homer.structures import Space
 from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
-from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 class CorrespondenceSuggester(Suggester):

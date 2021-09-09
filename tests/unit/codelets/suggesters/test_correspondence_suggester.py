@@ -15,7 +15,8 @@ from homer.tools import hasinstance
 def same_concept():
     concept = Mock()
     concept.name = "same"
-    concept.classifier.classify.return_value = 1.0
+    concept.classifier.classify_link.return_value = 1.0
+    concept.structure_type = Correspondence
     return concept
 
 
@@ -27,81 +28,66 @@ def same_different_space(same_concept):
 
 
 @pytest.fixture
-def label_concept_space():
-    return Mock()
-
-
-@pytest.fixture
-def label_concept_working_space(label_concept_space):
+def conceptual_space():
     space = Mock()
-    space.conceptual_space = label_concept_space
+    space.is_conceptual_space = True
     return space
 
 
 @pytest.fixture
-def bubble_chamber(same_different_space, label_concept_space):
+def bubble_chamber(same_concept, same_different_space, conceptual_space):
     chamber = Mock()
-    chamber.concepts = {"correspondence": Mock(), "suggest": Mock(), "text": Mock()}
-    label_concepts = Mock()
-    label_concepts.contents.of_type.return_value = StructureCollection(
-        {label_concept_space}
+    correspondence_concept = Mock()
+    correspondence_concept.name = "correspondence"
+    suggest_concept = Mock()
+    suggest_concept.name = "suggest"
+    chamber.concepts = StructureCollection(
+        {correspondence_concept, suggest_concept, same_concept}
     )
-    correspondential_concepts = Mock()
-    correspondential_concepts.contents.of_type.return_value = StructureCollection(
-        {same_different_space}
-    )
-    working_spaces = Mock()
-    working_space = Mock()
-    working_space_contents = Mock()
-    working_space_contents.get_exigent.return_value = target_structure_two
-    working_space.contents.of_type.return_value = working_space_contents
-    working_spaces.get_active.return_value = working_space
-    chamber.spaces = {
-        "label concepts": label_concepts,
-        "correspondential concepts": correspondential_concepts,
-        "top level working": Mock(),
-        "text": Mock(),
-    }
-    chamber.working_spaces = working_spaces
+    chamber.spaces = StructureCollection({same_different_space, conceptual_space})
+    chamber.working_spaces = StructureCollection()
+    chamber.frames = StructureCollection()
     return chamber
 
 
 @pytest.fixture
-def target_space_one(bubble_chamber):
+def target_space_one(bubble_chamber, conceptual_space):
     space = Mock()
     space.name = "target_space_one"
+    space.is_conceptual_space = False
     space.parent_spaces = []
-    space.conceptual_space = Mock()
-    bubble_chamber.working_spaces.add(target_space_one)
+    space.conceptual_spaces = StructureCollection({conceptual_space})
+    bubble_chamber.working_spaces.add(space)
     return space
 
 
 @pytest.fixture
-def target_space_two(bubble_chamber, target_space_one):
+def target_space_two(bubble_chamber, conceptual_space):
     space = Mock()
     space.name = "target_space_two"
-    space.conceptual_space = target_space_one.conceptual_space
-    space.is_basic_level = True
+    space.is_conceptual_space = False
+    space.conceptual_spaces = StructureCollection({conceptual_space})
+    bubble_chamber.frames.add(space)
     return space
 
 
 @pytest.fixture
-def target_structure_one(bubble_chamber, label_concept_working_space):
+def target_structure_one(bubble_chamber, conceptual_space, target_space_one):
     structure = Mock()
     structure.is_slot = False
     structure.correspondences = StructureCollection()
     structure.has_correspondence.return_value = False
-    structure.parent_spaces = StructureCollection({label_concept_working_space})
+    structure.parent_spaces = StructureCollection({conceptual_space, target_space_one})
     return structure
 
 
 @pytest.fixture
-def target_structure_two(label_concept_working_space, target_space_two):
+def target_structure_two(conceptual_space, target_space_two):
     structure = Mock()
     structure.is_slot = True
     structure.correspondences = StructureCollection()
     structure.name = "target_structure_two"
-    structure.parent_spaces = StructureCollection({label_concept_working_space})
+    structure.parent_spaces = StructureCollection({target_space_two, conceptual_space})
     target_space_two.contents.of_type.return_value = StructureCollection({structure})
     return structure
 
@@ -126,7 +112,6 @@ def target_view(existing_correspondence, target_space_one, target_space_two):
     return view
 
 
-@pytest.mark.skip
 def test_gets_second_target_space_and_structure_if_needed(
     bubble_chamber,
     target_view,
@@ -159,7 +144,6 @@ def test_gets_second_target_space_and_structure_if_needed(
     assert correspondence_suggester.target_structure_two == target_structure_two
 
 
-@pytest.mark.skip
 def test_gets_parent_concept_if_needed(
     bubble_chamber,
     target_view,
@@ -189,7 +173,6 @@ def test_gets_parent_concept_if_needed(
     assert correspondence_suggester.parent_concept is not None
 
 
-@pytest.mark.skip
 def test_gives_high_confidence_for_good_example(
     bubble_chamber,
     target_view,
@@ -222,7 +205,6 @@ def test_gives_high_confidence_for_good_example(
     assert isinstance(correspondence_suggester.child_codelets[0], CorrespondenceBuilder)
 
 
-@pytest.mark.skip
 def test_gives_low_confidence_for_bad_example(
     bubble_chamber,
     target_view,
@@ -232,7 +214,7 @@ def test_gives_low_confidence_for_bad_example(
     target_structure_two,
 ):
     concept = Mock()
-    concept.classifier.classify.return_value = 0.0
+    concept.classifier.classify_link.return_value = 0.0
     target_structures = {
         "target_view": target_view,
         "target_space_one": target_space_one,
@@ -257,7 +239,6 @@ def test_gives_low_confidence_for_bad_example(
     assert isinstance(correspondence_suggester.child_codelets[0], CorrespondenceBuilder)
 
 
-@pytest.mark.skip
 def test_fizzles_when_correspondence_already_exists(
     bubble_chamber,
     target_view,
