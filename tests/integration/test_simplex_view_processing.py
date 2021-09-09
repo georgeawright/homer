@@ -1,3 +1,5 @@
+# TODO: rename to test_simplex_view_processing
+# add word projection into an output space at end of text
 import math
 from unittest.mock import Mock
 
