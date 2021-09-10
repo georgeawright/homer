@@ -187,4 +187,7 @@ class Correspondence(Link):
         return False
 
     def __repr__(self) -> str:
-        return self.structure_id
+        return (
+            f"<{self.structure_id} {self.parent_concept.name}("
+            + f"{self.start.structure_id}, {self.end.structure_id})>"
+        )
