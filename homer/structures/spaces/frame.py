@@ -75,6 +75,10 @@ class Frame(Space):
             for correspondence in self.contents
         )
         for correspondence in copied_contents:
+            correspondence.start.links_out.add(correspondence)
+            correspondence.start.links_in.add(correspondence)
+            correspondence.end.links_out.add(correspondence)
+            correspondence.end.links_in.add(correspondence)
             bubble_chamber.logger.log(correspondence)
         instance_frame = Frame(
             structure_id=ID.new(Frame),
