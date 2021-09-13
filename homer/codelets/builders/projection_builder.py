@@ -1,14 +1,8 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import View
-from homer.structures.links import Correspondence
-from homer.structures.nodes import Word
-from homer.structures.spaces import Frame
 
 
 class ProjectionBuilder(Builder):
@@ -24,10 +18,10 @@ class ProjectionBuilder(Builder):
         self._target_structures = target_structures
         self.target_view = None
         self.non_frame = None
-        self.target_word = None
+        self.target_projectee = None
         self.target_correspondence = None
-        self.word_correspondee = None
-        self.non_frame_item = None
+        self.frame_correspondee = None
+        self.non_frame_correspondee = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -41,7 +35,6 @@ class ProjectionBuilder(Builder):
         target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
-        # TODO
         codelet_id = ID.new(cls)
         return cls(
             codelet_id,
@@ -52,21 +45,28 @@ class ProjectionBuilder(Builder):
         )
 
     @property
-    def _structure_concept(self):
-        raise NotImplementedError
-
-    @property
     def target_structures(self):
-        raise NotImplementedError
-        return StructureCollection({self.target_view, self.target_word})
+        return StructureCollection({self.target_view, self.target_projectee})
 
     def _passes_preliminary_checks(self):
-        # check doesn't already exist
-        raise NotImplementedError
+        print(self._target_structures)
+        self.target_view = self._target_structures["target_view"]
+        self.target_correspondence = self._target_structures["target_correspondence"]
+        self.target_projectee = self._target_structures["target_projectee"]
+        self.frame_correspondee = self._target_structures["frame_correspondee"]
+        self.non_frame = self._target_structures["non_frame"]
+        self.non_frame_correspondee = self._target_structures["non_frame_correspondee"]
+        if self.target_projectee.is_slot:
+            return (
+                self.frame_correspondee.structure_id in self.target_view.slot_values
+                and self.target_projectee.structure_id
+                not in self.target_view.slot_values
+            )
+        return not self.target_projectee.has_correspondence_to_space(
+            self.target_view.output_space
+        )
 
     def _process_structure(self):
-        # build item in output space
-        # build correspondences from input spaces to new item
         raise NotImplementedError
 
     def _fizzle(self):

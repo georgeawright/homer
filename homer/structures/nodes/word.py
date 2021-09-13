@@ -83,9 +83,9 @@ class Word(Node):
     def unchunkedness(self):
         if self.is_abstract:
             return 0
-        if len(self.super_phrases) == 0:
+        if len(self.super_chunks) == 0:
             return 1
-        return 0.5 * prod([chunk.unchunkedness for chunk in self.super_phrases])
+        return 0.5 * prod([chunk.unchunkedness for chunk in self.super_chunks])
 
     @property
     def potential_rule_mates(self) -> StructureCollection:

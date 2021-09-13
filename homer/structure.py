@@ -432,7 +432,6 @@ class Structure(ABC):
         except AttributeError:
             pass
         for link in self.links:
-            print(link.start, link.end)
             if not link.is_bidirectional:
                 continue
             if link.start != self:

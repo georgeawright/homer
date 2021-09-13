@@ -18,7 +18,7 @@ from homer.tools import centroid_euclidean_distance
 
 
 def test_chunking_of_weather_data(
-    bubble_chamber, location_space, temperature_space, sameness_rule
+    bubble_chamber, location_space, temperature_space, same_rule
 ):
     input_space = ContextualSpace(
         "",
@@ -84,7 +84,7 @@ def test_chunking_of_weather_data(
         {
             "target_space": input_space,
             "target_node": raw_chunk_1,
-            "target_rule": sameness_rule,
+            "target_rule": same_rule,
         },
         1,
     )

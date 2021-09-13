@@ -44,7 +44,6 @@ class ConceptDrivenFactory(Factory):
         action_concept = self.bubble_chamber.concepts["suggest"]
         space_concept = self.bubble_chamber.concepts["inner"]
         direction_concept = self.bubble_chamber.concepts["forward"]
-        print(parent_concept.name)
         if parent_concept in self.bubble_chamber.rules:
             structure_concept = self.bubble_chamber.concepts["chunk"]
         if parent_concept in self._get_correspondential_concepts():

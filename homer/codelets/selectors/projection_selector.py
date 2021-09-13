@@ -16,5 +16,4 @@ class ProjectionSelector(Selector):
         pass
 
     def _engender_follow_up(self):
-        # suggest projection between the same spaces
         raise NotImplementedError

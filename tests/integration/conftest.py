@@ -28,6 +28,9 @@ def bubble_chamber():
     view_simplex_concept = Concept(
         "", "", "view-simplex", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
+    word_concept = Concept(
+        "", "", "word", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
     suggest_concept = Concept(
         "", "", "suggest", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
@@ -43,6 +46,7 @@ def bubble_chamber():
     chamber.concepts.add(chunk_concept)
     chamber.concepts.add(correspondence_concept)
     chamber.concepts.add(view_simplex_concept)
+    chamber.concepts.add(word_concept)
     chamber.concepts.add(suggest_concept)
     chamber.concepts.add(build_concept)
     chamber.concepts.add(evaluate_concept)
@@ -107,6 +111,26 @@ def bubble_chamber():
     )
     view_simplex_concept.links_out.add(view_simplex_select_link)
     select_concept.links_in.add(view_simplex_select_link)
+    word_suggest_link = Relation(
+        "", "", word_concept, suggest_concept, Mock(), None, Mock()
+    )
+    word_concept.links_out.add(word_suggest_link)
+    suggest_concept.links_in.add(word_suggest_link)
+    word_build_link = Relation(
+        "", "", word_concept, build_concept, Mock(), None, Mock()
+    )
+    word_concept.links_out.add(word_build_link)
+    build_concept.links_in.add(word_build_link)
+    word_evaluate_link = Relation(
+        "", "", word_concept, evaluate_concept, Mock(), None, Mock()
+    )
+    word_concept.links_out.add(word_evaluate_link)
+    evaluate_concept.links_in.add(word_evaluate_link)
+    word_select_link = Relation(
+        "", "", word_concept, select_concept, Mock(), None, Mock()
+    )
+    word_concept.links_out.add(word_select_link)
+    select_concept.links_in.add(word_select_link)
     views_space = ContextualSpace("", "", "views", None, StructureCollection())
     chamber.contextual_spaces.add(views_space)
     return chamber
@@ -178,7 +202,7 @@ def grammar_space(bubble_chamber, grammar_concept):
         [],
         is_basic_level=True,
     )
-    bubble_chamber.contextual_spaces.add(space)
+    bubble_chamber.conceptual_spaces.add(space)
     return space
 
 
@@ -418,13 +442,21 @@ def than_lexeme():
 
 
 @pytest.fixture(scope="module")
-def warm_lexeme():
-    return Lexeme("", "", "warm", {WordForm.HEADWORD: "warm"})
+def warm_lexeme(warm_concept):
+    lexeme = Lexeme("", "", "warm", {WordForm.HEADWORD: "warm"})
+    link = Relation("", "", warm_concept, lexeme, None, [], 1.0)
+    warm_concept.links_out.add(link)
+    lexeme.links_in.add(link)
+    return lexeme
 
 
 @pytest.fixture(scope="module")
-def hotter_lexeme():
-    return Lexeme("", "", "hotter", {WordForm.HEADWORD: "hotter"})
+def hotter_lexeme(hotter_concept):
+    lexeme = Lexeme("", "", "hotter", {WordForm.HEADWORD: "hotter"})
+    link = Relation("", "", hotter_concept, lexeme, None, [], 1.0)
+    hotter_concept.links_out.add(link)
+    lexeme.links_in.add(link)
+    return lexeme
 
 
 @pytest.fixture(scope="module")
@@ -512,8 +544,8 @@ def warm_word(grammar_vectors, grammar_space, warm_lexeme):
 
 
 @pytest.fixture(scope="module")
-def hotter_word(grammar_vectors, grammar_space, hotter_lexeme):
-    return Word(
+def hotter_word(bubble_chamber, grammar_vectors, grammar_space, hotter_lexeme):
+    word = Word(
         "",
         "",
         "hotter",
@@ -523,6 +555,8 @@ def hotter_word(grammar_vectors, grammar_space, hotter_lexeme):
         grammar_space,
         1,
     )
+    bubble_chamber.words.add(word)
+    return word
 
 
 @pytest.fixture(scope="module")
@@ -683,11 +717,11 @@ def temperature_space(bubble_chamber, temperature_concept):
 
 
 @pytest.fixture(scope="module")
-def sameness_concept(bubble_chamber):
+def same_concept(bubble_chamber):
     concept = Concept(
         "",
         "",
-        "sameness",
+        "same",
         [],
         SamenessClassifier(),
         Mock(),
@@ -701,8 +735,8 @@ def sameness_concept(bubble_chamber):
 
 
 @pytest.fixture(scope="module")
-def sameness_rule(bubble_chamber, sameness_concept):
-    rule = Rule("", "", "sameness", Mock(), sameness_concept, sameness_concept, None)
+def same_rule(bubble_chamber, same_concept):
+    rule = Rule("", "", "same", Mock(), same_concept, same_concept, None)
     bubble_chamber.rules.add(rule)
     return rule
 
@@ -714,6 +748,25 @@ def hot_concept(bubble_chamber, temperature_space):
         "",
         "hot",
         [Location([[22]], temperature_space)],
+        Mock(),
+        Mock(),
+        Mock(),
+        temperature_space,
+        Mock(),
+        centroid_euclidean_distance,
+    )
+    temperature_space.add(concept)
+    bubble_chamber.concepts.add(concept)
+    return concept
+
+
+@pytest.fixture(scope="module")
+def warm_concept(bubble_chamber, temperature_space):
+    concept = Concept(
+        "",
+        "",
+        "warm",
+        [Location([[16]], temperature_space)],
         Mock(),
         Mock(),
         Mock(),

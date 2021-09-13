@@ -6,12 +6,16 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder
+from homer.codelets.builders.projection_builders import WordProjectionBuilder
 from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators import CorrespondenceEvaluator
+from homer.codelets.evaluators.projection_evaluators import WordProjectionEvaluator
 from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.codelets.selectors import CorrespondenceSelector
+from homer.codelets.selectors.projection_selectors import WordProjectionSelector
 from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.codelets.suggesters import CorrespondenceSuggester
+from homer.codelets.suggesters.projection_suggesters import WordProjectionSuggester
 from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from homer.id import ID
 from homer.location import Location
@@ -31,7 +35,7 @@ def test_view_and_correspondence_processes(
     location_space,
     temperature_space,
     grammar_space,
-    sameness_concept,
+    same_concept,
     hot_concept,
     cold_concept,
     hotter_concept,
@@ -40,6 +44,8 @@ def test_view_and_correspondence_processes(
     in_word,
     the_word,
     than_word,
+    hotter_lexeme,
+    hotter_word,
 ):
     input_space = ContextualSpace(
         "",
@@ -171,7 +177,7 @@ def test_view_and_correspondence_processes(
             one_to_two_relation.location_in_space(one_to_two_relation.parent_space),
             word_2.location_in_space(word_2.parent_space),
         ],
-        sameness_concept,
+        same_concept,
         temperature_space,
         None,
         1.0,
@@ -185,7 +191,7 @@ def test_view_and_correspondence_processes(
             label_one.location_in_space(label_one.parent_space),
             word_5.location_in_space(word_5.parent_space),
         ],
-        sameness_concept,
+        same_concept,
         location_space,
         None,
         1.0,
@@ -199,7 +205,7 @@ def test_view_and_correspondence_processes(
             label_two.location_in_space(label_two.parent_space),
             word_8.location_in_space(word_8.parent_space),
         ],
-        sameness_concept,
+        same_concept,
         location_space,
         None,
         1.0,
@@ -320,6 +326,8 @@ def test_view_and_correspondence_processes(
     correspondence_builder_1.run()
     assert CodeletResult.SUCCESS == correspondence_builder_1.result
     correspondence_1 = correspondence_builder_1.child_structures.get()
+    assert correspondence_1.start.parent_space == input_space
+    assert correspondence_1.end.parent_space == view.input_frames.get().input_space
     original_correspondence_1_quality = correspondence_1.quality
     original_correspondence_1_activation = correspondence_1.activation
 
@@ -343,6 +351,7 @@ def test_view_and_correspondence_processes(
     view_evaluator_2.run()
     assert CodeletResult.SUCCESS == view_evaluator_2.result
     assert view.quality > original_view_quality
+    view_quality_after_evaluator_2 = view.quality
 
     view_selector_2 = view_evaluator_2.child_codelets[0]
     assert isinstance(view_selector_2, SimplexViewSelector)
@@ -350,3 +359,89 @@ def test_view_and_correspondence_processes(
     assert CodeletResult.SUCCESS == view_selector_2.result
     view.update_activation()
     assert view.activation > original_view_activation
+    view_activation_after_selector_2 = view.activation
+
+    # project words into output
+    frame = view.input_spaces.where(is_frame=True).get()
+    target_word_1 = frame.output_space.contents.where(is_word=True, is_slot=False).get()
+    word_projection_suggester_1 = WordProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": target_word_1},
+        1.0,
+    )
+    word_projection_suggester_1.run()
+    assert CodeletResult.SUCCESS == word_projection_suggester_1.result
+
+    word_projection_builder_1 = word_projection_suggester_1.child_codelets[0]
+    assert isinstance(word_projection_builder_1, WordProjectionBuilder)
+    word_projection_builder_1.run()
+    assert CodeletResult.SUCCESS == word_projection_builder_1.result
+    assert 1 == len(view.output_space.contents.where(is_word=True))
+    word_1 = word_projection_builder_1.child_structures.where(is_word=True).get()
+    original_word_1_quality = word_1.quality
+    original_word_1_activation = word_1.activation
+
+    word_projection_evaluator_1 = word_projection_builder_1.child_codelets[0]
+    assert isinstance(word_projection_evaluator_1, WordProjectionEvaluator)
+    word_projection_evaluator_1.run()
+    assert CodeletResult.SUCCESS == word_projection_evaluator_1.result
+    assert word_1.quality > original_word_1_quality
+
+    word_projection_selector_1 = word_projection_evaluator_1.child_codelets[0]
+    assert isinstance(word_projection_selector_1, WordProjectionSelector)
+    word_projection_selector_1.run()
+    assert CodeletResult.SUCCESS == word_projection_selector_1.result
+    word_1.update_activation()
+    assert word_1.activation > original_word_1_activation
+
+    word_correspondee = correspondence_1.slot_argument
+    frame_correspondence = word_correspondee.correspondences_to_space(
+        frame.output_space
+    ).get()
+    target_word_2 = frame_correspondence.end
+    word_projection_suggester_2 = WordProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": target_word_2},
+        1.0,
+    )
+    word_projection_suggester_2.run()
+    assert CodeletResult.SUCCESS == word_projection_suggester_2.result
+
+    word_projection_builder_2 = word_projection_suggester_2.child_codelets[0]
+    assert isinstance(word_projection_builder_2, WordProjectionBuilder)
+    word_projection_builder_2.run()
+    assert CodeletResult.SUCCESS == word_projection_builder_2.result
+    assert 2 == len(view.output_space.contents.where(is_word=True))
+    word_2 = word_projection_builder_2.child_structures.where(is_word=True).get()
+    original_word_2_quality = word_2.quality
+    original_word_2_activation = word_2.activation
+
+    word_projection_evaluator_2 = word_projection_builder_2.child_codelets[0]
+    assert isinstance(word_projection_evaluator_2, WordProjectionEvaluator)
+    word_projection_evaluator_2.run()
+    assert CodeletResult.SUCCESS == word_projection_evaluator_2.result
+    assert word_2.quality > original_word_2_quality
+
+    word_projection_selector_2 = word_projection_evaluator_2.child_codelets[0]
+    assert isinstance(word_projection_selector_2, WordProjectionSelector)
+    word_projection_selector_2.run()
+    assert CodeletResult.SUCCESS == word_projection_selector_2.result
+    word_2.update_activation()
+    assert word_2.activation > original_word_2_activation
+
+    # re-evaluate view
+    view_evaluator_3 = SimplexViewEvaluator.spawn(
+        "", bubble_chamber, StructureCollection({view}), 1.0
+    )
+    view_evaluator_3.run()
+    assert CodeletResult.SUCCESS == view_evaluator_3.result
+    assert view.quality > view_quality_after_evaluator_2
+
+    view_selector_3 = view_evaluator_3.child_codelets[0]
+    assert isinstance(view_selector_3, SimplexViewSelector)
+    view_selector_3.run()
+    assert CodeletResult.SUCCESS == view_selector_3.result
+    view.update_activation()
+    assert view.activation >= view_activation_after_selector_2
