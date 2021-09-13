@@ -1,10 +1,7 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ProjectionSuggester
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation, corresponding_exigency
 from homer.structures import View
-from homer.structures.nodes import Word
-from homer.structures.spaces import Frame
 
 
 class WordProjectionSuggester(ProjectionSuggester):
