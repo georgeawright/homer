@@ -1,7 +1,4 @@
 from homer.codelets.selector import Selector
-from homer.codelets.suggesters import WordSuggester
-from homer.structure_collection import StructureCollection
-from homer.structure_collection_keys import uncorrespondedness
 
 
 class ProjectionSelector(Selector):
