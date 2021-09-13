@@ -49,7 +49,6 @@ class ProjectionBuilder(Builder):
         return StructureCollection({self.target_view, self.target_projectee})
 
     def _passes_preliminary_checks(self):
-        print(self._target_structures)
         self.target_view = self._target_structures["target_view"]
         self.target_correspondence = self._target_structures["target_correspondence"]
         self.target_projectee = self._target_structures["target_projectee"]
