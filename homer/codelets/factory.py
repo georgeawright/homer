@@ -62,7 +62,9 @@ class Factory(Codelet):
             CorrespondenceSuggester,
             LabelSuggester,
             RelationSuggester,
-            WordSuggester,
+        )
+        from homer.codelets.suggesters.projection_suggesters import (
+            WordProjectionSuggester,
         )
         from homer.codelets.suggesters.chunk_suggesters import (
             ChunkProjectionSuggester,
@@ -83,7 +85,9 @@ class Factory(Codelet):
             CorrespondenceEvaluator,
             LabelEvaluator,
             RelationEvaluator,
-            WordEvaluator,
+        )
+        from homer.codelets.evaluators.projection_evaluators import (
+            WordProjectionEvaluator,
         )
         from homer.codelets.evaluators.chunk_evaluators import (
             ChunkProjectionEvaluator,
@@ -117,7 +121,7 @@ class Factory(Codelet):
                         "chunk": ChunkProjectionSuggester,
                         "label": LabelProjectionSuggester,
                         "relation": RelationProjectionSuggester,
-                        "word": WordSuggester,
+                        "word": WordProjectionSuggester,
                     },
                     "reverse": {
                         "chunk": ReverseChunkProjectionSuggester,
@@ -140,7 +144,7 @@ class Factory(Codelet):
                         "chunk": ChunkProjectionEvaluator,
                         "label": LabelProjectionEvaluator,
                         "relation": RelationProjectionEvaluator,
-                        "word": WordEvaluator,
+                        "word": WordProjectionEvaluator,
                     },
                     "reverse": {
                         "chunk": ReverseChunkProjectionEvaluator,

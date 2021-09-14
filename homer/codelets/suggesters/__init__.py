@@ -4,4 +4,3 @@ from .label_suggester import LabelSuggester
 from .projection_suggester import ProjectionSuggester
 from .relation_suggester import RelationSuggester
 from .view_suggester import ViewSuggester
-from .word_suggester import WordSuggester
