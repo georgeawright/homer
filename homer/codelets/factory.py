@@ -147,7 +147,6 @@ class Factory(Codelet):
         inner = self.bubble_chamber.concepts["inner"]
         outer = self.bubble_chamber.concepts["outer"]
         forward = self.bubble_chamber.concepts["forward"]
-        reverse = self.bubble_chamber.concepts["reverse"]
         correspondence = self.bubble_chamber.concepts["correspondence"]
         chunk = self.bubble_chamber.concepts["chunk"]
         label = self.bubble_chamber.concepts["label"]
@@ -175,12 +174,6 @@ class Factory(Codelet):
                 "spaces": StructureCollection({outer}),
                 "directions": StructureCollection({forward}),
                 "structures": StructureCollection({word}),
-            },
-            "reverse": {
-                "actions": StructureCollection({suggest, evaluate}),
-                "spaces": StructureCollection({outer}),
-                "directions": StructureCollection({reverse}),
-                "structures": StructureCollection({chunk}),
             },
             "publish": {
                 "actions": StructureCollection({publish}),

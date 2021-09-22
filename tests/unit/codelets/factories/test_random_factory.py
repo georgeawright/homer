@@ -20,8 +20,6 @@ def concepts():
     outer_concept.name = "outer"
     forward_concept = Mock()
     forward_concept.name = "forward"
-    reverse_concept = Mock()
-    reverse_concept.name = "reverse"
     correspondence_concept = Mock()
     correspondence_concept.name = "correspondence"
     chunk_concept = Mock()
@@ -46,7 +44,6 @@ def concepts():
             inner_concept,
             outer_concept,
             forward_concept,
-            reverse_concept,
             correspondence_concept,
             chunk_concept,
             label_concept,
