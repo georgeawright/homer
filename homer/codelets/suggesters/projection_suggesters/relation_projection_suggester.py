@@ -1,0 +1,2 @@
+class RelationProjectionSuggester:
+    pass

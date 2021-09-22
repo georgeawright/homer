@@ -1,0 +1,2 @@
+class LabelProjectionSuggester:
+    pass

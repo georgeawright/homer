@@ -1,0 +1,2 @@
+class LabelProjectionEvaluator:
+    pass
