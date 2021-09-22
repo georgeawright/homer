@@ -11,7 +11,7 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Relation
 from homer.structures.nodes import Concept, Lexeme, Rule, Word
 from homer.structures.spaces import ConceptualSpace, ContextualSpace
-from homer.tools import centroid_euclidean_distance
+from homer.tools import add_vectors, centroid_euclidean_distance
 from homer.word_form import WordForm
 
 
@@ -154,6 +154,23 @@ def input_concept():
 
 
 @pytest.fixture(scope="module")
+def text_concept():
+    concept = Concept(
+        "",
+        "",
+        "text",
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    return concept
+
+
+@pytest.fixture(scope="module")
 def grammar_vectors():
     vectors = {
         "sentence": [],
@@ -161,6 +178,7 @@ def grammar_vectors():
         "vp": [],
         "pronoun": [],
         "adj": [],
+        "noun": [],
         "jjr": [],
         "cop": [],
         "prep": [],
@@ -442,6 +460,24 @@ def than_lexeme():
 
 
 @pytest.fixture(scope="module")
+def north_lexeme(north_concept):
+    lexeme = Lexeme("", "", "north", {WordForm.HEADWORD: "north"})
+    link = Relation("", "", north_concept, lexeme, None, [], 1.0)
+    north_concept.links_out.add(link)
+    lexeme.links_in.add(link)
+    return lexeme
+
+
+@pytest.fixture(scope="module")
+def south_lexeme(south_concept):
+    lexeme = Lexeme("", "", "south", {WordForm.HEADWORD: "south"})
+    link = Relation("", "", south_concept, lexeme, None, [], 1.0)
+    south_concept.links_out.add(link)
+    lexeme.links_in.add(link)
+    return lexeme
+
+
+@pytest.fixture(scope="module")
 def warm_lexeme(warm_concept):
     lexeme = Lexeme("", "", "warm", {WordForm.HEADWORD: "warm"})
     link = Relation("", "", warm_concept, lexeme, None, [], 1.0)
@@ -524,6 +560,44 @@ def than_word(grammar_vectors, grammar_space, than_lexeme):
         than_lexeme,
         WordForm.HEADWORD,
         [Location([grammar_vectors["prep"]], grammar_space)],
+        grammar_space,
+        1,
+    )
+
+
+@pytest.fixture(scope="module")
+def north_word(grammar_vectors, grammar_space, north_lexeme):
+    return Word(
+        "",
+        "",
+        "north",
+        north_lexeme,
+        WordForm.HEADWORD,
+        [
+            Location(
+                add_vectors([grammar_vectors["adj"]], [grammar_vectors["noun"]]),
+                grammar_space,
+            )
+        ],
+        grammar_space,
+        1,
+    )
+
+
+@pytest.fixture(scope="module")
+def south_word(grammar_vectors, grammar_space, south_lexeme):
+    return Word(
+        "",
+        "",
+        "south",
+        south_lexeme,
+        WordForm.HEADWORD,
+        [
+            Location(
+                add_vectors([grammar_vectors["adj"]], [grammar_vectors["noun"]]),
+                grammar_space,
+            )
+        ],
         grammar_space,
         1,
     )
@@ -679,6 +753,44 @@ def location_space(
     )
     bubble_chamber.conceptual_spaces.add(space)
     return space
+
+
+@pytest.fixture(scope="module")
+def south_concept(bubble_chamber, location_space):
+    concept = Concept(
+        "",
+        "",
+        "south",
+        [Location([[5, 2]], location_space)],
+        Mock(),
+        Mock(),
+        Mock(),
+        location_space,
+        Mock(),
+        centroid_euclidean_distance,
+    )
+    location_space.add(concept)
+    bubble_chamber.concepts.add(concept)
+    return concept
+
+
+@pytest.fixture(scope="module")
+def north_concept(bubble_chamber, location_space):
+    concept = Concept(
+        "",
+        "",
+        "north",
+        [Location([[0, 2]], location_space)],
+        Mock(),
+        Mock(),
+        Mock(),
+        location_space,
+        Mock(),
+        centroid_euclidean_distance,
+    )
+    location_space.add(concept)
+    bubble_chamber.concepts.add(concept)
+    return concept
 
 
 @pytest.fixture(scope="module")

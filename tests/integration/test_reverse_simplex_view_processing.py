@@ -26,7 +26,7 @@ from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
 
-def test_simplex_view_processing(
+def test_reverse_simplex_view_processing(
     bubble_chamber,
     input_concept,
     text_concept,
@@ -44,16 +44,18 @@ def test_simplex_view_processing(
     than_word,
     hotter_lexeme,
     hotter_word,
+    south_word,
+    north_word,
 ):
-    input_space = ContextualSpace(
+    text_space = ContextualSpace(
         "",
         "",
-        "input",
-        input_concept,
+        "text",
+        text_concept,
         StructureCollection(),
-        conceptual_spaces=StructureCollection({temperature_space, location_space}),
+        conceptual_spaces=StructureCollection({grammar_space}),
     )
-    bubble_chamber.contextual_spaces.add(input_space)
+    bubble_chamber.contextual_spaces.add(text_space)
 
     # setup frame
     frame_input_space = ContextualSpace(
@@ -216,73 +218,20 @@ def test_simplex_view_processing(
     )
     bubble_chamber.frames.add(frame)
 
-    # setup input space with chunks, labels, relations
-    hot_chunk = Chunk(
-        ID.new(Chunk),
-        "",
-        [
-            Location([[]], input_space),
-            Location([[0, 0]], location_space),
-            Location([[22]], temperature_space),
-        ],
-        StructureCollection(),
-        input_space,
-        1.0,
-    )
-    input_space.add(hot_chunk)
-    location_space.add(hot_chunk)
-    temperature_space.add(hot_chunk)
-    hot_label = Label(
-        ID.new(Label),
-        "",
-        hot_chunk,
-        hot_concept,
-        [Location([[]], input_space), Location([[22]], temperature_space)],
-        1.0,
-    )
-    hot_chunk.links_out.add(hot_label)
-    cold_chunk = Chunk(
-        ID.new(Chunk),
-        "",
-        [
-            Location([[]], input_space),
-            Location([[0, 1]], location_space),
-            Location([[4]], temperature_space),
-        ],
-        StructureCollection(),
-        input_space,
-        1.0,
-    )
-    input_space.add(cold_chunk)
-    location_space.add(cold_chunk)
-    temperature_space.add(cold_chunk)
-    cold_label = Label(
-        ID.new(Label),
-        "",
-        cold_chunk,
-        cold_concept,
-        [Location([[]], input_space), Location([[4]], temperature_space)],
-        1.0,
-    )
-    cold_chunk.links_out.add(cold_label)
-    hot_to_cold_relation = Relation(
-        ID.new(Relation),
-        "",
-        hot_chunk,
-        cold_chunk,
-        hotter_concept,
-        [
-            TwoPointLocation([[]], [[]], input_space),
-            TwoPointLocation([[22]], [[4]], temperature_space),
-        ],
-        1.0,
-    )
-    hot_chunk.links_out.add(hot_to_cold_relation)
-    cold_chunk.links_in.add(hot_to_cold_relation)
+    # setup text space with words
+    text_0 = it_word.copy_to_location(Location([[0]], text_space), quality=1.0)
+    text_1 = is_word.copy_to_location(Location([[1]], text_space), quality=1.0)
+    text_2 = hotter_word.copy_to_location(Location([[2]], text_space), quality=1.0)
+    text_3 = in_word.copy_to_location(Location([[3]], text_space), quality=1.0)
+    text_4 = the_word.copy_to_location(Location([[4]], text_space), quality=1.0)
+    text_5 = south_word.copy_to_location(Location([[5]], text_space), quality=1.0)
+    text_6 = than_word.copy_to_location(Location([[6]], text_space), quality=1.0)
+    text_7 = the_word.copy_to_location(Location([[7]], frame_output_space), quality=1.0)
+    text_8 = north_word.copy_to_location(Location([[8]], text_space), quality=1.0)
 
     # suggest and build view for input space and frame
     view_suggester = SimplexViewSuggester.spawn(
-        "", bubble_chamber, {"contextual_space": input_space, "frame": frame}, 1
+        "", bubble_chamber, {"contextual_space": text_space, "frame": frame}, 1
     )
     view_suggester.run()
     assert CodeletResult.SUCCESS == view_suggester.result
@@ -292,8 +241,8 @@ def test_simplex_view_processing(
     view_builder.run()
     assert CodeletResult.SUCCESS == view_builder.result
     view = view_builder.child_structures.where(is_simplex_view=True).get()
-    assert input_concept == view.input_frames.get().input_space.parent_concept
-    assert text_concept == view.input_frames.get().output_space.parent_concept
+    assert text_concept == view.input_frames.get().input_space.parent_concept
+    assert input_concept == view.input_frames.get().output_space.parent_concept
     original_view_quality = view.quality
     original_view_activation = view.activation
 
@@ -309,8 +258,8 @@ def test_simplex_view_processing(
         bubble_chamber,
         {
             "target_view": view,
-            "target_space_one": input_space,
-            "target_structure_one": hot_to_cold_relation,
+            "target_space_one": text_space,
+            "target_structure_one": text_2,
             "target_space_two": None,
             "target_structure_two": None,
             "target_conceptual_space": None,
@@ -326,7 +275,7 @@ def test_simplex_view_processing(
     correspondence_builder_1.run()
     assert CodeletResult.SUCCESS == correspondence_builder_1.result
     correspondence_1 = correspondence_builder_1.child_structures.get()
-    assert correspondence_1.start.parent_space == input_space
+    assert correspondence_1.start.parent_space == text_space
     assert correspondence_1.end.parent_space == view.input_frames.get().input_space
     original_correspondence_1_quality = correspondence_1.quality
     original_correspondence_1_activation = correspondence_1.activation
