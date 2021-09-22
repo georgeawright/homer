@@ -32,18 +32,26 @@ class CorrespondenceSelector(Selector):
         target_view = winner_correspondence.parent_view
         try:
             target_structure_one = (
-                winner_correspondence.start.arguments.get()
-                .links.where(is_correspondence=False)
-                .get(key=corresponding_exigency)
+                winner_correspondence.start.nearby().get(key=corresponding_exigency)
+                if winner_correspondence.start.is_node
+                else (
+                    winner_correspondence.start.arguments.get()
+                    .links.where(is_correspondence=False)
+                    .get(key=corresponding_exigency)
+                )
             )
             target_space_one = target_structure_one.parent_space
             target_conceptual_space = target_space_one.conceptual_spaces.get()
             target_space_two = target_view.input_spaces.get(exclude=[target_space_one])
             target_structure_two = (
-                winner_correspondence.end.arguments.get()
-                .links.of_type(type(target_structure_one))
-                .where(parent_space=target_space_two)
-                .get(key=corresponding_exigency)
+                None
+                if winner_correspondence.start.is_node
+                else (
+                    winner_correspondence.end.arguments.get()
+                    .links.of_type(type(target_structure_one))
+                    .where(parent_space=target_space_two)
+                    .get(key=corresponding_exigency)
+                )
             )
             target_concept = winner_correspondence.parent_concept.friends().get()
         except MissingStructureError:
