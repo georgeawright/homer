@@ -64,17 +64,10 @@ class Factory(Codelet):
             RelationSuggester,
         )
         from homer.codelets.suggesters.projection_suggesters import (
-            WordProjectionSuggester,
-        )
-        from homer.codelets.suggesters.chunk_suggesters import (
             ChunkProjectionSuggester,
-            ReverseChunkProjectionSuggester,
-        )
-        from homer.codelets.suggesters.label_suggesters import (
             LabelProjectionSuggester,
-        )
-        from homer.codelets.suggesters.relation_suggesters import (
             RelationProjectionSuggester,
+            WordProjectionSuggester,
         )
         from homer.codelets.suggesters.view_suggesters import (
             MonitoringViewSuggester,
@@ -87,17 +80,10 @@ class Factory(Codelet):
             RelationEvaluator,
         )
         from homer.codelets.evaluators.projection_evaluators import (
-            WordProjectionEvaluator,
-        )
-        from homer.codelets.evaluators.chunk_evaluators import (
             ChunkProjectionEvaluator,
-            ReverseChunkProjectionEvaluator,
-        )
-        from homer.codelets.evaluators.label_evaluators import (
             LabelProjectionEvaluator,
-        )
-        from homer.codelets.evaluators.relation_evaluators import (
             RelationProjectionEvaluator,
+            WordProjectionEvaluator,
         )
         from homer.codelets.evaluators.view_evaluators import (
             MonitoringViewEvaluator,
@@ -123,9 +109,6 @@ class Factory(Codelet):
                         "relation": RelationProjectionSuggester,
                         "word": WordProjectionSuggester,
                     },
-                    "reverse": {
-                        "chunk": ReverseChunkProjectionSuggester,
-                    },
                 },
             },
             "evaluate": {
@@ -145,9 +128,6 @@ class Factory(Codelet):
                         "label": LabelProjectionEvaluator,
                         "relation": RelationProjectionEvaluator,
                         "word": WordProjectionEvaluator,
-                    },
-                    "reverse": {
-                        "chunk": ReverseChunkProjectionEvaluator,
                     },
                 },
             },
