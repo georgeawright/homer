@@ -165,7 +165,7 @@ def text_concept():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
+        centroid_euclidean_distance,
     )
     return concept
 
