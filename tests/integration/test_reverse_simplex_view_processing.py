@@ -416,7 +416,14 @@ def test_reverse_simplex_view_processing(
 
     # project chunks, labels, relations into output
 
-    # re-evaluate view
+
+#    chunk_projection_suggester_1 = ChunkProjectionSuggester()
+#    chunk_projection_suggester_2 = ChunkProjectionSuggester()
+#    label_projection_suggester_1 = LabelProjectionSuggester()
+#    label_projection_suggester_2 = LabelProjectionSuggester()
+#    relation_projection_suggester = RelationProjectionSuggester()
+
+# re-evaluate view
 
 
 #    view_evaluator_3 = SimplexViewEvaluator.spawn(
