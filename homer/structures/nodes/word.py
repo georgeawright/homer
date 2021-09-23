@@ -317,5 +317,5 @@ class Word(Node):
     def __repr__(self) -> str:
         return (
             f'<{self.structure_id} "{self.name}" '
-            + " in {self.parent_space.structure_id} {self.locations}>"
+            + f" in {self.parent_space.structure_id} {self.locations}>"
         )
