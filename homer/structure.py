@@ -229,6 +229,17 @@ class Structure(ABC):
     def nearby(self, space: Structure = None):
         raise NotImplementedError
 
+    def similarity_with(self, other: Structure):
+        return statistics.fmean(
+            [
+                location.space.proximity_between(self, other)
+                if other.has_location_in_space(location.space)
+                else 0.0
+                for location in self.locations
+                if location.space.is_conceptual_space
+            ]
+        )
+
     def is_near(self, other: Structure) -> bool:
         for other_location in other.locations:
             for self_location in self.locations:
