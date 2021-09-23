@@ -145,7 +145,7 @@ class CorrespondenceSuggester(Suggester):
                         type(self.target_structure_one)
                     )
                     .where(is_slot=True)
-                    .get(key=exigency)
+                    .get(key=lambda x: x.similarity_with(self.target_structure_one))
                 )
                 self._target_structures[
                     "target_structure_two"
