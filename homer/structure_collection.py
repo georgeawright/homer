@@ -196,6 +196,7 @@ class StructureCollection:
             )._get_structure_according_to(key)
         if len(self.structures) == 1:
             return list(self.structures)[0]
+        # todo: randomness should depend on bubble chamber satisfaction
         structures = random.sample(
             self.structures, len(self.structures) // int(1 / sample_proportion)
         )
