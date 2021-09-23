@@ -135,7 +135,10 @@ def test_reverse_simplex_view_processing(
         None,
         None,
         WordForm.HEADWORD,
-        [Location([[2]], frame_output_space), Location([[None]], grammar_space)],
+        [
+            Location([[2]], frame_output_space),
+            hotter_word.location_in_space(grammar_space),
+        ],
         frame_output_space,
         1.0,
     )
@@ -148,7 +151,10 @@ def test_reverse_simplex_view_processing(
         None,
         None,
         WordForm.HEADWORD,
-        [Location([[5]], frame_output_space), Location([[None]], grammar_space)],
+        [
+            Location([[5]], frame_output_space),
+            south_word.location_in_space(grammar_space),
+        ],
         frame_output_space,
         1.0,
     )
@@ -163,7 +169,10 @@ def test_reverse_simplex_view_processing(
         None,
         None,
         WordForm.HEADWORD,
-        [Location([[8]], frame_output_space), Location([[None]], grammar_space)],
+        [
+            Location([[8]], frame_output_space),
+            south_word.location_in_space(grammar_space),
+        ],
         frame_output_space,
         1.0,
     )
@@ -253,6 +262,7 @@ def test_reverse_simplex_view_processing(
     assert view.quality == original_view_quality
 
     # build correspondences
+    view_frame_input = view.input_frames.get().input_space
     correspondence_suggester_1 = CorrespondenceSuggester.spawn(
         "",
         bubble_chamber,
@@ -260,8 +270,14 @@ def test_reverse_simplex_view_processing(
             "target_view": view,
             "target_space_one": text_space,
             "target_structure_one": text_2,
-            "target_space_two": None,
-            "target_structure_two": None,
+            "target_space_two": view_frame_input,
+            "target_structure_two": StructureCollection(
+                {
+                    word
+                    for word in view_frame_input.contents
+                    if word.location_in_space(view_frame_input).coordinates == [[2]]
+                }
+            ).get(),
             "target_conceptual_space": None,
             "parent_concept": None,
         },
@@ -293,6 +309,94 @@ def test_reverse_simplex_view_processing(
     correspondence_1.update_activation()
     assert correspondence_1.activation > original_correspondence_1_activation
 
+    correspondence_suggester_2 = (
+        correspondence_selector_1.child_codelets[0]
+        if isinstance(
+            correspondence_selector_1.child_codelets[0], CorrespondenceSuggester
+        )
+        else correspondence_selector_1.child_codelets[1]
+    )
+    correspondence_suggester_2._target_structures["target_structure_one"] = text_5
+    correspondence_suggester_2._target_structures["target_space_two"] = view_frame_input
+    correspondence_suggester_2._target_structures[
+        "target_structure_two"
+    ] = StructureCollection(
+        {
+            word
+            for word in view_frame_input.contents
+            if word.location_in_space(view_frame_input).coordinates == [[5]]
+        }
+    ).get()
+    correspondence_suggester_2.run()
+    assert CodeletResult.SUCCESS == correspondence_suggester_2.result
+
+    correspondence_builder_2 = correspondence_suggester_2.child_codelets[0]
+    assert isinstance(correspondence_builder_2, CorrespondenceBuilder)
+    correspondence_builder_2.run()
+    assert CodeletResult.SUCCESS == correspondence_builder_2.result
+    correspondence_2 = correspondence_builder_2.child_structures.get()
+    assert correspondence_2.start.parent_space == text_space
+    assert correspondence_2.end.parent_space == view.input_frames.get().input_space
+    original_correspondence_2_quality = correspondence_2.quality
+    original_correspondence_2_activation = correspondence_2.activation
+
+    correspondence_evaluator_2 = correspondence_builder_2.child_codelets[0]
+    assert isinstance(correspondence_evaluator_2, CorrespondenceEvaluator)
+    correspondence_evaluator_2.run()
+    assert CodeletResult.SUCCESS == correspondence_evaluator_2.result
+    assert correspondence_2.quality > original_correspondence_2_quality
+
+    correspondence_selector_2 = correspondence_evaluator_2.child_codelets[0]
+    assert isinstance(correspondence_selector_2, CorrespondenceSelector)
+    correspondence_selector_2.run()
+    assert CodeletResult.SUCCESS == correspondence_selector_2.result
+    correspondence_2.update_activation()
+    assert correspondence_2.activation > original_correspondence_2_activation
+
+    correspondence_suggester_3 = (
+        correspondence_selector_2.child_codelets[0]
+        if isinstance(
+            correspondence_selector_2.child_codelets[0], CorrespondenceSuggester
+        )
+        else correspondence_selector_2.child_codelets[1]
+    )
+    correspondence_suggester_3._target_structures["target_structure_one"] = text_8
+    correspondence_suggester_3._target_structures["target_space_two"] = view_frame_input
+    correspondence_suggester_3._target_structures[
+        "target_structure_two"
+    ] = StructureCollection(
+        {
+            word
+            for word in view_frame_input.contents
+            if word.location_in_space(view_frame_input).coordinates == [[8]]
+        }
+    ).get()
+    correspondence_suggester_3.run()
+    assert CodeletResult.SUCCESS == correspondence_suggester_3.result
+
+    correspondence_builder_3 = correspondence_suggester_3.child_codelets[0]
+    assert isinstance(correspondence_builder_3, CorrespondenceBuilder)
+    correspondence_builder_3.run()
+    assert CodeletResult.SUCCESS == correspondence_builder_3.result
+    correspondence_3 = correspondence_builder_3.child_structures.get()
+    assert correspondence_3.start.parent_space == text_space
+    assert correspondence_3.end.parent_space == view.input_frames.get().input_space
+    original_correspondence_3_quality = correspondence_3.quality
+    original_correspondence_3_activation = correspondence_3.activation
+
+    correspondence_evaluator_3 = correspondence_builder_3.child_codelets[0]
+    assert isinstance(correspondence_evaluator_3, CorrespondenceEvaluator)
+    correspondence_evaluator_3.run()
+    assert CodeletResult.SUCCESS == correspondence_evaluator_3.result
+    assert correspondence_3.quality > original_correspondence_3_quality
+
+    correspondence_selector_3 = correspondence_evaluator_3.child_codelets[0]
+    assert isinstance(correspondence_selector_3, CorrespondenceSelector)
+    correspondence_selector_3.run()
+    assert CodeletResult.SUCCESS == correspondence_selector_3.result
+    correspondence_3.update_activation()
+    assert correspondence_3.activation > original_correspondence_3_activation
+
     # re-evaluate and select view as correspondences are added
     view_evaluator_2 = SimplexViewEvaluator.spawn(
         "", bubble_chamber, StructureCollection({view}), 1.0
@@ -310,87 +414,21 @@ def test_reverse_simplex_view_processing(
     assert view.activation > original_view_activation
     view_activation_after_selector_2 = view.activation
 
-    # project words into output
-    frame = view.input_spaces.where(is_frame=True).get()
-    target_word_1 = frame.output_space.contents.where(is_word=True, is_slot=False).get()
-    word_projection_suggester_1 = WordProjectionSuggester.spawn(
-        "",
-        bubble_chamber,
-        {"target_view": view, "target_projectee": target_word_1},
-        1.0,
-    )
-    word_projection_suggester_1.run()
-    assert CodeletResult.SUCCESS == word_projection_suggester_1.result
-
-    word_projection_builder_1 = word_projection_suggester_1.child_codelets[0]
-    assert isinstance(word_projection_builder_1, WordProjectionBuilder)
-    word_projection_builder_1.run()
-    assert CodeletResult.SUCCESS == word_projection_builder_1.result
-    assert 1 == len(view.output_space.contents.where(is_word=True))
-    word_1 = word_projection_builder_1.child_structures.where(is_word=True).get()
-    original_word_1_quality = word_1.quality
-    original_word_1_activation = word_1.activation
-
-    word_projection_evaluator_1 = word_projection_builder_1.child_codelets[0]
-    assert isinstance(word_projection_evaluator_1, WordProjectionEvaluator)
-    word_projection_evaluator_1.run()
-    assert CodeletResult.SUCCESS == word_projection_evaluator_1.result
-    assert word_1.quality > original_word_1_quality
-
-    word_projection_selector_1 = word_projection_evaluator_1.child_codelets[0]
-    assert isinstance(word_projection_selector_1, WordProjectionSelector)
-    word_projection_selector_1.run()
-    assert CodeletResult.SUCCESS == word_projection_selector_1.result
-    word_1.update_activation()
-    assert word_1.activation > original_word_1_activation
-
-    word_correspondee = correspondence_1.slot_argument
-    frame_correspondence = word_correspondee.correspondences_to_space(
-        frame.output_space
-    ).get()
-    target_word_2 = frame_correspondence.end
-    word_projection_suggester_2 = WordProjectionSuggester.spawn(
-        "",
-        bubble_chamber,
-        {"target_view": view, "target_projectee": target_word_2},
-        1.0,
-    )
-    word_projection_suggester_2.run()
-    assert CodeletResult.SUCCESS == word_projection_suggester_2.result
-
-    word_projection_builder_2 = word_projection_suggester_2.child_codelets[0]
-    assert isinstance(word_projection_builder_2, WordProjectionBuilder)
-    word_projection_builder_2.run()
-    assert CodeletResult.SUCCESS == word_projection_builder_2.result
-    assert 2 == len(view.output_space.contents.where(is_word=True))
-    word_2 = word_projection_builder_2.child_structures.where(is_word=True).get()
-    original_word_2_quality = word_2.quality
-    original_word_2_activation = word_2.activation
-
-    word_projection_evaluator_2 = word_projection_builder_2.child_codelets[0]
-    assert isinstance(word_projection_evaluator_2, WordProjectionEvaluator)
-    word_projection_evaluator_2.run()
-    assert CodeletResult.SUCCESS == word_projection_evaluator_2.result
-    assert word_2.quality > original_word_2_quality
-
-    word_projection_selector_2 = word_projection_evaluator_2.child_codelets[0]
-    assert isinstance(word_projection_selector_2, WordProjectionSelector)
-    word_projection_selector_2.run()
-    assert CodeletResult.SUCCESS == word_projection_selector_2.result
-    word_2.update_activation()
-    assert word_2.activation > original_word_2_activation
+    # project chunks, labels, relations into output
 
     # re-evaluate view
-    view_evaluator_3 = SimplexViewEvaluator.spawn(
-        "", bubble_chamber, StructureCollection({view}), 1.0
-    )
-    view_evaluator_3.run()
-    assert CodeletResult.SUCCESS == view_evaluator_3.result
-    assert view.quality > view_quality_after_evaluator_2
 
-    view_selector_3 = view_evaluator_3.child_codelets[0]
-    assert isinstance(view_selector_3, SimplexViewSelector)
-    view_selector_3.run()
-    assert CodeletResult.SUCCESS == view_selector_3.result
-    view.update_activation()
-    assert view.activation >= view_activation_after_selector_2
+
+#    view_evaluator_3 = SimplexViewEvaluator.spawn(
+#        "", bubble_chamber, StructureCollection({view}), 1.0
+#    )
+#    view_evaluator_3.run()
+#    assert CodeletResult.SUCCESS == view_evaluator_3.result
+#    assert view.quality > view_quality_after_evaluator_2
+#
+#    view_selector_3 = view_evaluator_3.child_codelets[0]
+#    assert isinstance(view_selector_3, SimplexViewSelector)
+#    view_selector_3.run()
+#    assert CodeletResult.SUCCESS == view_selector_3.result
+#    view.update_activation()
+#    assert view.activation >= view_activation_after_selector_2
