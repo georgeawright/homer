@@ -1,5 +1,7 @@
+from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluators import ProjectionEvaluator
+from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
 
@@ -31,16 +33,39 @@ class WordProjectionEvaluator(ProjectionEvaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_word = self.target_structures.where(is_word=True).get()
-        labels = StructureCollection.union(
-            *[correspondee.labels for correspondee in target_word.correspondees]
-        )
-        compatible_labels = [
-            label for label in labels if label.parent_concept in target_word.concepts
-        ]
-        self.confidence = (
-            max(label.quality for label in compatible_labels)
-            if compatible_labels != []
-            else 1.0
-        )
+        try:
+            non_frame_item = (
+                StructureCollection(
+                    {
+                        correspondence
+                        for correspondence in self.target_structures.where(
+                            is_correspondence=True
+                        )
+                        if not correspondence.start.is_slot
+                    }
+                )
+                .get()
+                .start
+            )
+            frame_item = (
+                StructureCollection(
+                    {
+                        correspondence
+                        for correspondence in self.target_structures.where(
+                            is_correspondence=True
+                        )
+                        if correspondence.start.is_slot
+                    }
+                )
+                .get()
+                .start
+            )
+            correspondence_to_frame = non_frame_item.correspondences_with(
+                frame_item
+            ).get()
+            self.confidence = fuzzy.AND(
+                non_frame_item.quality, correspondence_to_frame.quality
+            )
+        except MissingStructureError:
+            self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

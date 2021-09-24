@@ -9,19 +9,44 @@ from homer.structure_collection import StructureCollection
 def test_changes_target_structure_quality(current_quality, label_quality):
     bubble_chamber = Mock()
     bubble_chamber.concepts = {"evaluate": Mock(), "word": Mock()}
-    concept = Mock()
+
     label = Mock()
-    label.parent_concept = concept
+    label.is_slot = False
     label.quality = label_quality
-    chunk = Mock()
-    chunk.labels = StructureCollection({label})
+
+    correspondence_to_frame = Mock()
+    correspondence_to_frame.quality = 1.0
+    label.correspondences_with.return_value = StructureCollection(
+        {correspondence_to_frame}
+    )
+
+    slot = Mock()
+    slot.is_slot = True
+
     word = Mock()
     word.is_word = True
     word.quality = current_quality
-    word.concepts = StructureCollection({concept})
-    word.correspondees = StructureCollection({chunk})
+
+    label_to_word_correspondence = Mock()
+    label_to_word_correspondence.is_correspondence = True
+    label_to_word_correspondence.start = label
+    label_to_word_correspondence.quality = current_quality
+    slot_to_word_correspondence = Mock()
+    slot_to_word_correspondence.is_correspondence = True
+    slot_to_word_correspondence.start = slot
+    slot_to_word_correspondence.quality = current_quality
+    word.correspondences = StructureCollection(
+        {label_to_word_correspondence, slot_to_word_correspondence}
+    )
+
     evaluator = WordProjectionEvaluator(
-        Mock(), Mock(), bubble_chamber, StructureCollection({word}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        StructureCollection(
+            {word, label_to_word_correspondence, slot_to_word_correspondence}
+        ),
+        Mock(),
     )
     evaluator.run()
     assert word.quality == label_quality
