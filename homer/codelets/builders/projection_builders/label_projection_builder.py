@@ -40,12 +40,12 @@ class LabelProjectionBuilder(ProjectionBuilder):
             locations,
             0.0,
         )
-        start_correspondence.links_out.add(label)
+        corresponding_start.links_out.add(label)
         self.bubble_chamber.labels.add(label)
+        self.bubble_chamber.logger.log(label)
         for location in locations:
             location.space.add(label)
             self.bubble_chamber.logger.log(location.space)
-        self.bubble_chamber.logger.log(label)
         frame_to_output_correspondence = Correspondence(
             ID.new(Correspondence),
             self.codelet_id,
