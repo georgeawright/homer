@@ -1,5 +1,6 @@
 from homer.codelets.selectors import ProjectionSelector
 from homer.codelets.suggesters.projection_suggesters import ChunkProjectionSuggester
+from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import uncorrespondedness
 
@@ -21,19 +22,24 @@ class ChunkProjectionSelector(ProjectionSelector):
                 == correspondence.end.parent_space.parent_concept
             }
         ).get()
-        frame = correspondence_from_frame.start.parent_space
-        new_target = frame.contents.where(is_chunk=True).get(key=uncorrespondedness)
-        self.child_codelets.append(
-            ChunkProjectionSuggester.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                {
-                    "target_view": correspondence_from_frame.parent_view,
-                    "target_projectee": new_target,
-                },
-                new_target.unhappiness,
+        frame_output = correspondence_from_frame.start.parent_space
+        try:
+            new_target = frame_output.contents.where(is_chunk=True).get(
+                key=uncorrespondedness, exclude=[correspondence_from_frame.start]
             )
-        )
+            self.child_codelets.append(
+                ChunkProjectionSuggester.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    {
+                        "target_view": correspondence_from_frame.parent_view,
+                        "target_projectee": new_target,
+                    },
+                    new_target.unhappiness,
+                )
+            )
+        except MissingStructureError:
+            pass
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,

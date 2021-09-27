@@ -463,8 +463,37 @@ def test_reverse_simplex_view_processing(
     chunk_projection_1.update_activation()
     assert chunk_projection_1.activation > original_chunk_projection_1_activation
 
+    chunk_projection_suggester_2 = None
+    for child_codelet in chunk_projection_selector_1.child_codelets:
+        if isinstance(child_codelet, ChunkProjectionSuggester):
+            chunk_projection_suggester_2 = child_codelet
+    chunk_projection_suggester_2.run()
+    assert CodeletResult.SUCCESS == chunk_projection_suggester_2.result
 
-#    chunk_projection_suggester_2 = ChunkProjectionSuggester()
+    chunk_projection_builder_2 = chunk_projection_suggester_2.child_codelets[0]
+    assert isinstance(chunk_projection_builder_2, ChunkProjectionBuilder)
+    chunk_projection_builder_2.run()
+    assert CodeletResult.SUCCESS == chunk_projection_builder_2.result
+    chunk_projection_2 = chunk_projection_builder_2.child_structures.where(
+        is_chunk=True
+    ).get()
+    original_chunk_projection_2_quality = chunk_projection_2.quality
+    original_chunk_projection_2_activation = chunk_projection_2.activation
+
+    chunk_projection_evaluator_2 = chunk_projection_builder_2.child_codelets[0]
+    assert isinstance(chunk_projection_evaluator_2, ChunkProjectionEvaluator)
+    chunk_projection_evaluator_2.run()
+    assert CodeletResult.SUCCESS == chunk_projection_evaluator_2.result
+    assert chunk_projection_2.quality > original_chunk_projection_2_quality
+
+    chunk_projection_selector_2 = chunk_projection_evaluator_2.child_codelets[0]
+    assert isinstance(chunk_projection_selector_2, ChunkProjectionSelector)
+    chunk_projection_selector_2.run()
+    assert CodeletResult.SUCCESS == chunk_projection_selector_2.result
+    chunk_projection_2.update_activation()
+    assert chunk_projection_2.activation > original_chunk_projection_2_activation
+
+
 #    label_projection_suggester_1 = LabelProjectionSuggester()
 #    label_projection_suggester_2 = LabelProjectionSuggester()
 #    relation_projection_suggester = RelationProjectionSuggester()
