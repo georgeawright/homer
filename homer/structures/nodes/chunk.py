@@ -134,6 +134,57 @@ class Chunk(Node):
                 return chunk
         return chunks.get(exclude=[self])
 
+    def copy_to_location(
+        self, location: Location, bubble_chamber: "BubbleChamber", parent_id: str = ""
+    ):
+        def copy_recursively(
+            chunk: Chunk,
+            location: Location,
+            bubble_chamber: "BubbleChamber",
+            parent_id: str,
+            copies: dict,
+        ):
+            locations = [
+                location
+                for location in chunk.locations
+                if location.space.is_conceptual_space
+            ] + [location]
+            members = StructureCollection()
+            for member in chunk.members:
+                if member not in copies:
+                    copies[member] = copy_recursively(
+                        member, location, bubble_chamber, parent_id, copies
+                    )
+                members.add(copies[member])
+            new_left_branch = StructureCollection(
+                {copies[member] for member in chunk.left_branch}
+            )
+            new_right_branch = StructureCollection(
+                {copies[member] for member in chunk.right_branch}
+            )
+            chunk_copy = Chunk(
+                structure_id=ID.new(Chunk),
+                parent_id=parent_id,
+                locations=locations,
+                members=members,
+                parent_space=location.space,
+                quality=chunk.quality,
+                left_branch=new_left_branch,
+                right_branch=new_right_branch,
+                rule=chunk.rule,
+                is_raw=chunk.is_raw,
+            )
+            location.space.contents.add(chunk_copy)
+            bubble_chamber.chunks.add(chunk_copy)
+            bubble_chamber.logger.log(chunk_copy)
+            for member in chunk_copy.members:
+                member.super_chunks.add(chunk_copy)
+                bubble_chamber.logger.log(member)
+            return chunk_copy
+
+        return copy_recursively(self, location, bubble_chamber, parent_id, {})
+
+    # TODO: get rid of
     def copy_with_contents(
         self,
         copies: dict,

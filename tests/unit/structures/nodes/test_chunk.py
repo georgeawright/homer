@@ -39,3 +39,52 @@ def test_location_in_space():
     )
     assert chunk.location_in_space(space_1) == space_1_location
     assert chunk.location_in_space(space_2) == space_2_location
+
+
+def test_copy_to_location():
+    parent_space = Mock()
+    parent_space.is_conceptual_space = False
+    conceptual_space = Mock()
+    conceptual_space.is_conceptual_space = True
+
+    contextual_location = Location([], parent_space)
+
+    left_conceptual_location = Location([[1]], conceptual_space)
+    left_locations = [contextual_location, left_conceptual_location]
+    left_chunk = Chunk("", "", left_locations, StructureCollection(), parent_space, 1)
+
+    right_conceptual_location = Location([[2]], conceptual_space)
+    right_locations = [contextual_location, right_conceptual_location]
+    right_chunk = Chunk("", "", right_locations, StructureCollection(), parent_space, 1)
+
+    root_conceptual_location = Location([[1], [2]], conceptual_space)
+    root_locations = [contextual_location, root_conceptual_location]
+    root_chunk = Chunk(
+        "",
+        "",
+        root_locations,
+        StructureCollection({left_chunk, right_chunk}),
+        parent_space,
+        1,
+        left_branch=StructureCollection({left_chunk}),
+        right_branch=StructureCollection({right_chunk}),
+        rule=Mock(),
+    )
+
+    left_chunk.super_chunks.add(root_chunk)
+    right_chunk.super_chunks.add(root_chunk)
+
+    bubble_chamber = Mock()
+    bubble_chamber.chunks = StructureCollection()
+
+    new_space = Mock()
+    new_space.contents = StructureCollection()
+    new_location = Location([], new_space)
+
+    root_copy = root_chunk.copy_to_location(new_location, bubble_chamber, "")
+
+    assert 2 == len(root_copy.members)
+    assert 1 == len(root_copy.left_branch)
+    assert 1 == len(root_copy.right_branch)
+    assert 3 == len(new_space.contents)
+    assert 3 == len(bubble_chamber.chunks)

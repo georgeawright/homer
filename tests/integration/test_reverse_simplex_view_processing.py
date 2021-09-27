@@ -440,6 +440,16 @@ def test_reverse_simplex_view_processing(
     chunk_projection_suggester_1.run()
     assert CodeletResult.SUCCESS == chunk_projection_suggester_1.result
 
+    chunk_projection_builder_1 = chunk_projection_suggester_1.child_codelets[0]
+    assert isinstance(chunk_projection_builder_1, ChunkProjectionBuilder)
+    chunk_projection_builder_1.run()
+    assert CodeletResult.SUCCESS == chunk_projection_builder_1.result
+    chunk_projection_1 = chunk_projection_builder_1.child_structures.where(
+        is_chunk=True
+    ).get()
+    original_chunk_projection_1_quality = chunk_projection_1.quality
+    original_chunk_projection_1_activation = chunk_projection_1.activation
+
 
 #    chunk_projection_suggester_1 = ChunkProjectionSuggester()
 #    chunk_projection_suggester_2 = ChunkProjectionSuggester()

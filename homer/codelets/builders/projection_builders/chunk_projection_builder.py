@@ -35,7 +35,7 @@ class ChunkProjectionBuilder(ProjectionBuilder):
             self.target_view.output_space,
         )
         chunk = self.target_projectee.copy_to_location(
-            output_location, parent_id=self.codelet_id
+            output_location, self.bubble_chamber, parent_id=self.codelet_id
         )
         self.target_view.output_space.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
