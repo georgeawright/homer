@@ -32,7 +32,7 @@ class RelationProjectionBuilder(ProjectionBuilder):
         conceptual_location = self.target_projectee.location_in_space(
             parent_concept.parent_space
         )
-        output_location = self.frame_correspondee.location_in_space(
+        output_location = corresponding_start.location_in_space(
             self.target_view.output_space
         )
         locations = [conceptual_location, output_location]

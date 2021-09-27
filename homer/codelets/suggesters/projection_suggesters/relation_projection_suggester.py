@@ -44,7 +44,7 @@ class RelationProjectionSuggester(ProjectionSuggester):
         return self.target_projectee.start.has_correspondence_to_space(
             self.target_view.output_space
         ) and self.target_projectee.end.has_correspondence_to_space(
-            self.target_view.ouptut_space
+            self.target_view.output_space
         )
 
     @property

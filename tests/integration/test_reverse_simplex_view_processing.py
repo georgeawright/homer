@@ -553,6 +553,39 @@ def test_reverse_simplex_view_processing(
     label_projection_2.update_activation()
     assert label_projection_2.activation > original_label_projection_2_activation
 
+    target_relation = view_frame_output.contents.where(is_relation=True).get()
+    relation_projection_suggester_1 = RelationProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": target_relation},
+        1.0,
+    )
+    relation_projection_suggester_1.run()
+    assert CodeletResult.SUCCESS == relation_projection_suggester_1.result
+
+    relation_projection_builder_1 = relation_projection_suggester_1.child_codelets[0]
+    assert isinstance(relation_projection_builder_1, RelationProjectionBuilder)
+    relation_projection_builder_1.run()
+    assert CodeletResult.SUCCESS == relation_projection_builder_1.result
+    relation_projection_1 = relation_projection_builder_1.child_structures.where(
+        is_relation=True
+    ).get()
+    original_relation_projection_1_quality = relation_projection_1.quality
+    original_relation_projection_1_activation = relation_projection_1.activation
+
+    relation_projection_evaluator_1 = relation_projection_builder_1.child_codelets[0]
+    assert isinstance(relation_projection_evaluator_1, RelationProjectionEvaluator)
+    relation_projection_evaluator_1.run()
+    assert CodeletResult.SUCCESS == relation_projection_evaluator_1.result
+    assert relation_projection_1.quality > original_relation_projection_1_quality
+
+    relation_projection_selector_1 = relation_projection_evaluator_1.child_codelets[0]
+    assert isinstance(relation_projection_selector_1, RelationProjectionSelector)
+    relation_projection_selector_1.run()
+    assert CodeletResult.SUCCESS == relation_projection_selector_1.result
+    relation_projection_1.update_activation()
+    assert relation_projection_1.activation > original_relation_projection_1_activation
+
 
 #    relation_projection_suggester = RelationProjectionSuggester()
 

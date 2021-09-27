@@ -28,6 +28,9 @@ def bubble_chamber():
     label_concept = Concept(
         "", "", "label", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
+    relation_concept = Concept(
+        "", "", "relation", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+    )
     view_simplex_concept = Concept(
         "", "", "view-simplex", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
@@ -49,6 +52,7 @@ def bubble_chamber():
     chamber.concepts.add(chunk_concept)
     chamber.concepts.add(correspondence_concept)
     chamber.concepts.add(label_concept)
+    chamber.concepts.add(relation_concept)
     chamber.concepts.add(view_simplex_concept)
     chamber.concepts.add(word_concept)
     chamber.concepts.add(suggest_concept)
@@ -115,6 +119,26 @@ def bubble_chamber():
     )
     label_concept.links_out.add(label_select_link)
     select_concept.links_in.add(label_select_link)
+    relation_suggest_link = Relation(
+        "", "", relation_concept, suggest_concept, Mock(), None, Mock()
+    )
+    relation_concept.links_out.add(relation_suggest_link)
+    suggest_concept.links_in.add(relation_suggest_link)
+    relation_build_link = Relation(
+        "", "", relation_concept, build_concept, Mock(), None, Mock()
+    )
+    relation_concept.links_out.add(relation_build_link)
+    build_concept.links_in.add(relation_build_link)
+    relation_evaluate_link = Relation(
+        "", "", relation_concept, evaluate_concept, Mock(), None, Mock()
+    )
+    relation_concept.links_out.add(relation_evaluate_link)
+    evaluate_concept.links_in.add(relation_evaluate_link)
+    relation_select_link = Relation(
+        "", "", relation_concept, select_concept, Mock(), None, Mock()
+    )
+    relation_concept.links_out.add(relation_select_link)
+    select_concept.links_in.add(relation_select_link)
     view_simplex_suggest_link = Relation(
         "", "", view_simplex_concept, suggest_concept, Mock(), None, Mock()
     )
