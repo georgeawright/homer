@@ -43,7 +43,7 @@ class LabelProjectionBuilder(ProjectionBuilder):
         corresponding_start.links_out.add(label)
         self.bubble_chamber.labels.add(label)
         self.bubble_chamber.logger.log(label)
-        for location in locations:
+        for location in [output_location, conceptual_location]:
             location.space.add(label)
             self.bubble_chamber.logger.log(location.space)
         frame_to_output_correspondence = Correspondence(

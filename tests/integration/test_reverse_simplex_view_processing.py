@@ -447,6 +447,7 @@ def test_reverse_simplex_view_processing(
     chunk_projection_1 = chunk_projection_builder_1.child_structures.where(
         is_chunk=True
     ).get()
+    assert chunk_projection_1 in view.output_space.contents
     original_chunk_projection_1_quality = chunk_projection_1.quality
     original_chunk_projection_1_activation = chunk_projection_1.activation
 
@@ -477,6 +478,7 @@ def test_reverse_simplex_view_processing(
     chunk_projection_2 = chunk_projection_builder_2.child_structures.where(
         is_chunk=True
     ).get()
+    assert chunk_projection_2 in view.output_space.contents
     original_chunk_projection_2_quality = chunk_projection_2.quality
     original_chunk_projection_2_activation = chunk_projection_2.activation
 
@@ -507,6 +509,7 @@ def test_reverse_simplex_view_processing(
     label_projection_1 = label_projection_builder_1.child_structures.where(
         is_label=True
     ).get()
+    assert label_projection_1 in view.output_space.contents
     original_label_projection_1_quality = label_projection_1.quality
     original_label_projection_1_activation = label_projection_1.activation
 
@@ -537,6 +540,7 @@ def test_reverse_simplex_view_processing(
     label_projection_2 = label_projection_builder_2.child_structures.where(
         is_label=True
     ).get()
+    assert label_projection_2 in view.output_space.contents
     original_label_projection_2_quality = label_projection_2.quality
     original_label_projection_2_activation = label_projection_2.activation
 
@@ -570,6 +574,7 @@ def test_reverse_simplex_view_processing(
     relation_projection_1 = relation_projection_builder_1.child_structures.where(
         is_relation=True
     ).get()
+    assert relation_projection_1 in view.output_space.contents
     original_relation_projection_1_quality = relation_projection_1.quality
     original_relation_projection_1_activation = relation_projection_1.activation
 

@@ -49,7 +49,7 @@ class RelationProjectionBuilder(ProjectionBuilder):
         corresponding_end.links_in.add(relation)
         self.bubble_chamber.relations.add(relation)
         self.bubble_chamber.logger.log(relation)
-        for location in locations:
+        for location in [output_location, conceptual_location]:
             location.space.add(relation)
             self.bubble_chamber.logger.log(location.space)
         frame_to_output_correspondence = Correspondence(
