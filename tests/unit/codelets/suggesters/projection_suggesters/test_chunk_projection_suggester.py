@@ -23,41 +23,12 @@ def target_view():
 @pytest.fixture
 def target_projectee(target_view):
     chunk = Mock()
-    frame_correspondee = Mock()
-    frame_correspondee.structure_id = "frame_correspondee"
-    frame_correspondence = Mock()
-    frame_correspondence.start = frame_correspondee
-    frame_correspondence.end = chunk
-    chunk.correspondences = StructureCollection({frame_correspondence})
-    non_frame_correspondee = Mock()
-    non_frame_correspondence = Mock()
-    non_frame_correspondence.start = non_frame_correspondee
-    non_frame_correspondence.end = frame_correspondee
-    frame_correspondee.correspondences = StructureCollection({non_frame_correspondence})
-    target_view.members = StructureCollection(
-        {frame_correspondence, non_frame_correspondence}
-    )
-    target_view.slot_values[frame_correspondee.structure_id] = Mock()
     return chunk
 
 
-def test_gives_suggests_projection_from_slot(
+def test_gives_full_confidence_to_project_chunk(
     bubble_chamber, target_view, target_projectee
 ):
-    target_structures = {
-        "target_view": target_view,
-        "target_projectee": target_projectee,
-    }
-    suggester = ChunkProjectionSuggester("", "", bubble_chamber, target_structures, 1.0)
-    suggester.run()
-    assert CodeletResult.SUCCESS == suggester.result
-
-
-def test_gives_full_confidence_to_project_non_slot(
-    bubble_chamber, target_view, target_projectee
-):
-    target_projectee.correspondences = StructureCollection()
-    target_projectee.is_slot = False
     target_projectee.has_correspondence_to_space.return_value = False
     target_structures = {
         "target_view": target_view,
@@ -72,7 +43,7 @@ def test_gives_full_confidence_to_project_non_slot(
 def test_fizzles_if_chunk_projection_exists(
     bubble_chamber, target_view, target_projectee
 ):
-    target_view.slot_values[target_projectee.structure_id] = Mock()
+    target_projectee.has_correspondence_to_space.return_value = True
     target_structures = {
         "target_view": target_view,
         "target_projectee": target_projectee,

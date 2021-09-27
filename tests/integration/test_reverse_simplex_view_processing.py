@@ -3,16 +3,32 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder
-from homer.codelets.builders.projection_builders import WordProjectionBuilder
+from homer.codelets.builders.projection_builders import (
+    ChunkProjectionBuilder,
+    LabelProjectionBuilder,
+    RelationProjectionBuilder,
+)
 from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators import CorrespondenceEvaluator
-from homer.codelets.evaluators.projection_evaluators import WordProjectionEvaluator
+from homer.codelets.evaluators.projection_evaluators import (
+    ChunkProjectionEvaluator,
+    LabelProjectionEvaluator,
+    RelationProjectionEvaluator,
+)
 from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.codelets.selectors import CorrespondenceSelector
-from homer.codelets.selectors.projection_selectors import WordProjectionSelector
+from homer.codelets.selectors.projection_selectors import (
+    ChunkProjectionSelector,
+    LabelProjectionSelector,
+    RelationProjectionSelector,
+)
 from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.codelets.suggesters import CorrespondenceSuggester
-from homer.codelets.suggesters.projection_suggesters import WordProjectionSuggester
+from homer.codelets.suggesters.projection_suggesters import (
+    ChunkProjectionSuggester,
+    LabelProjectionSuggester,
+    RelationProjectionSuggester,
+)
 from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from homer.id import ID
 from homer.location import Location
@@ -262,7 +278,8 @@ def test_reverse_simplex_view_processing(
     assert view.quality == original_view_quality
 
     # build correspondences
-    view_frame_input = view.input_frames.get().input_space
+    view_frame = view.input_frames.get()
+    view_frame_input = view_frame.input_space
     correspondence_suggester_1 = CorrespondenceSuggester.spawn(
         "",
         bubble_chamber,
@@ -415,6 +432,13 @@ def test_reverse_simplex_view_processing(
     view_activation_after_selector_2 = view.activation
 
     # project chunks, labels, relations into output
+    view_frame_output = view_frame.output_space
+    target_chunk = view_frame_output.contents.where(is_chunk=True).get()
+    chunk_projection_suggester_1 = ChunkProjectionSuggester.spawn(
+        "", bubble_chamber, {"target_view": view, "target_projectee": target_chunk}, 1.0
+    )
+    chunk_projection_suggester_1.run()
+    assert CodeletResult.SUCCESS == chunk_projection_suggester_1.result
 
 
 #    chunk_projection_suggester_1 = ChunkProjectionSuggester()

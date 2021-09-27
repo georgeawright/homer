@@ -39,3 +39,17 @@ class ChunkProjectionSuggester(ProjectionSuggester):
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
+
+    def _passes_preliminary_checks(self) -> bool:
+        self.target_view = self._target_structures["target_view"]
+        self.target_projectee = self._target_structures["target_projectee"]
+        self._target_structures["target_correspondence"] = None
+        self._target_structures["frame_correspondee"] = None
+        self._target_structures["non_frame"] = None
+        self._target_structures["non_frame_correspondee"] = None
+        return not self.target_projectee.has_correspondence_to_space(
+            self.target_view.output_space
+        )
+
+    def _calculate_confidence(self):
+        self.confidence = 1.0
