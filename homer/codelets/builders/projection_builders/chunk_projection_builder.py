@@ -18,6 +18,17 @@ class ChunkProjectionBuilder(ProjectionBuilder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
+    def _passes_preliminary_checks(self) -> bool:
+        self.target_view = self._target_structures["target_view"]
+        self.target_projectee = self._target_structures["target_projectee"]
+        self._target_structures["target_correspondence"] = None
+        self._target_structures["frame_correspondee"] = None
+        self._target_structures["non_frame"] = None
+        self._target_structures["non_frame_correspondee"] = None
+        return not self.target_projectee.has_correspondence_to_space(
+            self.target_view.output_space
+        )
+
     def _process_structure(self):
         output_location = Location(
             self.target_projectee.location.coordinates,
@@ -54,32 +65,4 @@ class ChunkProjectionBuilder(ProjectionBuilder):
         chunk.links_out.add(frame_to_output_correspondence)
         for location in frame_to_output_correspondence.locations:
             location.space.add(frame_to_output_correspondence)
-        if self.target_projectee.is_slot:
-            non_frame_to_output_correspondence = Correspondence(
-                ID.new(Correspondence),
-                self.codelet_id,
-                start=self.non_frame_correspondee,
-                end=chunk,
-                locations=[
-                    self.non_frame_correspondee.location_in_space(self.non_frame),
-                    chunk.location,
-                ],
-                parent_concept=self.bubble_chamber.concepts["same"],
-                conceptual_space=self.target_correspondence.conceptual_space,
-                parent_view=self.target_view,
-                quality=0.0,
-            )
-            self.child_structures.add(non_frame_to_output_correspondence)
-            self.bubble_chamber.correspondences.add(non_frame_to_output_correspondence)
-            self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
-            self.target_view.members.add(non_frame_to_output_correspondence)
-            chunk.links_in.add(non_frame_to_output_correspondence)
-            chunk.links_out.add(non_frame_to_output_correspondence)
-            self.non_frame_correspondee.links_in.add(non_frame_to_output_correspondence)
-            self.non_frame_correspondee.links_out.add(
-                non_frame_to_output_correspondence
-            )
-            self.bubble_chamber.logger.log(non_frame_to_output_correspondence)
-            for location in non_frame_to_output_correspondence.locations:
-                location.space.add(non_frame_to_output_correspondence)
         self.bubble_chamber.logger.log(self.target_view)

@@ -34,39 +34,17 @@ def target_projectee(target_view):
     return chunk
 
 
-@pytest.fixture
-def frame_correspondee(target_projectee, target_view):
-    correspondee = Mock()
-    correspondee.structure_id = "frame_correspondee"
-    frame_correspondence = Mock()
-    frame_correspondence.start = correspondee
-    frame_correspondence.end = target_projectee
-    target_projectee.correspondences = StructureCollection({frame_correspondence})
-    non_frame_correspondee = Mock()
-    non_frame_correspondence = Mock()
-    non_frame_correspondence.start = non_frame_correspondee
-    non_frame_correspondence.end = correspondee
-    correspondee.correspondences = StructureCollection(
-        {non_frame_correspondence, frame_correspondence}
-    )
-    target_view.members = StructureCollection(
-        {frame_correspondence, non_frame_correspondence}
-    )
-    target_view.slot_values[correspondee.structure_id] = Mock()
-    return correspondee
-
-
-def test_projects_slot_into_output_space(
-    bubble_chamber, target_view, target_projectee, frame_correspondee
+def test_projects_chunk_into_output_space(
+    bubble_chamber, target_view, target_projectee
 ):
-    target_projectee.is_slot = True
+    target_projectee.has_correspondence_to_space.return_value = False
     target_structures = {
         "target_view": target_view,
         "target_projectee": target_projectee,
-        "target_correspondence": Mock(),
-        "frame_correspondee": frame_correspondee,
-        "non_frame": Mock(),
-        "non_frame_correspondee": Mock(),
+        "target_correspondence": None,
+        "frame_correspondee": None,
+        "non_frame": None,
+        "non_frame_correspondee": None,
     }
     builder = ChunkProjectionBuilder("", "", bubble_chamber, target_structures, 1.0)
     builder.run()
@@ -74,17 +52,16 @@ def test_projects_slot_into_output_space(
 
 
 def test_fizzles_if_chunk_projection_exists(
-    bubble_chamber, target_view, target_projectee, frame_correspondee
+    bubble_chamber, target_view, target_projectee
 ):
-    target_projectee.is_slot = True
-    target_view.slot_values[target_projectee.structure_id] = Mock()
+    target_projectee.has_correspondence_to_space.return_value = True
     target_structures = {
         "target_view": target_view,
         "target_projectee": target_projectee,
-        "target_correspondence": Mock(),
-        "frame_correspondee": frame_correspondee,
-        "non_frame": Mock(),
-        "non_frame_correspondee": Mock(),
+        "target_correspondence": None,
+        "frame_correspondee": None,
+        "non_frame": None,
+        "non_frame_correspondee": None,
     }
     builder = ChunkProjectionBuilder("", "", bubble_chamber, target_structures, 1.0)
     builder.run()
