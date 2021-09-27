@@ -591,22 +591,18 @@ def test_reverse_simplex_view_processing(
     relation_projection_1.update_activation()
     assert relation_projection_1.activation > original_relation_projection_1_activation
 
+    # re-evaluate view
 
-#    relation_projection_suggester = RelationProjectionSuggester()
+    view_evaluator_3 = SimplexViewEvaluator.spawn(
+        "", bubble_chamber, StructureCollection({view}), 1.0
+    )
+    view_evaluator_3.run()
+    assert CodeletResult.SUCCESS == view_evaluator_3.result
+    assert view.quality > view_quality_after_evaluator_2
 
-# re-evaluate view
-
-
-#    view_evaluator_3 = SimplexViewEvaluator.spawn(
-#        "", bubble_chamber, StructureCollection({view}), 1.0
-#    )
-#    view_evaluator_3.run()
-#    assert CodeletResult.SUCCESS == view_evaluator_3.result
-#    assert view.quality > view_quality_after_evaluator_2
-#
-#    view_selector_3 = view_evaluator_3.child_codelets[0]
-#    assert isinstance(view_selector_3, SimplexViewSelector)
-#    view_selector_3.run()
-#    assert CodeletResult.SUCCESS == view_selector_3.result
-#    view.update_activation()
-#    assert view.activation >= view_activation_after_selector_2
+    view_selector_3 = view_evaluator_3.child_codelets[0]
+    assert isinstance(view_selector_3, SimplexViewSelector)
+    view_selector_3.run()
+    assert CodeletResult.SUCCESS == view_selector_3.result
+    view.update_activation()
+    assert view.activation >= view_activation_after_selector_2

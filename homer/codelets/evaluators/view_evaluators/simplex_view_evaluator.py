@@ -38,7 +38,20 @@ class SimplexViewEvaluator(ViewEvaluator):
             if len(target_view.members) > 0
             else 0
         )
+        frame = target_view.input_frames.get()
+        proportion_of_frame_items_projected_into_output_space = sum(
+            1
+            for item in frame.output_space.contents.where(is_correspondence=False)
+            if item.has_correspondence_to_space(target_view.output_space)
+        ) / sum(
+            1 for item in frame.output_space.contents.where(is_correspondence=False)
+        )
         self.confidence = statistics.fmean(
-            [proportion_of_slots_filled, average_correspondence_quality]
+            [
+                proportion_of_slots_filled,
+                average_correspondence_quality,
+                proportion_of_frame_items_projected_into_output_space,
+                target_view.output_space.quality,
+            ]
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
