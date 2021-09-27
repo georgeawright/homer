@@ -35,9 +35,9 @@ class SimplexViewBuilder(ViewBuilder):
             structure_id=ID.new(ContextualSpace),
             parent_id=self.codelet_id,
             name=f"output for {view_id}",
-            parent_concept=self.frame.output_space.parent_concept,
+            parent_concept=frame_instance.output_space.parent_concept,
             contents=StructureCollection(),
-            conceptual_spaces=self.frame.output_space.conceptual_spaces,
+            conceptual_spaces=frame_instance.output_space.conceptual_spaces,
         )
         view = SimplexView(
             structure_id=view_id,

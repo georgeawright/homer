@@ -168,7 +168,7 @@ class Chunk(Node):
                 locations=locations,
                 members=members,
                 parent_space=location.space,
-                quality=chunk.quality,
+                quality=0.0,
                 left_branch=new_left_branch,
                 right_branch=new_right_branch,
                 rule=chunk.rule,
