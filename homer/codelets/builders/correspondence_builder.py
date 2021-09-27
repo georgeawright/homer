@@ -98,10 +98,14 @@ class CorrespondenceBuilder(Builder):
 
     def _process_structure(self):
         self.correspondence.structure_id = ID.new(Correspondence)
-        self.target_view.slot_values[
-            self.correspondence.slot_argument.structure_id
-        ] = self.correspondence.non_slot_argument.parent_concept
+        if self.correspondence.slot_argument.is_word:
+            self.target_view.slot_values[
+                self.correspondence.slot_argument.structure_id
+            ] = self.correspondence.non_slot_argument.lexeme.concepts.get()
         if self.correspondence.slot_argument.is_link:
+            self.target_view.slot_values[
+                self.correspondence.slot_argument.structure_id
+            ] = self.correspondence.non_slot_argument.parent_concept
             self.target_view.slot_values[
                 self.correspondence.slot_argument.start.structure_id
             ] = (

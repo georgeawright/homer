@@ -493,9 +493,67 @@ def test_reverse_simplex_view_processing(
     chunk_projection_2.update_activation()
     assert chunk_projection_2.activation > original_chunk_projection_2_activation
 
+    target_label = view_frame_output.contents.where(is_label=True).get()
+    label_projection_suggester_1 = LabelProjectionSuggester.spawn(
+        "", bubble_chamber, {"target_view": view, "target_projectee": target_label}, 1.0
+    )
+    label_projection_suggester_1.run()
+    assert CodeletResult.SUCCESS == label_projection_suggester_1.result
 
-#    label_projection_suggester_1 = LabelProjectionSuggester()
-#    label_projection_suggester_2 = LabelProjectionSuggester()
+    label_projection_builder_1 = label_projection_suggester_1.child_codelets[0]
+    assert isinstance(label_projection_builder_1, LabelProjectionBuilder)
+    label_projection_builder_1.run()
+    assert CodeletResult.SUCCESS == label_projection_builder_1.result
+    label_projection_1 = label_projection_builder_1.child_structures.where(
+        is_label=True
+    ).get()
+    original_label_projection_1_quality = label_projection_1.quality
+    original_label_projection_1_activation = label_projection_1.activation
+
+    label_projection_evaluator_1 = label_projection_builder_1.child_codelets[0]
+    assert isinstance(label_projection_evaluator_1, LabelProjectionEvaluator)
+    label_projection_evaluator_1.run()
+    assert CodeletResult.SUCCESS == label_projection_evaluator_1.result
+    assert label_projection_1.quality > original_label_projection_1_quality
+
+    label_projection_selector_1 = label_projection_evaluator_1.child_codelets[0]
+    assert isinstance(label_projection_selector_1, LabelProjectionSelector)
+    label_projection_selector_1.run()
+    assert CodeletResult.SUCCESS == label_projection_selector_1.result
+    label_projection_1.update_activation()
+    assert label_projection_1.activation > original_label_projection_1_activation
+
+    label_projection_suggester_2 = None
+    for child_codelet in label_projection_selector_1.child_codelets:
+        if isinstance(child_codelet, LabelProjectionSuggester):
+            label_projection_suggester_2 = child_codelet
+    label_projection_suggester_2.run()
+    assert CodeletResult.SUCCESS == label_projection_suggester_2.result
+
+    label_projection_builder_2 = label_projection_suggester_2.child_codelets[0]
+    assert isinstance(label_projection_builder_2, LabelProjectionBuilder)
+    label_projection_builder_2.run()
+    assert CodeletResult.SUCCESS == label_projection_builder_2.result
+    label_projection_2 = label_projection_builder_2.child_structures.where(
+        is_label=True
+    ).get()
+    original_label_projection_2_quality = label_projection_2.quality
+    original_label_projection_2_activation = label_projection_2.activation
+
+    label_projection_evaluator_2 = label_projection_builder_2.child_codelets[0]
+    assert isinstance(label_projection_evaluator_2, LabelProjectionEvaluator)
+    label_projection_evaluator_2.run()
+    assert CodeletResult.SUCCESS == label_projection_evaluator_2.result
+    assert label_projection_2.quality > original_label_projection_2_quality
+
+    label_projection_selector_2 = label_projection_evaluator_2.child_codelets[0]
+    assert isinstance(label_projection_selector_2, LabelProjectionSelector)
+    label_projection_selector_2.run()
+    assert CodeletResult.SUCCESS == label_projection_selector_2.result
+    label_projection_2.update_activation()
+    assert label_projection_2.activation > original_label_projection_2_activation
+
+
 #    relation_projection_suggester = RelationProjectionSuggester()
 
 # re-evaluate view
