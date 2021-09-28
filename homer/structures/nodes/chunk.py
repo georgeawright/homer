@@ -75,10 +75,16 @@ class Chunk(Node):
         return ChunkSelector
 
     @property
-    def size(self):
+    def size(self) -> int:
         return (
             1 if len(self.members) == 0 else sum(member.size for member in self.members)
         )
+
+    @property
+    def raw_members(self) -> StructureCollection:
+        if self.is_raw:
+            return StructureCollection({self})
+        return StructureCollection.union(*[chunk.raw_members for chunk in self.members])
 
     @property
     def unchunkedness(self):

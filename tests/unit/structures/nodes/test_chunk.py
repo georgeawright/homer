@@ -41,6 +41,38 @@ def test_location_in_space():
     assert chunk.location_in_space(space_2) == space_2_location
 
 
+def test_raw_members():
+    raw_chunk_1 = Chunk("", "", [], StructureCollection(), Mock(), Mock(), is_raw=True)
+    raw_chunk_2 = Chunk("", "", [], StructureCollection(), Mock(), Mock(), is_raw=True)
+    raw_chunk_3 = Chunk("", "", [], StructureCollection(), Mock(), Mock(), is_raw=True)
+    raw_chunk_4 = Chunk("", "", [], StructureCollection(), Mock(), Mock(), is_raw=True)
+
+    left_chunk = Chunk(
+        "", "", [], StructureCollection({raw_chunk_1, raw_chunk_2}), Mock(), Mock()
+    )
+    right_chunk = Chunk(
+        "", "", [], StructureCollection({raw_chunk_3, raw_chunk_4}), Mock(), Mock()
+    )
+    root_chunk = Chunk(
+        "",
+        "",
+        [],
+        StructureCollection({left_chunk, right_chunk}),
+        Mock(),
+        Mock(),
+        left_branch=StructureCollection({left_chunk}),
+        right_branch=StructureCollection({right_chunk}),
+        rule=Mock(),
+    )
+
+    assert StructureCollection({raw_chunk_1, raw_chunk_2}) == left_chunk.raw_members
+    assert StructureCollection({raw_chunk_3, raw_chunk_4}) == right_chunk.raw_members
+    assert (
+        StructureCollection({raw_chunk_1, raw_chunk_2, raw_chunk_3, raw_chunk_4})
+        == root_chunk.raw_members
+    )
+
+
 def test_copy_to_location():
     parent_space = Mock()
     parent_space.is_conceptual_space = False
