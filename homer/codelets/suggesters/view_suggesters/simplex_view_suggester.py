@@ -1,5 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
+from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation
 
 
@@ -25,3 +26,7 @@ class SimplexViewSuggester(ViewSuggester):
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view-simplex"]
+
+    @property
+    def target_structures(self):
+        return StructureCollection({self.frame, self.contextual_space})

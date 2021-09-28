@@ -20,38 +20,33 @@ def bubble_chamber():
         "text": Mock(),
         "interpretation": Mock(),
     }
-    chamber.spaces = {"text": Mock(), "top level working": Mock(), "input": Mock()}
-    text_space = Mock()
-    text_space.contents.is_empty.return_value = False
-    text_space.parent_concept = chamber.concepts["text"]
-    chamber.working_spaces = StructureCollection({text_space})
-    chamber.views = StructureCollection()
+    chamber.monitoring_views = StructureCollection()
     return chamber
 
 
 @pytest.fixture
-def input_space():
+def input_space(bubble_chamber):
+    space = Mock()
+    space.activation = 1.0
+    bubble_chamber.spaces = {"input": space}
+    return space
+
+
+@pytest.fixture
+def interpretation_space():
     space = Mock()
     space.activation = 1.0
     return space
 
 
-@pytest.fixture
-def text_space():
-    space = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-    space.activation = 1.0
-    return space
-
-
-@pytest.mark.skip
 def test_gives_high_confidence_for_highly_activated_spaces(
-    bubble_chamber, input_space, text_space
+    bubble_chamber, input_space, interpretation_space
 ):
     view_suggester = MonitoringViewSuggester(
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection({input_space, text_space}),
+        {"input_spaces": StructureCollection({input_space, interpretation_space})},
         Mock(),
     )
     result = view_suggester.run()
@@ -61,17 +56,16 @@ def test_gives_high_confidence_for_highly_activated_spaces(
     assert isinstance(view_suggester.child_codelets[0], MonitoringViewBuilder)
 
 
-@pytest.mark.skip
 def test_gives_low_confidence_for_low_activated_spaces(
-    bubble_chamber, input_space, text_space
+    bubble_chamber, input_space, interpretation_space
 ):
     input_space.activation = 0.0
-    text_space.activation = 0.0
+    interpretation_space.activation = 0.0
     view_suggester = MonitoringViewSuggester(
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection({input_space, text_space}),
+        {"input_spaces": StructureCollection({input_space, interpretation_space})},
         1.0,
     )
     result = view_suggester.run()

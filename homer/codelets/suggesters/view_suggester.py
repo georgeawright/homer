@@ -6,7 +6,6 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection import StructureCollection
 
 
 class ViewSuggester(Suggester):
@@ -15,16 +14,15 @@ class ViewSuggester(Suggester):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_spaces: StructureCollection,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         Suggester.__init__(
-            self, codelet_id, parent_id, bubble_chamber, target_spaces, urgency
+            self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_spaces = target_spaces
-        self.second_target_view = None
-        self.correspondences = None
-        self.correspondences_to_add = None
+        self._target_structures = target_structures
+        self.input_spaces = None
+        self.output_space = None
         self.frame = None
         self.contextual_space = None
 
@@ -52,10 +50,6 @@ class ViewSuggester(Suggester):
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view"]
-
-    @property
-    def target_structures(self):
-        return self.target_spaces
 
     def _passes_preliminary_checks(self):
         self.frame = self._target_structures["frame"]

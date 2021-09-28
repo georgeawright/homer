@@ -1,3 +1,5 @@
+import statistics
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -19,20 +21,26 @@ class MonitoringViewSuggester(ViewSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        text_space = StructureCollection(
+        interpretation_view = StructureCollection(
             {
-                space
-                for space in bubble_chamber.working_spaces
-                if space.parent_concept == bubble_chamber.concepts["text"]
-                and not space.contents.is_empty()
+                view
+                for view in bubble_chamber.simplex_views
+                if view.output_space.parent_concept == bubble_chamber.concepts["input"]
             }
         ).get(key=activation)
+        text_space = interpretation_view.input_contextual_spaces.get()
+        interpretation_space = interpretation_view.output_space
         input_space = bubble_chamber.spaces["input"]
-        urgency = urgency if urgency is not None else text_space.activation
+        urgency = urgency if urgency is not None else interpretation_view.activation
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            StructureCollection({text_space, input_space}),
+            {
+                "input_spaces": StructureCollection(
+                    {interpretation_space, input_space}
+                ),
+                "output_space": text_space,
+            },
             urgency,
         )
 
@@ -40,15 +48,18 @@ class MonitoringViewSuggester(ViewSuggester):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view-monitoring"]
 
+    @property
+    def target_structures(self):
+        return self.input_spaces
+
     def _passes_preliminary_checks(self):
-        for view in self.bubble_chamber.views:
-            if (
-                StructureCollection.intersection(view.input_spaces, self.target_spaces)
-                == self.target_spaces
-            ):
+        self.input_spaces = self._target_structures["input_spaces"]
+        for view in self.bubble_chamber.monitoring_views:
+            if view.input_spaces == self.input_spaces:
                 return False
-        if self.frame is None:
-            for space in self.target_spaces:
-                if space.is_frame:
-                    self.frame = space
         return True
+
+    def _calculate_confidence(self):
+        self.confidence = statistics.fmean(
+            [space.activation for space in self.input_spaces]
+        )

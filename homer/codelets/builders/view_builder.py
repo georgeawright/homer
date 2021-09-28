@@ -19,11 +19,8 @@ class ViewBuilder(Builder):
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self._target_structures = target_structures
-        self.second_target_view = None
-        self.correspondences = None
-        self.correspondences_to_add = None
-        self.frame = None
-        self.contextual_space = None
+        self._input_spaces = None
+        self._ouptut_space = None
 
     @classmethod
     def spawn(
@@ -46,9 +43,8 @@ class ViewBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view"]
 
-    @property
     def target_structures(self):
-        return self.target_spaces
+        return StructureCollection(self._target_structures)
 
     def _passes_preliminary_checks(self):
         self.frame = self._target_structures["frame"]

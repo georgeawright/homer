@@ -1,4 +1,7 @@
+from typing import List
+
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Space, View
 from homer.structures.spaces import WorkingSpace
@@ -9,6 +12,7 @@ class MonitoringView(View):
         self,
         structure_id: str,
         parent_id: str,
+        locations: List[Location],
         members: StructureCollection,
         input_spaces: StructureCollection,
         output_space: WorkingSpace,
@@ -18,6 +22,7 @@ class MonitoringView(View):
             self,
             structure_id,
             parent_id,
+            locations,
             members,
             input_spaces,
             output_space,
@@ -44,31 +49,12 @@ class MonitoringView(View):
         return MonitoringViewSelector
 
     @property
-    def text_space(self) -> Space:
-        return StructureCollection(
-            {
-                space
-                for space in self.input_spaces
-                if space.parent_concept.name == "text"
-            }
-        ).get()
-
-    @property
-    def interpretation_space(self) -> Space:
-        return StructureCollection(
-            {
-                space
-                for space in self.input_spaces
-                if space.parent_concept.name == "interpretation"
-            }
-        ).get()
-
-    @property
     def raw_input_in_view(self) -> StructureCollection:
         return StructureCollection.union(
             *[
-                correspondence.arguments.where(is_raw=True)
+                argument.raw_members
                 for correspondence in self.members
+                for argument in correspondence.end.arguments
             ]
         )
 
@@ -104,4 +90,3 @@ class MonitoringView(View):
         self._activation_buffer -= self._activation_update_coefficient * amount
         for member in self.members:
             member.decay_activation(amount)
-        self.interpretation_space.decay_activation(amount)

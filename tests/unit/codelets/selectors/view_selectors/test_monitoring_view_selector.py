@@ -12,16 +12,24 @@ from homer.tools import hasinstance
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
-    chamber.concepts = {"view-monitoring": Mock(), "select": Mock(), "text": Mock()}
+    input_concept = Mock()
+    chamber.concepts = {
+        "view-monitoring": Mock(),
+        "select": Mock(),
+        "text": Mock(),
+        "input": input_concept,
+    }
     chamber.spaces = {"input": Mock()}
     text_space = Mock()
     text_space.contents.is_empty.return_value = False
     text_space.parent_concept = chamber.concepts["text"]
     chamber.working_spaces = StructureCollection({text_space})
+    reverse_simplex_view = Mock()
+    reverse_simplex_view.output_space.parent_concept = input_concept
+    chamber.simplex_views = StructureCollection({reverse_simplex_view})
     return chamber
 
 
-@pytest.mark.skip
 def test_finds_challenger_when_not_given_one(bubble_chamber):
     common_members = StructureCollection({Mock(), Mock()})
     champion = Mock()
@@ -43,7 +51,6 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     assert selector.challengers == StructureCollection({challenger})
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "champion_quality, champion_activation, "
     + "challenger_quality, challenger_activation, "
