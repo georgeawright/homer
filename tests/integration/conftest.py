@@ -34,6 +34,18 @@ def bubble_chamber():
     view_simplex_concept = Concept(
         "", "", "view-simplex", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
+    view_monitoring_concept = Concept(
+        "",
+        "",
+        "view-monitoring",
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
     word_concept = Concept(
         "", "", "word", Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
     )
@@ -54,6 +66,7 @@ def bubble_chamber():
     chamber.concepts.add(label_concept)
     chamber.concepts.add(relation_concept)
     chamber.concepts.add(view_simplex_concept)
+    chamber.concepts.add(view_monitoring_concept)
     chamber.concepts.add(word_concept)
     chamber.concepts.add(suggest_concept)
     chamber.concepts.add(build_concept)
@@ -159,6 +172,26 @@ def bubble_chamber():
     )
     view_simplex_concept.links_out.add(view_simplex_select_link)
     select_concept.links_in.add(view_simplex_select_link)
+    view_monitoring_suggest_link = Relation(
+        "", "", view_monitoring_concept, suggest_concept, Mock(), None, Mock()
+    )
+    view_monitoring_concept.links_out.add(view_monitoring_suggest_link)
+    suggest_concept.links_in.add(view_monitoring_suggest_link)
+    view_monitoring_build_link = Relation(
+        "", "", view_monitoring_concept, build_concept, Mock(), None, Mock()
+    )
+    view_monitoring_concept.links_out.add(view_monitoring_build_link)
+    build_concept.links_in.add(view_monitoring_build_link)
+    view_monitoring_evaluate_link = Relation(
+        "", "", view_monitoring_concept, evaluate_concept, Mock(), None, Mock()
+    )
+    view_monitoring_concept.links_out.add(view_monitoring_evaluate_link)
+    evaluate_concept.links_in.add(view_monitoring_evaluate_link)
+    view_monitoring_select_link = Relation(
+        "", "", view_monitoring_concept, select_concept, Mock(), None, Mock()
+    )
+    view_monitoring_concept.links_out.add(view_monitoring_select_link)
+    select_concept.links_in.add(view_monitoring_select_link)
     word_suggest_link = Relation(
         "", "", word_concept, suggest_concept, Mock(), None, Mock()
     )

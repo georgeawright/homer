@@ -251,7 +251,7 @@ def test_reverse_simplex_view_processing(
     text_4 = the_word.copy_to_location(Location([[4]], text_space), quality=1.0)
     text_5 = south_word.copy_to_location(Location([[5]], text_space), quality=1.0)
     text_6 = than_word.copy_to_location(Location([[6]], text_space), quality=1.0)
-    text_7 = the_word.copy_to_location(Location([[7]], frame_output_space), quality=1.0)
+    text_7 = the_word.copy_to_location(Location([[7]], text_space), quality=1.0)
     text_8 = north_word.copy_to_location(Location([[8]], text_space), quality=1.0)
 
     # suggest and build view for input space and frame
