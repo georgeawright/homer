@@ -133,20 +133,22 @@ class CorrespondenceSuggester(Suggester):
         if self.target_space_two is None:
             try:
                 self.target_space_two = self.target_view.input_frames.get(
-                    key=activation, exclude=[self.target_space_one]
+                    key=activation
                 ).input_space
                 self._target_structures["target_space_two"] = self.target_space_two
             except MissingStructureError:
-                return False
+                try:
+                    self.target_space_two = self.target_view.input_spaces.get(
+                        key=activation, exclude=[self.target_structure_one]
+                    )
+                    self._target_structures["target_space_two"] = self.target_space_two
+                except MissingStructureError:
+                    return False
         try:
             if self.target_structure_two is None:
-                self.target_structure_two = (
-                    self.target_space_two.contents.of_type(
-                        type(self.target_structure_one)
-                    )
-                    .where(is_slot=True)
-                    .get(key=lambda x: x.similarity_with(self.target_structure_one))
-                )
+                self.target_structure_two = self.target_space_two.contents.of_type(
+                    type(self.target_structure_one)
+                ).get(key=lambda x: x.similarity_with(self.target_structure_one))
                 self._target_structures[
                     "target_structure_two"
                 ] = self.target_structure_two

@@ -5,12 +5,13 @@ from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import ProximityClassifier, SamenessClassifier
+from homer.id import ID
 from homer.location import Location
 from homer.locations import TwoPointLocation
 from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence, Relation
-from homer.structures.nodes import Concept, Lexeme, Rule, Word
-from homer.structures.spaces import ConceptualSpace, ContextualSpace
+from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Chunk, Concept, Lexeme, Rule, Word
+from homer.structures.spaces import ConceptualSpace, ContextualSpace, Frame
 from homer.tools import add_vectors, centroid_euclidean_distance
 from homer.word_form import WordForm
 
@@ -1009,3 +1010,188 @@ def hotter_concept(bubble_chamber, temperature_space):
     temperature_space.add(concept)
     bubble_chamber.concepts.add(concept)
     return concept
+
+
+@pytest.fixture(scope="module")
+def comparison_frame(
+    bubble_chamber,
+    input_concept,
+    location_space,
+    temperature_space,
+    grammar_space,
+    it_word,
+    is_word,
+    in_word,
+    the_word,
+    than_word,
+    hotter_word,
+    south_word,
+):
+    frame_input_space = ContextualSpace(
+        "",
+        "",
+        "",
+        input_concept,
+        StructureCollection(),
+        [location_space, temperature_space],
+    )
+    chunk_one = Chunk(
+        ID.new(Chunk),
+        "",
+        [
+            Location([[]], frame_input_space),
+            Location([[None, None]], location_space),
+            Location([[None]], temperature_space),
+        ],
+        StructureCollection(),
+        frame_input_space,
+        1.0,
+    )
+    frame_input_space.add(chunk_one)
+    chunk_two = Chunk(
+        ID.new(Chunk),
+        "",
+        [
+            Location([[]], frame_input_space),
+            Location([[None, None]], location_space),
+            Location([[None]], temperature_space),
+        ],
+        StructureCollection(),
+        frame_input_space,
+        1.0,
+    )
+    frame_input_space.add(chunk_two)
+    label_one = Label(
+        ID.new(Label),
+        "",
+        chunk_one,
+        None,
+        [Location([[]], frame_input_space), Location([[None, None]], location_space)],
+        1.0,
+    )
+    chunk_one.links_out.add(label_one)
+    label_two = Label(
+        ID.new(Label),
+        "",
+        chunk_two,
+        None,
+        [Location([[]], frame_input_space), Location([[None, None]], location_space)],
+        1.0,
+    )
+    chunk_two.links_out.add(label_two)
+    one_to_two_relation = Relation(
+        ID.new(Relation),
+        "",
+        chunk_one,
+        chunk_two,
+        None,
+        [
+            TwoPointLocation([[]], [[]], frame_input_space),
+            TwoPointLocation([[None]], [[None]], temperature_space),
+        ],
+        1.0,
+    )
+    chunk_one.links_out.add(one_to_two_relation)
+    chunk_two.links_in.add(one_to_two_relation)
+    frame_output_space = ContextualSpace(
+        "", "", "", text_concept, StructureCollection(), [grammar_space]
+    )
+    word_0 = it_word.copy_to_location(Location([[0]], frame_output_space), quality=1.0)
+    word_1 = is_word.copy_to_location(Location([[1]], frame_output_space), quality=1.0)
+    word_2 = Word(
+        ID.new(Word),
+        "",
+        None,
+        None,
+        WordForm.HEADWORD,
+        [
+            Location([[2]], frame_output_space),
+            hotter_word.location_in_space(grammar_space),
+        ],
+        frame_output_space,
+        1.0,
+    )
+    frame_output_space.add(word_2)
+    word_3 = in_word.copy_to_location(Location([[3]], frame_output_space), quality=1.0)
+    word_4 = the_word.copy_to_location(Location([[4]], frame_output_space), quality=1.0)
+    word_5 = Word(
+        ID.new(Word),
+        "",
+        None,
+        None,
+        WordForm.HEADWORD,
+        [
+            Location([[5]], frame_output_space),
+            south_word.location_in_space(grammar_space),
+        ],
+        frame_output_space,
+        1.0,
+    )
+    frame_output_space.add(word_5)
+    word_6 = than_word.copy_to_location(
+        Location([[6]], frame_output_space), quality=1.0
+    )
+    word_7 = the_word.copy_to_location(Location([[7]], frame_output_space), quality=1.0)
+    word_8 = Word(
+        ID.new(Word),
+        "",
+        None,
+        None,
+        WordForm.HEADWORD,
+        [
+            Location([[8]], frame_output_space),
+            south_word.location_in_space(grammar_space),
+        ],
+        frame_output_space,
+        1.0,
+    )
+    frame_output_space.add(word_8)
+    word_2_correspondence = Correspondence(
+        "",
+        "",
+        one_to_two_relation,
+        word_2,
+        [
+            one_to_two_relation.location_in_space(one_to_two_relation.parent_space),
+            word_2.location_in_space(word_2.parent_space),
+        ],
+        same_concept,
+        temperature_space,
+        None,
+        1.0,
+    )
+    word_5_correspondence = Correspondence(
+        "",
+        "",
+        label_one,
+        word_5,
+        [
+            label_one.location_in_space(label_one.parent_space),
+            word_5.location_in_space(word_5.parent_space),
+        ],
+        same_concept,
+        location_space,
+        None,
+        1.0,
+    )
+    word_8_correspondence = Correspondence(
+        "",
+        "",
+        label_two,
+        word_8,
+        [
+            label_two.location_in_space(label_two.parent_space),
+            word_8.location_in_space(word_8.parent_space),
+        ],
+        same_concept,
+        location_space,
+        None,
+        1.0,
+    )
+    frame_contents = StructureCollection(
+        {word_2_correspondence, word_5_correspondence, word_8_correspondence}
+    )
+    frame = Frame(
+        "", "", "", Mock(), frame_contents, frame_input_space, frame_output_space
+    )
+    bubble_chamber.frames.add(frame)

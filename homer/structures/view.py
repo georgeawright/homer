@@ -48,15 +48,11 @@ class View(Structure):
 
     @property
     def input_contextual_spaces(self):
-        return StructureCollection(
-            {space for space in self.input_spaces if not isinstance(space, Frame)}
-        )
+        return self.input_spaces.where(is_contextual_space=True)
 
     @property
     def input_frames(self):
-        return StructureCollection(
-            {space for space in self.input_spaces if isinstance(space, Frame)}
-        )
+        return self.input_spaces.where(is_frame=True)
 
     @property
     def size(self):

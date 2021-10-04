@@ -2,9 +2,13 @@ from unittest.mock import Mock
 
 from homer.id import ID
 from homer.codelet_result import CodeletResult
+from homer.codelets.builders import CorrespondenceBuilder
 from homer.codelets.builders.view_builders import MonitoringViewBuilder
+from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
+from homer.codelets.selectors import CorrespondenceSelector
 from homer.codelets.selectors.view_selectors import MonitoringViewSelector
+from homer.codelets.suggesters import CorrespondenceSuggester
 from homer.codelets.suggesters.view_suggesters import MonitoringViewSuggester
 from homer.location import Location
 from homer.locations import TwoPointLocation
@@ -23,6 +27,7 @@ def test_monitoring_view_processing(
     location_space,
     temperature_space,
     grammar_space,
+    comparison_frame,
     north_concept,
     south_concept,
     cold_concept,
@@ -308,13 +313,12 @@ def test_monitoring_view_processing(
     interpretation_space.add(interpretation_temperature_relation)
     temperature_space.add(interpretation_temperature_relation)
 
-    frame = Mock()
     reverse_simplex_view = SimplexView(
         "",
         "",
         [],
         StructureCollection(),
-        StructureCollection({text_space, frame}),
+        StructureCollection({text_space, comparison_frame}),
         interpretation_space,
         1.0,
     )
@@ -392,5 +396,21 @@ def test_monitoring_view_processing(
     assert view.activation == original_view_activation
 
     # add correspondences between interpretation and input
+    correspondence_suggester_1 = CorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view,
+            "target_space_one": interpretation_space,
+            "target_structure_one": interpretation_temperature_relation,
+            "target_space_two": None,
+            "target_structure_two": None,
+            "target_conceptual_space": None,
+            "parent_concept": None,
+        },
+        1.0,
+    )
+    correspondence_suggester_1.run()
+    assert CodeletResult.SUCCESS == correspondence_suggester_1.result
 
     # re-evaluate and re-select monitoring view
