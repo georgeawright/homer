@@ -13,8 +13,9 @@ from homer.structures.nodes import Chunk
     [
         (0, 1, 20, 20, 1, 1),
         (1, 0, 20, 0, 0, 0),
-        (1, 0, 20, 20, 0.5, 0.5),
-        (1, 1, 20, 10, 0.75, 0.75),
+        (1, 0, 20, 20, 0.5, 0.25),
+        (1, 1, 20, 10, 0.75, 0.5625),
+        (1, 1, 20, 20, 0, 0),
     ],
 )
 def test_changes_target_structure_quality(
@@ -38,6 +39,7 @@ def test_changes_target_structure_quality(
     for i in range(input_size):
         chunk = Mock()
         chunk.raw_members = StructureCollection({chunk})
+        chunk.is_raw = True
         input_space.contents.add(chunk)
         raw_chunks.append(chunk)
 
