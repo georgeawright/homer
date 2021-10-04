@@ -58,6 +58,7 @@ def test_monitoring_view_processing(
         StructureCollection(),
         input_space,
         0,
+        is_raw=True,
     )
     input_space.add(raw_chunk_1)
     location_space.add(raw_chunk_1)
@@ -73,6 +74,7 @@ def test_monitoring_view_processing(
         StructureCollection(),
         input_space,
         0,
+        is_raw=True,
     )
     input_space.add(raw_chunk_2)
     location_space.add(raw_chunk_2)
@@ -88,6 +90,7 @@ def test_monitoring_view_processing(
         StructureCollection(),
         input_space,
         0,
+        is_raw=True,
     )
     input_space.add(raw_chunk_3)
     location_space.add(raw_chunk_3)
@@ -103,6 +106,7 @@ def test_monitoring_view_processing(
         StructureCollection(),
         input_space,
         0,
+        is_raw=True,
     )
     input_space.add(raw_chunk_4)
     location_space.add(raw_chunk_4)

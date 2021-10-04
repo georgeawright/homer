@@ -1,5 +1,6 @@
 import statistics
 
+from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluators import ViewEvaluator
 from homer.structure_collection import StructureCollection
@@ -32,7 +33,7 @@ class MonitoringViewEvaluator(ViewEvaluator):
         target_view = self.target_structures.get()
         original_input_space = self.bubble_chamber.spaces["input"]
         size_of_input_space = sum(
-            1 for chunk in original_input_space.contents if chunk.is_raw
+            1 for chunk in original_input_space.contents.where(is_raw=True)
         ) * len(original_input_space.conceptual_spaces)
         raw_inputs_in_interpretation = {
             space: set() for space in original_input_space.conceptual_spaces
@@ -56,11 +57,13 @@ class MonitoringViewEvaluator(ViewEvaluator):
             else 0
         )
         # should take into account no of interpretations of text
-        self.confidence = statistics.fmean(
-            [
-                proportion_of_raw_inputs_in_interpretation,
-                average_correspondence_quality,
-                target_view.output_space.quality,
-            ]
+        self.confidence = fuzzy.AND(
+            statistics.fmean(
+                [
+                    proportion_of_raw_inputs_in_interpretation,
+                    average_correspondence_quality,
+                ]
+            ),
+            target_view.output_space.quality,
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
