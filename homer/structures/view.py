@@ -47,7 +47,7 @@ class View(Structure):
         ).get()
 
     @property
-    def input_working_spaces(self):
+    def input_contextual_spaces(self):
         return StructureCollection(
             {space for space in self.input_spaces if not isinstance(space, Frame)}
         )

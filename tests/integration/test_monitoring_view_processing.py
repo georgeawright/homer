@@ -314,10 +314,11 @@ def test_monitoring_view_processing(
         "",
         [],
         StructureCollection(),
-        StructureCollection({interpretation_space, frame}),
-        text_space,
+        StructureCollection({text_space, frame}),
+        interpretation_space,
         1.0,
     )
+    bubble_chamber.views.add(reverse_simplex_view)
 
     location_1_correspondence = Correspondence(
         "",

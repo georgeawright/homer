@@ -218,7 +218,7 @@ def bubble_chamber():
 
 
 @pytest.fixture(scope="module")
-def input_concept():
+def input_concept(bubble_chamber):
     concept = Concept(
         "",
         "",
@@ -231,6 +231,7 @@ def input_concept():
         Mock(),
         Mock(),
     )
+    bubble_chamber.concepts.add(concept)
     return concept
 
 
