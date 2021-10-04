@@ -383,6 +383,13 @@ def test_monitoring_view_processing(
     assert CodeletResult.SUCCESS == view_evaluator.result
     assert view.quality == original_view_quality
 
+    view_selector = view_evaluator.child_codelets[0]
+    assert isinstance(view_selector, MonitoringViewSelector)
+    view_selector.run()
+    assert CodeletResult.SUCCESS == view_selector.result
+    view.update_activation()
+    assert view.activation == original_view_activation
+
     # add correspondences between interpretation and input
 
     # re-evaluate and re-select monitoring view
