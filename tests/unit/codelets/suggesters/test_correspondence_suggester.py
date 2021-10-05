@@ -31,6 +31,7 @@ def same_different_space(same_concept):
 def conceptual_space():
     space = Mock()
     space.is_conceptual_space = True
+    space.is_basic_level = True
     return space
 
 
