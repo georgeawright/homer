@@ -504,3 +504,39 @@ def test_monitoring_view_processing(
     assert CodeletResult.SUCCESS == view_selector_2.result
     view.update_activation()
     assert view.activation > original_view_activation
+
+    # build another view with different correspondences
+    view_2_suggester = MonitoringViewSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "input_spaces": StructureCollection({interpretation_space, input_space}),
+            "output_space": text_space,
+        },
+        1.0,
+    )
+    view_2_suggester.run()
+    assert CodeletResult.SUCCESS == view_2_suggester.result
+
+    view_2_builder = view_2_suggester.child_codelets[0]
+    assert isinstance(view_2_builder, MonitoringViewBuilder)
+    view_2_builder.run()
+    assert CodeletResult.SUCCESS == view_2_builder.result
+    view_2 = view_2_builder.child_structures.get()
+    original_view_2_quality = view_2.quality
+    original_view_2_activation = view_2.activation
+
+    view_2_evaluator = view_2_builder.child_codelets[0]
+    assert isinstance(view_2_evaluator, MonitoringViewEvaluator)
+    view_2_evaluator.run()
+    assert CodeletResult.SUCCESS == view_2_evaluator.result
+    assert view_2.quality == original_view_2_quality
+
+    view_2_selector = view_2_evaluator.child_codelets[0]
+    assert isinstance(view_2_selector, MonitoringViewSelector)
+    view_2_selector.run()
+    assert CodeletResult.SUCCESS == view_2_selector.result
+    view_2.update_activation()
+    assert view_2.activation == original_view_2_activation
+
+    # re-evaluate views and select new view

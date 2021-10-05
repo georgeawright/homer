@@ -19,9 +19,6 @@ class MonitoringViewBuilder(ViewBuilder):
     def _passes_preliminary_checks(self):
         self.input_spaces = self._target_structures["input_spaces"]
         self.output_space = self._target_structures["output_space"]
-        for view in self.bubble_chamber.monitoring_views:
-            if view.input_spaces == self.input_spaces:
-                return False
         return True
 
     def _process_structure(self):

@@ -54,9 +54,6 @@ class MonitoringViewSuggester(ViewSuggester):
 
     def _passes_preliminary_checks(self):
         self.input_spaces = self._target_structures["input_spaces"]
-        for view in self.bubble_chamber.monitoring_views:
-            if view.input_spaces == self.input_spaces:
-                return False
         return True
 
     def _calculate_confidence(self):
