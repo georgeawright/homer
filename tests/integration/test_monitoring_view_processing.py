@@ -413,4 +413,25 @@ def test_monitoring_view_processing(
     correspondence_suggester_1.run()
     assert CodeletResult.SUCCESS == correspondence_suggester_1.result
 
+    correspondence_builder_1 = correspondence_suggester_1.child_codelets[0]
+    assert isinstance(correspondence_builder_1, CorrespondenceBuilder)
+    correspondence_builder_1.run()
+    assert CodeletResult.SUCCESS == correspondence_builder_1.result
+    correspondence_1 = correspondence_builder_1.child_structures.get()
+    correspondence_1_original_quality = correspondence_1.quality
+    correspondence_1_original_activation = correspondence_1.activation
+
+    correspondence_evaluator_1 = correspondence_builder_1.child_codelets[0]
+    assert isinstance(correspondence_evaluator_1, CorrespondenceEvaluator)
+    correspondence_evaluator_1.run()
+    assert CodeletResult.SUCCESS == correspondence_evaluator_1.result
+    assert correspondence_1.quality > correspondence_1_original_quality
+
+    correspondence_selector_1 = correspondence_evaluator_1.child_codelets[0]
+    assert isinstance(correspondence_selector_1, CorrespondenceSelector)
+    correspondence_selector_1.run()
+    assert CodeletResult.SUCCESS == correspondence_selector_1.result
+    correspondence_1.update_activation()
+    assert correspondence_1.activation > correspondence_1_original_activation
+
     # re-evaluate and re-select monitoring view

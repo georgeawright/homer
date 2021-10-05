@@ -2,6 +2,7 @@ from __future__ import annotations
 import operator
 from typing import List
 
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
@@ -116,7 +117,7 @@ class Correspondence(Link):
             return self.start
         if self.end.is_slot:
             return self.end
-        raise Exception("Correspondence has no slot argument")
+        raise MissingStructureError("Correspondence has no slot argument")
 
     @property
     def non_slot_argument(self):

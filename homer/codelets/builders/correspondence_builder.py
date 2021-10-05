@@ -5,12 +5,8 @@ from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Node, Space, View
-from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
-from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 class CorrespondenceBuilder(Builder):
@@ -98,29 +94,15 @@ class CorrespondenceBuilder(Builder):
 
     def _process_structure(self):
         self.correspondence.structure_id = ID.new(Correspondence)
-        if self.correspondence.slot_argument.is_word:
-            self.target_view.slot_values[
-                self.correspondence.slot_argument.structure_id
-            ] = self.correspondence.non_slot_argument.lexeme.concepts.get()
-        if self.correspondence.slot_argument.is_link:
-            self.target_view.slot_values[
-                self.correspondence.slot_argument.structure_id
-            ] = self.correspondence.non_slot_argument.parent_concept
-            self.target_view.slot_values[
-                self.correspondence.slot_argument.start.structure_id
-            ] = (
-                self.correspondence.non_slot_argument.start.value
-                if self.correspondence.non_slot_argument.is_node
-                else self.correspondence.non_slot_argument.start.parent_concept
-            )
-            if self.correspondence.slot_argument.end is not None:
-                self.target_view.slot_values[
-                    self.correspondence.slot_argument.start.structure_id
-                ] = (
-                    self.correspondence.non_slot_argument.start.value
-                    if self.correspondence.non_slot_argument.is_node
-                    else self.correspondence.non_slot_argument.start.parent_concept
-                )
+        try:
+            if self.correspondence.slot_argument.is_word:
+                self._fill_in_word_slot()
+            if self.correspondence.slot_argument.is_label:
+                self._fill_in_label_slot()
+            if self.correspondence.slot_argument.is_relation:
+                self._fill_in_relation_slot()
+        except MissingStructureError:
+            pass
         self.target_view.members.add(self.correspondence)
         self.target_space_one.add(self.correspondence)
         self.target_space_two.add(self.correspondence)
@@ -131,6 +113,48 @@ class CorrespondenceBuilder(Builder):
         self.bubble_chamber.correspondences.add(self.correspondence)
         self.bubble_chamber.logger.log(self.correspondence)
         self.child_structures = StructureCollection({self.correspondence})
+
+    def _fill_in_word_slot(self):
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.structure_id
+        ] = self.correspondence.non_slot_argument.lexeme.concepts.get()
+
+    def _fill_in_label_slot(self):
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.structure_id
+        ] = self.correspondence.non_slot_argument.parent_concept
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.start.structure_id
+        ] = (
+            self.correspondence.non_slot_argument.start.location_in_space(
+                self.correspondence.conceptual_space
+            )
+            if self.correspondence.non_slot_argument.start.is_node
+            else self.correspondence.non_slot_argument.start.parent_concept
+        )
+
+    def _fill_in_relation_slot(self):
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.structure_id
+        ] = self.correspondence.non_slot_argument.parent_concept
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.start.structure_id
+        ] = (
+            self.correspondence.non_slot_argument.start.location_in_space(
+                self.correspondence.conceptual_space
+            )
+            if self.correspondence.non_slot_argument.start.is_node
+            else self.correspondence.non_slot_argument.start.parent_concept
+        )
+        self.target_view.slot_values[
+            self.correspondence.slot_argument.end.structure_id
+        ] = (
+            self.correspondence.non_slot_argument.end.location_in_space(
+                self.correspondence.conceptual_space
+            )
+            if self.correspondence.non_slot_argument.end.is_node
+            else self.correspondence.non_slot_argument.end.parent_concept
+        )
 
     def _fizzle(self):
         pass
