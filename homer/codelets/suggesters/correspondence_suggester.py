@@ -157,7 +157,7 @@ class CorrespondenceSuggester(Suggester):
         if self.target_conceptual_space is None:
             self.target_conceptual_space = (
                 self.target_structure_one.parent_spaces.where(
-                    is_conceptual_space=True
+                    is_conceptual_space=True, is_basic_level=True
                 ).get()
             )
             self._target_structures[

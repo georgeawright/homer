@@ -434,11 +434,19 @@ def test_monitoring_view_processing(
     correspondence_1.update_activation()
     assert correspondence_1.activation > correspondence_1_original_activation
 
-    selector_children = correspondence_selector_1.child_codelets
-    correspondence_suggester_2 = (
-        selector_children[0]
-        if isinstance(selector_children[0], CorrespondenceSuggester)
-        else selector_children[1]
+    correspondence_suggester_2 = CorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view,
+            "target_space_one": interpretation_space,
+            "target_structure_one": interpretation_location_label_1,
+            "target_space_two": input_space,
+            "target_structure_two": location_label_2,
+            "target_conceptual_space": None,
+            "parent_concept": None,
+        },
+        1.0,
     )
     correspondence_suggester_2.run()
     assert CodeletResult.SUCCESS == correspondence_suggester_2.result
@@ -464,4 +472,35 @@ def test_monitoring_view_processing(
     correspondence_2.update_activation()
     assert correspondence_2.activation > correspondence_2_original_activation
 
+    # suggest an incompatible correspondence
+    correspondence_suggester_3 = CorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view,
+            "target_space_one": interpretation_space,
+            "target_structure_one": interpretation_location_label_1,
+            "target_space_two": input_space,
+            "target_structure_two": location_label_1,
+            "target_conceptual_space": None,
+            "parent_concept": None,
+        },
+        1.0,
+    )
+    correspondence_suggester_3.run()
+    assert CodeletResult.FIZZLE == correspondence_suggester_3.result
+
     # re-evaluate and re-select monitoring view
+    view_evaluator_2 = view_evaluator.spawn(
+        "", bubble_chamber, StructureCollection({view}), 1
+    )
+    view_evaluator_2.run()
+    assert CodeletResult.SUCCESS == view_evaluator_2.result
+    assert view.quality > original_view_quality
+
+    view_selector_2 = view_evaluator_2.child_codelets[0]
+    assert isinstance(view_selector_2, MonitoringViewSelector)
+    view_selector_2.run()
+    assert CodeletResult.SUCCESS == view_selector_2.result
+    view.update_activation()
+    assert view.activation > original_view_activation
