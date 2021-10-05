@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Callable, List
 
 from homer.classifier import Classifier
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 from homer.location import Location
 from homer.structure_collection import StructureCollection
@@ -50,12 +51,16 @@ class Concept(Node):
     def prototype(self) -> list:
         return self.location.coordinates
 
-    def is_compatible_with(self, other: Concept) -> bool:
-        return (
-            self.parent_space == other.parent_space
+    def compatibility_with(self, other: Concept) -> FloatBetweenOneAndZero:
+        if (
+            self == other
             or self.parent_space.parent_concept == other
             or other.parent_space.parent_concept == self
-        )
+        ):
+            return 1.0
+        if self.parent_space == other.parent_space:
+            return self.proximity_to(other)
+        return 0.0
 
     def friends(self, space: Space = None) -> StructureCollection:
         space = self.parent_space if space is None else space
@@ -69,19 +74,19 @@ class Concept(Node):
     def distance_from(self, other: Node):
         return self.distance_function(
             self.location_in_space(self.parent_space).coordinates,
-            other.location_in_conceptual_space(self.parent_space).coordinates,
+            other.location_in_space(self.parent_space).coordinates,
         )
 
     def distance_from_start(self, other: Node, end: Location = None):
         return self.distance_function(
             self.location_in_space(self.parent_space, end=end).start_coordinates,
-            other.location_in_conceptual_space(self.parent_space).coordinates,
+            other.location_in_space(self.parent_space).coordinates,
         )
 
     def distance_from_end(self, other: Node, start: Location = None):
         return self.distance_function(
             self.location_in_space(self.parent_space, start=start).end_coordinates,
-            other.location_in_conceptual_space(self.parent_space).coordinates,
+            other.location_in_space(self.parent_space).coordinates,
         )
 
     def proximity_to(self, other: Node):

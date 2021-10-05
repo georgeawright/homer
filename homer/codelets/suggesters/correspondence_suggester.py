@@ -139,7 +139,7 @@ class CorrespondenceSuggester(Suggester):
             except MissingStructureError:
                 try:
                     self.target_space_two = self.target_view.input_spaces.get(
-                        key=activation, exclude=[self.target_structure_one]
+                        key=activation, exclude=[self.target_space_one]
                     )
                     self._target_structures["target_space_two"] = self.target_space_two
                 except MissingStructureError:

@@ -24,9 +24,10 @@ class SamenessClassifier(Classifier):
             if end.parent_concept is not None
             else end.parent_spaces.where(is_conceptual_space=True).get().parent_concept
         )
-        if start_concept.is_compatible_with(end_concept):
-            return statistics.fmean([start.quality, end.quality])
-        return 0.0
+        return fuzzy.AND(
+            start_concept.compatibility_with(end_concept),
+            statistics.fmean([start.quality, end.quality]),
+        )
 
     def classify_chunk(self, **kwargs: dict) -> FloatBetweenOneAndZero:
         root = kwargs["root"]

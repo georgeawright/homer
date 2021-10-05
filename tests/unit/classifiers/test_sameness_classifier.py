@@ -6,6 +6,7 @@ from homer.classifiers import SamenessClassifier
 
 def test_same_concepts_classified_as_same():
     common_concept = Mock()
+    common_concept.compatibility_with.return_value = 1
     start = Mock()
     start.parent_concept = common_concept
     end = Mock()
@@ -22,13 +23,13 @@ def test_same_concepts_classified_as_same():
 
 def test_compatible_concepts_classified_as_same():
     start_concept = Mock()
+    start_concept.compatibility_with.return_value = 1
     start = Mock()
-    start.parent_concept = Mock()
+    start.parent_concept = start_concept
     end_concept = Mock()
     end = Mock()
     end.parent_concept = None
     end.parent_space.parent_concept = end_concept
-    start_concept.is_compatible_with.return_value = True
     classifier = SamenessClassifier()
     start.quality = 1
     end.quality = 1
@@ -46,7 +47,7 @@ def test_incompatible_concepts_not_classified_as_same():
     end_concept = Mock()
     end = Mock()
     end.parent_concept = end_concept
-    start_concept.is_compatible_with.return_value = False
+    start_concept.compatibility_with.return_value = 0
     classifier = SamenessClassifier()
     start.quality = 1
     end.quality = 1

@@ -37,20 +37,30 @@ class CorrespondenceSelector(Selector):
                 else (
                     winner_correspondence.start.arguments.get()
                     .links.where(is_correspondence=False)
-                    .get(key=corresponding_exigency)
+                    .get(
+                        key=corresponding_exigency,
+                        exclude=[winner_correspondence.start],
+                    )
                 )
             )
             target_space_one = target_structure_one.parent_space
-            target_conceptual_space = target_space_one.conceptual_spaces.get()
+            target_conceptual_space = target_structure_one.parent_spaces.where(
+                is_conceptual_space=True, is_basic_level=True
+            ).get()
             target_space_two = target_view.input_spaces.get(exclude=[target_space_one])
             target_structure_two = (
                 None
                 if winner_correspondence.start.is_node
                 else (
-                    winner_correspondence.end.arguments.get()
-                    .links.of_type(type(target_structure_one))
-                    .where(parent_space=target_space_two)
-                    .get(key=corresponding_exigency)
+                    StructureCollection(
+                        {
+                            structure
+                            for structure in winner_correspondence.end.arguments.get()
+                            .links.of_type(type(target_structure_one))
+                            .where(parent_space=target_space_two)
+                            if structure in target_conceptual_space.contents
+                        }
+                    ).get(key=corresponding_exigency)
                 )
             )
             target_concept = winner_correspondence.parent_concept.friends().get()

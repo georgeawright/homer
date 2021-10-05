@@ -434,4 +434,34 @@ def test_monitoring_view_processing(
     correspondence_1.update_activation()
     assert correspondence_1.activation > correspondence_1_original_activation
 
+    selector_children = correspondence_selector_1.child_codelets
+    correspondence_suggester_2 = (
+        selector_children[0]
+        if isinstance(selector_children[0], CorrespondenceSuggester)
+        else selector_children[1]
+    )
+    correspondence_suggester_2.run()
+    assert CodeletResult.SUCCESS == correspondence_suggester_2.result
+
+    correspondence_builder_2 = correspondence_suggester_2.child_codelets[0]
+    assert isinstance(correspondence_builder_2, CorrespondenceBuilder)
+    correspondence_builder_2.run()
+    assert CodeletResult.SUCCESS == correspondence_builder_2.result
+    correspondence_2 = correspondence_builder_2.child_structures.get()
+    correspondence_2_original_quality = correspondence_2.quality
+    correspondence_2_original_activation = correspondence_2.activation
+
+    correspondence_evaluator_2 = correspondence_builder_2.child_codelets[0]
+    assert isinstance(correspondence_evaluator_2, CorrespondenceEvaluator)
+    correspondence_evaluator_2.run()
+    assert CodeletResult.SUCCESS == correspondence_evaluator_2.result
+    assert correspondence_2.quality > correspondence_2_original_quality
+
+    correspondence_selector_2 = correspondence_evaluator_2.child_codelets[0]
+    assert isinstance(correspondence_selector_2, CorrespondenceSelector)
+    correspondence_selector_2.run()
+    assert CodeletResult.SUCCESS == correspondence_selector_2.result
+    correspondence_2.update_activation()
+    assert correspondence_2.activation > correspondence_2_original_activation
+
     # re-evaluate and re-select monitoring view
