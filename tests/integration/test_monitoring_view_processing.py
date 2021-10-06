@@ -539,4 +539,96 @@ def test_monitoring_view_processing(
     view_2.update_activation()
     assert view_2.activation == original_view_2_activation
 
-    # re-evaluate views and select new view
+    view_2_correspondence_suggester_1 = CorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view_2,
+            "target_space_one": interpretation_space,
+            "target_structure_one": interpretation_temperature_relation,
+            "target_space_two": None,
+            "target_structure_two": None,
+            "target_conceptual_space": None,
+            "parent_concept": None,
+        },
+        1.0,
+    )
+    view_2_correspondence_suggester_1.run()
+    assert CodeletResult.SUCCESS == view_2_correspondence_suggester_1.result
+
+    view_2_correspondence_builder_1 = view_2_correspondence_suggester_1.child_codelets[
+        0
+    ]
+    assert isinstance(view_2_correspondence_builder_1, CorrespondenceBuilder)
+    view_2_correspondence_builder_1.run()
+    assert CodeletResult.SUCCESS == view_2_correspondence_builder_1.result
+    view_2_correspondence_1 = view_2_correspondence_builder_1.child_structures.get()
+    view_2_correspondence_1_original_quality = view_2_correspondence_1.quality
+    view_2_correspondence_1_original_activation = view_2_correspondence_1.activation
+
+    view_2_correspondence_evaluator_1 = view_2_correspondence_builder_1.child_codelets[
+        0
+    ]
+    assert isinstance(view_2_correspondence_evaluator_1, CorrespondenceEvaluator)
+    view_2_correspondence_evaluator_1.run()
+    assert CodeletResult.SUCCESS == view_2_correspondence_evaluator_1.result
+    assert view_2_correspondence_1.quality > view_2_correspondence_1_original_quality
+
+    view_2_correspondence_selector_1 = view_2_correspondence_evaluator_1.child_codelets[
+        0
+    ]
+    assert isinstance(view_2_correspondence_selector_1, CorrespondenceSelector)
+    view_2_correspondence_selector_1.run()
+    assert CodeletResult.SUCCESS == view_2_correspondence_selector_1.result
+    view_2_correspondence_1.update_activation()
+    assert (
+        view_2_correspondence_1.activation > view_2_correspondence_1_original_activation
+    )
+
+    view_2_correspondence_suggester_2 = CorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view_2,
+            "target_space_one": interpretation_space,
+            "target_structure_one": interpretation_location_label_1,
+            "target_space_two": input_space,
+            "target_structure_two": location_label_1,
+            "target_conceptual_space": None,
+            "parent_concept": None,
+        },
+        1.0,
+    )
+    view_2_correspondence_suggester_2.run()
+    assert CodeletResult.SUCCESS == view_2_correspondence_suggester_2.result
+
+    view_2_correspondence_builder_2 = view_2_correspondence_suggester_2.child_codelets[
+        0
+    ]
+    assert isinstance(view_2_correspondence_builder_2, CorrespondenceBuilder)
+    view_2_correspondence_builder_2.run()
+    assert CodeletResult.SUCCESS == view_2_correspondence_builder_2.result
+    view_2_correspondence_2 = view_2_correspondence_builder_2.child_structures.get()
+    view_2_correspondence_2_original_quality = view_2_correspondence_2.quality
+    view_2_correspondence_2_original_activation = view_2_correspondence_2.activation
+
+    view_2_correspondence_evaluator_2 = view_2_correspondence_builder_2.child_codelets[
+        0
+    ]
+    assert isinstance(view_2_correspondence_evaluator_2, CorrespondenceEvaluator)
+    view_2_correspondence_evaluator_2.run()
+    assert CodeletResult.SUCCESS == view_2_correspondence_evaluator_2.result
+    assert view_2_correspondence_2.quality > view_2_correspondence_2_original_quality
+
+    view_2_correspondence_selector_2 = view_2_correspondence_evaluator_2.child_codelets[
+        0
+    ]
+    assert isinstance(view_2_correspondence_selector_2, CorrespondenceSelector)
+    view_2_correspondence_selector_2.run()
+    assert CodeletResult.SUCCESS == view_2_correspondence_selector_2.result
+    view_2_correspondence_2.update_activation()
+    assert (
+        view_2_correspondence_2.activation > view_2_correspondence_2_original_activation
+    )
+
+    # select best correspondences, re-evaluate views, and select new view

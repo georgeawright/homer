@@ -17,46 +17,18 @@ def bubble_chamber():
 
 
 def test_finds_challenger_when_not_given_one(bubble_chamber):
-    space_1 = Mock()
-    space_2 = Mock()
-
-    new_conceptual_space = Mock()
-    new_target_one = Mock()
-    new_target_two = Mock()
-    new_space_one = Mock()
-    new_target_one.parent_space = new_space_one
-    new_space_one.parent_spaces = StructureCollection({space_1})
-    new_space_one.conceptual_space = new_conceptual_space
-    new_space_two = Mock()
-    new_space_two.parent_spaces = StructureCollection({space_2})
-    new_space_two.conceptual_space = new_conceptual_space
-    new_space_two.is_basic_level = True
-    space_2.contents.of_type.return_value = StructureCollection({new_space_two})
-
-    view = Mock()
-    view.input_spaces = StructureCollection({space_1, space_2})
-
-    start_argument = Mock()
-    start_argument.links.where.return_value = StructureCollection({new_target_one})
-    start_argument.parent_space = new_space_one
-
     champion = Mock()
     challenger = Mock()
     champion.size = 1
     champion.quality = 1.0
     champion.activation = 1.0
-    champion.start.arguments.get.return_value = start_argument
-    champion.parent_view = view
 
     challenger.size = 1
     challenger.quality = 1.0
     challenger.activation = 1.0
-    challenger.start.arguments.get.return_value = start_argument
-    challenger.parent_view = view
 
-    champion.start.correspondences_to_space.return_value = StructureCollection(
-        {champion, challenger}
-    )
+    champion.nearby.return_value = StructureCollection({challenger})
+    challenger.nearby.return_value = StructureCollection({champion})
 
     selector = CorrespondenceSelector(
         Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()

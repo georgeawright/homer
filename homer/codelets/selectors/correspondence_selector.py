@@ -14,14 +14,14 @@ class CorrespondenceSelector(Selector):
         if self.challengers is not None:
             return True
         champion_correspondence = self.champions.get()
-        candidates = champion_correspondence.start.correspondences_to_space(
-            champion_correspondence.end.parent_space
-        )
-        if len(candidates) > 1:
+        candidates = champion_correspondence.nearby()
+        try:
             challenger_correspondence = candidates.get(
                 key=activation, exclude=[champion_correspondence]
             )
             self.challengers = StructureCollection({challenger_correspondence})
+        except MissingStructureError:
+            pass
         return True
 
     def _fizzle(self):

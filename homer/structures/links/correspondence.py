@@ -105,10 +105,13 @@ class Correspondence(Link):
     def nearby(self):
         return StructureCollection.difference(
             StructureCollection.union(
-                self.start.correspondences,
-                self.end.correspondences,
+                self.start.correspondences_to_space(self.end.parent_space),
+                self.end.correspondences_to_space(self.start.parent_space),
             ),
-            StructureCollection({self}),
+            StructureCollection.intersection(
+                self.start.correspondences_to_space(self.end.parent_space),
+                self.end.correspondences_to_space(self.start.parent_space),
+            ),
         )
 
     @property

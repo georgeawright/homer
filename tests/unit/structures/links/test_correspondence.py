@@ -1,6 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
+from homer.location import Location
+from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence
 
@@ -59,34 +61,44 @@ def test_copy():
 
 
 def test_nearby():
-    start = Mock()
-    start.correspondences = StructureCollection({Mock()})
-    end = Mock()
-    end.correspondences = StructureCollection({Mock()})
     start_space = Mock()
-    start_space.contents = StructureCollection({Mock()})
-    start_location = Mock()
-    start_location.space = start_space
     end_space = Mock()
-    end_space.contents = StructureCollection({Mock()})
-    end_location = Mock()
-    end_location.space = end_space
-    correspondence = Correspondence(
-        Mock(),
-        Mock(),
-        start,
-        end,
-        [start_location, end_location],
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
+
+    start = Structure("", "", [Location([], start_space)], 1)
+    end = Structure("", "", [Location([], end_space)], 1)
+    other = Structure("", "", [Location([], end_space)], 1)
+
+    start_end_correspondence_1 = Correspondence(
+        "1", "", start, end, [], Mock(), Mock(), Mock(), 1
     )
-    start_space.contents.add(correspondence)
-    end_space.contents.add(correspondence)
-    neighbours = correspondence.nearby()
-    assert 2 == len(neighbours)
-    assert correspondence not in neighbours
+    start.links_out.add(start_end_correspondence_1)
+    start.links_in.add(start_end_correspondence_1)
+    end.links_out.add(start_end_correspondence_1)
+    end.links_in.add(start_end_correspondence_1)
+    start_end_correspondence_2 = Correspondence(
+        "2", "", start, end, [], Mock(), Mock(), Mock(), 1
+    )
+    start.links_out.add(start_end_correspondence_2)
+    start.links_in.add(start_end_correspondence_2)
+    end.links_out.add(start_end_correspondence_2)
+    end.links_in.add(start_end_correspondence_2)
+    start_other_correspondence = Correspondence(
+        "3", "", start, other, [], Mock(), Mock(), Mock(), 1
+    )
+    start.links_out.add(start_other_correspondence)
+    start.links_in.add(start_other_correspondence)
+    other.links_out.add(start_other_correspondence)
+    other.links_in.add(start_other_correspondence)
+
+    assert start_end_correspondence_1.nearby() == StructureCollection(
+        {start_other_correspondence}
+    )
+    assert start_end_correspondence_2.nearby() == StructureCollection(
+        {start_other_correspondence}
+    )
+    assert start_other_correspondence.nearby() == StructureCollection(
+        {start_end_correspondence_1, start_end_correspondence_2}
+    )
 
 
 def test_get_slot_argument_returns_slot():
