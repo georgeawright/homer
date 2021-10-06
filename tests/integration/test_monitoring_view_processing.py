@@ -471,6 +471,7 @@ def test_monitoring_view_processing(
     assert CodeletResult.SUCCESS == correspondence_selector_2.result
     correspondence_2.update_activation()
     assert correspondence_2.activation > correspondence_2_original_activation
+    correspondence_2_activation_after_selection = correspondence_2.activation
 
     # suggest an incompatible correspondence
     correspondence_suggester_3 = CorrespondenceSuggester.spawn(
@@ -630,5 +631,18 @@ def test_monitoring_view_processing(
     assert (
         view_2_correspondence_2.activation > view_2_correspondence_2_original_activation
     )
+    correspondence_2.update_activation()
+    assert correspondence_2.activation < correspondence_2_activation_after_selection
 
-    # select best correspondences, re-evaluate views, and select new view
+    # re-evaluate views
+    view_1_re_evaluator = MonitoringViewEvaluator.spawn(
+        "", bubble_chamber, StructureCollection({view}), 1
+    )
+    view_1_re_evaluator.run()
+
+    view_2_re_evaluator = MonitoringViewEvaluator.spawn(
+        "", bubble_chamber, StructureCollection({view_2}), 1
+    )
+    view_2_re_evaluator.run()
+
+    assert view_2.quality > view.quality
