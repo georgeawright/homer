@@ -70,43 +70,6 @@ class StructureCollection:
     def is_empty(self) -> bool:
         return len(self) == 0
 
-    def at(self, location: Location) -> StructureCollection:
-        return StructureCollection(
-            self.bubble_chamber,
-            [
-                structure
-                for coordinates in location.coordinates
-                for structure in self.structures
-                if coordinates in structure.location.coordinates
-            ],
-        )
-
-    def next_to(self, location: Location) -> StructureCollection:
-        left_most_coordinate = location.coordinates[0][0]
-        right_most_coordinate = location.coordinates[-1][0]
-        return StructureCollection(
-            self.bubble_chamber,
-            [
-                structure
-                for structure in location.space.contents
-                if structure.location_in_space(location.space).coordinates != []
-                and (
-                    structure.location.coordinates[-1][0] == left_most_coordinate - 1
-                    or structure.location.coordinates[0][0] == right_most_coordinate + 1
-                )
-            ],
-        )
-
-    def near(self, location: Location) -> StructureCollection:
-        return StructureCollection(
-            self.bubble_chamber,
-            [
-                structure
-                for structure in self.structures
-                if structure.location_in_space(location.space).is_near(location)
-            ],
-        )
-
     def filter(self, *filters: List[callable]) -> StructureCollection:
         old_collection = self
         for f in filters:
@@ -116,6 +79,31 @@ class StructureCollection:
             )
             old_collection = new_collection
         return new_collection
+
+    def at(self, location: Location) -> StructureCollection:
+        def _at(structure):
+            for coordinates in location.coordinates:
+                if coordinates in structure.location.coordinates:
+                    return True
+            return False
+
+        return self.filter(_at)
+
+    def next_to(self, location: Location) -> StructureCollection:
+        left_most_coordinate = location.coordinates[0][0]
+        right_most_coordinate = location.coordinates[-1][0]
+        return self.filter(
+            lambda x: x.location_in_space(location.space).coordinates != []
+            and (
+                x.location.coordinates[-1][0] == left_most_coordinate - 1
+                or x.location.coordinates[0][0] == right_most_coordinate + 1
+            )
+        )
+
+    def near(self, location: Location) -> StructureCollection:
+        return self.filter(
+            lambda x: x.location_in_space(location.space).is_near(location)
+        )
 
     def where(self, **kwargs) -> StructureCollection:
         old_collection = self

@@ -118,6 +118,74 @@ def test_filter():
     )
 
 
+def test_at():
+    structure_1 = Mock()
+    structure_1.location.coordinates = [[0, 0], [0, 1]]
+    structure_2 = Mock()
+    structure_2.location.coordinates = [[0, 1], [1, 1]]
+
+    collection = StructureCollection(Mock(), [structure_1, structure_2])
+
+    location_0_0 = Mock()
+    location_0_0.coordinates = [[0, 0]]
+    location_0_0_0_1 = Mock()
+    location_0_0_0_1.coordinates = [[0, 0], [0, 1]]
+    location_0_1 = Mock()
+    location_0_1.coordinates = [[0, 1]]
+    location_1_1 = Mock()
+    location_1_1.coordinates = [[1, 1]]
+
+    assert StructureCollection(Mock(), [structure_1]) == collection.at(location_0_0)
+    assert StructureCollection(Mock(), [structure_1, structure_2]) == collection.at(
+        location_0_0_0_1
+    )
+    assert StructureCollection(Mock(), [structure_1, structure_2]) == collection.at(
+        location_0_1
+    )
+    assert StructureCollection(Mock(), [structure_2]) == collection.at(location_1_1)
+
+
+def test_next_to():
+    structure_1 = Mock()
+    structure_1.location.coordinates = [[0]]
+    structure_2 = Mock()
+    structure_2.location.coordinates = [[1]]
+    structure_3 = Mock()
+    structure_3.location.coordinates = [[2]]
+    structure_4 = Mock()
+    structure_4.location.coordinates = [[0], [1]]
+
+    collection = StructureCollection(
+        Mock(), [structure_1, structure_2, structure_3, structure_4]
+    )
+
+    assert StructureCollection(Mock(), [structure_2]) == collection.next_to(
+        structure_1.location
+    )
+    assert StructureCollection(
+        Mock(), [structure_1, structure_3]
+    ) == collection.next_to(structure_2.location)
+    assert StructureCollection(
+        Mock(), [structure_2, structure_4]
+    ) == collection.next_to(structure_3.location)
+
+
+def test_is_near():
+    location_1 = Mock()
+    location_1.is_near.return_value = True
+    structure_1 = Mock()
+    structure_1.location_in_space.return_value = location_1
+
+    location_2 = Mock()
+    location_2.is_near.return_value = False
+    structure_2 = Mock()
+    structure_2.location_in_space.return_value = location_2
+
+    collection = StructureCollection(Mock(), [structure_1, structure_2])
+
+    assert StructureCollection(Mock(), [structure_1]) == collection.near(Mock())
+
+
 def test_where():
     structure_1 = Mock()
     structure_1.attribute = True
