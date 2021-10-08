@@ -4,91 +4,107 @@ from unittest.mock import Mock
 
 from homer.structure_collection import StructureCollection
 
-FLOAT_COMPARISON_TOLERANCE = 1e-3
-
-
-def test_eq():
-    assert StructureCollection(set()) == StructureCollection(set())
-    structure = Mock()
-    assert StructureCollection({structure}) == StructureCollection({structure})
-    assert not StructureCollection(set()) == StructureCollection({structure})
-
-
-def test_ne():
-    structure = Mock()
-    assert StructureCollection(set()) != StructureCollection({structure})
-    assert not StructureCollection(set()) != StructureCollection(set())
-    assert not StructureCollection({structure}) != StructureCollection({structure})
-
-
-def test_get_item():
-    structure_1 = Mock()
-    structure_2 = Mock()
-    structure_2.name = "structure"
-    collection = StructureCollection({structure_1, structure_2})
-    assert structure_2 == collection["structure"]
-
-
-def test_copy():
-    structures = {Mock(), Mock(), Mock()}
-    original_collection = StructureCollection(structures)
-    new_collection = original_collection.copy()
-    assert new_collection.structures == structures
-    assert new_collection == original_collection
-    original_collection.add(Mock())
-    assert new_collection != original_collection
-
-
-def test_is_empty():
-    collection = StructureCollection()
-    assert collection.is_empty()
-    collection.add(Mock())
-    assert not collection.is_empty()
-
-
-def test_add():
-    collection = StructureCollection(set())
-    assert collection.structures == set()
-    structure = Mock()
-    collection.add(structure)
-    assert collection.structures == {structure}
-
-
-def test_remove():
-    structure = Mock()
-    collection = StructureCollection({structure})
-    assert collection.structures == {structure}
-    collection.remove(structure)
-    assert collection.structures == set()
-
 
 def test_union():
     structure_1 = Mock()
     structure_2 = Mock()
-    collection_1 = StructureCollection({structure_1})
-    collection_2 = StructureCollection({structure_2})
+    collection_1 = StructureCollection(Mock(), [structure_1])
+    collection_2 = StructureCollection(Mock(), [structure_2])
     union = StructureCollection.union(collection_1, collection_2)
-    assert union.structures == {structure_1, structure_2}
+    assert union.structures == {structure_1: True, structure_2: True}
 
 
 def test_intersection():
     structure_1 = Mock()
     structure_2 = Mock()
     structure_3 = Mock()
-    collection_1 = StructureCollection({structure_1, structure_2})
-    collection_2 = StructureCollection({structure_2, structure_3})
+    collection_1 = StructureCollection(Mock(), [structure_1, structure_2])
+    collection_2 = StructureCollection(Mock(), [structure_2, structure_3])
     intersection = StructureCollection.intersection(collection_1, collection_2)
-    assert intersection.structures == {structure_2}
+    assert intersection.structures == {structure_2: True}
 
 
 def test_difference():
     structure_1 = Mock()
     structure_2 = Mock()
     structure_3 = Mock()
-    collection_1 = StructureCollection({structure_1, structure_2})
-    collection_2 = StructureCollection({structure_2, structure_3})
+    collection_1 = StructureCollection(Mock(), [structure_1, structure_2])
+    collection_2 = StructureCollection(Mock(), [structure_2, structure_3])
     difference = StructureCollection.difference(collection_1, collection_2)
-    assert difference.structures == {structure_1}
+    assert difference.structures == {structure_1: True}
+
+
+def test_eq_and_ne():
+    structure_1 = Mock()
+    structure_2 = Mock()
+    collection_a = StructureCollection(Mock(), [])
+    collection_b = StructureCollection(Mock(), [])
+    collection_c = StructureCollection(Mock(), [structure_1])
+    collection_d = StructureCollection(Mock(), [structure_1])
+    collection_e = StructureCollection(Mock(), [structure_2])
+    collection_f = StructureCollection(Mock(), [structure_1, structure_2])
+    collection_g = StructureCollection(Mock(), [structure_2, structure_1])
+
+    assert collection_a == collection_b
+    assert collection_c == collection_d
+    assert collection_f == collection_g
+
+    assert not collection_a == collection_c
+    assert not collection_a == collection_f
+    assert not collection_c == collection_e
+    assert not collection_c == collection_f
+
+    assert collection_a != collection_c
+    assert collection_a != collection_f
+    assert collection_c != collection_e
+    assert collection_c != collection_f
+
+    assert not collection_a != collection_b
+    assert not collection_c != collection_d
+    assert not collection_f != collection_g
+
+
+def test_get_item():
+    structure_1 = Mock()
+    structure_2 = Mock()
+    structure_2.name = "structure"
+    collection = StructureCollection(Mock(), [structure_1, structure_2])
+    assert structure_2 == collection["structure"]
+
+
+def test_copy():
+    structures = [Mock(), Mock(), Mock()]
+    original_collection = StructureCollection(Mock(), structures)
+    new_collection = original_collection.copy()
+    for structure in structures:
+        assert structure in original_collection
+        assert structure in new_collection
+    assert new_collection == original_collection
+    original_collection.add(Mock())
+    assert new_collection != original_collection
+
+
+def test_is_empty():
+    collection = StructureCollection(Mock(), [])
+    assert collection.is_empty()
+    collection.add(Mock())
+    assert not collection.is_empty()
+
+
+def test_add():
+    collection = StructureCollection(Mock(), [])
+    assert collection.structures == {}
+    structure = Mock()
+    collection.add(structure)
+    assert collection.structures == {structure: True}
+
+
+def test_remove():
+    structure = Mock()
+    collection = StructureCollection(Mock(), [structure])
+    assert collection.structures == {structure: True}
+    collection.remove(structure)
+    assert collection.structures == {}
 
 
 def test_of_type():
@@ -100,47 +116,6 @@ def test_of_type():
 
     structure_1 = A()
     structure_2 = B()
-    collection = StructureCollection({structure_1, structure_2})
-    assert StructureCollection({structure_1}) == collection.of_type(A)
-    assert StructureCollection({structure_2}) == collection.of_type(B)
-
-
-@pytest.mark.parametrize(
-    "no_of_valid_members, no_of_invalid_members, expected_proportion",
-    [(1, 1, 0.5), (1, 2, 0.33333), (0, 1, 0.0)],
-)
-def test_number_and_proportion_with_label(
-    no_of_valid_members,
-    no_of_invalid_members,
-    expected_proportion,
-):
-    concept = Mock()
-    valid_members = set()
-    for _ in range(no_of_valid_members):
-        member = Mock()
-        member.has_label.side_effect = [True]
-        valid_members.add(member)
-    invalid_members = set()
-    for _ in range(no_of_invalid_members):
-        member = Mock()
-        member.has_label.side_effect = [False]
-        invalid_members.add(member)
-    collection = StructureCollection(set.union(valid_members, invalid_members))
-    actual_proportion = collection.proportion_with_label(concept)
-    assert math.isclose(
-        expected_proportion, actual_proportion, abs_tol=FLOAT_COMPARISON_TOLERANCE
-    )
-
-
-def test_get_random():
-    structures = {Mock() for _ in range(10)}
-    collection = StructureCollection(structures)
-    random_structure = collection.get_random()
-    assert random_structure in structures
-
-
-def test_get_random_with_exclude():
-    structure_1 = Mock()
-    structure_2 = Mock()
-    collection = StructureCollection({structure_1, structure_2})
-    assert structure_2 == collection.get_random(exclude=[structure_1])
+    collection = StructureCollection(Mock(), [structure_1, structure_2])
+    assert StructureCollection(Mock(), [structure_1]) == collection.of_type(A)
+    assert StructureCollection(Mock(), [structure_2]) == collection.of_type(B)
