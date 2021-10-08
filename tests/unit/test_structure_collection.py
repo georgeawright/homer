@@ -107,6 +107,42 @@ def test_remove():
     assert collection.structures == {}
 
 
+def test_filter():
+    structure_1 = Mock()
+    structure_1.has_label.return_value = True
+    structure_2 = Mock()
+    structure_2.has_label.return_value = False
+    collection = StructureCollection(Mock(), [structure_1, structure_2])
+    assert StructureCollection(Mock(), [structure_1]) == collection.filter(
+        lambda x: x.has_label(Mock())
+    )
+
+
+def test_where():
+    structure_1 = Mock()
+    structure_1.attribute = True
+    structure_2 = Mock()
+    structure_2.attribute = False
+    collection = StructureCollection(Mock(), [structure_1, structure_2])
+    assert StructureCollection(Mock(), [structure_1]) == collection.where(
+        attribute=True
+    )
+    assert StructureCollection(Mock(), [structure_2]) == collection.where(
+        attribute=False
+    )
+
+
+def test_where_not():
+    structure_1 = Mock()
+    structure_1.attribute = Mock()
+    structure_2 = Mock()
+    structure_2.attribute = None
+    collection = StructureCollection(Mock(), [structure_1, structure_2])
+    assert StructureCollection(Mock(), [structure_1]) == collection.where_not(
+        attribute=None
+    )
+
+
 def test_of_type():
     class A:
         pass

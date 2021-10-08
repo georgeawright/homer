@@ -107,6 +107,16 @@ class StructureCollection:
             ],
         )
 
+    def filter(self, *filters: List[callable]) -> StructureCollection:
+        old_collection = self
+        for f in filters:
+            new_collection = StructureCollection(
+                self.bubble_chamber,
+                [structure for structure in old_collection if f(structure)],
+            )
+            old_collection = new_collection
+        return new_collection
+
     def where(self, **kwargs) -> StructureCollection:
         old_collection = self
         for key, value in kwargs.items():
