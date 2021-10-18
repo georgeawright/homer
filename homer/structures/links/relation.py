@@ -17,10 +17,13 @@ class Relation(Link):
         structure_id: str,
         parent_id: str,
         start: Structure,
-        end: Structure,
+        arguments: StructureCollection,
         parent_concept: Concept,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         is_bidirectional: bool = True,
     ):
         Link.__init__(
@@ -28,12 +31,13 @@ class Relation(Link):
             structure_id=structure_id,
             parent_id=parent_id,
             start=start,
-            end=end,
+            arguments=arguments,
             locations=locations,
             parent_concept=parent_concept,
             quality=quality,
-            links_in=None,
-            links_out=None,
+            links_in=links_in,
+            links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.is_relation = True
         self.is_bidirectional = is_bidirectional
@@ -58,6 +62,7 @@ class Relation(Link):
 
     def copy(self, **kwargs) -> Relation:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
+        bubble_chamber = kwargs["bubble_chamber"]
         start = kwargs["start"] if "start" in kwargs else self.start
         end = kwargs["end"] if "end" in kwargs else self.end
         parent_space = (
@@ -80,29 +85,23 @@ class Relation(Link):
             structure_id=ID.new(Relation),
             parent_id=parent_id,
             start=start,
-            end=end,
+            arguments=bubble_chamber.new_structure_collection(start, end),
             parent_concept=self.parent_concept,
             locations=new_locations,
             quality=self.quality,
+            links_in=bubble_chamber.new_structure_collection(),
+            links_out=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(),
         )
         return new_relation
 
     def nearby(self, space: Space = None) -> StructureCollection:
-        nearby_chunks = StructureCollection.union(
-            self.start.nearby(self.parent_space),
-            self.end.nearby(self.parent_space),
-        )
-        return StructureCollection.difference(
-            StructureCollection.union(
-                StructureCollection(
-                    {
-                        relation
-                        for chunk in nearby_chunks
-                        for relation in chunk.relations
-                    }
-                ),
+        print(self.end)
+        return (
+            StructureCollection.intersection(
                 self.start.relations,
                 self.end.relations,
-            ),
-            StructureCollection({self}),
+            )
+            .filter(lambda x: x.parent_spaces == self.parent_spaces)
+            .excluding(self)
         )

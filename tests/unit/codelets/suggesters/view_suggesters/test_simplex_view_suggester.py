@@ -5,7 +5,6 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces.frames import Template
 from homer.structures.views import SimplexView
 from homer.tools import hasinstance
 
@@ -16,7 +15,7 @@ def bubble_chamber():
     chamber.has_view.return_value = False
     chamber.concepts = {"suggest": Mock(), "view-simplex": Mock(), "text": Mock()}
     chamber.spaces = {"text": Mock(), "top level working": Mock(), "input": Mock()}
-    chamber.views = StructureCollection()
+    chamber.views = StructureCollection(Mock(), [])
     return chamber
 
 

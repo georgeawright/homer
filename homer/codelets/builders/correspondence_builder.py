@@ -5,7 +5,6 @@ from homer.codelets.builder import Builder
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence
 
 
@@ -86,6 +85,9 @@ class CorrespondenceBuilder(Builder):
             self.target_conceptual_space,
             self.target_view,
             0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         for correspondence in self.target_view.members:
             if not correspondence.is_compatible_with(self.correspondence):
@@ -112,7 +114,9 @@ class CorrespondenceBuilder(Builder):
         self.target_structure_two.links_out.add(self.correspondence)
         self.bubble_chamber.correspondences.add(self.correspondence)
         self.bubble_chamber.logger.log(self.correspondence)
-        self.child_structures = StructureCollection({self.correspondence})
+        self.child_structures = self.bubble_chamber.new_structure_collection(
+            self.correspondence
+        )
 
     def _fill_in_word_slot(self):
         self.target_view.slot_values[

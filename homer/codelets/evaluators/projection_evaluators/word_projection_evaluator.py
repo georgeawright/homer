@@ -18,7 +18,7 @@ class WordProjectionEvaluator(ProjectionEvaluator):
         word = bubble_chamber.input_nodes.where(is_word=True).get()
         correspondences = word.correspondences.where(end=word)
         target_structures = StructureCollection.union(
-            StructureCollection({word}), correspondences
+            bubble_chamber.new_structure_collection(word), correspondences
         )
         return cls.spawn(
             parent_id,
@@ -35,28 +35,14 @@ class WordProjectionEvaluator(ProjectionEvaluator):
     def _calculate_confidence(self):
         try:
             non_frame_item = (
-                StructureCollection(
-                    {
-                        correspondence
-                        for correspondence in self.target_structures.where(
-                            is_correspondence=True
-                        )
-                        if not correspondence.start.is_slot
-                    }
-                )
+                self.target_structures.where(is_correspondence=True)
+                .filter(lambda x: not x.start.is_slot)
                 .get()
                 .start
             )
             frame_item = (
-                StructureCollection(
-                    {
-                        correspondence
-                        for correspondence in self.target_structures.where(
-                            is_correspondence=True
-                        )
-                        if correspondence.start.is_slot
-                    }
-                )
+                self.target_structures.where(is_correspondence=True)
+                .filter(lambda x: x.start.is_slot)
                 .get()
                 .start
             )

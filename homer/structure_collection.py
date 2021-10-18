@@ -80,6 +80,9 @@ class StructureCollection:
             old_collection = new_collection
         return new_collection
 
+    def excluding(self, *structures) -> StructureCollection:
+        return self.filter(lambda x: x not in structures)
+
     def at(self, location: Location) -> StructureCollection:
         def _at(structure):
             for coordinates in location.coordinates:
@@ -152,7 +155,7 @@ class StructureCollection:
             [element for element in self.structures if not isinstance(element, t)],
         )
 
-    def get(self, key: callable = None, exclude: list = None):
+    def get(self, key: callable = lambda x: 0, exclude: list = None):
         return self.bubble_chamber.random_machine.select(self.structures, key, exclude)
 
     def _arrange_structures_by_name(self):

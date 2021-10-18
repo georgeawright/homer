@@ -16,7 +16,9 @@ class ChunkSelector(Selector):
         try:
             champion_chunk = self.champions.where(is_chunk=True, is_slot=False).get()
             challenger_chunk = champion_chunk.nearby().get(key=activation)
-            self.challengers = StructureCollection({challenger_chunk})
+            self.challengers = self.bubble_chamber.new_structure_collection(
+                challenger_chunk
+            )
         except MissingStructureError:
             return True
         members_intersection = StructureCollection.intersection(

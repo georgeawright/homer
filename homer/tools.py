@@ -48,18 +48,6 @@ def areinstances(items: Iterable, t: type) -> bool:
     return True
 
 
-def correspond(a, b, view=None) -> bool:
-    from homer.structure_collection import StructureCollection
-
-    if a is None and b is None:
-        return True
-    view_members = StructureCollection() if view is None else view.members
-    intersection = StructureCollection.intersection(
-        a.correspondences, b.correspondences, view_members
-    )
-    return len(intersection) > 0
-
-
 def project_item_into_space(item: "Structure", space: "Space"):
     from homer.location import Location
 

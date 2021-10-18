@@ -3,7 +3,6 @@ import statistics
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluators import ViewEvaluator
-from homer.structure_collection import StructureCollection
 
 
 class MonitoringViewEvaluator(ViewEvaluator):
@@ -14,7 +13,7 @@ class MonitoringViewEvaluator(ViewEvaluator):
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            StructureCollection({target}),
+            bubble_chamber.new_structure_collection(target),
             structure_type.activation,
         )
 

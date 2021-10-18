@@ -47,7 +47,9 @@ class ProjectionSuggester(Suggester):
 
     @property
     def target_structures(self):
-        return StructureCollection({self.target_view, self.target_projectee})
+        return self.bubble_chamber.new_structue_collection(
+            self.target_view, self.target_projectee
+        )
 
     def _passes_preliminary_checks(self):
         self.target_view = self._target_structures["target_view"]
@@ -57,25 +59,27 @@ class ProjectionSuggester(Suggester):
         self._target_structures["non_frame"] = None
         self._target_structures["non_frame_correspondee"] = None
         try:
-            self.frame_correspondee = StructureCollection(
-                {
+            self.frame_correspondee = self.bubble_chamber.new_structure_collection(
+                *[
                     correspondence.start
                     if correspondence.start != self.target_projectee
                     else correspondence.end
                     for correspondence in self.target_projectee.correspondences
                     if correspondence.start.is_slot and correspondence.end.is_slot
-                }
+                ]
             ).get()
             self._target_structures["frame_correspondee"] = self.frame_correspondee
-            self.correspondence_to_non_frame = StructureCollection(
-                {
-                    correspondence
-                    for correspondence in self.frame_correspondee.correspondences
-                    if correspondence.start.parent_space
-                    != correspondence.end.parent_space
-                    and correspondence in self.target_view.members
-                }
-            ).get()
+            self.correspondence_to_non_frame = (
+                self.bubble_chamber.new_structure_collection(
+                    *[
+                        correspondence
+                        for correspondence in self.frame_correspondee.correspondences
+                        if correspondence.start.parent_space
+                        != correspondence.end.parent_space
+                        and correspondence in self.target_view.members
+                    ]
+                ).get()
+            )
             self._target_structures[
                 "target_correspondence"
             ] = self.correspondence_to_non_frame

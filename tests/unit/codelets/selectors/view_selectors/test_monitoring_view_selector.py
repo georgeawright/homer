@@ -9,29 +9,8 @@ from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
 
-@pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    input_concept = Mock()
-    chamber.concepts = {
-        "view-monitoring": Mock(),
-        "select": Mock(),
-        "text": Mock(),
-        "input": input_concept,
-    }
-    chamber.spaces = {"input": Mock()}
-    text_space = Mock()
-    text_space.contents.is_empty.return_value = False
-    text_space.parent_concept = chamber.concepts["text"]
-    chamber.working_spaces = StructureCollection({text_space})
-    reverse_simplex_view = Mock()
-    reverse_simplex_view.output_space.parent_concept = input_concept
-    chamber.simplex_views = StructureCollection({reverse_simplex_view})
-    return chamber
-
-
 def test_finds_challenger_when_not_given_one(bubble_chamber):
-    common_members = StructureCollection({Mock(), Mock()})
+    common_members = bubble_chamber.new_structure_collection(Mock(), Mock())
     champion = Mock()
     champion.members = common_members
     champion.size = 2
@@ -42,13 +21,17 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion.activation = 1.0
     challenger.quality = 1.0
     challenger.activation = 1.0
-    champion.nearby.return_value = StructureCollection({challenger})
+    champion.nearby.return_value = bubble_chamber.new_structure_collection(challenger)
     selector = MonitoringViewSelector(
-        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(champion),
+        Mock(),
     )
     assert selector.challengers is None
     selector.run()
-    assert selector.challengers == StructureCollection({challenger})
+    assert selector.challengers == bubble_chamber.new_structure_collection(challenger)
 
 
 @pytest.mark.parametrize(
@@ -84,9 +67,9 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             Mock(),
             Mock(),
             bubble_chamber,
-            StructureCollection({champion}),
+            bubble_chamber.new_structure_collection(champion),
             Mock(),
-            challengers=StructureCollection({challenger}),
+            challengers=bubble_chamber.new_structure_collection(challenger),
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result

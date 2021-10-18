@@ -6,7 +6,7 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Space, View
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import ContextualSpace
 
 
 class SimplexView(View):
@@ -17,8 +17,11 @@ class SimplexView(View):
         locations: List[Location],
         members: StructureCollection,
         input_spaces: StructureCollection,
-        output_space: WorkingSpace,
+        output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
     ):
         View.__init__(
             self,
@@ -29,6 +32,9 @@ class SimplexView(View):
             input_spaces,
             output_space,
             quality,
+            links_in,
+            links_out,
+            parent_spaces,
         )
         self.is_simplex_view = True
 
@@ -72,12 +78,10 @@ class SimplexView(View):
             return statistics.fmean([proportion_in_view_1, proportion_in_view_2])
 
         space = space if space is not None else self.location.space
-        return StructureCollection(
-            {
-                view
-                for view in space.contents.of_type(View)
-                if view != self and input_overlap(view, self) > 0.5
-            }
+        return (
+            space.contents.where(is_view=True)
+            .filter(lambda x: input_overlap(x, self) > 0.5)
+            .excluding(self)
         )
 
     def copy(self, **kwargs: dict):
@@ -89,7 +93,7 @@ class SimplexView(View):
         parent_id = kwargs["parent_id"]
         original_structure = kwargs["original_structure"]
         replacement_structure = kwargs["replacement_structure"]
-        new_members = StructureCollection()
+        new_members = bubble_chamber.new_structure_collection()
         for correspondence in self.members:
             if (
                 correspondence.start in self.output_space.contents
@@ -117,6 +121,9 @@ class SimplexView(View):
             input_spaces=self.input_spaces,
             output_space=new_output_space,
             quality=self.quality,
+            links_in=bubble_chamber.new_structure_collection(),
+            links_out=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(),
         )
         for correspondence in new_output_space.contents.of_type(Correspondence):
             new_view.members.add(correspondence)

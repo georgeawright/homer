@@ -29,4 +29,6 @@ class SimplexViewSuggester(ViewSuggester):
 
     @property
     def target_structures(self):
-        return StructureCollection({self.frame, self.contextual_space})
+        return self.bubble_chamber.new_structure_collection(
+            self.frame, self.contextual_space
+        )

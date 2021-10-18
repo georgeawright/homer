@@ -11,15 +11,6 @@ from homer.tools import hasinstance
 
 
 @pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.satisfaction = 0.0
-    chamber.concepts = {"suggest": Mock(), "chunk": Mock()}
-    chamber.chunks = StructureCollection()
-    return chamber
-
-
-@pytest.fixture
 def target_slot():
     chunk = Mock()
     chunk.is_slot = True
@@ -34,18 +25,18 @@ def target_rule():
 
 
 @pytest.fixture
-def target_root(target_slot, target_rule):
+def target_root(bubble_chamber, target_slot, target_rule):
     chunk = Mock()
-    chunk.members = StructureCollection({target_slot})
+    chunk.members = bubble_chamber.new_structure_collection(target_slot)
     chunk.rule = target_rule
     return chunk
 
 
 @pytest.fixture
-def target_node(target_root):
+def target_node(bubble_chamber, target_root):
     chunk = Mock()
     chunk.is_slot = False
-    chunk.super_chunks = StructureCollection({target_root})
+    chunk.super_chunks = bubble_chamber.new_structure_collection(target_root)
     target_root.members.add(chunk)
     return chunk
 
@@ -93,11 +84,13 @@ def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
     existing_chunk = Mock()
     existing_chunk.rule = target_rule
     target_slot_filler = Mock()
-    existing_chunk.members = StructureCollection({target_node, target_slot_filler})
+    existing_chunk.members = StructureCollection(
+        Mock(), [target_node, target_slot_filler]
+    )
     bubble_chamber.chunks.add(existing_chunk)
     target_space = Mock()
     contents_where = Mock()
-    contents_where.at = StructureCollection({target_slot_filler})
+    contents_where.at = StructureCollection(Mock(), [target_slot_filler])
     target_space.contents.where.return_value = contents_where
     target_structures = {
         "target_space": Mock(),

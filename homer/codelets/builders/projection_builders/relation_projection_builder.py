@@ -1,6 +1,5 @@
 from homer.id import ID
 from homer.codelets.builders import ProjectionBuilder
-from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Relation
 
 
@@ -40,10 +39,15 @@ class RelationProjectionBuilder(ProjectionBuilder):
             ID.new(Relation),
             self.codelet_id,
             corresponding_start,
-            corresponding_end,
+            self.bubble_chamber.new_structure_collection(
+                corresponding_start, corresponding_end
+            ),
             parent_concept,
             locations,
             0.0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         corresponding_start.links_out.add(relation)
         corresponding_end.links_in.add(relation)
@@ -56,15 +60,20 @@ class RelationProjectionBuilder(ProjectionBuilder):
             ID.new(Correspondence),
             self.codelet_id,
             start=self.target_projectee,
-            end=relation,
+            arguments=self.bubble_chamber.new_structure_collection(
+                self.target_projectee, relation
+            ),
             locations=[self.target_projectee.location, relation.location],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
             parent_view=self.target_view,
             quality=0.0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
-        self.child_structures = StructureCollection(
-            {relation, frame_to_output_correspondence}
+        self.child_structures = self.bubble_chamber.new_structure_collection(
+            relation, frame_to_output_correspondence
         )
         self.bubble_chamber.correspondences.add(frame_to_output_correspondence)
         self.bubble_chamber.logger.log(frame_to_output_correspondence)
@@ -80,7 +89,9 @@ class RelationProjectionBuilder(ProjectionBuilder):
                 ID.new(Correspondence),
                 self.codelet_id,
                 start=self.non_frame_correspondee,
-                end=relation,
+                arguments=self.bubble_chamber.new_structure_collection(
+                    self.non_frame_correspondee, relation
+                ),
                 locations=[
                     self.non_frame_correspondee.location_in_space(self.non_frame),
                     relation.location,
@@ -89,6 +100,9 @@ class RelationProjectionBuilder(ProjectionBuilder):
                 conceptual_space=self.target_correspondence.conceptual_space,
                 parent_view=self.target_view,
                 quality=0.0,
+                links_in=self.bubble_chamber.new_structure_collection(),
+                links_out=self.bubble_chamber.new_structure_collection(),
+                parent_spaces=self.bubble_chamber.new_structure_collection(),
             )
             self.child_structures.add(non_frame_to_output_correspondence)
             self.bubble_chamber.correspondences.add(non_frame_to_output_correspondence)

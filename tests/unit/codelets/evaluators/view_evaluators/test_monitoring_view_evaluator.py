@@ -19,6 +19,7 @@ from homer.structures.nodes import Chunk
     ],
 )
 def test_changes_target_structure_quality(
+    bubble_chamber,
     current_quality,
     correspondences_quality,
     input_size,
@@ -26,29 +27,30 @@ def test_changes_target_structure_quality(
     output_space_quality,
     expected_quality,
 ):
-    bubble_chamber = Mock()
-    bubble_chamber.concepts = {"evaluate": Mock(), "view-monitoring": Mock()}
-
     conceptual_space = Mock()
 
     input_space = Mock()
     bubble_chamber.spaces = {"input": input_space}
-    input_space.conceptual_spaces = StructureCollection({conceptual_space})
-    input_space.contents = StructureCollection()
+    input_space.conceptual_spaces = bubble_chamber.new_structure_collection(
+        conceptual_space
+    )
+    input_space.contents = bubble_chamber.new_structure_collection()
     raw_chunks = []
     for i in range(input_size):
         chunk = Mock()
-        chunk.raw_members = StructureCollection({chunk})
+        chunk.raw_members = bubble_chamber.new_structure_collection(chunk)
         chunk.is_raw = True
         input_space.contents.add(chunk)
         raw_chunks.append(chunk)
 
     view = Mock()
-    view.members = StructureCollection()
+    view.members = bubble_chamber.new_structure_collection()
     for i in range(raw_inputs_in_interpretation):
         correspondence = Mock()
         correspondence.conceptual_space = conceptual_space
-        correspondence.end.arguments = StructureCollection({raw_chunks[i]})
+        correspondence.end.arguments = bubble_chamber.new_structure_collection(
+            raw_chunks[i]
+        )
         correspondence.quality = correspondences_quality
         view.members.add(correspondence)
 
@@ -56,7 +58,11 @@ def test_changes_target_structure_quality(
     view.quality = current_quality
 
     evaluator = MonitoringViewEvaluator(
-        Mock(), Mock(), bubble_chamber, StructureCollection({view}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(view),
+        Mock(),
     )
     evaluator.run()
     assert expected_quality == view.quality

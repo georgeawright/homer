@@ -2,7 +2,6 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 
 
@@ -71,8 +70,8 @@ class Suggester(Codelet):
 
     @property
     def target_structures(self):
-        return StructureCollection(
-            {structure for structure in self._target_structures.values()}
+        return self.bubble_chamber.new_structure_collection(
+            *self._target_structures.values()
         )
 
     def _boost_activations(self):

@@ -19,8 +19,9 @@ class Frame(Space):
         contents: StructureCollection,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
     ):
         quality = 1
         Space.__init__(
@@ -33,6 +34,7 @@ class Frame(Space):
             quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.input_space = input_space
         self.output_space = output_space
@@ -62,17 +64,20 @@ class Frame(Space):
         output_space, output_items_map = output_space.copy(
             bubble_chamber=bubble_chamber, parent_id=parent_id
         )
-        copied_contents = StructureCollection(
-            correspondence.copy(
-                start=input_items_map[correspondence.start]
-                if correspondence.start in input_items_map
-                else output_items_map[correspondence.start],
-                end=output_items_map[correspondence.end]
-                if correspondence.end in output_items_map
-                else input_items_map[correspondence.end],
-                parent_id=parent_id,
-            )
-            for correspondence in self.contents
+        print(self.contents)
+        copied_contents = bubble_chamber.new_structure_collection(
+            *[
+                correspondence.copy(
+                    start=input_items_map[correspondence.start]
+                    if correspondence.start in input_items_map
+                    else output_items_map[correspondence.start],
+                    end=output_items_map[correspondence.end]
+                    if correspondence.end in output_items_map
+                    else input_items_map[correspondence.end],
+                    parent_id=parent_id,
+                )
+                for correspondence in self.contents
+            ]
         )
         for correspondence in copied_contents:
             correspondence.start.links_out.add(correspondence)
@@ -88,6 +93,9 @@ class Frame(Space):
             contents=copied_contents,
             input_space=input_space,
             output_space=output_space,
+            links_in=bubble_chamber.new_structure_collection(),
+            links_out=bubble_chamber.new_structure_collection(),
+            parent_spaces=self.parent_spaces,
         )
         bubble_chamber.logger.log(instance_frame)
         return instance_frame

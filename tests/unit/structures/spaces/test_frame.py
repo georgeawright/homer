@@ -1,6 +1,5 @@
 from unittest.mock import Mock
 
-from homer.structure_collection import StructureCollection
 from homer.structures.spaces import Frame
 
 
@@ -11,12 +10,17 @@ def test_instantiate():
     output_space = Mock()
     output_copy = Mock()
     output_space.copy.return_value = (output_copy, {})
-    frame = Frame("", "", "", Mock(), StructureCollection(), input_space, output_space)
+    frame = Frame(
+        "", "", "", Mock(), [], input_space, output_space, Mock(), Mock(), Mock()
+    )
 
-    instance = frame.instantiate(input_space, "", Mock())
+    bubble_chamber = Mock()
+    bubble_chamber.new_structure_collection.return_value = []
+
+    instance = frame.instantiate(input_space, "", bubble_chamber)
     assert instance.input_space == input_copy
     assert instance.output_space == output_copy
 
-    reverse_instance = frame.instantiate(output_space, "", Mock())
+    reverse_instance = frame.instantiate(output_space, "", bubble_chamber)
     assert reverse_instance.input_space == output_copy
     assert reverse_instance.output_space == input_copy

@@ -44,7 +44,7 @@ class ViewBuilder(Builder):
         return self.bubble_chamber.concepts["view"]
 
     def target_structures(self):
-        return StructureCollection(self._target_structures)
+        return self.bubble_chamber.new_structure_collection(self._target_structures)
 
     def _passes_preliminary_checks(self):
         self.frame = self._target_structures["frame"]

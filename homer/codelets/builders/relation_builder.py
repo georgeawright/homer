@@ -3,7 +3,6 @@ from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
-from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 
 
@@ -71,6 +70,9 @@ class RelationBuilder(Builder):
             self.parent_concept,
             self.target_space,
             0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         relation.activation = self.INITIAL_STRUCTURE_ACTIVATION
         self.target_space.add(relation)
@@ -78,7 +80,7 @@ class RelationBuilder(Builder):
         self.target_structure_two.links_in.add(relation)
         self.bubble_chamber.relations.add(relation)
         self.bubble_chamber.logger.log(relation)
-        self.child_structures = StructureCollection({relation})
+        self.child_structures = self.bubble_chamber.new_structure_collection(relation)
 
     def _fizzle(self):
         pass

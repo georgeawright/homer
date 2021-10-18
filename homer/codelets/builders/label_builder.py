@@ -3,7 +3,6 @@ from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
-from homer.structure_collection import StructureCollection
 from homer.structures.links import Label
 
 
@@ -66,16 +65,20 @@ class LabelBuilder(Builder):
             ID.new(Label),
             self.codelet_id,
             self.target_node,
+            self.bubble_chamber.new_structure_collection(self.target_node),
             self.parent_concept,
             self.target_node.parent_space,
             0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         label.activation = self.INITIAL_STRUCTURE_ACTIVATION
         self.target_node.parent_space.add(label)
         self.target_node.links_out.add(label)
         self.bubble_chamber.labels.add(label)
         self.bubble_chamber.logger.log(label)
-        self.child_structures = StructureCollection({label})
+        self.child_structures = self.bubble_chamber.new_structure_collection(label)
 
     def _fizzle(self):
         pass

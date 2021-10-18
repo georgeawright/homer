@@ -6,18 +6,17 @@ from homer.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize("current_quality, label_quality", [(0.75, 0.5), (0.5, 0.75)])
-def test_changes_target_structure_quality(current_quality, label_quality):
-    bubble_chamber = Mock()
-    bubble_chamber.concepts = {"evaluate": Mock(), "word": Mock()}
-
+def test_changes_target_structure_quality(
+    bubble_chamber, current_quality, label_quality
+):
     label = Mock()
     label.is_slot = False
     label.quality = label_quality
 
     correspondence_to_frame = Mock()
     correspondence_to_frame.quality = 1.0
-    label.correspondences_with.return_value = StructureCollection(
-        {correspondence_to_frame}
+    label.correspondences_with.return_value = bubble_chamber.new_structure_collection(
+        correspondence_to_frame
     )
 
     slot = Mock()
@@ -35,16 +34,16 @@ def test_changes_target_structure_quality(current_quality, label_quality):
     slot_to_word_correspondence.is_correspondence = True
     slot_to_word_correspondence.start = slot
     slot_to_word_correspondence.quality = current_quality
-    word.correspondences = StructureCollection(
-        {label_to_word_correspondence, slot_to_word_correspondence}
+    word.correspondences = bubble_chamber.new_structure_collection(
+        label_to_word_correspondence, slot_to_word_correspondence
     )
 
     evaluator = WordProjectionEvaluator(
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection(
-            {word, label_to_word_correspondence, slot_to_word_correspondence}
+        bubble_chamber.new_structure_collection(
+            word, label_to_word_correspondence, slot_to_word_correspondence
         ),
         Mock(),
     )
@@ -52,17 +51,19 @@ def test_changes_target_structure_quality(current_quality, label_quality):
     assert word.quality == label_quality
 
 
-def test_gives_function_word_maximum_quality():
-    bubble_chamber = Mock()
-    bubble_chamber.concepts = {"evaluate": Mock(), "word": Mock()}
+def test_gives_function_word_maximum_quality(bubble_chamber):
     word = Mock()
     word.is_word = True
     word.quality = 0
     correspondee = Mock()
-    correspondee.labels = StructureCollection()
-    word.correspondees = StructureCollection({correspondee})
+    correspondee.labels = bubble_chamber.new_structure_collection()
+    word.correspondees = bubble_chamber.new_structure_collection(correspondee)
     evaluator = WordProjectionEvaluator(
-        Mock(), Mock(), bubble_chamber, StructureCollection({word}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(word),
+        Mock(),
     )
     evaluator.run()
     assert 1 == word.quality

@@ -6,7 +6,7 @@ from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 from homer.structures.space import Space
-from homer.structures.spaces import Frame, WorkingSpace
+from homer.structures.spaces import ContextualSpace
 
 
 class View(Structure):
@@ -19,8 +19,11 @@ class View(Structure):
         locations: List[Location],
         members: StructureCollection,
         input_spaces: StructureCollection,
-        output_space: WorkingSpace,
+        output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
     ):
         Structure.__init__(
             self,
@@ -28,6 +31,9 @@ class View(Structure):
             parent_id,
             locations=locations,
             quality=quality,
+            links_in=links_in,
+            links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.value = None
         self.input_spaces = input_spaces
@@ -38,12 +44,8 @@ class View(Structure):
 
     @property
     def raw_input_space(self) -> Space:
-        return StructureCollection(
-            {
-                space
-                for space in self.input_spaces
-                if space.parent_concept.name == "input"
-            }
+        return self.input_spaces.filter(
+            lambda x: x.parent_concept.name == "input"
         ).get()
 
     @property

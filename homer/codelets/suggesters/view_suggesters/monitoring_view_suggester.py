@@ -3,7 +3,6 @@ import statistics
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation
 
 
@@ -21,12 +20,8 @@ class MonitoringViewSuggester(ViewSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        interpretation_view = StructureCollection(
-            {
-                view
-                for view in bubble_chamber.simplex_views
-                if view.output_space.parent_concept == bubble_chamber.concepts["input"]
-            }
+        interpretation_view = bubble_chamber.simplex_views.filter(
+            lambda x: x.output_space.parent_concept == bubble_chamber.concepts["input"]
         ).get(key=activation)
         text_space = interpretation_view.input_contextual_spaces.get()
         interpretation_space = interpretation_view.output_space
@@ -36,8 +31,8 @@ class MonitoringViewSuggester(ViewSuggester):
             parent_id,
             bubble_chamber,
             {
-                "input_spaces": StructureCollection(
-                    {interpretation_space, input_space}
+                "input_spaces": bubble_chamber.new_structue_collection(
+                    interpretation_space, input_space
                 ),
                 "output_space": text_space,
             },

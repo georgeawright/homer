@@ -21,10 +21,13 @@ def test_add(
         "",
         "north-south",
         Mock(),
-        StructureCollection(),
+        StructureCollection(Mock(), []),
         1,
         [],
         [],
+        Mock(),
+        Mock(),
+        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [[c[0]] for c in location.coordinates]
         },
@@ -34,10 +37,13 @@ def test_add(
         "",
         "west-east",
         Mock(),
-        StructureCollection(),
+        StructureCollection(Mock(), []),
         1,
         [],
         [],
+        Mock(),
+        Mock(),
+        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [[c[1]] for c in location.coordinates]
         },
@@ -47,10 +53,13 @@ def test_add(
         "",
         "nw-se",
         Mock(),
-        StructureCollection(),
+        StructureCollection(Mock(), []),
         1,
         [],
         [],
+        Mock(),
+        Mock(),
+        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [
                 [statistics.fmean(c)] for c in location.coordinates
@@ -62,10 +71,13 @@ def test_add(
         "",
         "ne-sw",
         Mock(),
-        StructureCollection(),
+        StructureCollection(Mock(), []),
         1,
         [],
         [],
+        Mock(),
+        Mock(),
+        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [
                 [statistics.fmean([c[0], 4 - c[1]])] for c in location.coordinates
@@ -79,14 +91,31 @@ def test_add(
         "",
         "location",
         location_concept,
-        StructureCollection(),
+        StructureCollection(Mock(), []),
         2,
         [north_south_space, west_east_space],
         [north_south_space, west_east_space, nw_se_space, ne_sw_space],
+        Mock(),
+        Mock(),
+        Mock(),
         is_basic_level=True,
     )
     location = Location(coordinates, location_space)
-    chunk = Chunk("", "", [location], Mock(), Mock(), Mock())
+    chunk = Chunk(
+        "",
+        "",
+        [location],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
     location_space.add(chunk)
 
     assert chunk in location_space.contents
@@ -129,7 +158,10 @@ def test_update_activation(
         "",
         "name",
         Mock(),
-        StructureCollection({concept_1, concept_2, concept_3}),
+        StructureCollection(Mock(), [concept_1, concept_2, concept_3]),
+        Mock(),
+        Mock(),
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

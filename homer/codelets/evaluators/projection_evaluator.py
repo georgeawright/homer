@@ -15,7 +15,7 @@ class ProjectionEvaluator(Evaluator):
         word = bubble_chamber.input_nodes.where(is_word=True).get()
         correspondences = word.correspondences.where(end=word)
         target_structures = StructureCollection.union(
-            StructureCollection({word}), correspondences
+            bubble_chamber.new_structure_collection(word), correspondences
         )
         return cls.spawn(
             parent_id,

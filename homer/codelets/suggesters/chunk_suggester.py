@@ -92,12 +92,12 @@ class ChunkSuggester(Suggester):
     ):
         target_view = bubble_chamber.production_views.get(key=activation)
         target_space = target_view.spaces.where_not(is_frame=True).get()
-        target_node = StructureCollection(
-            {
+        target_node = bubble_chamber.new_structure_collection(
+            *[
                 node
                 for node in target_space.contents.where(is_node=True)
                 if target_rule.is_compatible_with(node)
-            }
+            ]
         ).get(key=chunking_exigency)
         return cls.spawn(
             parent_id,
@@ -129,12 +129,8 @@ class ChunkSuggester(Suggester):
                 ).get(key=activation)
         else:
             try:
-                self.target_root = StructureCollection(
-                    {
-                        chunk
-                        for chunk in self.target_node.super_chunks
-                        if chunk.rule == self.target_rule
-                    }
+                self.target_root = self.target_node.super_chunks.where(
+                    rule=self.target_rule
                 ).get()
             except MissingStructureError:
                 self.target_root = None
@@ -162,22 +158,20 @@ class ChunkSuggester(Suggester):
         self._target_structures["target_root"] = self.target_root
         self._target_structures["target_slot"] = self.target_slot
         self._target_structures["target_slot_filler"] = self.target_slot_filler
+        print(self.target_root, self.target_node, self.target_slot_filler)
         suggested_members = StructureCollection.union(
             self.target_root.members.where(is_slot=False)
             if self.target_root is not None
-            else StructureCollection(),
-            StructureCollection({self.target_node}),
-            StructureCollection({self.target_slot_filler})
+            else self.bubble_chamber.new_structure_collection(),
+            self.bubble_chamber.new_structure_collection(self.target_node),
+            self.bubble_chamber.new_structure_collection(self.target_slot_filler)
             if self.target_slot_filler is not None
-            else StructureCollection(),
+            else self.bubble_chamber.new_structure_collection(),
         )
-        for chunk in self.bubble_chamber.chunks:
-            if (
-                chunk.rule == self.target_rule
-                and chunk.members.where(is_slot=False) == suggested_members
-            ):
-                return False
-        return True
+        return self.bubble_chamber.chunks.filter(
+            lambda x: x.rule == self.target_rule
+            and x.members.where(is_slot=False) == suggested_members
+        ).is_empty()
 
     def _calculate_confidence(self):
         def randomized_compatibility(compatibility, randomness, satisfaction):

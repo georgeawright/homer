@@ -18,18 +18,16 @@ class RelationProjectionEvaluator(ProjectionEvaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["relation"]
         input_concept = bubble_chamber.concepts["input"]
-        view = StructureCollection(
-            {
-                view
-                for view in bubble_chamber.views
-                if view.output_space.parent_concept == input_concept
-                and not view.contents.where(is_relation=True).is_empty()
-            }
+        view = bubble_chamber.new_structure_collection(
+            view
+            for view in bubble_chamber.views
+            if view.output_space.parent_concept == input_concept
+            and not view.contents.where(is_relation=True).is_empty()
         ).get()
         relation = view.ouptut_space.contents.where(is_relation=True).get()
         correspondences = relation.correspondences.where(end=relation)
         target_structures = StructureCollection.union(
-            StructureCollection({relation}), correspondences
+            bubble_chamber.new_structure_collection({relation}), correspondences
         )
         return cls.spawn(
             parent_id,
@@ -46,28 +44,14 @@ class RelationProjectionEvaluator(ProjectionEvaluator):
     def _calculate_confidence(self):
         try:
             non_frame_item = (
-                StructureCollection(
-                    {
-                        correspondence
-                        for correspondence in self.target_structures.where(
-                            is_correspondence=True
-                        )
-                        if not correspondence.start.is_slot
-                    }
-                )
+                self.target_structures.where(is_correspondence=True)
+                .filter(lambda x: not x.start.is_slot)
                 .get()
                 .start
             )
             frame_item = (
-                StructureCollection(
-                    {
-                        correspondence
-                        for correspondence in self.target_structures.where(
-                            is_correspondence=True
-                        )
-                        if correspondence.start.is_slot
-                    }
-                )
+                self.target_structures.where(is_correspondence=True)
+                .filter(lambda x: x.start.is_slot)
                 .get()
                 .start
             )

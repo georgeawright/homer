@@ -1,6 +1,5 @@
 from homer.codelets.selector import Selector
 from homer.errors import MissingStructureError
-from homer.structure_collection import StructureCollection
 
 
 class ViewSelector(Selector):
@@ -18,7 +17,9 @@ class ViewSelector(Selector):
         try:
             champion_view = self.champions.get()
             challenger_view = champion_view.nearby().get()
-            self.challengers = StructureCollection({challenger_view})
+            self.challengers = self.bubble_chamber.new_structure_collection(
+                challenger_view
+            )
         except MissingStructureError:
             return True
         return True

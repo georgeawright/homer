@@ -20,6 +20,9 @@ class ConceptualSpace(Space):
         no_of_dimensions: int,
         dimensions: List[ConceptualSpace],
         sub_spaces: List[ConceptualSpace],
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
@@ -32,6 +35,9 @@ class ConceptualSpace(Space):
             parent_concept=parent_concept,
             contents=contents,
             quality=1.0,
+            links_in=links_in,
+            links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.no_of_dimensions = no_of_dimensions
         self._dimensions = dimensions

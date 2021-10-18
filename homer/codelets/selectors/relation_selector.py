@@ -24,7 +24,9 @@ class RelationSelector(Selector):
             challenger_relation = candidates.get(
                 key=activation, exclude=[champion_relation]
             )
-            self.challengers = StructureCollection({challenger_relation})
+            self.challengers = self.bubble_chamber.new_structure_collection(
+                challenger_relation
+            )
             return True
         except MissingStructureError:
             return False

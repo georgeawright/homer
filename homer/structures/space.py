@@ -14,8 +14,9 @@ class Space(Structure):
         parent_concept: "Concept",
         contents: StructureCollection,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
     ):
         Structure.__init__(
             self,
@@ -25,6 +26,7 @@ class Space(Structure):
             quality=quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.name = name
         self.value = name

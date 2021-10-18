@@ -20,8 +20,9 @@ class Rule(Node):
         root_concept: Concept,
         left_concept: Concept,
         right_concept: Concept,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         stable_activation: FloatBetweenOneAndZero = None,
     ):
         quality = None
@@ -34,6 +35,7 @@ class Rule(Node):
             quality=quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
             stable_activation=stable_activation,
         )
         self.name = name
@@ -44,33 +46,20 @@ class Rule(Node):
         self.is_rule = True
 
     @property
-    def rule_constituents(self) -> StructureCollection:
-        return StructureCollection(
-            {self.root_concept, self.left_concept, self.right_concept}
-        )
-
-    @property
     def instance_type(self) -> type:
         return self.left_concept.instance_type
 
     @property
     def friends(self) -> StructureCollection:
-        return StructureCollection.union(
-            StructureCollection(
-                {
-                    link_link.start
-                    for link in self.links_in
-                    for link_link in link.start.links_in
-                }
-            ).where(is_rule=True, parent_space=self.parent_space),
-            StructureCollection(
-                {
-                    link_link.end
-                    for link in self.links_out
-                    for link_link in link.end.links_out
-                }
-            ).where(is_rule=True, parent_space=self.parent_space),
+        linked_node_links = StructureCollection.union(
+            *[linked_node.relations for linked_node in self.relatives]
         )
+        linked_rules = StructureCollection.union(
+            *[linked_node_link.arguments for linked_node_link in linked_node_links]
+        ).filter(
+            lambda x: x != self and x.is_rule and x.parent_space == self.parent_space
+        )
+        return linked_rules
 
     def compatibility_with(
         self, root: Node = None, child: Node = None, branch: str = "left"

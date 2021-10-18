@@ -110,6 +110,7 @@ def coderack():
     return rack
 
 
+@pytest.mark.skip
 def test_gets_appropriate_follow_up_class(
     bubble_chamber,
     coderack,

@@ -2,7 +2,6 @@ import statistics
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
-from homer.structure_collection import StructureCollection
 
 
 class ChunkEvaluator(Evaluator):
@@ -19,7 +18,7 @@ class ChunkEvaluator(Evaluator):
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            StructureCollection({target}),
+            bubble_chamber.new_structure_collection(target),
             structure_type.activation,
         )
 

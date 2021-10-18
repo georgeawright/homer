@@ -88,24 +88,19 @@ class RelationSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_space = StructureCollection(
-            {
-                space
-                for space in bubble_chamber.working_spaces
-                if space.no_of_dimensions == 1
-                and parent_concept.is_compatible_with(space.parent_concept)
-            }
+        target_space = bubble_chamber.new_structure_collection(
+            space
+            for space in bubble_chamber.contextual_spaces
+            if space.no_of_dimensions == 1
+            and parent_concept.is_compatible_with(space.parent_concept)
         ).get()
         potential_targets = StructureCollection.union(
             target_space.contents.where(is_chunk=True),
             target_space.contents.where(is_word=True),
         )
-        sample_proportion = 1 if potential_targets.get().is_word else 0.5
-        # maximize chances of finding right word for dependency relation
         try:
             target_structure_one = potential_targets.get(
                 key=lambda x: parent_concept.proximity_to_start(x),
-                sample_proportion=sample_proportion,
             )
             target_structure_two = target_structure_one.get_potential_relative(
                 space=target_space, concept=parent_concept
@@ -141,32 +136,30 @@ class RelationSuggester(Suggester):
         self.target_structure_two = self._target_structures["target_structure_two"]
         self.parent_concept = self._target_structures["parent_concept"]
         if self.parent_concept is None:
-            conceptual_space = StructureCollection(
-                {
-                    space
-                    for space in self.bubble_chamber.conceptual_spaces.where(
-                        is_basic_level=True
-                    ).where(instance_type=type(self.target_structure_one))
-                    if self.target_structure_one.has_location_in_space(space)
-                }
-            ).get()
+            conceptual_space = (
+                self.bubble_chamber.conceptual_spaces.where(
+                    is_basic_level=True, instance_type=type(self.target_structure_one)
+                )
+                .filter(lambda x: self.target_structure_one.has_location_in_space(x))
+                .get()
+            )
             location = self.target_structure_one.location_in_space(conceptual_space)
             try:
-                self.parent_concept = StructureCollection(
-                    {
-                        concept
-                        for concept in conceptual_space.contents.of_type(Concept).where(
-                            structure_type=Relation
-                        )
-                        if any(
+                self.parent_concept = (
+                    conceptual_space.contents.where(
+                        is_concept=True, structure_type=Relation
+                    )
+                    .filter(
+                        lambda x: any(
                             [
                                 location.start_is_near(location)
-                                for location in concept.locations
+                                for location in x.locations
                                 if location.space == conceptual_space
                             ]
                         )
-                    }
-                ).get()
+                    )
+                    .get()
+                )
             except MissingStructureError:
                 try:
                     self.parent_concept = (

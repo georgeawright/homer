@@ -1,7 +1,5 @@
 import yaml
 
-from .structures.spaces import WorkingSpace
-
 
 class Problem:
 
@@ -19,7 +17,7 @@ class Problem:
     def __init__(self, path_to_file: str):
         self.path_to_file = path_to_file
 
-    def as_working_space(self) -> WorkingSpace:
+    def as_working_space(self):
         pass
 
 

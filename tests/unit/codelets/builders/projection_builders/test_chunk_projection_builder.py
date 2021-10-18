@@ -10,12 +10,11 @@ from homer.tools import hasinstance
 
 
 @pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.concepts = {"build": Mock(), "same": Mock(), "chunk": Mock()}
-    chamber.conceptual_spaces = {"grammar": Mock()}
-    chamber.chunks = StructureCollection()
-    return chamber
+def grammar_space(bubble_chamber):
+    space = Mock()
+    space.name = "grammar"
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(space)
+    return space
 
 
 @pytest.fixture
@@ -35,7 +34,7 @@ def target_projectee(target_view):
 
 
 def test_projects_chunk_into_output_space(
-    bubble_chamber, target_view, target_projectee
+    bubble_chamber, target_view, target_projectee, grammar_space
 ):
     target_projectee.has_correspondence_to_space.return_value = False
     target_structures = {

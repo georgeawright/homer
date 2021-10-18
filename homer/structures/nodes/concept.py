@@ -22,8 +22,9 @@ class Concept(Node):
         parent_space: Space,
         child_spaces: StructureCollection,
         distance_function: Callable,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
     ):
@@ -37,6 +38,7 @@ class Concept(Node):
             quality=quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.name = name
         self.classifier = classifier
@@ -64,12 +66,10 @@ class Concept(Node):
 
     def friends(self, space: Space = None) -> StructureCollection:
         space = self.parent_space if space is None else space
-        if space.no_of_dimensions == 0:
-            concepts = StructureCollection(
-                {link.end for link in self.links_out if link.end in space.contents}
-            )
-            return concepts if not concepts.is_empty() else StructureCollection({self})
-        return StructureCollection({self})
+        friend_concepts = self.relatives.filter(lambda x: x in space.contents)
+        if friend_concepts.is_empty():
+            friend_concepts.add(self)
+        return friend_concepts
 
     def distance_from(self, other: Node):
         return self.distance_function(

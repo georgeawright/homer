@@ -48,6 +48,9 @@ def test_distance_from(prototype, space_name, distance_function, expected, struc
         parent_space,
         Mock(),
         distance_function,
+        Mock(),
+        Mock(),
+        Mock(),
     )
     assert expected == concept.distance_from(structure)
 
@@ -84,6 +87,9 @@ def test_proximity_to(
         parent_space,
         Mock(),
         distance_function,
+        Mock(),
+        Mock(),
+        Mock(),
         distance_to_proximity_weight=distance_to_proximity_weight,
     )
     assert expected == concept.proximity_to(structure)

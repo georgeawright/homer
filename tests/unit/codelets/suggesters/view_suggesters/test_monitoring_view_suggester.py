@@ -11,20 +11,6 @@ from homer.tools import hasinstance
 
 
 @pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.has_view.return_value = False
-    chamber.concepts = {
-        "suggest": Mock(),
-        "view-monitoring": Mock(),
-        "text": Mock(),
-        "interpretation": Mock(),
-    }
-    chamber.monitoring_views = StructureCollection()
-    return chamber
-
-
-@pytest.fixture
 def input_space(bubble_chamber):
     space = Mock()
     space.activation = 1.0
@@ -42,11 +28,16 @@ def interpretation_space():
 def test_gives_high_confidence_for_highly_activated_spaces(
     bubble_chamber, input_space, interpretation_space
 ):
+    bubble_chamber.has_view.return_value = False
     view_suggester = MonitoringViewSuggester(
         Mock(),
         Mock(),
         bubble_chamber,
-        {"input_spaces": StructureCollection({input_space, interpretation_space})},
+        {
+            "input_spaces": bubble_chamber.new_structure_collection(
+                input_space, interpretation_space
+            )
+        },
         Mock(),
     )
     result = view_suggester.run()
@@ -59,13 +50,18 @@ def test_gives_high_confidence_for_highly_activated_spaces(
 def test_gives_low_confidence_for_low_activated_spaces(
     bubble_chamber, input_space, interpretation_space
 ):
+    bubble_chamber.has_view.return_value = False
     input_space.activation = 0.0
     interpretation_space.activation = 0.0
     view_suggester = MonitoringViewSuggester(
         Mock(),
         Mock(),
         bubble_chamber,
-        {"input_spaces": StructureCollection({input_space, interpretation_space})},
+        {
+            "input_spaces": bubble_chamber.new_structure_collection(
+                input_space, interpretation_space
+            )
+        },
         1.0,
     )
     result = view_suggester.run()

@@ -24,12 +24,13 @@ class Chunk(Node):
         members: StructureCollection,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
-        left_branch: StructureCollection = None,
-        right_branch: StructureCollection = None,
-        rule: Rule = None,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
-        super_chunks: StructureCollection = None,
+        left_branch: StructureCollection,
+        right_branch: StructureCollection,
+        rule: Rule,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
+        super_chunks: StructureCollection,
         is_raw: bool = False,
     ):
         Node.__init__(
@@ -41,18 +42,13 @@ class Chunk(Node):
             quality=quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.members = members
-        self.left_branch = (
-            left_branch if left_branch is not None else StructureCollection()
-        )
-        self.right_branch = (
-            right_branch if right_branch is not None else StructureCollection()
-        )
+        self.left_branch = left_branch
+        self.right_branch = right_branch
         self.rule = rule
-        self.super_chunks = (
-            super_chunks if super_chunks is not None else StructureCollection()
-        )
+        self.super_chunks = super_chunks
         self.is_raw = is_raw
         self.is_chunk = True
 
@@ -83,7 +79,9 @@ class Chunk(Node):
     @property
     def raw_members(self) -> StructureCollection:
         if self.is_raw:
-            return StructureCollection({self})
+            raw_members = self.members
+            raw_members.add(self)
+            return raw_members
         return StructureCollection.union(*[chunk.raw_members for chunk in self.members])
 
     @property
@@ -155,18 +153,18 @@ class Chunk(Node):
                 for location in chunk.locations
                 if location.space.is_conceptual_space
             ] + [location]
-            members = StructureCollection()
+            members = bubble_chamber.new_structure_collection()
             for member in chunk.members:
                 if member not in copies:
                     copies[member] = copy_recursively(
                         member, location, bubble_chamber, parent_id, copies
                     )
                 members.add(copies[member])
-            new_left_branch = StructureCollection(
-                {copies[member] for member in chunk.left_branch}
+            new_left_branch = bubble_chamber.new_structure_collection(
+                *[copies[member] for member in chunk.left_branch]
             )
-            new_right_branch = StructureCollection(
-                {copies[member] for member in chunk.right_branch}
+            new_right_branch = bubble_chamber.new_structure_collection(
+                *[copies[member] for member in chunk.right_branch]
             )
             chunk_copy = Chunk(
                 structure_id=ID.new(Chunk),
@@ -178,6 +176,10 @@ class Chunk(Node):
                 left_branch=new_left_branch,
                 right_branch=new_right_branch,
                 rule=chunk.rule,
+                links_in=bubble_chamber.new_structure_collection(),
+                links_out=bubble_chamber.new_structure_collection(),
+                parent_spaces=bubble_chamber.new_structure_collection(),
+                super_chunks=bubble_chamber.new_structure_collection(),
                 is_raw=chunk.is_raw,
             )
             location.space.contents.add(chunk_copy)
@@ -208,7 +210,7 @@ class Chunk(Node):
                 self.location_in_space(self.parent_space).coordinates, parent_space
             )
         )
-        new_members = StructureCollection()
+        new_members = bubble_chamber.new_structure_collection()
         for member in self.members:
             if member not in copies:
                 copies[member] = member.copy(
@@ -218,11 +220,11 @@ class Chunk(Node):
                     parent_space=parent_space,
                 )
             new_members.add(copies[member])
-        new_left_branch = StructureCollection(
-            {copies[member] for member in self.left_branch}
+        new_left_branch = bubble_chamber.new_structure_collection(
+            copies[member] for member in self.left_branch
         )
-        new_right_branch = StructureCollection(
-            {copies[member] for member in self.right_branch}
+        new_right_branch = bubble_chamber.new_structure_collection(
+            copies[member] for member in self.right_branch
         )
         chunk_copy = Chunk(
             structure_id=ID.new(Chunk),
@@ -234,6 +236,10 @@ class Chunk(Node):
             left_branch=new_left_branch,
             right_branch=new_right_branch,
             rule=self.rule,
+            links_in=bubble_chamber.new_structure_collection(),
+            links_out=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(),
+            super_chunks=bubble_chamber.new_structure_collection(),
             is_raw=self.is_raw,
         )
         bubble_chamber.logger.log(chunk_copy)

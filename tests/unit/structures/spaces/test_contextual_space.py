@@ -28,7 +28,11 @@ def test_update_activation(
         Mock(),
         "name",
         Mock(),
-        StructureCollection({structure_1, structure_2, structure_3}),
+        StructureCollection(Mock(), [structure_1, structure_2, structure_3]),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     contextual_space.update_activation()
     assert expected_activation == contextual_space.activation

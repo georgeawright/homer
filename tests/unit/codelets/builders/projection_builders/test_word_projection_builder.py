@@ -10,12 +10,11 @@ from homer.tools import hasinstance
 
 
 @pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.concepts = {"build": Mock(), "same": Mock(), "word": Mock()}
-    chamber.conceptual_spaces = {"grammar": Mock()}
-    chamber.words = StructureCollection()
-    return chamber
+def grammar_space(bubble_chamber):
+    space = Mock()
+    space.name = "grammar"
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(space)
+    return space
 
 
 @pytest.fixture
@@ -36,6 +35,7 @@ def target_projectee(target_view):
 
 @pytest.fixture
 def abstract_word(bubble_chamber):
+    bubble_chamber.words = bubble_chamber.new_structure_collection()
     word = Mock()
     word.name = "word"
     bubble_chamber.words.add(word)
@@ -53,36 +53,38 @@ def lexeme(abstract_word, target_projectee):
 
 
 @pytest.fixture
-def word_concept(lexeme):
+def word_concept(bubble_chamber, lexeme):
     concept = Mock()
-    concept.lexemes = StructureCollection({lexeme})
+    concept.lexemes = bubble_chamber.new_structure_collection(lexeme)
     return concept
 
 
 @pytest.fixture
-def frame_correspondee(target_view, word_concept, target_projectee):
+def frame_correspondee(bubble_chamber, target_view, word_concept, target_projectee):
     correspondee = Mock()
     correspondee.structure_id = "frame_correspondee"
     frame_correspondence = Mock()
     frame_correspondence.start = frame_correspondee
     frame_correspondence.end = target_projectee
-    target_projectee.correspondences = StructureCollection({frame_correspondence})
+    target_projectee.correspondences = bubble_chamber.new_structure_collection(
+        frame_correspondence
+    )
     non_frame_correspondee = Mock()
     non_frame_correspondence = Mock()
     non_frame_correspondence.start = non_frame_correspondee
     non_frame_correspondence.end = correspondee
-    correspondee.correspondences = StructureCollection(
-        {frame_correspondence, non_frame_correspondence}
+    correspondee.correspondences = bubble_chamber.new_structure_collection(
+        frame_correspondence, non_frame_correspondence
     )
-    target_view.members = StructureCollection(
-        {frame_correspondence, non_frame_correspondence}
+    target_view.members = bubble_chamber.new_structure_collection(
+        frame_correspondence, non_frame_correspondence
     )
     target_view.slot_values[correspondee.structure_id] = word_concept
     return correspondee
 
 
 def test_projects_slot_into_output_space(
-    bubble_chamber, target_view, target_projectee, frame_correspondee
+    bubble_chamber, target_view, target_projectee, frame_correspondee, grammar_space
 ):
     target_projectee.is_slot = True
     target_structures = {
@@ -99,7 +101,7 @@ def test_projects_slot_into_output_space(
 
 
 def test_projects_non_slot_word_into_output_space(
-    bubble_chamber, target_view, target_projectee
+    bubble_chamber, target_view, target_projectee, grammar_space
 ):
     target_projectee.is_slot = False
     target_projectee.has_correspondence_to_space.return_value = False

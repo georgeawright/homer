@@ -11,23 +11,6 @@ from homer.tools import hasinstance
 
 
 @pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.has_view.return_value = False
-    chamber.concepts = {
-        "build": Mock(),
-        "view-monitoring": Mock(),
-        "text": Mock(),
-        "interpretation": Mock(),
-    }
-    views_space = Mock()
-    views_space.name = "views"
-    chamber.spaces = StructureCollection({views_space})
-    chamber.monitoring_views = StructureCollection()
-    return chamber
-
-
-@pytest.fixture
 def input_space(bubble_chamber):
     space = Mock()
     space.activation = 1.0
@@ -57,7 +40,9 @@ def test_successful_creates_view_and_spawns_follow_up(
         Mock(),
         bubble_chamber,
         {
-            "input_spaces": StructureCollection({input_space, interpretation_space}),
+            "input_spaces": bubble_chamber.new_structure_collection(
+                input_space, interpretation_space
+            ),
             "output_space": text_space,
         },
         Mock(),

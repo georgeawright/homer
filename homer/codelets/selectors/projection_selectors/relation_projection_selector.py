@@ -1,7 +1,6 @@
 from homer.codelets.selectors import ProjectionSelector
 from homer.codelets.suggesters.projection_suggesters import RelationProjectionSuggester
 from homer.errors import MissingStructureError
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import uncorrespondedness
 
 
@@ -14,13 +13,13 @@ class RelationProjectionSelector(ProjectionSelector):
         return True
 
     def _engender_follow_up(self):
-        correspondence_from_frame = StructureCollection(
-            {
+        correspondence_from_frame = self.bubble_chamber.new_structure_collection(
+            *[
                 correspondence
                 for correspondence in self.winners.where(is_correspondence=True)
                 if correspondence.start.parent_space.parent_concept
                 == correspondence.end.parent_space.parent_concept
-            }
+            ]
         ).get()
         frame = correspondence_from_frame.start.parent_space
         try:

@@ -7,13 +7,6 @@ from homer.structure_collection import StructureCollection
 
 
 @pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.concepts = {"suggest": Mock(), "same": Mock(), "word": Mock()}
-    return chamber
-
-
-@pytest.fixture
 def target_view():
     view = Mock()
     view.slot_values = {}
@@ -21,21 +14,23 @@ def target_view():
 
 
 @pytest.fixture
-def target_projectee(target_view):
+def target_projectee(bubble_chamber, target_view):
     word = Mock()
     frame_correspondee = Mock()
     frame_correspondee.structure_id = "frame_correspondee"
     frame_correspondence = Mock()
     frame_correspondence.start = frame_correspondee
     frame_correspondence.end = word
-    word.correspondences = StructureCollection({frame_correspondence})
+    word.correspondences = bubble_chamber.new_structure_collection(frame_correspondence)
     non_frame_correspondee = Mock()
     non_frame_correspondence = Mock()
     non_frame_correspondence.start = non_frame_correspondee
     non_frame_correspondence.end = frame_correspondee
-    frame_correspondee.correspondences = StructureCollection({non_frame_correspondence})
-    target_view.members = StructureCollection(
-        {frame_correspondence, non_frame_correspondence}
+    frame_correspondee.correspondences = bubble_chamber.new_structure_collection(
+        non_frame_correspondence
+    )
+    target_view.members = bubble_chamber.new_structure_collection(
+        frame_correspondence, non_frame_correspondence
     )
     target_view.slot_values[frame_correspondee.structure_id] = Mock()
     return word
@@ -56,7 +51,7 @@ def test_gives_suggests_projection_from_slot(
 def test_gives_full_confidence_to_project_non_slot(
     bubble_chamber, target_view, target_projectee
 ):
-    target_projectee.correspondences = StructureCollection()
+    target_projectee.correspondences = bubble_chamber.new_structure_collection()
     target_projectee.is_slot = False
     target_projectee.has_correspondence_to_space.return_value = False
     target_structures = {

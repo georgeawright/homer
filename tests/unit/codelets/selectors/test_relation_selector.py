@@ -9,13 +9,6 @@ from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
 
-@pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.concepts = {"relation": Mock(), "select": Mock()}
-    return chamber
-
-
 def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion = Mock()
     challenger = Mock()
@@ -25,21 +18,25 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     challenger.size = 1
     challenger.quality = 1.0
     challenger.activation = 1.0
-    champion.start.relations_in_space_with.return_value = StructureCollection(
-        {champion, challenger}
+    champion.start.relations_in_space_with.return_value = (
+        bubble_chamber.new_structure_collection(champion, challenger)
     )
     space = Mock()
     space.no_of_dimensions = 1
-    champion.start.parent_spaces = StructureCollection({space})
-    champion.end.parent_spaces = StructureCollection({space})
-    challenger.start.parent_spaces = StructureCollection({space})
-    challenger.end.parent_spaces = StructureCollection({space})
+    champion.start.parent_spaces = bubble_chamber.new_structure_collection(space)
+    champion.end.parent_spaces = bubble_chamber.new_structure_collection(space)
+    challenger.start.parent_spaces = bubble_chamber.new_structure_collection(space)
+    challenger.end.parent_spaces = bubble_chamber.new_structure_collection(space)
     selector = RelationSelector(
-        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(champion),
+        Mock(),
     )
     assert selector.challengers is None
     selector.run()
-    assert selector.challengers == StructureCollection({challenger})
+    assert selector.challengers == bubble_chamber.new_structure_collection(challenger)
 
 
 @pytest.mark.parametrize(
@@ -73,17 +70,17 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         challenger.activation = challenger_activation
         space = Mock()
         space.no_of_dimensions = 1
-        champion.start.parent_spaces = StructureCollection({space})
-        champion.end.parent_spaces = StructureCollection({space})
-        challenger.start.parent_spaces = StructureCollection({space})
-        challenger.end.parent_spaces = StructureCollection({space})
+        champion.start.parent_spaces = bubble_chamber.new_structure_collection(space)
+        champion.end.parent_spaces = bubble_chamber.new_structure_collection(space)
+        challenger.start.parent_spaces = bubble_chamber.new_structure_collection(space)
+        challenger.end.parent_spaces = bubble_chamber.new_structure_collection(space)
         selector = RelationSelector(
             Mock(),
             Mock(),
             bubble_chamber,
-            StructureCollection({champion}),
+            bubble_chamber.new_structure_collection(champion),
             Mock(),
-            challengers=StructureCollection({challenger}),
+            challengers=bubble_chamber.new_structure_collection(challenger),
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result

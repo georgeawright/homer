@@ -1,7 +1,6 @@
 from homer.codelets.builders import ViewBuilder
 from homer.id import ID
 from homer.location import Location
-from homer.structure_collection import StructureCollection
 from homer.structures.views import MonitoringView
 
 
@@ -27,11 +26,14 @@ class MonitoringViewBuilder(ViewBuilder):
             structure_id=view_id,
             parent_id=self.codelet_id,
             locations=[Location([], self.bubble_chamber.spaces["views"])],
-            members=StructureCollection(),
+            members=self.bubble_chamber.new_structure_collection(),
             input_spaces=self.input_spaces,
             output_space=self.output_space,
             quality=0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         self.bubble_chamber.logger.log(view)
         self.bubble_chamber.views.add(view)
-        self.child_structures = StructureCollection({view})
+        self.child_structures = self.bubble_chamber.new_structure_collection(view)

@@ -1,6 +1,5 @@
 from homer.id import ID
 from homer.codelets.builders import ProjectionBuilder
-from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Label
 
 
@@ -36,9 +35,13 @@ class LabelProjectionBuilder(ProjectionBuilder):
             ID.new(Label),
             self.codelet_id,
             corresponding_start,
+            self.bubble_chamber.new_structure_collection(corresponding_start),
             parent_concept,
             locations,
             0.0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         corresponding_start.links_out.add(label)
         self.bubble_chamber.labels.add(label)
@@ -50,15 +53,20 @@ class LabelProjectionBuilder(ProjectionBuilder):
             ID.new(Correspondence),
             self.codelet_id,
             start=self.target_projectee,
-            end=label,
+            arguments=self.bubble_chamber.new_structure_collection(
+                self.target_projectee, label
+            ),
             locations=[self.target_projectee.location, label.location],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
             parent_view=self.target_view,
             quality=0.0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
-        self.child_structures = StructureCollection(
-            {label, frame_to_output_correspondence}
+        self.child_structures = self.bubble_chamber.new_structure_collection(
+            label, frame_to_output_correspondence
         )
         self.bubble_chamber.correspondences.add(frame_to_output_correspondence)
         self.bubble_chamber.logger.log(frame_to_output_correspondence)
@@ -74,7 +82,9 @@ class LabelProjectionBuilder(ProjectionBuilder):
                 ID.new(Correspondence),
                 self.codelet_id,
                 start=self.non_frame_correspondee,
-                end=label,
+                arguments=self.bubble_chamber.new_structure_collection(
+                    self.non_frame_correspondee, label
+                ),
                 locations=[
                     self.non_frame_correspondee.location_in_space(self.non_frame),
                     label.location,
@@ -83,6 +93,9 @@ class LabelProjectionBuilder(ProjectionBuilder):
                 conceptual_space=self.target_correspondence.conceptual_space,
                 parent_view=self.target_view,
                 quality=0.0,
+                links_in=self.bubble_chamber.new_structure_collection(),
+                links_out=self.bubble_chamber.new_structure_collection(),
+                parent_spaces=self.bubble_chamber.new_structure_collection(),
             )
             self.child_structures.add(non_frame_to_output_correspondence)
             self.bubble_chamber.correspondences.add(non_frame_to_output_correspondence)

@@ -6,13 +6,6 @@ from homer.codelets.selectors.projection_selectors import RelationProjectionSele
 from homer.structure_collection import StructureCollection
 
 
-@pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.concepts = {"relation": Mock(), "select": Mock()}
-    return chamber
-
-
 def test_relation_is_boosted(bubble_chamber):
     relation = Mock()
     relation.size = 1
@@ -32,7 +25,7 @@ def test_relation_is_boosted(bubble_chamber):
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection({relation, correspondence_from_frame}),
+        bubble_chamber.new_structure_collection(relation, correspondence_from_frame),
         Mock(),
     )
     selector.run()

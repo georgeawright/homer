@@ -16,7 +16,10 @@ class ContextualSpace(Space):
         name: str,
         parent_concept: Concept,
         contents: StructureCollection,
-        conceptual_spaces: StructureCollection = None,
+        conceptual_spaces: StructureCollection,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
     ):
         Space.__init__(
             self,
@@ -26,10 +29,11 @@ class ContextualSpace(Space):
             parent_concept=parent_concept,
             contents=contents,
             quality=0.0,
+            links_in=links_in,
+            links_out=links_out,
+            parent_spaces=parent_spaces,
         )
-        self.conceptual_spaces = (
-            StructureCollection() if conceptual_spaces is None else conceptual_spaces
-        )
+        self.conceptual_spaces = conceptual_spaces
         self.is_contextual_space = True
 
     @property
@@ -69,8 +73,11 @@ class ContextualSpace(Space):
             parent_id=parent_id,
             name=self.name,
             parent_concept=self.parent_concept,
-            contents=StructureCollection(),
+            contents=bubble_chamber.new_structure_collection(),
             conceptual_spaces=self.conceptual_spaces,
+            links_in=bubble_chamber.new_structure_collection(),
+            links_out=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(),
         )
         bubble_chamber.logger.log(new_space)
         copies = {}

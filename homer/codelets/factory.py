@@ -154,31 +154,32 @@ class Factory(Codelet):
         view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
         view_simplex = self.bubble_chamber.concepts["view-simplex"]
         word = self.bubble_chamber.concepts["word"]
+
+        nsc = lambda *x: self.bubble_chamber.new_structure_collection(*x)
+
         return {
             "inner-or-outer": {
-                "actions": StructureCollection({suggest, evaluate}),
-                "spaces": StructureCollection({inner, outer}),
-                "directions": StructureCollection({forward}),
-                "structures": StructureCollection({chunk, label, relation}),
+                "actions": nsc(suggest, evaluate),
+                "spaces": nsc(inner, outer),
+                "directions": nsc(forward),
+                "structures": nsc(chunk, label, relation),
             },
             "inner": {
-                "actions": StructureCollection({suggest, evaluate}),
-                "spaces": StructureCollection({inner}),
-                "directions": StructureCollection({forward}),
-                "structures": StructureCollection(
-                    {correspondence, view_monitoring, view_simplex}
-                ),
+                "actions": nsc(suggest, evaluate),
+                "spaces": nsc(inner),
+                "directions": nsc(forward),
+                "structures": nsc(correspondence, view_monitoring, view_simplex),
             },
             "outer": {
-                "actions": StructureCollection({suggest, evaluate}),
-                "spaces": StructureCollection({outer}),
-                "directions": StructureCollection({forward}),
-                "structures": StructureCollection({word}),
+                "actions": nsc(suggest, evaluate),
+                "spaces": nsc(outer),
+                "directions": nsc(forward),
+                "structures": nsc(word),
             },
             "publish": {
-                "actions": StructureCollection({publish}),
-                "spaces": StructureCollection({publish}),
-                "directions": StructureCollection({publish}),
-                "structures": StructureCollection({publish}),
+                "actions": nsc(publish),
+                "spaces": nsc(publish),
+                "directions": nsc(publish),
+                "structures": nsc(publish),
             },
         }

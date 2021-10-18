@@ -1,7 +1,6 @@
 from homer.codelets.builders import ViewBuilder
 from homer.id import ID
 from homer.location import Location
-from homer.structure_collection import StructureCollection
 from homer.structures.spaces import ContextualSpace
 from homer.structures.views import SimplexView
 
@@ -30,26 +29,34 @@ class SimplexViewBuilder(ViewBuilder):
             parent_id=self.codelet_id,
             bubble_chamber=self.bubble_chamber,
         )
-        input_spaces = StructureCollection({self.contextual_space, frame_instance})
+        input_spaces = self.bubble_chamber.new_structure_collection(
+            self.contextual_space, frame_instance
+        )
         view_output = ContextualSpace(
             structure_id=ID.new(ContextualSpace),
             parent_id=self.codelet_id,
             name=f"output for {view_id}",
             parent_concept=frame_instance.output_space.parent_concept,
-            contents=StructureCollection(),
+            contents=self.bubble_chamber.new_structure_collection(),
             conceptual_spaces=frame_instance.output_space.conceptual_spaces,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         view = SimplexView(
             structure_id=view_id,
             parent_id=self.codelet_id,
             locations=[Location([], self.bubble_chamber.spaces["views"])],
-            members=StructureCollection(),
+            members=self.bubble_chamber.new_structure_collection(),
             input_spaces=input_spaces,
             output_space=view_output,
             quality=0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         self.bubble_chamber.logger.log(view_output)
         self.bubble_chamber.contextual_spaces.add(view_output)
         self.bubble_chamber.logger.log(view)
         self.bubble_chamber.views.add(view)
-        self.child_structures = StructureCollection({view})
+        self.child_structures = self.bubble_chamber.new_structure_collection(view)

@@ -71,8 +71,8 @@ class Builder(Codelet):
 
     @property
     def target_structures(self):
-        return StructureCollection(
-            {structure for structure in self._target_structures.values()}
+        return self.bubble_chamber.new_structure_collection(
+            *[structure for structure in self._target_structures.values()]
         )
 
     def _boost_activations(self):

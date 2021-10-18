@@ -19,7 +19,7 @@ class CorrespondenceEvaluator(Evaluator):
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            StructureCollection({target}),
+            bubble_chamber.new_structure_collection(target),
             structure_type.activation,
         )
 

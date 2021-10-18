@@ -18,18 +18,18 @@ class LabelProjectionEvaluator(ProjectionEvaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["label"]
         input_concept = bubble_chamber.concepts["input"]
-        view = StructureCollection(
-            {
+        view = bubble_chamber.new_structure_collection(
+            *[
                 view
                 for view in bubble_chamber.views
                 if view.output_space.parent_concept == input_concept
                 and not view.contents.where(is_label=True).is_empty()
-            }
+            ]
         ).get()
         label = view.ouptut_space.contents.where(is_label=True).get()
         correspondences = label.correspondences.where(end=label)
         target_structures = StructureCollection.union(
-            StructureCollection({label}), correspondences
+            bubble_chamber.new_structure_collection(label), correspondences
         )
         return cls.spawn(
             parent_id,
@@ -46,28 +46,14 @@ class LabelProjectionEvaluator(ProjectionEvaluator):
     def _calculate_confidence(self):
         try:
             non_frame_item = (
-                StructureCollection(
-                    {
-                        correspondence
-                        for correspondence in self.target_structures.where(
-                            is_correspondence=True
-                        )
-                        if not correspondence.start.is_slot
-                    }
-                )
+                self.target_structures.where(is_correspondence=True)
+                .filter(lambda x: not x.start.is_slot)
                 .get()
                 .start
             )
             frame_item = (
-                StructureCollection(
-                    {
-                        correspondence
-                        for correspondence in self.target_structures.where(
-                            is_correspondence=True
-                        )
-                        if correspondence.start.is_slot
-                    }
-                )
+                self.target_structures.where(is_correspondence=True)
+                .filter(lambda x: x.start.is_slot)
                 .get()
                 .start
             )

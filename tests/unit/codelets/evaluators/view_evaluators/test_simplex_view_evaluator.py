@@ -18,6 +18,7 @@ from homer.structure_collection import StructureCollection
     ],
 )
 def test_changes_target_structure_quality(
+    bubble_chamber,
     current_quality,
     correspondences_quality,
     no_of_slots,
@@ -27,15 +28,12 @@ def test_changes_target_structure_quality(
     output_quality,
     expected_view_quality,
 ):
-    bubble_chamber = Mock()
-    bubble_chamber.concepts = {"evaluate": Mock(), "view-simplex": Mock()}
-
     view = Mock()
     view.slots = [Mock() for _ in range(no_of_slots)]
     view.slot_values = {Mock(): Mock() for _ in range(no_of_slot_values)}
 
     frame = Mock()
-    frame.output_space.contents = StructureCollection()
+    frame.output_space.contents = bubble_chamber.new_structure_collection()
     for _ in range(no_of_projected_frame_items):
         item = Mock()
         item.is_correspondence = False
@@ -46,7 +44,7 @@ def test_changes_target_structure_quality(
         item.is_correspondence = False
         item.has_correspondence_to_space.return_value = False
         frame.output_space.contents.add(item)
-    view.input_frames = StructureCollection({frame})
+    view.input_frames = bubble_chamber.new_structure_collection(frame)
 
     view.output_space.quality = output_quality
 
@@ -54,11 +52,15 @@ def test_changes_target_structure_quality(
     member_1.quality = correspondences_quality
     member_2 = Mock()
     member_2.quality = correspondences_quality
-    view.members = StructureCollection({member_1, member_2})
+    view.members = bubble_chamber.new_structure_collection(member_1, member_2)
     view.quality = current_quality
 
     evaluator = SimplexViewEvaluator(
-        Mock(), Mock(), bubble_chamber, StructureCollection({view}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(view),
+        Mock(),
     )
     evaluator.run()
     assert expected_view_quality == view.quality

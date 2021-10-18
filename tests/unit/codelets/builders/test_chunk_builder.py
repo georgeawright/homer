@@ -69,6 +69,7 @@ def target_slot_filler():
     return chunk
 
 
+@pytest.fixture
 def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
     target_rule = Mock()
     existing_chunk = Mock()
@@ -95,6 +96,7 @@ def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
     assert CodeletResult.FIZZLE == builder.result
 
 
+@pytest.fixture
 def test_creates_new_chunk_if_necessary(
     bubble_chamber, target_space, target_rule, target_node
 ):
@@ -115,6 +117,7 @@ def test_creates_new_chunk_if_necessary(
     assert hasinstance(builder.child_structures, Chunk)
 
 
+@pytest.fixture
 def test_fills_slot_if_necessary(
     bubble_chamber,
     target_rule,
@@ -143,6 +146,7 @@ def test_fills_slot_if_necessary(
     assert target_slot not in target_root.members
 
 
+@pytest.fixture
 def test_leaves_slot_if_appropriate(
     bubble_chamber,
     target_rule,

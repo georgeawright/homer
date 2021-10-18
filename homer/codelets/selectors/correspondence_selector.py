@@ -1,7 +1,6 @@
 from homer.codelets.selector import Selector
 from homer.codelets.suggesters import CorrespondenceSuggester
 from homer.errors import MissingStructureError
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation, corresponding_exigency
 
 
@@ -19,7 +18,9 @@ class CorrespondenceSelector(Selector):
             challenger_correspondence = candidates.get(
                 key=activation, exclude=[champion_correspondence]
             )
-            self.challengers = StructureCollection({challenger_correspondence})
+            self.challengers = self.bubble_chamber.new_structure_collection(
+                challenger_correspondence
+            )
         except MissingStructureError:
             pass
         return True
@@ -52,14 +53,14 @@ class CorrespondenceSelector(Selector):
                 None
                 if winner_correspondence.start.is_node
                 else (
-                    StructureCollection(
-                        {
+                    self.bubble_chamber.new_structure_collection(
+                        *[
                             structure
                             for structure in winner_correspondence.end.arguments.get()
                             .links.of_type(type(target_structure_one))
                             .where(parent_space=target_space_two)
                             if structure in target_conceptual_space.contents
-                        }
+                        ]
                     ).get(key=corresponding_exigency)
                 )
             )

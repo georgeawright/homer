@@ -2,7 +2,6 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection import StructureCollection
 
 
 class ProjectionBuilder(Builder):
@@ -46,7 +45,9 @@ class ProjectionBuilder(Builder):
 
     @property
     def target_structures(self):
-        return StructureCollection({self.target_view, self.target_projectee})
+        return self.bubble_chamber.new_structure_collection(
+            self.target_view, self.target_projectee
+        )
 
     def _passes_preliminary_checks(self):
         self.target_view = self._target_structures["target_view"]

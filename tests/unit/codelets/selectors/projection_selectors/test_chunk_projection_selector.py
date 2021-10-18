@@ -6,13 +6,6 @@ from homer.codelets.selectors.projection_selectors import ChunkProjectionSelecto
 from homer.structure_collection import StructureCollection
 
 
-@pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.concepts = {"chunk": Mock(), "select": Mock()}
-    return chamber
-
-
 def test_word_is_boosted(bubble_chamber):
     chunk = Mock()
     chunk.size = 1
@@ -32,7 +25,7 @@ def test_word_is_boosted(bubble_chamber):
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection({chunk, correspondence_from_frame}),
+        bubble_chamber.new_structure_collection(chunk, correspondence_from_frame),
         Mock(),
     )
     selector.run()

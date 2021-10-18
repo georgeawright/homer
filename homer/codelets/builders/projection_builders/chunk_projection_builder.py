@@ -1,7 +1,6 @@
 from homer.id import ID
 from homer.location import Location
 from homer.codelets.builders import ProjectionBuilder
-from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence
 
 
@@ -46,15 +45,20 @@ class ChunkProjectionBuilder(ProjectionBuilder):
             ID.new(Correspondence),
             self.codelet_id,
             start=self.target_projectee,
-            end=chunk,
+            arguments=self.bubble_chamber.new_structure_collection(
+                self.target_projectee, chunk
+            ),
             locations=[self.target_projectee.location, chunk.location],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
             parent_view=self.target_view,
             quality=0.0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
-        self.child_structures = StructureCollection(
-            {chunk, frame_to_output_correspondence}
+        self.child_structures = self.bubble_chamber.new_structure_collection(
+            chunk, frame_to_output_correspondence
         )
         self.bubble_chamber.correspondences.add(frame_to_output_correspondence)
         self.bubble_chamber.logger.log(frame_to_output_correspondence)

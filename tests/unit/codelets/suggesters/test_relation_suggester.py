@@ -19,21 +19,11 @@ def parent_concept():
 
 
 @pytest.fixture
-def conceptual_space(parent_concept):
+def conceptual_space(bubble_chamber, parent_concept):
     space = Mock()
-    space.contents = StructureCollection({parent_concept})
+    space.contents = bubble_chamber.new_structure_collection(parent_concept)
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(space)
     return space
-
-
-@pytest.fixture
-def bubble_chamber(conceptual_space):
-    chamber = Mock()
-    chamber.concepts = {"relation": Mock(), "suggest": Mock()}
-    conceptual_spaces = StructureCollection({conceptual_space})
-    conceptual_spaces_where = Mock()
-    conceptual_spaces_where.where.return_value = conceptual_spaces
-    chamber.conceptual_spaces.where.return_value = conceptual_spaces_where
-    return chamber
 
 
 @pytest.fixture

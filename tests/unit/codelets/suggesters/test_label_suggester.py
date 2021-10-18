@@ -20,21 +20,13 @@ def parent_concept():
 
 
 @pytest.fixture
-def conceptual_space(parent_concept):
+def conceptual_space(bubble_chamber, parent_concept):
     space = Mock()
     space.contents = StructureCollection({parent_concept})
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(
+        conceptual_space
+    )
     return space
-
-
-@pytest.fixture
-def bubble_chamber(conceptual_space):
-    chamber = Mock()
-    chamber.concepts = {"label": Mock(), "suggest": Mock()}
-    conceptual_spaces = StructureCollection({conceptual_space})
-    conceptual_spaces_where = Mock()
-    conceptual_spaces_where.where.return_value = conceptual_spaces
-    chamber.conceptual_spaces.where.return_value = conceptual_spaces_where
-    return chamber
 
 
 @pytest.fixture
@@ -58,8 +50,10 @@ def test_bottom_up_codelet_gets_a_concept(bubble_chamber, target_chunk):
     assert label_suggester.parent_concept is not None
 
 
-def test_gives_high_confidence_for_positive_example(bubble_chamber, target_chunk):
-    target_structures = {"target_node": target_chunk, "parent_concept": None}
+def test_gives_high_confidence_for_positive_example(
+    bubble_chamber, target_chunk, parent_concept
+):
+    target_structures = {"target_node": target_chunk, "parent_concept": parent_concept}
     label_suggester = LabelSuggester(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )

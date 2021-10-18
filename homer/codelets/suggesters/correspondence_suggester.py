@@ -5,7 +5,7 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection_keys import activation, corresponding_exigency, exigency
+from homer.structure_collection_keys import activation, corresponding_exigency
 from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
 
@@ -191,6 +191,9 @@ class CorrespondenceSuggester(Suggester):
             self.target_conceptual_space,
             self.target_view,
             0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
         for correspondence in self.target_view.members:
             if not correspondence.is_compatible_with(self.correspondence):

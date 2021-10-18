@@ -18,7 +18,7 @@ class ChunkProjectionEvaluator(ProjectionEvaluator):
         chunk = bubble_chamber.input_nodes.where(is_chunk=True).get()
         correspondences = chunk.correspondences.where(end=chunk)
         target_structures = StructureCollection.union(
-            StructureCollection({chunk}), correspondences
+            bubble_chamber.new_structure_collection(chunk), correspondences
         )
         return cls.spawn(
             parent_id,
