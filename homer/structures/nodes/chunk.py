@@ -125,6 +125,21 @@ class Chunk(Node):
     def adjacent(self) -> StructureCollection:
         return self.parent_space.contents.next_to(self.location).where(is_node=True)
 
+    def nearby(self, space: Space = None) -> StructureCollection:
+        if space is not None:
+            return (
+                space.contents.where(is_chunk=True)
+                .near(self.location_in_space(space))
+                .excluding(self),
+            )
+        return StructureCollection.intersection(
+            *[
+                location.space.contents.where(is_chunk=True).near(location)
+                for location in self.locations
+                if location.space.is_conceptual_space and location.space.is_basic_level
+            ]
+        ).excluding(self)
+
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:
@@ -221,10 +236,10 @@ class Chunk(Node):
                 )
             new_members.add(copies[member])
         new_left_branch = bubble_chamber.new_structure_collection(
-            copies[member] for member in self.left_branch
+            *[copies[member] for member in self.left_branch]
         )
         new_right_branch = bubble_chamber.new_structure_collection(
-            copies[member] for member in self.right_branch
+            *[copies[member] for member in self.right_branch]
         )
         chunk_copy = Chunk(
             structure_id=ID.new(Chunk),

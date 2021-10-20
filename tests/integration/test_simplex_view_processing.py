@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
@@ -44,177 +45,22 @@ def test_simplex_view_processing(
     than_word,
     hotter_lexeme,
     hotter_word,
+    comparison_frame,
 ):
     input_space = ContextualSpace(
         "",
         "",
         "input",
         input_concept,
-        StructureCollection(),
-        conceptual_spaces=StructureCollection({temperature_space, location_space}),
+        bubble_chamber.new_structure_collection(),
+        conceptual_spaces=bubble_chamber.new_structure_collection(
+            temperature_space, location_space
+        ),
+        links_in=bubble_chamber.new_structure_collection(),
+        links_out=bubble_chamber.new_structure_collection(),
+        parent_spaces=bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.contextual_spaces.add(input_space)
-
-    # setup frame
-    frame_input_space = ContextualSpace(
-        "",
-        "",
-        "",
-        input_concept,
-        StructureCollection(),
-        [location_space, temperature_space],
-    )
-    chunk_one = Chunk(
-        ID.new(Chunk),
-        "",
-        [
-            Location([[]], frame_input_space),
-            Location([[None, None]], location_space),
-            Location([[None]], temperature_space),
-        ],
-        StructureCollection(),
-        frame_input_space,
-        1.0,
-    )
-    frame_input_space.add(chunk_one)
-    chunk_two = Chunk(
-        ID.new(Chunk),
-        "",
-        [
-            Location([[]], frame_input_space),
-            Location([[None, None]], location_space),
-            Location([[None]], temperature_space),
-        ],
-        StructureCollection(),
-        frame_input_space,
-        1.0,
-    )
-    frame_input_space.add(chunk_two)
-    label_one = Label(
-        ID.new(Label),
-        "",
-        chunk_one,
-        None,
-        [Location([[]], frame_input_space), Location([[None, None]], location_space)],
-        1.0,
-    )
-    chunk_one.links_out.add(label_one)
-    label_two = Label(
-        ID.new(Label),
-        "",
-        chunk_two,
-        None,
-        [Location([[]], frame_input_space), Location([[None, None]], location_space)],
-        1.0,
-    )
-    chunk_two.links_out.add(label_two)
-    one_to_two_relation = Relation(
-        ID.new(Relation),
-        "",
-        chunk_one,
-        chunk_two,
-        None,
-        [
-            TwoPointLocation([[]], [[]], frame_input_space),
-            TwoPointLocation([[None]], [[None]], temperature_space),
-        ],
-        1.0,
-    )
-    chunk_one.links_out.add(one_to_two_relation)
-    chunk_two.links_in.add(one_to_two_relation)
-    frame_output_space = ContextualSpace(
-        "", "", "", text_concept, StructureCollection(), [grammar_space]
-    )
-    word_0 = it_word.copy_to_location(Location([[0]], frame_output_space), quality=1.0)
-    word_1 = is_word.copy_to_location(Location([[1]], frame_output_space), quality=1.0)
-    word_2 = Word(
-        ID.new(Word),
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [Location([[2]], frame_output_space), Location([[None]], grammar_space)],
-        frame_output_space,
-        1.0,
-    )
-    frame_output_space.add(word_2)
-    word_3 = in_word.copy_to_location(Location([[3]], frame_output_space), quality=1.0)
-    word_4 = the_word.copy_to_location(Location([[4]], frame_output_space), quality=1.0)
-    word_5 = Word(
-        ID.new(Word),
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [Location([[5]], frame_output_space), Location([[None]], grammar_space)],
-        frame_output_space,
-        1.0,
-    )
-    frame_output_space.add(word_5)
-    word_6 = than_word.copy_to_location(
-        Location([[6]], frame_output_space), quality=1.0
-    )
-    word_7 = the_word.copy_to_location(Location([[7]], frame_output_space), quality=1.0)
-    word_8 = Word(
-        ID.new(Word),
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [Location([[8]], frame_output_space), Location([[None]], grammar_space)],
-        frame_output_space,
-        1.0,
-    )
-    frame_output_space.add(word_8)
-    word_2_correspondence = Correspondence(
-        "",
-        "",
-        one_to_two_relation,
-        word_2,
-        [
-            one_to_two_relation.location_in_space(one_to_two_relation.parent_space),
-            word_2.location_in_space(word_2.parent_space),
-        ],
-        same_concept,
-        temperature_space,
-        None,
-        1.0,
-    )
-    word_5_correspondence = Correspondence(
-        "",
-        "",
-        label_one,
-        word_5,
-        [
-            label_one.location_in_space(label_one.parent_space),
-            word_5.location_in_space(word_5.parent_space),
-        ],
-        same_concept,
-        location_space,
-        None,
-        1.0,
-    )
-    word_8_correspondence = Correspondence(
-        "",
-        "",
-        label_two,
-        word_8,
-        [
-            label_two.location_in_space(label_two.parent_space),
-            word_8.location_in_space(word_8.parent_space),
-        ],
-        same_concept,
-        location_space,
-        None,
-        1.0,
-    )
-    frame_contents = StructureCollection(
-        {word_2_correspondence, word_5_correspondence, word_8_correspondence}
-    )
-    frame = Frame(
-        "", "", "", Mock(), frame_contents, frame_input_space, frame_output_space
-    )
-    bubble_chamber.frames.add(frame)
 
     # setup input space with chunks, labels, relations
     hot_chunk = Chunk(
@@ -225,9 +71,18 @@ def test_simplex_view_processing(
             Location([[0, 0]], location_space),
             Location([[22]], temperature_space),
         ],
-        StructureCollection(),
+        bubble_chamber.new_structure_collection(),
         input_space,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            input_space, location_space, temperature_space
+        ),
+        bubble_chamber.new_structure_collection(),
     )
     input_space.add(hot_chunk)
     location_space.add(hot_chunk)
@@ -236,9 +91,13 @@ def test_simplex_view_processing(
         ID.new(Label),
         "",
         hot_chunk,
+        bubble_chamber.new_structure_collection(hot_chunk),
         hot_concept,
         [Location([[]], input_space), Location([[22]], temperature_space)],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(input_space, temperature_space),
     )
     hot_chunk.links_out.add(hot_label)
     cold_chunk = Chunk(
@@ -249,9 +108,18 @@ def test_simplex_view_processing(
             Location([[0, 1]], location_space),
             Location([[4]], temperature_space),
         ],
-        StructureCollection(),
+        bubble_chamber.new_structure_collection(),
         input_space,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            input_space, location_space, temperature_space
+        ),
+        bubble_chamber.new_structure_collection(),
     )
     input_space.add(cold_chunk)
     location_space.add(cold_chunk)
@@ -260,29 +128,39 @@ def test_simplex_view_processing(
         ID.new(Label),
         "",
         cold_chunk,
+        bubble_chamber.new_structure_collection(cold_chunk),
         cold_concept,
         [Location([[]], input_space), Location([[4]], temperature_space)],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(input_space, temperature_space),
     )
     cold_chunk.links_out.add(cold_label)
     hot_to_cold_relation = Relation(
         ID.new(Relation),
         "",
         hot_chunk,
-        cold_chunk,
+        bubble_chamber.new_structure_collection(hot_chunk, cold_chunk),
         hotter_concept,
         [
             TwoPointLocation([[]], [[]], input_space),
             TwoPointLocation([[22]], [[4]], temperature_space),
         ],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(input_space, temperature_space),
     )
     hot_chunk.links_out.add(hot_to_cold_relation)
     cold_chunk.links_in.add(hot_to_cold_relation)
 
     # suggest and build view for input space and frame
     view_suggester = SimplexViewSuggester.spawn(
-        "", bubble_chamber, {"contextual_space": input_space, "frame": frame}, 1
+        "",
+        bubble_chamber,
+        {"contextual_space": input_space, "frame": comparison_frame},
+        1,
     )
     view_suggester.run()
     assert CodeletResult.SUCCESS == view_suggester.result
@@ -346,7 +224,7 @@ def test_simplex_view_processing(
 
     # re-evaluate and select view as correspondences are added
     view_evaluator_2 = SimplexViewEvaluator.spawn(
-        "", bubble_chamber, StructureCollection({view}), 1.0
+        "", bubble_chamber, bubble_chamber.new_structure_collection(view), 1.0
     )
     view_evaluator_2.run()
     assert CodeletResult.SUCCESS == view_evaluator_2.result
@@ -433,7 +311,7 @@ def test_simplex_view_processing(
 
     # re-evaluate view
     view_evaluator_3 = SimplexViewEvaluator.spawn(
-        "", bubble_chamber, StructureCollection({view}), 1.0
+        "", bubble_chamber, bubble_chamber.new_structure_collection(view), 1.0
     )
     view_evaluator_3.run()
     assert CodeletResult.SUCCESS == view_evaluator_3.result

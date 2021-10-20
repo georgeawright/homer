@@ -45,6 +45,8 @@ class Structure(ABC):
         self._parent_concept = None
 
         self.is_node = False
+        self.is_lexeme = False
+        self.is_concept = False
         self.is_chunk = False
         self.is_phrase = False
         self.is_word = False
@@ -175,6 +177,8 @@ class Structure(ABC):
 
     @property
     def relations(self) -> StructureCollection:
+        if self.is_lexeme:
+            print(self, self.links_in, self.links_out)
         return StructureCollection.union(
             self.links_in.where(is_relation=True),
             self.links_out.where(is_relation=True),
@@ -189,12 +193,16 @@ class Structure(ABC):
 
     @property
     def relatives(self) -> StructureCollection:
+        if self.relations.is_empty():
+            return self.relations.copy()
         return StructureCollection.union(
             *[relation.arguments for relation in self.relations]
         ).excluding(self)
 
     @property
     def correspondees(self) -> StructureCollection:
+        if self.correspondences.is_empty():
+            return self.correspondences.copy()
         return StructureCollection.union(
             *[correspondence.arguments for correspondence in self.correspondences]
         ).excluding(self)

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
@@ -82,16 +83,19 @@ class ChunkBuilder(Builder):
 
     def _process_structure(self):
         if self.target_root is None:
+            print("target root is none")
             if (
                 self.target_rule.right_concept is None
                 and self.target_rule.root_concept == self.target_rule.left_concept
             ):
+                print("root=left")
                 slot_locations = [Location([], self.target_space)] + [
-                    Location([[None]], space)
+                    Location([[math.nan]], space)
                     for space in self.target_space.conceptual_spaces
                 ]
                 chunk_locations = self.target_node.locations
             elif self.target_rule.right_concept is None:
+                print("right=None")
                 root_location = self.target_node.location_in_space(self.target_space)
                 root_conceptual_location = (
                     self.target_rule.root_concept.location_in_space(
@@ -101,6 +105,7 @@ class ChunkBuilder(Builder):
                 slot_locations = []
                 chunk_locations = [root_location, root_conceptual_location]
             else:
+                print("else")
                 target_node_location = self.target_node.location_in_space(
                     self.target_space
                 )
@@ -110,7 +115,7 @@ class ChunkBuilder(Builder):
                     else target_node_location.get_adjacent_location_left()
                 )
                 slot_conceptual_locations = [
-                    Location([[None]], space)
+                    Location([[math.nan]], space)
                     for space in self.target_space.conceptual_spaces
                 ]
                 root_location = (
@@ -138,17 +143,22 @@ class ChunkBuilder(Builder):
                 members=self.bubble_chamber.new_structure_collection(),
                 parent_space=self.target_space,
                 quality=0.0,
-                left_branch=None,
-                right_branch=None,
+                left_branch=self.bubble_chamber.new_structure_collection(),
+                right_branch=self.bubble_chamber.new_structure_collection(),
                 rule=None,
+                links_in=self.bubble_chamber.new_structure_collection(),
+                links_out=self.bubble_chamber.new_structure_collection(),
+                parent_spaces=self.bubble_chamber.new_structure_collection(),
+                super_chunks=self.bubble_chamber.new_structure_collection(),
             )
             if self.target_branch == "left":
+                print("left")
                 left_branch = self.bubble_chamber.new_structure_collection(
                     self.target_node
                 )
-                right_branch = None
+                right_branch = self.bubble_chamber.new_structure_collection()
             else:
-                left_branch = None
+                left_branch = self.bubble_chamber.new_structure_collection()
                 right_branch = self.bubble_chamber.new_structure_collection(
                     self.target_node
                 )
@@ -156,14 +166,16 @@ class ChunkBuilder(Builder):
                 structure_id=ID.new(Chunk),
                 parent_id=self.codelet_id,
                 locations=chunk_locations,
-                members=self.bubble_chamber.new_structure_collection(
-                    {self.target_node}
-                ),
+                members=self.bubble_chamber.new_structure_collection(self.target_node),
                 parent_space=self.target_space,
                 quality=0.0,
                 left_branch=left_branch,
                 right_branch=right_branch,
                 rule=self.target_rule,
+                links_in=self.bubble_chamber.new_structure_collection(),
+                links_out=self.bubble_chamber.new_structure_collection(),
+                parent_spaces=self.bubble_chamber.new_structure_collection(),
+                super_chunks=self.bubble_chamber.new_structure_collection(),
             )
             self.child_structures = self.bubble_chamber.new_structure_collection(chunk)
             self.target_node.super_chunks.add(chunk)

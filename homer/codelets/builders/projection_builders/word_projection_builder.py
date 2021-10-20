@@ -35,7 +35,9 @@ class WordProjectionBuilder(ProjectionBuilder):
             self.target_view.output_space,
         )
         word = abstract_word.copy_to_location(
-            output_location, parent_id=self.codelet_id
+            output_location,
+            parent_id=self.codelet_id,
+            bubble_chamber=self.bubble_chamber,
         )
         self.target_view.output_space.add(word)
         self.bubble_chamber.words.add(word)

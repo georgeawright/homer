@@ -95,6 +95,7 @@ class ContextualSpace(Space):
                     start=new_item,
                     parent_space=new_space,
                     parent_id=parent_id,
+                    bubble_chamber=bubble_chamber,
                 )
                 new_item.links_out.add(new_label)
                 new_space.add(new_label)
@@ -104,7 +105,10 @@ class ContextualSpace(Space):
                     continue
                 new_end = copies[relation.end]
                 new_relation = relation.copy(
-                    start=new_item, end=new_end, parent_space=new_space
+                    start=new_item,
+                    end=new_end,
+                    parent_space=new_space,
+                    bubble_chamber=bubble_chamber,
                 )
                 new_item.links_out.add(new_relation)
                 new_space.add(new_relation)
@@ -114,7 +118,10 @@ class ContextualSpace(Space):
                     continue
                 new_start = copies[relation.start]
                 new_relation = relation.copy(
-                    start=new_start, end=new_item, parent_space=new_space
+                    start=new_start,
+                    end=new_item,
+                    parent_space=new_space,
+                    bubble_chamber=bubble_chamber,
                 )
                 new_item.links_in.add(new_relation)
                 new_space.add(new_relation)

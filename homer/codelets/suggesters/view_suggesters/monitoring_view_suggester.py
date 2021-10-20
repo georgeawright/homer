@@ -31,7 +31,7 @@ class MonitoringViewSuggester(ViewSuggester):
             parent_id,
             bubble_chamber,
             {
-                "input_spaces": bubble_chamber.new_structue_collection(
+                "input_spaces": bubble_chamber.new_structure_collection(
                     interpretation_space, input_space
                 ),
                 "output_space": text_space,

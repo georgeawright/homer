@@ -1,3 +1,4 @@
+import math
 from unittest.mock import Mock
 
 from homer.id import ID
@@ -48,8 +49,13 @@ def test_monitoring_view_processing(
         "",
         "input",
         input_concept,
-        StructureCollection(),
-        conceptual_spaces=StructureCollection({temperature_space, location_space}),
+        bubble_chamber.new_structure_collection(),
+        conceptual_spaces=bubble_chamber.new_structure_collection(
+            temperature_space, location_space
+        ),
+        links_in=bubble_chamber.new_structure_collection(),
+        links_out=bubble_chamber.new_structure_collection(),
+        parent_spaces=bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.contextual_spaces.add(input_space)
     raw_chunk_1 = Chunk(
@@ -60,9 +66,18 @@ def test_monitoring_view_processing(
             Location([[0, 0]], location_space),
             Location([[5]], temperature_space),
         ],
-        StructureCollection(),
+        bubble_chamber.new_structure_collection(),
         input_space,
         0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            input_space, temperature_space, location_space
+        ),
+        bubble_chamber.new_structure_collection(),
         is_raw=True,
     )
     input_space.add(raw_chunk_1)
@@ -76,9 +91,18 @@ def test_monitoring_view_processing(
             Location([[0, 1]], location_space),
             Location([[5]], temperature_space),
         ],
-        StructureCollection(),
+        bubble_chamber.new_structure_collection(),
         input_space,
         0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            input_space, temperature_space, location_space
+        ),
+        bubble_chamber.new_structure_collection(),
         is_raw=True,
     )
     input_space.add(raw_chunk_2)
@@ -92,9 +116,18 @@ def test_monitoring_view_processing(
             Location([[1, 0]], location_space),
             Location([[20]], temperature_space),
         ],
-        StructureCollection(),
+        bubble_chamber.new_structure_collection(),
         input_space,
         0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            input_space, temperature_space, location_space
+        ),
+        bubble_chamber.new_structure_collection(),
         is_raw=True,
     )
     input_space.add(raw_chunk_3)
@@ -108,9 +141,18 @@ def test_monitoring_view_processing(
             Location([[1, 1]], location_space),
             Location([[20]], temperature_space),
         ],
-        StructureCollection(),
+        bubble_chamber.new_structure_collection(),
         input_space,
         0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            input_space, temperature_space, location_space
+        ),
+        bubble_chamber.new_structure_collection(),
         is_raw=True,
     )
     input_space.add(raw_chunk_4)
@@ -125,9 +167,18 @@ def test_monitoring_view_processing(
             Location([[0, 0], [0, 1]], location_space),
             Location([[5]], temperature_space),
         ],
-        StructureCollection({raw_chunk_1, raw_chunk_2}),
+        bubble_chamber.new_structure_collection(raw_chunk_1, raw_chunk_2),
         input_space,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            input_space, temperature_space, location_space
+        ),
+        bubble_chamber.new_structure_collection(),
     )
     input_space.add(chunk_1)
     location_space.add(chunk_1)
@@ -140,9 +191,18 @@ def test_monitoring_view_processing(
             Location([[1, 0], [1, 1]], location_space),
             Location([[20]], temperature_space),
         ],
-        StructureCollection({raw_chunk_3, raw_chunk_4}),
+        bubble_chamber.new_structure_collection(raw_chunk_3, raw_chunk_4),
         input_space,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            input_space, temperature_space, location_space
+        ),
+        bubble_chamber.new_structure_collection(),
     )
     input_space.add(chunk_2)
     location_space.add(chunk_2)
@@ -152,9 +212,13 @@ def test_monitoring_view_processing(
         "",
         "",
         chunk_1,
+        bubble_chamber.new_structure_collection(chunk_1),
         north_concept,
         [Location([[]], input_space), Location([[0, 0], [0, 1]], location_space)],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(input_space, location_space),
     )
     chunk_1.links_out.add(location_label_1)
     input_space.add(location_label_1)
@@ -163,9 +227,13 @@ def test_monitoring_view_processing(
         "",
         "",
         chunk_1,
+        bubble_chamber.new_structure_collection(chunk_1),
         cold_concept,
         [Location([[]], input_space), Location([[5]], temperature_space)],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(input_space, temperature_space),
     )
     chunk_1.links_out.add(temperature_label_1)
     input_space.add(temperature_label_1)
@@ -175,9 +243,13 @@ def test_monitoring_view_processing(
         "",
         "",
         chunk_2,
+        bubble_chamber.new_structure_collection(chunk_2),
         south_concept,
         [Location([[]], input_space), Location([[1, 0], [1, 1]], location_space)],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(input_space, location_space),
     )
     chunk_2.links_out.add(location_label_2)
     input_space.add(location_label_2)
@@ -186,9 +258,13 @@ def test_monitoring_view_processing(
         "",
         "",
         chunk_2,
+        bubble_chamber.new_structure_collection(chunk_2),
         hot_concept,
         [Location([[]], input_space), Location([[20]], temperature_space)],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(input_space, temperature_space),
     )
     chunk_2.links_out.add(temperature_label_2)
     input_space.add(temperature_label_2)
@@ -198,13 +274,16 @@ def test_monitoring_view_processing(
         "",
         "",
         chunk_2,
-        chunk_1,
+        bubble_chamber.new_structure_collection(chunk_1, chunk_2),
         hotter_concept,
         [
             Location([[]], input_space),
             TwoPointLocation([[20]], [[5]], temperature_space),
         ],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(input_space, temperature_space),
     )
     chunk_2.links_out.add(temperature_relation)
     chunk_1.links_in.add(temperature_relation)
@@ -217,38 +296,73 @@ def test_monitoring_view_processing(
         "",
         "text",
         text_concept,
-        StructureCollection(),
-        conceptual_spaces=StructureCollection({grammar_space}),
+        bubble_chamber.new_structure_collection(),
+        conceptual_spaces=bubble_chamber.new_structure_collection(grammar_space),
+        links_in=bubble_chamber.new_structure_collection(),
+        links_out=bubble_chamber.new_structure_collection(),
+        parent_spaces=bubble_chamber.new_structure_collection(),
     )
-    text_0 = it_word.copy_to_location(Location([[0]], text_space), quality=1.0)
-    text_1 = is_word.copy_to_location(Location([[1]], text_space), quality=1.0)
-    text_2 = hotter_word.copy_to_location(Location([[2]], text_space), quality=1.0)
-    text_3 = in_word.copy_to_location(Location([[3]], text_space), quality=1.0)
-    text_4 = the_word.copy_to_location(Location([[4]], text_space), quality=1.0)
-    text_5 = south_word.copy_to_location(Location([[5]], text_space), quality=1.0)
-    text_6 = than_word.copy_to_location(Location([[6]], text_space), quality=1.0)
-    text_7 = the_word.copy_to_location(Location([[7]], text_space), quality=1.0)
-    text_8 = north_word.copy_to_location(Location([[8]], text_space), quality=1.0)
+    text_0 = it_word.copy_to_location(
+        Location([[0]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_1 = is_word.copy_to_location(
+        Location([[1]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_2 = hotter_word.copy_to_location(
+        Location([[2]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_3 = in_word.copy_to_location(
+        Location([[3]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_4 = the_word.copy_to_location(
+        Location([[4]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_5 = south_word.copy_to_location(
+        Location([[5]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_6 = than_word.copy_to_location(
+        Location([[6]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_7 = the_word.copy_to_location(
+        Location([[7]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_8 = north_word.copy_to_location(
+        Location([[8]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
 
     interpretation_space = ContextualSpace(
         "",
         "",
         "interpretation",
         input_concept,
-        StructureCollection(),
-        conceptual_spaces=StructureCollection({temperature_space, location_space}),
+        bubble_chamber.new_structure_collection(),
+        conceptual_spaces=bubble_chamber.new_structure_collection(
+            temperature_space, location_space
+        ),
+        links_in=bubble_chamber.new_structure_collection(),
+        links_out=bubble_chamber.new_structure_collection(),
+        parent_spaces=bubble_chamber.new_structure_collection(),
     )
     interpretation_chunk_1 = Chunk(
         "",
         "",
         [
             Location([[]], interpretation_space),
-            Location([[None, None]], location_space),
-            Location([[None]], temperature_space),
+            Location([[math.nan, math.nan]], location_space),
+            Location([[math.nan]], temperature_space),
         ],
-        StructureCollection(),
+        bubble_chamber.new_structure_collection(),
         input_space,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            interpretation_space, location_space, temperature_space
+        ),
+        bubble_chamber.new_structure_collection(),
     )
     interpretation_space.add(interpretation_chunk_1)
     location_space.add(interpretation_chunk_1)
@@ -258,12 +372,21 @@ def test_monitoring_view_processing(
         "",
         [
             Location([[]], interpretation_space),
-            Location([[None, None]], location_space),
-            Location([[None]], temperature_space),
+            Location([[math.nan, math.nan]], location_space),
+            Location([[math.nan]], temperature_space),
         ],
-        StructureCollection({raw_chunk_3, raw_chunk_4}),
+        bubble_chamber.new_structure_collection(raw_chunk_3, raw_chunk_4),
         interpretation_space,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            interpretation_space, location_space, temperature_space
+        ),
+        bubble_chamber.new_structure_collection(),
     )
     interpretation_space.add(interpretation_chunk_2)
     location_space.add(interpretation_chunk_2)
@@ -272,12 +395,16 @@ def test_monitoring_view_processing(
         "",
         "",
         interpretation_chunk_1,
+        bubble_chamber.new_structure_collection(interpretation_chunk_1),
         north_concept,
         [
             Location([[]], interpretation_space),
-            Location([[None, None]], location_space),
+            Location([[math.nan, math.nan]], location_space),
         ],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(interpretation_space, location_space),
     )
     interpretation_chunk_1.links_out.add(interpretation_location_label_1)
     interpretation_space.add(interpretation_location_label_1)
@@ -286,12 +413,16 @@ def test_monitoring_view_processing(
         "",
         "",
         interpretation_chunk_2,
+        bubble_chamber.new_structure_collection(interpretation_chunk_2),
         south_concept,
         [
             Location([[]], interpretation_space),
-            Location([[None, None]], location_space),
+            Location([[math.nan, math.nan]], location_space),
         ],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(interpretation_space, location_space),
     )
     interpretation_chunk_2.links_out.add(interpretation_location_label_2)
     interpretation_space.add(interpretation_location_label_2)
@@ -300,13 +431,20 @@ def test_monitoring_view_processing(
         "",
         "",
         interpretation_chunk_2,
-        interpretation_chunk_1,
+        bubble_chamber.new_structure_collection(
+            interpretation_chunk_1, interpretation_chunk_2
+        ),
         hotter_concept,
         [
             Location([[]], interpretation_space),
-            TwoPointLocation([[None]], [[None]], temperature_space),
+            TwoPointLocation([[math.nan]], [[math.nan]], temperature_space),
         ],
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(
+            interpretation_space, temperature_space
+        ),
     )
     interpretation_chunk_2.links_out.add(interpretation_temperature_relation)
     interpretation_chunk_1.links_in.add(interpretation_temperature_relation)
@@ -317,10 +455,13 @@ def test_monitoring_view_processing(
         "",
         "",
         [],
-        StructureCollection(),
-        StructureCollection({text_space, comparison_frame}),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(text_space, comparison_frame),
         interpretation_space,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.views.add(reverse_simplex_view)
 
@@ -328,36 +469,51 @@ def test_monitoring_view_processing(
         "",
         "",
         text_8,
-        interpretation_location_label_1,
+        bubble_chamber.new_structure_collection(
+            text_8, interpretation_location_label_1
+        ),
         [],
         same_concept,
         location_space,
         reverse_simplex_view,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     reverse_simplex_view.members.add(location_1_correspondence)
     location_2_correspondence = Correspondence(
         "",
         "",
         text_5,
-        interpretation_location_label_2,
+        bubble_chamber.new_structure_collection(
+            text_5, interpretation_location_label_2
+        ),
         [],
         same_concept,
         location_space,
         reverse_simplex_view,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     reverse_simplex_view.members.add(location_2_correspondence)
     temperature_relation_correspondence = Correspondence(
         "",
         "",
         text_2,
-        interpretation_temperature_relation,
+        bubble_chamber.new_structure_collection(
+            text_2, interpretation_temperature_relation
+        ),
         [],
         same_concept,
         temperature_space,
         reverse_simplex_view,
         1.0,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     reverse_simplex_view.members.add(temperature_relation_correspondence)
 
@@ -366,7 +522,9 @@ def test_monitoring_view_processing(
         "",
         bubble_chamber,
         {
-            "input_spaces": StructureCollection({interpretation_space, input_space}),
+            "input_spaces": bubble_chamber.new_structure_collection(
+                interpretation_space, input_space
+            ),
             "output_space": text_space,
         },
         1.0,
@@ -493,7 +651,7 @@ def test_monitoring_view_processing(
 
     # re-evaluate and re-select monitoring view
     view_evaluator_2 = view_evaluator.spawn(
-        "", bubble_chamber, StructureCollection({view}), 1
+        "", bubble_chamber, bubble_chamber.new_structure_collection(view), 1
     )
     view_evaluator_2.run()
     assert CodeletResult.SUCCESS == view_evaluator_2.result
@@ -511,7 +669,9 @@ def test_monitoring_view_processing(
         "",
         bubble_chamber,
         {
-            "input_spaces": StructureCollection({interpretation_space, input_space}),
+            "input_spaces": bubble_chamber.new_structure_collection(
+                interpretation_space, input_space
+            ),
             "output_space": text_space,
         },
         1.0,
@@ -636,12 +796,12 @@ def test_monitoring_view_processing(
 
     # re-evaluate views
     view_1_re_evaluator = MonitoringViewEvaluator.spawn(
-        "", bubble_chamber, StructureCollection({view}), 1
+        "", bubble_chamber, bubble_chamber.new_structure_collection(view), 1
     )
     view_1_re_evaluator.run()
 
     view_2_re_evaluator = MonitoringViewEvaluator.spawn(
-        "", bubble_chamber, StructureCollection({view_2}), 1
+        "", bubble_chamber, bubble_chamber.new_structure_collection(view_2), 1
     )
     view_2_re_evaluator.run()
 

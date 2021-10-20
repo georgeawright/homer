@@ -64,7 +64,6 @@ class Frame(Space):
         output_space, output_items_map = output_space.copy(
             bubble_chamber=bubble_chamber, parent_id=parent_id
         )
-        print(self.contents)
         copied_contents = bubble_chamber.new_structure_collection(
             *[
                 correspondence.copy(
@@ -75,6 +74,7 @@ class Frame(Space):
                     if correspondence.end in output_items_map
                     else input_items_map[correspondence.end],
                     parent_id=parent_id,
+                    bubble_chamber=bubble_chamber,
                 )
                 for correspondence in self.contents
             ]

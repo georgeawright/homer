@@ -38,6 +38,7 @@ class LabelProjectionSuggester(ProjectionSuggester):
 
     def _passes_preliminary_checks(self) -> bool:
         if not ProjectionSuggester._passes_preliminary_checks(self):
+            print("generic not passed")
             return False
         return self.target_projectee.start.has_correspondence_to_space(
             self.target_view.output_space

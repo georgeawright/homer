@@ -85,7 +85,9 @@ class Label(Link):
             quality=self.quality,
             links_in=bubble_chamber.new_structure_collection(),
             links_out=bubble_chamber.new_structure_collection(),
-            parent_spaces=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(
+                *[location.space for location in new_locations]
+            ),
         )
         return new_label
 

@@ -11,6 +11,10 @@ from homer.structures.nodes import Chunk, Concept, Rule
 def test_spreading_activation():
     bubble_chamber = BubbleChamber.setup(Mock())
 
+    contextual_space = Mock()
+    contextual_space.quality = 0.5
+    bubble_chamber.contextual_spaces.add(contextual_space)
+
     conceptual_space = Mock()
     concept_a = Concept(
         "",
@@ -23,6 +27,9 @@ def test_spreading_activation():
         Mock(),
         Mock(),
         Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     concept_b = Concept(
         "",
@@ -35,6 +42,9 @@ def test_spreading_activation():
         Mock(),
         Mock(),
         Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     concept_c = Concept(
         "",
@@ -47,6 +57,9 @@ def test_spreading_activation():
         Mock(),
         Mock(),
         Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     concept_d = Concept(
         "",
@@ -59,8 +72,22 @@ def test_spreading_activation():
         Mock(),
         Mock(),
         Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
-    c_to_d = Relation("", "", concept_c, concept_d, Mock(), conceptual_space, Mock())
+    c_to_d = Relation(
+        "",
+        "",
+        concept_c,
+        bubble_chamber.new_structure_collection(concept_c, concept_d),
+        Mock(),
+        conceptual_space,
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+    )
     c_to_d._activation = 1.0
     concept_c.links_out.add(c_to_d)
     concept_d.links_in.add(c_to_d)
@@ -72,27 +99,82 @@ def test_spreading_activation():
         concept_a,
         concept_b,
         concept_c,
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     a_to_rule = Relation(
-        "", "", concept_a, rule_a_b_c, Mock(), conceptual_space, Mock()
+        "",
+        "",
+        concept_a,
+        bubble_chamber.new_structure_collection(concept_a, rule_a_b_c),
+        Mock(),
+        conceptual_space,
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     a_to_rule._activation = 1.0
     concept_a.links_out.add(a_to_rule)
     rule_a_b_c.links_in.add(a_to_rule)
     rule_to_b = Relation(
-        "", "", rule_a_b_c, concept_b, Mock(), conceptual_space, Mock()
+        "",
+        "",
+        rule_a_b_c,
+        bubble_chamber.new_structure_collection(rule_a_b_c, concept_b),
+        Mock(),
+        conceptual_space,
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     rule_to_b._activation = 1.0
     rule_a_b_c.links_out.add(rule_to_b)
     concept_b.links_in.add(rule_to_b)
     rule_to_c = Relation(
-        "", "", rule_a_b_c, concept_c, Mock(), conceptual_space, Mock()
+        "",
+        "",
+        rule_a_b_c,
+        bubble_chamber.new_structure_collection(rule_a_b_c, concept_c),
+        Mock(),
+        conceptual_space,
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     rule_to_c._activation = 1.0
     rule_a_b_c.links_out.add(rule_to_c)
     concept_c.links_in.add(rule_to_c)
-    chunk = Chunk("", "", [Location([], conceptual_space)], Mock(), Mock(), Mock())
-    label_a = Label("", "", chunk, concept_b, conceptual_space, Mock())
+    chunk = Chunk(
+        "",
+        "",
+        [Location([], conceptual_space)],
+        Mock(),
+        Mock(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+    )
+    label_a = Label(
+        "",
+        "",
+        chunk,
+        bubble_chamber.new_structure_collection(chunk),
+        concept_b,
+        conceptual_space,
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+    )
     chunk.links_out.add(label_a)
 
     bubble_chamber.concepts.add(concept_a)

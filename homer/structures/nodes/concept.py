@@ -48,6 +48,7 @@ class Concept(Node):
         self.distance_function = distance_function
         self.depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
+        self.is_concept = True
 
     @property
     def prototype(self) -> list:

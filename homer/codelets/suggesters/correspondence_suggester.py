@@ -182,7 +182,9 @@ class CorrespondenceSuggester(Suggester):
             None,
             self.codelet_id,
             self.target_structure_one,
-            self.target_structure_two,
+            self.bubble_chamber.new_structure_collection(
+                self.target_structure_one, self.target_structure_two
+            ),
             [
                 self.target_structure_one.location_in_space(self.target_space_one),
                 self.target_structure_two.location_in_space(self.target_space_two),

@@ -1,6 +1,6 @@
 from __future__ import annotations
-import random
 
+from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
 from homer.errors import MissingStructureError
@@ -126,7 +126,14 @@ class ChunkSuggester(Suggester):
                 self.target_root = None
                 self.target_rule = self.bubble_chamber.rules.where(
                     instance_type=type(self.target_node)
-                ).get(key=activation)
+                ).get(
+                    key=lambda x: fuzzy.OR(
+                        x.left_concept.proximity_to(self.target_node),
+                        x.right_concept.proximity_to(self.target_node),
+                    )
+                    if x.right_concept is not None
+                    else x.left_concept.proximity_to(self.target_node)
+                )
         else:
             try:
                 self.target_root = self.target_node.super_chunks.where(
@@ -174,36 +181,44 @@ class ChunkSuggester(Suggester):
         ).is_empty()
 
     def _calculate_confidence(self):
-        def randomized_compatibility(compatibility, randomness, satisfaction):
-            return compatibility * (
-                compatibility * satisfaction + randomness * (1 - satisfaction)
+        if self.target_rule.right_concept is None:
+            self._target_structures["branch"] = "left"
+            self.confidence = fuzzy.AND(
+                self.target_rule.root_concept.classifier.classify_chunk(
+                    chunk=self.target_root
+                )
+                if self.target_root is not None
+                else 1.0,
+                self.target_rule.left_concept.classifier.classify_chunk(
+                    chunk=self.target_node
+                ),
             )
-
-        left_randomness = random.random()
-        right_randomness = random.random()
-        child = (
-            self.target_node
-            if self.target_slot_filler is None
-            else self.target_slot_filler
+        branch_names = {
+            self.target_rule.left_concept: "left",
+            self.target_rule.right_concept: "right",
+        }
+        branch_concept = self.bubble_chamber.random_machine.select(
+            [self.target_rule.left_concept, self.target_rule.right_concept],
+            key=lambda x: self.target_rule.compatibility_with(
+                root=self.target_root, child=self.target_node, branch=branch_names[x]
+            ),
         )
-        left_compatibility = self.target_rule.compatibility_with(
-            root=self.target_root, child=child, branch="left"
+        branch = branch_names[branch_concept]
+        self._target_structures["branch"] = branch
+        self.confidence = fuzzy.AND(
+            self.target_rule.root_concept.classifier.classify_chunk(
+                chunk=self.target_root
+            )
+            if self.target_root is not None
+            else 1.0,
+            self.target_rule.left_concept.classifier.classify_chunk(
+                chunk=self.target_node
+            )
+            if branch == "left"
+            else self.target_rule.right_concept.classifier.classify_chunk(
+                chunk=self.target_node
+            ),
         )
-        right_compatibility = self.target_rule.compatibility_with(
-            root=self.target_root, child=child, branch="right"
-        )
-        left_probability = randomized_compatibility(
-            left_compatibility, left_randomness, self.bubble_chamber.satisfaction
-        )
-        right_probability = randomized_compatibility(
-            right_compatibility, right_randomness, self.bubble_chamber.satisfaction
-        )
-        if left_probability > right_probability:
-            self._target_structures["target_branch"] = "left"
-            self.confidence = left_compatibility
-        else:
-            self._target_structures["target_branch"] = "right"
-            self.confidence = right_compatibility
 
     def _fizzle(self):
         pass

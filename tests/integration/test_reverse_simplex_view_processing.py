@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import Mock
 
 from homer.bubble_chamber import BubbleChamber
@@ -62,201 +63,56 @@ def test_reverse_simplex_view_processing(
     hotter_word,
     south_word,
     north_word,
+    comparison_frame,
 ):
     text_space = ContextualSpace(
         "",
         "",
         "text",
         text_concept,
-        StructureCollection(),
-        conceptual_spaces=StructureCollection({grammar_space}),
+        bubble_chamber.new_structure_collection(),
+        conceptual_spaces=bubble_chamber.new_structure_collection(grammar_space),
+        links_in=bubble_chamber.new_structure_collection(),
+        links_out=bubble_chamber.new_structure_collection(),
+        parent_spaces=bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.contextual_spaces.add(text_space)
 
-    # setup frame
-    frame_input_space = ContextualSpace(
-        "",
-        "",
-        "",
-        input_concept,
-        StructureCollection(),
-        [location_space, temperature_space],
-    )
-    chunk_one = Chunk(
-        ID.new(Chunk),
-        "",
-        [
-            Location([[]], frame_input_space),
-            Location([[None, None]], location_space),
-            Location([[None]], temperature_space),
-        ],
-        StructureCollection(),
-        frame_input_space,
-        1.0,
-    )
-    frame_input_space.add(chunk_one)
-    chunk_two = Chunk(
-        ID.new(Chunk),
-        "",
-        [
-            Location([[]], frame_input_space),
-            Location([[None, None]], location_space),
-            Location([[None]], temperature_space),
-        ],
-        StructureCollection(),
-        frame_input_space,
-        1.0,
-    )
-    frame_input_space.add(chunk_two)
-    label_one = Label(
-        ID.new(Label),
-        "",
-        chunk_one,
-        None,
-        [Location([[]], frame_input_space), Location([[None, None]], location_space)],
-        1.0,
-    )
-    chunk_one.links_out.add(label_one)
-    label_two = Label(
-        ID.new(Label),
-        "",
-        chunk_two,
-        None,
-        [Location([[]], frame_input_space), Location([[None, None]], location_space)],
-        1.0,
-    )
-    chunk_two.links_out.add(label_two)
-    one_to_two_relation = Relation(
-        ID.new(Relation),
-        "",
-        chunk_one,
-        chunk_two,
-        None,
-        [
-            TwoPointLocation([[]], [[]], frame_input_space),
-            TwoPointLocation([[None]], [[None]], temperature_space),
-        ],
-        1.0,
-    )
-    chunk_one.links_out.add(one_to_two_relation)
-    chunk_two.links_in.add(one_to_two_relation)
-    frame_output_space = ContextualSpace(
-        "", "", "", text_concept, StructureCollection(), [grammar_space]
-    )
-    word_0 = it_word.copy_to_location(Location([[0]], frame_output_space), quality=1.0)
-    word_1 = is_word.copy_to_location(Location([[1]], frame_output_space), quality=1.0)
-    word_2 = Word(
-        ID.new(Word),
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [
-            Location([[2]], frame_output_space),
-            hotter_word.location_in_space(grammar_space),
-        ],
-        frame_output_space,
-        1.0,
-    )
-    frame_output_space.add(word_2)
-    word_3 = in_word.copy_to_location(Location([[3]], frame_output_space), quality=1.0)
-    word_4 = the_word.copy_to_location(Location([[4]], frame_output_space), quality=1.0)
-    word_5 = Word(
-        ID.new(Word),
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [
-            Location([[5]], frame_output_space),
-            south_word.location_in_space(grammar_space),
-        ],
-        frame_output_space,
-        1.0,
-    )
-    frame_output_space.add(word_5)
-    word_6 = than_word.copy_to_location(
-        Location([[6]], frame_output_space), quality=1.0
-    )
-    word_7 = the_word.copy_to_location(Location([[7]], frame_output_space), quality=1.0)
-    word_8 = Word(
-        ID.new(Word),
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [
-            Location([[8]], frame_output_space),
-            south_word.location_in_space(grammar_space),
-        ],
-        frame_output_space,
-        1.0,
-    )
-    frame_output_space.add(word_8)
-    word_2_correspondence = Correspondence(
-        "",
-        "",
-        one_to_two_relation,
-        word_2,
-        [
-            one_to_two_relation.location_in_space(one_to_two_relation.parent_space),
-            word_2.location_in_space(word_2.parent_space),
-        ],
-        same_concept,
-        temperature_space,
-        None,
-        1.0,
-    )
-    word_5_correspondence = Correspondence(
-        "",
-        "",
-        label_one,
-        word_5,
-        [
-            label_one.location_in_space(label_one.parent_space),
-            word_5.location_in_space(word_5.parent_space),
-        ],
-        same_concept,
-        location_space,
-        None,
-        1.0,
-    )
-    word_8_correspondence = Correspondence(
-        "",
-        "",
-        label_two,
-        word_8,
-        [
-            label_two.location_in_space(label_two.parent_space),
-            word_8.location_in_space(word_8.parent_space),
-        ],
-        same_concept,
-        location_space,
-        None,
-        1.0,
-    )
-    frame_contents = StructureCollection(
-        {word_2_correspondence, word_5_correspondence, word_8_correspondence}
-    )
-    frame = Frame(
-        "", "", "", Mock(), frame_contents, frame_input_space, frame_output_space
-    )
-    bubble_chamber.frames.add(frame)
-
     # setup text space with words
-    text_0 = it_word.copy_to_location(Location([[0]], text_space), quality=1.0)
-    text_1 = is_word.copy_to_location(Location([[1]], text_space), quality=1.0)
-    text_2 = hotter_word.copy_to_location(Location([[2]], text_space), quality=1.0)
-    text_3 = in_word.copy_to_location(Location([[3]], text_space), quality=1.0)
-    text_4 = the_word.copy_to_location(Location([[4]], text_space), quality=1.0)
-    text_5 = south_word.copy_to_location(Location([[5]], text_space), quality=1.0)
-    text_6 = than_word.copy_to_location(Location([[6]], text_space), quality=1.0)
-    text_7 = the_word.copy_to_location(Location([[7]], text_space), quality=1.0)
-    text_8 = north_word.copy_to_location(Location([[8]], text_space), quality=1.0)
+    text_0 = it_word.copy_to_location(
+        Location([[0]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_1 = is_word.copy_to_location(
+        Location([[1]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_2 = hotter_word.copy_to_location(
+        Location([[2]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_3 = in_word.copy_to_location(
+        Location([[3]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_4 = the_word.copy_to_location(
+        Location([[4]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_5 = south_word.copy_to_location(
+        Location([[5]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_6 = than_word.copy_to_location(
+        Location([[6]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_7 = the_word.copy_to_location(
+        Location([[7]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
+    text_8 = north_word.copy_to_location(
+        Location([[8]], text_space), quality=1.0, bubble_chamber=bubble_chamber
+    )
 
     # suggest and build view for input space and frame
     view_suggester = SimplexViewSuggester.spawn(
-        "", bubble_chamber, {"contextual_space": text_space, "frame": frame}, 1
+        "",
+        bubble_chamber,
+        {"contextual_space": text_space, "frame": comparison_frame},
+        1,
     )
     view_suggester.run()
     assert CodeletResult.SUCCESS == view_suggester.result
@@ -288,12 +144,12 @@ def test_reverse_simplex_view_processing(
             "target_space_one": text_space,
             "target_structure_one": text_2,
             "target_space_two": view_frame_input,
-            "target_structure_two": StructureCollection(
-                {
+            "target_structure_two": bubble_chamber.new_structure_collection(
+                *[
                     word
                     for word in view_frame_input.contents
                     if word.location_in_space(view_frame_input).coordinates == [[2]]
-                }
+                ]
             ).get(),
             "target_conceptual_space": None,
             "parent_concept": None,
@@ -337,12 +193,12 @@ def test_reverse_simplex_view_processing(
     correspondence_suggester_2._target_structures["target_space_two"] = view_frame_input
     correspondence_suggester_2._target_structures[
         "target_structure_two"
-    ] = StructureCollection(
-        {
+    ] = bubble_chamber.new_structure_collection(
+        *[
             word
             for word in view_frame_input.contents
             if word.location_in_space(view_frame_input).coordinates == [[5]]
-        }
+        ]
     ).get()
     correspondence_suggester_2.run()
     assert CodeletResult.SUCCESS == correspondence_suggester_2.result
@@ -381,12 +237,12 @@ def test_reverse_simplex_view_processing(
     correspondence_suggester_3._target_structures["target_space_two"] = view_frame_input
     correspondence_suggester_3._target_structures[
         "target_structure_two"
-    ] = StructureCollection(
-        {
+    ] = bubble_chamber.new_structure_collection(
+        *[
             word
             for word in view_frame_input.contents
             if word.location_in_space(view_frame_input).coordinates == [[8]]
-        }
+        ]
     ).get()
     correspondence_suggester_3.run()
     assert CodeletResult.SUCCESS == correspondence_suggester_3.result
@@ -416,7 +272,7 @@ def test_reverse_simplex_view_processing(
 
     # re-evaluate and select view as correspondences are added
     view_evaluator_2 = SimplexViewEvaluator.spawn(
-        "", bubble_chamber, StructureCollection({view}), 1.0
+        "", bubble_chamber, bubble_chamber.new_structure_collection(view), 1.0
     )
     view_evaluator_2.run()
     assert CodeletResult.SUCCESS == view_evaluator_2.result
@@ -594,7 +450,7 @@ def test_reverse_simplex_view_processing(
     # re-evaluate view
 
     view_evaluator_3 = SimplexViewEvaluator.spawn(
-        "", bubble_chamber, StructureCollection({view}), 1.0
+        "", bubble_chamber, bubble_chamber.new_structure_collection(view), 1.0
     )
     view_evaluator_3.run()
     assert CodeletResult.SUCCESS == view_evaluator_3.result

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 import statistics
 from typing import List
 
@@ -49,7 +50,7 @@ class Node(Structure):
     def is_slot(self):
         return any(
             [
-                None in coordinates
+                math.nan in coordinates
                 for location in self.locations
                 for coordinates in location.coordinates
             ]

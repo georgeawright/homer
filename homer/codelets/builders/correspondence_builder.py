@@ -79,7 +79,9 @@ class CorrespondenceBuilder(Builder):
             None,
             self.codelet_id,
             self.target_structure_one,
-            self.target_structure_two,
+            self.bubble_chamber.new_structure_collection(
+                self.target_structure_one, self.target_structure_two
+            ),
             [self.target_structure_one.location, self.target_structure_two.location],
             self.parent_concept,
             self.target_conceptual_space,
@@ -119,6 +121,11 @@ class CorrespondenceBuilder(Builder):
         )
 
     def _fill_in_word_slot(self):
+        print(
+            self.codelet_id,
+            self.correspondence.non_slot_argument.lexeme,
+            self.correspondence.non_slot_argument.lexeme.concepts,
+        )
         self.target_view.slot_values[
             self.correspondence.slot_argument.structure_id
         ] = self.correspondence.non_slot_argument.lexeme.concepts.get()

@@ -19,6 +19,8 @@ class SamenessClassifier(Classifier):
             .get()
             .parent_concept
         )
+        print(end)
+        print(end.parent_spaces)
         end_concept = (
             end.parent_concept
             if end.parent_concept is not None

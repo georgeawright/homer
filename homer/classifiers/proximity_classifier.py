@@ -12,21 +12,19 @@ class ProximityClassifier(Classifier):
         return kwargs["concept"].proximity_to(kwargs["start"])
 
     def classify_chunk(self, **kwargs: dict):
-        root = kwargs.get("root")
-        child = kwargs.get("child")
-        if root is None and child is not None:
-            return 1.0
-        if child is None or child.is_slot:
-            proximities = [
-                space.proximity_between(member, root) if not member.is_slot else 0
-                for space in root.parent_spaces
-                for member in root.members
-                if space.is_conceptual_space and space.is_basic_level
+        chunk = kwargs.get("chunk")
+        return statistics.fmean(
+            [
+                chunk.rule.root_concept.proximity_to(chunk.root)
+                if not (chunk.root.is_slot or chunk.root is None)
+                else 0,
+                chunk.rule.left_concept.proximity_to(chunk.left_branch.get())
+                if not (chunk.left_branch.is_empty() or chunk.left_branch.get().is_slot)
+                else 0,
+                chunk.rule.right_concept.proximity_to(chunk.right_branch.get())
+                if not (
+                    chunk.right_branch.is_empty() or chunk.right_branch.get().is_slot
+                )
+                else 0,
             ]
-            return statistics.fmean(proximities) if proximities != [] else 0
-        distances = [
-            space.proximity_between(root, child)
-            for space in root.parent_spaces
-            if space.is_conceptual_space and space.is_basic_level
-        ]
-        return 0.0 if distances == [] else fuzzy.AND(*distances)
+        )
