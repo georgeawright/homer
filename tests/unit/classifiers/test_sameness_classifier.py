@@ -2,78 +2,60 @@ import pytest
 from unittest.mock import Mock
 
 from homer.classifiers import SamenessClassifier
+from homer.structure_collection import StructureCollection
 
 
-def test_same_concepts_classified_as_same():
-    common_concept = Mock()
-    common_concept.compatibility_with.return_value = 1
-    start = Mock()
-    start.parent_concept = common_concept
-    end = Mock()
-    end.parent_concept = common_concept
+def test_sameness_of_single_item_in_collection():
     classifier = SamenessClassifier()
-    start.quality = 1
-    end.quality = 1
-    assert 1 == classifier.classify_link(start=start, end=end)
-    start.quality = 0
-    assert 0.5 == classifier.classify_link(start=start, end=end)
-    end.quality = 0
-    assert 0 == classifier.classify_link(start=start, end=end)
-
-
-def test_compatible_concepts_classified_as_same():
-    start_concept = Mock()
-    start_concept.compatibility_with.return_value = 1
-    start = Mock()
-    start.parent_concept = start_concept
-    end_concept = Mock()
-    end = Mock()
-    end.parent_concept = None
-    end.parent_space.parent_concept = end_concept
-    classifier = SamenessClassifier()
-    start.quality = 1
-    end.quality = 1
-    assert 1 == classifier.classify_link(start=start, end=end)
-    start.quality = 0
-    assert 0.5 == classifier.classify_link(start=start, end=end)
-    end.quality = 0
-    assert 0 == classifier.classify_link(start=start, end=end)
-
-
-def test_incompatible_concepts_not_classified_as_same():
-    start_concept = Mock()
-    start = Mock()
-    start.parent_concept = start_concept
-    end_concept = Mock()
-    end = Mock()
-    end.parent_concept = end_concept
-    start_concept.compatibility_with.return_value = 0
-    classifier = SamenessClassifier()
-    start.quality = 1
-    end.quality = 1
-    assert 0 == classifier.classify_link(start=start, end=end)
-
-
-def test_sameness_of_chunk_no_root():
-    classifier = SamenessClassifier()
-    assert 1.0 == classifier.classify_chunk(root=None, child=Mock())
-
-
-def test_sameness_of_chunk_no_child():
-    classifier = SamenessClassifier()
-    assert 1.0 == classifier.classify_chunk(root=Mock(), child=None)
+    item = Mock()
+    parent_space = Mock()
+    parent_space.is_conceptual_space = False
+    conceptual_space = Mock()
+    conceptual_space.is_conceptual_space = True
+    conceptual_space.is_basic_level = True
+    conceptual_space.proximity_between.return_value = 1.0
+    item.parent_spaces = StructureCollection(Mock(), [parent_space, conceptual_space])
+    collection = StructureCollection(Mock(), [item])
+    assert 1.0 == classifier.classify(collection=collection)
 
 
 @pytest.mark.parametrize("proximity", [(0.0), (0.5), (1.0)])
-def test_sameness_of_chunk_child_and_root(proximity):
+def test_sameness_of_two_items_in_collection(proximity):
     classifier = SamenessClassifier()
-    space = Mock()
-    space.is_conceptual_space = True
-    space.is_basic_level = True
-    space.proximity_between.return_value = proximity
-    location = Mock()
-    location.space = space
-    root = Mock()
-    root.locations = [location]
-    child = Mock()
-    assert proximity == classifier.classify_chunk(root=root, child=child)
+
+    parent_space = Mock()
+    parent_space.is_conceptual_space = False
+    conceptual_space = Mock()
+    conceptual_space.is_conceptual_space = True
+    conceptual_space.is_basic_level = True
+    conceptual_space.proximity_between.return_value = proximity
+
+    item_1 = Mock()
+    item_1.parent_spaces = StructureCollection(Mock(), [parent_space, conceptual_space])
+    item_2 = Mock()
+    item_2.parent_spaces = StructureCollection(Mock(), [parent_space, conceptual_space])
+
+    collection = StructureCollection(Mock(), [item_1, item_2])
+
+    assert proximity == classifier.classify(collection=collection)
+
+
+@pytest.mark.parametrize("proximity", [(0.0), (0.5), (1.0)])
+def test_sameness_of_two_arguments(proximity):
+    classifier = SamenessClassifier()
+
+    parent_space = Mock()
+    parent_space.is_conceptual_space = False
+    conceptual_space = Mock()
+    conceptual_space.is_conceptual_space = True
+    conceptual_space.is_basic_level = True
+    conceptual_space.proximity_between.return_value = proximity
+
+    start = Mock()
+    start.parent_spaces = StructureCollection(Mock(), [parent_space, conceptual_space])
+    end = Mock()
+    end.parent_spaces = StructureCollection(Mock(), [parent_space, conceptual_space])
+
+    assert proximity == classifier.classify(
+        start=start, end=end, space=conceptual_space
+    )

@@ -16,7 +16,7 @@ from homer.classifiers import DifferenceClassifier
         ([[5]], [[10]], 0, 0),
     ],
 )
-def test_classify_link(start_value, end_value, prototype_difference, expected):
+def test_classify(start_value, end_value, prototype_difference, expected):
     classifier = DifferenceClassifier(prototype_difference)
     start = Mock()
     start_location = Mock()
@@ -28,4 +28,4 @@ def test_classify_link(start_value, end_value, prototype_difference, expected):
     end.location_in_space.return_value = end_location
     space = Mock()
     space.parent_concept.relevant_value = "value"
-    assert expected == classifier.classify_link(start=start, end=end, space=space)
+    assert expected == classifier.classify(start=start, end=end, space=space)

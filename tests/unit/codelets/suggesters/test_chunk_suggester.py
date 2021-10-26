@@ -41,6 +41,7 @@ def target_node(bubble_chamber, target_root):
     return chunk
 
 
+@pytest.mark.skip
 def test_bottom_up_chunk_suggester_gets_target_rule(bubble_chamber, target_node):
     target_structures = {
         "target_space": Mock(),
@@ -57,6 +58,7 @@ def test_bottom_up_chunk_suggester_gets_target_rule(bubble_chamber, target_node)
     assert suggester.target_rule is not None
 
 
+@pytest.mark.skip
 def test_bottom_up_chunk_suggester_with_root_gets_slot_and_filler(
     bubble_chamber, target_node
 ):
@@ -79,6 +81,7 @@ def test_bottom_up_chunk_suggester_with_root_gets_slot_and_filler(
     assert suggester.target_slot_filler is not None
 
 
+@pytest.mark.skip
 def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
     target_rule = Mock()
     existing_chunk = Mock()
@@ -106,6 +109,7 @@ def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
     assert CodeletResult.FIZZLE == suggester.result
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize("compatibility", [(1.0), (0.5), (0.0)])
 def test_has_high_confidence_for_root_compatible_with_rule(
     bubble_chamber,

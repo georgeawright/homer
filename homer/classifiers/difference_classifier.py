@@ -9,7 +9,10 @@ class DifferenceClassifier(Classifier):
     def __init__(self, prototype_difference: float):
         self.prototype_difference = prototype_difference
 
-    def classify_link(self, **kwargs: dict):
+    def classify(self, **kwargs: dict):
+        """
+        Required: 'start'; 'end'; 'space'
+        """
         start = kwargs["start"]
         end = kwargs["end"]
         space = kwargs["space"]

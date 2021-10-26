@@ -1,46 +1,51 @@
-import statistics
-
 from homer import fuzzy
 from homer.classifier import Classifier
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.structure_collection import StructureCollection
 
 
 class SamenessClassifier(Classifier):
-    def __init__(self):
-        pass
+    def classify(self, **kwargs: dict) -> FloatBetweenOneAndZero:
+        """
+        Required: ('start' AND 'end') OR 'collection'
+        Optional: 'space'
+        """
+        start = kwargs.get("start")
+        end = kwargs.get("end")
+        collection = kwargs.get("collection")
+        space = kwargs.get("space")
 
-    def classify_link(self, **kwargs: dict) -> FloatBetweenOneAndZero:
-        start = kwargs["start"]
-        end = kwargs["end"]
-        start_concept = (
-            start.parent_concept
-            if start.parent_concept is not None
-            else start.parent_spaces.where(is_conceptual_space=True)
-            .get()
-            .parent_concept
+        collection = list(collection) if collection is not None else [start, end]
+        spaces = (
+            StructureCollection.union(
+                *[
+                    item.parent_spaces.where(
+                        is_conceptual_space=True, is_basic_level=True
+                    )
+                    for item in collection
+                ]
+            )
+            if space is None
+            else [space]
         )
-        print(end)
-        print(end.parent_spaces)
-        end_concept = (
-            end.parent_concept
-            if end.parent_concept is not None
-            else end.parent_spaces.where(is_conceptual_space=True).get().parent_concept
-        )
-        return fuzzy.AND(
-            start_concept.compatibility_with(end_concept),
-            statistics.fmean([start.quality, end.quality]),
-        )
-
-    def classify_chunk(self, **kwargs: dict) -> FloatBetweenOneAndZero:
-        root = kwargs["root"]
-        child = kwargs["child"]
-        if root is None:
-            return 1.0
-        if child is None:
-            return 1.0
-        distances = [
-            location.space.proximity_between(root, child)
-            for location in root.locations
-            if location.space.is_conceptual_space and location.space.is_basic_level
+        distinct_pairs = [
+            (collection[i], collection[j])
+            for i in range(len(collection))
+            for j in range(len(collection[:i]))
         ]
-        return 0.0 if distances == [] else fuzzy.AND(*distances)
+        if distinct_pairs == []:
+            distinct_pairs = [(collection[0], collection[0])]
+        return fuzzy.OR(
+            *[
+                fuzzy.AND(
+                    *[
+                        space.proximity_between(pair[0], pair[1])
+                        if pair[0].has_location_in_space(space)
+                        and pair[1].has_location_in_space(space)
+                        else 0.0
+                        for pair in distinct_pairs
+                    ]
+                )
+                for space in spaces
+            ]
+        )
