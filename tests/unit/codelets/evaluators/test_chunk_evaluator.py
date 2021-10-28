@@ -6,7 +6,6 @@ from homer.codelets.selectors import ChunkSelector
 from homer.structure_collection import StructureCollection
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
 def test_changes_target_structure_quality(
     bubble_chamber, current_quality, classification
@@ -14,7 +13,7 @@ def test_changes_target_structure_quality(
     chunk = Mock()
     chunk.is_slot = False
     chunk.rule.right_concept = None
-    chunk.rule.left_concept.classifier.classify_chunk.return_value = classification
+    chunk.rule.left_concept.classifier.classify.return_value = classification
     chunk.quality = current_quality
     evaluator = ChunkEvaluator(
         Mock(),

@@ -1,5 +1,4 @@
-import statistics
-
+from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
 
@@ -29,7 +28,16 @@ class ChunkEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_chunk = self.target_structures.where(is_slot=False).get()
-        self.confidence = target_chunk.rule.root_concept.classify_chunk(
-            chunk=target_chunk
-        )
+        classifications = [
+            target_chunk.rule.left_concept.classifier.classify(
+                collection=target_chunk.left_branch
+            ),
+        ]
+        if target_chunk.rule.right_concept is not None:
+            classifications.append(
+                target_chunk.rule.right_concept.classifier.classify(
+                    collection=target_chunk.left_branch
+                ),
+            )
+        self.confidence = fuzzy.AND(*classifications)
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

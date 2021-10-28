@@ -165,7 +165,6 @@ class ChunkSuggester(Suggester):
         self._target_structures["target_root"] = self.target_root
         self._target_structures["target_slot"] = self.target_slot
         self._target_structures["target_slot_filler"] = self.target_slot_filler
-        print(self.target_root, self.target_node, self.target_slot_filler)
         suggested_members = StructureCollection.union(
             self.target_root.members.where(is_slot=False)
             if self.target_root is not None
@@ -182,43 +181,30 @@ class ChunkSuggester(Suggester):
 
     def _calculate_confidence(self):
         if self.target_rule.right_concept is None:
+            branch_concept = self.target_rule.left_concept
             self._target_structures["branch"] = "left"
-            self.confidence = fuzzy.AND(
-                self.target_rule.root_concept.classifier.classify_chunk(
-                    chunk=self.target_root
-                )
-                if self.target_root is not None
-                else 1.0,
-                self.target_rule.left_concept.classifier.classify_chunk(
-                    chunk=self.target_node
+        else:
+            branch_names = {
+                self.target_rule.left_concept: "left",
+                self.target_rule.right_concept: "right",
+            }
+            branch_concept = self.bubble_chamber.random_machine.select(
+                [self.target_rule.left_concept, self.target_rule.right_concept],
+                key=lambda x: self.target_rule.compatibility_with(
+                    root=self.target_root,
+                    child=self.target_node,
+                    branch=branch_names[x],
                 ),
             )
-        branch_names = {
-            self.target_rule.left_concept: "left",
-            self.target_rule.right_concept: "right",
-        }
-        branch_concept = self.bubble_chamber.random_machine.select(
-            [self.target_rule.left_concept, self.target_rule.right_concept],
-            key=lambda x: self.target_rule.compatibility_with(
-                root=self.target_root, child=self.target_node, branch=branch_names[x]
-            ),
-        )
-        branch = branch_names[branch_concept]
-        self._target_structures["branch"] = branch
-        self.confidence = fuzzy.AND(
-            self.target_rule.root_concept.classifier.classify_chunk(
-                chunk=self.target_root
+            self._target_structures["branch"] = branch_names[branch_concept]
+        classifications = [
+            branch_concept.classifier.classify(
+                collection=self.bubble_chamber.new_structure_collection(
+                    self.target_node
+                )
             )
-            if self.target_root is not None
-            else 1.0,
-            self.target_rule.left_concept.classifier.classify_chunk(
-                chunk=self.target_node
-            )
-            if branch == "left"
-            else self.target_rule.right_concept.classifier.classify_chunk(
-                chunk=self.target_node
-            ),
-        )
+        ]
+        self.confidence = fuzzy.AND(*classifications)
 
     def _fizzle(self):
         pass

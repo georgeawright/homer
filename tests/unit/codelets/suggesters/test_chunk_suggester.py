@@ -18,15 +18,19 @@ def target_slot():
 
 
 @pytest.fixture
-def target_rule():
+def target_rule(bubble_chamber):
     rule = Mock()
     rule.compatibility_with.return_value = 1.0
+    rule.root_concept.classifier.classify.return_value = 1.0
+    rule.left_concept.classifier.classify.return_value = 1.0
+    rule.right_concept.classifier.classify.return_value = 1.0
     return rule
 
 
 @pytest.fixture
 def target_root(bubble_chamber, target_slot, target_rule):
     chunk = Mock()
+    chunk.name = "target_root"
     chunk.members = bubble_chamber.new_structure_collection(target_slot)
     chunk.rule = target_rule
     return chunk
@@ -41,7 +45,6 @@ def target_node(bubble_chamber, target_root):
     return chunk
 
 
-@pytest.mark.skip
 def test_bottom_up_chunk_suggester_gets_target_rule(bubble_chamber, target_node):
     target_structures = {
         "target_space": Mock(),
@@ -58,7 +61,6 @@ def test_bottom_up_chunk_suggester_gets_target_rule(bubble_chamber, target_node)
     assert suggester.target_rule is not None
 
 
-@pytest.mark.skip
 def test_bottom_up_chunk_suggester_with_root_gets_slot_and_filler(
     bubble_chamber, target_node
 ):
@@ -81,7 +83,6 @@ def test_bottom_up_chunk_suggester_with_root_gets_slot_and_filler(
     assert suggester.target_slot_filler is not None
 
 
-@pytest.mark.skip
 def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
     target_rule = Mock()
     existing_chunk = Mock()
@@ -109,7 +110,6 @@ def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
     assert CodeletResult.FIZZLE == suggester.result
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize("compatibility", [(1.0), (0.5), (0.0)])
 def test_has_high_confidence_for_root_compatible_with_rule(
     bubble_chamber,
@@ -117,6 +117,9 @@ def test_has_high_confidence_for_root_compatible_with_rule(
     compatibility,
 ):
     target_rule = Mock()
+    target_rule.root_concept.classifier.classify.return_value = compatibility
+    target_rule.left_concept.classifier.classify.return_value = compatibility
+    target_rule.right_concept.classifier.classify.return_value = compatibility
     target_rule.compatibility_with.return_value = compatibility
     target_structures = {
         "target_space": Mock(),
