@@ -11,7 +11,7 @@ def test_changes_target_structure_quality(
     bubble_chamber, current_quality, classification
 ):
     concept = Mock()
-    concept.classifier.classify_link.return_value = classification
+    concept.classifier.classify.return_value = classification
     relation = Mock()
     relation.quality = current_quality
     relation.parent_concept = concept

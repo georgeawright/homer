@@ -179,7 +179,7 @@ def test_gives_high_confidence_for_good_example(
     target_space_two,
     target_structure_two,
 ):
-    same_concept.classifier.classify_link.return_value = 1.0
+    same_concept.classifier.classify.return_value = 1.0
     target_structures = {
         "target_view": target_view,
         "target_space_one": target_space_one,
@@ -212,7 +212,7 @@ def test_gives_low_confidence_for_bad_example(
     target_structure_two,
 ):
     concept = Mock()
-    concept.classifier.classify_link.return_value = 0.0
+    concept.classifier.classify.return_value = 0.0
     target_structures = {
         "target_view": target_view,
         "target_space_one": target_space_one,

@@ -27,7 +27,7 @@ class LabelEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_label = self.target_structures.get()
-        self.confidence = target_label.parent_concept.classifier.classify_link(
+        self.confidence = target_label.parent_concept.classifier.classify(
             start=target_label.start,
             concept=target_label.parent_concept,
         )

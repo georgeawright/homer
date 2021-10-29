@@ -190,7 +190,7 @@ class RelationSuggester(Suggester):
         )
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classifier.classify_link(
+        self.confidence = self.parent_concept.classifier.classify(
             concept=self.parent_concept,
             space=self.target_space,
             start=self.target_structure_one,

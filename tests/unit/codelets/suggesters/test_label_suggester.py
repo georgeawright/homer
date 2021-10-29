@@ -15,7 +15,7 @@ def parent_concept():
     concept = Mock()
     concept.is_concept = True
     concept.structure_type = Label
-    concept.classifier.classify_link.return_value = 1.0
+    concept.classifier.classify.return_value = 1.0
     return concept
 
 
@@ -66,7 +66,7 @@ def test_gives_high_confidence_for_positive_example(
 
 def test_gives_low_confidence_bad_example(bubble_chamber, target_chunk):
     parent_concept = Mock()
-    parent_concept.classifier.classify_link.return_value = 0.0
+    parent_concept.classifier.classify.return_value = 0.0
     target_structures = {"target_node": target_chunk, "parent_concept": parent_concept}
     label_suggester = LabelSuggester(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0

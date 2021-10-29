@@ -14,7 +14,7 @@ def parent_concept():
     concept = Mock()
     concept.is_concept = True
     concept.structure_type = Relation
-    concept.classifier.classify_link.return_value = 1.0
+    concept.classifier.classify.return_value = 1.0
     return concept
 
 
@@ -103,7 +103,7 @@ def test_gives_low_confidence_for_bad_example(
         "target_structure_two": None,
         "parent_concept": parent_concept,
     }
-    parent_concept.classifier.classify_link.return_value = 0.0
+    parent_concept.classifier.classify.return_value = 0.0
     relation_suggester = RelationSuggester(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
