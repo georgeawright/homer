@@ -1,3 +1,4 @@
+import operator
 from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -39,6 +40,7 @@ class View(Structure):
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members
+        self.input_node_pairs = []
         self.slot_values = {}
         self.is_view = True
 
@@ -67,6 +69,12 @@ class View(Structure):
     def copy(self, **kwargs: dict):
         raise NotImplementedError
 
+    def add(self, correspondence: "Correspondence"):
+        self.members.add(correspondence)
+        for node_pair in correspondence.node_pairs:
+            if node_pair not in self.input_node_pairs:
+                self.input_node_pairs.append(node_pair)
+
     def has_member(
         self,
         parent_concept: Concept,
@@ -85,6 +93,26 @@ class View(Structure):
             ):
                 return True
         return False
+
+    def can_accept_member(self, correspondence: "Correspondence") -> bool:
+        if not StructureCollection.intersection(
+            self.members, correspondence.end.correspondences
+        ).is_empty():
+            return False
+        potential_node_pairs = correspondence.node_pairs
+        if all(
+            potential_node_pair in self.input_node_pairs
+            for potential_node_pair in potential_node_pairs
+        ):
+            return True
+        return not any(
+            operator.xor(
+                potential_node_pair[0] == existing_node_pair[0],
+                potential_node_pair[1] == existing_node_pair[1],
+            )
+            for potential_node_pair in potential_node_pairs
+            for existing_node_pair in self.input_node_pairs
+        )
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])

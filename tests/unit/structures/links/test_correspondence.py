@@ -7,6 +7,86 @@ from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence
 
 
+def test_node_pairs(bubble_chamber):
+    start_node_1 = Mock()
+    start_node_1.is_node = True
+    start_node_2 = Mock()
+    start_node_2.is_node = True
+    end_node_1 = Mock()
+    end_node_1.is_node = True
+    end_node_2 = Mock()
+    end_node_2.is_node = True
+
+    start_label = Mock()
+    start_label.is_node = False
+    start_label.is_label = True
+    start_label.start = start_node_1
+    end_label = Mock()
+    end_label.is_node = False
+    end_label.is_label = True
+    end_label.start = end_node_1
+
+    start_relation = Mock()
+    start_relation.is_node = False
+    start_relation.is_label = False
+    start_relation.start = start_node_1
+    start_relation.end = start_node_2
+    end_relation = Mock()
+    end_relation.is_node = False
+    end_relation.is_label = False
+    end_relation.start = end_node_1
+    end_relation.end = end_node_2
+
+    node_correspondence = Correspondence(
+        "",
+        "",
+        start_node_1,
+        bubble_chamber.new_structure_collection(start_node_1, end_node_1),
+        [],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    assert [(start_node_1, end_node_1)] == node_correspondence.node_pairs
+    label_correspondence = Correspondence(
+        "",
+        "",
+        start_label,
+        bubble_chamber.new_structure_collection(start_label, end_label),
+        [],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    assert [(start_node_1, end_node_1)] == label_correspondence.node_pairs
+    relation_correspondence = Correspondence(
+        "",
+        "",
+        start_relation,
+        bubble_chamber.new_structure_collection(start_relation, end_relation),
+        [],
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+    )
+    assert [
+        (start_node_1, end_node_1),
+        (start_node_2, end_node_2),
+    ] == relation_correspondence.node_pairs
+
+
 def test_copy(bubble_chamber):
     start_space = Mock()
     start_space.parent_concept = Mock()

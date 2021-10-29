@@ -197,10 +197,7 @@ class CorrespondenceSuggester(Suggester):
             links_out=self.bubble_chamber.new_structure_collection(),
             parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
-        for correspondence in self.target_view.members:
-            if not correspondence.is_compatible_with(self.correspondence):
-                return False
-        return True
+        return self.target_view.can_accept_member(self.correspondence)
 
     def _calculate_confidence(self):
         self.confidence = self.parent_concept.classifier.classify(

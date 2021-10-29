@@ -592,6 +592,7 @@ def test_monitoring_view_processing(
     correspondence_1.update_activation()
     assert correspondence_1.activation > correspondence_1_original_activation
 
+    # suggest an incompatible correspondence
     correspondence_suggester_2 = CorrespondenceSuggester.spawn(
         "",
         bubble_chamber,
@@ -607,47 +608,7 @@ def test_monitoring_view_processing(
         1.0,
     )
     correspondence_suggester_2.run()
-    assert CodeletResult.SUCCESS == correspondence_suggester_2.result
-
-    correspondence_builder_2 = correspondence_suggester_2.child_codelets[0]
-    assert isinstance(correspondence_builder_2, CorrespondenceBuilder)
-    correspondence_builder_2.run()
-    assert CodeletResult.SUCCESS == correspondence_builder_2.result
-    correspondence_2 = correspondence_builder_2.child_structures.get()
-    correspondence_2_original_quality = correspondence_2.quality
-    correspondence_2_original_activation = correspondence_2.activation
-
-    correspondence_evaluator_2 = correspondence_builder_2.child_codelets[0]
-    assert isinstance(correspondence_evaluator_2, CorrespondenceEvaluator)
-    correspondence_evaluator_2.run()
-    assert CodeletResult.SUCCESS == correspondence_evaluator_2.result
-    assert correspondence_2.quality > correspondence_2_original_quality
-
-    correspondence_selector_2 = correspondence_evaluator_2.child_codelets[0]
-    assert isinstance(correspondence_selector_2, CorrespondenceSelector)
-    correspondence_selector_2.run()
-    assert CodeletResult.SUCCESS == correspondence_selector_2.result
-    correspondence_2.update_activation()
-    assert correspondence_2.activation > correspondence_2_original_activation
-    correspondence_2_activation_after_selection = correspondence_2.activation
-
-    # suggest an incompatible correspondence
-    correspondence_suggester_3 = CorrespondenceSuggester.spawn(
-        "",
-        bubble_chamber,
-        {
-            "target_view": view,
-            "target_space_one": interpretation_space,
-            "target_structure_one": interpretation_location_label_1,
-            "target_space_two": input_space,
-            "target_structure_two": location_label_1,
-            "target_conceptual_space": None,
-            "parent_concept": None,
-        },
-        1.0,
-    )
-    correspondence_suggester_3.run()
-    assert CodeletResult.FIZZLE == correspondence_suggester_3.result
+    assert CodeletResult.FIZZLE == correspondence_suggester_2.result
 
     # re-evaluate and re-select monitoring view
     view_evaluator_2 = view_evaluator.spawn(
@@ -791,8 +752,6 @@ def test_monitoring_view_processing(
     assert (
         view_2_correspondence_2.activation > view_2_correspondence_2_original_activation
     )
-    correspondence_2.update_activation()
-    assert correspondence_2.activation < correspondence_2_activation_after_selection
 
     # re-evaluate views
     view_1_re_evaluator = MonitoringViewEvaluator.spawn(

@@ -1,5 +1,4 @@
 from __future__ import annotations
-import operator
 from typing import List
 
 from homer.errors import MissingStructureError
@@ -8,13 +7,9 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Link, Node, View
+from homer.structures import Link, View
 from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
-from homer.tools import areinstances, hasinstance
-
-from .label import Label
-from .relation import Relation
 
 
 class Correspondence(Link):
@@ -69,6 +64,14 @@ class Correspondence(Link):
         from homer.codelets.selectors import CorrespondenceSelector
 
         return CorrespondenceSelector
+
+    @property
+    def node_pairs(self) -> list:
+        if self.start.is_node:
+            return [(self.start, self.end)]
+        if self.start.is_label:
+            return [(self.start.start, self.end.start)]
+        return [(self.start.start, self.end.start), (self.start.end, self.end.end)]
 
     def copy(self, **kwargs: dict) -> Correspondence:
         """Requires keyword arguments 'start', 'end', and 'parent_id' OR 'new arg', 'old_arg', and 'parent_id'."""
@@ -140,61 +143,6 @@ class Correspondence(Link):
 
     def common_arguments_with(self, other: Correspondence) -> StructureCollection:
         return StructureCollection.intersection(self.arguments, other.arguments)
-
-    def is_compatible_with(self, other: Correspondence) -> bool:
-        common_arguments = self.common_arguments_with(other)
-        if len(common_arguments) == 2:
-            return False
-        if hasinstance(self.arguments, Node):
-            self_corresponding_nodes = self.arguments.structures
-            self_corresponding_links = {}
-        elif areinstances(self.arguments, Label):
-            self_corresponding_nodes = {self.start.start: True, self.end.start: True}
-            self_corresponding_links = self.arguments.structures
-        elif areinstances(self.arguments, Relation):
-            self_corresponding_nodes = {
-                self.start.start: True,
-                self.start.end: True,
-                self.end.start: True,
-                self.end.end: True,
-            }
-            self_corresponding_links = self.arguments.structures
-        if areinstances(other.arguments, Node):
-            other_corresponding_nodes = other.arguments.structures
-            other_corresponding_links = {}
-        elif areinstances(other.arguments, Label):
-            other_corresponding_nodes = {other.start.start: True, other.end.start: True}
-            other_corresponding_links = other.arguments.structures
-        elif areinstances(other.arguments, Relation):
-            other_corresponding_nodes = {
-                other.start.start: True,
-                other.start.end: True,
-                other.end.start: True,
-                other.end.end: True,
-            }
-            other_corresponding_links = other.arguments.structures
-        if len(self_corresponding_links.keys() & other_corresponding_links.keys()) > 0:
-            return False
-        corresponding_nodes_intersection = (
-            self_corresponding_nodes.keys() & other_corresponding_nodes.keys()
-        )
-        if (
-            len(self_corresponding_nodes)
-            == len(other_corresponding_nodes)
-            == len(corresponding_nodes_intersection)
-        ):
-            return True
-        if len(corresponding_nodes_intersection) == 0:
-            return True
-        if (
-            operator.xor(
-                areinstances(self.arguments, Relation),
-                areinstances(other.arguments, Relation),
-            )
-            and len(corresponding_nodes_intersection) == 2
-        ):
-            return True
-        return False
 
     def __repr__(self) -> str:
         return (

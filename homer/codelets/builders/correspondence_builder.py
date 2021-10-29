@@ -91,10 +91,7 @@ class CorrespondenceBuilder(Builder):
             links_out=self.bubble_chamber.new_structure_collection(),
             parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
-        for correspondence in self.target_view.members:
-            if not correspondence.is_compatible_with(self.correspondence):
-                return False
-        return True
+        return self.target_view.can_accept_member(self.correspondence)
 
     def _process_structure(self):
         self.correspondence.structure_id = ID.new(Correspondence)
@@ -107,7 +104,7 @@ class CorrespondenceBuilder(Builder):
                 self._fill_in_relation_slot()
         except MissingStructureError:
             pass
-        self.target_view.members.add(self.correspondence)
+        self.target_view.add(self.correspondence)
         self.target_space_one.add(self.correspondence)
         self.target_space_two.add(self.correspondence)
         self.target_structure_one.links_in.add(self.correspondence)

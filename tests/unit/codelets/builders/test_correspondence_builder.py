@@ -83,7 +83,6 @@ def target_structure_two(bubble_chamber, conceptual_space, target_space_two):
 @pytest.fixture
 def existing_correspondence():
     correspondence = Mock()
-    correspondence.is_compatible_with.return_value = True
     return correspondence
 
 
