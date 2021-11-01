@@ -1,9 +1,11 @@
 from itertools import chain
 import statistics
-from typing import List, Union
+from typing import Callable, List, Union
 
+from .classifier import Classifier
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
+from .hyper_parameters import HyperParameters
 from .id import ID
 from .location import Location
 from .logger import Logger
@@ -13,7 +15,7 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Lexeme, Rule, Word
+from .structures.nodes import Chunk, Concept, Lexeme, Rule, Word
 from .structures.spaces import ConceptualSpace, ContextualSpace, Frame
 from .structures.views import SimplexView, MonitoringView
 from .word_form import WordForm
@@ -155,6 +157,7 @@ class BubbleChamber:
             Frame: self.frames,
             # nodes
             Chunk: self.chunks,
+            Concept: self.concepts,
             Rule: self.rules,
             Word: self.words,
             # links
@@ -199,6 +202,42 @@ class BubbleChamber:
             member.super_chunks.add(chunk)
         self.add(chunk)
         return chunk
+
+    def new_concept(
+        self,
+        parent_id: str,
+        name: str,
+        locations: List[Location],
+        classifier: Classifier,
+        instance_type: type,
+        structure_type: type,
+        parent_space: Space,
+        distance_function: Callable,
+        depth: int = 1,
+        distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
+    ) -> Concept:
+        parent_spaces = self.new_structure_collection(
+            *[location.space for location in locations]
+        )
+        concept = Concept(
+            structure_id=ID.new(Concept),
+            parent_id=parent_id,
+            name=name,
+            locations=locations,
+            classifier=classifier,
+            instance_type=instance_type,
+            structure_type=structure_type,
+            parent_space=parent_space,
+            child_spaces=self.new_structure_collection(),
+            distance_function=distance_function,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=parent_spaces,
+            depth=depth,
+            distance_to_proximity_weight=distance_to_proximity_weight,
+        )
+        self.add(concept)
+        return concept
 
     def new_word(
         self,

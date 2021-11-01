@@ -20,197 +20,31 @@ from homer.word_form import WordForm
 def bubble_chamber():
     logger = Mock()
     chamber = BubbleChamber.setup(logger, random_seed=1)
-    chunk_concept = Concept(
-        "",
-        "",
-        "chunk",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    correspondence_concept = Concept(
-        "",
-        "",
-        "correspondence",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    label_concept = Concept(
-        "",
-        "",
-        "label",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    relation_concept = Concept(
-        "",
-        "",
-        "relation",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    view_simplex_concept = Concept(
-        "",
-        "",
-        "view-simplex",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    view_monitoring_concept = Concept(
-        "",
-        "",
-        "view-monitoring",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    word_concept = Concept(
-        "",
-        "",
-        "word",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    suggest_concept = Concept(
-        "",
-        "",
-        "suggest",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    build_concept = Concept(
-        "",
-        "",
-        "build",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    evaluate_concept = Concept(
-        "",
-        "",
-        "evaluate",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    select_concept = Concept(
-        "",
-        "",
-        "select",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-    )
-    chamber.concepts.add(chunk_concept)
-    chamber.concepts.add(correspondence_concept)
-    chamber.concepts.add(label_concept)
-    chamber.concepts.add(relation_concept)
-    chamber.concepts.add(view_simplex_concept)
-    chamber.concepts.add(view_monitoring_concept)
-    chamber.concepts.add(word_concept)
-    chamber.concepts.add(suggest_concept)
-    chamber.concepts.add(build_concept)
-    chamber.concepts.add(evaluate_concept)
-    chamber.concepts.add(select_concept)
 
     structure_concepts = [
-        chunk_concept,
-        correspondence_concept,
-        label_concept,
-        relation_concept,
-        view_simplex_concept,
-        view_monitoring_concept,
-        word_concept,
+        chamber.new_concept(
+            "", concept_name, [], Mock(), Mock(), Mock(), Mock(), Mock()
+        )
+        for concept_name in [
+            "chunk",
+            "correspondence",
+            "label",
+            "relation",
+            "view-simplex",
+            "view-monitoring",
+            "word",
+        ]
     ]
     codelet_concepts = [
-        suggest_concept,
-        build_concept,
-        evaluate_concept,
-        select_concept,
+        chamber.new_concept(
+            "", concept_name, [], Mock(), Mock(), Mock(), Mock(), Mock()
+        )
+        for concept_name in [
+            "suggest",
+            "build",
+            "evaluate",
+            "select",
+        ]
     ]
     for structure_concept in structure_concepts:
         for codelet_concept in codelet_concepts:
@@ -954,23 +788,16 @@ def hotter_word(bubble_chamber, grammar_vectors, grammar_space, hotter_lexeme):
 
 @pytest.fixture(scope="module")
 def location_concept(bubble_chamber):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "location",
-        Mock(),
-        Mock(),
+        [],
         Mock(),
         Mock(),
         Mock(),
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
@@ -1094,8 +921,7 @@ def location_space(
 
 @pytest.fixture(scope="module")
 def south_concept(bubble_chamber, location_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "south",
         [Location([[5, 2]], location_space)],
@@ -1103,21 +929,13 @@ def south_concept(bubble_chamber, location_space):
         Mock(),
         Mock(),
         location_space,
-        Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    location_space.add(concept)
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def north_concept(bubble_chamber, location_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "north",
         [Location([[0, 2]], location_space)],
@@ -1125,36 +943,22 @@ def north_concept(bubble_chamber, location_space):
         Mock(),
         Mock(),
         location_space,
-        Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    location_space.add(concept)
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def temperature_concept(bubble_chamber):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "temperature",
-        Mock(),
-        Mock(),
+        [],
         Mock(),
         Mock(),
         Mock(),
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
@@ -1199,8 +1003,7 @@ def same_different_space(bubble_chamber):
 
 @pytest.fixture(scope="module")
 def same_concept(bubble_chamber, same_different_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "same",
         [Location([], same_different_space)],
@@ -1209,14 +1012,7 @@ def same_concept(bubble_chamber, same_different_space):
         Correspondence,
         same_different_space,
         Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(same_different_space),
     )
-    same_different_space.add(concept)
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
@@ -1239,8 +1035,7 @@ def same_rule(bubble_chamber, same_concept):
 
 @pytest.fixture(scope="module")
 def hot_concept(bubble_chamber, temperature_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "hot",
         [Location([[22]], temperature_space)],
@@ -1248,21 +1043,13 @@ def hot_concept(bubble_chamber, temperature_space):
         Mock(),
         Mock(),
         temperature_space,
-        Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    temperature_space.add(concept)
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def warm_concept(bubble_chamber, temperature_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "warm",
         [Location([[16]], temperature_space)],
@@ -1270,21 +1057,13 @@ def warm_concept(bubble_chamber, temperature_space):
         Mock(),
         Mock(),
         temperature_space,
-        Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    temperature_space.add(concept)
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def cold_concept(bubble_chamber, temperature_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "cold",
         [Location([[4]], temperature_space)],
@@ -1292,21 +1071,13 @@ def cold_concept(bubble_chamber, temperature_space):
         Mock(),
         Mock(),
         temperature_space,
-        Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    temperature_space.add(concept)
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def hotter_concept(bubble_chamber, temperature_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "hotter",
         [TwoPointLocation([[math.nan]], [[math.nan]], temperature_space)],
@@ -1314,15 +1085,8 @@ def hotter_concept(bubble_chamber, temperature_space):
         Mock(),
         Mock(),
         temperature_space,
-        Mock(),
         centroid_euclidean_distance,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    temperature_space.add(concept)
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
