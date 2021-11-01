@@ -3,6 +3,7 @@ import statistics
 from typing import List
 
 from .errors import MissingStructureError
+from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .id import ID
 from .location import Location
 from .logger import Logger
@@ -12,8 +13,9 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Word
-from .structures.spaces import ConceptualSpace, ContextualSpace
+from .structures.nodes import Chunk, Rule, Word
+from .structures.spaces import ConceptualSpace, ContextualSpace, Frame
+from .structures.views import SimplexView, MonitoringView
 
 
 class BubbleChamber:
@@ -121,6 +123,17 @@ class BubbleChamber:
     def satisfaction(self):
         return statistics.fmean([space.quality for space in self.contextual_spaces])
 
+    def spread_activations(self):
+        for structure in self.structures:
+            structure.spread_activation()
+
+    def update_activations(self) -> None:
+        for structure in self.structures:
+            structure.update_activation()
+            if self.log_count % 500 == 0:
+                self.logger.log(structure)
+        self.log_count += 1
+
     def new_structure_collection(
         self, *structures: List[Structure]
     ) -> StructureCollection:
@@ -128,6 +141,9 @@ class BubbleChamber:
 
     def add(self, item):
         self.logger.log(item)
+        for space in item.parent_spaces:
+            space.add(item)
+            self.logger.log(space)
         collections = {
             # views
             MonitoringView: self.monitoring_views,
@@ -147,13 +163,38 @@ class BubbleChamber:
         }
         collections[type(item)].add(item)
 
-    def spread_activations(self):
-        for structure in self.structures:
-            structure.spread_activation()
-
-    def update_activations(self) -> None:
-        for structure in self.structures:
-            structure.update_activation()
-            if self.log_count % 500 == 0:
-                self.logger.log(structure)
-        self.log_count += 1
+    def new_chunk(
+        self,
+        parent_id: str,
+        locations: List[Location],
+        members: StructureCollection,
+        parent_space: Space,
+        quality: FloatBetweenOneAndZero,
+        left_branch: StructureCollection,
+        right_branch: StructureCollection,
+        rule: Rule,
+        is_raw: bool = False,
+    ) -> Chunk:
+        parent_spaces = self.new_structure_collection(
+            *[location.space for location in locations]
+        )
+        chunk = Chunk(
+            structure_id=ID.new(Chunk),
+            parent_id=parent_id,
+            locations=locations,
+            members=members,
+            parent_space=parent_space,
+            quality=quality,
+            left_branch=left_branch,
+            right_branch=right_branch,
+            rule=rule,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=parent_spaces,
+            super_chunks=self.new_structure_collection(),
+            is_raw=is_raw,
+        )
+        for member in members:
+            member.super_chunks.add(chunk)
+        self.add(chunk)
+        return chunk
