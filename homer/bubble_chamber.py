@@ -158,6 +158,7 @@ class BubbleChamber:
             # nodes
             Chunk: self.chunks,
             Concept: self.concepts,
+            Lexeme: self.lexemes,
             Rule: self.rules,
             Word: self.words,
             # links
@@ -238,6 +239,42 @@ class BubbleChamber:
         )
         self.add(concept)
         return concept
+
+    def new_lexeme(
+        self,
+        parent_id: str,
+        headword: str,
+        word_forms: dict,
+        concepts: List[Concept] = None,
+    ) -> Lexeme:
+        concepts = [] if concepts is None else concepts
+        lexeme = Lexeme(
+            structure_id=ID.new(Lexeme),
+            parent_id=parent_id,
+            headword=headword,
+            word_forms=word_forms,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=self.new_structure_collection(),
+        )
+        self.add(lexeme)
+        for concept in concepts:
+            link = Relation(
+                "",
+                "",
+                concept,
+                self.new_structure_collection(concept, lexeme),
+                None,
+                [],
+                1.0,
+                self.new_structure_collection(),
+                self.new_structure_collection(),
+                self.new_structure_collection(),
+            )
+            concept.links_out.add(link)
+            lexeme.links_in.add(link)
+            self.add(link)
+        return lexeme
 
     def new_word(
         self,

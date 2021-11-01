@@ -522,141 +522,56 @@ def vp_cop_rule(bubble_chamber, grammar_space, vp_concept, cop_concept):
 
 
 @pytest.fixture(scope="module")
-def it_lexeme():
-    return Lexeme("", "", "it", {WordForm.HEADWORD: "it"}, Mock(), Mock(), Mock())
+def it_lexeme(bubble_chamber):
+    return bubble_chamber.new_lexeme("", "it", {WordForm.HEADWORD: "it"})
 
 
 @pytest.fixture(scope="module")
-def is_lexeme():
-    return Lexeme("", "", "is", {WordForm.HEADWORD: "is"}, Mock(), Mock(), Mock())
+def is_lexeme(bubble_chamber):
+    return bubble_chamber.new_lexeme("", "is", {WordForm.HEADWORD: "is"})
 
 
 @pytest.fixture(scope="module")
-def in_lexeme():
-    return Lexeme("", "", "in", {WordForm.HEADWORD: "in"}, Mock(), Mock(), Mock())
+def in_lexeme(bubble_chamber):
+    return bubble_chamber.new_lexeme("", "in", {WordForm.HEADWORD: "in"})
 
 
 @pytest.fixture(scope="module")
-def the_lexeme():
-    return Lexeme("", "", "the", {WordForm.HEADWORD: "the"}, Mock(), Mock(), Mock())
+def the_lexeme(bubble_chamber):
+    return bubble_chamber.new_lexeme("", "the", {WordForm.HEADWORD: "the"})
 
 
 @pytest.fixture(scope="module")
-def than_lexeme():
-    return Lexeme("", "", "than", {WordForm.HEADWORD: "than"}, Mock(), Mock(), Mock())
+def than_lexeme(bubble_chamber):
+    return bubble_chamber.new_lexeme("", "than", {WordForm.HEADWORD: "than"})
 
 
 @pytest.fixture(scope="module")
 def north_lexeme(bubble_chamber, north_concept):
-    lexeme = Lexeme(
-        "",
-        "",
-        "north",
-        {WordForm.HEADWORD: "north"},
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
+    return bubble_chamber.new_lexeme(
+        "", "north", {WordForm.HEADWORD: "north"}, concepts=[north_concept]
     )
-    link = Relation(
-        "",
-        "",
-        north_concept,
-        bubble_chamber.new_structure_collection(north_concept, lexeme),
-        None,
-        [],
-        1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    north_concept.links_out.add(link)
-    lexeme.links_in.add(link)
-    return lexeme
 
 
 @pytest.fixture(scope="module")
 def south_lexeme(bubble_chamber, south_concept):
-    lexeme = Lexeme(
-        "",
-        "",
-        "south",
-        {WordForm.HEADWORD: "south"},
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
+    return bubble_chamber.new_lexeme(
+        "", "south", {WordForm.HEADWORD: "south"}, concepts=[south_concept]
     )
-    link = Relation(
-        "",
-        "",
-        south_concept,
-        bubble_chamber.new_structure_collection(south_concept, lexeme),
-        None,
-        [],
-        1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    south_concept.links_out.add(link)
-    lexeme.links_in.add(link)
-    return lexeme
 
 
 @pytest.fixture(scope="module")
 def warm_lexeme(bubble_chamber, warm_concept):
-    lexeme = Lexeme(
-        "",
-        "",
-        "warm",
-        {WordForm.HEADWORD: "warm"},
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
+    return bubble_chamber.new_lexeme(
+        "", "warm", {WordForm.HEADWORD: "warm"}, concepts=[warm_concept]
     )
-    link = Relation(
-        "",
-        "",
-        warm_concept,
-        bubble_chamber.new_structure_collection(warm_concept, lexeme),
-        None,
-        [],
-        1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    warm_concept.links_out.add(link)
-    lexeme.links_in.add(link)
-    return lexeme
 
 
 @pytest.fixture(scope="module")
 def hotter_lexeme(bubble_chamber, hotter_concept):
-    lexeme = Lexeme(
-        "",
-        "",
-        "hotter",
-        {WordForm.HEADWORD: "hotter"},
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
+    return bubble_chamber.new_lexeme(
+        "", "hotter", {WordForm.HEADWORD: "hotter"}, concepts=[hotter_concept]
     )
-    link = Relation(
-        "",
-        "",
-        hotter_concept,
-        bubble_chamber.new_structure_collection(hotter_concept, lexeme),
-        None,
-        [],
-        1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    hotter_concept.links_out.add(link)
-    lexeme.links_in.add(link)
-    return lexeme
 
 
 @pytest.fixture(scope="module")
