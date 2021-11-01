@@ -1,6 +1,6 @@
 from itertools import chain
 import statistics
-from typing import Callable, List, Union
+from typing import Callable, Dict, List, Union
 
 from .classifier import Classifier
 from .errors import MissingStructureError
@@ -168,6 +168,43 @@ class BubbleChamber:
         }
         collections[type(item)].add(item)
 
+    def new_conceptual_space(
+        self,
+        parent_id: str,
+        name: str,
+        parent_concept: Concept,
+        no_of_dimensions: int,
+        dimensions: List[ConceptualSpace],
+        sub_spaces: List[ConceptualSpace],
+        is_basic_level: bool = False,
+        is_symbolic: bool = False,
+        super_space_to_coordinate_function_map: Dict[str, Callable] = None,
+    ) -> ConceptualSpace:
+        space = ConceptualSpace(
+            structure_id=ID.new(ConceptualSpace),
+            parent_id=parent_id,
+            name=name,
+            parent_concept=parent_concept,
+            contents=self.new_structure_collection(),
+            no_of_dimensions=no_of_dimensions,
+            dimensions=dimensions,
+            sub_spaces=sub_spaces,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=self.new_structure_collection(),
+            is_basic_level=is_basic_level,
+            is_symbolic=is_symbolic,
+            super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
+        )
+        self.add(space)
+        return space
+
+    def new_contextual_space(self) -> ContextualSpace:
+        raise NotImplementedError
+
+    def new_frame(self) -> Frame:
+        raise NotImplementedError
+
     def new_chunk(
         self,
         parent_id: str,
@@ -276,6 +313,9 @@ class BubbleChamber:
             self.add(link)
         return lexeme
 
+    def new_rule(self) -> Rule:
+        raise NotImplementedError
+
     def new_word(
         self,
         parent_id: str,
@@ -305,3 +345,18 @@ class BubbleChamber:
         )
         self.add(word)
         return word
+
+    def new_correspondence(self) -> Correspondence:
+        raise NotImplementedError
+
+    def new_label(self) -> Label:
+        raise NotImplementedError
+
+    def new_relation(self) -> Relation:
+        raise NotImplementedError
+
+    def new_simplex_view(self) -> SimplexView:
+        raise NotImplementedError
+
+    def new_monitoring_view(self) -> MonitoringView:
+        raise NotImplementedError

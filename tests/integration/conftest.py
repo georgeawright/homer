@@ -717,46 +717,32 @@ def location_concept(bubble_chamber):
 
 @pytest.fixture(scope="module")
 def north_south_space(bubble_chamber, location_concept):
-    space = ConceptualSpace(
-        "",
+    return bubble_chamber.new_conceptual_space(
         "",
         "north-south",
         location_concept,
-        bubble_chamber.new_structure_collection(),
         1,
         [],
         [],
-        Mock(),
-        Mock(),
-        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [[c[0]] for c in location.coordinates]
         },
     )
-    bubble_chamber.conceptual_spaces.add(space)
-    return space
 
 
 @pytest.fixture(scope="module")
 def west_east_space(bubble_chamber, location_concept):
-    space = ConceptualSpace(
-        "",
+    return bubble_chamber.new_conceptual_space(
         "",
         "west-east",
         location_concept,
-        bubble_chamber.new_structure_collection(),
         1,
         [],
         [],
-        Mock(),
-        Mock(),
-        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [[c[1]] for c in location.coordinates]
         },
     )
-    bubble_chamber.conceptual_spaces.add(space)
-    return space
 
 
 @pytest.fixture(scope="module")
