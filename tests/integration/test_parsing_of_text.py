@@ -18,7 +18,6 @@ from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
 
-@pytest.mark.skip
 def test_parsing_of_text(
     bubble_chamber,
     grammar_concept,
@@ -151,6 +150,13 @@ def test_parsing_of_text(
         bubble_chamber.new_structure_collection(word_1),
         output_space,
         0,
+        bubble_chamber.new_structure_collection(word_1),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     original_alternative_chunk_activation = alternative_chunk.activation
 

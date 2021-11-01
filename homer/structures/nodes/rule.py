@@ -62,26 +62,31 @@ class Rule(Node):
         return linked_rules
 
     def compatibility_with(
-        self, root: Node = None, child: Node = None, branch: str = "left"
+        self,
+        root: Node = None,
+        collection: StructureCollection = None,
+        branch: str = "left",
     ) -> FloatBetweenOneAndZero:
         if root is None:
             if branch == "left":
-                return self.left_concept.classifier.classify_chunk(
-                    root=root, child=child
+                return self.left_concept.classifier.classify(
+                    collection=collection, concept=self.left_concept
                 )
             if branch == "right" and self.right_concept is not None:
-                return self.right_concept.classifier.classify_chunk(
-                    root=root, child=child
+                return self.right_concept.classifier.classify(
+                    collection=collection, concept=self.right_concept
                 )
             return 0.0
         if branch == "left":
             if self.left_branch_is_free(root):
-                return self.left_concept.classifier.classify_chunk(
-                    root=root, child=child
+                return self.left_concept.classifier.classify(
+                    collection=collection, concept=self.left_concept
                 )
             return 0.0
         if self.right_branch_is_free(root):
-            return self.right_concept.classifier.classify_chunk(root=root, child=child)
+            return self.right_concept.classifier.classify(
+                collection=collection, concept=self.right_concept
+            )
         return 0.0
 
     def left_branch_is_free(self, root: Node) -> bool:

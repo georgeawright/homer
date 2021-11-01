@@ -358,9 +358,9 @@ def sentence_concept(bubble_chamber, grammar_vectors, grammar_space):
         grammar_space,
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.concepts.add(concept)
     return concept
@@ -379,9 +379,9 @@ def np_concept(bubble_chamber, grammar_vectors, grammar_space):
         grammar_space,
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.concepts.add(concept)
     return concept
@@ -400,9 +400,9 @@ def vp_concept(bubble_chamber, grammar_vectors, grammar_space):
         grammar_space,
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.concepts.add(concept)
     return concept
@@ -421,9 +421,9 @@ def pronoun_concept(bubble_chamber, grammar_vectors, grammar_space):
         grammar_space,
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.concepts.add(concept)
     return concept
@@ -442,9 +442,9 @@ def cop_concept(bubble_chamber, grammar_vectors, grammar_space):
         grammar_space,
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.concepts.add(concept)
     return concept
@@ -463,9 +463,9 @@ def adj_concept(bubble_chamber, grammar_vectors, grammar_space):
         grammar_space,
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     bubble_chamber.concepts.add(concept)
     return concept
@@ -506,7 +506,7 @@ def s_np_vp_rule(
         "",
         "",
         rule,
-        np_concept,
+        bubble_chamber.new_structure_collection(rule, np_concept),
         Mock(),
         grammar_space,
         Mock(),
@@ -520,7 +520,7 @@ def s_np_vp_rule(
         "",
         "",
         rule,
-        vp_concept,
+        bubble_chamber.new_structure_collection(rule, vp_concept),
         Mock(),
         grammar_space,
         Mock(),
@@ -552,7 +552,7 @@ def np_pronoun_rule(bubble_chamber, grammar_space, np_concept, pronoun_concept):
         "",
         "",
         np_concept,
-        rule,
+        bubble_chamber.new_structure_collection(np_concept, rule),
         Mock(),
         grammar_space,
         Mock(),
@@ -566,7 +566,7 @@ def np_pronoun_rule(bubble_chamber, grammar_space, np_concept, pronoun_concept):
         "",
         "",
         rule,
-        pronoun_concept,
+        bubble_chamber.new_structure_collection(rule, pronoun_concept),
         Mock(),
         grammar_space,
         Mock(),
@@ -600,7 +600,7 @@ def vp_cop_adj_rule(
         "",
         "",
         vp_concept,
-        rule,
+        bubble_chamber.new_structure_collection(vp_concept, rule),
         Mock(),
         grammar_space,
         Mock(),
@@ -614,7 +614,7 @@ def vp_cop_adj_rule(
         "",
         "",
         rule,
-        cop_concept,
+        bubble_chamber.new_structure_collection(rule, cop_concept),
         Mock(),
         grammar_space,
         Mock(),
@@ -628,7 +628,7 @@ def vp_cop_adj_rule(
         "",
         "",
         rule,
-        adj_concept,
+        bubble_chamber.new_structure_collection(rule, adj_concept),
         Mock(),
         grammar_space,
         Mock(),
@@ -660,7 +660,7 @@ def vp_cop_rule(bubble_chamber, grammar_space, vp_concept, cop_concept):
         "",
         "",
         vp_concept,
-        rule,
+        bubble_chamber.new_structure_collection(vp_concept, rule),
         Mock(),
         grammar_space,
         Mock(),
@@ -674,7 +674,7 @@ def vp_cop_rule(bubble_chamber, grammar_space, vp_concept, cop_concept):
         "",
         "",
         rule,
-        cop_concept,
+        bubble_chamber.new_structure_collection(rule, cop_concept),
         Mock(),
         grammar_space,
         Mock(),

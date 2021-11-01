@@ -30,13 +30,15 @@ class ChunkEvaluator(Evaluator):
         target_chunk = self.target_structures.where(is_slot=False).get()
         classifications = [
             target_chunk.rule.left_concept.classifier.classify(
-                collection=target_chunk.left_branch
+                collection=target_chunk.left_branch.where(is_slot=False),
+                concept=target_chunk.rule.left_concept,
             ),
         ]
         if target_chunk.rule.right_concept is not None:
             classifications.append(
                 target_chunk.rule.right_concept.classifier.classify(
-                    collection=target_chunk.left_branch
+                    collection=target_chunk.right_branch.where(is_slot=False),
+                    concept=target_chunk.rule.right_concept,
                 ),
             )
         self.confidence = fuzzy.AND(*classifications)

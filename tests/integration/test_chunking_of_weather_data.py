@@ -18,7 +18,6 @@ from homer.structures.spaces import ConceptualSpace, ContextualSpace
 from homer.tools import centroid_euclidean_distance
 
 
-@pytest.mark.skip
 def test_chunking_of_weather_data(
     bubble_chamber, location_space, temperature_space, same_rule, input_concept
 ):

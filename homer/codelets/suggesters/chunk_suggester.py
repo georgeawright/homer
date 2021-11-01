@@ -182,7 +182,7 @@ class ChunkSuggester(Suggester):
     def _calculate_confidence(self):
         if self.target_rule.right_concept is None:
             branch_concept = self.target_rule.left_concept
-            self._target_structures["branch"] = "left"
+            self._target_structures["target_branch"] = "left"
         else:
             branch_names = {
                 self.target_rule.left_concept: "left",
@@ -191,17 +191,19 @@ class ChunkSuggester(Suggester):
             branch_concept = self.bubble_chamber.random_machine.select(
                 [self.target_rule.left_concept, self.target_rule.right_concept],
                 key=lambda x: self.target_rule.compatibility_with(
-                    root=self.target_root,
-                    child=self.target_node,
+                    collection=self.bubble_chamber.new_structure_collection(
+                        self.target_node
+                    ),
                     branch=branch_names[x],
                 ),
             )
-            self._target_structures["branch"] = branch_names[branch_concept]
+            self._target_structures["target_branch"] = branch_names[branch_concept]
         classifications = [
             branch_concept.classifier.classify(
                 collection=self.bubble_chamber.new_structure_collection(
                     self.target_node
-                )
+                ),
+                concept=branch_concept,
             )
         ]
         self.confidence = fuzzy.AND(*classifications)
