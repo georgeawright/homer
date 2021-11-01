@@ -1,6 +1,6 @@
 from itertools import chain
 import statistics
-from typing import List
+from typing import List, Union
 
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -13,9 +13,10 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Rule, Word
+from .structures.nodes import Chunk, Lexeme, Rule, Word
 from .structures.spaces import ConceptualSpace, ContextualSpace, Frame
 from .structures.views import SimplexView, MonitoringView
+from .word_form import WordForm
 
 
 class BubbleChamber:
@@ -198,3 +199,33 @@ class BubbleChamber:
             member.super_chunks.add(chunk)
         self.add(chunk)
         return chunk
+
+    def new_word(
+        self,
+        parent_id: str,
+        name: str,
+        lexeme: Union[Lexeme, None],
+        word_form: WordForm,
+        locations: List[Location],
+        parent_space: Space,
+        quality: FloatBetweenOneAndZero,
+    ) -> Word:
+        parent_spaces = self.new_structure_collection(
+            *[location.space for location in locations]
+        )
+        word = Word(
+            structure_id=ID.new(Word),
+            parent_id=parent_id,
+            name=name,
+            lexeme=lexeme,
+            word_form=word_form,
+            locations=locations,
+            parent_space=parent_space,
+            quality=quality,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=parent_spaces,
+            super_chunks=self.new_structure_collection(),
+        )
+        self.add(word)
+        return word

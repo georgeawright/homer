@@ -827,8 +827,7 @@ def hotter_lexeme(bubble_chamber, hotter_concept):
 
 @pytest.fixture(scope="module")
 def it_word(bubble_chamber, grammar_vectors, grammar_space, it_lexeme):
-    return Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "it",
         it_lexeme,
@@ -836,17 +835,12 @@ def it_word(bubble_chamber, grammar_vectors, grammar_space, it_lexeme):
         [Location([grammar_vectors["pronoun"]], grammar_space)],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
 
 
 @pytest.fixture(scope="module")
 def is_word(bubble_chamber, grammar_vectors, grammar_space, is_lexeme):
-    return Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "is",
         is_lexeme,
@@ -854,17 +848,12 @@ def is_word(bubble_chamber, grammar_vectors, grammar_space, is_lexeme):
         [Location([grammar_vectors["cop"]], grammar_space)],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
 
 
 @pytest.fixture(scope="module")
 def in_word(bubble_chamber, grammar_vectors, grammar_space, in_lexeme):
-    return Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "in",
         in_lexeme,
@@ -872,17 +861,12 @@ def in_word(bubble_chamber, grammar_vectors, grammar_space, in_lexeme):
         [Location([grammar_vectors["prep"]], grammar_space)],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
 
 
 @pytest.fixture(scope="module")
 def the_word(bubble_chamber, grammar_vectors, grammar_space, the_lexeme):
-    return Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "the",
         the_lexeme,
@@ -890,17 +874,12 @@ def the_word(bubble_chamber, grammar_vectors, grammar_space, the_lexeme):
         [Location([grammar_vectors["det"]], grammar_space)],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
 
 
 @pytest.fixture(scope="module")
 def than_word(bubble_chamber, grammar_vectors, grammar_space, than_lexeme):
-    return Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "than",
         than_lexeme,
@@ -908,17 +887,12 @@ def than_word(bubble_chamber, grammar_vectors, grammar_space, than_lexeme):
         [Location([grammar_vectors["prep"]], grammar_space)],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
 
 
 @pytest.fixture(scope="module")
 def north_word(bubble_chamber, grammar_vectors, grammar_space, north_lexeme):
-    return Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "north",
         north_lexeme,
@@ -931,17 +905,12 @@ def north_word(bubble_chamber, grammar_vectors, grammar_space, north_lexeme):
         ],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
 
 
 @pytest.fixture(scope="module")
 def south_word(bubble_chamber, grammar_vectors, grammar_space, south_lexeme):
-    return Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "south",
         south_lexeme,
@@ -954,17 +923,12 @@ def south_word(bubble_chamber, grammar_vectors, grammar_space, south_lexeme):
         ],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
 
 
 @pytest.fixture(scope="module")
 def warm_word(bubble_chamber, grammar_vectors, grammar_space, warm_lexeme):
-    return Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "warm",
         warm_lexeme,
@@ -972,17 +936,12 @@ def warm_word(bubble_chamber, grammar_vectors, grammar_space, warm_lexeme):
         [Location([grammar_vectors["adj"]], grammar_space)],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
 
 
 @pytest.fixture(scope="module")
 def hotter_word(bubble_chamber, grammar_vectors, grammar_space, hotter_lexeme):
-    word = Word(
-        "",
+    return bubble_chamber.new_word(
         "",
         "hotter",
         hotter_lexeme,
@@ -990,13 +949,7 @@ def hotter_word(bubble_chamber, grammar_vectors, grammar_space, hotter_lexeme):
         [Location([grammar_vectors["jjr"]], grammar_space)],
         grammar_space,
         1,
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(grammar_space),
-        Mock(),
     )
-    bubble_chamber.words.add(word)
-    return word
 
 
 @pytest.fixture(scope="module")
