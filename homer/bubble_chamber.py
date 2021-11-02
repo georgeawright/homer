@@ -335,18 +335,66 @@ class BubbleChamber:
         )
         self.add(lexeme)
         for concept in concepts:
-            link = self.new_relation(
-                "",
-                concept,
-                lexeme,
-                None,
-                [],
-                1.0,
+            self.new_relation(
+                parent_id=parent_id,
+                start=concept,
+                end=lexeme,
+                parent_concept=None,
+                locations=[],
+                quality=1.0,
             )
         return lexeme
 
-    def new_rule(self) -> Rule:
-        raise NotImplementedError
+    def new_rule(
+        self,
+        parent_id: str,
+        name: str,
+        location: Location,
+        root_concept: Concept,
+        left_concept: Concept,
+        right_concept: Concept,
+        stable_activation: FloatBetweenOneAndZero = None,
+    ) -> Rule:
+        rule = Rule(
+            structure_id=ID.new(Rule),
+            parent_id=parent_id,
+            name=name,
+            location=location,
+            root_concept=root_concept,
+            left_concept=left_concept,
+            right_concept=right_concept,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=self.new_structure_collection(location.space),
+            stable_activation=stable_activation,
+        )
+        self.new_relation(
+            parent_id=parent_id,
+            start=root_concept,
+            end=rule,
+            parent_concept=None,
+            locations=[],
+            quality=1.0,
+        )
+        self.new_relation(
+            parent_id=parent_id,
+            start=rule,
+            end=left_concept,
+            parent_concept=None,
+            locations=[],
+            quality=1.0,
+        )
+        if right_concept is not None:
+            self.new_relation(
+                parent_id=parent_id,
+                start=rule,
+                end=right_concept,
+                parent_concept=None,
+                locations=[],
+                quality=1.0,
+            )
+        self.add(rule)
+        return rule
 
     def new_word(
         self,
@@ -415,6 +463,8 @@ class BubbleChamber:
         end.links_out.add(correspondence)
         end.links_in.add(correspondence)
         self.add(correspondence)
+        self.logger.log(start)
+        self.logger.log(end)
         return correspondence
 
     def new_label(
@@ -442,6 +492,7 @@ class BubbleChamber:
         )
         start.links_out.add(label)
         self.add(label)
+        self.logger.log(start)
         return label
 
     def new_relation(
@@ -473,6 +524,8 @@ class BubbleChamber:
         start.links_out.add(relation)
         end.links_in.add(relation)
         self.add(relation)
+        self.logger.log(start)
+        self.logger.log(end)
         return relation
 
     def new_simplex_view(self) -> SimplexView:

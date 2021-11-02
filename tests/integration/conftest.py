@@ -20,7 +20,6 @@ from homer.word_form import WordForm
 def bubble_chamber():
     logger = Mock()
     chamber = BubbleChamber.setup(logger, random_seed=1)
-
     structure_concepts = [
         chamber.new_concept(
             "", concept_name, [], Mock(), Mock(), Mock(), Mock(), Mock()
@@ -48,7 +47,7 @@ def bubble_chamber():
     ]
     for structure_concept in structure_concepts:
         for codelet_concept in codelet_concepts:
-            link = chamber.new_relation(
+            chamber.new_relation(
                 "",
                 structure_concept,
                 codelet_concept,
@@ -56,8 +55,7 @@ def bubble_chamber():
                 [],
                 Mock(),
             )
-
-    views_space = chamber.new_contextual_space(
+    chamber.new_contextual_space(
         "",
         "views",
         None,
@@ -229,216 +227,52 @@ def adj_concept(bubble_chamber, grammar_vectors, grammar_space):
 def s_np_vp_rule(
     bubble_chamber, grammar_space, sentence_concept, np_concept, vp_concept
 ):
-    rule = Rule(
-        "",
+    return bubble_chamber.new_rule(
         "",
         "s-->np,vp",
         Location([], grammar_space),
         sentence_concept,
         np_concept,
         vp_concept,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.rules.add(rule)
-    sentence_to_s_np_vp = Relation(
-        "",
-        "",
-        sentence_concept,
-        rule,
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    sentence_concept.links_out.add(sentence_to_s_np_vp)
-    rule.links_in.add(sentence_to_s_np_vp)
-    s_np_vp_to_np = Relation(
-        "",
-        "",
-        rule,
-        bubble_chamber.new_structure_collection(rule, np_concept),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    rule.links_out.add(s_np_vp_to_np)
-    np_concept.links_in.add(s_np_vp_to_np)
-    s_np_vp_to_vp = Relation(
-        "",
-        "",
-        rule,
-        bubble_chamber.new_structure_collection(rule, vp_concept),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    rule.links_out.add(s_np_vp_to_vp)
-    vp_concept.links_in.add(s_np_vp_to_vp)
-    return rule
 
 
 @pytest.fixture(scope="module")
 def np_pronoun_rule(bubble_chamber, grammar_space, np_concept, pronoun_concept):
-    rule = Rule(
-        "",
+    return bubble_chamber.new_rule(
         "",
         "np-->pronoun",
         Location([], grammar_space),
         np_concept,
         pronoun_concept,
         None,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.rules.add(rule)
-    np_to_np_pronoun = Relation(
-        "",
-        "",
-        np_concept,
-        bubble_chamber.new_structure_collection(np_concept, rule),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    np_concept.links_out.add(np_to_np_pronoun)
-    rule.links_in.add(np_to_np_pronoun)
-    np_pronoun_to_pronoun = Relation(
-        "",
-        "",
-        rule,
-        bubble_chamber.new_structure_collection(rule, pronoun_concept),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    rule.links_out.add(np_pronoun_to_pronoun)
-    pronoun_concept.links_in.add(np_pronoun_to_pronoun)
-    return rule
 
 
 @pytest.fixture(scope="module")
 def vp_cop_adj_rule(
     bubble_chamber, grammar_space, vp_concept, cop_concept, adj_concept
 ):
-    rule = Rule(
-        "",
+    bubble_chamber.new_rule(
         "",
         "vp-->cop,adj",
         Location([], grammar_space),
         vp_concept,
         cop_concept,
         adj_concept,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.rules.add(rule)
-    vp_to_vp_cop_adj = Relation(
-        "",
-        "",
-        vp_concept,
-        bubble_chamber.new_structure_collection(vp_concept, rule),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    vp_concept.links_out.add(vp_to_vp_cop_adj)
-    rule.links_in.add(vp_to_vp_cop_adj)
-    vp_cop_adj_to_cop = Relation(
-        "",
-        "",
-        rule,
-        bubble_chamber.new_structure_collection(rule, cop_concept),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    rule.links_out.add(vp_cop_adj_to_cop)
-    cop_concept.links_in.add(vp_cop_adj_to_cop)
-    vp_cop_adj_to_adj = Relation(
-        "",
-        "",
-        rule,
-        bubble_chamber.new_structure_collection(rule, adj_concept),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    rule.links_out.add(vp_cop_adj_to_adj)
-    adj_concept.links_in.add(vp_cop_adj_to_adj)
-    return rule
 
 
 @pytest.fixture(scope="module")
 def vp_cop_rule(bubble_chamber, grammar_space, vp_concept, cop_concept):
-    rule = Rule(
-        "",
+    bubble_chamber.new_rule(
         "",
         "vp-->cop",
         Location([], grammar_space),
         vp_concept,
         cop_concept,
         None,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.rules.add(rule)
-    vp_to_vp_cop = Relation(
-        "",
-        "",
-        vp_concept,
-        bubble_chamber.new_structure_collection(vp_concept, rule),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    vp_concept.links_out.add(vp_to_vp_cop)
-    rule.links_in.add(vp_to_vp_cop)
-    vp_cop_to_cop = Relation(
-        "",
-        "",
-        rule,
-        bubble_chamber.new_structure_collection(rule, cop_concept),
-        Mock(),
-        grammar_space,
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-    )
-    rule.links_out.add(vp_cop_to_cop)
-    cop_concept.links_in.add(vp_cop_rule)
-    return rule
 
 
 @pytest.fixture(scope="module")
@@ -803,20 +637,14 @@ def same_concept(bubble_chamber, same_different_space):
 
 @pytest.fixture(scope="module")
 def same_rule(bubble_chamber, same_concept):
-    rule = Rule(
-        "",
+    return bubble_chamber.new_rule(
         "",
         "same",
         Mock(),
         same_concept,
         same_concept,
         None,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.rules.add(rule)
-    return rule
 
 
 @pytest.fixture(scope="module")
