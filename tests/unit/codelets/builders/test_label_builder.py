@@ -36,7 +36,6 @@ def test_successful_creates_label_and_spawns_follow_up(
     label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_structures, 1.0)
     result = label_builder.run()
     assert CodeletResult.SUCCESS == result
-    assert hasinstance(label_builder.child_structures, Label)
     assert len(label_builder.child_codelets) == 1
     assert isinstance(label_builder.child_codelets[0], LabelEvaluator)
 

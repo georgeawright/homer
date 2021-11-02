@@ -5,7 +5,6 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection import StructureCollection
 
 
 class ProjectionSuggester(Suggester):
@@ -98,18 +97,12 @@ class ProjectionSuggester(Suggester):
             self._target_structures[
                 "non_frame_correspondee"
             ] = self.non_frame_correspondee
-            print(self.target_view.slot_values)
-            print(self.frame_correspondee.structure_id in self.target_view.slot_values)
-            print(
-                self.target_projectee.structure_id not in self.target_view.slot_values
-            )
             return (
                 self.frame_correspondee.structure_id in self.target_view.slot_values
                 and self.target_projectee.structure_id
                 not in self.target_view.slot_values
             )
         except MissingStructureError:
-            print("missing")
             return (
                 not self.target_projectee.is_slot
                 and not self.target_projectee.has_correspondence_to_space(

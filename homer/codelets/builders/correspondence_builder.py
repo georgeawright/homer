@@ -118,11 +118,6 @@ class CorrespondenceBuilder(Builder):
         )
 
     def _fill_in_word_slot(self):
-        print(
-            self.codelet_id,
-            self.correspondence.non_slot_argument.lexeme,
-            self.correspondence.non_slot_argument.lexeme.concepts,
-        )
         self.target_view.slot_values[
             self.correspondence.slot_argument.structure_id
         ] = self.correspondence.non_slot_argument.lexeme.concepts.get()

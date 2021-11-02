@@ -458,6 +458,7 @@ class BubbleChamber:
         )
         if parent_view is not None:
             parent_view.members.add(correspondence)
+            self.logger.log(parent_view)
         start.links_out.add(correspondence)
         start.links_in.add(correspondence)
         end.links_out.add(correspondence)
