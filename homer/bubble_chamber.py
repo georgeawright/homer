@@ -220,8 +220,29 @@ class BubbleChamber:
         self.add(space)
         return space
 
-    def new_frame(self) -> Frame:
-        raise NotImplementedError
+    def new_frame(
+        self,
+        parent_id: str,
+        name: str,
+        parent_concept: Concept,
+        contents: StructureCollection,
+        input_space: ContextualSpace,
+        output_space: ContextualSpace,
+    ) -> Frame:
+        frame = Frame(
+            structure_id=ID.new(Frame),
+            parent_id=parent_id,
+            name=name,
+            parent_concept=parent_concept,
+            contents=contents,
+            input_space=input_space,
+            output_space=output_space,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=self.new_structure_collection(),
+        )
+        self.add(frame)
+        return frame
 
     def new_chunk(
         self,

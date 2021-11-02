@@ -1214,17 +1214,12 @@ def comparison_frame(
     frame_contents = bubble_chamber.new_structure_collection(
         word_2_correspondence, word_5_correspondence, word_8_correspondence
     )
-    frame = Frame(
-        "",
+    frame = bubble_chamber.new_frame(
         "",
         "",
         Mock(),
         frame_contents,
         frame_input_space,
         frame_output_space,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.frames.add(frame)
     return frame
