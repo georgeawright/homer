@@ -1086,8 +1086,7 @@ def comparison_frame(
         quality=1.0,
         bubble_chamber=bubble_chamber,
     )
-    word_2 = Word(
-        ID.new(Word),
+    word_2 = bubble_chamber.new_word(
         "",
         None,
         None,
@@ -1098,12 +1097,7 @@ def comparison_frame(
         ],
         frame_output_space,
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(frame_output_space, grammar_space),
-        bubble_chamber.new_structure_collection(),
     )
-    frame_output_space.add(word_2)
     word_3 = in_word.copy_to_location(
         Location([[3]], frame_output_space),
         quality=1.0,
@@ -1114,8 +1108,7 @@ def comparison_frame(
         quality=1.0,
         bubble_chamber=bubble_chamber,
     )
-    word_5 = Word(
-        ID.new(Word),
+    word_5 = bubble_chamber.new_word(
         "",
         None,
         None,
@@ -1126,12 +1119,7 @@ def comparison_frame(
         ],
         frame_output_space,
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(frame_output_space, grammar_space),
-        bubble_chamber.new_structure_collection(),
     )
-    frame_output_space.add(word_5)
     word_6 = than_word.copy_to_location(
         Location([[6]], frame_output_space),
         quality=1.0,
@@ -1142,8 +1130,7 @@ def comparison_frame(
         quality=1.0,
         bubble_chamber=bubble_chamber,
     )
-    word_8 = Word(
-        ID.new(Word),
+    word_8 = bubble_chamber.new_word(
         "",
         None,
         None,
@@ -1154,12 +1141,7 @@ def comparison_frame(
         ],
         frame_output_space,
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(frame_output_space, grammar_space),
-        bubble_chamber.new_structure_collection(),
     )
-    frame_output_space.add(word_8)
     word_2_correspondence = Correspondence(
         "",
         "",
