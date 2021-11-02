@@ -335,21 +335,14 @@ class BubbleChamber:
         )
         self.add(lexeme)
         for concept in concepts:
-            link = Relation(
-                "",
+            link = self.new_relation(
                 "",
                 concept,
-                self.new_structure_collection(concept, lexeme),
+                lexeme,
                 None,
                 [],
                 1.0,
-                self.new_structure_collection(),
-                self.new_structure_collection(),
-                self.new_structure_collection(),
             )
-            concept.links_out.add(link)
-            lexeme.links_in.add(link)
-            self.add(link)
         return lexeme
 
     def new_rule(self) -> Rule:
@@ -385,14 +378,102 @@ class BubbleChamber:
         self.add(word)
         return word
 
-    def new_correspondence(self) -> Correspondence:
-        raise NotImplementedError
+    def new_correspondence(
+        self,
+        parent_id: str,
+        start: Structure,
+        end: Structure,
+        locations: List[Location],
+        parent_concept: Concept,
+        conceptual_space: ConceptualSpace,
+        parent_view: View,
+        quality: FloatBetweenOneAndZero,
+        is_privileged: bool = False,
+    ) -> Correspondence:
+        parent_spaces = self.new_structure_collection(
+            *[location.space for location in locations]
+        )
+        correspondence = Correspondence(
+            structure_id=ID.new(Correspondence),
+            parent_id=parent_id,
+            start=start,
+            arguments=self.new_structure_collection(start, end),
+            locations=locations,
+            parent_concept=parent_concept,
+            conceptual_space=conceptual_space,
+            parent_view=parent_view,
+            quality=quality,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=parent_spaces,
+            is_privileged=is_privileged,
+        )
+        if parent_view is not None:
+            parent_view.members.add(correspondence)
+        start.links_out.add(correspondence)
+        start.links_in.add(correspondence)
+        end.links_out.add(correspondence)
+        end.links_in.add(correspondence)
+        self.add(correspondence)
+        return correspondence
 
-    def new_label(self) -> Label:
-        raise NotImplementedError
+    def new_label(
+        self,
+        parent_id: str,
+        start: Structure,
+        parent_concept: Concept,
+        locations: List[Location],
+        quality: FloatBetweenOneAndZero,
+    ) -> Label:
+        parent_spaces = self.new_structure_collection(
+            *[location.space for location in locations]
+        )
+        label = Label(
+            structure_id=ID.new(Label),
+            parent_id=parent_id,
+            start=start,
+            arguments=self.new_structure_collection(start),
+            parent_concept=parent_concept,
+            locations=locations,
+            quality=quality,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=parent_spaces,
+        )
+        start.links_out.add(label)
+        self.add(label)
+        return label
 
-    def new_relation(self) -> Relation:
-        raise NotImplementedError
+    def new_relation(
+        self,
+        parent_id: str,
+        start: Structure,
+        end: Structure,
+        parent_concept: Concept,
+        locations: List[Location],
+        quality: FloatBetweenOneAndZero,
+        is_bidirectional: bool = True,
+    ) -> Relation:
+        parent_spaces = self.new_structure_collection(
+            *[location.space for location in locations]
+        )
+        relation = Relation(
+            structure_id=ID.new(Relation),
+            parent_id=parent_id,
+            start=start,
+            arguments=self.new_structure_collection(start, end),
+            parent_concept=parent_concept,
+            locations=locations,
+            quality=quality,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=parent_spaces,
+            is_bidirectional=is_bidirectional,
+        )
+        start.links_out.add(relation)
+        end.links_in.add(relation)
+        self.add(relation)
+        return relation
 
     def new_simplex_view(self) -> SimplexView:
         raise NotImplementedError

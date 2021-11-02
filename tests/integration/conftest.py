@@ -48,75 +48,50 @@ def bubble_chamber():
     ]
     for structure_concept in structure_concepts:
         for codelet_concept in codelet_concepts:
-            link = Relation(
-                "",
+            link = chamber.new_relation(
                 "",
                 structure_concept,
-                chamber.new_structure_collection(structure_concept, codelet_concept),
-                Mock(),
+                codelet_concept,
                 None,
+                [],
                 Mock(),
-                chamber.new_structure_collection(),
-                chamber.new_structure_collection(),
-                chamber.new_structure_collection(),
             )
-            structure_concept.links_out.add(link)
-            codelet_concept.links_in.add(link)
 
-    views_space = ContextualSpace(
-        "",
+    views_space = chamber.new_contextual_space(
         "",
         "views",
         None,
         chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
-        chamber.new_structure_collection(),
     )
-    chamber.contextual_spaces.add(views_space)
     return chamber
 
 
 @pytest.fixture(scope="module")
 def input_concept(bubble_chamber):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "input",
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
+        [],
         Mock(),
         Mock(),
         Mock(),
         Mock(),
         Mock(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
-def text_concept():
-    concept = Concept(
-        "",
+def text_concept(bubble_chamber):
+    return bubble_chamber.new_concept(
         "",
         "text",
-        Mock(),
-        Mock(),
+        [],
         Mock(),
         Mock(),
         Mock(),
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    return concept
 
 
 @pytest.fixture(scope="module")
@@ -140,49 +115,35 @@ def grammar_vectors():
 
 
 @pytest.fixture(scope="module")
-def grammar_concept():
-    concept = Concept(
-        "",
+def grammar_concept(bubble_chamber):
+    return bubble_chamber.new_concept(
         "",
         "grammar",
-        Mock(),
-        Mock(),
+        [],
         Mock(),
         Mock(),
         Mock(),
         Mock(),
         centroid_euclidean_distance,
-        Mock(),
-        Mock(),
-        Mock(),
     )
-    return concept
 
 
 @pytest.fixture(scope="module")
 def grammar_space(bubble_chamber, grammar_concept):
-    space = ConceptualSpace(
-        "",
+    return bubble_chamber.new_conceptual_space(
         "",
         "grammar",
         grammar_concept,
-        bubble_chamber.new_structure_collection(),
         1,
         [],
         [],
-        Mock(),
-        Mock(),
-        Mock(),
         is_basic_level=True,
     )
-    bubble_chamber.conceptual_spaces.add(space)
-    return space
 
 
 @pytest.fixture(scope="module")
 def sentence_concept(bubble_chamber, grammar_vectors, grammar_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "sentence",
         [Location([grammar_vectors["sentence"]], grammar_space)],
@@ -190,20 +151,13 @@ def sentence_concept(bubble_chamber, grammar_vectors, grammar_space):
         Mock(),
         Mock(),
         grammar_space,
-        Mock(),
         centroid_euclidean_distance,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def np_concept(bubble_chamber, grammar_vectors, grammar_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "np",
         [Location([grammar_vectors["np"]], grammar_space)],
@@ -211,20 +165,13 @@ def np_concept(bubble_chamber, grammar_vectors, grammar_space):
         Mock(),
         Mock(),
         grammar_space,
-        Mock(),
         centroid_euclidean_distance,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def vp_concept(bubble_chamber, grammar_vectors, grammar_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "vp",
         [Location([grammar_vectors["vp"]], grammar_space)],
@@ -232,20 +179,13 @@ def vp_concept(bubble_chamber, grammar_vectors, grammar_space):
         Mock(),
         Mock(),
         grammar_space,
-        Mock(),
         centroid_euclidean_distance,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def pronoun_concept(bubble_chamber, grammar_vectors, grammar_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "pronoun",
         [Location([grammar_vectors["pronoun"]], grammar_space)],
@@ -253,20 +193,13 @@ def pronoun_concept(bubble_chamber, grammar_vectors, grammar_space):
         Word,
         Mock(),
         grammar_space,
-        Mock(),
         centroid_euclidean_distance,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def cop_concept(bubble_chamber, grammar_vectors, grammar_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "cop",
         [Location([grammar_vectors["cop"]], grammar_space)],
@@ -274,20 +207,13 @@ def cop_concept(bubble_chamber, grammar_vectors, grammar_space):
         Word,
         Mock(),
         grammar_space,
-        Mock(),
         centroid_euclidean_distance,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
 def adj_concept(bubble_chamber, grammar_vectors, grammar_space):
-    concept = Concept(
-        "",
+    return bubble_chamber.new_concept(
         "",
         "adj",
         [Location([grammar_vectors["adj"]], grammar_space)],
@@ -295,14 +221,8 @@ def adj_concept(bubble_chamber, grammar_vectors, grammar_space):
         Word,
         Mock(),
         grammar_space,
-        Mock(),
         centroid_euclidean_distance,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    bubble_chamber.concepts.add(concept)
-    return concept
 
 
 @pytest.fixture(scope="module")
@@ -977,8 +897,7 @@ def comparison_frame(
         input_concept,
         bubble_chamber.new_structure_collection(location_space, temperature_space),
     )
-    chunk_one = Chunk(
-        ID.new(Chunk),
+    chunk_one = bubble_chamber.new_chunk(
         "",
         [
             Location([[]], frame_input_space),
@@ -991,16 +910,8 @@ def comparison_frame(
         bubble_chamber.new_structure_collection(),
         bubble_chamber.new_structure_collection(),
         Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(
-            frame_input_space, location_space, temperature_space
-        ),
-        bubble_chamber.new_structure_collection(),
     )
-    frame_input_space.add(chunk_one)
-    chunk_two = Chunk(
-        ID.new(Chunk),
+    chunk_two = bubble_chamber.new_chunk(
         "",
         [
             Location([[]], frame_input_space),
@@ -1013,63 +924,38 @@ def comparison_frame(
         bubble_chamber.new_structure_collection(),
         bubble_chamber.new_structure_collection(),
         Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(
-            frame_input_space, location_space, temperature_space
-        ),
-        bubble_chamber.new_structure_collection(),
     )
-    frame_input_space.add(chunk_two)
-    label_one = Label(
-        ID.new(Label),
+    label_one = bubble_chamber.new_label(
         "",
         chunk_one,
-        bubble_chamber.new_structure_collection(chunk_one),
         None,
         [
             Location([[]], frame_input_space),
             Location([[math.nan, math.nan]], location_space),
         ],
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(frame_input_space, location_space),
     )
-    chunk_one.links_out.add(label_one)
-    label_two = Label(
-        ID.new(Label),
+    label_two = bubble_chamber.new_label(
         "",
         chunk_two,
-        bubble_chamber.new_structure_collection(chunk_two),
         None,
         [
             Location([[]], frame_input_space),
             Location([[math.nan, math.nan]], location_space),
         ],
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(frame_input_space, location_space),
     )
-    chunk_two.links_out.add(label_two)
-    one_to_two_relation = Relation(
-        ID.new(Relation),
+    one_to_two_relation = bubble_chamber.new_relation(
         "",
         chunk_one,
-        bubble_chamber.new_structure_collection(chunk_one, chunk_two),
+        chunk_two,
         None,
         [
             TwoPointLocation([[]], [[]], frame_input_space),
             TwoPointLocation([[math.nan]], [[math.nan]], temperature_space),
         ],
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(frame_input_space, temperature_space),
     )
-    chunk_one.links_out.add(one_to_two_relation)
-    chunk_two.links_in.add(one_to_two_relation)
     frame_output_space = bubble_chamber.new_contextual_space(
         "",
         "",
@@ -1142,11 +1028,10 @@ def comparison_frame(
         frame_output_space,
         1.0,
     )
-    word_2_correspondence = Correspondence(
-        "",
+    word_2_correspondence = bubble_chamber.new_correspondence(
         "",
         one_to_two_relation,
-        bubble_chamber.new_structure_collection(one_to_two_relation, word_2),
+        word_2,
         [
             one_to_two_relation.location_in_space(one_to_two_relation.parent_space),
             word_2.location_in_space(word_2.parent_space),
@@ -1155,15 +1040,11 @@ def comparison_frame(
         temperature_space,
         None,
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    word_5_correspondence = Correspondence(
-        "",
+    word_5_correspondence = bubble_chamber.new_correspondence(
         "",
         label_one,
-        bubble_chamber.new_structure_collection(label_one, word_5),
+        word_5,
         [
             label_one.location_in_space(label_one.parent_space),
             word_5.location_in_space(word_5.parent_space),
@@ -1172,15 +1053,11 @@ def comparison_frame(
         location_space,
         None,
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
-    word_8_correspondence = Correspondence(
-        "",
+    word_8_correspondence = bubble_chamber.new_correspondence(
         "",
         label_two,
-        bubble_chamber.new_structure_collection(label_two, word_8),
+        word_8,
         [
             label_two.location_in_space(label_two.parent_space),
             word_8.location_in_space(word_8.parent_space),
@@ -1189,9 +1066,6 @@ def comparison_frame(
         location_space,
         None,
         1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
     )
     frame_contents = bubble_chamber.new_structure_collection(
         word_2_correspondence, word_5_correspondence, word_8_correspondence
