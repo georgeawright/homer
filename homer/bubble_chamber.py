@@ -199,8 +199,26 @@ class BubbleChamber:
         self.add(space)
         return space
 
-    def new_contextual_space(self) -> ContextualSpace:
-        raise NotImplementedError
+    def new_contextual_space(
+        self,
+        parent_id: str,
+        name: str,
+        parent_concept: Concept,
+        conceptual_spaces: StructureCollection,
+    ) -> ContextualSpace:
+        space = ContextualSpace(
+            structure_id=ID.new(ContextualSpace),
+            parent_id=parent_id,
+            name=name,
+            parent_concept=parent_concept,
+            contents=self.new_structure_collection(),
+            conceptual_spaces=conceptual_spaces,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=self.new_structure_collection(),
+        )
+        self.add(space)
+        return space
 
     def new_frame(self) -> Frame:
         raise NotImplementedError

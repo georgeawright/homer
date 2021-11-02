@@ -747,50 +747,36 @@ def west_east_space(bubble_chamber, location_concept):
 
 @pytest.fixture(scope="module")
 def nw_se_space(bubble_chamber, location_concept):
-    space = ConceptualSpace(
-        "",
+    return bubble_chamber.new_conceptual_space(
         "",
         "nw-se",
         location_concept,
-        bubble_chamber.new_structure_collection(),
         1,
         [],
         [],
-        Mock(),
-        Mock(),
-        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [
                 [statistics.fmean(c)] for c in location.coordinates
             ]
         },
     )
-    bubble_chamber.conceptual_spaces.add(space)
-    return space
 
 
 @pytest.fixture(scope="module")
 def ne_sw_space(bubble_chamber, location_concept):
-    space = ConceptualSpace(
-        "",
+    return bubble_chamber.new_conceptual_space(
         "",
         "ne-sw",
         location_concept,
-        bubble_chamber.new_structure_collection(),
         1,
         [],
         [],
-        Mock(),
-        Mock(),
-        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [
                 [statistics.fmean([c[0], 4 - c[1]])] for c in location.coordinates
             ]
         },
     )
-    bubble_chamber.conceptual_spaces.add(space)
-    return space
 
 
 @pytest.fixture(scope="module")
@@ -802,22 +788,15 @@ def location_space(
     nw_se_space,
     ne_sw_space,
 ):
-    space = ConceptualSpace(
-        "",
+    return bubble_chamber.new_conceptual_space(
         "",
         "location",
         location_concept,
-        bubble_chamber.new_structure_collection(),
         2,
         [north_south_space, west_east_space],
         [north_south_space, west_east_space, nw_se_space, ne_sw_space],
-        Mock(),
-        Mock(),
-        Mock(),
         is_basic_level=True,
     )
-    bubble_chamber.conceptual_spaces.add(space)
-    return space
 
 
 @pytest.fixture(scope="module")
@@ -864,42 +843,28 @@ def temperature_concept(bubble_chamber):
 
 @pytest.fixture(scope="module")
 def temperature_space(bubble_chamber, temperature_concept):
-    space = ConceptualSpace(
-        "",
+    return bubble_chamber.new_conceptual_space(
         "",
         "temperature",
         temperature_concept,
-        bubble_chamber.new_structure_collection(),
         1,
         [],
         [],
-        Mock(),
-        Mock(),
-        Mock(),
         is_basic_level=True,
     )
-    bubble_chamber.conceptual_spaces.add(space)
-    return space
 
 
 @pytest.fixture(scope="module")
 def same_different_space(bubble_chamber):
-    space = ConceptualSpace(
-        "",
+    return bubble_chamber.new_conceptual_space(
         "",
         "same-different",
         Mock(),
-        bubble_chamber.new_structure_collection(),
         1,
         [],
         [],
-        Mock(),
-        Mock(),
-        Mock(),
         is_basic_level=True,
     )
-    bubble_chamber.conceptual_spaces.add(space)
-    return space
 
 
 @pytest.fixture(scope="module")
@@ -1006,16 +971,11 @@ def comparison_frame(
     hotter_word,
     south_word,
 ):
-    frame_input_space = ContextualSpace(
-        "",
+    frame_input_space = bubble_chamber.new_contextual_space(
         "",
         "frame-input",
         input_concept,
-        bubble_chamber.new_structure_collection(),
-        [location_space, temperature_space],
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(location_space, temperature_space),
     )
     chunk_one = Chunk(
         ID.new(Chunk),
@@ -1110,16 +1070,11 @@ def comparison_frame(
     )
     chunk_one.links_out.add(one_to_two_relation)
     chunk_two.links_in.add(one_to_two_relation)
-    frame_output_space = ContextualSpace(
-        "",
+    frame_output_space = bubble_chamber.new_contextual_space(
         "",
         "",
         text_concept,
-        bubble_chamber.new_structure_collection(),
-        [grammar_space],
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(grammar_space),
     )
     word_0 = it_word.copy_to_location(
         Location([[0]], frame_output_space),
