@@ -5,10 +5,10 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.classifiers import SamenessClassifier
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ChunkBuilder
-from homer.codelets.evaluators import ChunkEvaluator
-from homer.codelets.selectors import ChunkSelector
-from homer.codelets.suggesters import ChunkSuggester
+from homer.codelets.builders import ChunkBuilder, LabelBuilder, RelationBuilder
+from homer.codelets.evaluators import ChunkEvaluator, LabelEvaluator, RelationEvaluator
+from homer.codelets.selectors import ChunkSelector, LabelSelector, RelationSelector
+from homer.codelets.suggesters import ChunkSuggester, LabelSuggester, RelationSuggester
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
@@ -19,7 +19,16 @@ from homer.tools import centroid_euclidean_distance
 
 
 def test_chunking_of_weather_data(
-    bubble_chamber, location_space, temperature_space, same_rule, input_concept
+    bubble_chamber,
+    location_space,
+    temperature_space,
+    same_rule,
+    input_concept,
+    hot_concept,
+    warm_concept,
+    cold_concept,
+    north_concept,
+    south_concept,
 ):
     input_space = ContextualSpace(
         "",
@@ -192,3 +201,63 @@ def test_chunking_of_weather_data(
     builder_2 = suggester_2.child_codelets[0]
     assert isinstance(builder_2, ChunkBuilder)
     assert builder_2._target_structures["target_root"] == chunk
+
+    # create label suggester
+    suggester = LabelSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_node": raw_chunk_1,
+            "parent_concept": cold_concept,
+        },
+        1,
+    )
+
+    # run label suggester
+    suggester.run()
+    assert CodeletResult.SUCCESS == suggester.result
+
+    # assert follow up is label builder
+    builder = suggester.child_codelets[0]
+    assert isinstance(builder, LabelBuilder)
+
+    # run label builder
+    builder.run()
+    assert CodeletResult.SUCCESS == builder.result
+    label = builder.child_structures.where(is_slot=False).get()
+    original_label_quality = label.quality
+    original_label_activation = label.activation
+
+    # assert follow up is label evaluator
+    evaluator = builder.child_codelets[0]
+    assert isinstance(evaluator, LabelEvaluator)
+
+    # run label evaluator
+    evaluator.run()
+
+    # assert quality is increased and follow up is label selector
+    assert label.quality > original_label_quality
+    selector = evaluator.child_codelets[0]
+    assert isinstance(selector, LabelSelector)
+
+    # build alternative label
+    alternative_label = bubble_chamber.new_label(
+        "",
+        start=raw_chunk_1,
+        parent_concept=hot_concept,
+        locations=[raw_chunk_1.location_in_space(hot_concept.parent_space)],
+        quality=0.0,
+    )
+    original_alternative_label_activation = alternative_label.activation
+
+    # run label selector
+    selector.run()
+    label.update_activation()
+    alternative_label.update_activation()
+
+    # assert high quality label is preferred and follow up is top down label suggester
+    assert label.activation > original_label_activation
+    assert alternative_label.activation <= original_alternative_label_activation
+    suggester_2 = selector.child_codelets[0]
+    assert isinstance(suggester_2, LabelSuggester)
+    assert label.parent_concept == suggester_2._target_structures["parent_concept"]

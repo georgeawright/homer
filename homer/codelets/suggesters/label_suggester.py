@@ -118,8 +118,9 @@ class LabelSuggester(Suggester):
             except MissingStructureError:
                 try:
                     self.parent_concept = (
-                        conceptual_space.contents.of_type(Concept)
-                        .where(structure_type=Label)
+                        conceptual_space.contents.where(
+                            is_concept=True, structure_type=Label
+                        )
                         .where_not(classifier=None)
                         .get()
                     )

@@ -33,7 +33,6 @@ class Lexeme(Node):
 
     @property
     def concepts(self) -> StructureCollection:
-        print(self.relatives)
         return self.relatives.where(is_concept=True)
 
     def get_form(self, form: WordForm) -> str:

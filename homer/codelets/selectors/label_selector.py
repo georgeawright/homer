@@ -13,7 +13,9 @@ class LabelSelector(Selector):
         if self.challengers is not None:
             return True
         champion_label = self.champions.get()
-        candidates = champion_label.start.labels_in_space(champion_label.parent_space)
+        candidates = champion_label.start.labels_in_space(
+            champion_label.parent_concept.parent_space
+        )
         try:
             challenger_label = candidates.get(key=activation, exclude=[champion_label])
             self.challengers = self.bubble_chamber.new_structure_collection(

@@ -64,7 +64,9 @@ class LabelBuilder(Builder):
             parent_id=self.codelet_id,
             start=self.target_node,
             parent_concept=self.parent_concept,
-            parent_space=self.target_node.parent_space,
+            locations=[
+                self.target_node.location_in_space(self.parent_concept.parent_space)
+            ],
             quality=0,
         )
         label.activation = self.INITIAL_STRUCTURE_ACTIVATION

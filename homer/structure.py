@@ -178,8 +178,6 @@ class Structure(ABC):
 
     @property
     def relations(self) -> StructureCollection:
-        if self.is_lexeme:
-            print(self, self.links_in, self.links_out)
         return StructureCollection.union(
             self.links_in.where(is_relation=True),
             self.links_out.where(is_relation=True),

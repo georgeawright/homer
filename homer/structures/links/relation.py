@@ -98,7 +98,6 @@ class Relation(Link):
         return new_relation
 
     def nearby(self, space: Space = None) -> StructureCollection:
-        print(self.end)
         return (
             StructureCollection.intersection(
                 self.start.relations,

@@ -75,7 +75,6 @@ class ConceptualSpace(Space):
                 sub_space.add(structure)
 
     def location_from_super_space_location(self, location: Location) -> Location:
-        print(location)
         if location.coordinates[0][0] is None:
             coordinates = [[None for _ in range(self.no_of_dimensions)]]
         else:
