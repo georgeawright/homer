@@ -149,24 +149,26 @@ class BubbleChamber:
             self.logger.log(space)
         collections = {
             # views
-            MonitoringView: self.monitoring_views,
-            SimplexView: self.simplex_views,
+            MonitoringView: "monitoring_views",
+            SimplexView: "simplex_views",
             # spaces
-            ConceptualSpace: self.conceptual_spaces,
-            ContextualSpace: self.contextual_spaces,
-            Frame: self.frames,
+            ConceptualSpace: "conceptual_spaces",
+            ContextualSpace: "contextual_spaces",
+            Frame: "frames",
             # nodes
-            Chunk: self.chunks,
-            Concept: self.concepts,
-            Lexeme: self.lexemes,
-            Rule: self.rules,
-            Word: self.words,
+            Chunk: "chunks",
+            Concept: "concepts",
+            Lexeme: "lexemes",
+            Rule: "rules",
+            Word: "words",
             # links
-            Correspondence: self.correspondences,
-            Label: self.labels,
-            Relation: self.relations,
+            Correspondence: "correspondences",
+            Label: "labels",
+            Relation: "relations",
         }
-        collections[type(item)].add(item)
+        collection_name = collections[type(item)]
+        print(collection_name)
+        getattr(self, collection_name).add(item)
 
     def new_conceptual_space(
         self,
