@@ -1,21 +1,31 @@
 import re
 
+from .classifiers import ProximityClassifier
 from .location import Location
+from .tools import centroid_euclidean_distance
 
 
 class Interpreter:
     def __init__(self, bubble_chamber):
         self.bubble_chamber = bubble_chamber
         self.names = {}
-        self.object_methods = {"Concept": "new_concept"}
+        self.classifiers = {"ProximityClassifier": ProximityClassifier}
+        self.distance_functions = {
+            "centroid_euclidean_distance": centroid_euclidean_distance
+        }
+        self.object_methods = {
+            "ConceptualSpace": "new_conceptual_space",
+            "Concept": "new_concept",
+        }
 
     def interpret_assignment(self, assignment: str):
         operands = assignment.split("=")
         name = operands[0]
         definition = operands[1]
-        type_name = definition.split("(")[0]
-        arguments = definition.split("(")[1].split(")")[0]
-        arguments_list = arguments.split(",")
+        arguments_index = definition.index("(")
+        type_name = definition[:arguments_index]
+        arguments = definition[arguments_index + 1 : len(definition) - 1]
+        arguments_list = arguments.split(";")
         arguments_dict = {}
         for argument in arguments_list:
             pairs = argument.split(":")
@@ -27,16 +37,27 @@ class Interpreter:
         self.names[name] = method(**arguments_dict)
 
     def interpret_string(self, string: str):
-        string = re.sub(r"\s+", "", string)
-        assignments = string.split(".")
-        for assignment in assignments:
-            if assignment == "":
-                continue
-            self.interpret_assignment(assignment)
+        current_assignment = ""
+        in_string = False
+        for character in string:
+            if character == ".":
+                if in_string:
+                    raise Exception("String left open")
+                self.interpret_assignment(current_assignment)
+                current_assignment = ""
+            else:
+                if character == '"':
+                    in_string = not in_string
+                current_assignment += (
+                    re.sub(r"\s", "", character) if not in_string else character
+                )
+        if current_assignment != "":
+            raise Exception("Unexpected EOF")
 
     def interpret_file(self, file_name: str):
         with open(file_name, "r") as f:
             current_assignment = ""
+            in_string = False
             while True:
                 character = f.read(1)
                 if not character:
@@ -44,14 +65,33 @@ class Interpreter:
                         raise Exception("Unexpected EOF")
                     break
                 if character == ".":
+                    if in_string:
+                        raise Exception("String left open")
                     self.interpret_assignment(current_assignment)
                     current_assignment = ""
                 else:
-                    current_assignment += re.sub(r"\s", "", character)
+                    if character == '"':
+                        in_string = not in_string
+                    current_assignment += (
+                        re.sub(r"\s", "", character) if not in_string else character
+                    )
 
     def _pythonize_value(self, value: str):
         if value[0] == "[":
-            elements = value[1 : len(value) - 1].split(",")
+            elements = []
+            in_list = False
+            in_function = False
+            current_element = ""
+            for character in value[1:]:
+                if character in {"[", "]"}:
+                    in_list = not in_list
+                if character in {"(", ")"}:
+                    in_function = not in_function
+                if character == "," and not in_list and not in_function:
+                    elements.append(current_element)
+                    current_element = ""
+                else:
+                    current_element += character
             return [
                 self._pythonize_value(element) for element in elements if element != ""
             ]
@@ -59,6 +99,10 @@ class Interpreter:
             return value[1:-1]
         if value in self.names:
             return self.names[value]
+        if value in self.classifiers:
+            return self.classifiers[value]()
+        if value in self.distance_functions:
+            return self.distance_functions[value]
         if "Location(" in value:
             arguments = value.split("(")[1].split(")")[0].split(",")
             pythonized_arguments = [self._pythonize_value(arg) for arg in arguments]
