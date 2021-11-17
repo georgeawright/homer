@@ -1,6 +1,6 @@
 import re
 
-from .classifiers import ProximityClassifier
+from . import classifiers
 from .location import Location
 from .tools import centroid_euclidean_distance
 
@@ -9,13 +9,27 @@ class Interpreter:
     def __init__(self, bubble_chamber):
         self.bubble_chamber = bubble_chamber
         self.names = {}
-        self.classifiers = {"ProximityClassifier": ProximityClassifier}
+        self.classifiers = {
+            "DifferenceClassifier": classifiers.DifferenceClassifier,
+            "DifferentnessClassifier": classifiers.DifferentnessClassifier,
+            "ProximityClassifier": classifiers.ProximityClassifier,
+            "SamenessClassifier": classifiers.SamenessClassifier,
+        }
         self.distance_functions = {
             "centroid_euclidean_distance": centroid_euclidean_distance
         }
         self.object_methods = {
-            "ConceptualSpace": "new_conceptual_space",
-            "Concept": "new_concept",
+            "ConceptualSpace": bubble_chamber.new_conceptual_space,
+            "ContextualSpace": bubble_chamber.new_contextual_space,
+            "Frame": bubble_chamber.new_frame,
+            "Chunk": bubble_chamber.new_chunk,
+            "Concept": bubble_chamber.new_concept,
+            "Lexeme": bubble_chamber.new_lexeme,
+            "Rule": bubble_chamber.new_rule,
+            "Word": bubble_chamber.new_word,
+            "Correspondence": bubble_chamber.new_correspondence,
+            "Label": bubble_chamber.new_label,
+            "Relation": bubble_chamber.new_relation,
         }
 
     def interpret_assignment(self, assignment: str):
@@ -32,9 +46,8 @@ class Interpreter:
             key = pairs[0]
             value = pairs[1]
             arguments_dict[key] = self._pythonize_value(value)
-        object_method_name = self.object_methods[type_name]
-        method = getattr(self.bubble_chamber, object_method_name)
-        self.names[name] = method(**arguments_dict)
+        object_method = self.object_methods[type_name]
+        self.names[name] = object_method(**arguments_dict)
 
     def interpret_string(self, string: str):
         current_assignment = ""
@@ -107,6 +120,10 @@ class Interpreter:
             arguments = value.split("(")[1].split(")")[0].split(",")
             pythonized_arguments = [self._pythonize_value(arg) for arg in arguments]
             return Location(*pythonized_arguments)
+        if "StructureCollection(" in value:
+            arguments = value.split("(")[1].split(")")[0].split(",")
+            pythonized_arguments = [self._pythonize_value(arg) for arg in arguments]
+            return self.bubble_chamber.new_structure_collection(*pythonized_arguments)
         if value == "None":
             return None
         if value == "True":
