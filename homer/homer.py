@@ -1,7 +1,6 @@
 import operator
 from typing import Any, Callable, Dict, List, Union
 
-from homer import fuzzy
 from .bubble_chamber import BubbleChamber
 from .classifier import Classifier
 from .coderack import Coderack
@@ -17,9 +16,8 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Concept, Lexeme, Phrase, Rule, Word
-from .structures.spaces import ConceptualSpace, WorkingSpace
-from .structures.spaces.frames import Template
+from .structures.nodes import Chunk, Concept, Lexeme, Rule, Word
+from .structures.spaces import ConceptualSpace, ContextualSpace
 from .word_form import WordForm
 
 
@@ -244,7 +242,7 @@ class Homer:
         parent_concept: Concept = None,
         conceptual_space: ConceptualSpace = None,
         contents: List[Word] = None,
-    ) -> Template:
+    ):
         template = Template(
             structure_id=ID.new(Template),
             parent_id="",
@@ -339,16 +337,16 @@ class Homer:
         locations: List[Location] = None,
         contents: StructureCollection = None,
         no_of_dimensions: int = 0,
-        dimensions: List[WorkingSpace] = None,
-        sub_spaces: List[WorkingSpace] = None,
+        dimensions: List[ContextualSpace] = None,
+        sub_spaces: List[ContextualSpace] = None,
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
         links_in: StructureCollection = None,
         links_out: StructureCollection = None,
-    ) -> WorkingSpace:
-        working_space = WorkingSpace(
-            structure_id=ID.new(WorkingSpace),
+    ) -> ContextualSpace:
+        working_space = ContextualSpace(
+            structure_id=ID.new(ContextualSpace),
             parent_id="",
             name=name,
             parent_concept=parent_concept,
@@ -433,7 +431,7 @@ class Homer:
         self,
         locations: List[Location] = None,
         members: StructureCollection = None,
-        parent_space: WorkingSpace = None,
+        parent_space: ContextualSpace = None,
         quality: FloatBetweenOneAndZero = 1,
     ):
         locations = locations if locations is not None else []
@@ -457,7 +455,7 @@ class Homer:
         self,
         start: Structure = None,
         parent_concept: Concept = None,
-        parent_space: WorkingSpace = None,
+        parent_space: ContextualSpace = None,
         quality: FloatBetweenOneAndZero = 1,
     ):
         label = Label(

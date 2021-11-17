@@ -3,7 +3,6 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import labeling_exigency
 from homer.structures.links import Label
 from homer.structures.nodes import Concept
@@ -74,12 +73,10 @@ class LabelSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        potential_targets = StructureCollection(
-            {
-                node
-                for node in bubble_chamber.input_nodes
-                if isinstance(node, parent_concept.instance_type)
-            }
+        potential_targets = bubble_chamber.new_structure_collection(
+            node
+            for node in bubble_chamber.input_nodes
+            if isinstance(node, parent_concept.instance_type)
         )
         target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
         urgency = urgency if urgency is not None else target.unlabeledness
@@ -96,34 +93,34 @@ class LabelSuggester(Suggester):
 
     @property
     def target_structures(self):
-        return StructureCollection({self.target_node})
+        return self.bubble_chamber.new_structure_collection(self.target_node)
 
     def _passes_preliminary_checks(self):
         self.target_node = self._target_structures["target_node"]
         self.parent_concept = self._target_structures["parent_concept"]
         if self.parent_concept is None:
-            conceptual_space = StructureCollection(
-                {
-                    space
-                    for space in self.bubble_chamber.conceptual_spaces.where(
-                        is_basic_level=True
-                    ).where(instance_type=type(self.target_node))
-                    if self.target_node.has_location_in_conceptual_space(space)
-                }
-            ).get()
-            location = self.target_node.location_in_conceptual_space(conceptual_space)
+            conceptual_space = (
+                self.bubble_chamber.conceptual_spaces.where(
+                    is_basic_level=True, instance_type=type(self.target_node)
+                )
+                .filter(lambda x: self.target_node.has_location_in_space(x))
+                .get()
+            )
+            location = self.target_node.location_in_space(conceptual_space)
             try:
                 self.parent_concept = (
-                    conceptual_space.contents.of_type(Concept)
-                    .where(structure_type=Label)
+                    conceptual_space.contents.where(
+                        is_concept=True, structure_type=Label
+                    )
                     .near(location)
                     .get()
                 )
             except MissingStructureError:
                 try:
                     self.parent_concept = (
-                        conceptual_space.contents.of_type(Concept)
-                        .where(structure_type=Label)
+                        conceptual_space.contents.where(
+                            is_concept=True, structure_type=Label
+                        )
                         .where_not(classifier=None)
                         .get()
                     )

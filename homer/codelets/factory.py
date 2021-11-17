@@ -62,21 +62,12 @@ class Factory(Codelet):
             CorrespondenceSuggester,
             LabelSuggester,
             RelationSuggester,
-            WordSuggester,
-            PhraseSuggester,
         )
-        from homer.codelets.suggesters.chunk_suggesters import (
+        from homer.codelets.suggesters.projection_suggesters import (
             ChunkProjectionSuggester,
-            ReverseChunkProjectionSuggester,
-        )
-        from homer.codelets.suggesters.label_suggesters import (
             LabelProjectionSuggester,
-        )
-        from homer.codelets.suggesters.phrase_suggesters import (
-            PhraseProjectionSuggester,
-        )
-        from homer.codelets.suggesters.relation_suggesters import (
             RelationProjectionSuggester,
+            WordProjectionSuggester,
         )
         from homer.codelets.suggesters.view_suggesters import (
             MonitoringViewSuggester,
@@ -87,21 +78,12 @@ class Factory(Codelet):
             CorrespondenceEvaluator,
             LabelEvaluator,
             RelationEvaluator,
-            WordEvaluator,
-            PhraseEvaluator,
         )
-        from homer.codelets.evaluators.chunk_evaluators import (
+        from homer.codelets.evaluators.projection_evaluators import (
             ChunkProjectionEvaluator,
-            ReverseChunkProjectionEvaluator,
-        )
-        from homer.codelets.evaluators.label_evaluators import (
             LabelProjectionEvaluator,
-        )
-        from homer.codelets.evaluators.phrase_evaluators import (
-            PhraseProjectionEvaluator,
-        )
-        from homer.codelets.evaluators.relation_evaluators import (
             RelationProjectionEvaluator,
+            WordProjectionEvaluator,
         )
         from homer.codelets.evaluators.view_evaluators import (
             MonitoringViewEvaluator,
@@ -115,7 +97,6 @@ class Factory(Codelet):
                         "chunk": ChunkSuggester,
                         "correspondence": CorrespondenceSuggester,
                         "label": LabelSuggester,
-                        "phrase": PhraseSuggester,
                         "relation": RelationSuggester,
                         "view-monitoring": MonitoringViewSuggester,
                         "view-simplex": SimplexViewSuggester,
@@ -125,12 +106,8 @@ class Factory(Codelet):
                     "forward": {
                         "chunk": ChunkProjectionSuggester,
                         "label": LabelProjectionSuggester,
-                        "phrase": PhraseProjectionSuggester,
                         "relation": RelationProjectionSuggester,
-                        "word": WordSuggester,
-                    },
-                    "reverse": {
-                        "chunk": ReverseChunkProjectionSuggester,
+                        "word": WordProjectionSuggester,
                     },
                 },
             },
@@ -140,7 +117,6 @@ class Factory(Codelet):
                         "chunk": ChunkEvaluator,
                         "correspondence": CorrespondenceEvaluator,
                         "label": LabelEvaluator,
-                        "phrase": PhraseEvaluator,
                         "relation": RelationEvaluator,
                         "view-monitoring": MonitoringViewEvaluator,
                         "view-simplex": SimplexViewEvaluator,
@@ -150,12 +126,8 @@ class Factory(Codelet):
                     "forward": {
                         "chunk": ChunkProjectionEvaluator,
                         "label": LabelProjectionEvaluator,
-                        "phrase": PhraseProjectionEvaluator,
                         "relation": RelationProjectionEvaluator,
-                        "word": WordEvaluator,
-                    },
-                    "reverse": {
-                        "chunk": ReverseChunkProjectionEvaluator,
+                        "word": WordProjectionEvaluator,
                     },
                 },
             },
@@ -175,47 +147,39 @@ class Factory(Codelet):
         inner = self.bubble_chamber.concepts["inner"]
         outer = self.bubble_chamber.concepts["outer"]
         forward = self.bubble_chamber.concepts["forward"]
-        reverse = self.bubble_chamber.concepts["reverse"]
         correspondence = self.bubble_chamber.concepts["correspondence"]
         chunk = self.bubble_chamber.concepts["chunk"]
         label = self.bubble_chamber.concepts["label"]
-        phrase = self.bubble_chamber.concepts["phrase"]
         relation = self.bubble_chamber.concepts["relation"]
         view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
         view_simplex = self.bubble_chamber.concepts["view-simplex"]
         word = self.bubble_chamber.concepts["word"]
+
+        nsc = lambda *x: self.bubble_chamber.new_structure_collection(*x)
+
         return {
             "inner-or-outer": {
-                "actions": StructureCollection({suggest, evaluate}),
-                "spaces": StructureCollection({inner, outer}),
-                "directions": StructureCollection({forward}),
-                # "structures": StructureCollection({chunk, label, phrase, relation}),
-                "structures": StructureCollection({chunk, label, relation}),
+                "actions": nsc(suggest, evaluate),
+                "spaces": nsc(inner, outer),
+                "directions": nsc(forward),
+                "structures": nsc(chunk, label, relation),
             },
             "inner": {
-                "actions": StructureCollection({suggest, evaluate}),
-                "spaces": StructureCollection({inner}),
-                "directions": StructureCollection({forward}),
-                "structures": StructureCollection(
-                    {correspondence, view_monitoring, view_simplex}
-                ),
+                "actions": nsc(suggest, evaluate),
+                "spaces": nsc(inner),
+                "directions": nsc(forward),
+                "structures": nsc(correspondence, view_monitoring, view_simplex),
             },
             "outer": {
-                "actions": StructureCollection({suggest, evaluate}),
-                "spaces": StructureCollection({outer}),
-                "directions": StructureCollection({forward}),
-                "structures": StructureCollection({word}),
-            },
-            "reverse": {
-                "actions": StructureCollection({suggest, evaluate}),
-                "spaces": StructureCollection({outer}),
-                "directions": StructureCollection({reverse}),
-                "structures": StructureCollection({chunk}),
+                "actions": nsc(suggest, evaluate),
+                "spaces": nsc(outer),
+                "directions": nsc(forward),
+                "structures": nsc(word),
             },
             "publish": {
-                "actions": StructureCollection({publish}),
-                "spaces": StructureCollection({publish}),
-                "directions": StructureCollection({publish}),
-                "structures": StructureCollection({publish}),
+                "actions": nsc(publish),
+                "spaces": nsc(publish),
+                "directions": nsc(publish),
+                "structures": nsc(publish),
             },
         }

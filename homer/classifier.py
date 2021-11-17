@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 
 
-class Classifier(ABC):
-    @abstractmethod
-    def classify(self):
-        pass
+class Classifier:
+    def classify(self, **kwargs: dict) -> FloatBetweenOneAndZero:
+        raise NotImplementedError

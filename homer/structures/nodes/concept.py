@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Callable, List
 
 from homer.classifier import Classifier
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 from homer.location import Location
 from homer.structure_collection import StructureCollection
@@ -21,8 +22,9 @@ class Concept(Node):
         parent_space: Space,
         child_spaces: StructureCollection,
         distance_function: Callable,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
     ):
@@ -36,6 +38,7 @@ class Concept(Node):
             quality=quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.name = name
         self.classifier = classifier
@@ -45,39 +48,46 @@ class Concept(Node):
         self.distance_function = distance_function
         self.depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
+        self.is_concept = True
 
     @property
     def prototype(self) -> list:
         return self.location.coordinates
 
-    def is_compatible_with(self, other: Concept) -> bool:
-        return self.instance_type == other.instance_type
+    def compatibility_with(self, other: Concept) -> FloatBetweenOneAndZero:
+        if (
+            self == other
+            or self.parent_space.parent_concept == other
+            or other.parent_space.parent_concept == self
+        ):
+            return 1.0
+        if self.parent_space == other.parent_space:
+            return self.proximity_to(other)
+        return 0.0
 
     def friends(self, space: Space = None) -> StructureCollection:
         space = self.parent_space if space is None else space
-        if space.no_of_dimensions == 0:
-            concepts = StructureCollection(
-                {link.end for link in self.links_out if link.end in space.contents}
-            )
-            return concepts if not concepts.is_empty() else StructureCollection({self})
-        return StructureCollection({self})
+        friend_concepts = self.relatives.filter(lambda x: x in space.contents)
+        if friend_concepts.is_empty():
+            friend_concepts.add(self)
+        return friend_concepts
 
     def distance_from(self, other: Node):
         return self.distance_function(
             self.location_in_space(self.parent_space).coordinates,
-            other.location_in_conceptual_space(self.parent_space).coordinates,
+            other.location_in_space(self.parent_space).coordinates,
         )
 
     def distance_from_start(self, other: Node, end: Location = None):
         return self.distance_function(
             self.location_in_space(self.parent_space, end=end).start_coordinates,
-            other.location_in_conceptual_space(self.parent_space).coordinates,
+            other.location_in_space(self.parent_space).coordinates,
         )
 
     def distance_from_end(self, other: Node, start: Location = None):
         return self.distance_function(
             self.location_in_space(self.parent_space, start=start).end_coordinates,
-            other.location_in_conceptual_space(self.parent_space).coordinates,
+            other.location_in_space(self.parent_space).coordinates,
         )
 
     def proximity_to(self, other: Node):
@@ -91,17 +101,10 @@ class Concept(Node):
 
     def distance_between(self, a: Node, b: Node, space: "Space" = None):
         space = self.parent_space if space is None else space
-        a_location = (
-            a.location_in_space(space)
-            if a.has_location_in_space(space)
-            else a.location_in_conceptual_space(space)
+        return self.distance_function(
+            a.location_in_space(space).coordinates,
+            b.location_in_space(space).coordinates,
         )
-        b_location = (
-            b.location_in_space(space)
-            if b.has_location_in_space(space)
-            else b.location_in_conceptual_space(space)
-        )
-        return self.distance_function(a_location.coordinates, b_location.coordinates)
 
     def proximity_between(self, a: Node, b: Node, space: "Space" = None):
         return self._distance_to_proximity(self.distance_between(a, b, space=space))

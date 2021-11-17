@@ -2,8 +2,13 @@ from homer.classifier import Classifier
 
 
 class ProximityClassifier(Classifier):
-    def __init__(self):
-        pass
-
     def classify(self, **kwargs: dict):
-        return kwargs["concept"].proximity_to(kwargs["start"])
+        """
+        Required: 'concept'; 'start' OR 'collection'
+        """
+        collection = kwargs.get("collection")
+        start = kwargs.get("start")
+        concept = kwargs.get("concept")
+
+        item = start if start is not None else collection.get()
+        return concept.proximity_to(item)

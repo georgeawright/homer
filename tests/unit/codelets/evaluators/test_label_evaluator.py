@@ -7,16 +7,20 @@ from homer.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
-def test_changes_target_structure_quality(current_quality, classification):
-    bubble_chamber = Mock()
-    bubble_chamber.concepts = {"evaluate": Mock(), "label": Mock()}
+def test_changes_target_structure_quality(
+    bubble_chamber, current_quality, classification
+):
     concept = Mock()
     concept.classifier.classify.return_value = classification
     label = Mock()
     label.quality = current_quality
     label.parent_concept = concept
     evaluator = LabelEvaluator(
-        Mock(), Mock(), bubble_chamber, StructureCollection({label}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(label),
+        Mock(),
     )
     evaluator.run()
     assert classification == label.quality

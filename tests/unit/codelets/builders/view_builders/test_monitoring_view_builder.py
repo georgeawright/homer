@@ -11,46 +11,40 @@ from homer.tools import hasinstance
 
 
 @pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.has_view.return_value = False
-    chamber.concepts = {
-        "build": Mock(),
-        "view-monitoring": Mock(),
-        "text": Mock(),
-        "interpretation": Mock(),
-    }
-    chamber.spaces = {"text": Mock(), "top level working": Mock(), "input": Mock()}
-    text_space = Mock()
-    text_space.contents.is_empty.return_value = False
-    text_space.parent_concept = chamber.concepts["text"]
-    chamber.working_spaces = StructureCollection({text_space})
-    chamber.views = StructureCollection()
-    return chamber
+def input_space(bubble_chamber):
+    space = Mock()
+    space.activation = 1.0
+    bubble_chamber.spaces.add(space)
+    return space
 
 
 @pytest.fixture
-def input_space():
+def text_space():
     space = Mock()
     space.activation = 1.0
     return space
 
 
 @pytest.fixture
-def text_space():
-    space = Frame(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+def interpretation_space():
+    space = Mock()
     space.activation = 1.0
     return space
 
 
 def test_successful_creates_view_and_spawns_follow_up(
-    bubble_chamber, input_space, text_space
+    bubble_chamber, interpretation_space, input_space, text_space
 ):
     view_builder = MonitoringViewBuilder(
         Mock(),
         Mock(),
         bubble_chamber,
-        StructureCollection({input_space, text_space}),
+        {
+            "input_spaces": bubble_chamber.new_structure_collection(
+                input_space, interpretation_space
+            ),
+            "output_space": text_space,
+        },
         Mock(),
     )
     result = view_builder.run()

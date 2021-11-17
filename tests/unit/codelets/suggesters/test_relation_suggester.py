@@ -12,27 +12,18 @@ from homer.tools import hasinstance
 @pytest.fixture
 def parent_concept():
     concept = Mock()
+    concept.is_concept = True
+    concept.structure_type = Relation
     concept.classifier.classify.return_value = 1.0
     return concept
 
 
 @pytest.fixture
-def bubble_chamber(parent_concept):
-    chamber = Mock()
-    chamber.concepts = {"relation": Mock(), "suggest": Mock()}
-    relational_concept_space = Mock()
-    relational_concept_space.contents.of_type.return_value = StructureCollection(
-        {parent_concept}
-    )
-    relational_concept = Mock()
-    relational_concept.child_spaces = StructureCollection({relational_concept_space})
+def conceptual_space(bubble_chamber, parent_concept):
     space = Mock()
-    space.name = "relational concepts"
-    space.contents.of_type.return_value = StructureCollection(
-        {relational_concept_space}
-    )
-    chamber.spaces = StructureCollection({space})
-    return chamber
+    space.contents = bubble_chamber.new_structure_collection(parent_concept)
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(space)
+    return space
 
 
 @pytest.fixture

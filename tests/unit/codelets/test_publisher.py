@@ -15,7 +15,7 @@ from homer.structure_collection import StructureCollection
     ],
 )
 def test_publishes_text_from_high_quality_active_monitoring_view(
-    view_quality, view_activation, random_number, success_or_fail
+    bubble_chamber, view_quality, view_activation, random_number, success_or_fail
 ):
     hello = Mock()
     hello.is_word = True
@@ -27,16 +27,14 @@ def test_publishes_text_from_high_quality_active_monitoring_view(
     world.location.coordinates = [[1]]
 
     output_space = Mock()
-    output_space.contents = StructureCollection({hello, world})
+    output_space.contents = bubble_chamber.new_structure_collection(hello, world)
     view = Mock()
     view.output_space = output_space
     view.quality = view_quality
     view.activation = view_activation
 
-    bubble_chamber = Mock()
     bubble_chamber.result = None
-    bubble_chamber.concepts = {"publish": Mock()}
-    bubble_chamber.monitoring_views = StructureCollection({view})
+    bubble_chamber.monitoring_views = bubble_chamber.new_structure_collection(view)
 
     with patch.object(random, "random", return_value=random_number):
         publisher = Publisher("", "", bubble_chamber, 1)

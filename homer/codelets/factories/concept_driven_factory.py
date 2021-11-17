@@ -5,9 +5,8 @@ from homer.codelets import Factory
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation
-from homer.structures.links import Label, Relation
+from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.nodes import Concept
-from homer.structures.spaces import ConceptualSpace
 
 
 class ConceptDrivenFactory(Factory):
@@ -35,7 +34,7 @@ class ConceptDrivenFactory(Factory):
 
     def _get_parent_concept(self) -> Concept:
         return StructureCollection.union(
-            # self.bubble_chamber.rules,
+            self.bubble_chamber.rules,
             self._get_correspondential_concepts(),
             self._get_label_concepts(),
             self._get_relational_concepts(),
@@ -46,7 +45,7 @@ class ConceptDrivenFactory(Factory):
         space_concept = self.bubble_chamber.concepts["inner"]
         direction_concept = self.bubble_chamber.concepts["forward"]
         if parent_concept in self.bubble_chamber.rules:
-            structure_concept = self.bubble_chamber.concepts["phrase"]
+            structure_concept = self.bubble_chamber.concepts["chunk"]
         if parent_concept in self._get_correspondential_concepts():
             structure_concept = self.bubble_chamber.concepts["correspondence"]
         if parent_concept in self._get_label_concepts():
@@ -61,14 +60,8 @@ class ConceptDrivenFactory(Factory):
         )
 
     def _get_correspondential_concepts(self) -> StructureCollection:
-        return StructureCollection(
-            {
-                concept
-                for conceptual_space in self.bubble_chamber.spaces[
-                    "correspondential concepts"
-                ].contents.of_type(ConceptualSpace)
-                for concept in conceptual_space.contents.of_type(Concept)
-            }
+        return self.bubble_chamber.concepts.where(
+            structure_type=Correspondence
         ).where_not(classifier=None)
 
     def _get_label_concepts(self) -> StructureCollection:

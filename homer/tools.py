@@ -5,7 +5,7 @@ from typing import Iterable, List, Union
 
 def centroid_euclidean_distance(a, b) -> float:
     distance = math.dist(average_vector(a), average_vector(b))
-    return distance if distance != math.nan else 0
+    return distance if not math.isnan(distance) else 0
 
 
 def average_vector(vectors: List[List[Union[float, int]]]):
@@ -46,18 +46,6 @@ def areinstances(items: Iterable, t: type) -> bool:
         if not isinstance(item, t):
             return False
     return True
-
-
-def correspond(a, b, view=None) -> bool:
-    from homer.structure_collection import StructureCollection
-
-    if a is None and b is None:
-        return True
-    view_members = StructureCollection() if view is None else view.members
-    intersection = StructureCollection.intersection(
-        a.correspondences, b.correspondences, view_members
-    )
-    return len(intersection) > 0
 
 
 def project_item_into_space(item: "Structure", space: "Space"):

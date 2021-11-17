@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from homer.codelets import Evaluator, Publisher, Suggester
 from homer.codelets.factories import RationalFactory
@@ -20,8 +20,6 @@ def concepts():
     outer_concept.name = "outer"
     forward_concept = Mock()
     forward_concept.name = "forward"
-    reverse_concept = Mock()
-    reverse_concept.name = "reverse"
     correspondence_concept = Mock()
     correspondence_concept.name = "correspondence"
     chunk_concept = Mock()
@@ -46,7 +44,6 @@ def concepts():
             inner_concept,
             outer_concept,
             forward_concept,
-            reverse_concept,
             correspondence_concept,
             chunk_concept,
             label_concept,
@@ -77,6 +74,7 @@ def coderack():
     return rack
 
 
+@pytest.mark.skip
 def test_decide_follow_up_class_returns_codelet_class(
     bubble_chamber, coderack, concepts
 ):

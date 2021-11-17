@@ -6,8 +6,6 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection import StructureCollection
-from homer.structures.spaces import Frame
 
 
 class ViewSuggester(Suggester):
@@ -16,24 +14,24 @@ class ViewSuggester(Suggester):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_spaces: StructureCollection,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         Suggester.__init__(
-            self, codelet_id, parent_id, bubble_chamber, target_spaces, urgency
+            self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_spaces = target_spaces
-        self.second_target_view = None
-        self.correspondences = None
-        self.correspondences_to_add = None
+        self._target_structures = target_structures
+        self.input_spaces = None
+        self.output_space = None
         self.frame = None
+        self.contextual_space = None
 
     @classmethod
     def spawn(
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_spaces: StructureCollection,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -41,7 +39,7 @@ class ViewSuggester(Suggester):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_spaces,
+            target_structures,
             urgency,
         )
 
@@ -53,20 +51,14 @@ class ViewSuggester(Suggester):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view"]
 
-    @property
-    def target_structures(self):
-        return self.target_spaces
-
     def _passes_preliminary_checks(self):
-        if self.frame is None:
-            for space in self.target_spaces:
-                if isinstance(space, Frame):
-                    self.frame = space
+        self.frame = self._target_structures["frame"]
+        self.contextual_space = self._target_structures["contextual_space"]
         return True
 
     def _calculate_confidence(self):
         self.confidence = statistics.fmean(
-            [space.activation for space in self.target_spaces]
+            [self.frame.activation, self.contextual_space.activation]
         )
 
     def _fizzle(self):

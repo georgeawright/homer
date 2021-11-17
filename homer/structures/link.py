@@ -13,12 +13,13 @@ class Link(Structure):
         structure_id: str,
         parent_id: str,
         start: Structure,
-        end: Structure,
+        arguments: StructureCollection,
         locations: List[Location],
         parent_concept: "Concept",
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
     ):
         Structure.__init__(
             self,
@@ -28,24 +29,26 @@ class Link(Structure):
             quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.start = start
-        self.end = end
+        self.arguments = arguments
         self._parent_concept = parent_concept
         self.value = parent_concept.name if hasattr(parent_concept, "name") else None
         self.is_link = True
 
     @property
     def parent_space(self) -> Space:
-        if len(self.locations) == 0:
-            return None
-        return self.locations[0].space
+        contextual_spaces = [
+            location.space
+            for location in self.locations
+            if location.space.is_contextual_space
+        ]
+        return contextual_spaces[0] if len(contextual_spaces) > 0 else None
 
     @property
-    def arguments(self) -> StructureCollection:
-        return StructureCollection(
-            {arg for arg in [self.start, self.end] if arg is not None}
-        )
+    def end(self) -> StructureCollection:
+        return self.arguments.excluding(self.start).get()
 
     @property
     def is_slot(self) -> bool:

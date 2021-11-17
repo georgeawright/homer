@@ -7,18 +7,20 @@ from homer.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])
-def test_changes_target_structure_quality(current_quality, classification):
-    bubble_chamber = Mock()
-    bubble_chamber.concepts = {"evaluate": Mock(), "chunk": Mock()}
+def test_changes_target_structure_quality(
+    bubble_chamber, current_quality, classification
+):
     chunk = Mock()
-    chunk.members = StructureCollection({Mock(), Mock()})
-    space = Mock()
-    space.is_sub_space = False
-    space.proximity_between.return_value = classification
-    chunk.parent_spaces = StructureCollection({space})
+    chunk.is_slot = False
+    chunk.rule.right_concept = None
+    chunk.rule.left_concept.classifier.classify.return_value = classification
     chunk.quality = current_quality
     evaluator = ChunkEvaluator(
-        Mock(), Mock(), bubble_chamber, StructureCollection({chunk}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(chunk),
+        Mock(),
     )
     evaluator.run()
     assert classification == chunk.quality

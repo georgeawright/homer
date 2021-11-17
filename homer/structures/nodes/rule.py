@@ -17,11 +17,12 @@ class Rule(Node):
         parent_id: str,
         name: str,
         location: Location,
-        root: Concept,
-        left_branch: Concept,
-        right_branch: Concept,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
+        root_concept: Concept,
+        left_concept: Concept,
+        right_concept: Concept,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         stable_activation: FloatBetweenOneAndZero = None,
     ):
         quality = None
@@ -34,19 +35,75 @@ class Rule(Node):
             quality=quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
             stable_activation=stable_activation,
         )
         self.name = name
         self._value = name
-        self.root = root
-        self.left_branch = left_branch
-        self.right_branch = right_branch
+        self.root_concept = root_concept
+        self.left_concept = left_concept
+        self.right_concept = right_concept
+        self.is_rule = True
 
     @property
-    def rule_constituents(self) -> StructureCollection:
-        return StructureCollection({self.root, self.left_branch, self.right_branch})
+    def instance_type(self) -> type:
+        return self.left_concept.instance_type
+
+    @property
+    def friends(self) -> StructureCollection:
+        linked_node_links = StructureCollection.union(
+            *[linked_node.relations for linked_node in self.relatives]
+        )
+        linked_rules = StructureCollection.union(
+            *[linked_node_link.arguments for linked_node_link in linked_node_links]
+        ).filter(
+            lambda x: x != self and x.is_rule and x.parent_space == self.parent_space
+        )
+        return linked_rules
+
+    def compatibility_with(
+        self,
+        root: Node = None,
+        collection: StructureCollection = None,
+        branch: str = "left",
+    ) -> FloatBetweenOneAndZero:
+        if root is None:
+            if branch == "left":
+                return self.left_concept.classifier.classify(
+                    collection=collection, concept=self.left_concept
+                )
+            if branch == "right" and self.right_concept is not None:
+                return self.right_concept.classifier.classify(
+                    collection=collection, concept=self.right_concept
+                )
+            return 0.0
+        if branch == "left":
+            if self.left_branch_is_free(root):
+                return self.left_concept.classifier.classify(
+                    collection=collection, concept=self.left_concept
+                )
+            return 0.0
+        if self.right_branch_is_free(root):
+            return self.right_concept.classifier.classify(
+                collection=collection, concept=self.right_concept
+            )
+        return 0.0
+
+    def left_branch_is_free(self, root: Node) -> bool:
+        return (
+            self.left_concept is not None
+            and not root.left_branch.where(is_slot=True).is_empty()
+        )
+
+    def right_branch_is_free(self, root: Node) -> bool:
+        return (
+            self.right_concept is not None
+            and not root.right_branch.where(is_slot=True).is_empty()
+        )
 
     def is_compatible_with(self, *fragments: List[Structure]) -> bool:
+        # TODO: update for chunks
+        raise NotImplementedError
         if len(fragments) == 1:
             fragment = fragments[0]
             return (
@@ -76,3 +133,6 @@ class Rule(Node):
                 or arranged_fragments["right"].has_label(self.right_branch)
             )
         )
+
+    def __repr__(self) -> str:
+        return f'<{self.structure_id} "{self.name}" in {self.parent_space.name}>'

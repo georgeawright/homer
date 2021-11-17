@@ -1,19 +1,15 @@
 from __future__ import annotations
-import operator
 from typing import List
 
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-from homer.structures import Link, Node, Space, View
+from homer.structures import Link, View
 from homer.structures.nodes import Concept
 from homer.structures.spaces import ConceptualSpace
-from homer.tools import areinstances, equivalent_space, hasinstance
-
-from .label import Label
-from .relation import Relation
 
 
 class Correspondence(Link):
@@ -22,14 +18,15 @@ class Correspondence(Link):
         structure_id: str,
         parent_id: str,
         start: Structure,
-        end: Structure,
-        start_space: Space,
-        end_space: Space,
+        arguments: StructureCollection,
         locations: List[Location],
         parent_concept: Concept,
         conceptual_space: ConceptualSpace,
         parent_view: View,
         quality: FloatBetweenOneAndZero,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         is_privileged: bool = False,
     ):
         Link.__init__(
@@ -37,15 +34,14 @@ class Correspondence(Link):
             structure_id,
             parent_id,
             start,
-            end,
+            arguments,
             locations,
             parent_concept,
             quality,
-            links_in=None,
-            links_out=None,
+            links_in=links_in,
+            links_out=links_out,
+            parent_spaces=parent_spaces,
         )
-        self.start_space = start_space
-        self.end_space = end_space
         self.conceptual_space = conceptual_space
         self.parent_view = parent_view
         self.is_privileged = is_privileged
@@ -69,8 +65,17 @@ class Correspondence(Link):
 
         return CorrespondenceSelector
 
+    @property
+    def node_pairs(self) -> list:
+        if self.start.is_node:
+            return [(self.start, self.end)]
+        if self.start.is_label:
+            return [(self.start.start, self.end.start)]
+        return [(self.start.start, self.end.start), (self.start.end, self.end.end)]
+
     def copy(self, **kwargs: dict) -> Correspondence:
         """Requires keyword arguments 'start', 'end', and 'parent_id' OR 'new arg', 'old_arg', and 'parent_id'."""
+        bubble_chamber = kwargs["bubble_chamber"]
         if "start" in kwargs:
             start = kwargs["start"]
         else:
@@ -88,20 +93,22 @@ class Correspondence(Link):
                 else self.end
             )
         parent_id = kwargs["parent_id"]
-        start_space = equivalent_space(start, self.start_space)
-        end_space = equivalent_space(end, self.end_space)
         new_correspondence = Correspondence(
             ID.new(Correspondence),
             parent_id,
             start,
-            end,
-            start_space,
-            end_space,
-            [start.location_in_space(start_space), end.location_in_space(end_space)],
+            bubble_chamber.new_structure_collection(start, end),
+            [
+                start.location_in_space(start.parent_space),
+                end.location_in_space(end.parent_space),
+            ],
             self.parent_concept,
             self.conceptual_space,
             self.parent_view,
             self.quality,
+            bubble_chamber.new_structure_collection(),
+            bubble_chamber.new_structure_collection(),
+            bubble_chamber.new_structure_collection(),
             is_privileged=self.is_privileged,
         )
         return new_correspondence
@@ -109,10 +116,13 @@ class Correspondence(Link):
     def nearby(self):
         return StructureCollection.difference(
             StructureCollection.union(
-                self.start.correspondences,
-                self.end.correspondences,
+                self.start.correspondences_to_space(self.end.parent_space),
+                self.end.correspondences_to_space(self.start.parent_space),
             ),
-            StructureCollection({self}),
+            StructureCollection.intersection(
+                self.start.correspondences_to_space(self.end.parent_space),
+                self.end.correspondences_to_space(self.start.parent_space),
+            ),
         )
 
     @property
@@ -121,7 +131,7 @@ class Correspondence(Link):
             return self.start
         if self.end.is_slot:
             return self.end
-        raise Exception("Correspondence has no slot argument")
+        raise MissingStructureError("Correspondence has no slot argument")
 
     @property
     def non_slot_argument(self):
@@ -132,64 +142,10 @@ class Correspondence(Link):
         raise Exception("Correspondence has no non slot argument")
 
     def common_arguments_with(self, other: Correspondence) -> StructureCollection:
-        return StructureCollection(
-            set.intersection({self.start, self.end}, {other.start, other.end})
-        )
-
-    def is_compatible_with(self, other: Correspondence) -> bool:
-        common_arguments = self.common_arguments_with(other)
-        if len(common_arguments) == 2:
-            return False
-        if hasinstance(self.arguments, Node):
-            self_corresponding_nodes = self.arguments
-            self_corresponding_links = StructureCollection()
-        elif areinstances(self.arguments, Label):
-            self_corresponding_nodes = StructureCollection(
-                {self.start.start, self.end.start}
-            )
-            self_corresponding_links = self.arguments
-        elif areinstances(self.arguments, Relation):
-            self_corresponding_nodes = StructureCollection(
-                {self.start.start, self.start.end, self.end.start, self.end.end}
-            )
-            self_corresponding_links = self.arguments
-        if areinstances(other.arguments, Node):
-            other_corresponding_nodes = other.arguments
-            other_corresponding_links = StructureCollection()
-        elif areinstances(other.arguments, Label):
-            other_corresponding_nodes = StructureCollection(
-                {other.start.start, other.end.start}
-            )
-            other_corresponding_links = other.arguments
-        elif areinstances(other.arguments, Relation):
-            other_corresponding_nodes = StructureCollection(
-                {other.start.start, other.start.end, other.end.start, other.end.end}
-            )
-            other_corresponding_links = other.arguments
-        if not StructureCollection.intersection(
-            self_corresponding_links, other_corresponding_links
-        ).is_empty():
-            return False
-        corresponding_nodes_intersection = StructureCollection.intersection(
-            self_corresponding_nodes, other_corresponding_nodes
-        )
-        if (
-            len(self_corresponding_nodes)
-            == len(other_corresponding_nodes)
-            == len(corresponding_nodes_intersection)
-        ):
-            return True
-        if len(corresponding_nodes_intersection) == 0:
-            return True
-        if (
-            operator.xor(
-                areinstances(self.arguments, Relation),
-                areinstances(other.arguments, Relation),
-            )
-            and len(corresponding_nodes_intersection) == 2
-        ):
-            return True
-        return False
+        return StructureCollection.intersection(self.arguments, other.arguments)
 
     def __repr__(self) -> str:
-        return self.structure_id
+        return (
+            f"<{self.structure_id} {self.parent_concept.name}("
+            + f"{self.start.structure_id}, {self.end.structure_id})>"
+        )

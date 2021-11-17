@@ -1,7 +1,10 @@
 from __future__ import annotations
+from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
+from homer.locations import TwoPointLocation
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Link, Space
@@ -14,25 +17,30 @@ class Relation(Link):
         structure_id: str,
         parent_id: str,
         start: Structure,
-        end: Structure,
+        arguments: StructureCollection,
         parent_concept: Concept,
-        parent_space: Space,
+        locations: List[Location],
         quality: FloatBetweenOneAndZero,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
+        is_bidirectional: bool = True,
     ):
         Link.__init__(
             self,
-            structure_id,
-            parent_id,
-            start,
-            end,
-            [start.location_in_space(parent_space)] if parent_space is not None else [],
-            parent_concept,
-            quality,
-            links_in=None,
-            links_out=None,
+            structure_id=structure_id,
+            parent_id=parent_id,
+            start=start,
+            arguments=arguments,
+            locations=locations,
+            parent_concept=parent_concept,
+            quality=quality,
+            links_in=links_in,
+            links_out=links_out,
+            parent_spaces=parent_spaces,
         )
-        self._parent_space = parent_space
         self.is_relation = True
+        self.is_bidirectional = is_bidirectional
 
     @classmethod
     def get_builder_class(cls):
@@ -52,45 +60,49 @@ class Relation(Link):
 
         return RelationSelector
 
-    @property
-    def parent_space(self) -> Space:
-        return self._parent_space
-
     def copy(self, **kwargs) -> Relation:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
+        bubble_chamber = kwargs["bubble_chamber"]
         start = kwargs["start"] if "start" in kwargs else self.start
         end = kwargs["end"] if "end" in kwargs else self.end
         parent_space = (
             kwargs["parent_space"] if "parent_space" in kwargs else self.parent_space
         )
+        new_locations = [
+            location
+            for location in self.locations
+            if location.space.is_conceptual_space
+        ]
+        new_locations.append(
+            TwoPointLocation(
+                self.location.start_coordinates,
+                self.location.end_coordinates,
+                parent_space,
+            )
+        )
         parent_id = kwargs["parent_id"] if "parent_id" in kwargs else ""
         new_relation = Relation(
-            ID.new(Relation),
-            parent_id,
-            start,
-            end,
-            self.parent_concept,
-            parent_space,
-            self.quality,
+            structure_id=ID.new(Relation),
+            parent_id=parent_id,
+            start=start,
+            arguments=bubble_chamber.new_structure_collection(start, end),
+            parent_concept=self.parent_concept,
+            locations=new_locations,
+            quality=self.quality,
+            links_in=bubble_chamber.new_structure_collection(),
+            links_out=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(
+                *[location.space for location in new_locations]
+            ),
         )
         return new_relation
 
     def nearby(self, space: Space = None) -> StructureCollection:
-        nearby_chunks = StructureCollection.union(
-            self.start.nearby(self.parent_space),
-            self.end.nearby(self.parent_space),
-        )
-        return StructureCollection.difference(
-            StructureCollection.union(
-                StructureCollection(
-                    {
-                        relation
-                        for chunk in nearby_chunks
-                        for relation in chunk.relations
-                    }
-                ),
+        return (
+            StructureCollection.intersection(
                 self.start.relations,
                 self.end.relations,
-            ),
-            StructureCollection({self}),
+            )
+            .filter(lambda x: x.parent_spaces == self.parent_spaces)
+            .excluding(self)
         )

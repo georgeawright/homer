@@ -13,18 +13,22 @@ class SimplexViewSuggester(ViewSuggester):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
-        target_one = bubble_chamber.spaces["input"]
-        target_two = bubble_chamber.frames.where(
-            parent_concept=bubble_chamber.concepts["text"]
-        ).get(key=activation)
-        urgency = urgency if urgency is not None else target_two.activation
+        contextual_space = bubble_chamber.contextual_spaces.get(key=activation)
+        frame = bubble_chamber.frames.get(key=activation)
+        urgency = urgency if urgency is not None else frame.activation
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            StructureCollection({target_one, target_two}),
+            {"frame": frame, "contextual_space": contextual_space},
             urgency,
         )
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view-simplex"]
+
+    @property
+    def target_structures(self):
+        return self.bubble_chamber.new_structure_collection(
+            self.frame, self.contextual_space
+        )

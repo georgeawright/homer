@@ -1,8 +1,7 @@
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Space, View
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import ContextualSpace
 
 
 class DiscourseView(View):
@@ -10,21 +9,25 @@ class DiscourseView(View):
         self,
         structure_id: str,
         parent_id: str,
-        location: Location,
         members: StructureCollection,
         input_spaces: StructureCollection,
-        output_space: WorkingSpace,
+        output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
     ):
         View.__init__(
             self,
             structure_id,
             parent_id,
-            location,
             members,
             input_spaces,
             output_space,
             quality,
+            links_in,
+            links_out,
+            parent_spaces,
         )
         self.is_discourse_view = True
 
@@ -36,15 +39,14 @@ class DiscourseView(View):
 
     def nearby(self, space: Space = None) -> StructureCollection:
         space = space if space is not None else self.location.space
-        return StructureCollection(
-            {
-                view
-                for view in space.contents.where(is_view=True)
-                if view != self
-                and not StructureCollection.intersection(
-                    view.input_working_spaces, self.input_working_spaces
+        return (
+            space.contents.where(is_view=True)
+            .filter(
+                lambda x: not StructureCollection.intersection(
+                    x.input_contextual_spaces, self.input_contextual_spaces
                 ).is_empty()
-            }
+            )
+            .excluding(self)
         )
 
     def decay_activation(self, amount: float = None):

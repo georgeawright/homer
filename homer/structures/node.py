@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 import statistics
 from typing import List
 
@@ -20,6 +21,7 @@ class Node(Structure):
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection,
         links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         stable_activation: FloatBetweenOneAndZero = None,
     ):
         Structure.__init__(
@@ -30,6 +32,7 @@ class Node(Structure):
             quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
             stable_activation=stable_activation,
         )
         self._parent_space = parent_space
@@ -47,7 +50,7 @@ class Node(Structure):
     def is_slot(self):
         return any(
             [
-                None in coordinates
+                math.nan in coordinates
                 for location in self.locations
                 for coordinates in location.coordinates
             ]
@@ -65,19 +68,7 @@ class Node(Structure):
         )
 
     def nearby(self, space: Space = None) -> StructureCollection:
-        if space is not None:
-            return StructureCollection.difference(
-                space.contents.of_type(type(self)).near(self.location_in_space(space)),
-                StructureCollection({self}),
-            )
-        nearby_nodes = StructureCollection.union(
-            *[
-                location.space.contents.of_type(type(self)).near(location)
-                for location in self.locations
-            ]
-        )
-        nearby_nodes.remove(self)
-        return nearby_nodes
+        raise NotImplementedError
 
     def get_potential_relative(
         self, space: Space = None, concept: "Concept" = None

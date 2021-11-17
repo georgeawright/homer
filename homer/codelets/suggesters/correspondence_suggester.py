@@ -5,11 +5,9 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection_keys import activation, corresponding_exigency, exigency
-from homer.structures import Space
+from homer.structure_collection_keys import activation, corresponding_exigency
 from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
-from homer.structures.spaces import ConceptualSpace, WorkingSpace
 
 
 class CorrespondenceSuggester(Suggester):
@@ -69,12 +67,7 @@ class CorrespondenceSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = bubble_chamber.production_views.get(key=activation)
-        target_space = (
-            target_view.input_working_spaces.get()
-            .contents.of_type(Space)
-            .where(is_basic_level=True)
-            .get(key=activation)
-        )
+        target_space = target_view.input_contextual_spaces.get()
         target = target_space.contents.where(is_link=True, is_correspondence=False).get(
             key=corresponding_exigency
         )
@@ -103,12 +96,7 @@ class CorrespondenceSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = bubble_chamber.production_views.get(key=activation)
-        target_space = (
-            target_view.input_working_spaces.get()
-            .contents.of_type(Space)
-            .where(is_basic_level=True)
-            .get(key=activation)
-        )
+        target_space = target_view.input_contextual_spaces.get()
         target = target_space.contents.where(is_link=True, is_correspondence=False).get(
             key=corresponding_exigency
         )
@@ -144,44 +132,43 @@ class CorrespondenceSuggester(Suggester):
         self.parent_concept = self._target_structures["parent_concept"]
         if self.target_space_two is None:
             try:
-                self.target_space_two = (
-                    self.target_view.input_spaces.get(
-                        key=activation,
-                        exclude=list(self.target_space_one.parent_spaces),
-                    )
-                    .contents.of_type(WorkingSpace)
-                    .where(is_basic_level=True)
-                    .where(conceptual_space=self.target_space_one.conceptual_space)
-                    .get()
-                )
+                self.target_space_two = self.target_view.input_frames.get(
+                    key=activation
+                ).input_space
                 self._target_structures["target_space_two"] = self.target_space_two
             except MissingStructureError:
-                return False
+                try:
+                    self.target_space_two = self.target_view.input_spaces.get(
+                        key=activation, exclude=[self.target_space_one]
+                    )
+                    self._target_structures["target_space_two"] = self.target_space_two
+                except MissingStructureError:
+                    return False
         try:
             if self.target_structure_two is None:
                 self.target_structure_two = self.target_space_two.contents.of_type(
                     type(self.target_structure_one)
-                ).get(key=exigency)
+                ).get(key=lambda x: x.similarity_with(self.target_structure_one))
                 self._target_structures[
                     "target_structure_two"
                 ] = self.target_structure_two
         except MissingStructureError:
             return False
         if self.target_conceptual_space is None:
-            self.target_conceptual_space = self.target_space_one.conceptual_space
+            self.target_conceptual_space = (
+                self.target_structure_one.parent_spaces.where(
+                    is_conceptual_space=True, is_basic_level=True
+                ).get()
+            )
             self._target_structures[
                 "target_conceptual_space"
             ] = self.target_conceptual_space
-        if self.target_conceptual_space != self.target_space_two.conceptual_space:
+        if self.target_conceptual_space not in self.target_space_two.conceptual_spaces:
             return False
         if self.parent_concept is None:
-            self.parent_concept = (
-                self.bubble_chamber.spaces["correspondential concepts"]
-                .contents.of_type(ConceptualSpace)
-                .get()
-                .contents.of_type(Concept)
-                .get()
-            )
+            self.parent_concept = self.bubble_chamber.concepts.where(
+                structure_type=Correspondence
+            ).get()
             self._target_structures["parent_concept"] = self.parent_concept
         if self.target_view.has_member(
             self.parent_concept,
@@ -195,9 +182,9 @@ class CorrespondenceSuggester(Suggester):
             None,
             self.codelet_id,
             self.target_structure_one,
-            self.target_structure_two,
-            self.target_space_one,
-            self.target_space_two,
+            self.bubble_chamber.new_structure_collection(
+                self.target_structure_one, self.target_structure_two
+            ),
             [
                 self.target_structure_one.location_in_space(self.target_space_one),
                 self.target_structure_two.location_in_space(self.target_space_two),
@@ -206,11 +193,11 @@ class CorrespondenceSuggester(Suggester):
             self.target_conceptual_space,
             self.target_view,
             0,
+            links_in=self.bubble_chamber.new_structure_collection(),
+            links_out=self.bubble_chamber.new_structure_collection(),
+            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
-        for correspondence in self.target_view.members:
-            if not correspondence.is_compatible_with(self.correspondence):
-                return False
-        return True
+        return self.target_view.can_accept_member(self.correspondence)
 
     def _calculate_confidence(self):
         self.confidence = self.parent_concept.classifier.classify(

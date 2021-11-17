@@ -1,6 +1,5 @@
 from homer.codelets.selectors import ViewSelector
 from homer.errors import MissingStructureError
-from homer.structure_collection import StructureCollection
 from homer.structures.views import SimplexView
 
 
@@ -25,21 +24,19 @@ class SimplexViewSelector(ViewSelector):
         try:
             champion_view = self.champions.get()
             challenger_view = champion_view.nearby().get()
-            self.challengers = StructureCollection({challenger_view})
+            self.challengers = self.bubble_chamber.new_structure_collection(
+                challenger_view
+            )
         except MissingStructureError:
             return True
-        champion_members_starts = StructureCollection(
-            {
-                member.start
-                for member in champion_view.members
-                if member.start.parent_space.parent_concept.name == "input"
-            }
+        champion_members_starts = self.bubble_chamber.new_structure_collection(
+            member.start
+            for member in champion_view.members
+            if member.start.parent_space.parent_concept.name == "input"
         )
-        return not StructureCollection(
-            {
-                member.start
-                for member in challenger_view.members
-                if member.start.parent_space.parent_concept.name == "input"
-                and member.start in champion_members_starts
-            }
+        return not self.bubble_chamber.new_structure_collection(
+            member.start
+            for member in challenger_view.members
+            if member.start.parent_space.parent_concept.name == "input"
+            and member.start in champion_members_starts
         ).is_empty()

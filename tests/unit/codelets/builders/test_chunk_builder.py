@@ -13,108 +13,161 @@ from homer.tools import hasinstance
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
-    chamber.concepts = {"chunk": Mock(), "build": Mock()}
-    chamber.has_chunk.return_value = False
-    input_space = Mock()
-    chunk = Mock()
-    chunk.is_chunk = True
-    input_space.contents = StructureCollection({chunk})
-    chamber.spaces = {"input": input_space}
+    chamber.satisfaction = 0.0
+    chamber.concepts = {"build": Mock(), "chunk": Mock()}
+    chamber.chunks = StructureCollection()
     return chamber
 
 
 @pytest.fixture
-def common_space():
+def target_space():
     space = Mock()
-    space.is_sub_space = False
-    space.proximity_between.return_value = 1.0
-    space.parent_concept.relevant_value = "value"
+    space.conceptual_spaces = [Mock()]
     return space
 
 
 @pytest.fixture
-def second_target_chunk(common_space):
-    location = Mock()
-    location.coordinates = [[1, 1]]
-    location.space = common_space
+def target_slot():
     chunk = Mock()
-    chunk.size = 1
-    chunk.activation = 0.5
-    chunk.quality = 0.5
-    chunk.location_in_space.return_value = location
-    chunk.neighbours = StructureCollection()
-    chunk.parent_spaces = StructureCollection({common_space})
-    chunk.links_in = StructureCollection()
-    chunk.links_out = StructureCollection()
-    chunk.labels = []
-    chunk.relations = []
-    chunk.correspondences = []
+    chunk.is_slot = True
     return chunk
 
 
 @pytest.fixture
-def target_chunk(common_space, second_target_chunk):
-    location = Mock()
-    location.coordinates = [[2, 2]]
-    location.space = common_space
+def target_rule():
+    rule = Mock()
+    root_concept = Mock()
+    rule.root_concept = root_concept
+    rule.left_concept = root_concept
+    rule.right_concept = None
+    rule.compatibility_with.return_value = 1.0
+    return rule
+
+
+@pytest.fixture
+def target_root(target_slot, target_rule):
     chunk = Mock()
-    chunk.size = 1
-    chunk.activation = 0.5
-    chunk.quality = 0.5
-    chunk.location_in_space.return_value = location
-    chunk.members = StructureCollection()
-    chunk.neighbours = StructureCollection()
-    chunk.parent_spaces = StructureCollection({common_space})
-    chunk.nearby.return_value = StructureCollection({second_target_chunk})
-    chunk.links_in = StructureCollection()
-    chunk.links_out = StructureCollection()
-    chunk.labels = []
-    chunk.relations = []
-    chunk.correspondences = []
+    chunk.members = StructureCollection({target_slot})
+    chunk.rule = target_rule
+    chunk.locations = [Mock()]
     return chunk
 
 
-def test_successful_creates_chunk_and_spawns_follow_up(
-    bubble_chamber, target_chunk, second_target_chunk
+@pytest.fixture
+def target_node(target_root):
+    chunk = Mock()
+    chunk.is_slot = False
+    chunk.super_chunks = StructureCollection({target_root})
+    target_root.members.add(chunk)
+    return chunk
+
+
+@pytest.fixture
+def target_slot_filler():
+    chunk = Mock()
+    chunk.is_slot = False
+    return chunk
+
+
+@pytest.fixture
+def test_fizzles_if_chunk_exists(bubble_chamber, target_node):
+    target_rule = Mock()
+    existing_chunk = Mock()
+    existing_chunk.rule = target_rule
+    target_slot_filler = Mock()
+    existing_chunk.members = StructureCollection({target_node, target_slot_filler})
+    bubble_chamber.chunks.add(existing_chunk)
+    target_space = Mock()
+    contents_where = Mock()
+    contents_where.at = StructureCollection({target_slot_filler})
+    target_space.contents.where.return_value = contents_where
+    target_structures = {
+        "target_space": Mock(),
+        "target_rule": target_rule,
+        "target_root": None,
+        "target_node": target_node,
+        "target_slot": None,
+        "target_slot_filler": None,
+        "target_branch": "left",
+    }
+    urgency = 1
+    builder = ChunkBuilder("", "", bubble_chamber, target_structures, urgency)
+    builder.run()
+    assert CodeletResult.FIZZLE == builder.result
+
+
+@pytest.fixture
+def test_creates_new_chunk_if_necessary(
+    bubble_chamber, target_space, target_rule, target_node
 ):
-    target_structures = {"target_one": target_chunk, "target_two": second_target_chunk}
-    chunk_builder = ChunkBuilder(
-        Mock(), Mock(), bubble_chamber, target_structures, Mock()
-    )
-    result = chunk_builder.run()
-    assert CodeletResult.SUCCESS == result
-    assert hasinstance(chunk_builder.child_structures, Chunk)
-    assert len(chunk_builder.child_codelets) == 1
-    assert isinstance(chunk_builder.child_codelets[0], ChunkEvaluator)
+    target_structures = {
+        "target_space": target_space,
+        "target_rule": target_rule,
+        "target_root": None,
+        "target_node": target_node,
+        "target_slot": None,
+        "target_slot_filler": None,
+        "target_branch": "left",
+    }
+    urgency = 1
+    builder = ChunkBuilder("", "", bubble_chamber, target_structures, urgency)
+    builder.run()
+    assert CodeletResult.SUCCESS == builder.result
+    assert 2 == len(builder.child_structures)
+    assert hasinstance(builder.child_structures, Chunk)
 
 
-def test_new_chunk_has_no_duplicate_links(
-    bubble_chamber, target_chunk, second_target_chunk, common_space
+@pytest.fixture
+def test_fills_slot_if_necessary(
+    bubble_chamber,
+    target_rule,
+    target_root,
+    target_node,
+    target_slot,
+    target_slot_filler,
 ):
-    target_structures = {"target_one": target_chunk, "target_two": second_target_chunk}
-    concept = Mock()
-    label_1 = Label(Mock(), Mock(), target_chunk, concept, common_space, 1)
-    label_2 = Label(Mock(), Mock(), second_target_chunk, concept, common_space, 1)
-    target_chunk.labels = StructureCollection({label_1})
-    second_target_chunk.labels = StructureCollection({label_2})
-    chunk_builder = ChunkBuilder(
-        Mock(), Mock(), bubble_chamber, target_structures, Mock()
-    )
-    result = chunk_builder.run()
-    assert CodeletResult.SUCCESS == result
-    child_structure = chunk_builder.child_structures.get_random()
-    assert len(child_structure.links) == 1
+    target_rule.right_concept = None
+    target_structures = {
+        "target_space": Mock(),
+        "target_rule": target_rule,
+        "target_root": target_root,
+        "target_node": target_node,
+        "target_slot": target_slot,
+        "target_slot_filler": target_slot_filler,
+        "target_branch": "left",
+    }
+    urgency = 1
+    target_root.has_free_branch = False
+    assert target_slot_filler not in target_root.members
+    builder = ChunkBuilder("", "", bubble_chamber, target_structures, urgency)
+    builder.run()
+    assert CodeletResult.SUCCESS == builder.result
+    assert target_slot_filler in target_root.members
+    assert target_slot not in target_root.members
 
 
-def test_fizzles_when_chunk_already_exists(
-    bubble_chamber, target_chunk, second_target_chunk
+@pytest.fixture
+def test_leaves_slot_if_appropriate(
+    bubble_chamber,
+    target_rule,
+    target_root,
+    target_node,
+    target_slot,
+    target_slot_filler,
 ):
-    bubble_chamber.has_chunk.return_value = True
-    target_structures = {"target_one": target_chunk, "target_two": second_target_chunk}
-    urgency = 1.0
-    chunk_builder = ChunkBuilder(
-        Mock(), Mock(), bubble_chamber, target_structures, urgency
-    )
-    result = chunk_builder.run()
-    assert CodeletResult.FIZZLE == result
-    assert chunk_builder.child_structures is None
+    target_structures = {
+        "target_space": Mock(),
+        "target_rule": target_rule,
+        "target_root": target_root,
+        "target_node": target_node,
+        "target_slot": target_slot,
+        "target_slot_filler": target_slot_filler,
+        "target_branch": "left",
+    }
+    urgency = 1
+    assert target_slot_filler not in target_root.members
+    builder = ChunkBuilder("", "", bubble_chamber, target_structures, urgency)
+    builder.run()
+    assert CodeletResult.SUCCESS == builder.result
+    assert target_slot_filler in target_root.members
+    assert target_slot in target_root.members

@@ -9,61 +9,30 @@ from homer.structure_collection import StructureCollection
 from homer.tools import hasinstance
 
 
-@pytest.fixture
-def bubble_chamber():
-    chamber = Mock()
-    chamber.concepts = {"correspondence": Mock(), "select": Mock()}
-    return chamber
-
-
 def test_finds_challenger_when_not_given_one(bubble_chamber):
-    space_1 = Mock()
-    space_2 = Mock()
-
-    new_conceptual_space = Mock()
-    new_target_one = Mock()
-    new_target_two = Mock()
-    new_space_one = Mock()
-    new_target_one.parent_space = new_space_one
-    new_space_one.parent_spaces = StructureCollection({space_1})
-    new_space_one.conceptual_space = new_conceptual_space
-    new_space_two = Mock()
-    new_space_two.parent_spaces = StructureCollection({space_2})
-    new_space_two.conceptual_space = new_conceptual_space
-    new_space_two.is_basic_level = True
-    space_2.contents.of_type.return_value = StructureCollection({new_space_two})
-
-    view = Mock()
-    view.input_spaces = StructureCollection({space_1, space_2})
-
-    start_argument = Mock()
-    start_argument.links.where.return_value = StructureCollection({new_target_one})
-    start_argument.parent_space = new_space_one
-
     champion = Mock()
     challenger = Mock()
     champion.size = 1
     champion.quality = 1.0
     champion.activation = 1.0
-    champion.start.arguments.get.return_value = start_argument
-    champion.parent_view = view
 
     challenger.size = 1
     challenger.quality = 1.0
     challenger.activation = 1.0
-    challenger.start.arguments.get.return_value = start_argument
-    challenger.parent_view = view
 
-    champion.start.correspondences_to_space.return_value = StructureCollection(
-        {champion, challenger}
-    )
+    champion.nearby.return_value = bubble_chamber.new_structure_collection(challenger)
+    challenger.nearby.return_value = bubble_chamber.new_structure_collection(champion)
 
     selector = CorrespondenceSelector(
-        Mock(), Mock(), bubble_chamber, StructureCollection({champion}), Mock()
+        Mock(),
+        Mock(),
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(champion),
+        Mock(),
     )
     assert selector.challengers is None
     selector.run()
-    assert selector.challengers == StructureCollection({challenger})
+    assert selector.challengers == bubble_chamber.new_structure_collection(challenger)
 
 
 @pytest.mark.parametrize(
@@ -96,20 +65,24 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         new_target_two = Mock()
         new_space_one = Mock()
         new_target_one.parent_space = new_space_one
-        new_space_one.parent_spaces = StructureCollection({space_1})
+        new_space_one.parent_spaces = bubble_chamber.new_structure_collection(space_1)
         new_space_one.conceptual_space = new_conceptual_space
         new_space_two = Mock()
-        new_space_two.parent_spaces = StructureCollection({space_2})
+        new_space_two.parent_spaces = bubble_chamber.new_structure_collection(space_2)
         new_space_two.conceptual_space = new_conceptual_space
         new_space_two.is_basic_level = True
-        space_2.contents.of_type.return_value = StructureCollection({new_space_two})
+        space_2.contents.of_type.return_value = bubble_chamber.new_structure_collection(
+            new_space_two
+        )
 
         view = Mock()
         view.name = "view"
-        view.input_spaces = StructureCollection({space_1, space_2})
+        view.input_spaces = bubble_chamber.new_structure_collection(space_1, space_2)
 
         start_argument = Mock()
-        start_argument.links.where.return_value = StructureCollection({new_target_one})
+        start_argument.links.where.return_value = (
+            bubble_chamber.new_structure_collection(new_target_one)
+        )
         start_argument.parent_space = new_space_one
 
         champion = Mock()
@@ -132,9 +105,9 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             Mock(),
             Mock(),
             bubble_chamber,
-            StructureCollection({champion}),
+            bubble_chamber.new_structure_collection(champion),
             Mock(),
-            challengers=StructureCollection({challenger}),
+            challengers=bubble_chamber.new_structure_collection(challenger),
         )
         selector.run()
         assert CodeletResult.SUCCESS == selector.result

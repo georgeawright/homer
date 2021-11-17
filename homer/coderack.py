@@ -1,10 +1,8 @@
-import random
-
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
 from .codelets import CoderackCleaner, Factory
 from .codelets.factories import ConceptDrivenFactory, RandomFactory, RationalFactory
-from .errors import NoMoreCodelets
+from .errors import MissingStructureError, NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .logger import Logger
@@ -63,30 +61,19 @@ class Coderack:
             ][0]
             self._codelets.remove(codelet_choice)
             return codelet_choice
-        codelet_choice = None
-        highest_weight = 0
-        randomness = self._randomness()
-        rationality = 1 - randomness
-        for codelet in self._codelets:
-            weight = codelet.urgency * rationality + random.random() * randomness
-            if weight > highest_weight:
-                highest_weight = weight
-                codelet_choice = codelet
-        if codelet_choice is None:
+        try:
+            codelet_choice = self.bubble_chamber.random_machine.select(
+                self._codelets, key=lambda x: x.urgency
+            )
+        except MissingStructureError:
             raise NoMoreCodelets
         self._codelets.remove(codelet_choice)
         return codelet_choice
 
     def _remove_a_codelet(self):
-        codelet_choice = None
-        lowest_weight = float("inf")
-        randomness = self._randomness()
-        rationality = 1 - randomness
-        for codelet in self._codelets:
-            weight = codelet.urgency * rationality + random.random() * randomness
-            if weight < lowest_weight:
-                lowest_weight = weight
-                codelet_choice = codelet
+        codelet_choice = self.bubble_chamber.random_machine.select(
+            self._codelets, key=lambda x: 1 - x.urgency
+        )
         self.remove_codelet(codelet_choice)
 
     def proportion_of_codelets_of_type(self, t: type) -> float:

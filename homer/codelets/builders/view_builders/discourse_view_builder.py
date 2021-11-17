@@ -1,8 +1,7 @@
 from homer.codelets.builders import ViewBuilder
 from homer.id import ID
 from homer.location import Location
-from homer.structure_collection import StructureCollection
-from homer.structures.spaces import WorkingSpace
+from homer.structures.spaces import ContextualSpace
 from homer.structures.views import DiscourseView
 
 
@@ -41,20 +40,20 @@ class DiscourseViewBuilder(ViewBuilder):
     def _process_structure(self):
         view_id = ID.new(DiscourseView)
         view_location = Location([], self.bubble_chamber.spaces["top level working"])
-        input_spaces = StructureCollection(
-            {
+        input_spaces = self.bubble_chamber.new_structure_collection(
+            *[
                 self._instantiate_frame(space) if space.is_frame else space
                 for space in self.target_spaces
-            }
+            ]
         )
-        view_output = WorkingSpace(
-            structure_id=ID.new(WorkingSpace),
+        view_output = ContextualSpace(
+            structure_id=ID.new(ContextualSpace),
             parent_id=self.codelet_id,
             name=f"output for {view_id}",
             parent_concept=self.frame.parent_concept,
             conceptual_space=self.frame.conceptual_space,
             locations=[view_location],
-            contents=StructureCollection(),
+            contents=self.bubble_chamber.new_structure_collection(),
             no_of_dimensions=1,
             dimensions=[],
             sub_spaces=[],
@@ -63,7 +62,7 @@ class DiscourseViewBuilder(ViewBuilder):
             structure_id=view_id,
             parent_id=self.codelet_id,
             location=view_location,
-            members=StructureCollection(),
+            members=self.bubble_chamber.new_structure_collection(),
             input_spaces=input_spaces,
             output_space=view_output,
             quality=0,
@@ -71,4 +70,4 @@ class DiscourseViewBuilder(ViewBuilder):
         self.bubble_chamber.logger.log(view_output)
         self.bubble_chamber.logger.log(view)
         self.bubble_chamber.views.add(view)
-        self.child_structures = StructureCollection({view})
+        self.child_structures = self.bubble_chamber.new_structure_collection(view)

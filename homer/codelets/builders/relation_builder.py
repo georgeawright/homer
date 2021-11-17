@@ -1,14 +1,8 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
-from homer.structure_collection import StructureCollection
-from homer.structures import Space
-from homer.structures.links import Relation
-from homer.structures.nodes import Concept
-from homer.structures.spaces import ConceptualSpace
 
 
 class RelationBuilder(Builder):
@@ -67,22 +61,16 @@ class RelationBuilder(Builder):
         )
 
     def _process_structure(self):
-        relation = Relation(
-            ID.new(Relation),
-            self.codelet_id,
-            self.target_structure_one,
-            self.target_structure_two,
-            self.parent_concept,
-            self.target_space,
-            0,
+        relation = self.bubble_chamber.new_relation(
+            parent_id=self.codelet_id,
+            start=self.target_structure_one,
+            end=self.target_structure_two,
+            parent_concept=self.parent_concept,
+            parent_space=self.target_space,
+            quality=0,
         )
         relation.activation = self.INITIAL_STRUCTURE_ACTIVATION
-        self.target_space.add(relation)
-        self.target_structure_one.links_out.add(relation)
-        self.target_structure_two.links_in.add(relation)
-        self.bubble_chamber.relations.add(relation)
-        self.bubble_chamber.logger.log(relation)
-        self.child_structures = StructureCollection({relation})
+        self.child_structures = self.bubble_chamber.new_structure_collection(relation)
 
     def _fizzle(self):
         pass

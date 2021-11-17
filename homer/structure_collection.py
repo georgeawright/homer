@@ -1,16 +1,41 @@
 from __future__ import annotations
-import operator
-import random
-from typing import List, Optional, Set, Union
+from typing import List
 
 from .errors import MissingStructureError
 from .location import Location
 
 
 class StructureCollection:
-    def __init__(self, structures: Optional[Set] = None):
-        self.structures = set() if structures is None else structures
+    def __init__(self, bubble_chamber: "BubbleChamber", structures: List["Structure"]):
+        self.bubble_chamber = bubble_chamber
+        self.structures = {structure: True for structure in structures}
         self.structures_by_name = None
+
+    @staticmethod
+    def union(*collections: List[StructureCollection]) -> StructureCollection:
+        return StructureCollection(
+            collections[0].bubble_chamber,
+            [structure for collection in collections for structure in collection],
+        )
+
+    @staticmethod
+    def intersection(*collections: List[StructureCollection]) -> StructureCollection:
+        structures = [
+            structure for collection in collections for structure in collection
+        ]
+        for collection in collections:
+            structures = [
+                structure for structure in structures if structure in collection
+            ]
+        return StructureCollection(collections[0].bubble_chamber, structures)
+
+    @staticmethod
+    def difference(
+        a: StructureCollection, b: StructureCollection
+    ) -> StructureCollection:
+        return StructureCollection(
+            a.bubble_chamber, [structure for structure in a if structure not in b]
+        )
 
     def __len__(self):
         return len(self.structures)
@@ -34,50 +59,59 @@ class StructureCollection:
             self._arrange_structures_by_name()
         return self.structures_by_name[name]
 
+    def __repr__(self) -> str:
+        return "{" + ", ".join(repr(structure) for structure in self.structures) + "}"
+
     def copy(self) -> StructureCollection:
-        return StructureCollection({structure for structure in self.structures})
+        return StructureCollection(
+            self.bubble_chamber, [structure for structure in self.structures]
+        )
 
     def is_empty(self) -> bool:
         return len(self) == 0
 
+    def filter(self, *filters: List[callable]) -> StructureCollection:
+        old_collection = self
+        for f in filters:
+            new_collection = StructureCollection(
+                self.bubble_chamber,
+                [structure for structure in old_collection if f(structure)],
+            )
+            old_collection = new_collection
+        return new_collection
+
+    def excluding(self, *structures) -> StructureCollection:
+        return self.filter(lambda x: x not in structures)
+
     def at(self, location: Location) -> StructureCollection:
-        return StructureCollection(
-            {
-                structure
-                for coordinates in location.coordinates
-                for structure in self.structures
-                if coordinates in structure.location.coordinates
-            }
-        )
+        def _at(structure):
+            for coordinates in location.coordinates:
+                if coordinates in structure.location.coordinates:
+                    return True
+            return False
+
+        return self.filter(_at)
 
     def next_to(self, location: Location) -> StructureCollection:
         left_most_coordinate = location.coordinates[0][0]
         right_most_coordinate = location.coordinates[-1][0]
-        return StructureCollection(
-            {
-                structure
-                for structure in location.space.contents
-                if structure.location_in_space(location.space).coordinates != []
-                and (
-                    structure.location.coordinates[-1][0] == left_most_coordinate - 1
-                    or structure.location.coordinates[0][0] == right_most_coordinate + 1
-                )
-            }
+        return self.filter(
+            lambda x: x.location_in_space(location.space).coordinates != []
+            and (
+                x.location.coordinates[-1][0] == left_most_coordinate - 1
+                or x.location.coordinates[0][0] == right_most_coordinate + 1
+            )
         )
 
     def near(self, location: Location) -> StructureCollection:
-        return StructureCollection(
-            {
-                structure
-                for structure in self.structures
-                if structure.location.is_near(location)
-            }
+        return self.filter(
+            lambda x: x.location_in_space(location.space).is_near(location)
         )
 
     def where(self, **kwargs) -> StructureCollection:
         old_collection = self
         for key, value in kwargs.items():
-            new_collection = StructureCollection()
+            new_collection = StructureCollection(self.bubble_chamber, [])
             for structure in old_collection:
                 if hasattr(structure, key) and getattr(structure, key) == value:
                     new_collection.add(structure)
@@ -87,7 +121,7 @@ class StructureCollection:
     def where_not(self, **kwargs) -> StructureCollection:
         old_collection = self
         for key, value in kwargs.items():
-            new_collection = StructureCollection()
+            new_collection = StructureCollection(self.bubble_chamber, [])
             for structure in old_collection:
                 if hasattr(structure, key) and getattr(structure, key) != value:
                     new_collection.add(structure)
@@ -95,122 +129,34 @@ class StructureCollection:
         return new_collection
 
     def add(self, structure):
-        self.structures.add(structure)
+        self.structures[structure] = True
         if self.structures_by_name is not None and hasattr(structure, "name"):
             self.structures_by_name[structure.name] = structure
 
     def remove(self, structure):
-        self.structures.discard(structure)
+        self.structures.pop(structure, None)
         if self.structures_by_name is not None and hasattr(structure, "name"):
-            try:
-                self.structures_by_name.pop(structure.name)
-            except KeyError:
-                pass
+            self.structures_by_name.pop(structure.name, None)
 
     def pop(self):
-        structure = self.get_random()
+        structure = self.get()
         self.remove(structure)
         return structure
 
-    @staticmethod
-    def union(*collections: List[StructureCollection]) -> StructureCollection:
-        if len(collections) == 0:
-            return StructureCollection()
-        return StructureCollection(
-            set.union(*[collection.structures for collection in collections])
-        )
-
-    @staticmethod
-    def intersection(*collections: List[StructureCollection]) -> StructureCollection:
-        return StructureCollection(
-            set.intersection(*[collection.structures for collection in collections])
-        )
-
-    @staticmethod
-    def difference(
-        a: StructureCollection, b: StructureCollection
-    ) -> StructureCollection:
-        return StructureCollection(set.difference(a.structures, b.structures))
-
     def of_type(self, t: type) -> StructureCollection:
         return StructureCollection(
-            {element for element in self.structures if isinstance(element, t)}
+            self.bubble_chamber,
+            [element for element in self.structures if isinstance(element, t)],
         )
 
     def not_of_type(self, t: type) -> StructureCollection:
         return StructureCollection(
-            {element for element in self.structures if not isinstance(element, t)}
+            self.bubble_chamber,
+            [element for element in self.structures if not isinstance(element, t)],
         )
 
-    def proportion_with_label(self, concept):
-        return self.number_with_label(concept) / len(self)
-
-    def number_with_label(self, concept):
-        return sum(1 for structure in self.structures if structure.has_label(concept))
-
-    def get(
-        self,
-        key: callable = None,
-        comparison_operator: callable = operator.gt,
-        exclude: list = None,
-        sample_proportion: float = 0.5,
-    ):
-        if key is None:
-            return self.get_random(exclude=exclude)
-        return self._get_structure_according_to(
-            key,
-            comparison_operator=comparison_operator,
-            exclude=exclude,
-            sample_proportion=sample_proportion,
-        )
-
-    def get_random(self, exclude: list = None):
-        """Returns a random structure"""
-        if len(self.structures) < 1:
-            raise MissingStructureError
-        if exclude is not None:
-            return StructureCollection.difference(
-                self, StructureCollection(set(exclude))
-            ).get_random()
-        return random.sample(self.structures, 1)[0]
-
-    def get_most_active(self):
-        return self._get_structure_with_highest("activation")
-
-    def __repr__(self) -> str:
-        return "{" + ", ".join(repr(structure) for structure in self.structures) + "}"
-
-    def _get_structure_according_to(
-        self,
-        key: callable,
-        comparison_operator: callable = operator.gt,
-        exclude: list = None,
-        sample_proportion: float = 0.5,
-    ):
-        """Returns a structure probabilistically according to key."""
-        if len(self.structures) < 1:
-            raise MissingStructureError
-        if exclude is not None:
-            return StructureCollection.difference(
-                self, StructureCollection(set(exclude))
-            )._get_structure_according_to(key)
-        if len(self.structures) == 1:
-            return list(self.structures)[0]
-        structures = random.sample(
-            self.structures, len(self.structures) // int(1 / sample_proportion)
-        )
-        structure_choice = structures[0]
-        for structure in structures[1:]:
-            if comparison_operator(key(structure), key(structure_choice)):
-                structure_choice = structure
-        return structure_choice
-
-    def _get_structure_with_highest(self, attribute: str):
-        structure_choice = self.get_random()
-        for structure in self.structures:
-            if getattr(structure, attribute) > getattr(structure_choice, attribute):
-                structure_choice = structure
-        return structure_choice
+    def get(self, key: callable = lambda x: 0, exclude: list = None):
+        return self.bubble_chamber.random_machine.select(self.structures, key, exclude)
 
     def _arrange_structures_by_name(self):
         self.structures_by_name = {}

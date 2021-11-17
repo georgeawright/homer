@@ -1,7 +1,6 @@
 from homer.codelets.selector import Selector
 from homer.codelets.suggesters import LabelSuggester
 from homer.errors import MissingStructureError
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation, labeling_exigency
 
 
@@ -14,10 +13,14 @@ class LabelSelector(Selector):
         if self.challengers is not None:
             return True
         champion_label = self.champions.get()
-        candidates = champion_label.start.labels_in_space(champion_label.parent_space)
+        candidates = champion_label.start.labels_in_space(
+            champion_label.parent_concept.parent_space
+        )
         try:
             challenger_label = candidates.get(key=activation, exclude=[champion_label])
-            self.challengers = StructureCollection({challenger_label})
+            self.challengers = self.bubble_chamber.new_structure_collection(
+                challenger_label
+            )
             return True
         except MissingStructureError:
             return True

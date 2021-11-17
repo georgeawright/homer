@@ -3,9 +3,6 @@ from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Label
-from homer.tools import add_vectors
 
 
 class LabelBuilder(Builder):
@@ -55,37 +52,25 @@ class LabelBuilder(Builder):
         return not self.target_node.has_label(self.parent_concept)
 
     def _process_structure(self):
-        space = self.parent_concept.parent_space.instance_in_space(
-            self.target_node.parent_space
-        )
         parent_concept_coordinates = self.parent_concept.location_in_space(
-            space.conceptual_space
+            self.parent_concept.parent_space
         ).coordinates
-        if not self.target_node.has_location_in_space(space):
+        if not self.target_node.has_location_in_space(self.parent_concept.parent_space):
             self.target_node.locations.append(
-                Location(parent_concept_coordinates, space)
+                Location(parent_concept_coordinates, self.parent_concept.parent_space)
             )
-            space.add(self.target_node)
-        self.bubble_chamber.logger.log(space)
-        label = Label(
-            ID.new(Label),
-            self.codelet_id,
-            self.target_node,
-            self.parent_concept,
-            space,
-            0,
+            self.parent_concept.parent_space.add(self.target_node)
+        label = self.bubble_chamber.new_label(
+            parent_id=self.codelet_id,
+            start=self.target_node,
+            parent_concept=self.parent_concept,
+            locations=[
+                self.target_node.location_in_space(self.parent_concept.parent_space)
+            ],
+            quality=0,
         )
         label.activation = self.INITIAL_STRUCTURE_ACTIVATION
-        space.add(label)
-        self.target_node.links_out.add(label)
-        self.bubble_chamber.labels.add(label)
-        self.bubble_chamber.working_spaces.add(space)
-        top_level_working_space = self.bubble_chamber.spaces["top level working"]
-        space.locations.append(Location([], top_level_working_space))
-        top_level_working_space.add(space)
-        space.parent_spaces.add(self.bubble_chamber.spaces["top level working"])
-        self.bubble_chamber.logger.log(label)
-        self.child_structures = StructureCollection({label})
+        self.child_structures = self.bubble_chamber.new_structure_collection(label)
 
     def _fizzle(self):
         pass

@@ -9,8 +9,10 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
+from homer.structures.spaces import ContextualSpace
 
 from .concept import Concept
+from .rule import Rule
 
 
 class Chunk(Node):
@@ -22,9 +24,13 @@ class Chunk(Node):
         members: StructureCollection,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
-        chunks_made_from_this_chunk: StructureCollection = None,
+        left_branch: StructureCollection,
+        right_branch: StructureCollection,
+        rule: Rule,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
+        super_chunks: StructureCollection,
         is_raw: bool = False,
     ):
         Node.__init__(
@@ -36,13 +42,13 @@ class Chunk(Node):
             quality=quality,
             links_in=links_in,
             links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.members = members
-        self.chunks_made_from_this_chunk = (
-            chunks_made_from_this_chunk
-            if chunks_made_from_this_chunk is not None
-            else StructureCollection()
-        )
+        self.left_branch = left_branch
+        self.right_branch = right_branch
+        self.rule = rule
+        self.super_chunks = super_chunks
         self.is_raw = is_raw
         self.is_chunk = True
 
@@ -65,18 +71,74 @@ class Chunk(Node):
         return ChunkSelector
 
     @property
-    def size(self):
+    def size(self) -> int:
         return (
             1 if len(self.members) == 0 else sum(member.size for member in self.members)
         )
 
     @property
+    def raw_members(self) -> StructureCollection:
+        if self.is_raw:
+            raw_members = self.members
+            raw_members.add(self)
+            return raw_members
+        return StructureCollection.union(*[chunk.raw_members for chunk in self.members])
+
+    @property
     def unchunkedness(self):
-        if len(self.chunks_made_from_this_chunk) == 0:
+        if len(self.super_chunks) == 0:
             return 1
-        return 0.5 * prod(
-            [chunk.unchunkedness for chunk in self.chunks_made_from_this_chunk]
-        )
+        return 0.5 * prod([chunk.unchunkedness for chunk in self.super_chunks])
+
+    @property
+    def free_branch_concept(self):
+        if self.rule.root_concept == self.rule.left_concept:
+            return self.rule.left_concept
+        if self.left_branch.is_empty():
+            return self.rule.left_concept
+        if self.right_branch.is_empty() and self.rule.right_concept is not None:
+            return self.rule.right_concept
+        raise MissingStructureError
+
+    @property
+    def free_branch(self):
+        if self.rule.root_concept == self.rule.left_concept:
+            return self.left_branch
+        if self.left_branch.is_empty():
+            return self.left_branch
+        if self.right_branch.is_empty() and self.rule.right_concept is not None:
+            return self.right_branch
+        raise MissingStructureError
+
+    @property
+    def has_free_branch(self):
+        try:
+            return self.free_branch is not None
+        except MissingStructureError:
+            return False
+
+    @property
+    def potential_chunk_mates(self) -> StructureCollection:
+        return StructureCollection.union(self.adjacent, self.super_chunks, self.members)
+
+    @property
+    def adjacent(self) -> StructureCollection:
+        return self.parent_space.contents.next_to(self.location).where(is_node=True)
+
+    def nearby(self, space: Space = None) -> StructureCollection:
+        if space is not None:
+            return (
+                space.contents.where(is_chunk=True)
+                .near(self.location_in_space(space))
+                .excluding(self),
+            )
+        return StructureCollection.intersection(
+            *[
+                location.space.contents.where(is_chunk=True).near(location)
+                for location in self.locations
+                if location.space.is_conceptual_space and location.space.is_basic_level
+            ]
+        ).excluding(self)
 
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
@@ -91,36 +153,112 @@ class Chunk(Node):
                 return chunk
         return chunks.get(exclude=[self])
 
-    def copy(self, **kwargs: dict) -> Chunk:
-        """Requires keyword arguments 'bubble_chamber', 'parent_id', and 'parent_space'."""
-        bubble_chamber = kwargs["bubble_chamber"]
-        parent_id = kwargs["parent_id"]
-        parent_space = kwargs["parent_space"]
-        sub_spaces = parent_space.contents.where(is_space=True)
-        new_spaces = StructureCollection.union(
-            sub_spaces, StructureCollection({parent_space})
-        )
-        locations = [
-            Location(
-                location.coordinates,
-                [
-                    space
-                    for space in new_spaces
-                    if space.parent_concept == location.space.parent_concept
-                ][0],
+    def copy_to_location(
+        self, location: Location, bubble_chamber: "BubbleChamber", parent_id: str = ""
+    ):
+        def copy_recursively(
+            chunk: Chunk,
+            location: Location,
+            bubble_chamber: "BubbleChamber",
+            parent_id: str,
+            copies: dict,
+        ):
+            locations = [
+                location
+                for location in chunk.locations
+                if location.space.is_conceptual_space
+            ] + [location]
+            members = bubble_chamber.new_structure_collection()
+            for member in chunk.members:
+                if member not in copies:
+                    copies[member] = copy_recursively(
+                        member, location, bubble_chamber, parent_id, copies
+                    )
+                members.add(copies[member])
+            new_left_branch = bubble_chamber.new_structure_collection(
+                *[copies[member] for member in chunk.left_branch]
             )
+            new_right_branch = bubble_chamber.new_structure_collection(
+                *[copies[member] for member in chunk.right_branch]
+            )
+            chunk_copy = Chunk(
+                structure_id=ID.new(Chunk),
+                parent_id=parent_id,
+                locations=locations,
+                members=members,
+                parent_space=location.space,
+                quality=0.0,
+                left_branch=new_left_branch,
+                right_branch=new_right_branch,
+                rule=chunk.rule,
+                links_in=bubble_chamber.new_structure_collection(),
+                links_out=bubble_chamber.new_structure_collection(),
+                parent_spaces=bubble_chamber.new_structure_collection(),
+                super_chunks=bubble_chamber.new_structure_collection(),
+                is_raw=chunk.is_raw,
+            )
+            location.space.contents.add(chunk_copy)
+            bubble_chamber.chunks.add(chunk_copy)
+            bubble_chamber.logger.log(chunk_copy)
+            for member in chunk_copy.members:
+                member.super_chunks.add(chunk_copy)
+                bubble_chamber.logger.log(member)
+            return chunk_copy
+
+        return copy_recursively(self, location, bubble_chamber, parent_id, {})
+
+    # TODO: get rid of
+    def copy_with_contents(
+        self,
+        copies: dict,
+        bubble_chamber: "BubbleChamber",
+        parent_id: str,
+        parent_space: ContextualSpace,
+    ):
+        new_locations = [
+            location
             for location in self.locations
+            if location.space.is_conceptual_space
         ]
-        new_chunk = Chunk(
-            ID.new(Chunk),
-            parent_id,
-            locations=locations,
-            members=StructureCollection(),
+        new_locations.append(
+            Location(
+                self.location_in_space(self.parent_space).coordinates, parent_space
+            )
+        )
+        new_members = bubble_chamber.new_structure_collection()
+        for member in self.members:
+            if member not in copies:
+                copies[member] = member.copy(
+                    copies=copies,
+                    bubble_chamber=bubble_chamber,
+                    parent_id=parent_id,
+                    parent_space=parent_space,
+                )
+            new_members.add(copies[member])
+        new_left_branch = bubble_chamber.new_structure_collection(
+            *[copies[member] for member in self.left_branch]
+        )
+        new_right_branch = bubble_chamber.new_structure_collection(
+            *[copies[member] for member in self.right_branch]
+        )
+        chunk_copy = Chunk(
+            structure_id=ID.new(Chunk),
+            parent_id=parent_id,
+            locations=new_locations,
+            members=new_members,
             parent_space=parent_space,
             quality=self.quality,
+            left_branch=new_left_branch,
+            right_branch=new_right_branch,
+            rule=self.rule,
+            links_in=bubble_chamber.new_structure_collection(),
+            links_out=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(),
+            super_chunks=bubble_chamber.new_structure_collection(),
+            is_raw=self.is_raw,
         )
-        for location in new_chunk.locations:
-            location.space.add(new_chunk)
-        bubble_chamber.logger.log(new_chunk)
-        bubble_chamber.chunks.add(new_chunk)
-        return new_chunk
+        bubble_chamber.logger.log(chunk_copy)
+        for member in chunk_copy.members:
+            member.super_chunks.add(chunk_copy)
+            bubble_chamber.logger.log(member)
+        return (chunk_copy, copies)

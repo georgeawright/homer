@@ -23,16 +23,18 @@ class Structure(ABC):
         parent_id: str,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection = None,
-        links_out: StructureCollection = None,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
         stable_activation: float = None,
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
         self._locations = locations
         self._quality = quality
-        self.links_in = StructureCollection() if links_in is None else links_in
-        self.links_out = StructureCollection() if links_out is None else links_out
+        self.links_in = links_in
+        self.links_out = links_out
+        self.parent_spaces = parent_spaces
         self._activation = FloatBetweenOneAndZero(
             random.random() if stable_activation is None else stable_activation
         )
@@ -43,7 +45,10 @@ class Structure(ABC):
         self._parent_concept = None
 
         self.is_node = False
+        self.is_lexeme = False
+        self.is_concept = False
         self.is_chunk = False
+        self.is_rule = False
         self.is_phrase = False
         self.is_word = False
         self.is_link = False
@@ -53,7 +58,7 @@ class Structure(ABC):
         self.is_view = False
         self.is_space = False
         self.is_conceptual_space = False
-        self.is_working_space = False
+        self.is_contextual_space = False
         self.is_frame = False
         self.is_template = False
 
@@ -104,10 +109,6 @@ class Structure(ABC):
     @property
     def is_slot(self) -> bool:
         return False
-
-    @property
-    def parent_spaces(self) -> StructureCollection:
-        return StructureCollection({location.space for location in self.locations})
 
     @property
     def exigency(self) -> FloatBetweenOneAndZero:
@@ -172,62 +173,56 @@ class Structure(ABC):
         return StructureCollection.union(self.links_in, self.links_out)
 
     @property
-    def correspondences(self) -> StructureCollection:
-        from homer.structures.links import Correspondence
-
-        return StructureCollection(
-            set.union(
-                {link for link in self.links_in if isinstance(link, Correspondence)},
-                {link for link in self.links_out if isinstance(link, Correspondence)},
-            )
-        )
-
-    @property
-    def correspondees(self) -> StructureCollection:
-        return StructureCollection(
-            set.union(
-                {
-                    correspondence.start
-                    for correspondence in self.correspondences
-                    if self != correspondence.start
-                },
-                {
-                    correspondence.end
-                    for correspondence in self.correspondences
-                    if self != correspondence.end
-                },
-            )
-        )
-
-    @property
     def labels(self) -> StructureCollection:
-        from homer.structures.links import Label
-
-        return StructureCollection(
-            {link for link in self.links_out if isinstance(link, Label)}
-        )
+        return self.links_out.where(is_label=True)
 
     @property
     def relations(self) -> StructureCollection:
-        from homer.structures.links import Relation
-
-        return StructureCollection(
-            set.union(
-                {link for link in self.links_in if isinstance(link, Relation)},
-                {link for link in self.links_out if isinstance(link, Relation)},
-            )
+        return StructureCollection.union(
+            self.links_in.where(is_relation=True),
+            self.links_out.where(is_relation=True),
         )
 
     @property
-    def lexemes(self) -> StructureCollection:
-        from homer.structures.nodes import Lexeme
-
-        return StructureCollection(
-            {link.end for link in self.links_out if isinstance(link.end, Lexeme)}
+    def correspondences(self) -> StructureCollection:
+        return StructureCollection.union(
+            self.links_in.where(is_correspondence=True),
+            self.links_out.where(is_correspondence=True),
         )
+
+    @property
+    def relatives(self) -> StructureCollection:
+        if self.relations.is_empty():
+            return self.relations.copy()
+        return StructureCollection.union(
+            *[relation.arguments for relation in self.relations]
+        ).excluding(self)
+
+    @property
+    def correspondees(self) -> StructureCollection:
+        if self.correspondences.is_empty():
+            return self.correspondences.copy()
+        return StructureCollection.union(
+            *[correspondence.arguments for correspondence in self.correspondences]
+        ).excluding(self)
+
+    @property
+    def lexemes(self) -> StructureCollection:
+        return self.relatives.where(is_lexeme=True)
 
     def nearby(self, space: Structure = None):
         raise NotImplementedError
+
+    def similarity_with(self, other: Structure):
+        return statistics.fmean(
+            [
+                location.space.proximity_between(self, other)
+                if other.has_location_in_space(location.space)
+                else 0.0
+                for location in self.locations
+                if location.space.is_conceptual_space
+            ]
+        )
 
     def is_near(self, other: Structure) -> bool:
         for other_location in other.locations:
@@ -300,9 +295,7 @@ class Structure(ABC):
         raise MissingStructureError
 
     def labels_in_space(self, space: Structure) -> StructureCollection:
-        return StructureCollection(
-            {label for label in self.labels if label in space.contents}
-        )
+        return self.labels.filter(lambda x: x in space.contents)
 
     def has_relation(
         self,
@@ -336,23 +329,12 @@ class Structure(ABC):
     def relations_in_space_with(
         self, space: Structure, other: Structure
     ) -> StructureCollection:
-        return StructureCollection(
-            {
-                relation
-                for relation in self.relations
-                if relation in space.contents
-                and other in {relation.start, relation.end}
-            }
+        return self.relations.filter(
+            lambda x: x in space.contents and other in x.arguments
         )
 
     def relations_with(self, other: Structure) -> StructureCollection:
-        return StructureCollection(
-            {
-                relation
-                for relation in self.relations
-                if other in {relation.start, relation.end}
-            }
-        )
+        return self.relations.filter(lambda x: other in x.arguments)
 
     def has_relation_with(self, other: Structure) -> StructureCollection:
         return not self.relations_with(other).is_empty()
@@ -380,27 +362,15 @@ class Structure(ABC):
         return len(self.correspondences_to_space(space)) > 0
 
     def correspondences_with(self, other: Structure):
-        return StructureCollection(
-            {
-                correspondence
-                for correspondence in self.correspondences
-                if correspondence.start == self
-                and correspondence.end == other
-                or correspondence.start == other
-                and correspondence.end == self
-            }
+        return self.correspondences.filter(
+            lambda x: (x.start == self and x.end == other)
+            or (x.start == other and x.end == self)
         )
 
     def correspondences_to_space(self, space: Structure):
-        return StructureCollection(
-            {
-                correspondence
-                for correspondence in self.correspondences
-                if correspondence.start == self
-                and correspondence.end_space == space
-                or correspondence.end == self
-                and correspondence.start_space == space
-            }
+        return self.correspondences.filter(
+            lambda x: (x.start == self and x.end.parent_space == space)
+            or (x.end == self and x.start.parent_space == space)
         )
 
     def is_fully_active(self) -> bool:
@@ -423,13 +393,21 @@ class Structure(ABC):
     def spread_activation(self):
         if not self.is_fully_active():
             return
-        if self.parent_concept is not None:
+        try:
             self.parent_concept.boost_activation(self.activation)
+        except AttributeError:
+            pass
+        try:
+            self.rule.boost_activation(self.activation)
+        except AttributeError:
+            pass
         for link in self.links:
-            try:
+            if not link.is_bidirectional:
+                continue
+            if link.start != self:
+                link.start.boost_activation(link.activation)
+            else:
                 link.end.boost_activation(link.activation)
-            except AttributeError:  # labels have no end
-                pass
 
     def update_activation(self):
         if self._activation_buffer == 0.0:

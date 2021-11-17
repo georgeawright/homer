@@ -11,40 +11,22 @@ from homer.tools import hasinstance
 
 
 @pytest.fixture
-def working_space():
-    space = Mock()
-    space.parent_concept.relevant_value = "value"
-    space.contents = StructureCollection()
-    return space
-
-
-@pytest.fixture
-def parent_concept(working_space):
+def parent_concept():
     concept = Mock()
-    concept.parent_space.instance_in_space.return_value = working_space
+    concept.is_concept = True
+    concept.structure_type = Label
     concept.classifier.classify.return_value = 1.0
     return concept
 
 
 @pytest.fixture
-def bubble_chamber(parent_concept):
-    chamber = Mock()
-    chamber.concepts = {"label": Mock(), "suggest": Mock()}
-    label_concept_space = Mock()
-    label_concept_space.parent_concept.relevant_value = "value"
-    label_concept_space.is_basic_level = True
-    label_concept_space.instance_type = Mock
-    label_concept_space.contents.of_type.return_value = StructureCollection(
-        {parent_concept}
-    )
+def conceptual_space(bubble_chamber, parent_concept):
     space = Mock()
-    space.name = "label concepts"
-    space.contents.of_type.return_value = StructureCollection({label_concept_space})
-    chamber.spaces = StructureCollection({space})
-    top_level_working_space = Mock()
-    top_level_working_space.name = "top level working"
-    chamber.spaces.add(top_level_working_space)
-    return chamber
+    space.contents = StructureCollection({parent_concept})
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(
+        conceptual_space
+    )
+    return space
 
 
 @pytest.fixture
@@ -58,7 +40,6 @@ def target_chunk():
     return chunk
 
 
-@pytest.mark.skip
 def test_bottom_up_codelet_gets_a_concept(bubble_chamber, target_chunk):
     target_structures = {"target_node": target_chunk, "parent_concept": None}
     label_suggester = LabelSuggester(
@@ -69,9 +50,10 @@ def test_bottom_up_codelet_gets_a_concept(bubble_chamber, target_chunk):
     assert label_suggester.parent_concept is not None
 
 
-@pytest.mark.skip
-def test_gives_high_confidence_for_positive_example(bubble_chamber, target_chunk):
-    target_structures = {"target_node": target_chunk, "parent_concept": None}
+def test_gives_high_confidence_for_positive_example(
+    bubble_chamber, target_chunk, parent_concept
+):
+    target_structures = {"target_node": target_chunk, "parent_concept": parent_concept}
     label_suggester = LabelSuggester(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
@@ -82,7 +64,6 @@ def test_gives_high_confidence_for_positive_example(bubble_chamber, target_chunk
     assert isinstance(label_suggester.child_codelets[0], LabelBuilder)
 
 
-@pytest.mark.skip
 def test_gives_low_confidence_bad_example(bubble_chamber, target_chunk):
     parent_concept = Mock()
     parent_concept.classifier.classify.return_value = 0.0
@@ -97,7 +78,6 @@ def test_gives_low_confidence_bad_example(bubble_chamber, target_chunk):
     assert isinstance(label_suggester.child_codelets[0], LabelBuilder)
 
 
-@pytest.mark.skip
 def test_fizzles_when_label_exists(bubble_chamber, target_chunk):
     target_chunk.has_label.return_value = True
     target_structures = {"target_node": target_chunk, "parent_concept": None}

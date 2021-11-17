@@ -1,9 +1,8 @@
 import statistics
 
+from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluators import ViewEvaluator
-from homer.structure_collection import StructureCollection
-from homer.structures.nodes import Chunk
 
 
 class MonitoringViewEvaluator(ViewEvaluator):
@@ -14,7 +13,7 @@ class MonitoringViewEvaluator(ViewEvaluator):
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            StructureCollection({target}),
+            bubble_chamber.new_structure_collection(target),
             structure_type.activation,
         )
 
@@ -31,37 +30,39 @@ class MonitoringViewEvaluator(ViewEvaluator):
 
     def _calculate_confidence(self):
         target_view = self.target_structures.get()
-        chunks_in_interpretation = target_view.interpretation_space.contents.of_type(
-            Chunk
+        original_input_space = self.bubble_chamber.spaces["input"]
+        size_of_input_space = sum(
+            1 for chunk in original_input_space.contents.where(is_raw=True)
+        ) * len(original_input_space.conceptual_spaces)
+        raw_inputs_in_interpretation = {
+            space: set() for space in original_input_space.conceptual_spaces
+        }
+        for member in target_view.members:
+            for argument in member.end.arguments:
+                for raw_member in argument.raw_members:
+                    raw_inputs_in_interpretation[member.conceptual_space].add(
+                        raw_member
+                    )
+        no_of_raw_inputs_in_interpretation = sum(
+            len(raw_input_set)
+            for raw_input_set in raw_inputs_in_interpretation.values()
         )
-        no_of_chunks_with_correspondences_to_raw_input = sum(
-            1 for chunk in chunks_in_interpretation if not chunk.members.is_empty()
-        )
-        proportion_of_interpretation_corresponding_to_raw_input = (
-            (
-                no_of_chunks_with_correspondences_to_raw_input
-                / len(chunks_in_interpretation)
-            )
-            if len(chunks_in_interpretation) != 0
-            else 0
+        proportion_of_raw_inputs_in_interpretation = (
+            no_of_raw_inputs_in_interpretation / size_of_input_space
         )
         average_correspondence_quality = (
             statistics.fmean([member.quality for member in target_view.members])
             if len(target_view.members) > 0
             else 0
         )
-        no_of_monitoring_views_with_text_input = len(
-            self.bubble_chamber.monitoring_views.where(
-                text_space=target_view.text_space
-            )
-        )
-        self.confidence = (
+        # should take into account no of interpretations of text
+        self.confidence = fuzzy.AND(
             statistics.fmean(
                 [
-                    proportion_of_interpretation_corresponding_to_raw_input,
+                    proportion_of_raw_inputs_in_interpretation,
                     average_correspondence_quality,
                 ]
-            )
-            / no_of_monitoring_views_with_text_input
+            ),
+            target_view.output_space.quality,
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

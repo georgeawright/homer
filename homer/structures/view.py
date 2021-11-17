@@ -1,11 +1,13 @@
+import operator
+from typing import List
+
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 from homer.structures.space import Space
-from homer.structures.spaces import Frame, WorkingSpace
+from homer.structures.spaces import ContextualSpace
 
 
 class View(Structure):
@@ -15,47 +17,46 @@ class View(Structure):
         self,
         structure_id: str,
         parent_id: str,
-        location: Location,
+        locations: List[Location],
         members: StructureCollection,
         input_spaces: StructureCollection,
-        output_space: WorkingSpace,
+        output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
+        links_in: StructureCollection,
+        links_out: StructureCollection,
+        parent_spaces: StructureCollection,
     ):
         Structure.__init__(
             self,
             structure_id,
             parent_id,
-            locations=[location],
+            locations=locations,
             quality=quality,
+            links_in=links_in,
+            links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.value = None
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members
+        self.input_node_pairs = []
         self.slot_values = {}
         self.is_view = True
 
     @property
     def raw_input_space(self) -> Space:
-        return StructureCollection(
-            {
-                space
-                for space in self.input_spaces
-                if space.parent_concept.name == "input"
-            }
+        return self.input_spaces.filter(
+            lambda x: x.parent_concept.name == "input"
         ).get()
 
     @property
-    def input_working_spaces(self):
-        return StructureCollection(
-            {space for space in self.input_spaces if not isinstance(space, Frame)}
-        )
+    def input_contextual_spaces(self):
+        return self.input_spaces.where(is_contextual_space=True)
 
     @property
     def input_frames(self):
-        return StructureCollection(
-            {space for space in self.input_spaces if isinstance(space, Frame)}
-        )
+        return self.input_spaces.where(is_frame=True)
 
     @property
     def size(self):
@@ -63,28 +64,16 @@ class View(Structure):
 
     @property
     def slots(self):
-        # TODO: ideally there should be a recursive call to space.slots
-        spaces = StructureCollection.union(
-            self.input_spaces,
-            StructureCollection(
-                {
-                    sub_space
-                    for space in self.input_spaces
-                    for sub_space in space.contents.where(is_space=True)
-                }
-            ),
-        )
-        return StructureCollection(
-            {
-                structure
-                for space in spaces
-                for structure in space.contents
-                if structure.is_slot
-            }
-        )
+        return StructureCollection.union(*[frame.slots for frame in self.input_frames])
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError
+
+    def add(self, correspondence: "Correspondence"):
+        self.members.add(correspondence)
+        for node_pair in correspondence.node_pairs:
+            if node_pair not in self.input_node_pairs:
+                self.input_node_pairs.append(node_pair)
 
     def has_member(
         self,
@@ -104,6 +93,26 @@ class View(Structure):
             ):
                 return True
         return False
+
+    def can_accept_member(self, correspondence: "Correspondence") -> bool:
+        if not StructureCollection.intersection(
+            self.members, correspondence.end.correspondences
+        ).is_empty():
+            return False
+        potential_node_pairs = correspondence.node_pairs
+        if all(
+            potential_node_pair in self.input_node_pairs
+            for potential_node_pair in potential_node_pairs
+        ):
+            return True
+        return not any(
+            operator.xor(
+                potential_node_pair[0] == existing_node_pair[0],
+                potential_node_pair[1] == existing_node_pair[1],
+            )
+            for potential_node_pair in potential_node_pairs
+            for existing_node_pair in self.input_node_pairs
+        )
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])
