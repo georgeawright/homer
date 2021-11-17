@@ -167,7 +167,6 @@ class BubbleChamber:
             Relation: "relations",
         }
         collection_name = collections[type(item)]
-        print(collection_name)
         getattr(self, collection_name).add(item)
 
     def new_conceptual_space(
