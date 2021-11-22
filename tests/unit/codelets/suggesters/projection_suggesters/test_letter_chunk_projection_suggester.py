@@ -2,7 +2,9 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.suggesters.projection_suggesters import WordProjectionSuggester
+from homer.codelets.suggesters.projection_suggesters import (
+    LetterChunkProjectionSuggester,
+)
 from homer.structure_collection import StructureCollection
 
 
@@ -43,7 +45,9 @@ def test_gives_suggests_projection_from_slot(
         "target_view": target_view,
         "target_projectee": target_projectee,
     }
-    suggester = WordProjectionSuggester("", "", bubble_chamber, target_structures, 1.0)
+    suggester = LetterChunkProjectionSuggester(
+        "", "", bubble_chamber, target_structures, 1.0
+    )
     suggester.run()
     assert CodeletResult.SUCCESS == suggester.result
 
@@ -58,7 +62,9 @@ def test_gives_full_confidence_to_project_non_slot(
         "target_view": target_view,
         "target_projectee": target_projectee,
     }
-    suggester = WordProjectionSuggester("", "", bubble_chamber, target_structures, 1.0)
+    suggester = LetterChunkProjectionSuggester(
+        "", "", bubble_chamber, target_structures, 1.0
+    )
     suggester.run()
     assert CodeletResult.SUCCESS == suggester.result
     assert 1.0 == suggester.confidence
@@ -72,6 +78,8 @@ def test_fizzles_if_word_projection_exists(
         "target_view": target_view,
         "target_projectee": target_projectee,
     }
-    suggester = WordProjectionSuggester("", "", bubble_chamber, target_structures, 1.0)
+    suggester = LetterChunkProjectionSuggester(
+        "", "", bubble_chamber, target_structures, 1.0
+    )
     suggester.run()
     assert CodeletResult.FIZZLE == suggester.result

@@ -50,7 +50,6 @@ class Structure(ABC):
         self.is_chunk = False
         self.is_rule = False
         self.is_phrase = False
-        self.is_word = False
         self.is_link = False
         self.is_correspondence = False
         self.is_label = False

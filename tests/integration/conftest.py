@@ -10,7 +10,8 @@ from homer.location import Location
 from homer.locations import TwoPointLocation
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Label, Relation
-from homer.structures.nodes import Chunk, Concept, Lexeme, Rule, Word
+from homer.structures.nodes import Chunk, Concept, Rule
+from homer.structures.nodes.chunks import LetterChunk
 from homer.structures.spaces import ConceptualSpace, ContextualSpace, Frame
 from homer.tools import add_vectors, centroid_euclidean_distance
 from homer.word_form import WordForm
@@ -99,8 +100,8 @@ def grammar_vectors():
         "np": [],
         "vp": [],
         "pronoun": [],
-        "adj": [],
-        "noun": [],
+        "nn": [],
+        "jj": [],
         "jjr": [],
         "cop": [],
         "prep": [],
@@ -182,13 +183,27 @@ def vp_concept(bubble_chamber, grammar_vectors, grammar_space):
 
 
 @pytest.fixture(scope="module")
+def nn_concept(bubble_chamber, grammar_vectors, grammar_space):
+    return bubble_chamber.new_concept(
+        "",
+        "nn",
+        [Location([grammar_vectors["nn"]], grammar_space)],
+        ProximityClassifier(),
+        LetterChunk,
+        Mock(),
+        grammar_space,
+        centroid_euclidean_distance,
+    )
+
+
+@pytest.fixture(scope="module")
 def pronoun_concept(bubble_chamber, grammar_vectors, grammar_space):
     return bubble_chamber.new_concept(
         "",
         "pronoun",
         [Location([grammar_vectors["pronoun"]], grammar_space)],
         ProximityClassifier(),
-        Word,
+        LetterChunk,
         Mock(),
         grammar_space,
         centroid_euclidean_distance,
@@ -202,7 +217,7 @@ def cop_concept(bubble_chamber, grammar_vectors, grammar_space):
         "cop",
         [Location([grammar_vectors["cop"]], grammar_space)],
         ProximityClassifier(),
-        Word,
+        LetterChunk,
         Mock(),
         grammar_space,
         centroid_euclidean_distance,
@@ -210,13 +225,27 @@ def cop_concept(bubble_chamber, grammar_vectors, grammar_space):
 
 
 @pytest.fixture(scope="module")
-def adj_concept(bubble_chamber, grammar_vectors, grammar_space):
+def jj_concept(bubble_chamber, grammar_vectors, grammar_space):
     return bubble_chamber.new_concept(
         "",
-        "adj",
-        [Location([grammar_vectors["adj"]], grammar_space)],
+        "jj",
+        [Location([grammar_vectors["jj"]], grammar_space)],
         ProximityClassifier(),
-        Word,
+        LetterChunk,
+        Mock(),
+        grammar_space,
+        centroid_euclidean_distance,
+    )
+
+
+@pytest.fixture(scope="module")
+def jjr_concept(bubble_chamber, grammar_vectors, grammar_space):
+    return bubble_chamber.new_concept(
+        "",
+        "jjr",
+        [Location([grammar_vectors["jjr"]], grammar_space)],
+        ProximityClassifier(),
+        LetterChunk,
         Mock(),
         grammar_space,
         centroid_euclidean_distance,
@@ -276,182 +305,131 @@ def vp_cop_rule(bubble_chamber, grammar_space, vp_concept, cop_concept):
 
 
 @pytest.fixture(scope="module")
-def it_lexeme(bubble_chamber):
-    return bubble_chamber.new_lexeme("", "it", {WordForm.HEADWORD: "it"})
-
-
-@pytest.fixture(scope="module")
-def is_lexeme(bubble_chamber):
-    return bubble_chamber.new_lexeme("", "is", {WordForm.HEADWORD: "is"})
-
-
-@pytest.fixture(scope="module")
-def in_lexeme(bubble_chamber):
-    return bubble_chamber.new_lexeme("", "in", {WordForm.HEADWORD: "in"})
-
-
-@pytest.fixture(scope="module")
-def the_lexeme(bubble_chamber):
-    return bubble_chamber.new_lexeme("", "the", {WordForm.HEADWORD: "the"})
-
-
-@pytest.fixture(scope="module")
-def than_lexeme(bubble_chamber):
-    return bubble_chamber.new_lexeme("", "than", {WordForm.HEADWORD: "than"})
-
-
-@pytest.fixture(scope="module")
-def north_lexeme(bubble_chamber, north_concept):
-    return bubble_chamber.new_lexeme(
-        "", "north", {WordForm.HEADWORD: "north"}, concepts=[north_concept]
-    )
-
-
-@pytest.fixture(scope="module")
-def south_lexeme(bubble_chamber, south_concept):
-    return bubble_chamber.new_lexeme(
-        "", "south", {WordForm.HEADWORD: "south"}, concepts=[south_concept]
-    )
-
-
-@pytest.fixture(scope="module")
-def warm_lexeme(bubble_chamber, warm_concept):
-    return bubble_chamber.new_lexeme(
-        "", "warm", {WordForm.HEADWORD: "warm"}, concepts=[warm_concept]
-    )
-
-
-@pytest.fixture(scope="module")
-def hotter_lexeme(bubble_chamber, hotter_concept):
-    return bubble_chamber.new_lexeme(
-        "", "hotter", {WordForm.HEADWORD: "hotter"}, concepts=[hotter_concept]
-    )
-
-
-@pytest.fixture(scope="module")
-def it_word(bubble_chamber, grammar_vectors, grammar_space, it_lexeme):
-    return bubble_chamber.new_word(
+def it_word(bubble_chamber, grammar_vectors, grammar_space):
+    return bubble_chamber.new_letter_chunk(
         "",
         "it",
-        it_lexeme,
-        WordForm.HEADWORD,
         [Location([grammar_vectors["pronoun"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
     )
 
 
 @pytest.fixture(scope="module")
-def is_word(bubble_chamber, grammar_vectors, grammar_space, is_lexeme):
-    return bubble_chamber.new_word(
+def is_word(bubble_chamber, grammar_vectors, grammar_space):
+    return bubble_chamber.new_letter_chunk(
         "",
         "is",
-        is_lexeme,
-        WordForm.HEADWORD,
         [Location([grammar_vectors["cop"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
     )
 
 
 @pytest.fixture(scope="module")
-def in_word(bubble_chamber, grammar_vectors, grammar_space, in_lexeme):
-    return bubble_chamber.new_word(
+def in_word(bubble_chamber, grammar_vectors, grammar_space):
+    return bubble_chamber.new_letter_chunk(
         "",
         "in",
-        in_lexeme,
-        WordForm.HEADWORD,
         [Location([grammar_vectors["prep"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
     )
 
 
 @pytest.fixture(scope="module")
-def the_word(bubble_chamber, grammar_vectors, grammar_space, the_lexeme):
-    return bubble_chamber.new_word(
+def the_word(bubble_chamber, grammar_vectors, grammar_space):
+    return bubble_chamber.new_letter_chunk(
         "",
         "the",
-        the_lexeme,
-        WordForm.HEADWORD,
         [Location([grammar_vectors["det"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
     )
 
 
 @pytest.fixture(scope="module")
-def than_word(bubble_chamber, grammar_vectors, grammar_space, than_lexeme):
-    return bubble_chamber.new_word(
+def than_word(bubble_chamber, grammar_vectors, grammar_space):
+    return bubble_chamber.new_letter_chunk(
         "",
         "than",
-        than_lexeme,
-        WordForm.HEADWORD,
         [Location([grammar_vectors["prep"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
     )
 
 
 @pytest.fixture(scope="module")
-def north_word(bubble_chamber, grammar_vectors, grammar_space, north_lexeme):
-    return bubble_chamber.new_word(
+def north_word(
+    bubble_chamber, grammar_vectors, grammar_space, north_concept, nn_concept
+):
+    return bubble_chamber.new_letter_chunk(
         "",
         "north",
-        north_lexeme,
-        WordForm.HEADWORD,
-        [
-            Location(
-                add_vectors([grammar_vectors["adj"]], [grammar_vectors["noun"]]),
-                grammar_space,
-            )
-        ],
+        [Location([grammar_vectors["nn"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
+        meaning_concept=north_concept,
+        grammar_concept=nn_concept,
     )
 
 
 @pytest.fixture(scope="module")
-def south_word(bubble_chamber, grammar_vectors, grammar_space, south_lexeme):
-    return bubble_chamber.new_word(
+def south_word(
+    bubble_chamber, grammar_vectors, grammar_space, south_concept, nn_concept
+):
+    return bubble_chamber.new_letter_chunk(
         "",
         "south",
-        south_lexeme,
-        WordForm.HEADWORD,
-        [
-            Location(
-                add_vectors([grammar_vectors["adj"]], [grammar_vectors["noun"]]),
-                grammar_space,
-            )
-        ],
+        [Location([grammar_vectors["nn"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
+        meaning_concept=south_concept,
+        grammar_concept=nn_concept,
     )
 
 
 @pytest.fixture(scope="module")
-def warm_word(bubble_chamber, grammar_vectors, grammar_space, warm_lexeme):
-    return bubble_chamber.new_word(
+def warm_word(
+    bubble_chamber,
+    grammar_vectors,
+    grammar_space,
+    warm_concept,
+    jj_concept,
+    jjr_concept,
+):
+    word = bubble_chamber.new_letter_chunk(
         "",
         "warm",
-        warm_lexeme,
-        WordForm.HEADWORD,
         [Location([grammar_vectors["adj"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
+        meaning_concept=warm_concept,
+        grammar_concept=jj_concept,
     )
+    bubble_chamber.new_relation("", warm_concept, word, jjr_concept, [], 1.0)
+    return word
 
 
 @pytest.fixture(scope="module")
-def hotter_word(bubble_chamber, grammar_vectors, grammar_space, hotter_lexeme):
+def hott_word(bubble_chamber, grammar_vectors, grammar_space, hot_concept, jjr_concept):
     return bubble_chamber.new_word(
         "",
         "hotter",
-        hotter_lexeme,
-        WordForm.HEADWORD,
         [Location([grammar_vectors["jjr"]], grammar_space)],
+        bubble_chamber.new_structure_collection(),
         grammar_space,
         1,
+        meaning_concept=hot_concept,
+        grammar_concept=jjr_concept,
     )
 
 

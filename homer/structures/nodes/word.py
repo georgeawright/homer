@@ -9,10 +9,8 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
 from homer.structures.spaces import ContextualSpace
-from homer.word_form import WordForm
 
 from .concept import Concept
-from .lexeme import Lexeme
 
 
 class Word(Node):
@@ -20,9 +18,8 @@ class Word(Node):
         self,
         structure_id: str,
         parent_id: str,
-        name: str,
-        lexeme: Union[Lexeme, None],
-        word_form: WordForm,
+        name: Union[str, None],
+        members: StructureCollection,  # labels and relations eg HOT and MORE
         locations: List[Location],
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
@@ -44,7 +41,7 @@ class Word(Node):
         )
         self.name = name
         self.lexeme = lexeme
-        self.word_form = word_form
+        self.members = members
         self.is_word = True
         self.super_chunks = super_chunks
 
