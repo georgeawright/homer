@@ -335,8 +335,13 @@ class Structure(ABC):
     def relations_with(self, other: Structure) -> StructureCollection:
         return self.relations.filter(lambda x: other in x.arguments)
 
-    def has_relation_with(self, other: Structure) -> StructureCollection:
-        return not self.relations_with(other).is_empty()
+    def has_relation_with(
+        self, other: Structure, parent_concept: Structure = None
+    ) -> StructureCollection:
+        relations = self.relations_with(other)
+        if parent_concept is not None:
+            relations = relations.where(parent_concept=parent_concept)
+        return not relations.is_empty()
 
     def relation_in_space_of_type_with(
         self, space: Structure, concept: Structure, start: Structure, end: Structure

@@ -47,8 +47,7 @@ def test_simplex_view_processing(
     in_word,
     the_word,
     than_word,
-    hotter_lexeme,
-    hotter_word,
+    hott_word,
     comparison_frame,
 ):
     input_space = ContextualSpace(

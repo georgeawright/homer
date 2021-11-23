@@ -43,6 +43,7 @@ from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
 
+@pytest.mark.skip
 def test_reverse_simplex_view_processing(
     bubble_chamber,
     input_concept,
@@ -53,14 +54,12 @@ def test_reverse_simplex_view_processing(
     same_concept,
     hot_concept,
     cold_concept,
-    hotter_concept,
     it_word,
     is_word,
     in_word,
     the_word,
     than_word,
-    hotter_lexeme,
-    hotter_word,
+    hott_word,
     south_word,
     north_word,
     comparison_frame,
