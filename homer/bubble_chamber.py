@@ -19,7 +19,6 @@ from .structures.nodes import Chunk, Concept, Rule
 from .structures.nodes.chunks import LetterChunk
 from .structures.spaces import ConceptualSpace, ContextualSpace, Frame
 from .structures.views import SimplexView, MonitoringView
-from .word_form import WordForm
 
 
 class BubbleChamber:
