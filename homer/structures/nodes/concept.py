@@ -54,23 +54,6 @@ class Concept(Node):
     def prototype(self) -> list:
         return self.location.coordinates
 
-    def letter_chunk_forms(
-        self, grammar_concept: Concept = None
-    ) -> StructureCollection:
-        return StructureCollection.union(
-            *[
-                link.arguments.excluding(self)
-                for link in self.links_out.filter(
-                    lambda x: x.end.is_word
-                    and (
-                        x.parent_concept == grammar_concept
-                        if grammar_concept is not None
-                        else True
-                    )
-                )
-            ]
-        )
-
     def compatibility_with(self, other: Concept) -> FloatBetweenOneAndZero:
         if (
             self == other

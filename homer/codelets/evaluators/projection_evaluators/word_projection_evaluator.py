@@ -5,14 +5,12 @@ from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
 
-class LetterChunkProjectionEvaluator(ProjectionEvaluator):
+class WordProjectionEvaluator(ProjectionEvaluator):
     @classmethod
     def get_follow_up_class(cls) -> type:
-        from homer.codelets.selectors.projection_selectors import (
-            LetterChunkProjectionSelector,
-        )
+        from homer.codelets.selectors.projection_selectors import WordProjectionSelector
 
-        return LetterChunkProjectionSelector
+        return WordProjectionSelector
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):

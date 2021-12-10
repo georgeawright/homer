@@ -12,13 +12,12 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
-from homer.structures.nodes import Chunk
+from homer.structures.nodes import Chunk, Concept, Lexeme, Rule, Word
 from homer.structures.spaces import ConceptualSpace, ContextualSpace
 from homer.tools import centroid_euclidean_distance
 from homer.word_form import WordForm
 
 
-@pytest.mark.skip
 def test_parsing_of_text(
     bubble_chamber,
     grammar_concept,

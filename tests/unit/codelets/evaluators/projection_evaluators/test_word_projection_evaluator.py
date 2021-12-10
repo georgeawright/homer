@@ -1,9 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators.projection_evaluators import (
-    LetterChunkProjectionEvaluator,
-)
+from homer.codelets.evaluators.projection_evaluators import WordProjectionEvaluator
 from homer.structure_collection import StructureCollection
 
 
@@ -40,7 +38,7 @@ def test_changes_target_structure_quality(
         label_to_word_correspondence, slot_to_word_correspondence
     )
 
-    evaluator = LetterChunkProjectionEvaluator(
+    evaluator = WordProjectionEvaluator(
         Mock(),
         Mock(),
         bubble_chamber,
@@ -60,7 +58,7 @@ def test_gives_function_word_maximum_quality(bubble_chamber):
     correspondee = Mock()
     correspondee.labels = bubble_chamber.new_structure_collection()
     word.correspondees = bubble_chamber.new_structure_collection(correspondee)
-    evaluator = LetterChunkProjectionEvaluator(
+    evaluator = WordProjectionEvaluator(
         Mock(),
         Mock(),
         bubble_chamber,

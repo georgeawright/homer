@@ -1,16 +1,15 @@
 from homer.location import Location
 from homer.codelets.builders import ProjectionBuilder
-from homer.structure_collection_keys import activation
 
 
-class LetterChunkProjectionBuilder(ProjectionBuilder):
+class WordProjectionBuilder(ProjectionBuilder):
     @classmethod
     def get_follow_up_class(cls) -> type:
         from homer.codelets.evaluators.projection_evaluators import (
-            LetterChunkProjectionEvaluator,
+            WordProjectionEvaluator,
         )
 
-        return LetterChunkProjectionEvaluator
+        return WordProjectionEvaluator
 
     @property
     def _structure_concept(self):
@@ -18,15 +17,12 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
 
     def _process_structure(self):
         if self.target_projectee.is_slot:
-            meaning_concept = self.target_view.slot_values[
+            word_concept = self.target_view.slot_values[
                 self.frame_correspondee.structure_id
             ]
-            grammar_concept = self.target_projectee.labels_in_space(
-                self.bubble_chamber.conceptual_spaces["grammar"]
-            ).get()
-            abstract_word = meaning_concept.letter_chunk_forms(grammar_concept).get(
-                key=activation
-            )
+            lexeme = word_concept.lexemes.get()
+            word_form = self.target_projectee.word_form
+            abstract_word = self.bubble_chamber.words[lexeme.word_forms[word_form]]
             self.target_view.slot_values[
                 self.target_projectee.structure_id
             ] = abstract_word.name

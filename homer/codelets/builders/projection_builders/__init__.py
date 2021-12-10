@@ -1,4 +1,4 @@
 from .chunk_projection_builder import ChunkProjectionBuilder
 from .label_projection_builder import LabelProjectionBuilder
-from .letter_chunk_projection_builder import LetterChunkProjectionBuilder
 from .relation_projection_builder import RelationProjectionBuilder
+from .word_projection_builder import WordProjectionBuilder

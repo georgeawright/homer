@@ -15,8 +15,7 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Concept, Rule
-from .structures.nodes.chunks import LetterChunk
+from .structures.nodes import Chunk, Concept, Lexeme, Rule, Word
 from .structures.spaces import ConceptualSpace, ContextualSpace, Frame
 from .structures.views import SimplexView, MonitoringView
 from .word_form import WordForm
@@ -33,8 +32,9 @@ class BubbleChamber:
         self.frame_instances = None
 
         self.concepts = None
+        self.lexemes = None
         self.chunks = None
-        self.letter_chunks = None
+        self.words = None
         self.rules = None
 
         self.concept_links = None
@@ -56,8 +56,9 @@ class BubbleChamber:
         bubble_chamber.frames = bubble_chamber.new_structure_collection()
         bubble_chamber.frame_instances = bubble_chamber.new_structure_collection()
         bubble_chamber.concepts = bubble_chamber.new_structure_collection()
+        bubble_chamber.lexemes = bubble_chamber.new_structure_collection()
         bubble_chamber.chunks = bubble_chamber.new_structure_collection()
-        bubble_chamber.letter_chunks = bubble_chamber.new_structure_collection()
+        bubble_chamber.words = bubble_chamber.new_structure_collection()
         bubble_chamber.rules = bubble_chamber.new_structure_collection()
         bubble_chamber.concept_links = bubble_chamber.new_structure_collection()
         bubble_chamber.correspondences = bubble_chamber.new_structure_collection()
@@ -77,7 +78,7 @@ class BubbleChamber:
         return self.new_structure_collection(
             *[
                 node
-                for node in chain(self.chunks, self.letter_chunks)
+                for node in chain(self.chunks, self.words)
                 if node.parent_space.parent_concept
                 in (self.concepts["input"], self.concepts["text"])
                 and not node.parent_space.is_frame
@@ -114,9 +115,9 @@ class BubbleChamber:
             self.concepts,
             self.correspondences,
             self.labels,
-            self.letter_chunks,
             self.relations,
             self.views,
+            self.words,
             self.concept_links,
             self.rules,
         )
@@ -157,8 +158,9 @@ class BubbleChamber:
             # nodes
             Chunk: "chunks",
             Concept: "concepts",
-            LetterChunk: "letter_chunks",
+            Lexeme: "lexemes",
             Rule: "rules",
+            Word: "words",
             # links
             Correspondence: "correspondences",
             Label: "labels",
@@ -279,52 +281,6 @@ class BubbleChamber:
         self.add(chunk)
         return chunk
 
-    def new_letter_chunk(
-        self,
-        parent_id: str,
-        name: Union[str, None],
-        locations: List[Location],
-        members: StructureCollection,
-        parent_space: Space,
-        quality: FloatBetweenOneAndZero,
-        left_branch: StructureCollection = None,
-        right_branch: StructureCollection = None,
-        rule: Rule = None,
-        meaning_concept: Concept = None,
-        grammar_concept: Concept = None,
-    ) -> Chunk:
-        if left_branch is None:
-            left_branch = self.new_structure_collection()
-        if right_branch is None:
-            right_branch = self.new_structure_collection()
-        parent_spaces = self.new_structure_collection(
-            *[location.space for location in locations]
-        )
-        letter_chunk = LetterChunk(
-            structure_id=ID.new(Chunk),
-            parent_id=parent_id,
-            name=name,
-            locations=locations,
-            members=members,
-            parent_space=parent_space,
-            quality=quality,
-            left_branch=left_branch,
-            right_branch=right_branch,
-            rule=rule,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
-            parent_spaces=parent_spaces,
-            super_chunks=self.new_structure_collection(),
-        )
-        for member in members:
-            member.super_chunks.add(letter_chunk)
-        self.add(letter_chunk)
-        if meaning_concept is not None:
-            self.new_relation(
-                parent_id, meaning_concept, letter_chunk, grammar_concept, [], 1.0
-            )
-        return letter_chunk
-
     def new_concept(
         self,
         parent_id: str,
@@ -360,6 +316,35 @@ class BubbleChamber:
         )
         self.add(concept)
         return concept
+
+    def new_lexeme(
+        self,
+        parent_id: str,
+        headword: str,
+        word_forms: dict,
+        concepts: List[Concept] = None,
+    ) -> Lexeme:
+        concepts = [] if concepts is None else concepts
+        lexeme = Lexeme(
+            structure_id=ID.new(Lexeme),
+            parent_id=parent_id,
+            headword=headword,
+            word_forms=word_forms,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=self.new_structure_collection(),
+        )
+        self.add(lexeme)
+        for concept in concepts:
+            self.new_relation(
+                parent_id=parent_id,
+                start=concept,
+                end=lexeme,
+                parent_concept=None,
+                locations=[],
+                quality=1.0,
+            )
+        return lexeme
 
     def new_rule(
         self,
@@ -411,6 +396,36 @@ class BubbleChamber:
             )
         self.add(rule)
         return rule
+
+    def new_word(
+        self,
+        parent_id: str,
+        name: str,
+        lexeme: Union[Lexeme, None],
+        word_form: WordForm,
+        locations: List[Location],
+        parent_space: Space,
+        quality: FloatBetweenOneAndZero,
+    ) -> Word:
+        parent_spaces = self.new_structure_collection(
+            *[location.space for location in locations]
+        )
+        word = Word(
+            structure_id=ID.new(Word),
+            parent_id=parent_id,
+            name=name,
+            lexeme=lexeme,
+            word_form=word_form,
+            locations=locations,
+            parent_space=parent_space,
+            quality=quality,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=parent_spaces,
+            super_chunks=self.new_structure_collection(),
+        )
+        self.add(word)
+        return word
 
     def new_correspondence(
         self,

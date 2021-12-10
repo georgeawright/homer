@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.selectors.projection_selectors import LetterChunkProjectionSelector
+from homer.codelets.selectors.projection_selectors import WordProjectionSelector
 from homer.structure_collection import StructureCollection
 
 
@@ -21,7 +21,7 @@ def test_word_is_boosted(bubble_chamber):
     correspondence_from_frame.quality = 1.0
     correspondence_from_frame.activation = 1.0
 
-    selector = LetterChunkProjectionSelector(
+    selector = WordProjectionSelector(
         Mock(),
         Mock(),
         bubble_chamber,

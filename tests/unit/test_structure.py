@@ -1,9 +1,10 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.nodes import Lexeme
 
 
 def test_correspondences_returns_correspondences(bubble_chamber):
@@ -89,6 +90,37 @@ def test_labels_returns_labels(bubble_chamber):
     assert number_of_labels == len(structure.labels)
     for label in structure.labels:
         assert isinstance(label, Label)
+
+
+def test_lexemes_returns_lexemes(bubble_chamber):
+    structure = Structure(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        Mock(),
+    )
+    number_of_lexemes = 10
+    for _ in range(number_of_lexemes):
+        lexeme = Lexeme(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+        relation = Relation(
+            Mock(),
+            Mock(),
+            structure,
+            bubble_chamber.new_structure_collection(structure, lexeme),
+            Mock(),
+            None,
+            Mock(),
+            Mock(),
+            Mock(),
+            Mock(),
+        )
+        structure.links_out.add(relation)
+    assert number_of_lexemes == len(structure.lexemes)
+    for lexeme in structure.lexemes:
+        assert isinstance(lexeme, Lexeme)
 
 
 def test_labels_in_space(bubble_chamber):
