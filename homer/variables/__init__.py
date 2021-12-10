@@ -1,3 +1,0 @@
-from .concept_variable import ConceptVariable
-from .conceptual_space_variable import ConceptualSpaceVariable
-from .number_variable import NumberVariable
