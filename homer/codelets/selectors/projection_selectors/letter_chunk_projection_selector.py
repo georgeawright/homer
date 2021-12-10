@@ -1,9 +1,11 @@
 from homer.codelets.selectors import ProjectionSelector
-from homer.codelets.suggesters.projection_suggesters import WordProjectionSuggester
+from homer.codelets.suggesters.projection_suggesters import (
+    LetterChunkProjectionSuggester,
+)
 from homer.structure_collection_keys import uncorrespondedness
 
 
-class WordProjectionSelector(ProjectionSelector):
+class LetterChunkProjectionSelector(ProjectionSelector):
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]
@@ -21,9 +23,9 @@ class WordProjectionSelector(ProjectionSelector):
             ]
         ).get()
         frame = correspondence_from_frame.start.parent_space
-        new_target = frame.contents.where(is_word=True).get(key=uncorrespondedness)
+        new_target = frame.contents.where(is_chunk=True).get(key=uncorrespondedness)
         self.child_codelets.append(
-            WordProjectionSuggester.spawn(
+            LetterChunkProjectionSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 {

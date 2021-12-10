@@ -2,11 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from homer.codelet_result import CodeletResult
-from homer.codelets.builders.projection_builders import WordProjectionBuilder
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence
-from homer.structures.nodes import Word
-from homer.tools import hasinstance
+from homer.codelets.builders.projection_builders import LetterChunkProjectionBuilder
 
 
 @pytest.fixture
@@ -38,6 +34,7 @@ def abstract_word(bubble_chamber):
     bubble_chamber.words = bubble_chamber.new_structure_collection()
     word = Mock()
     word.name = "word"
+    word.activation = 1.0
     bubble_chamber.words.add(word)
     word_copy = Mock()
     word_copy.locations = []
@@ -46,16 +43,11 @@ def abstract_word(bubble_chamber):
 
 
 @pytest.fixture
-def lexeme(abstract_word, target_projectee):
-    lexeme = Mock()
-    lexeme.word_forms = {target_projectee.word_form: abstract_word.name}
-    return lexeme
-
-
-@pytest.fixture
-def word_concept(bubble_chamber, lexeme):
+def word_concept(bubble_chamber, abstract_word):
     concept = Mock()
-    concept.lexemes = bubble_chamber.new_structure_collection(lexeme)
+    concept.letter_chunk_forms.return_value = bubble_chamber.new_structure_collection(
+        abstract_word
+    )
     return concept
 
 
@@ -95,7 +87,9 @@ def test_projects_slot_into_output_space(
         "non_frame": Mock(),
         "non_frame_correspondee": Mock(),
     }
-    builder = WordProjectionBuilder("", "", bubble_chamber, target_structures, 1.0)
+    builder = LetterChunkProjectionBuilder(
+        "", "", bubble_chamber, target_structures, 1.0
+    )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
 
@@ -113,7 +107,9 @@ def test_projects_non_slot_word_into_output_space(
         "non_frame": Mock(),
         "non_frame_correspondee": Mock(),
     }
-    builder = WordProjectionBuilder("", "", bubble_chamber, target_structures, 1.0)
+    builder = LetterChunkProjectionBuilder(
+        "", "", bubble_chamber, target_structures, 1.0
+    )
     builder.run()
     assert CodeletResult.SUCCESS == builder.result
 
@@ -131,6 +127,8 @@ def test_fizzles_if_word_projection_exists(
         "non_frame": Mock(),
         "non_frame_correspondee": Mock(),
     }
-    builder = WordProjectionBuilder("", "", bubble_chamber, target_structures, 1.0)
+    builder = LetterChunkProjectionBuilder(
+        "", "", bubble_chamber, target_structures, 1.0
+    )
     builder.run()
     assert CodeletResult.FIZZLE == builder.result

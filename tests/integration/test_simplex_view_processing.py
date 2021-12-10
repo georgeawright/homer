@@ -4,16 +4,20 @@ from unittest.mock import Mock
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import CorrespondenceBuilder
-from homer.codelets.builders.projection_builders import WordProjectionBuilder
+from homer.codelets.builders.projection_builders import LetterChunkProjectionBuilder
 from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators import CorrespondenceEvaluator
-from homer.codelets.evaluators.projection_evaluators import WordProjectionEvaluator
+from homer.codelets.evaluators.projection_evaluators import (
+    LetterChunkProjectionEvaluator,
+)
 from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.codelets.selectors import CorrespondenceSelector
-from homer.codelets.selectors.projection_selectors import WordProjectionSelector
+from homer.codelets.selectors.projection_selectors import LetterChunkProjectionSelector
 from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.codelets.suggesters import CorrespondenceSuggester
-from homer.codelets.suggesters.projection_suggesters import WordProjectionSuggester
+from homer.codelets.suggesters.projection_suggesters import (
+    LetterChunkProjectionSuggester,
+)
 from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from homer.id import ID
 from homer.location import Location
@@ -241,7 +245,7 @@ def test_simplex_view_processing(
     # project words into output
     frame = view.input_spaces.where(is_frame=True).get()
     target_word_1 = frame.output_space.contents.where(is_word=True, is_slot=False).get()
-    word_projection_suggester_1 = WordProjectionSuggester.spawn(
+    word_projection_suggester_1 = LetterChunkProjectionSuggester.spawn(
         "",
         bubble_chamber,
         {"target_view": view, "target_projectee": target_word_1},
@@ -251,7 +255,7 @@ def test_simplex_view_processing(
     assert CodeletResult.SUCCESS == word_projection_suggester_1.result
 
     word_projection_builder_1 = word_projection_suggester_1.child_codelets[0]
-    assert isinstance(word_projection_builder_1, WordProjectionBuilder)
+    assert isinstance(word_projection_builder_1, LetterChunkProjectionBuilder)
     word_projection_builder_1.run()
     assert CodeletResult.SUCCESS == word_projection_builder_1.result
     assert 1 == len(view.output_space.contents.where(is_word=True))
@@ -260,13 +264,13 @@ def test_simplex_view_processing(
     original_word_1_activation = word_1.activation
 
     word_projection_evaluator_1 = word_projection_builder_1.child_codelets[0]
-    assert isinstance(word_projection_evaluator_1, WordProjectionEvaluator)
+    assert isinstance(word_projection_evaluator_1, LetterChunkProjectionEvaluator)
     word_projection_evaluator_1.run()
     assert CodeletResult.SUCCESS == word_projection_evaluator_1.result
     assert word_1.quality > original_word_1_quality
 
     word_projection_selector_1 = word_projection_evaluator_1.child_codelets[0]
-    assert isinstance(word_projection_selector_1, WordProjectionSelector)
+    assert isinstance(word_projection_selector_1, LetterChunkProjectionSelector)
     word_projection_selector_1.run()
     assert CodeletResult.SUCCESS == word_projection_selector_1.result
     word_1.update_activation()
@@ -277,7 +281,7 @@ def test_simplex_view_processing(
         frame.output_space
     ).get()
     target_word_2 = frame_correspondence.end
-    word_projection_suggester_2 = WordProjectionSuggester.spawn(
+    word_projection_suggester_2 = LetterChunkProjectionSuggester.spawn(
         "",
         bubble_chamber,
         {"target_view": view, "target_projectee": target_word_2},
@@ -287,7 +291,7 @@ def test_simplex_view_processing(
     assert CodeletResult.SUCCESS == word_projection_suggester_2.result
 
     word_projection_builder_2 = word_projection_suggester_2.child_codelets[0]
-    assert isinstance(word_projection_builder_2, WordProjectionBuilder)
+    assert isinstance(word_projection_builder_2, LetterChunkProjectionBuilder)
     word_projection_builder_2.run()
     assert CodeletResult.SUCCESS == word_projection_builder_2.result
     assert 2 == len(view.output_space.contents.where(is_word=True))
@@ -296,13 +300,13 @@ def test_simplex_view_processing(
     original_word_2_activation = word_2.activation
 
     word_projection_evaluator_2 = word_projection_builder_2.child_codelets[0]
-    assert isinstance(word_projection_evaluator_2, WordProjectionEvaluator)
+    assert isinstance(word_projection_evaluator_2, LetterChunkProjectionEvaluator)
     word_projection_evaluator_2.run()
     assert CodeletResult.SUCCESS == word_projection_evaluator_2.result
     assert word_2.quality > original_word_2_quality
 
     word_projection_selector_2 = word_projection_evaluator_2.child_codelets[0]
-    assert isinstance(word_projection_selector_2, WordProjectionSelector)
+    assert isinstance(word_projection_selector_2, LetterChunkProjectionSelector)
     word_projection_selector_2.run()
     assert CodeletResult.SUCCESS == word_projection_selector_2.result
     word_2.update_activation()
