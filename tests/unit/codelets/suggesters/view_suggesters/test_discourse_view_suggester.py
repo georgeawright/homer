@@ -5,7 +5,7 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders.view_builders import DiscourseViewBuilder
 from homer.codelets.suggesters.view_suggesters import DiscourseViewSuggester
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import Frame
+from homer.structures import Frame
 from homer.structures.views import DiscourseView
 from homer.tools import hasinstance
 

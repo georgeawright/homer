@@ -13,11 +13,11 @@ from .problem import Problem
 from .random_machine import RandomMachine
 from .structure import Structure
 from .structure_collection import StructureCollection
-from .structures import Space, View
+from .structures import Frame, Space, View
 from .structures.links import Correspondence, Label, Relation
 from .structures.nodes import Chunk, Concept, Rule
 from .structures.nodes.chunks import LetterChunk
-from .structures.spaces import ConceptualSpace, ContextualSpace, Frame
+from .structures.spaces import ConceptualSpace, ContextualSpace
 from .structures.views import SimplexView, MonitoringView
 
 
@@ -223,6 +223,7 @@ class BubbleChamber:
         parent_id: str,
         name: str,
         parent_concept: Concept,
+        parent_frame: Frame,
         contents: StructureCollection,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
@@ -232,6 +233,7 @@ class BubbleChamber:
             parent_id=parent_id,
             name=name,
             parent_concept=parent_concept,
+            parent_frame=parent_frame,
             contents=contents,
             input_space=input_space,
             output_space=output_space,

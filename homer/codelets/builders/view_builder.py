@@ -5,7 +5,7 @@ from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import Frame
+from homer.structures import Frame
 
 
 class ViewBuilder(Builder):

@@ -37,6 +37,7 @@ class Frame(Structure):
         self.sub_frames = sub_frames
         self.input_space = input_space
         self.output_space = output_space
+        self.slot_values = {}
         self.is_frame = True
 
     @property

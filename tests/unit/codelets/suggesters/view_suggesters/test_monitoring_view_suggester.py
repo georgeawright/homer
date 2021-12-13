@@ -5,7 +5,7 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders.view_builders import MonitoringViewBuilder
 from homer.codelets.suggesters.view_suggesters import MonitoringViewSuggester
 from homer.structure_collection import StructureCollection
-from homer.structures.spaces import Frame
+from homer.structures import Frame
 from homer.structures.views import MonitoringView
 from homer.tools import hasinstance
 
