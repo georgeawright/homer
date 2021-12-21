@@ -11,7 +11,6 @@ class HyperParameters:
 
     # TODO: these ought to be removed when suggesters are implemented
     CONFIDENCE_THRESHOLD = 0.5
-    EVALUATOR_CONFIDENCE_THRESHOLD = 0.0
 
     # TODO: these ought to be specific to each conceptual space
     DISTANCE_TO_PROXIMITY_WEIGHT = 1.5
