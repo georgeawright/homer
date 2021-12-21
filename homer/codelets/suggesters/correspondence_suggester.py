@@ -121,6 +121,8 @@ class CorrespondenceSuggester(Suggester):
         return self.bubble_chamber.concepts["correspondence"]
 
     def _passes_preliminary_checks(self):
+        # TODO: change as no longer needs to work with words
+        # TODO: also needs to be possible to construct correspondence from small frame element to big frame element
         self.target_view = self._target_structures["target_view"]
         self.target_structure_one = self._target_structures["target_structure_one"]
         self.target_structure_two = self._target_structures["target_structure_two"]

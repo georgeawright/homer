@@ -97,10 +97,13 @@ class CorrespondenceBuilder(Builder):
         self.correspondence.structure_id = ID.new(Correspondence)
         try:
             if self.correspondence.slot_argument.is_word:
+                # TODO: words will no longer be corresponded, only their labels
                 self._fill_in_word_slot()
             if self.correspondence.slot_argument.is_label:
+                # TODO: relation needs to be built from slot parent concept to actual concept
                 self._fill_in_label_slot()
             if self.correspondence.slot_argument.is_relation:
+                # TODO: probably the same as for label
                 self._fill_in_relation_slot()
         except MissingStructureError:
             pass

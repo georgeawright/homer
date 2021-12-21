@@ -52,6 +52,9 @@ class LabelBuilder(Builder):
         return not self.target_node.has_label(self.parent_concept)
 
     def _process_structure(self):
+        # TODO: if labeling a link that already has a label, you need to copy the label and label the copy
+        # TODO: project items into spaces if not in them
+        # TODO: create space if doesn't exist?
         parent_concept_coordinates = self.parent_concept.location_in_space(
             self.parent_concept.parent_space
         ).coordinates

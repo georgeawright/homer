@@ -56,6 +56,7 @@ class LabelSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
+        # TODO: allow labeling of labels and relations
         target = bubble_chamber.input_nodes.get(key=labeling_exigency)
         urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(

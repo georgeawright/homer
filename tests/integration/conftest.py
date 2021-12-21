@@ -16,6 +16,8 @@ from homer.structures.spaces import ConceptualSpace, ContextualSpace, Frame
 from homer.tools import add_vectors, centroid_euclidean_distance
 from homer.word_form import WordForm
 
+# use a single string + interpreter to define testing evironment
+
 
 @pytest.fixture(scope="module")
 def bubble_chamber():

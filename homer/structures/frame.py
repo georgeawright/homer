@@ -4,6 +4,8 @@ from homer.errors import MissingStructureError
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
+# TODO: allow frames to be defined as children of other frames with only parts overwritten
+
 
 class Frame(Structure):
     def __init__(
@@ -14,6 +16,7 @@ class Frame(Structure):
         parent_concept: "Concept",
         parent_frame: Frame,
         sub_frames: StructureCollection,
+        concepts: StructureCollection,
         input_space: "ContextualSpace",
         output_space: "ContextualSpace",
         links_in: StructureCollection,
@@ -35,6 +38,7 @@ class Frame(Structure):
         self._parent_concept = parent_concept
         self.parent_frame = parent_frame
         self.sub_frames = sub_frames
+        self.concepts = concepts
         self.input_space = input_space
         self.output_space = output_space
         self.slot_values = {}

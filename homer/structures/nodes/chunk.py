@@ -140,6 +140,7 @@ class Chunk(Node):
             ]
         ).excluding(self)
 
+    # TODO: stop using randomness in here
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:

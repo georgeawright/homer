@@ -7,6 +7,10 @@ from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 
+# TODO: also need to implement instances based on bubble chamber structures
+# definitely: unhappiness and exigency
+# possibly: activation and quality
+
 
 class Factory(Codelet):
     """Spawns a new codelet and a copy of itself"""

@@ -25,6 +25,7 @@ class ViewSelector(Selector):
         return True
 
     def _engender_follow_up(self):
+        # spawn a top-down view suggester with copy of winning view's frame
         self.child_codelets.append(
             self.get_follow_up_class().make(self.codelet_id, self.bubble_chamber)
         )

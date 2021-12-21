@@ -218,6 +218,7 @@ class BubbleChamber:
         self.add(space)
         return space
 
+    # TODO: allow frames to be defined as children of other frames with only parts overwritten
     def new_frame(
         self,
         parent_id: str,

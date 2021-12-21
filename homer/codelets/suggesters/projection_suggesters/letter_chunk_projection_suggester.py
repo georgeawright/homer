@@ -38,6 +38,8 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
             urgency,
         )
 
+    # TODO: reduce urgency of builder if the letter chunk is the end of a sameness relation
+
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["word"]

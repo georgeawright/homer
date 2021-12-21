@@ -26,6 +26,7 @@ class LabelEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
+        # TODO: label labels affects their quality. Use fuzzy.OR
         target_label = self.target_structures.get()
         self.confidence = target_label.parent_concept.classifier.classify(
             start=target_label.start,
