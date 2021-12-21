@@ -9,6 +9,7 @@ from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Link, Space
 from homer.structures.nodes import Concept
+from homer.structures.spaces import ConceptualSpace
 
 
 class Relation(Link):
@@ -19,6 +20,7 @@ class Relation(Link):
         start: Structure,
         arguments: StructureCollection,
         parent_concept: Concept,
+        conceptual_space: ConceptualSpace,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
         links_in: StructureCollection,
@@ -39,6 +41,7 @@ class Relation(Link):
             links_out=links_out,
             parent_spaces=parent_spaces,
         )
+        self.conceptual_space = conceptual_space
         self.is_relation = True
         self.is_bidirectional = is_bidirectional
 
@@ -87,6 +90,7 @@ class Relation(Link):
             start=start,
             arguments=bubble_chamber.new_structure_collection(start, end),
             parent_concept=self.parent_concept,
+            conceptual_space=self.conceptual_space,
             locations=new_locations,
             quality=self.quality,
             links_in=bubble_chamber.new_structure_collection(),
