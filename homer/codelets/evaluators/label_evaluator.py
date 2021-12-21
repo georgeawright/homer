@@ -1,5 +1,7 @@
+from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
+from homer.errors import MissingStructureError
 
 
 class LabelEvaluator(Evaluator):
@@ -26,10 +28,21 @@ class LabelEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        # TODO: label labels affects their quality. Use fuzzy.OR
         target_label = self.target_structures.get()
-        self.confidence = target_label.parent_concept.classifier.classify(
-            start=target_label.start,
-            concept=target_label.parent_concept,
+        labels = []
+        while target_label is not None:
+            labels.append(target_label)
+            try:
+                target_label = target_label.labels.get()
+            except MissingStructureError:
+                target_label = None
+                print(target_label)
+        self.confidence = fuzzy.OR(
+            *[
+                label.parent_concept.classifier.classify(
+                    start=label.start, concept=label.parent_concept
+                )
+                for label in labels
+            ]
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
