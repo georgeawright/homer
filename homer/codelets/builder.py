@@ -3,7 +3,6 @@ from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
-from homer.structure_collection import StructureCollection
 from homer.structures.nodes import Concept
 
 
