@@ -251,10 +251,10 @@ class BubbleChamber:
         locations: List[Location],
         members: StructureCollection,
         parent_space: Space,
-        quality: FloatBetweenOneAndZero,
-        left_branch: StructureCollection,
-        right_branch: StructureCollection,
-        rule: Rule,
+        quality: FloatBetweenOneAndZero = 0.0,
+        left_branch: StructureCollection = None,
+        right_branch: StructureCollection = None,
+        rule: Rule = None,
         is_raw: bool = False,
     ) -> Chunk:
         parent_spaces = self.new_structure_collection(
@@ -288,7 +288,7 @@ class BubbleChamber:
         locations: List[Location],
         members: StructureCollection,
         parent_space: Space,
-        quality: FloatBetweenOneAndZero,
+        quality: FloatBetweenOneAndZero = 0.0,
         left_branch: StructureCollection = None,
         right_branch: StructureCollection = None,
         rule: Rule = None,
@@ -423,7 +423,7 @@ class BubbleChamber:
         parent_concept: Concept,
         conceptual_space: ConceptualSpace,
         parent_view: View,
-        quality: FloatBetweenOneAndZero,
+        quality: FloatBetweenOneAndZero = 0.0,
         is_privileged: bool = False,
     ) -> Correspondence:
         parent_spaces = self.new_structure_collection(
@@ -462,7 +462,7 @@ class BubbleChamber:
         start: Structure,
         parent_concept: Concept,
         locations: List[Location],
-        quality: FloatBetweenOneAndZero,
+        quality: FloatBetweenOneAndZero = 0.0,
     ) -> Label:
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
@@ -491,7 +491,7 @@ class BubbleChamber:
         end: Structure,
         parent_concept: Concept,
         locations: List[Location],
-        quality: FloatBetweenOneAndZero,
+        quality: FloatBetweenOneAndZero = 0.0,
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
     ) -> Relation:
