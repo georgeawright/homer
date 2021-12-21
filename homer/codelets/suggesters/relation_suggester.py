@@ -23,10 +23,10 @@ class RelationSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_space = None
-        self.target_structure_one = None
-        self.target_structure_two = None
-        self.parent_concept = None
+        self.target_space = target_structures.get("target_space")
+        self.target_structure_one = target_structures.get("target_structure_one")
+        self.target_structure_two = target_structures.get("target_structure_two")
+        self.parent_concept = target_structures.get("parent_concept")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -130,11 +130,16 @@ class RelationSuggester(Suggester):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]
 
+    @property
+    def targets_dict(self):
+        return {
+            "target_space": self.target_space,
+            "target_structure_one": self.target_structure_one,
+            "target_structure_two": self.target_structure_two,
+            "parent_concept": self.parent_concept,
+        }
+
     def _passes_preliminary_checks(self):
-        self.target_space = self._target_structures["target_space"]
-        self.target_structure_one = self._target_structures["target_structure_one"]
-        self.target_structure_two = self._target_structures["target_structure_two"]
-        self.parent_concept = self._target_structures["parent_concept"]
         if self.parent_concept is None:
             conceptual_space = (
                 self.bubble_chamber.conceptual_spaces.where(
@@ -180,8 +185,6 @@ class RelationSuggester(Suggester):
                 )
             except MissingStructureError:
                 return False
-        self._target_structures["parent_concept"] = self.parent_concept
-        self._target_structures["target_structure_two"] = self.target_structure_two
         return not self.target_structure_one.has_relation(
             self.target_space,
             self.parent_concept,

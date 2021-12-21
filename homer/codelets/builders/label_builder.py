@@ -15,9 +15,8 @@ class LabelBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self._target_structures = target_structures
-        self.target_node = None
-        self.parent_concept = None
+        self.target_node = target_structures.get("target_node")
+        self.parent_concept = target_structures.get("parent_concept")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -46,9 +45,14 @@ class LabelBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["label"]
 
+    @property
+    def targets_dict(self):
+        return {
+            "target_node": self.target_node,
+            "parent_concept": self.parent_concept,
+        }
+
     def _passes_preliminary_checks(self):
-        self.parent_concept = self._target_structures["parent_concept"]
-        self.target_node = self._target_structures["target_node"]
         return not self.target_node.has_label(self.parent_concept)
 
     def _process_structure(self):

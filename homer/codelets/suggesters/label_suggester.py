@@ -20,8 +20,8 @@ class LabelSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_node = None
-        self.parent_concept = None
+        self.target_node = target_structures.get("target_node")
+        self.parent_concept = target_structures.get("parent_concept")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -93,12 +93,13 @@ class LabelSuggester(Suggester):
         return self.bubble_chamber.concepts["label"]
 
     @property
-    def target_structures(self):
-        return self.bubble_chamber.new_structure_collection(self.target_node)
+    def target_dict(self):
+        return {
+            "target_node": self.target_node,
+            "parent_concept": self.parent_concept,
+        }
 
     def _passes_preliminary_checks(self):
-        self.target_node = self._target_structures["target_node"]
-        self.parent_concept = self._target_structures["parent_concept"]
         if self.parent_concept is None:
             conceptual_space = (
                 self.bubble_chamber.conceptual_spaces.where(
@@ -129,7 +130,6 @@ class LabelSuggester(Suggester):
                     return False
         if self.parent_concept is None:
             return False
-        self._target_structures["parent_concept"] = self.parent_concept
         return not self.target_node.has_label(self.parent_concept)
 
     def _calculate_confidence(self):

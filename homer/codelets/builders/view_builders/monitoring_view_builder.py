@@ -16,8 +16,6 @@ class MonitoringViewBuilder(ViewBuilder):
         return self.bubble_chamber.concepts["view-monitoring"]
 
     def _passes_preliminary_checks(self):
-        self.input_spaces = self._target_structures["input_spaces"]
-        self.output_space = self._target_structures["output_space"]
         return True
 
     def _process_structure(self):

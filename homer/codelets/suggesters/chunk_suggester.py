@@ -25,12 +25,13 @@ class ChunkSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_space = None
-        self.target_rule = None
-        self.target_root = None
-        self.target_node = None
-        self.target_slot = None
-        self.target_slot_filler = None
+        self.target_space = target_structures.get("target_space")
+        self.target_rule = target_structures.get("target_rule")
+        self.target_root = target_structures.get("target_root")
+        self.target_node = target_structures.get("target_node")
+        self.target_slot = target_structures.get("target_slot")
+        self.target_slot_filler = target_structures.get("target_slot_filler")
+        self.target_branch = target_structures.get("target_branch")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -114,10 +115,19 @@ class ChunkSuggester(Suggester):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
+    @property
+    def target_dict(self):
+        return {
+            "target_space": self.target_space,
+            "target_rule": self.target_rule,
+            "target_root": self.target_root,
+            "target_node": self.target_node,
+            "target_slot": self.target_slot,
+            "target_slot_filler": self.target_slot_filler,
+            "target_brach": self.target_branch,
+        }
+
     def _passes_preliminary_checks(self):
-        self.target_space = self._target_structures["target_space"]
-        self.target_rule = self._target_structures["target_rule"]
-        self.target_node = self._target_structures["target_node"]
         if self.target_rule is None:
             try:
                 self.target_root = self.target_node.super_chunks.get()
@@ -161,10 +171,6 @@ class ChunkSuggester(Suggester):
                     )
             except MissingStructureError:
                 return False
-        self._target_structures["target_rule"] = self.target_rule
-        self._target_structures["target_root"] = self.target_root
-        self._target_structures["target_slot"] = self.target_slot
-        self._target_structures["target_slot_filler"] = self.target_slot_filler
         suggested_members = StructureCollection.union(
             self.target_root.members.where(is_slot=False)
             if self.target_root is not None
@@ -182,7 +188,7 @@ class ChunkSuggester(Suggester):
     def _calculate_confidence(self):
         if self.target_rule.right_concept is None:
             branch_concept = self.target_rule.left_concept
-            self._target_structures["target_branch"] = "left"
+            self.target_branch = "left"
         else:
             branch_names = {
                 self.target_rule.left_concept: "left",
@@ -197,7 +203,7 @@ class ChunkSuggester(Suggester):
                     branch=branch_names[x],
                 ),
             )
-            self._target_structures["target_branch"] = branch_names[branch_concept]
+            self.target_branch = branch_names[branch_concept]
         classifications = [
             branch_concept.classifier.classify(
                 collection=self.bubble_chamber.new_structure_collection(

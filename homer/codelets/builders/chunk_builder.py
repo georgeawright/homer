@@ -20,14 +20,13 @@ class ChunkBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self._target_structures = target_structures
-        self.target_space = None
-        self.target_rule = None
-        self.target_root = None
-        self.target_node = None
-        self.target_slot = None
-        self.target_slot_filler = None
-        self.target_branch = None
+        self.target_space = target_structures.get("target_space")
+        self.target_rule = target_structures.get("target_rule")
+        self.target_root = target_structures.get("target_root")
+        self.target_node = target_structures.get("target_node")
+        self.target_slot = target_structures.get("target_slot")
+        self.target_slot_filler = target_structures.get("target_slot_filler")
+        self.target_branch = target_structures.get("target_branch")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -56,14 +55,19 @@ class ChunkBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
+    @property
+    def targets_dict(self):
+        return {
+            "target_space": self.target_space,
+            "target_rule": self.target_rule,
+            "target_root": self.target_root,
+            "target_node": self.target_node,
+            "target_slot": self.target_slot,
+            "target_slot_filler": self.target_slot_filler,
+            "target_branch": self.target_branch,
+        }
+
     def _passes_preliminary_checks(self):
-        self.target_space = self._target_structures["target_space"]
-        self.target_rule = self._target_structures["target_rule"]
-        self.target_root = self._target_structures["target_root"]
-        self.target_node = self._target_structures["target_node"]
-        self.target_slot = self._target_structures["target_slot"]
-        self.target_slot_filler = self._target_structures["target_slot_filler"]
-        self.target_branch = self._target_structures["target_branch"]
         suggested_members = StructureCollection.union(
             self.target_root.members.where(is_slot=False)
             if self.target_root is not None

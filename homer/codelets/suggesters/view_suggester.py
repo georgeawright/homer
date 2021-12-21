@@ -20,11 +20,10 @@ class ViewSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self._target_structures = target_structures
-        self.input_spaces = None
-        self.output_space = None
-        self.frame = None
-        self.contextual_space = None
+        self.input_spaces = target_structures.get("input_spaces")
+        self.output_space = target_structures.get("ouptut_space")
+        self.frame = target_structures.get("frame")
+        self.contextual_space = target_structures.get("contextual_space")
 
     @classmethod
     def spawn(
@@ -51,9 +50,16 @@ class ViewSuggester(Suggester):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view"]
 
+    @property
+    def targets_dict(self):
+        return {
+            "input_spaces": self.input_spaces,
+            "output_space": self.output_space,
+            "frame": self.frame,
+            "contextual_space": self.contextual_space,
+        }
+
     def _passes_preliminary_checks(self):
-        self.frame = self._target_structures["frame"]
-        self.contextual_space = self._target_structures["contextual_space"]
         return True
 
     def _calculate_confidence(self):

@@ -19,13 +19,15 @@ class ProjectionSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_view = None
-        self.target_projectee = None
-        self.frame = None
-        self.frame_correspondee = None
-        self.correspondence_to_non_frame = None
-        self.non_frame = None
-        self.non_frame_correspondee = None
+        self.target_view = target_structures.get("target_view")
+        self.target_projectee = target_structures.get("target_projectee")
+        self.frame = target_structures.get("frame")
+        self.frame_correspondee = target_structures.get("frame_correspondee")
+        self.correspondence_to_non_frame = target_structures.get(
+            "correspondence_to_non_frame"
+        )
+        self.non_frame = target_structures.get("non_frame")
+        self.non_frame_correspondee = target_structures.get("non_frame_correspondee")
 
     @classmethod
     def spawn(
@@ -45,18 +47,18 @@ class ProjectionSuggester(Suggester):
         )
 
     @property
-    def target_structures(self):
-        return self.bubble_chamber.new_structue_collection(
-            self.target_view, self.target_projectee
-        )
+    def targets_dict(self):
+        return {
+            "target_view": self.target_view,
+            "target_projectee": self.target_projectee,
+            "frame": self.frame,
+            "frame_correspondee": self.frame_correspondee,
+            "correspondence_to_non_frame": self.correspondence_to_non_frame,
+            "non_frame": self.non_frame,
+            "non_frame_correspondee": self.non_frame_correspondee,
+        }
 
     def _passes_preliminary_checks(self):
-        self.target_view = self._target_structures["target_view"]
-        self.target_projectee = self._target_structures["target_projectee"]
-        self._target_structures["target_correspondence"] = None
-        self._target_structures["frame_correspondee"] = None
-        self._target_structures["non_frame"] = None
-        self._target_structures["non_frame_correspondee"] = None
         try:
             self.frame_correspondee = self.bubble_chamber.new_structure_collection(
                 *[
@@ -67,7 +69,6 @@ class ProjectionSuggester(Suggester):
                     if correspondence.start.is_slot and correspondence.end.is_slot
                 ]
             ).get()
-            self._target_structures["frame_correspondee"] = self.frame_correspondee
             self.correspondence_to_non_frame = (
                 self.bubble_chamber.new_structure_collection(
                     *[
@@ -79,9 +80,6 @@ class ProjectionSuggester(Suggester):
                     ]
                 ).get()
             )
-            self._target_structures[
-                "target_correspondence"
-            ] = self.correspondence_to_non_frame
             self.non_frame, self.non_frame_correspondee = (
                 (
                     self.correspondence_to_non_frame.start.parent_space,
@@ -93,10 +91,6 @@ class ProjectionSuggester(Suggester):
                     self.correspondence_to_non_frame.end,
                 )
             )
-            self._target_structures["non_frame"] = self.non_frame
-            self._target_structures[
-                "non_frame_correspondee"
-            ] = self.non_frame_correspondee
             return (
                 self.frame_correspondee.structure_id in self.target_view.slot_values
                 and self.target_projectee.structure_id

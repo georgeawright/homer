@@ -14,13 +14,12 @@ class ProjectionBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self._target_structures = target_structures
-        self.target_view = None
-        self.non_frame = None
-        self.target_projectee = None
-        self.target_correspondence = None
-        self.frame_correspondee = None
-        self.non_frame_correspondee = None
+        self.target_view = target_structures.get("target_view")
+        self.non_frame = target_structures.get("non_frame")
+        self.target_projectee = target_structures.get("target_projectee")
+        self.target_correspondence = target_structures.get("target_correspondence")
+        self.frame_correspondee = target_structures.get("frame_correspondee")
+        self.non_frame_correspondee = target_structures.get("non_frame_correspondee")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -49,13 +48,18 @@ class ProjectionBuilder(Builder):
             self.target_view, self.target_projectee
         )
 
+    @property
+    def targets_dict(self):
+        return {
+            "target_view": self.target_view,
+            "non_frame": self.non_frame,
+            "target_projectee": self.target_projectee,
+            "target_correspondence": self.target_correspondence,
+            "frame_correspondee": self.frame_correspondee,
+            "non_frame_correspondee": self.non_frame_correspondee,
+        }
+
     def _passes_preliminary_checks(self):
-        self.target_view = self._target_structures["target_view"]
-        self.target_correspondence = self._target_structures["target_correspondence"]
-        self.target_projectee = self._target_structures["target_projectee"]
-        self.frame_correspondee = self._target_structures["frame_correspondee"]
-        self.non_frame = self._target_structures["non_frame"]
-        self.non_frame_correspondee = self._target_structures["non_frame_correspondee"]
         if self.target_projectee.is_slot:
             return (
                 self.frame_correspondee.structure_id in self.target_view.slot_values

@@ -17,16 +17,15 @@ class Codelet(ABC):
         self.child_codelets = []
         self.result = None
 
-    # TODO: tidy up _target_structures mess
-    """
     @property
     def targets_dict(self):
-        return {"target_node": self.target_node}
-    
+        raise NotImplementedError
+
     @property
     def targets_collection(self):
-        return self.bubble_chamber.new_structure_collection(self.target_node)
-    """
+        return self.bubble_chamber.new_structure_collection(
+            *[structure for name, structure in self.targets_dict.items()]
+        )
 
     # TODO: decide whether to implement fizzle or get rid of it
 

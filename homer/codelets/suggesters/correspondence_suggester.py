@@ -22,14 +22,13 @@ class CorrespondenceSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_view = None
-        self.target_space_one = None
-        self.target_structure_one = None
-        self.target_space_two = None
-        self.target_structure_two = None
-        self.target_conceptual_space = None
-        self.parent_concept = None
-        self.parent_space = None
+        self.target_view = target_structures.get("target_view")
+        self.target_structure_one = target_structures.get("target_structure_one")
+        self.target_structure_two = target_structures.get("target_structure_two")
+        self.target_space_one = target_structures.get("target_space_one")
+        self.target_space_two = target_structures.get("target_space_two")
+        self.target_conceptual_space = target_structures.get("target_conceptual_space")
+        self.parent_concept = target_structures.get("parent_concept")
         self.correspondence = None
         self.child_structure = None
 
@@ -120,30 +119,31 @@ class CorrespondenceSuggester(Suggester):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["correspondence"]
 
+    @property
+    def target_dict(self):
+        return {
+            "target_structure_one": self.target_structure_one,
+            "target_structure_two": self.target_structure_two,
+            "target_space_one": self.target_space_two,
+            "target_space_two": self.target_space_two,
+            "target_conceptual_space": self.target_conceptual_space,
+            "parent_concept": self.parent_concept,
+            "target_view": self.target_view,
+        }
+
     def _passes_preliminary_checks(self):
         # TODO: change as no longer needs to work with words
         # TODO: also needs to be possible to construct correspondence from small frame element to big frame element
-        self.target_view = self._target_structures["target_view"]
-        self.target_structure_one = self._target_structures["target_structure_one"]
-        self.target_structure_two = self._target_structures["target_structure_two"]
-        self.target_space_one = self._target_structures["target_space_one"]
-        self.target_space_two = self._target_structures["target_space_two"]
-        self.target_conceptual_space = self._target_structures[
-            "target_conceptual_space"
-        ]
-        self.parent_concept = self._target_structures["parent_concept"]
         if self.target_space_two is None:
             try:
                 self.target_space_two = self.target_view.input_frames.get(
                     key=activation
                 ).input_space
-                self._target_structures["target_space_two"] = self.target_space_two
             except MissingStructureError:
                 try:
                     self.target_space_two = self.target_view.input_spaces.get(
                         key=activation, exclude=[self.target_space_one]
                     )
-                    self._target_structures["target_space_two"] = self.target_space_two
                 except MissingStructureError:
                     return False
         try:
@@ -151,9 +151,6 @@ class CorrespondenceSuggester(Suggester):
                 self.target_structure_two = self.target_space_two.contents.of_type(
                     type(self.target_structure_one)
                 ).get(key=lambda x: x.similarity_with(self.target_structure_one))
-                self._target_structures[
-                    "target_structure_two"
-                ] = self.target_structure_two
         except MissingStructureError:
             return False
         if self.target_conceptual_space is None:
@@ -162,16 +159,12 @@ class CorrespondenceSuggester(Suggester):
                     is_conceptual_space=True, is_basic_level=True
                 ).get()
             )
-            self._target_structures[
-                "target_conceptual_space"
-            ] = self.target_conceptual_space
         if self.target_conceptual_space not in self.target_space_two.conceptual_spaces:
             return False
         if self.parent_concept is None:
             self.parent_concept = self.bubble_chamber.concepts.where(
                 structure_type=Correspondence
             ).get()
-            self._target_structures["parent_concept"] = self.parent_concept
         if self.target_view.has_member(
             self.parent_concept,
             self.target_structure_one,

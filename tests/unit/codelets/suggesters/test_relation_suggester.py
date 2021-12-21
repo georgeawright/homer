@@ -56,7 +56,6 @@ def test_bottom_up_codelet_gets_a_concept(bubble_chamber):
     assert relation_suggester.parent_concept is None
     relation_suggester.run()
     assert relation_suggester.parent_concept is not None
-    assert relation_suggester._target_structures["parent_concept"] is not None
 
 
 def test_codelet_gets_a_second_target_structure(bubble_chamber, target_structure_one):
@@ -72,7 +71,6 @@ def test_codelet_gets_a_second_target_structure(bubble_chamber, target_structure
     assert relation_suggester.target_structure_two is None
     relation_suggester.run()
     assert relation_suggester.target_structure_two is not None
-    assert relation_suggester._target_structures["target_structure_two"] is not None
 
 
 def test_gives_high_confidence_for_good_example(

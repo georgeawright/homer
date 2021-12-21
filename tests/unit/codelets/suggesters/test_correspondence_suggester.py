@@ -76,6 +76,7 @@ def target_structure_two(bubble_chamber, conceptual_space, target_space_two):
     structure.is_slot = True
     structure.correspondences = bubble_chamber.new_structure_collection()
     structure.name = "target_structure_two"
+    structure.similarity_with.return_value = 1.0
     structure.parent_spaces = bubble_chamber.new_structure_collection(
         target_space_two, conceptual_space
     )
@@ -95,13 +96,13 @@ def existing_correspondence():
 def target_view(
     bubble_chamber, existing_correspondence, target_space_one, target_space_two
 ):
-    input_space = Mock()
-    input_space.name = "target space 2 container"
-    input_space.contents.of_type.return_value = bubble_chamber.new_structure_collection(
-        target_space_two
-    )
     view = Mock()
-    view.input_spaces = bubble_chamber.new_structure_collection(input_space)
+    view.input_spaces = bubble_chamber.new_structure_collection(
+        target_space_one, target_space_two
+    )
+    frame = Mock()
+    frame.input_space = target_space_two
+    view.input_frames.get.return_value = frame
     view.has_member.return_value = False
     view.members = bubble_chamber.new_structure_collection(existing_correspondence)
     view.slot_values = {}
@@ -120,9 +121,9 @@ def test_gets_second_target_space_and_structure_if_needed(
     target_structures = {
         "target_view": target_view,
         "target_space_one": target_space_one,
-        "target_space_two": target_space_two,
+        "target_space_two": None,
         "target_structure_one": target_structure_one,
-        "target_structure_two": target_structure_two,
+        "target_structure_two": None,
         "target_conceptual_space": None,
         "parent_concept": same_concept,
     }

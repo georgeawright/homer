@@ -18,9 +18,10 @@ class ViewBuilder(Builder):
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self._target_structures = target_structures
-        self._input_spaces = None
-        self._ouptut_space = None
+        self.frame = target_structures.get("frame")
+        self.contextual_space = target_structures.get("contextual_space")
+        self.input_spaces = target_structures.get("input_spaces")
+        self.output_space = target_structures.get("output_space")
 
     @classmethod
     def spawn(
@@ -43,12 +44,14 @@ class ViewBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view"]
 
-    def target_structures(self):
-        return self.bubble_chamber.new_structure_collection(self._target_structures)
+    @property
+    def targets_dict(self):
+        return {
+            "frame": self.frame,
+            "contextual_space": self.contextual_space,
+        }
 
     def _passes_preliminary_checks(self):
-        self.frame = self._target_structures["frame"]
-        self.contextual_space = self._target_structures["contextual_space"]
         return True
 
     def _fizzle(self):
