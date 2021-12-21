@@ -492,6 +492,7 @@ class BubbleChamber:
         parent_concept: Concept,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
+        conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
     ) -> Relation:
         parent_spaces = self.new_structure_collection(
@@ -503,6 +504,7 @@ class BubbleChamber:
             start=start,
             arguments=self.new_structure_collection(start, end),
             parent_concept=parent_concept,
+            conceptual_space=conceptual_space,
             locations=locations,
             quality=quality,
             links_in=self.new_structure_collection(),
