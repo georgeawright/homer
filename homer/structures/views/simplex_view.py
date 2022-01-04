@@ -5,6 +5,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
+from homer.structures import Frame
 from homer.structures import Space, View
 from homer.structures.spaces import ContextualSpace
 
@@ -14,6 +15,7 @@ class SimplexView(View):
         self,
         structure_id: str,
         parent_id: str,
+        parent_frame: Frame,
         locations: List[Location],
         members: StructureCollection,
         input_spaces: StructureCollection,
@@ -27,6 +29,7 @@ class SimplexView(View):
             self,
             structure_id,
             parent_id,
+            parent_frame,
             locations,
             members,
             input_spaces,
@@ -116,7 +119,8 @@ class SimplexView(View):
         new_view = SimplexView(
             ID.new(SimplexView),
             parent_id,
-            location=self.location,
+            parent_frame=self.parent_frame,
+            locations=self.locations,
             members=new_members,
             input_spaces=self.input_spaces,
             output_space=new_output_space,

@@ -16,8 +16,8 @@ class LetterChunkProjectionEvaluator(ProjectionEvaluator):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        structure_type = bubble_chamber.concepts["word"]
-        word = bubble_chamber.input_nodes.where(is_word=True).get()
+        structure_type = bubble_chamber.concepts["letter_chunk"]
+        word = bubble_chamber.input_nodes.where(is_letter_chunk=True).get()
         correspondences = word.correspondences.where(end=word)
         target_structures = StructureCollection.union(
             bubble_chamber.new_structure_collection(word), correspondences

@@ -74,6 +74,10 @@ class Structure(ABC):
         raise NotImplementedError
 
     @property
+    def is_labellable(self) -> bool:
+        return (self.is_chunk or self.is_label or self.is_relation) and not self.is_slot
+
+    @property
     def parent_space(self) -> Structure:
         return self._parent_space
 

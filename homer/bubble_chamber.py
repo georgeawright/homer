@@ -72,15 +72,21 @@ class BubbleChamber:
         )
 
     @property
+    def input_spaces(self) -> StructureCollection:
+        return StructureCollection.union(
+            *[view.input_spaces for view in self.production_views]
+        )
+
+    @property
     def input_nodes(self) -> StructureCollection:
-        return self.new_structure_collection(
-            *[
-                node
-                for node in chain(self.chunks, self.letter_chunks)
-                if node.parent_space.parent_concept
-                in (self.concepts["input"], self.concepts["text"])
-                and not node.parent_space.is_frame
-            ]
+        return StructureCollection.union(
+            *[space.contents.where(is_node=True) for space in self.input_spaces]
+        )
+
+    @property
+    def labellable_items(self) -> StructureCollection:
+        return StructureCollection.union(
+            *[space.contents.where(is_labellable=True) for space in self.input_spaces]
         )
 
     @property

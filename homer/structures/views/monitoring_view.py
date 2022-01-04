@@ -3,7 +3,7 @@ from typing import List
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Space, View
+from homer.structures import Frame, Space, View
 from homer.structures.spaces import ContextualSpace
 
 
@@ -12,6 +12,7 @@ class MonitoringView(View):
         self,
         structure_id: str,
         parent_id: str,
+        parent_frame: Frame,
         locations: List[Location],
         members: StructureCollection,
         input_spaces: StructureCollection,
@@ -25,6 +26,7 @@ class MonitoringView(View):
             self,
             structure_id,
             parent_id,
+            parent_frame,
             locations,
             members,
             input_spaces,

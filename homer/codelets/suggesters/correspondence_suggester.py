@@ -5,9 +5,22 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation, corresponding_exigency
 from homer.structures.nodes import Concept
 from homer.structures.links import Correspondence
+
+# TODO: suggest a corresp between input space structure and mainframe slot
+# this should only happen for structures not in a sub-frame
+# builder needs to fill in slot
+
+# TODO: or suggest a corresp between mainframe and subframe structures
+# builder needs to fill in slot
+# builder should build multiple correspondences subframe-mainframe and inputspace-mainframe
+# also needs to build chunk-chunk and letterchunk-letterchunk correspondences
+
+# TODO: or suggest a corresp between a mainframe structure and a potential subframe's structure
+# builder needs to add new subframe and another view's correspondences to view (either destroy view and change correspondences' parent view or make view a sub-view)
 
 
 class CorrespondenceSuggester(Suggester):
@@ -132,13 +145,11 @@ class CorrespondenceSuggester(Suggester):
         }
 
     def _passes_preliminary_checks(self):
-        # TODO: change as no longer needs to work with words
+        raise NotImplementedError
         # TODO: also needs to be possible to construct correspondence from small frame element to big frame element
         if self.target_space_two is None:
             try:
-                self.target_space_two = self.target_view.input_frames.get(
-                    key=activation
-                ).input_space
+                self.target_space_two = self.target_view.parent_frame.input_space
             except MissingStructureError:
                 try:
                     self.target_space_two = self.target_view.input_spaces.get(
@@ -154,13 +165,17 @@ class CorrespondenceSuggester(Suggester):
         except MissingStructureError:
             return False
         if self.target_conceptual_space is None:
-            self.target_conceptual_space = (
-                self.target_structure_one.parent_spaces.where(
-                    is_conceptual_space=True, is_basic_level=True
-                ).get()
-            )
-        if self.target_conceptual_space not in self.target_space_two.conceptual_spaces:
-            return False
+            try:
+                self.target_conceptual_space = (
+                    StructureCollection.union(
+                        self.target_structure_one.parent_spaces,
+                        self.target_structure_two.parent_spaces,
+                    )
+                    .where(is_basic_level=True)
+                    .get()
+                )
+            except MissingStructureError:
+                return False
         if self.parent_concept is None:
             self.parent_concept = self.bubble_chamber.concepts.where(
                 structure_type=Correspondence

@@ -28,6 +28,7 @@ class Codelet(ABC):
         )
 
     # TODO: decide whether to implement fizzle or get rid of it
+    # possibly fizzle spawns a factory
 
     @classmethod
     def get_target_class(cls):

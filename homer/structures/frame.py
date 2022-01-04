@@ -15,7 +15,8 @@ class Frame(Structure):
         name: str,
         parent_concept: "Concept",
         parent_frame: Frame,
-        sub_frames: StructureCollection,
+        sub_frames: StructureCollection,  # collection of frames (all slots)
+        # structures have locations in frame and sub-frame spaces
         concepts: StructureCollection,
         input_space: "ContextualSpace",
         output_space: "ContextualSpace",

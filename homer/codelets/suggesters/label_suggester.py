@@ -3,7 +3,7 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection_keys import labeling_exigency
+from homer.structure_collection_keys import activation, labeling_exigency
 from homer.structures.links import Label
 from homer.structures.nodes import Concept
 
@@ -56,8 +56,9 @@ class LabelSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        # TODO: allow labeling of labels and relations
-        target = bubble_chamber.input_nodes.get(key=labeling_exigency)
+        view = bubble_chamber.production_views.get(key=activation)
+        space = view.input_spaces.get(key=activation)
+        target = space.contents.where(is_labellable=True).get(key=labeling_exigency)
         urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(
             parent_id,
@@ -74,10 +75,8 @@ class LabelSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        potential_targets = bubble_chamber.new_structure_collection(
-            node
-            for node in bubble_chamber.input_nodes
-            if isinstance(node, parent_concept.instance_type)
+        potential_targets = bubble_chamber.labellable_items.filter(
+            lambda x: isinstance(x, parent_concept.instance_type)
         )
         target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
         urgency = urgency if urgency is not None else target.unlabeledness

@@ -5,6 +5,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
+from homer.structures import Frame
 from homer.structures.nodes import Concept
 from homer.structures.space import Space
 from homer.structures.spaces import ContextualSpace
@@ -17,6 +18,7 @@ class View(Structure):
         self,
         structure_id: str,
         parent_id: str,
+        parent_frame: Frame,
         locations: List[Location],
         members: StructureCollection,
         input_spaces: StructureCollection,
@@ -36,6 +38,7 @@ class View(Structure):
             links_out=links_out,
             parent_spaces=parent_spaces,
         )
+        self.parent_frame = parent_frame
         self.value = None
         self.input_spaces = input_spaces
         self.output_space = output_space
@@ -53,10 +56,6 @@ class View(Structure):
     @property
     def input_contextual_spaces(self):
         return self.input_spaces.where(is_contextual_space=True)
-
-    @property
-    def input_frames(self):
-        return self.input_spaces.where(is_frame=True)
 
     @property
     def size(self):
@@ -95,6 +94,7 @@ class View(Structure):
         return False
 
     def can_accept_member(self, correspondence: "Correspondence") -> bool:
+        # TODO: first check that target view does not have member
         if not StructureCollection.intersection(
             self.members, correspondence.end.correspondences
         ).is_empty():

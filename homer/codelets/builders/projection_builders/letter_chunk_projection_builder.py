@@ -2,6 +2,12 @@ from homer.location import Location
 from homer.codelets.builders import ProjectionBuilder
 from homer.structure_collection_keys import activation
 
+# TODO: word choice
+# if not a slot then copy word
+# if slot with relation to neighbour use relation to determine choice (ie comparative ending)
+# if slot with label then use label to determine choice (pos + semantic labels)
+# if slot with correspondence then copy correspondee
+
 
 class LetterChunkProjectionBuilder(ProjectionBuilder):
     @classmethod
