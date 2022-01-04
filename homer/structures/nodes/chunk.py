@@ -1,6 +1,5 @@
 from __future__ import annotations
 from math import prod
-import random
 from typing import List
 
 from homer.errors import MissingStructureError
@@ -140,19 +139,13 @@ class Chunk(Node):
             ]
         ).excluding(self)
 
-    # TODO: stop using randomness in here
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:
         space = self.parent_space if space is None else space
         chunks = space.contents.where(is_chunk=True)
-        if len(chunks) == 1:
-            raise MissingStructureError
-        for _ in range(len(chunks)):
-            chunk = chunks.get(exclude=[self])
-            if space.proximity_between(chunk, self) - random.random() <= 0:
-                return chunk
-        return chunks.get(exclude=[self])
+        key = lambda x: 1 - space.proximity_between(x, self)
+        return chunks.get(key=key, exclude=[self])
 
     def copy_to_location(
         self, location: Location, bubble_chamber: "BubbleChamber", parent_id: str = ""
