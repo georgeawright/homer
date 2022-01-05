@@ -67,54 +67,16 @@ class CorrespondenceBuilder(Builder):
         }
 
     def _passes_preliminary_checks(self):
-        if self.target_view.has_member(
+        return self.target_view.can_accept_member(
             self.parent_concept,
             self.target_structure_one,
             self.target_structure_two,
             self.target_space_one,
             self.target_space_two,
-        ):
-            return False
-        self.correspondence = Correspondence(
-            None,
-            self.codelet_id,
-            self.target_structure_one,
-            self.bubble_chamber.new_structure_collection(
-                self.target_structure_one, self.target_structure_two
-            ),
-            [self.target_structure_one.location, self.target_structure_two.location],
-            self.parent_concept,
-            self.target_conceptual_space,
-            self.target_view,
-            0,
-            links_in=self.bubble_chamber.new_structure_collection(),
-            links_out=self.bubble_chamber.new_structure_collection(),
-            parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
-        return self.target_view.can_accept_member(self.correspondence)
 
     def _process_structure(self):
-        if not self.correspondence.slot_argument.parent_concept.is_filled_in:
-            self.bubble_chamber.new_relation(
-                parent_id=self.codelet_id,
-                start=self.correspondence.slot_argument.parent_concept,
-                end=self.correspondence.non_slot_argument.parent_concept,
-                parent_concept=None,
-                locations=[],
-                quality=1.0,
-            )
-        self.bubble_chamber.new_correspondence(
-            parent_id=self.codelet_id,
-            start=self.correspondence.start,
-            end=self.correspondence.end,
-            locations=self.correspondence.locations,
-            parent_concept=self.correspondence.parent_concept,
-            conceptual_space=self.correspondence.conceptual_space,
-            parent_view=self.target_view,
-        )
-        self.child_structures = self.bubble_chamber.new_structure_collection(
-            self.correspondence
-        )
+        raise NotImplementedError
 
     def _fizzle(self):
         pass
