@@ -77,29 +77,35 @@ class View(Structure):
     def has_member(
         self,
         parent_concept: Concept,
+        conceptual_space: Space,
         start: Structure,
         end: Structure,
-        start_space: Space,
-        end_space: Space,
     ) -> bool:
-        for correspondence in self.members:
-            if (
-                correspondence.parent_concept == parent_concept
-                and correspondence.start == start
-                and correspondence.end == end
-                and correspondence.start_space == start_space
-                and correspondence.end_space == end_space
-            ):
-                return True
-        return False
+        return not self.members.where(
+            parent_concept=parent_concept,
+            conceptual_space=conceptual_space,
+            start=start,
+            end=end,
+        ).is_empty()
 
-    def can_accept_member(self, correspondence: "Correspondence") -> bool:
-        # TODO: first check that target view does not have member
-        if not StructureCollection.intersection(
-            self.members, correspondence.end.correspondences
-        ).is_empty():
+    def can_accept_member(
+        self,
+        parent_concept: Concept,
+        conceptual_space: Space,
+        start: Structure,
+        end: Structure,
+    ) -> bool:
+        if self.has_member(parent_concept, conceptual_space, start, end):
             return False
-        potential_node_pairs = correspondence.node_pairs
+        if not end.correspondences.filter(lambda x: x in self.members).is_empty():
+            return False
+        potential_node_pairs = (
+            [(start, end)]
+            if start.is_node
+            else [(start.start, end.start)]
+            if start.is_label
+            else [(start.start, end.start), (start.end, end.end)]
+        )
         if all(
             potential_node_pair in self.input_node_pairs
             for potential_node_pair in potential_node_pairs
