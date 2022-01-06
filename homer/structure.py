@@ -251,6 +251,7 @@ class Structure(ABC):
     def location_in_space(
         self, space: Structure, start: Location = None, end: Location = None
     ) -> Location:
+        # TODO: workout location if space is a projection of another space
         locations = self.locations
         random.shuffle(locations)
         for location in locations:
