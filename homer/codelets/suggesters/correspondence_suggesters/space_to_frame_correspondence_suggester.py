@@ -27,7 +27,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     ):
         target_view = bubble_chamber.production_views.get(key=exigency)
         target_space = target_view.input_contextual_spaces.get()
-        target = target_space.contents.where(is_link=True, is_correspondence=False).get(
+        target = target_space.contents.where(is_correspondence=False).get(
             key=corresponding_exigency
         )
         urgency = urgency if urgency is not None else target.uncorrespondedness

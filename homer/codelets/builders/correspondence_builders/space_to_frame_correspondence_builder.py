@@ -3,9 +3,11 @@ from homer.codelets.builders import CorrespondenceBuilder
 
 class SpaceToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     # TODO: test
-    # TODO: also needs to build chunk-chunk and letterchunk-letterchunk correspondences
     def _process_structure(self):
-        if not self.target_structure_two.parent_concept.is_filled_in:
+        if (
+            self.target_structure_two.is_link
+            and not self.target_structure_two.parent_concept.is_filled_in
+        ):
             self.bubble_chamber.new_relation(
                 parent_id=self.codelet_id,
                 start=self.target_structure_two.parent_concept,

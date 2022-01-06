@@ -4,7 +4,10 @@ from homer.codelets.builders import CorrespondenceBuilder
 class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     # TODO: test
     def _process_structure(self):
-        if not self.target_structure_two.parent_concept.is_filled_in:
+        if (
+            self.target_structure_two.is_link
+            and not self.target_structure_two.parent_concept.is_filled_in
+        ):
             slot_value = (
                 self.target_structure_one.parent_concept.relations.filter(
                     lambda x: not x.end.is_slot

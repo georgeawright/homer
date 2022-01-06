@@ -11,9 +11,12 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
         )
         for correspondence in sub_view.members:
             correspondence.parent_view = self.target_view
-            self.target_view.members.add(correspondence)
+            self.target_view.add(correspondence)
         self.bubble_chamber.views.remove(sub_view)
-        if not self.target_structure_two.parent_concept.is_filled_in:
+        if (
+            self.target_structure_two.is_link
+            and not self.target_structure_two.parent_concept.is_filled_in
+        ):
             slot_value = (
                 self.target_structure_one.parent_concept.relations.filter(
                     lambda x: not x.end.is_slot
