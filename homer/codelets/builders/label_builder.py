@@ -57,15 +57,11 @@ class LabelBuilder(Builder):
 
     def _process_structure(self):
         # TODO: if labeling a link that already has a label, you need to copy the label and label the copy
-        # TODO: project items into spaces if not in them
-        # TODO: create space if doesn't exist?
         parent_concept_coordinates = self.parent_concept.location_in_space(
             self.parent_concept.parent_space
         ).coordinates
-        if not self.target_node.has_location_in_space(self.parent_concept.parent_space):
-            self.target_node.locations.append(
-                Location(parent_concept_coordinates, self.parent_concept.parent_space)
-            )
+        if self.target_node not in self.parent_concept.parent_space:
+            # TODO: create space if doesn't exist?
             self.parent_concept.parent_space.add(self.target_node)
         label = self.bubble_chamber.new_label(
             parent_id=self.codelet_id,
