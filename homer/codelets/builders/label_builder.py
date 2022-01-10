@@ -56,7 +56,11 @@ class LabelBuilder(Builder):
         return not self.target_node.has_label(self.parent_concept)
 
     def _process_structure(self):
-        # TODO: if labeling a link that already has a label, you need to copy the label and label the copy
+        if self.target_node.is_label:
+            # TODO: test
+            self.target_node = self.target_node.copy(
+                bubble_chamber=self.bubble_chamber, parent_id=self.codelet_id
+            )
         parent_concept_coordinates = self.parent_concept.location_in_space(
             self.parent_concept.parent_space
         ).coordinates
