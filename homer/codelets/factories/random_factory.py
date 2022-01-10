@@ -1,5 +1,3 @@
-import random
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Factory
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -20,7 +18,7 @@ class RandomFactory(Factory):
 
     def _engender_follow_up(self):
         follow_up_class = self._decide_follow_up_class()
-        rand = random.random()
+        rand = self.bubble_chamber.random_factory.generate_random_number()
         if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make(self.codelet_id, self.bubble_chamber)
             self.child_codelets.append(follow_up)
