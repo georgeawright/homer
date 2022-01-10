@@ -57,7 +57,6 @@ class LabelBuilder(Builder):
 
     def _process_structure(self):
         if self.target_node.is_label:
-            # TODO: test
             self.target_node = self.target_node.copy(
                 bubble_chamber=self.bubble_chamber, parent_id=self.codelet_id
             )

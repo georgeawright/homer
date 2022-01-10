@@ -3,7 +3,6 @@ from homer.structure_collection import StructureCollection
 
 
 class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
-    # TODO: test
     def _process_structure(self):
         sub_view = self.target_structure_one.correspondences.get().parent_view
         self.target_view.frames = StructureCollection.union(

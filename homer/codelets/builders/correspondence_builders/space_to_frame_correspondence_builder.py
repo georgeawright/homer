@@ -2,7 +2,6 @@ from homer.codelets.builders import CorrespondenceBuilder
 
 
 class SpaceToFrameCorrespondenceBuilder(CorrespondenceBuilder):
-    # TODO: test
     def _process_structure(self):
         if (
             self.target_structure_two.is_link

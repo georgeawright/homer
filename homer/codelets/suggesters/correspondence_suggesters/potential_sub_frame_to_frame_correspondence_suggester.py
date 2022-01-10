@@ -7,8 +7,6 @@ from homer.structures.nodes import Concept
 
 
 class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
-    # TODO: test
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from homer.codelets.builders.correspondence_builders import (
