@@ -34,7 +34,7 @@ class CorrespondenceSelector(Selector):
         try:
             target_structure_one = (
                 winner_correspondence.start.nearby().get(key=corresponding_exigency)
-                if winner_correspondence.start.is_node  # TODO: should no longer ever be node
+                if winner_correspondence.start.is_node
                 else (
                     winner_correspondence.start.arguments.get()
                     .links.where(is_correspondence=False)
