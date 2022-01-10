@@ -65,7 +65,6 @@ class LabelBuilder(Builder):
             self.parent_concept.parent_space
         ).coordinates
         if self.target_node not in self.parent_concept.parent_space:
-            # TODO: create space if doesn't exist?
             self.parent_concept.parent_space.add(self.target_node)
         label = self.bubble_chamber.new_label(
             parent_id=self.codelet_id,
