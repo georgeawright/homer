@@ -63,6 +63,12 @@ class ConceptualSpace(Space):
             return [self]
         return self._dimensions
 
+    def nearby(self, space: Structure = None):
+        return StructureCollection.union(
+            self.correspondees,
+            *[correspondee.correspondees for correspondee in self.correspondees]
+        )
+
     def add(self, structure: Structure):
         location_in_this_space = structure.location_in_space(self)
         if structure not in self.contents:
@@ -83,9 +89,3 @@ class ConceptualSpace(Space):
             ]
             coordinates = coordinates_function(location)
         return Location(coordinates, self)
-
-    def update_activation(self):
-        if len(self.contents) == 0:
-            self._activation = 0
-        else:
-            self._activation = max(item.activation for item in self.contents)
