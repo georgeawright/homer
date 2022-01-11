@@ -50,11 +50,15 @@ class Concept(Node):
         self.depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
         self.is_concept = True
-        self.is_slot = is_slot
+        self._is_slot = is_slot
 
     @property
     def prototype(self) -> list:
         return self.location.coordinates
+
+    @property
+    def is_slot(self) -> bool:
+        return self._is_slot
 
     @property
     def is_filled_in(self) -> bool:
