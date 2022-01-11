@@ -42,9 +42,8 @@ class CorrespondenceSuggester(Suggester):
         target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
-        qualifier = (
-            "TopDown" if target_structures["parent_concept"] is not None else "BottomUp"
-        )
+        parent_concept = target_structures.get("parent_concept")
+        qualifier = "TopDown" if parent_concept is not None else "BottomUp"
         codelet_id = ID.new(cls, qualifier)
         return cls(
             codelet_id,

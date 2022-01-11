@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from homer.random_machine import RandomMachine
 from homer.structure_collection import StructureCollection
+from homer.structures.links import Correspondence
 
 
 @pytest.fixture(scope="module")
@@ -47,6 +48,7 @@ def bubble_chamber():
     interpretation_concept = Mock()
     interpretation_concept.name = "interpretation"
     same_concept = Mock()
+    same_concept.structure_type = Correspondence
     same_concept.name = "same"
     chamber.concepts = chamber.new_structure_collection(
         suggest_concept,

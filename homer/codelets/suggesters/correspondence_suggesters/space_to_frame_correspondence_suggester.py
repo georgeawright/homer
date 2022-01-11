@@ -66,7 +66,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             urgency,
         )
 
-    def passes_preliminary_checks(self):
+    def _passes_preliminary_checks(self):
         try:
             if self.target_space_two is None:
                 self.target_space_two = self.target_view.parent_frame.input_space
