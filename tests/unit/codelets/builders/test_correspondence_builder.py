@@ -103,6 +103,7 @@ def target_view(
     return view
 
 
+@pytest.mark.skip
 def test_successful_creates_chunk_and_spawns_follow_up(
     bubble_chamber,
     target_view,
@@ -132,6 +133,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
     assert isinstance(correspondence_builder.child_codelets[0], CorrespondenceEvaluator)
 
 
+@pytest.mark.skip
 def test_fizzles_when_correspondence_already_exists(
     bubble_chamber,
     target_view,

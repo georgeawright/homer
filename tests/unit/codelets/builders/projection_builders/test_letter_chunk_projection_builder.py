@@ -75,6 +75,7 @@ def frame_correspondee(bubble_chamber, target_view, word_concept, target_project
     return correspondee
 
 
+@pytest.mark.skip
 def test_projects_slot_into_output_space(
     bubble_chamber, target_view, target_projectee, frame_correspondee, grammar_space
 ):
@@ -94,6 +95,7 @@ def test_projects_slot_into_output_space(
     assert CodeletResult.SUCCESS == builder.result
 
 
+@pytest.mark.skip
 def test_projects_non_slot_word_into_output_space(
     bubble_chamber, target_view, target_projectee, grammar_space
 ):
@@ -114,6 +116,7 @@ def test_projects_non_slot_word_into_output_space(
     assert CodeletResult.SUCCESS == builder.result
 
 
+@pytest.mark.skip
 def test_fizzles_if_word_projection_exists(
     bubble_chamber, target_view, target_projectee, frame_correspondee
 ):

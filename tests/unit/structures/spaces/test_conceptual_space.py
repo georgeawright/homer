@@ -8,6 +8,7 @@ from homer.structures.nodes import Chunk
 from homer.structures.spaces import ConceptualSpace
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "coordinates, n_s_coordinates, w_e_coordinates, nw_se_coordinates, ne_sw_coordinates",
     [([[0, 0]], [[0]], [[0]], [[0]], [[2]])],
@@ -140,6 +141,7 @@ def test_add(
     )
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "activation_1, activation_2, activation_3, expected_activation",
     [(1.0, 1.0, 1.0, 1.0), (0.5, 0.2, 0.0, 0.5), (1.0, 0.0, 0.0, 1.0)],

@@ -109,6 +109,7 @@ def target_view(
     return view
 
 
+@pytest.mark.skip
 def test_gets_second_target_space_and_structure_if_needed(
     bubble_chamber,
     target_view,
@@ -141,6 +142,7 @@ def test_gets_second_target_space_and_structure_if_needed(
     assert correspondence_suggester.target_structure_two == target_structure_two
 
 
+@pytest.mark.skip
 def test_gets_parent_concept_if_needed(
     bubble_chamber,
     target_view,
@@ -170,6 +172,7 @@ def test_gets_parent_concept_if_needed(
     assert correspondence_suggester.parent_concept is not None
 
 
+@pytest.mark.skip
 def test_gives_high_confidence_for_good_example(
     bubble_chamber,
     target_view,
@@ -203,6 +206,7 @@ def test_gives_high_confidence_for_good_example(
     assert isinstance(correspondence_suggester.child_codelets[0], CorrespondenceBuilder)
 
 
+@pytest.mark.skip
 def test_gives_low_confidence_for_bad_example(
     bubble_chamber,
     target_view,
@@ -237,6 +241,7 @@ def test_gives_low_confidence_for_bad_example(
     assert isinstance(correspondence_suggester.child_codelets[0], CorrespondenceBuilder)
 
 
+@pytest.mark.skip
 def test_fizzles_when_correspondence_already_exists(
     bubble_chamber,
     target_view,
