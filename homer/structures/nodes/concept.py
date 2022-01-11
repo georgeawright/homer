@@ -27,6 +27,7 @@ class Concept(Node):
         parent_spaces: StructureCollection,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
+        is_slot: bool = False,
     ):
         quality = None
         Node.__init__(
@@ -49,10 +50,15 @@ class Concept(Node):
         self.depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
         self.is_concept = True
+        self.is_slot = is_slot
 
     @property
     def prototype(self) -> list:
         return self.location.coordinates
+
+    @property
+    def is_filled_in(self) -> bool:
+        return not self.relatives.where(is_slot=False).is_empty()
 
     def letter_chunk_forms(
         self, grammar_concept: Concept = None
