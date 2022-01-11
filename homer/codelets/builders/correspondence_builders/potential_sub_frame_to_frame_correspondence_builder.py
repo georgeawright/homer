@@ -4,6 +4,7 @@ from homer.structure_collection import StructureCollection
 
 class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     def _process_structure(self):
+        self.child_structures = self.bubble_chamber.new_structure_collection()
         sub_view = self.target_structure_one.correspondences.get().parent_view
         self.target_view.frames = StructureCollection.union(
             self.target_view.frames, sub_view.frames
@@ -23,7 +24,7 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                 .get()
                 .end
             )
-            self.bubble_chamber.new_relation(
+            concept_link = self.bubble_chamber.new_relation(
                 parent_id=self.codelet_id,
                 start=self.target_structure_two.parent_concept,
                 end=slot_value,
@@ -31,6 +32,7 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                 locations=[],
                 quality=1.0,
             )
+            self.child_structures.add(concept_link)
         sub_frame_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
             start=self.target_structure_one,
@@ -43,6 +45,7 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             conceptual_space=self.target_conceptual_space,
             parent_view=self.target_view,
         )
+        self.child_structures.add(sub_frame_correspondence)
         input_space_to_sub_frame_correspondence = (
             self.target_structure_one.correspondences.filter(
                 lambda x: x.end == self.target_structure_one
@@ -63,6 +66,4 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             conceptual_space=self.target_conceptual_space,
             parent_view=self.target_view,
         )
-        self.child_structures = self.bubble_chamber.new_structure_collection(
-            sub_frame_correspondence, input_space_correspondence
-        )
+        self.child_structures.add(input_space_correspondence)

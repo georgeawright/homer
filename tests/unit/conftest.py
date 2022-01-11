@@ -12,6 +12,12 @@ def bubble_chamber():
     chamber.random_machine = RandomMachine(chamber, seed=1)
     chamber.new_structure_collection = lambda *x: StructureCollection(chamber, x)
 
+    chamber.new_chunk = lambda **x: Mock()
+    chamber.new_letter_chunk = lambda **x: Mock()
+    chamber.new_correspondence = lambda **x: Mock()
+    chamber.new_label = lambda **x: Mock()
+    chamber.new_relation = lambda **x: Mock()
+
     suggest_concept = Mock()
     suggest_concept.name = "suggest"
     build_concept = Mock()

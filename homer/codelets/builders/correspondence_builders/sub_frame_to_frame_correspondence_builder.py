@@ -3,6 +3,7 @@ from homer.codelets.builders import CorrespondenceBuilder
 
 class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     def _process_structure(self):
+        self.child_structures = self.bubble_chamber.new_structure_collection()
         if (
             self.target_structure_two.is_link
             and not self.target_structure_two.parent_concept.is_filled_in
@@ -14,7 +15,7 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                 .get()
                 .end
             )
-            self.bubble_chamber.new_relation(
+            concept_link = self.bubble_chamber.new_relation(
                 parent_id=self.codelet_id,
                 start=self.target_structure_two.parent_concept,
                 end=slot_value,
@@ -22,6 +23,7 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                 locations=[],
                 quality=1.0,
             )
+            self.child_structures.add(concept_link)
         sub_frame_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
             start=self.target_structure_one,
@@ -34,6 +36,8 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             conceptual_space=self.target_conceptual_space,
             parent_view=self.target_view,
         )
+        self.child_structures.add(sub_frame_correspondence)
+        print(self.child_structures)
         input_space_to_sub_frame_correspondence = (
             self.target_structure_one.correspondences.filter(
                 lambda x: x.end == self.target_structure_one
@@ -54,6 +58,5 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             conceptual_space=self.target_conceptual_space,
             parent_view=self.target_view,
         )
-        self.child_structures = self.bubble_chamber.new_structure_collection(
-            sub_frame_correspondence, input_space_correspondence
-        )
+        self.child_structures.add(input_space_correspondence)
+        print(self.child_structures)
