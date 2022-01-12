@@ -1,8 +1,8 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.location import Location
 
 
 class LabelBuilder(Builder):
@@ -56,14 +56,10 @@ class LabelBuilder(Builder):
         return not self.target_node.has_label(self.parent_concept)
 
     def _process_structure(self):
-        if self.target_node.is_label:
-            self.target_node = self.target_node.copy(
-                bubble_chamber=self.bubble_chamber, parent_id=self.codelet_id
-            )
-        parent_concept_coordinates = self.parent_concept.location_in_space(
-            self.parent_concept.parent_space
-        ).coordinates
-        if self.target_node not in self.parent_concept.parent_space:
+        self.child_structures = self.bubble_chamber.new_structure_collection()
+        if self.target_node.is_link:
+            self._recursively_copy_links()
+        if self.target_node not in self.parent_concept.parent_space.contents:
             self.parent_concept.parent_space.add(self.target_node)
         label = self.bubble_chamber.new_label(
             parent_id=self.codelet_id,
@@ -75,7 +71,24 @@ class LabelBuilder(Builder):
             quality=0,
         )
         label.activation = self.INITIAL_STRUCTURE_ACTIVATION
-        self.child_structures = self.bubble_chamber.new_structure_collection(label)
+        self.child_structures.add(label)
+
+    def _recursively_copy_links(self):
+        item_to_copy = self.target_node
+        while item_to_copy.start.is_link:
+            item_to_copy = item_to_copy.start
+        previous_item = item_to_copy.start
+        while item_to_copy is not None:
+            previous_item = item_to_copy.copy(
+                bubble_chamber=self.bubble_chamber,
+                parent_id=self.codelet_id,
+                start=previous_item,
+            )
+            self.child_structures.add(previous_item)
+            try:
+                item_to_copy = item_to_copy.labels.get()
+            except MissingStructureError:
+                item_to_copy = None
 
     def _fizzle(self):
         pass

@@ -20,6 +20,8 @@ from .structures.nodes.chunks import LetterChunk
 from .structures.spaces import ConceptualSpace, ContextualSpace
 from .structures.views import SimplexView, MonitoringView
 
+# TODO: new_structure methods should accept activation as arg with rand as default
+
 
 class BubbleChamber:
     def __init__(self, logger: Logger):
