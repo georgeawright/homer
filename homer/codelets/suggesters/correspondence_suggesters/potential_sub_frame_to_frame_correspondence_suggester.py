@@ -43,7 +43,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     ):
         return cls.make(parent_id, bubble_chamber, urgency)
 
-    def passes_preliminary_checks(self):
+    def _passes_preliminary_checks(self):
         try:
             sub_view = self.bubble_chamber.production_views.filter(
                 lambda x: x.parent_frame.parent_concept
@@ -85,7 +85,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         )
 
     def _fizzle(self):
-        from sub_frame_to_frame_correspondence_suggester import (
+        from .sub_frame_to_frame_correspondence_suggester import (
             SubFrameToFrameCorrespondenceSuggester,
         )
 

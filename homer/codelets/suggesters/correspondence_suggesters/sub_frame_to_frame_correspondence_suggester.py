@@ -43,7 +43,7 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     ):
         return cls.make(parent_id, bubble_chamber, urgency)
 
-    def passes_preliminary_checks(self):
+    def _passes_preliminary_checks(self):
         try:
             frame_one = self.target_view.sub_frames.get(key=corresponding_exigency)
             spaces = self.bubble_chamber.new_structure_collection(
@@ -81,7 +81,7 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         )
 
     def _fizzle(self):
-        from space_to_frame_correspondence_suggester import (
+        from .space_to_frame_correspondence_suggester import (
             SpaceToFrameCorrespondenceSuggester,
         )
 

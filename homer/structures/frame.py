@@ -5,6 +5,7 @@ from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
 # TODO: allow frames to be defined as children of other frames with only parts overwritten
+# TODO: subframes need corresponding exigency to be defined
 
 
 class Frame(Structure):
