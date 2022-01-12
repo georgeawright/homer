@@ -70,7 +70,6 @@ class LabelBuilder(Builder):
             ],
             quality=0,
         )
-        label.activation = self.INITIAL_STRUCTURE_ACTIVATION
         self.child_structures.add(label)
 
     def _recursively_copy_links(self):
