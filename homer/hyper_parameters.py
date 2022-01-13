@@ -15,6 +15,3 @@ class HyperParameters:
     # TODO: these ought to be specific to each conceptual space
     DISTANCE_TO_PROXIMITY_WEIGHT = 1.5
     HOW_FAR_IS_NEAR = 1.5
-
-    # TODO: shouldn't this have been replaced with random initial activations?
-    INITIAL_STRUCTURE_ACTIVATION = 0.5

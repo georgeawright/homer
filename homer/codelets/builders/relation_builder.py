@@ -73,7 +73,6 @@ class RelationBuilder(Builder):
             parent_space=self.target_space,
             quality=0,
         )
-        relation.activation = self.INITIAL_STRUCTURE_ACTIVATION
         self.child_structures = self.bubble_chamber.new_structure_collection(relation)
 
     def _fizzle(self):
