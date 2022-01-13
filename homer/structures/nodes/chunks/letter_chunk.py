@@ -10,8 +10,6 @@ from homer.structures import Space
 from homer.structures.nodes import Chunk, Rule
 from homer.structures.spaces import ContextualSpace
 
-# TODO: needs abstract_chunk attribute
-
 
 class LetterChunk(Chunk):
     def __init__(
