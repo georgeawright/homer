@@ -30,6 +30,7 @@ class Chunk(Node):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
+        abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ):
         Node.__init__(
@@ -43,6 +44,7 @@ class Chunk(Node):
             links_out=links_out,
             parent_spaces=parent_spaces,
         )
+        self.abstract_chunk = (abstract_chunk,)
         self.members = members
         self.left_branch = left_branch
         self.right_branch = right_branch

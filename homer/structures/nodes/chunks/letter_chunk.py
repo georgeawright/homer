@@ -6,8 +6,8 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
-from homer.structures import Node, Space
-from homer.structures.nodes import Chunk, Concept, Rule
+from homer.structures import Space
+from homer.structures.nodes import Chunk, Rule
 from homer.structures.spaces import ContextualSpace
 
 # TODO: needs abstract_chunk attribute
@@ -30,6 +30,7 @@ class LetterChunk(Chunk):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
+        abstract_chunk: LetterChunk = None,
     ):
         Chunk.__init__(
             self,
@@ -46,6 +47,7 @@ class LetterChunk(Chunk):
             links_out=links_out,
             parent_spaces=parent_spaces,
             super_chunks=super_chunks,
+            abstract_chunk=abstract_chunk,
         )
         self.name = name
 

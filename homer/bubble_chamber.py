@@ -263,6 +263,7 @@ class BubbleChamber:
         left_branch: StructureCollection = None,
         right_branch: StructureCollection = None,
         rule: Rule = None,
+        abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ) -> Chunk:
         parent_spaces = self.new_structure_collection(
@@ -282,6 +283,7 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
+            abstract_chunk=abstract_chunk,
             is_raw=is_raw,
         )
         for member in members:
@@ -302,6 +304,7 @@ class BubbleChamber:
         rule: Rule = None,
         meaning_concept: Concept = None,
         grammar_concept: Concept = None,
+        abstract_chunk: LetterChunk = None,
     ) -> Chunk:
         if left_branch is None:
             left_branch = self.new_structure_collection()
@@ -325,6 +328,7 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
+            abstract_chunk=abstract_chunk,
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
