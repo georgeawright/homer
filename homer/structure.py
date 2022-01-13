@@ -45,7 +45,6 @@ class Structure(ABC):
         self._parent_concept = None
 
         self.is_node = False
-        self.is_lexeme = False
         self.is_concept = False
         self.is_chunk = False
         self.is_rule = False
@@ -208,10 +207,6 @@ class Structure(ABC):
         return StructureCollection.union(
             *[correspondence.arguments for correspondence in self.correspondences]
         ).excluding(self)
-
-    @property
-    def lexemes(self) -> StructureCollection:
-        return self.relatives.where(is_lexeme=True)
 
     def nearby(self, space: Structure = None):
         raise NotImplementedError
