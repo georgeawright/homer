@@ -5,7 +5,6 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders.projection_builders import ChunkProjectionBuilder
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Correspondence
-from homer.structures.nodes import Word
 from homer.tools import hasinstance
 
 
