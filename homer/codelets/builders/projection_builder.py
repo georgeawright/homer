@@ -60,12 +60,6 @@ class ProjectionBuilder(Builder):
         }
 
     def _passes_preliminary_checks(self):
-        if self.target_projectee.is_slot:
-            return (
-                self.frame_correspondee.structure_id in self.target_view.slot_values
-                and self.target_projectee.structure_id
-                not in self.target_view.slot_values
-            )
         return not self.target_projectee.has_correspondence_to_space(
             self.target_view.output_space
         )

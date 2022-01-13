@@ -5,133 +5,162 @@ from homer.codelet_result import CodeletResult
 from homer.codelets.builders.projection_builders import LetterChunkProjectionBuilder
 
 
-@pytest.fixture
-def grammar_space(bubble_chamber):
-    space = Mock()
-    space.name = "grammar"
-    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(space)
-    return space
+def test_projects_non_slot_into_output(bubble_chamber):
+    grammar_space = Mock()
+    grammar_space.name = "grammar"
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(
+        grammar_space
+    )
 
-
-@pytest.fixture
-def target_view():
-    view = Mock()
-    view.slot_values = {}
-    return view
-
-
-@pytest.fixture
-def target_projectee(target_view):
-    word = Mock()
     word_copy = Mock()
     word_copy.locations = []
-    word.copy_to_location.return_value = word_copy
-    return word
+    abstract_chunk = Mock()
+    abstract_chunk.copy_to_location.return_value = word_copy
 
-
-@pytest.fixture
-def abstract_word(bubble_chamber):
-    bubble_chamber.words = bubble_chamber.new_structure_collection()
-    word = Mock()
-    word.name = "word"
-    word.activation = 1.0
-    bubble_chamber.words.add(word)
-    word_copy = Mock()
-    word_copy.locations = []
-    word.copy_to_location.return_value = word_copy
-    return word
-
-
-@pytest.fixture
-def word_concept(bubble_chamber, abstract_word):
-    concept = Mock()
-    concept.letter_chunk_forms.return_value = bubble_chamber.new_structure_collection(
-        abstract_word
-    )
-    return concept
-
-
-@pytest.fixture
-def frame_correspondee(bubble_chamber, target_view, word_concept, target_projectee):
-    correspondee = Mock()
-    correspondee.structure_id = "frame_correspondee"
-    frame_correspondence = Mock()
-    frame_correspondence.start = frame_correspondee
-    frame_correspondence.end = target_projectee
-    target_projectee.correspondences = bubble_chamber.new_structure_collection(
-        frame_correspondence
-    )
-    non_frame_correspondee = Mock()
-    non_frame_correspondence = Mock()
-    non_frame_correspondence.start = non_frame_correspondee
-    non_frame_correspondence.end = correspondee
-    correspondee.correspondences = bubble_chamber.new_structure_collection(
-        frame_correspondence, non_frame_correspondence
-    )
-    target_view.members = bubble_chamber.new_structure_collection(
-        frame_correspondence, non_frame_correspondence
-    )
-    target_view.slot_values[correspondee.structure_id] = word_concept
-    return correspondee
-
-
-@pytest.mark.skip
-def test_projects_slot_into_output_space(
-    bubble_chamber, target_view, target_projectee, frame_correspondee, grammar_space
-):
-    target_projectee.is_slot = True
-    target_structures = {
-        "target_view": target_view,
-        "target_projectee": target_projectee,
-        "target_correspondence": Mock(),
-        "frame_correspondee": frame_correspondee,
-        "non_frame": Mock(),
-        "non_frame_correspondee": Mock(),
-    }
-    builder = LetterChunkProjectionBuilder(
-        "", "", bubble_chamber, target_structures, 1.0
-    )
-    builder.run()
-    assert CodeletResult.SUCCESS == builder.result
-
-
-@pytest.mark.skip
-def test_projects_non_slot_word_into_output_space(
-    bubble_chamber, target_view, target_projectee, grammar_space
-):
+    target_projectee = Mock()
     target_projectee.is_slot = False
+    target_projectee.abstract_chunk = abstract_chunk
     target_projectee.has_correspondence_to_space.return_value = False
+
+    target_view = Mock()
+
     target_structures = {
-        "target_view": target_view,
         "target_projectee": target_projectee,
-        "target_correspondence": Mock(),
-        "frame_correspondee": None,
-        "non_frame": Mock(),
-        "non_frame_correspondee": Mock(),
+        "target_view": target_view,
     }
-    builder = LetterChunkProjectionBuilder(
-        "", "", bubble_chamber, target_structures, 1.0
+
+    projection_builder = LetterChunkProjectionBuilder(
+        Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
-    builder.run()
-    assert CodeletResult.SUCCESS == builder.result
+    projection_builder.run()
+    assert CodeletResult.SUCCESS == projection_builder.result
+    assert word_copy in projection_builder.child_structures
 
 
-@pytest.mark.skip
-def test_fizzles_if_word_projection_exists(
-    bubble_chamber, target_view, target_projectee, frame_correspondee
-):
+def test_projects_correspondee_of_slot_into_output(bubble_chamber):
+    grammar_space = Mock()
+    grammar_space.name = "grammar"
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(
+        grammar_space
+    )
+
+    word_copy = Mock()
+    word_copy.locations = []
+    abstract_chunk = Mock()
+    abstract_chunk.copy_to_location.return_value = word_copy
+
+    corresponding_word = Mock()
+    corresponding_word.abstract_chunk = abstract_chunk
+
+    target_projectee = Mock()
     target_projectee.is_slot = True
-    target_view.slot_values[target_projectee.structure_id] = Mock()
+    target_projectee.has_correspondence_to_space.return_value = False
+    target_projectee.correspondences.is_empty.return_value = False
+    target_projectee.correspondees.get.return_value = corresponding_word
+
+    target_view = Mock()
+
     target_structures = {
-        "target_view": target_view,
         "target_projectee": target_projectee,
-        "target_correspondence": Mock(),
-        "frame_correspondee": frame_correspondee,
-        "non_frame": Mock(),
-        "non_frame_correspondee": Mock(),
+        "target_view": target_view,
     }
-    builder = LetterChunkProjectionBuilder(
-        "", "", bubble_chamber, target_structures, 1.0
+
+    projection_builder = LetterChunkProjectionBuilder(
+        Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
-    builder.run()
-    assert CodeletResult.FIZZLE == builder.result
+    projection_builder.run()
+    assert CodeletResult.SUCCESS == projection_builder.result
+    assert word_copy in projection_builder.child_structures
+
+
+def test_projects_slot_into_output_according_to_relation(bubble_chamber):
+    grammar_space = Mock()
+    grammar_space.name = "grammar"
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(
+        grammar_space
+    )
+
+    word_copy = Mock()
+    word_copy.locations = []
+    abstract_chunk = Mock()
+    abstract_chunk.copy_to_location.return_value = word_copy
+
+    parent_concept = Mock()
+    abstract_relation = Mock()
+    abstract_relation.parent_concept = parent_concept
+    abstract_relation.arguments.get.return_value = abstract_chunk
+    abstract_relations = bubble_chamber.new_structure_collection(abstract_relation)
+    relation = Mock()
+    relation.parent_concept = parent_concept
+    relative = Mock()
+    relative.abstract_chunk.relations = abstract_relations
+
+    target_projectee = Mock()
+    target_projectee.is_slot = True
+    target_projectee.has_correspondence_to_space.return_value = False
+    target_projectee.correspondences.is_empty.return_value = True
+    target_projectee.relations.is_empty.return_value = False
+    target_projectee.relations.get.return_value = relation
+    target_projectee.relatives.get.return_value = relative
+
+    target_view = Mock()
+
+    target_structures = {
+        "target_projectee": target_projectee,
+        "target_view": target_view,
+    }
+
+    projection_builder = LetterChunkProjectionBuilder(
+        Mock(), Mock(), bubble_chamber, target_structures, 1.0
+    )
+    projection_builder.run()
+    assert CodeletResult.SUCCESS == projection_builder.result
+    assert word_copy in projection_builder.child_structures
+
+
+def test_projects_slot_into_output_according_to_label(bubble_chamber):
+    grammar_space = Mock()
+    grammar_space.name = "grammar"
+    bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection(
+        grammar_space
+    )
+
+    word_copy = Mock()
+    word_copy.locations = []
+    abstract_chunk = Mock()
+    abstract_chunk.copy_to_location.return_value = word_copy
+
+    meaning_relation = Mock()
+    meaning_relation.end = abstract_chunk
+    meaning_relation.end.activation = 1.0
+    meaning_relations = bubble_chamber.new_structure_collection(meaning_relation)
+    meaning_concept = Mock()
+    meaning_concept.relations.where.return_value = meaning_relations
+    grammar_label = Mock()
+    grammar_label.parent_space = grammar_space
+    meaning_label = Mock()
+    meaning_label.parent_space = Mock()
+    meaning_label.parent_concept = meaning_concept
+
+    target_projectee = Mock()
+    target_projectee.is_slot = True
+    target_projectee.has_correspondence_to_space.return_value = False
+    target_projectee.correspondences.is_empty.return_value = True
+    target_projectee.relations.is_empty.return_value = True
+    target_projectee.labels = bubble_chamber.new_structure_collection(
+        grammar_label, meaning_label
+    )
+
+    target_view = Mock()
+
+    target_structures = {
+        "target_projectee": target_projectee,
+        "target_view": target_view,
+    }
+
+    projection_builder = LetterChunkProjectionBuilder(
+        Mock(), Mock(), bubble_chamber, target_structures, 1.0
+    )
+    projection_builder.run()
+    assert CodeletResult.SUCCESS == projection_builder.result
+    assert word_copy in projection_builder.child_structures
