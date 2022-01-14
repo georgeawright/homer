@@ -19,6 +19,7 @@ class StructureDrivenFactory(Factory):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
     def _engender_follow_up(self):
+        input_space = self.bubble_chamber.production_views.get().input_spaces.get()
         structure = input_space.contents.get(key=unhappiness)
         follow_up_class = self._get_follow_up_class(structure)
         rand = self.bubble_chamber.random_machine.generate_random_number()
@@ -31,16 +32,16 @@ class StructureDrivenFactory(Factory):
         space_concept = self.bubble_chamber.concepts["inner"]
         direction_concept = self.bubble_chamber.concepts["forward"]
 
-        lowest_unhappiness = structure.unlabeledness
-        structure_concept = self.bubble_chamber["label"]
-        if structure.unrelatedness < lowest_unhappiness:
-            lowest_unhappiness = structure.unrelatedness
-            structure_concept = self.bubble_chamber["relation"]
-        if structure.uncorrespondedness < lowest_unhappiness:
-            lowest_unhappiness = structure.uncorrespondedness
-            structure_concept = self.bubble_chamber["correspondence"]
-        if structure.is_chunk and structure.unchunkedness < lowest_unhappiness:
-            structure_concept = self.bubble_chamber["chunk"]
+        highest_unhappiness = structure.unlabeledness
+        structure_concept = self.bubble_chamber.concepts["label"]
+        if structure.unrelatedness > highest_unhappiness:
+            highest_unhappiness = structure.unrelatedness
+            structure_concept = self.bubble_chamber.concepts["relation"]
+        if structure.uncorrespondedness > highest_unhappiness:
+            highest_unhappiness = structure.uncorrespondedness
+            structure_concept = self.bubble_chamber.concepts["correspondence"]
+        if structure.is_chunk and structure.unchunkedness > highest_unhappiness:
+            structure_concept = self.bubble_chamber.concepts["chunk"]
         return self._get_codelet_type_from_concepts(
             action=action_concept,
             space=space_concept,

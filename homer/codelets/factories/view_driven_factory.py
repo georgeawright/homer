@@ -33,13 +33,13 @@ class ViewDrivenFactory(Factory):
         space_concept = self.bubble_chamber.concepts["inner"]
         direction_concept = self.bubble_chamber.concepts["forward"]
         if slot.is_label:
-            structure_concept = self.bubble_chamber["label"]
+            structure_concept = self.bubble_chamber.concepts["label"]
         elif slot.is_relation:
-            structure_concept = self.bubble_chamber["relation"]
+            structure_concept = self.bubble_chamber.concepts["relation"]
         elif slot.is_chunk:
-            structure_concept = self.bubble_chamber["chunk"]
+            structure_concept = self.bubble_chamber.concepts["chunk"]
         elif slot.is_view:
-            structure_concept = self.bubble_chamber["view"]
+            structure_concept = self.bubble_chamber.concepts["view-simplex"]
         return self._get_codelet_type_from_concepts(
             action=action_concept,
             space=space_concept,

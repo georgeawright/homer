@@ -19,13 +19,15 @@ class RationalFactory(Factory):
 
     def _engender_follow_up(self):
         follow_up_class = self._decide_follow_up_class()
-        rand = self.bubble_chamber.random_factory.generate_random_number()
+        rand = self.bubble_chamber.random_machine.generate_random_number()
         if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make(self.codelet_id, self.bubble_chamber)
             self.child_codelets.append(follow_up)
 
     def _decide_follow_up_class(self):
-        follow_up_theme = random.sample(list(self.codelet_themes().values()), 1)[0]
+        follow_up_theme = self.bubble_chamber.random_machine.select(
+            self.codelet_themes().values()
+        )
         return self._get_codelet_type_from_concepts(
             action=follow_up_theme["actions"].get(key=activation),
             space=follow_up_theme["spaces"].get(key=activation),

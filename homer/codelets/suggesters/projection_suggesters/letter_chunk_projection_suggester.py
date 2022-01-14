@@ -42,4 +42,4 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
 
     @property
     def _structure_concept(self):
-        return self.bubble_chamber.concepts["word"]
+        return self.bubble_chamber.concepts["letter-chunk"]

@@ -62,15 +62,18 @@ class Factory(Codelet):
         from homer.codelets import Publisher
         from homer.codelets.suggesters import (
             ChunkSuggester,
-            CorrespondenceSuggester,
             LabelSuggester,
             RelationSuggester,
+        )
+        from homer.codelets.suggesters.correspondence_suggesters import (
+            SpaceToFrameCorrespondenceSuggester,
+            SubFrameToFrameCorrespondenceSuggester,
         )
         from homer.codelets.suggesters.projection_suggesters import (
             ChunkProjectionSuggester,
             LabelProjectionSuggester,
             RelationProjectionSuggester,
-            WordProjectionSuggester,
+            LetterChunkProjectionSuggester,
         )
         from homer.codelets.suggesters.view_suggesters import (
             MonitoringViewSuggester,
@@ -86,7 +89,7 @@ class Factory(Codelet):
             ChunkProjectionEvaluator,
             LabelProjectionEvaluator,
             RelationProjectionEvaluator,
-            WordProjectionEvaluator,
+            LetterChunkProjectionEvaluator,
         )
         from homer.codelets.evaluators.view_evaluators import (
             MonitoringViewEvaluator,
@@ -98,7 +101,7 @@ class Factory(Codelet):
                 "inner": {
                     "forward": {
                         "chunk": ChunkSuggester,
-                        "correspondence": CorrespondenceSuggester,
+                        "correspondence": SpaceToFrameCorrespondenceSuggester,
                         "label": LabelSuggester,
                         "relation": RelationSuggester,
                         "view-monitoring": MonitoringViewSuggester,
@@ -108,9 +111,10 @@ class Factory(Codelet):
                 "outer": {
                     "forward": {
                         "chunk": ChunkProjectionSuggester,
+                        "correspondence": SubFrameToFrameCorrespondenceSuggester,
                         "label": LabelProjectionSuggester,
                         "relation": RelationProjectionSuggester,
-                        "word": WordProjectionSuggester,
+                        "letter-chunk": LetterChunkProjectionSuggester,
                     },
                 },
             },
@@ -128,9 +132,10 @@ class Factory(Codelet):
                 "outer": {
                     "forward": {
                         "chunk": ChunkProjectionEvaluator,
+                        "correspondence": CorrespondenceEvaluator,
                         "label": LabelProjectionEvaluator,
                         "relation": RelationProjectionEvaluator,
-                        "word": WordProjectionEvaluator,
+                        "letter-chunk": LetterChunkProjectionEvaluator,
                     },
                 },
             },
@@ -156,7 +161,7 @@ class Factory(Codelet):
         relation = self.bubble_chamber.concepts["relation"]
         view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
         view_simplex = self.bubble_chamber.concepts["view-simplex"]
-        word = self.bubble_chamber.concepts["word"]
+        letter_chunk = self.bubble_chamber.concepts["letter-chunk"]
 
         nsc = lambda *x: self.bubble_chamber.new_structure_collection(*x)
 
@@ -165,19 +170,19 @@ class Factory(Codelet):
                 "actions": nsc(suggest, evaluate),
                 "spaces": nsc(inner, outer),
                 "directions": nsc(forward),
-                "structures": nsc(chunk, label, relation),
+                "structures": nsc(chunk, correspondence, label, relation),
             },
             "inner": {
                 "actions": nsc(suggest, evaluate),
                 "spaces": nsc(inner),
                 "directions": nsc(forward),
-                "structures": nsc(correspondence, view_monitoring, view_simplex),
+                "structures": nsc(view_monitoring, view_simplex),
             },
             "outer": {
                 "actions": nsc(suggest, evaluate),
                 "spaces": nsc(outer),
                 "directions": nsc(forward),
-                "structures": nsc(word),
+                "structures": nsc(letter_chunk),
             },
             "publish": {
                 "actions": nsc(publish),

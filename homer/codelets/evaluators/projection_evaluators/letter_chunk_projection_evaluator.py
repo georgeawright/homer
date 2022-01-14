@@ -16,7 +16,7 @@ class LetterChunkProjectionEvaluator(ProjectionEvaluator):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        structure_type = bubble_chamber.concepts["letter_chunk"]
+        structure_type = bubble_chamber.concepts["letter-chunk"]
         word = bubble_chamber.input_nodes.where(is_letter_chunk=True).get()
         correspondences = word.correspondences.where(end=word)
         target_structures = StructureCollection.union(
@@ -31,7 +31,7 @@ class LetterChunkProjectionEvaluator(ProjectionEvaluator):
 
     @property
     def _parent_link(self):
-        structure_concept = self.bubble_chamber.concepts["word"]
+        structure_concept = self.bubble_chamber.concepts["letter-chunk"]
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):

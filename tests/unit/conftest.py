@@ -29,10 +29,16 @@ def bubble_chamber():
     select_concept.name = "select"
     publish_concept = Mock()
     publish_concept.name = "publish"
+    inner_concept = Mock()
+    inner_concept.name = "inner"
+    outer_concept = Mock()
+    outer_concept.name = "outer"
+    forward_concept = Mock()
+    forward_concept.name = "forward"
     chunk_concept = Mock()
     chunk_concept.name = "chunk"
-    word_concept = Mock()
-    word_concept.name = "word"
+    letter_chunk_concept = Mock()
+    letter_chunk_concept.name = "letter-chunk"
     label_concept = Mock()
     label_concept.name = "label"
     relation_concept = Mock()
@@ -56,8 +62,11 @@ def bubble_chamber():
         evaluate_concept,
         select_concept,
         publish_concept,
+        inner_concept,
+        outer_concept,
+        forward_concept,
         chunk_concept,
-        word_concept,
+        letter_chunk_concept,
         label_concept,
         relation_concept,
         correspondence_concept,
@@ -67,8 +76,11 @@ def bubble_chamber():
         interpretation_concept,
         same_concept,
     )
+    for concept in chamber.concepts:
+        concept.activation = 0.5
 
     chamber.chunks = chamber.new_structure_collection()
+    chamber.rules = chamber.new_structure_collection()
     chamber.input_nodes = [Mock()]
     input_space = Mock()
     input_space.name = "input"

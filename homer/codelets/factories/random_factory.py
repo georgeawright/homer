@@ -24,7 +24,9 @@ class RandomFactory(Factory):
             self.child_codelets.append(follow_up)
 
     def _decide_follow_up_class(self):
-        follow_up_theme = random.sample(list(self.codelet_themes().values()), 1)[0]
+        follow_up_theme = self.bubble_chamber.random_machine.select(
+            self.codelet_themes().values()
+        )
         return self._get_codelet_type_from_concepts(
             action=follow_up_theme["actions"].get(),
             space=follow_up_theme["spaces"].get(),

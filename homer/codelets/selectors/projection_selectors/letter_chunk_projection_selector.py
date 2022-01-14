@@ -8,7 +8,7 @@ from homer.structure_collection_keys import uncorrespondedness
 class LetterChunkProjectionSelector(ProjectionSelector):
     @property
     def _structure_concept(self):
-        return self.bubble_chamber.concepts["word"]
+        return self.bubble_chamber.concepts["letter-chunk"]
 
     def _passes_preliminary_checks(self):
         return True
