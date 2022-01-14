@@ -8,6 +8,7 @@ from homer.structures.links import Correspondence, Label, Relation
 from homer.structures.nodes import Chunk, Concept, Rule
 
 
+@pytest.mark.skip
 def test_spreading_activation():
     bubble_chamber = BubbleChamber.setup(Mock())
 

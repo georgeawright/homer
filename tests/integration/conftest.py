@@ -1,22 +1,31 @@
-import math
 import pytest
-import statistics
 from unittest.mock import Mock
 
-from homer.bubble_chamber import BubbleChamber
-from homer.classifiers import ProximityClassifier, SamenessClassifier
-from homer.id import ID
-from homer.location import Location
-from homer.locations import TwoPointLocation
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence, Label, Relation
-from homer.structures.nodes import Chunk, Concept, Rule
-from homer.structures.nodes.chunks import LetterChunk
-from homer.structures.spaces import ConceptualSpace, ContextualSpace, Frame
-from homer.tools import add_vectors, centroid_euclidean_distance
-from homer.word_form import WordForm
+from homer import Homer
 
 # use a single string + interpreter to define testing evironment
+
+
+@pytest.fixture(scope="module")
+def program():
+    return """
+# basic concepts
+input_concept = Concept(
+    parent_id:""; name:"input"; locations:[]; classifier:None; instance_type:None;
+    structure_type:None; parent_space:None; distance_function:None
+)
+# grammar concepts
+# semantic concepts - temperature, height, goodness, location, magnitude
+# frames
+# input
+"""
+
+
+@pytest.fixture(scope="module")
+def homer(program):
+    system = Homer.setup(logger=Mock())
+    system.interpreter.interpret_string(program)
+    return system
 
 
 @pytest.fixture(scope="module")
