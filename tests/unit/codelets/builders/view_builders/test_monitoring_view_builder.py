@@ -32,7 +32,6 @@ def interpretation_space():
     return space
 
 
-@pytest.mark.skip
 def test_successful_creates_view_and_spawns_follow_up(
     bubble_chamber, interpretation_space, input_space, text_space
 ):

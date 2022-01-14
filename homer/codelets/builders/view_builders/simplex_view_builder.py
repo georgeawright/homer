@@ -46,6 +46,7 @@ class SimplexViewBuilder(ViewBuilder):
         view = SimplexView(
             structure_id=view_id,
             parent_id=self.codelet_id,
+            parent_frame=frame_instance,
             locations=[Location([], self.bubble_chamber.spaces["views"])],
             members=self.bubble_chamber.new_structure_collection(),
             input_spaces=input_spaces,

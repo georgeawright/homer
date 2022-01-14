@@ -23,6 +23,7 @@ class MonitoringViewBuilder(ViewBuilder):
         view = MonitoringView(
             structure_id=view_id,
             parent_id=self.codelet_id,
+            parent_frame=None,
             locations=[Location([], self.bubble_chamber.spaces["views"])],
             members=self.bubble_chamber.new_structure_collection(),
             input_spaces=self.input_spaces,
