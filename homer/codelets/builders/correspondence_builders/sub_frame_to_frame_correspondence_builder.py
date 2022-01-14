@@ -37,7 +37,6 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             parent_view=self.target_view,
         )
         self.child_structures.add(sub_frame_correspondence)
-        print(self.child_structures)
         input_space_to_sub_frame_correspondence = (
             self.target_structure_one.correspondences.filter(
                 lambda x: x.end == self.target_structure_one
@@ -59,4 +58,3 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             parent_view=self.target_view,
         )
         self.child_structures.add(input_space_correspondence)
-        print(self.child_structures)

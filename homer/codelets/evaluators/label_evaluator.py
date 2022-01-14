@@ -36,7 +36,6 @@ class LabelEvaluator(Evaluator):
                 target_label = target_label.labels.get()
             except MissingStructureError:
                 target_label = None
-                print(target_label)
         self.confidence = fuzzy.OR(
             *[
                 label.parent_concept.classifier.classify(
