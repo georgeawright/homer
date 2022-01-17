@@ -180,12 +180,14 @@ class BubbleChamber:
         name: str,
         parent_concept: Concept,
         no_of_dimensions: int,
-        dimensions: List[ConceptualSpace],
-        sub_spaces: List[ConceptualSpace],
+        dimensions: List[ConceptualSpace] = None,
+        sub_spaces: List[ConceptualSpace] = None,
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
     ) -> ConceptualSpace:
+        dimensions = [] if dimensions is None else dimensions
+        sub_spaces = [] if sub_spaces is None else sub_spaces
         space = ConceptualSpace(
             structure_id=ID.new(ConceptualSpace),
             parent_id=parent_id,
