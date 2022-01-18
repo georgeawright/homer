@@ -26,7 +26,7 @@ def test_evaluate():
     bubble_chamber = BubbleChamber.setup(Mock())
     interpreter = Interpreter(bubble_chamber)
 
-    program = '(define s "hello~world")'
+    program = '(define s """hello world""")'
     interpreter.evaluate(interpreter.parse(program))
     assert interpreter.names["s"] == "hello world"
 
@@ -42,7 +42,7 @@ def test_evaluate():
     interpreter.evaluate(interpreter.parse(program))
     assert interpreter.names["c"] == {"k": 1}
 
-    program = '(define d (python "lambda~x:~x*2"))'
+    program = '(define d (python """lambda x: x*2"""))'
     interpreter.evaluate(interpreter.parse(program))
     func = interpreter.names["d"]
     assert func(2) == 4

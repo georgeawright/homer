@@ -52,8 +52,36 @@ class Interpreter:
         program = f"(eval {program})"
         return self.read_from_tokens(self.tokenize(program))
 
-    def tokenize(self, string: str) -> list:
-        return string.replace("(", " ( ").replace(")", " ) ").split()
+    def tokenize(self, program: str) -> list:
+        tokens = [""]
+        in_big_string = False
+        i = 0
+        while i < len(program):
+            if (
+                i < len(program) - 2
+                and program[i] == program[i + 1] == program[i + 2] == '"'
+            ):
+                tokens[-1] += '"'
+                in_big_string = not in_big_string
+                i += 3
+            if in_big_string:
+                tokens[-1] += program[i]
+            elif program[i] == "(" or program[i] == ")":
+                if tokens[-1] == "":
+                    tokens[-1] += program[i]
+                else:
+                    tokens.append(program[i])
+                tokens.append("")
+            elif program[i].isspace():
+                if tokens[-1] != "":
+                    tokens.append("")
+            else:
+                tokens[-1] += program[i]
+            i += 1
+        if in_big_string:
+            raise SyntaxError("Unexpected EOF")
+        print(tokens)
+        return tokens
 
     def read_from_tokens(self, tokens: list):
         if len(tokens) == 0:
@@ -65,10 +93,9 @@ class Interpreter:
                 l.append(self.read_from_tokens(tokens))
             tokens.pop(0)
             return l
-        elif token == ")":
+        if token == ")":
             raise SyntaxError("Unexpected )")
-        else:
-            return self.atom(token)
+        return self.atom(token)
 
     def atom(self, token: str):
         try:
@@ -81,8 +108,9 @@ class Interpreter:
 
     def evaluate(self, x):
         if isinstance(x, str):
+            print(x)
             if x[0] == '"':
-                return x.replace("~", " ")[1:-1]
+                return x[1:-1]
             return self.names[x]
         if isinstance(x, (float, int)):
             return x
@@ -92,6 +120,7 @@ class Interpreter:
         else:
             procedure = self.evaluate(x.pop(0))
             args = []
+            print(x)
             while len(x) > 0 and (isinstance(x[0], (float, int)) or x[0][0] != ":"):
                 args.append(self.evaluate(x.pop(0)))
             kwargs = {}

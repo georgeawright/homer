@@ -176,10 +176,10 @@ class BubbleChamber:
 
     def new_conceptual_space(
         self,
-        parent_id: str,
         name: str,
         parent_concept: Concept,
         no_of_dimensions: int,
+        parent_id: str = "",
         dimensions: List[ConceptualSpace] = None,
         sub_spaces: List[ConceptualSpace] = None,
         is_basic_level: bool = False,
@@ -209,10 +209,10 @@ class BubbleChamber:
 
     def new_contextual_space(
         self,
-        parent_id: str,
         name: str,
         parent_concept: Concept,
         conceptual_spaces: StructureCollection,
+        parent_id: str = "",
     ) -> ContextualSpace:
         space = ContextualSpace(
             structure_id=ID.new(ContextualSpace),
@@ -231,13 +231,13 @@ class BubbleChamber:
     # TODO: allow frames to be defined as children of other frames with only parts overwritten
     def new_frame(
         self,
-        parent_id: str,
         name: str,
         parent_concept: Concept,
         parent_frame: Frame,
         contents: StructureCollection,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
+        parent_id: str = "",
     ) -> Frame:
         frame = Frame(
             structure_id=ID.new(Frame),
@@ -257,10 +257,10 @@ class BubbleChamber:
 
     def new_chunk(
         self,
-        parent_id: str,
         locations: List[Location],
         members: StructureCollection,
         parent_space: Space,
+        parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         left_branch: StructureCollection = None,
         right_branch: StructureCollection = None,
@@ -295,11 +295,11 @@ class BubbleChamber:
 
     def new_letter_chunk(
         self,
-        parent_id: str,
         name: Union[str, None],
         locations: List[Location],
         members: StructureCollection,
         parent_space: Space,
+        parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         left_branch: StructureCollection = None,
         right_branch: StructureCollection = None,
@@ -343,7 +343,6 @@ class BubbleChamber:
 
     def new_concept(
         self,
-        parent_id: str,
         name: str,
         locations: List[Location],
         classifier: Classifier,
@@ -351,6 +350,7 @@ class BubbleChamber:
         structure_type: type,
         parent_space: Space,
         distance_function: Callable,
+        parent_id: str = "",
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
     ) -> Concept:
@@ -379,12 +379,12 @@ class BubbleChamber:
 
     def new_rule(
         self,
-        parent_id: str,
         name: str,
         location: Location,
         root_concept: Concept,
         left_concept: Concept,
         right_concept: Concept,
+        parent_id: str = "",
         stable_activation: FloatBetweenOneAndZero = None,
     ) -> Rule:
         rule = Rule(
@@ -430,13 +430,13 @@ class BubbleChamber:
 
     def new_correspondence(
         self,
-        parent_id: str,
         start: Structure,
         end: Structure,
         locations: List[Location],
         parent_concept: Concept,
         conceptual_space: ConceptualSpace,
         parent_view: View,
+        parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         is_privileged: bool = False,
     ) -> Correspondence:
@@ -472,10 +472,10 @@ class BubbleChamber:
 
     def new_label(
         self,
-        parent_id: str,
         start: Structure,
         parent_concept: Concept,
         locations: List[Location],
+        parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
     ) -> Label:
         parent_spaces = self.new_structure_collection(
@@ -500,11 +500,11 @@ class BubbleChamber:
 
     def new_relation(
         self,
-        parent_id: str,
         start: Structure,
         end: Structure,
         parent_concept: Concept,
         locations: List[Location],
+        parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
