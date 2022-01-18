@@ -5,7 +5,7 @@ from . import structures
 from .location import Location
 from .tools import centroid_euclidean_distance
 
-# strings can't contain spaces
+# strings can't contain spaces. '~' is used to represent a space
 
 
 class Interpreter:
@@ -41,6 +41,7 @@ class Interpreter:
             "list": lambda *x: list(x),
             "tuple": lambda *x: tuple(x),
             "dict": lambda *x: dict(*x),
+            "python": lambda *x: eval(x[-1]),
             "Location": Location,
             "None": None,
             "True": True,
@@ -81,7 +82,7 @@ class Interpreter:
     def evaluate(self, x):
         if isinstance(x, str):
             if x[0] == '"':
-                return x[1:-1]
+                return x.replace("~", " ")[1:-1]
             return self.names[x]
         if isinstance(x, (float, int)):
             return x
