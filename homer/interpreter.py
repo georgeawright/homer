@@ -40,7 +40,7 @@ class Interpreter:
             "eval": lambda *x: x[-1],
             "list": lambda *x: list(x),
             "tuple": lambda *x: tuple(x),
-            "dict": lambda *x: dict(*x),
+            "dict": dict,
             "python": lambda *x: eval(x[-1]),
             "Location": Location,
             "None": None,
