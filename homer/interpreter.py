@@ -24,7 +24,7 @@ class Interpreter:
             "ProximityClassifier": classifiers.ProximityClassifier,
             "SamenessClassifier": classifiers.SamenessClassifier,
             # Distance Functions
-            "centroid-euclidean-distance": centroid_euclidean_distance,
+            "centroid_euclidean_distance": centroid_euclidean_distance,
             # Structure Factory Methods
             "def-conceptual-space": bubble_chamber.new_conceptual_space,
             "def-contextual-space": bubble_chamber.new_contextual_space,
@@ -39,6 +39,8 @@ class Interpreter:
             # Other inbuilt classes and functions
             "eval": lambda *x: x[-1],
             "list": lambda *x: list(x),
+            "tuple": lambda *x: tuple(x),
+            "dict": lambda *x: dict(*x),
             "Location": Location,
             "None": None,
             "True": True,

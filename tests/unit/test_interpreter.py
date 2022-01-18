@@ -28,8 +28,21 @@ def test_evaluate():
 
     program = "(define a (list 1 2))"
     interpreter.evaluate(interpreter.parse(program))
-
     assert interpreter.names["a"] == [1, 2]
+
+    program = '(define b (tuple "k" 1))'
+    interpreter.evaluate(interpreter.parse(program))
+    assert interpreter.names["b"] == ("k", 1)
+
+    program = '(define c (dict (list (tuple "k" 1))))'
+    interpreter.evaluate(interpreter.parse(program))
+    assert interpreter.names["c"] == {"k": 1}
+
+
+#    program = '(define d (python "lambda x: x*2"))'
+#    interpreter.evaluate(interpreter.parse(program))
+#    func = interpreter.names["d"]
+#    assert func(2) == 4
 
 
 def test_interpret_string():
@@ -40,7 +53,7 @@ def test_interpret_string():
     (define input (def-concept :parent_id "x" :name "input" :locations (list) :classifier None :instance_type None :structure_type None :parent_space None :distance_function None :depth 1))
     (define temperature_concept (def-concept :parent_id "x" :name "temperature" :locations (list) :classifier None :instance_type None :structure_type None :parent_space None :distance_function None :depth 1))
     (define temperature_space (def-conceptual-space :parent_id "x" :name "temperature" :parent_concept temperature_concept :no_of_dimensions 1 :dimensions (list) :sub_spaces (list) :is_basic_level True))
-    (define hot_concept (def-concept :parent_id "x" :name "hot" :locations (list (Location (list(list 20)) temperature_space)) :classifier ProximityClassifier :instance_type Chunk :structure_type Label :parent_space temperature_space :distance_function centroid-euclidean-distance :depth 1))
+    (define hot_concept (def-concept :parent_id "x" :name "hot" :locations (list (Location (list(list 20)) temperature_space)) :classifier ProximityClassifier :instance_type Chunk :structure_type Label :parent_space temperature_space :distance_function centroid_euclidean_distance :depth 1))
     """
 
     interpreter.interpret_string(string)
