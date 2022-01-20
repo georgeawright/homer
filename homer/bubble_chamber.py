@@ -258,8 +258,8 @@ class BubbleChamber:
     def new_chunk(
         self,
         locations: List[Location],
-        members: StructureCollection,
         parent_space: Space,
+        members: StructureCollection = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         left_branch: StructureCollection = None,
@@ -268,6 +268,8 @@ class BubbleChamber:
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ) -> Chunk:
+        if members is None:
+            members = self.new_structure_collection()
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )

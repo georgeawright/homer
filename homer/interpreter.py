@@ -19,10 +19,10 @@ class Interpreter:
             "Chunk": structures.nodes.Chunk,
             "LetterChunk": structures.nodes.chunks.LetterChunk,
             # Classifier Types
-            "DifferenceClassifier": classifiers.DifferenceClassifier,
-            "DifferentnessClassifier": classifiers.DifferentnessClassifier,
-            "ProximityClassifier": classifiers.ProximityClassifier,
-            "SamenessClassifier": classifiers.SamenessClassifier,
+            "DifferenceClassifier": classifiers.DifferenceClassifier(),
+            "DifferentnessClassifier": classifiers.DifferentnessClassifier(),
+            "ProximityClassifier": classifiers.ProximityClassifier(),
+            "SamenessClassifier": classifiers.SamenessClassifier(),
             # Distance Functions
             "centroid_euclidean_distance": centroid_euclidean_distance,
             # Structure Factory Methods
@@ -42,6 +42,7 @@ class Interpreter:
             "tuple": lambda *x: tuple(x),
             "dict": dict,
             "python": lambda *x: eval(x[-1]),
+            "StructureCollection": bubble_chamber.new_structure_collection,
             "Location": Location,
             "None": None,
             "True": True,
@@ -80,7 +81,6 @@ class Interpreter:
             i += 1
         if in_big_string:
             raise SyntaxError("Unexpected EOF")
-        print(tokens)
         return tokens
 
     def read_from_tokens(self, tokens: list):
@@ -108,7 +108,6 @@ class Interpreter:
 
     def evaluate(self, x):
         if isinstance(x, str):
-            print(x)
             if x[0] == '"':
                 return x[1:-1]
             return self.names[x]
@@ -120,7 +119,6 @@ class Interpreter:
         else:
             procedure = self.evaluate(x.pop(0))
             args = []
-            print(x)
             while len(x) > 0 and (isinstance(x[0], (float, int)) or x[0][0] != ":"):
                 args.append(self.evaluate(x.pop(0)))
             kwargs = {}
@@ -130,7 +128,6 @@ class Interpreter:
                 kwargs[key] = self.evaluate(value)
             if len(x) > 0:
                 raise SyntaxError("Positional argument after keyword argument.")
-            print("proc", procedure)
             return procedure(*args, **kwargs)
 
     def interpret_string(self, string: str):

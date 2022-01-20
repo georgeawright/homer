@@ -24,3 +24,17 @@ from homer.codelets.suggesters import (
 
 def test_pipeline_of_codelets(homer):
     bubble_chamber = homer.bubble_chamber
+    input_space = bubble_chamber.contextual_spaces["input"]
+    location_space = bubble_chamber.conceptual_spaces["location"]
+
+    target_node = input_space.contents.filter(
+        lambda x: x.location_in_space(location_space).coordinates == [[0, 0]]
+    ).get()
+    parent_concept = bubble_chamber.concepts["cold"]
+    codelet = LabelSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_node": target_node, "parent_concept": parent_concept},
+        1.0,
+    )
+    codelet.run()
