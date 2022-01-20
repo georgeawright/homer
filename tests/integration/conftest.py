@@ -3,21 +3,479 @@ from unittest.mock import Mock
 
 from homer import Homer
 
-# use a single string + interpreter to define testing evironment
-
 
 @pytest.fixture(scope="module")
 def program():
     return """
-# basic concepts
-input_concept = Concept(
-    parent_id:""; name:"input"; locations:[]; classifier:None; instance_type:None;
-    structure_type:None; parent_space:None; distance_function:None
-)
-# grammar concepts
-# semantic concepts - temperature, height, goodness, location, magnitude
-# frames
-# input
+(define input-concept (def-concept :name "input"))
+(define text-concept (def-concept :name "text"))
+
+(define activity-concept (def-concept :name "activity"))
+(define activity-space
+  (def-conceptual-space :name "activity" :parent_concept activity-concept))
+(define suggest-concept
+  (def-concept :name "suggest" :locations (list (Location (list) activity-space))
+    :parent_space activity-space :activation 1.0))
+(define build-concept
+  (def-concept :name "build" :locations (list (Location (list) activity-space))
+    :parent_space activity-space :activation 1.0))
+(define evaluate-concept
+  (def-concept :name "evaluate" :locations (list (Location (list) activity-space))
+    :parent_space activity-space))
+(define select-concept
+  (def-concept :name "select" :locations (list (Location (list) activity-space))
+    :parent_space activity-space))
+(define publish-concept
+  (def-concept :name "publish" :locations (list (Location (list) activity-space))
+    :parent_space activity-space))
+
+(define space-type-concept (def-concept :name "space-type"))
+(define space-type-space
+  (def-conceptual-space :name "space-type" :parent_concept space-type-concept))
+(define inner-concept
+  (def-concept :name "inner" :locations (list (Location (list) space-type-space))
+    :parent_space space-type-space))
+(define outer-concept
+  (def-concept :name "outer" :locations (list (Location (list) space-type-space))
+    :parent_space space-type-space))
+
+(define direction-concept (def-concept :name "direction-type"))
+(define direction-space
+  (def-conceptual-space :name "direction" :parent_concept direction-concept))
+(define forward-concept
+  (def-concept :name "forward" :locations (list (Location (list) direction-space))
+    :parent_space direction-space))
+(define backward-concept
+  (def-concept :name "backward" :locations (list (Location (list) direction-space))
+    :parent_space direction-space))
+
+(define structure-concept (def-concept :name "structure-type"))
+(define structure-space
+  (def-conceptual-space :name "structure" :parent_concept structure-concept))
+(define correspondence-concept
+  (def-concept :name "correspondence" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
+(define label-concept
+  (def-concept :name "label" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
+(define relation-concept
+  (def-concept :name "relation" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
+(define chunk-concept
+  (def-concept :name "chunk" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
+(define letter-chunk-concept
+  (def-concept :name "letter-chunk" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
+(define view-monitoring-concept
+  (def-concept :name "view-monitoring" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
+(define view-simplex-concept
+  (def-concept :name "view-simplex" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
+
+(define grammar-distance-to-proximity 0.1)
+(define grammar-concept (def-concept :name "grammar"))
+(define grammar-space
+  (def-conceptual-space :name "grammar" :parent_concept grammar-concept
+    :no_of_dimensions 0))
+(define sentence-concept
+  (def-concept :name "sentence" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define np-concept
+  (def-concept :name "np" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define vp-concept
+  (def-concept :name "vp" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define ap-concept
+  (def-concept :name "ap" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define rp-concept
+  (def-concept :name "rp" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-concept
+  (def-concept :name "pp" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define nn-concept
+  (def-concept :name "nn" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define vb-concept
+  (def-concept :name "vb" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define jj-concept
+  (def-concept :name "jj" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define jjr-concept
+  (def-concept :name "jjr" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define rb-concept
+  (def-concept :name "rb" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define cop-concept
+  (def-concept :name "cop" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define prep-concept
+  (def-concept :name "prep" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define det-concept
+  (def-concept :name "det" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define conj-concept
+  (def-concept :name "conj" :locations (list (Location (list (list)) grammar-space))
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+
+(define the (def-letter-chunk :name "the" :locations (list (Location (list) grammar-space))))
+(define is (def-letter-chunk :name "is" :locations (list (Location (list) grammar-space))))
+(define it (def-letter-chunk :name "it" :locations (list (Location (list) grammar-space))))
+(define in (def-letter-chunk :name "in" :locations (list (Location (list) grammar-space))))
+(define than (def-letter-chunk :name "than" :locations (list (Location (list) grammar-space))))
+(define and (def-letter-chunk :name "and" :locations (list (Location (list) grammar-space))))
+(define but (def-letter-chunk :name "but" :locations (list (Location (list) grammar-space))))
+(define comma (def-letter-chunk :name "comma" :locations (list (Location (list) grammar-space))))
+(define fstop (def-letter-chunk :name "fstop" :locations (list (Location (list) grammar-space))))
+(define -er (def-letter-chunk :name "-er" :locations (list (Location (list) grammar-space))))
+(define null (def-letter-chunk :name "" :locations (list (Location (list) grammar-space))))
+
+(define same-different-concept
+  (def-concept :name "same-different" :locations (list) :classifier None :instance_type None
+    :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define same-different-space
+  (def-conceptual-space :name "same-different" :parent_concept same-different-concept
+    :no_of_dimensions 1))
+(define same-concept
+  (def-concept :name "same"
+    :locations (list (Location (list (list 10)) same-different-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Relation
+    :parent_space same-different-space :distance_function centroid_euclidean_distance))
+(define different-concept
+  (def-concept :name "different"
+    :locations (list (Location (list (list 10)) same-different-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Relation
+    :parent_space same-different-space :distance_function centroid_euclidean_distance))
+    
+(define same-word (def-letter-chunk :name "same" :locations (list)))
+(def-relation :start same-concept :end same-word :parent_concept jj-concept)
+(define different-word (def-letter-chunk :name "different" :locations (list)))
+(def-relation :start different-concept :end different-word :parent_concept jj-concept)
+
+(define more-less-concept
+  (def-concept :name "more-less" :locations (list) :classifier None :instance_type None
+    :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define more-less-space
+  (def-conceptual-space :name "more-less" :parent_concept more-less-concept
+    :no_of_dimensions 1))
+(define more-concept
+  (def-concept :name "more" :locations (list (Location (list (list 5)) more-less-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Relation
+    :parent_space more-less-space :distance_function centroid_euclidean_distance))
+(define less-concept
+  (def-concept :name "less" :locations (list (Location (list (list -5)) more-less-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Relation
+    :parent_space more-less-space :distance_function centroid_euclidean_distance))
+
+(define more-word (def-letter-chunk :name "more" :locations (list)))
+(def-relation :start more-concept :end more-word :parent_concept jj-concept)
+(define less-word (def-letter-chunk :name "less" :locations (list)))
+(def-relation :start less-concept :end less-word :parent_concept jj-concept)
+
+(define magnitude-concept
+  (def-concept :name "magnitude" :locations (list) :classifier None :instance_type None
+    :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define magnitude-space
+  (def-conceptual-space :name "magnitude" :parent_concept magnitude-concept
+    :no_of_dimensions 1))
+(define extremely-concept
+  (def-concept :name "extremely"
+    :locations (list (Location (list (list 2)) magnitude-space))
+    :classifier ProximityClassifier :instance_type Label :structure_type Label
+    :parent_space magnitude-space :distance_function centroid_euclidean_distance))
+(define very-concept
+  (def-concept :name "very"
+    :locations (list (Location (list (list 1)) magnitude-space))
+    :classifier ProximityClassifier :instance_type Label :structure_type Label
+    :parent_space magnitude-space :distance_function centroid_euclidean_distance))
+(define quite-concept
+  (def-concept :name "quite"
+    :locations (list (Location (list (list -1)) magnitude-space))
+    :classifier ProximityClassifier :instance_type Label :structure_type Label
+    :parent_space magnitude-space :distance_function centroid_euclidean_distance))
+(define bit-concept
+  (def-concept :name "bit"
+    :locations (list (Location (list (list -2)) magnitude-space))
+    :classifier ProximityClassifier :instance_type Label :structure_type Label
+    :parent_space magnitude-space :distance_function centroid_euclidean_distance))
+
+(define height-concept
+  (def-concept :name "height" :locations (list) :classifier None
+    :instance_type None :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define height-space
+  (def-conceptual-space :name "height" :parent_concept height-concept
+    :no_of_dimensions 1))
+(define high-concept
+  (def-concept :name "high" :locations (list (Location (list (list 10)) height-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space height-space :distance_function centroid_euclidean_distance))
+(define low-concept
+  (def-concept :name "low" :locations (list (Location (list (list 0)) height-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space height-space :distance_function centroid_euclidean_distance))
+
+(define high-word (def-letter-chunk :name "high" :locations (list)))
+(def-relation :start high-concept :end high-word :parent_concept jj-concept)
+(def-relation :start high-concept :end high-word :parent_concept jjr-concept)
+(def-relation :start high-word :end -er :parent_concept jjr-concept)
+(define low-word (def-letter-chunk :name "low" :locations (list)))
+(def-relation :start low-concept :end low-word :parent_concept jj-concept)
+(def-relation :start low-concept :end low-word :parent_concept jjr-concept)
+(def-relation :start low-word :end -er :parent_concept jjr-concept)
+
+(define goodness-concept
+  (def-concept :name "goodness" :locations (list) :classifier None
+    :instance_type None :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define goodness-space
+  (def-conceptual-space :name "goodness" :parent_concept goodness-concept
+    :no_of_dimensions 1))
+(define good-concept
+  (def-concept :name "good" :locations (list (Location (list (list 10)) goodness-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space goodness-space :distance_function centroid_euclidean_distance))
+(define bad-concept
+  (def-concept :name "bad" :locations (list (Location (list (list 0)) goodness-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space goodness-space :distance_function centroid_euclidean_distance))
+
+(define good-word (def-letter-chunk :name "good" :locations (list)))
+(def-relation :start good-concept :end good-word :parent_concept jj-concept)
+(define bett-word (def-letter-chunk :name "bett" :locations (list)))
+(def-relation :start good-concept :end bett-word :parent_concept jjr-concept)
+(def-relation :start bett-word :end -er :parent_concept jjr-concept)
+(define bad-word (def-letter-chunk :name "bad" :locations (list)))
+(def-relation :start bad-concept :end bad-word :parent_concept jj-concept)
+(define worse-word (def-letter-chunk :name "worse" :locations (list)))
+(def-relation :start bad-concept :end worse-word :parent_concept jjr-concept)
+(def-relation :start worse-word :end null :parent_concept jjr-concept)
+
+(define extremeness-concept
+  (def-concept :name "extremeness" :locations (list) :classifier None
+    :instance_type None :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define extremeness-space
+  (def-conceptual-space :name "extremeness" :parent_concept extremeness-concept
+    :no_of_dimensions 1))
+(define extreme-concept
+  (def-concept :name "extreme" :locations (list (Location (list (list 10)) extremeness-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space extremeness-space :distance_function centroid_euclidean_distance))
+    
+(define extreme-word (def-letter-chunk :name "extreme" :locations (list)))
+(def-relation :start extreme-concept :end extreme-word :parent_concept jj-concept)
+
+(define temperature-concept
+  (def-concept :name "temperature" :locations (list) :classifier None
+    :instance_type None :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define temperature-space
+  (def-conceptual-space :name "temperature" :parent_concept temperature-concept
+    :no_of_dimensions 1))
+(define hot-concept
+  (def-concept :name "hot" :locations (list (Location (list (list 22)) temperature-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space temperature-space :distance_function centroid_euclidean_distance))
+(define warm-concept
+  (def-concept :name "warm" :locations (list (Location (list (list 18)) temperature-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space temperature-space :distance_function centroid_euclidean_distance))
+(define mild-concept
+  (def-concept :name "mild"
+    :locations (list
+		(Location (list (list 0)) extremeness-space)
+		(Location (list (list 13)) temperature-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space extremeness-space :distance_function centroid_euclidean_distance))
+(define cool-concept
+  (def-concept :name "cool" :locations (list (Location (list (list 8)) temperature-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space temperature-space :distance_function centroid_euclidean_distance))
+(define cold-concept
+  (def-concept :name "cold" :locations (list (Location (list (list 4)) temperature-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space temperature-space :distance_function centroid_euclidean_distance))
+    
+(define hot-word (def-letter-chunk :name "hot" :locations (list)))
+(def-relation :start hot-concept :end hot-word :parent_concept jj-concept)
+(define hott-word (def-letter-chunk :name "hott" :locations (list)))
+(def-relation :start hot-concept :end hott-word :parent_concept jjr-concept)
+(def-relation :start hott-word :end -er :parent_concept jjr-concept)
+(define heat-word (def-letter-chunk :name "heat" :locations (list)))
+(def-relation :start hot-concept :end heat-word :parent_concept nn-concept)
+(define warm-word (def-letter-chunk :name "warm" :locations (list)))
+(def-relation :start warm-concept :end warm-word :parent_concept jj-concept)
+(def-relation :start warm-concept :end warm-word :parent_concept jjr-concept)
+(def-relation :start warm-word :end -er :parent_concept jjr-concept)
+(define warmth-word (def-letter-chunk :name "warmth" :locations (list)))
+(def-relation :start warm-concept :end warmth-word :parent_concept nn-concept)
+(define mild-word (def-letter-chunk :name "mild" :locations (list)))
+(def-relation :start mild-concept :end mild-word :parent_concept jj-concept)
+(def-relation :start mild-concept :end mild-word :parent_concept jjr-concept)
+(def-relation :start mild-word :end -er :parent_concept jjr-concept)
+(define cool-word (def-letter-chunk :name "cool" :locations (list)))
+(def-relation :start cool-concept :end cool-word :parent_concept jj-concept)
+(def-relation :start cool-concept :end cool-word :parent_concept jjr-concept)
+(def-relation :start cool-word :end -er :parent_concept jjr-concept)
+(define cold-word (def-letter-chunk :name "cold" :locations (list)))
+(def-relation :start cold-concept :end cold-word :parent_concept jj-concept)
+(def-relation :start cold-concept :end cold-word :parent_concept jjr-concept)
+(def-relation :start cold-word :end -er :parent_concept jjr-concept)
+
+(define peripheralness-concept
+  (def-concept :name "peripheralness" :locations (list) :classifier None
+    :instance_type None :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define peripheralness-space
+  (def-conceptual-space :name "peripheralness" :parent_concept peripheralness-concept
+    :no_of_dimensions 1))
+(define peripheral-concept
+  (def-concept :name "peripheral"
+    :locations (list (Location (list (list 10)) peripheralness-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space peripheralness-space :distance_function centroid_euclidean_distance))
+    
+(define peripheries-word (def-letter-chunk :name "peripheries" :locations (list)))
+(def-relation :start peripheral-concept :end peripheries-word :parent_concept nn-concept)
+
+(define location-concept
+  (def-concept :name "location" :locations (list) :classifier None
+    :instance_type None :structure_type None :parent_space None
+    :distance_function centroid_euclidean_distance))
+(define north-south-space
+  (def-conceptual-space :name "north-south" :parent_concept location-concept
+    :no_of_dimensions 1
+    :super_space_to_coordinate_function_map
+    (dict (list (tuple "location" (python \"""
+lambda location: [[c[0]] for c in location.coordinates]
+\"""))))))
+(define west-east-space
+  (def-conceptual-space :name "west-east" :parent_concept location-concept
+    :no_of_dimensions 1
+    :super_space_to_coordinate_function_map
+    (dict (list (tuple "location" (python \"""
+lambda location: [[c[1]] for c in location.coordinates]
+\"""))))))
+(define nw-se-space
+  (def-conceptual-space :name "northwest-southeast" :parent_concept location-concept
+    :no_of_dimensions 1
+    :super_space_to_coordinate_function_map
+    (dict (list (tuple "location" (python \"""
+lambda location: [[sum(c)/len(c)] for c in location.coordinates]
+\"""))))))
+(define ne-sw-space
+  (def-conceptual-space :name "northeast-southwest" :parent_concept location-concept
+    :no_of_dimensions 1
+    :super_space_to_coordinate_function_map
+    (dict (list (tuple "location" (python \"""
+lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
+\"""))))))
+(define location-space
+  (def-conceptual-space :name "location" :parent_concept location-concept
+    :no_of_dimensions 1
+    :dimensions (list north-south-space west-east-space)
+    :sub_spaces (list north-south-space west-east-space nw-se-space ne-sw-space)))
+(define north-concept
+  (def-concept :name "north" :locations (list (Location (list (list 0 4)) location-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+(define south-concept
+  (def-concept :name "south" :locations (list (Location (list (list 10 4)) location-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+(define west-concept
+  (def-concept :name "west" :locations (list (Location (list (list 5 0)) location-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+(define east-concept
+  (def-concept :name "east" :locations (list (Location (list (list 5 8)) location-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+(define northwest-concept
+  (def-concept :name "northwest" :locations (list (Location (list (list 0 0)) location-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+(define northeast-concept
+  (def-concept :name "northeast" :locations (list (Location (list (list 0 8)) location-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+(define southwest-concept
+  (def-concept :name "southwest" :locations (list (Location (list (list 10 0)) location-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+(define southeast-concept
+  (def-concept :name "southeast" :locations (list (Location (list (list 10 8)) location-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+(define central-concept
+  (def-concept :name "central"
+    :locations (list (Location (list (list 5 4)) location-space)
+		     (Location (list (list 0)) peripheralness-space))
+    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function centroid_euclidean_distance))
+
+(define north-word (def-letter-chunk :name "north" :locations (list)))
+(def-relation :start north-concept :end north-word :parent_concept nn-concept)
+(define south-word (def-letter-chunk :name "south" :locations (list)))
+(def-relation :start south-concept :end south-word :parent_concept nn-concept)
+(define west-word (def-letter-chunk :name "west" :locations (list)))
+(def-relation :start west-concept :end west-word :parent_concept nn-concept)
+(define east-word (def-letter-chunk :name "east" :locations (list)))
+(def-relation :start east-concept :end east-word :parent_concept nn-concept)
+(define northwest-word (def-letter-chunk :name "northwest" :locations (list)))
+(def-relation :start northwest-concept :end northwest-word :parent_concept nn-concept)
+(define northeast-word (def-letter-chunk :name "northeast" :locations (list)))
+(def-relation :start northeast-concept :end northeast-word :parent_concept nn-concept)
+(define southwest-word (def-letter-chunk :name "southwest" :locations (list)))
+(def-relation :start southwest-concept :end southwest-word :parent_concept nn-concept)
+(define southeast-word (def-letter-chunk :name "southeast" :locations (list)))
+(def-relation :start southeast-concept :end southeast-word :parent_concept nn-concept)
+(define centre-word (def-letter-chunk :name "centre" :locations (list)))
+(def-relation :start central-concept :end centre-word :parent_concept nn-concept)
+(define midlands-word (def-letter-chunk :name "midlands" :locations (list)))
+(def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
+
 """
 
 
@@ -26,873 +484,3 @@ def homer(program):
     system = Homer.setup(logger=Mock())
     system.interpreter.interpret_string(program)
     return system
-
-
-@pytest.fixture(scope="module")
-def bubble_chamber():
-    logger = Mock()
-    chamber = BubbleChamber.setup(logger, random_seed=1)
-    structure_concepts = [
-        chamber.new_concept(
-            "", concept_name, [], Mock(), Mock(), Mock(), Mock(), Mock()
-        )
-        for concept_name in [
-            "chunk",
-            "correspondence",
-            "label",
-            "relation",
-            "view-simplex",
-            "view-monitoring",
-            "word",
-        ]
-    ]
-    codelet_concepts = [
-        chamber.new_concept(
-            "", concept_name, [], Mock(), Mock(), Mock(), Mock(), Mock()
-        )
-        for concept_name in [
-            "suggest",
-            "build",
-            "evaluate",
-            "select",
-        ]
-    ]
-    for structure_concept in structure_concepts:
-        for codelet_concept in codelet_concepts:
-            chamber.new_relation(
-                "",
-                structure_concept,
-                codelet_concept,
-                None,
-                [],
-                Mock(),
-            )
-    chamber.new_contextual_space(
-        "",
-        "views",
-        None,
-        chamber.new_structure_collection(),
-    )
-    return chamber
-
-
-@pytest.fixture(scope="module")
-def input_concept(bubble_chamber):
-    return bubble_chamber.new_concept(
-        "",
-        "input",
-        [],
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-    )
-
-
-@pytest.fixture(scope="module")
-def text_concept(bubble_chamber):
-    return bubble_chamber.new_concept(
-        "",
-        "text",
-        [],
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def grammar_vectors():
-    vectors = {
-        "sentence": [],
-        "np": [],
-        "vp": [],
-        "pronoun": [],
-        "nn": [],
-        "jj": [],
-        "jjr": [],
-        "cop": [],
-        "prep": [],
-        "det": [],
-    }
-    for index, concept in enumerate(vectors):
-        vectors[concept] = [0 for _ in vectors]
-        vectors[concept][index] = 1
-    return vectors
-
-
-@pytest.fixture(scope="module")
-def grammar_concept(bubble_chamber):
-    return bubble_chamber.new_concept(
-        "",
-        "grammar",
-        [],
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def grammar_space(bubble_chamber, grammar_concept):
-    return bubble_chamber.new_conceptual_space(
-        "",
-        "grammar",
-        grammar_concept,
-        1,
-        [],
-        [],
-        is_basic_level=True,
-    )
-
-
-@pytest.fixture(scope="module")
-def sentence_concept(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_concept(
-        "",
-        "sentence",
-        [Location([grammar_vectors["sentence"]], grammar_space)],
-        ProximityClassifier(),
-        Mock(),
-        Mock(),
-        grammar_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def np_concept(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_concept(
-        "",
-        "np",
-        [Location([grammar_vectors["np"]], grammar_space)],
-        ProximityClassifier(),
-        Mock(),
-        Mock(),
-        grammar_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def vp_concept(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_concept(
-        "",
-        "vp",
-        [Location([grammar_vectors["vp"]], grammar_space)],
-        ProximityClassifier(),
-        Mock(),
-        Mock(),
-        grammar_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def nn_concept(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_concept(
-        "",
-        "nn",
-        [Location([grammar_vectors["nn"]], grammar_space)],
-        ProximityClassifier(),
-        LetterChunk,
-        Mock(),
-        grammar_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def pronoun_concept(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_concept(
-        "",
-        "pronoun",
-        [Location([grammar_vectors["pronoun"]], grammar_space)],
-        ProximityClassifier(),
-        LetterChunk,
-        Mock(),
-        grammar_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def cop_concept(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_concept(
-        "",
-        "cop",
-        [Location([grammar_vectors["cop"]], grammar_space)],
-        ProximityClassifier(),
-        LetterChunk,
-        Mock(),
-        grammar_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def jj_concept(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_concept(
-        "",
-        "jj",
-        [Location([grammar_vectors["jj"]], grammar_space)],
-        ProximityClassifier(),
-        LetterChunk,
-        Mock(),
-        grammar_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def jjr_concept(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_concept(
-        "",
-        "jjr",
-        [Location([grammar_vectors["jjr"]], grammar_space)],
-        ProximityClassifier(),
-        LetterChunk,
-        Mock(),
-        grammar_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def s_np_vp_rule(
-    bubble_chamber, grammar_space, sentence_concept, np_concept, vp_concept
-):
-    return bubble_chamber.new_rule(
-        "",
-        "s-->np,vp",
-        Location([], grammar_space),
-        sentence_concept,
-        np_concept,
-        vp_concept,
-    )
-
-
-@pytest.fixture(scope="module")
-def np_pronoun_rule(bubble_chamber, grammar_space, np_concept, pronoun_concept):
-    return bubble_chamber.new_rule(
-        "",
-        "np-->pronoun",
-        Location([], grammar_space),
-        np_concept,
-        pronoun_concept,
-        None,
-    )
-
-
-@pytest.fixture(scope="module")
-def vp_cop_adj_rule(
-    bubble_chamber, grammar_space, vp_concept, cop_concept, adj_concept
-):
-    bubble_chamber.new_rule(
-        "",
-        "vp-->cop,adj",
-        Location([], grammar_space),
-        vp_concept,
-        cop_concept,
-        adj_concept,
-    )
-
-
-@pytest.fixture(scope="module")
-def vp_cop_rule(bubble_chamber, grammar_space, vp_concept, cop_concept):
-    bubble_chamber.new_rule(
-        "",
-        "vp-->cop",
-        Location([], grammar_space),
-        vp_concept,
-        cop_concept,
-        None,
-    )
-
-
-@pytest.fixture(scope="module")
-def it_word(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_letter_chunk(
-        "",
-        "it",
-        [Location([grammar_vectors["pronoun"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-    )
-
-
-@pytest.fixture(scope="module")
-def is_word(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_letter_chunk(
-        "",
-        "is",
-        [Location([grammar_vectors["cop"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-    )
-
-
-@pytest.fixture(scope="module")
-def in_word(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_letter_chunk(
-        "",
-        "in",
-        [Location([grammar_vectors["prep"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-    )
-
-
-@pytest.fixture(scope="module")
-def the_word(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_letter_chunk(
-        "",
-        "the",
-        [Location([grammar_vectors["det"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-    )
-
-
-@pytest.fixture(scope="module")
-def than_word(bubble_chamber, grammar_vectors, grammar_space):
-    return bubble_chamber.new_letter_chunk(
-        "",
-        "than",
-        [Location([grammar_vectors["prep"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-    )
-
-
-@pytest.fixture(scope="module")
-def north_word(
-    bubble_chamber, grammar_vectors, grammar_space, north_concept, nn_concept
-):
-    return bubble_chamber.new_letter_chunk(
-        "",
-        "north",
-        [Location([grammar_vectors["nn"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-        meaning_concept=north_concept,
-        grammar_concept=nn_concept,
-    )
-
-
-@pytest.fixture(scope="module")
-def south_word(
-    bubble_chamber, grammar_vectors, grammar_space, south_concept, nn_concept
-):
-    return bubble_chamber.new_letter_chunk(
-        "",
-        "south",
-        [Location([grammar_vectors["nn"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-        meaning_concept=south_concept,
-        grammar_concept=nn_concept,
-    )
-
-
-@pytest.fixture(scope="module")
-def warm_word(
-    bubble_chamber,
-    grammar_vectors,
-    grammar_space,
-    warm_concept,
-    jj_concept,
-    jjr_concept,
-):
-    word = bubble_chamber.new_letter_chunk(
-        "",
-        "warm",
-        [Location([grammar_vectors["adj"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-        meaning_concept=warm_concept,
-        grammar_concept=jj_concept,
-    )
-    bubble_chamber.new_relation("", warm_concept, word, jjr_concept, [], 1.0)
-    return word
-
-
-@pytest.fixture(scope="module")
-def hott_word(bubble_chamber, grammar_vectors, grammar_space, hot_concept, jjr_concept):
-    return bubble_chamber.new_word(
-        "",
-        "hotter",
-        [Location([grammar_vectors["jjr"]], grammar_space)],
-        bubble_chamber.new_structure_collection(),
-        grammar_space,
-        1,
-        meaning_concept=hot_concept,
-        grammar_concept=jjr_concept,
-    )
-
-
-@pytest.fixture(scope="module")
-def location_concept(bubble_chamber):
-    return bubble_chamber.new_concept(
-        "",
-        "location",
-        [],
-        Mock(),
-        Chunk,
-        Mock(),
-        Mock(),
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def north_south_space(bubble_chamber, location_concept):
-    return bubble_chamber.new_conceptual_space(
-        "",
-        "north-south",
-        location_concept,
-        1,
-        [],
-        [],
-        super_space_to_coordinate_function_map={
-            "location": lambda location: [[c[0]] for c in location.coordinates]
-        },
-    )
-
-
-@pytest.fixture(scope="module")
-def west_east_space(bubble_chamber, location_concept):
-    return bubble_chamber.new_conceptual_space(
-        "",
-        "west-east",
-        location_concept,
-        1,
-        [],
-        [],
-        super_space_to_coordinate_function_map={
-            "location": lambda location: [[c[1]] for c in location.coordinates]
-        },
-    )
-
-
-@pytest.fixture(scope="module")
-def nw_se_space(bubble_chamber, location_concept):
-    return bubble_chamber.new_conceptual_space(
-        "",
-        "nw-se",
-        location_concept,
-        1,
-        [],
-        [],
-        super_space_to_coordinate_function_map={
-            "location": lambda location: [
-                [statistics.fmean(c)] for c in location.coordinates
-            ]
-        },
-    )
-
-
-@pytest.fixture(scope="module")
-def ne_sw_space(bubble_chamber, location_concept):
-    return bubble_chamber.new_conceptual_space(
-        "",
-        "ne-sw",
-        location_concept,
-        1,
-        [],
-        [],
-        super_space_to_coordinate_function_map={
-            "location": lambda location: [
-                [statistics.fmean([c[0], 4 - c[1]])] for c in location.coordinates
-            ]
-        },
-    )
-
-
-@pytest.fixture(scope="module")
-def location_space(
-    bubble_chamber,
-    location_concept,
-    north_south_space,
-    west_east_space,
-    nw_se_space,
-    ne_sw_space,
-):
-    return bubble_chamber.new_conceptual_space(
-        "",
-        "location",
-        location_concept,
-        2,
-        [north_south_space, west_east_space],
-        [north_south_space, west_east_space, nw_se_space, ne_sw_space],
-        is_basic_level=True,
-    )
-
-
-@pytest.fixture(scope="module")
-def south_concept(bubble_chamber, location_space):
-    return bubble_chamber.new_concept(
-        "",
-        "south",
-        [Location([[5, 2]], location_space)],
-        ProximityClassifier(),
-        Mock(),
-        Label,
-        location_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def north_concept(bubble_chamber, location_space):
-    return bubble_chamber.new_concept(
-        "",
-        "north",
-        [Location([[0, 2]], location_space)],
-        ProximityClassifier(),
-        Mock(),
-        Label,
-        location_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def temperature_concept(bubble_chamber):
-    return bubble_chamber.new_concept(
-        "",
-        "temperature",
-        [],
-        Mock(),
-        Chunk,
-        Mock(),
-        Mock(),
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def temperature_space(bubble_chamber, temperature_concept):
-    return bubble_chamber.new_conceptual_space(
-        "",
-        "temperature",
-        temperature_concept,
-        1,
-        [],
-        [],
-        is_basic_level=True,
-    )
-
-
-@pytest.fixture(scope="module")
-def same_different_space(bubble_chamber):
-    return bubble_chamber.new_conceptual_space(
-        "",
-        "same-different",
-        Mock(),
-        1,
-        [],
-        [],
-        is_basic_level=True,
-    )
-
-
-@pytest.fixture(scope="module")
-def same_concept(bubble_chamber, same_different_space):
-    return bubble_chamber.new_concept(
-        "",
-        "same",
-        [Location([], same_different_space)],
-        SamenessClassifier(),
-        Mock(),
-        Correspondence,
-        same_different_space,
-        Mock(),
-    )
-
-
-@pytest.fixture(scope="module")
-def same_rule(bubble_chamber, same_concept):
-    return bubble_chamber.new_rule(
-        "",
-        "same",
-        Mock(),
-        same_concept,
-        same_concept,
-        None,
-    )
-
-
-@pytest.fixture(scope="module")
-def hot_concept(bubble_chamber, temperature_space):
-    return bubble_chamber.new_concept(
-        "",
-        "hot",
-        [Location([[22]], temperature_space)],
-        ProximityClassifier(),
-        Mock(),
-        Label,
-        temperature_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def warm_concept(bubble_chamber, temperature_space):
-    return bubble_chamber.new_concept(
-        "",
-        "warm",
-        [Location([[16]], temperature_space)],
-        ProximityClassifier(),
-        Mock(),
-        Label,
-        temperature_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def cold_concept(bubble_chamber, temperature_space):
-    return bubble_chamber.new_concept(
-        "",
-        "cold",
-        [Location([[4]], temperature_space)],
-        ProximityClassifier(),
-        Mock(),
-        Label,
-        temperature_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def hotter_concept(bubble_chamber, temperature_space):
-    return bubble_chamber.new_concept(
-        "",
-        "hotter",
-        [TwoPointLocation([[math.nan]], [[math.nan]], temperature_space)],
-        Mock(),
-        Mock(),
-        Relation,
-        temperature_space,
-        centroid_euclidean_distance,
-    )
-
-
-@pytest.fixture(scope="module")
-def comparison_frame(
-    bubble_chamber,
-    input_concept,
-    text_concept,
-    location_space,
-    temperature_space,
-    grammar_space,
-    it_word,
-    is_word,
-    in_word,
-    the_word,
-    than_word,
-    hotter_word,
-    south_word,
-):
-    frame_input_space = bubble_chamber.new_contextual_space(
-        "",
-        "frame-input",
-        input_concept,
-        bubble_chamber.new_structure_collection(location_space, temperature_space),
-    )
-    chunk_one = bubble_chamber.new_chunk(
-        "",
-        [
-            Location([[]], frame_input_space),
-            Location([[math.nan, math.nan]], location_space),
-            Location([[math.nan]], temperature_space),
-        ],
-        bubble_chamber.new_structure_collection(),
-        frame_input_space,
-        1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        Mock(),
-    )
-    chunk_two = bubble_chamber.new_chunk(
-        "",
-        [
-            Location([[]], frame_input_space),
-            Location([[math.nan, math.nan]], location_space),
-            Location([[math.nan]], temperature_space),
-        ],
-        bubble_chamber.new_structure_collection(),
-        frame_input_space,
-        1.0,
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        Mock(),
-    )
-    label_one = bubble_chamber.new_label(
-        "",
-        chunk_one,
-        None,
-        [
-            Location([[]], frame_input_space),
-            Location([[math.nan, math.nan]], location_space),
-        ],
-        1.0,
-    )
-    label_two = bubble_chamber.new_label(
-        "",
-        chunk_two,
-        None,
-        [
-            Location([[]], frame_input_space),
-            Location([[math.nan, math.nan]], location_space),
-        ],
-        1.0,
-    )
-    one_to_two_relation = bubble_chamber.new_relation(
-        "",
-        chunk_one,
-        chunk_two,
-        None,
-        [
-            TwoPointLocation([[]], [[]], frame_input_space),
-            TwoPointLocation([[math.nan]], [[math.nan]], temperature_space),
-        ],
-        1.0,
-    )
-    frame_output_space = bubble_chamber.new_contextual_space(
-        "",
-        "",
-        text_concept,
-        bubble_chamber.new_structure_collection(grammar_space),
-    )
-    word_0 = it_word.copy_to_location(
-        Location([[0]], frame_output_space),
-        quality=1.0,
-        bubble_chamber=bubble_chamber,
-    )
-    word_1 = is_word.copy_to_location(
-        Location([[1]], frame_output_space),
-        quality=1.0,
-        bubble_chamber=bubble_chamber,
-    )
-    word_2 = bubble_chamber.new_word(
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [
-            Location([[2]], frame_output_space),
-            hotter_word.location_in_space(grammar_space),
-        ],
-        frame_output_space,
-        1.0,
-    )
-    word_3 = in_word.copy_to_location(
-        Location([[3]], frame_output_space),
-        quality=1.0,
-        bubble_chamber=bubble_chamber,
-    )
-    word_4 = the_word.copy_to_location(
-        Location([[4]], frame_output_space),
-        quality=1.0,
-        bubble_chamber=bubble_chamber,
-    )
-    word_5 = bubble_chamber.new_word(
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [
-            Location([[5]], frame_output_space),
-            south_word.location_in_space(grammar_space),
-        ],
-        frame_output_space,
-        1.0,
-    )
-    word_6 = than_word.copy_to_location(
-        Location([[6]], frame_output_space),
-        quality=1.0,
-        bubble_chamber=bubble_chamber,
-    )
-    word_7 = the_word.copy_to_location(
-        Location([[7]], frame_output_space),
-        quality=1.0,
-        bubble_chamber=bubble_chamber,
-    )
-    word_8 = bubble_chamber.new_word(
-        "",
-        None,
-        None,
-        WordForm.HEADWORD,
-        [
-            Location([[8]], frame_output_space),
-            south_word.location_in_space(grammar_space),
-        ],
-        frame_output_space,
-        1.0,
-    )
-    word_2_correspondence = bubble_chamber.new_correspondence(
-        "",
-        one_to_two_relation,
-        word_2,
-        [
-            one_to_two_relation.location_in_space(one_to_two_relation.parent_space),
-            word_2.location_in_space(word_2.parent_space),
-        ],
-        same_concept,
-        temperature_space,
-        None,
-        1.0,
-    )
-    word_5_correspondence = bubble_chamber.new_correspondence(
-        "",
-        label_one,
-        word_5,
-        [
-            label_one.location_in_space(label_one.parent_space),
-            word_5.location_in_space(word_5.parent_space),
-        ],
-        same_concept,
-        location_space,
-        None,
-        1.0,
-    )
-    word_8_correspondence = bubble_chamber.new_correspondence(
-        "",
-        label_two,
-        word_8,
-        [
-            label_two.location_in_space(label_two.parent_space),
-            word_8.location_in_space(word_8.parent_space),
-        ],
-        same_concept,
-        location_space,
-        None,
-        1.0,
-    )
-    frame_contents = bubble_chamber.new_structure_collection(
-        word_2_correspondence, word_5_correspondence, word_8_correspondence
-    )
-    frame = bubble_chamber.new_frame(
-        "",
-        "",
-        Mock(),
-        frame_contents,
-        frame_input_space,
-        frame_output_space,
-    )
-    return frame
