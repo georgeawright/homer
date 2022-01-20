@@ -178,7 +178,7 @@ class BubbleChamber:
         self,
         name: str,
         parent_concept: Concept,
-        no_of_dimensions: int,
+        no_of_dimensions: int = 0,
         parent_id: str = "",
         dimensions: List[ConceptualSpace] = None,
         sub_spaces: List[ConceptualSpace] = None,
@@ -297,8 +297,8 @@ class BubbleChamber:
         self,
         name: Union[str, None],
         locations: List[Location],
-        members: StructureCollection,
-        parent_space: Space,
+        members: StructureCollection = None,
+        parent_space: Space = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         left_branch: StructureCollection = None,
@@ -308,6 +308,8 @@ class BubbleChamber:
         grammar_concept: Concept = None,
         abstract_chunk: LetterChunk = None,
     ) -> Chunk:
+        if members is None:
+            members = self.new_structure_collection()
         if left_branch is None:
             left_branch = self.new_structure_collection()
         if right_branch is None:
@@ -344,16 +346,18 @@ class BubbleChamber:
     def new_concept(
         self,
         name: str,
-        locations: List[Location],
-        classifier: Classifier,
-        instance_type: type,
-        structure_type: type,
-        parent_space: Space,
-        distance_function: Callable,
         parent_id: str = "",
+        locations: List[Location] = None,
+        classifier: Classifier = None,
+        instance_type: type = None,
+        structure_type: type = None,
+        parent_space: Space = None,
+        distance_function: Callable = None,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
+        activation: FloatBetweenOneAndZero = None,
     ) -> Concept:
+        locations = [] if locations is None else locations
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )
@@ -374,6 +378,8 @@ class BubbleChamber:
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
         )
+        if activation is not None:
+            concept._activation = activation
         self.add(concept)
         return concept
 
@@ -502,13 +508,15 @@ class BubbleChamber:
         self,
         start: Structure,
         end: Structure,
-        parent_concept: Concept,
-        locations: List[Location],
+        parent_concept: Concept = None,
+        locations: List[Location] = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
+        activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
+        locations = [] if locations is None else locations
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )
@@ -526,6 +534,8 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_bidirectional=is_bidirectional,
         )
+        if activation is not None:
+            relation._activation = activation
         start.links_out.add(relation)
         end.links_in.add(relation)
         self.add(relation)
