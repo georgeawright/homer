@@ -2,6 +2,7 @@ from .bubble_chamber import BubbleChamber
 from .coderack import Coderack
 from .errors import NoMoreCodelets
 from .hyper_parameters import HyperParameters
+from .interpreter import Interpreter
 from .logger import Logger
 from .structure_collection import StructureCollection
 from .structures.spaces import ConceptualSpace
@@ -12,37 +13,33 @@ class Homer:
         self,
         bubble_chamber: BubbleChamber,
         coderack: Coderack,
+        interpreter: Interpreter,
         logger: Logger,
         activation_update_frequency: int = HyperParameters.ACTIVATION_UPDATE_FREQUENCY,
     ):
         self.bubble_chamber = bubble_chamber
         self.coderack = coderack
+        self.interpreter = interpreter
         self.logger = logger
         self.activation_update_frequency = activation_update_frequency
 
     @classmethod
     def setup(cls, logger: Logger):
-        top_level_conceptual_space = ConceptualSpace(
-            "top_level_space",
-            "",
-            "top level",
-            None,
-            [None],
-            StructureCollection(),
-            0,
-            [],
-            [],
-        )
-        logger.log(top_level_conceptual_space)
-        top_level_working_space = top_level_conceptual_space.instance_in_space(
-            None, name="top level working"
-        )
-        logger.log(top_level_working_space)
         bubble_chamber = BubbleChamber.setup(logger)
-        bubble_chamber.conceptual_spaces.add(top_level_conceptual_space)
-        bubble_chamber.working_spaces.add(top_level_working_space)
         coderack = Coderack.setup(bubble_chamber, logger)
-        return cls(bubble_chamber, coderack, logger)
+        interpreter = Interpreter(bubble_chamber)
+        return cls(bubble_chamber, coderack, interpreter, logger)
+
+    def run_program(self, program: str):
+        # possibly first interpret / sort out internal stuff
+        # that might be done in bubble chamber setup
+        self.interpreter.interpret_string(program)
+        self.run()
+
+    def reset(self):
+        self.logger.reset()
+        self.bubble_chamber = BubbleChamber.setup(self.logger)
+        self.coderack = Coderack.setup(self.bubble_chamber, self.logger)
 
     def run(self):
         while self.bubble_chamber.result is None:
