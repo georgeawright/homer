@@ -48,7 +48,7 @@ def test_successful_creates_view_and_spawns_follow_up(
         Mock(),
     )
     result = view_builder.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert hasinstance(view_builder.child_structures, MonitoringView)
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], MonitoringViewEvaluator)

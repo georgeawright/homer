@@ -39,4 +39,4 @@ def test_pipeline_of_codelets(homer):
         1.0,
     )
     codelet.run()
-    assert CodeletResult.SUCCESS == codelet.result
+    assert CodeletResult.FINISH == codelet.result

@@ -58,7 +58,7 @@ def test_gives_high_confidence_for_positive_example(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     result = label_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert label_suggester.confidence == 1
     assert len(label_suggester.child_codelets) == 1
     assert isinstance(label_suggester.child_codelets[0], LabelBuilder)
@@ -72,7 +72,7 @@ def test_gives_low_confidence_bad_example(bubble_chamber, target_chunk):
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     result = label_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert label_suggester.confidence == 0
     assert len(label_suggester.child_codelets) == 1
     assert isinstance(label_suggester.child_codelets[0], LabelBuilder)

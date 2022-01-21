@@ -41,7 +41,7 @@ def test_gives_high_confidence_for_highly_activated_spaces(
         Mock(),
     )
     result = view_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert view_suggester.confidence == 1
     assert len(view_suggester.child_codelets) == 1
     assert isinstance(view_suggester.child_codelets[0], MonitoringViewBuilder)
@@ -65,7 +65,7 @@ def test_gives_low_confidence_for_low_activated_spaces(
         1.0,
     )
     result = view_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert view_suggester.confidence == 0
     assert len(view_suggester.child_codelets) == 1
     assert isinstance(view_suggester.child_codelets[0], MonitoringViewBuilder)

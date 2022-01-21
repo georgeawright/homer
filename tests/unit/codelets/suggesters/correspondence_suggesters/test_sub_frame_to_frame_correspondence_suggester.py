@@ -52,7 +52,7 @@ def test_gets_second_target_structure_if_needed(bubble_chamber):
     correspondence_suggester.run()
     assert correspondence_suggester.target_space_two is not None
     assert correspondence_suggester.target_structure_two is not None
-    assert CodeletResult.SUCCESS == correspondence_suggester.result
+    assert CodeletResult.FINISH == correspondence_suggester.result
 
 
 def test_gets_parent_concept_if_needed(bubble_chamber):
@@ -76,4 +76,4 @@ def test_gets_parent_concept_if_needed(bubble_chamber):
     assert correspondence_suggester.parent_concept is None
     correspondence_suggester.run()
     assert correspondence_suggester.parent_concept is not None
-    assert CodeletResult.SUCCESS == correspondence_suggester.result
+    assert CodeletResult.FINISH == correspondence_suggester.result

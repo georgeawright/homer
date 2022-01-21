@@ -36,7 +36,7 @@ def test_gives_full_confidence_to_project_chunk(
     }
     suggester = ChunkProjectionSuggester("", "", bubble_chamber, target_structures, 1.0)
     suggester.run()
-    assert CodeletResult.SUCCESS == suggester.result
+    assert CodeletResult.FINISH == suggester.result
     assert 1.0 == suggester.confidence
 
 

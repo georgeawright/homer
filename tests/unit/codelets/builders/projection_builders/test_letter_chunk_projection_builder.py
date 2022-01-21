@@ -33,7 +33,7 @@ def test_projects_non_slot_into_output(bubble_chamber):
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     projection_builder.run()
-    assert CodeletResult.SUCCESS == projection_builder.result
+    assert CodeletResult.FINISH == projection_builder.result
     assert word_copy in projection_builder.child_structures
 
 
@@ -69,7 +69,7 @@ def test_projects_correspondee_of_slot_into_output(bubble_chamber):
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     projection_builder.run()
-    assert CodeletResult.SUCCESS == projection_builder.result
+    assert CodeletResult.FINISH == projection_builder.result
     assert word_copy in projection_builder.child_structures
 
 
@@ -114,7 +114,7 @@ def test_projects_slot_into_output_according_to_relation(bubble_chamber):
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     projection_builder.run()
-    assert CodeletResult.SUCCESS == projection_builder.result
+    assert CodeletResult.FINISH == projection_builder.result
     assert word_copy in projection_builder.child_structures
 
 
@@ -162,5 +162,5 @@ def test_projects_slot_into_output_according_to_label(bubble_chamber):
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     projection_builder.run()
-    assert CodeletResult.SUCCESS == projection_builder.result
+    assert CodeletResult.FINISH == projection_builder.result
     assert word_copy in projection_builder.child_structures

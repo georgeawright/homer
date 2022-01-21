@@ -29,5 +29,5 @@ def test_word_is_boosted(bubble_chamber):
         Mock(),
     )
     selector.run()
-    assert CodeletResult.SUCCESS == selector.result
+    assert CodeletResult.FINISH == selector.result
     assert chunk.boost_activation.is_called()

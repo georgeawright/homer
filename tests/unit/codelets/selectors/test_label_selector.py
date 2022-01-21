@@ -79,7 +79,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             challengers=bubble_chamber.new_structure_collection(challenger),
         )
         selector.run()
-        assert CodeletResult.SUCCESS == selector.result
+        assert CodeletResult.FINISH == selector.result
         if expected_winner == "champion":
             assert champion.boost_activation.is_called()
             assert challenger.decay_activation.is_called()

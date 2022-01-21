@@ -43,7 +43,7 @@ class Evaluator(Codelet):
         for structure in self.target_structures:
             structure.quality = self.confidence
         self._engender_follow_up()
-        self.result = CodeletResult.SUCCESS
+        self.result = CodeletResult.FINISH
         # TODO: probably just boost/decay activations proportionally to change in confidence
         if self.change_in_confidence > self.CONFIDENCE_THRESHOLD:
             self._boost_activations()

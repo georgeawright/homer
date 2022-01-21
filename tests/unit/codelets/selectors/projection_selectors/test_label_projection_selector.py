@@ -29,5 +29,5 @@ def test_label_is_boosted(bubble_chamber):
         Mock(),
     )
     selector.run()
-    assert CodeletResult.SUCCESS == selector.result
+    assert CodeletResult.FINISH == selector.result
     assert label.boost_activation.is_called()

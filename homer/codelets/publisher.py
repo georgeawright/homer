@@ -53,7 +53,7 @@ class Publisher(Codelet):
             words.sort(key=lambda word: word.location.coordinates[0][0])
             text = " ".join([word.value for word in words])
             self.bubble_chamber.result = text
-            self.result = CodeletResult.SUCCESS
+            self.result = CodeletResult.FINISH
             return self.result
         return self._fail()
 

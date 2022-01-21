@@ -69,7 +69,7 @@ def test_builds_correspondence_when_view_can_accept_it(bubble_chamber):
         Mock(), Mock(), bubble_chamber, target_structures, 1
     )
     result = correspondence_builder.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert 2 == len(correspondence_builder.child_structures)
 
 
@@ -114,5 +114,5 @@ def test_fills_in_target_structure_two_parent_concept(bubble_chamber):
         Mock(), Mock(), bubble_chamber, target_structures, 1
     )
     result = correspondence_builder.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert 3 == len(correspondence_builder.child_structures)

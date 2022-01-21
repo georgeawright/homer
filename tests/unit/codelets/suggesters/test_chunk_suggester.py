@@ -132,6 +132,6 @@ def test_has_high_confidence_for_root_compatible_with_rule(
     urgency = 1
     suggester = ChunkSuggester("", "", bubble_chamber, target_structures, urgency)
     suggester.run()
-    assert CodeletResult.SUCCESS == suggester.result
+    assert CodeletResult.FINISH == suggester.result
     assert compatibility == suggester.confidence
     assert compatibility == suggester.child_codelets[0].urgency

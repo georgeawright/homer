@@ -49,7 +49,7 @@ def test_gives_suggests_projection_from_slot(
         "", "", bubble_chamber, target_structures, 1.0
     )
     suggester.run()
-    assert CodeletResult.SUCCESS == suggester.result
+    assert CodeletResult.FINISH == suggester.result
 
 
 def test_gives_full_confidence_to_project_non_slot(
@@ -66,7 +66,7 @@ def test_gives_full_confidence_to_project_non_slot(
         "", "", bubble_chamber, target_structures, 1.0
     )
     suggester.run()
-    assert CodeletResult.SUCCESS == suggester.result
+    assert CodeletResult.FINISH == suggester.result
     assert 1.0 == suggester.confidence
 
 

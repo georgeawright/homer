@@ -35,7 +35,7 @@ def test_creates_new_label(bubble_chamber):
     label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_structures, 1.0)
     label_builder.run()
     assert 1 == len(label_builder.child_structures)
-    assert CodeletResult.SUCCESS == label_builder.result
+    assert CodeletResult.FINISH == label_builder.result
 
 
 def test_copies_label_and_adds_label(bubble_chamber):
@@ -58,7 +58,7 @@ def test_copies_label_and_adds_label(bubble_chamber):
     label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_structures, 1.0)
     label_builder.run()
     assert 2 == len(label_builder.child_structures)
-    assert CodeletResult.SUCCESS == label_builder.result
+    assert CodeletResult.FINISH == label_builder.result
 
 
 def test_copies_labels_label_and_adds_label(bubble_chamber):
@@ -88,4 +88,4 @@ def test_copies_labels_label_and_adds_label(bubble_chamber):
     label_builder = LabelBuilder(Mock(), Mock(), bubble_chamber, target_structures, 1.0)
     label_builder.run()
     assert 3 == len(label_builder.child_structures)
-    assert CodeletResult.SUCCESS == label_builder.result
+    assert CodeletResult.FINISH == label_builder.result

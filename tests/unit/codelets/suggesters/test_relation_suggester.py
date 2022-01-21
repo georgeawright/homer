@@ -86,7 +86,7 @@ def test_gives_high_confidence_for_good_example(
         Mock(), Mock(), bubble_chamber, target_structures, Mock()
     )
     result = relation_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert relation_suggester.confidence == 1
     assert len(relation_suggester.child_codelets) == 1
     assert isinstance(relation_suggester.child_codelets[0], RelationBuilder)
@@ -106,7 +106,7 @@ def test_gives_low_confidence_for_bad_example(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     result = relation_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert relation_suggester.confidence == 0
     assert len(relation_suggester.child_codelets) == 1
     assert isinstance(relation_suggester.child_codelets[0], RelationBuilder)

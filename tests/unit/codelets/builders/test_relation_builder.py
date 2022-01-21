@@ -45,7 +45,7 @@ def test_successful_creates_chunk_and_spawns_follow_up(
         Mock(), Mock(), bubble_chamber, target_structures, Mock()
     )
     result = relation_builder.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert len(relation_builder.child_codelets) == 1
     assert isinstance(relation_builder.child_codelets[0], RelationEvaluator)
 

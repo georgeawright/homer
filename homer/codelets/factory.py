@@ -40,7 +40,7 @@ class Factory(Codelet):
     def run(self) -> CodeletResult:
         try:
             self._engender_follow_up()
-            self.result = CodeletResult.SUCCESS
+            self.result = CodeletResult.FINISH
         except MissingStructureError:
             self.result = CodeletResult.FAIL
         self.child_codelets.append(

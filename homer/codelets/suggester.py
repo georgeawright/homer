@@ -53,7 +53,7 @@ class Suggester(Codelet):
         self._calculate_confidence()
         self._boost_activations()
         self._engender_follow_up()
-        self.result = CodeletResult.SUCCESS
+        self.result = CodeletResult.FINISH
         return self.result
 
     @property

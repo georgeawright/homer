@@ -65,7 +65,7 @@ class Selector(Codelet):
             self.winners.get().quality - self.winners.get().activation
         )
         self._engender_follow_up()
-        self.result = CodeletResult.SUCCESS
+        self.result = CodeletResult.FINISH
         return self.result
 
     def _hold_competition(self):

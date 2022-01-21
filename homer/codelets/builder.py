@@ -49,7 +49,7 @@ class Builder(Codelet):
         self._boost_activations()
         self._process_structure()
         self._engender_follow_up()
-        self.result = CodeletResult.SUCCESS
+        self.result = CodeletResult.FINISH
         return self.result
 
     @property

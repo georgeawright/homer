@@ -76,7 +76,7 @@ def test_projects_slot_into_output_space(
     }
     builder = RelationProjectionBuilder("", "", bubble_chamber, target_structures, 1.0)
     builder.run()
-    assert CodeletResult.SUCCESS == builder.result
+    assert CodeletResult.FINISH == builder.result
 
 
 def test_fizzles_if_word_projection_exists(
