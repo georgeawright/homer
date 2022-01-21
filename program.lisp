@@ -301,7 +301,7 @@
     :distance_function centroid_euclidean_distance))
 (define height-space
   (def-conceptual-space :name "height" :parent_concept height-concept
-    :no_of_dimensions 1))
+    :no_of_dimensions 1 :is_basic_level True))
 (define high-concept
   (def-concept :name "high" :locations (list (Location (list (list 10)) height-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
@@ -326,7 +326,7 @@
     :distance_function centroid_euclidean_distance))
 (define goodness-space
   (def-conceptual-space :name "goodness" :parent_concept goodness-concept
-    :no_of_dimensions 1))
+    :no_of_dimensions 1 :is_basic_level True))
 (define good-concept
   (def-concept :name "good" :locations (list (Location (list (list 10)) goodness-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
@@ -368,7 +368,7 @@
     :distance_function centroid_euclidean_distance))
 (define temperature-space
   (def-conceptual-space :name "temperature" :parent_concept temperature-concept
-    :no_of_dimensions 1))
+    :no_of_dimensions 1 :is_basic_level True))
 (define hot-concept
   (def-concept :name "hot" :locations (list (Location (list (list 22)) temperature-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
@@ -470,7 +470,8 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-conceptual-space :name "location" :parent_concept location-concept
     :no_of_dimensions 1
     :dimensions (list north-south-space west-east-space)
-    :sub_spaces (list north-south-space west-east-space nw-se-space ne-sw-space)))
+    :sub_spaces (list north-south-space west-east-space nw-se-space ne-sw-space)
+    :is_basic_level True))
 (define north-concept
   (def-concept :name "north" :locations (list (Location (list (list 0 4)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
