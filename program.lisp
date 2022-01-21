@@ -224,12 +224,12 @@
 (define same-concept
   (def-concept :name "same"
     :locations (list (Location (list (list 10)) same-different-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Relation
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Relation
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 (define different-concept
   (def-concept :name "different"
     :locations (list (Location (list (list 10)) same-different-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Relation
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Relation
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 
 (define same-word (def-letter-chunk :name "same" :locations (list)))
@@ -246,11 +246,11 @@
     :no_of_dimensions 1))
 (define more-concept
   (def-concept :name "more" :locations (list (Location (list (list 5)) more-less-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Relation
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
 (define less-concept
   (def-concept :name "less" :locations (list (Location (list (list -5)) more-less-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Relation
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
 
 (define more-word (def-letter-chunk :name "more" :locations (list)))
@@ -268,22 +268,22 @@
 (define extremely-concept
   (def-concept :name "extremely"
     :locations (list (Location (list (list 2)) magnitude-space))
-    :classifier ProximityClassifier :instance_type Label :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Label :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 (define very-concept
   (def-concept :name "very"
     :locations (list (Location (list (list 1)) magnitude-space))
-    :classifier ProximityClassifier :instance_type Label :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Label :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 (define quite-concept
   (def-concept :name "quite"
     :locations (list (Location (list (list -1)) magnitude-space))
-    :classifier ProximityClassifier :instance_type Label :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Label :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 (define bit-concept
   (def-concept :name "bit"
     :locations (list (Location (list (list -2)) magnitude-space))
-    :classifier ProximityClassifier :instance_type Label :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Label :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 
 (define extremely-word (def-letter-chunk :name "extremely" :locations (list)))
@@ -304,11 +304,11 @@
     :no_of_dimensions 1))
 (define high-concept
   (def-concept :name "high" :locations (list (Location (list (list 10)) height-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space height-space :distance_function centroid_euclidean_distance))
 (define low-concept
   (def-concept :name "low" :locations (list (Location (list (list 0)) height-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space height-space :distance_function centroid_euclidean_distance))
 
 (define high-word (def-letter-chunk :name "high" :locations (list)))
@@ -329,11 +329,11 @@
     :no_of_dimensions 1))
 (define good-concept
   (def-concept :name "good" :locations (list (Location (list (list 10)) goodness-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space goodness-space :distance_function centroid_euclidean_distance))
 (define bad-concept
   (def-concept :name "bad" :locations (list (Location (list (list 0)) goodness-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space goodness-space :distance_function centroid_euclidean_distance))
 
 (define good-word (def-letter-chunk :name "good" :locations (list)))
@@ -356,7 +356,7 @@
     :no_of_dimensions 1))
 (define extreme-concept
   (def-concept :name "extreme" :locations (list (Location (list (list 10)) extremeness-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space extremeness-space :distance_function centroid_euclidean_distance))
 
 (define extreme-word (def-letter-chunk :name "extreme" :locations (list)))
@@ -371,25 +371,25 @@
     :no_of_dimensions 1))
 (define hot-concept
   (def-concept :name "hot" :locations (list (Location (list (list 22)) temperature-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space temperature-space :distance_function centroid_euclidean_distance))
 (define warm-concept
   (def-concept :name "warm" :locations (list (Location (list (list 18)) temperature-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space temperature-space :distance_function centroid_euclidean_distance))
 (define mild-concept
   (def-concept :name "mild"
     :locations (list (Location (list (list 0)) extremeness-space)
 		     (Location (list (list 13)) temperature-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space extremeness-space :distance_function centroid_euclidean_distance))
 (define cool-concept
   (def-concept :name "cool" :locations (list (Location (list (list 8)) temperature-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space temperature-space :distance_function centroid_euclidean_distance))
 (define cold-concept
   (def-concept :name "cold" :locations (list (Location (list (list 4)) temperature-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space temperature-space :distance_function centroid_euclidean_distance))
 
 (define hot-word (def-letter-chunk :name "hot" :locations (list)))
@@ -428,7 +428,7 @@
 (define peripheral-concept
   (def-concept :name "peripheral"
     :locations (list (Location (list (list 10)) peripheralness-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space peripheralness-space :distance_function centroid_euclidean_distance))
 
 (define peripheries-word (def-letter-chunk :name "peripheries" :locations (list)))
@@ -473,41 +473,41 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :sub_spaces (list north-south-space west-east-space nw-se-space ne-sw-space)))
 (define north-concept
   (def-concept :name "north" :locations (list (Location (list (list 0 4)) location-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 (define south-concept
   (def-concept :name "south" :locations (list (Location (list (list 10 4)) location-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 (define west-concept
   (def-concept :name "west" :locations (list (Location (list (list 5 0)) location-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 (define east-concept
   (def-concept :name "east" :locations (list (Location (list (list 5 8)) location-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 (define northwest-concept
   (def-concept :name "northwest" :locations (list (Location (list (list 0 0)) location-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 (define northeast-concept
   (def-concept :name "northeast" :locations (list (Location (list (list 0 8)) location-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 (define southwest-concept
   (def-concept :name "southwest" :locations (list (Location (list (list 10 0)) location-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 (define southeast-concept
   (def-concept :name "southeast" :locations (list (Location (list (list 10 8)) location-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 (define central-concept
   (def-concept :name "central"
     :locations (list (Location (list (list 5 4)) location-space)
 		     (Location (list (list 0)) peripheralness-space))
-    :classifier ProximityClassifier :instance_type Chunk :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 
 (define north-word (def-letter-chunk :name "north" :locations (list)))
@@ -530,3 +530,163 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (def-relation :start central-concept :end centre-word :parent_concept nn-concept)
 (define midlands-word (def-letter-chunk :name "midlands" :locations (list)))
 (def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
+
+(define input-space
+  (def-contextual-space :name "input" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection temperature-space location-space)))
+
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 4)) temperature-space)
+		   (Location (list (list 0 0)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 4)) temperature-space)
+		   (Location (list (list 0 1)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 0 2)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 0 3)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 0 4)) location-space))
+  :parent_space input-space)
+
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 4)) temperature-space)
+		   (Location (list (list 1 0)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 4)) temperature-space)
+		   (Location (list (list 1 1)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 1 2)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 1 3)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 1 4)) location-space))
+  :parent_space input-space)
+
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 4)) temperature-space)
+		   (Location (list (list 2 0)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 4)) temperature-space)
+		   (Location (list (list 2 1)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 2 2)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 2 3)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 2 4)) location-space))
+  :parent_space input-space)
+
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 3 0)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 3 1)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 3 2)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 3 3)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 3 4)) location-space))
+  :parent_space input-space)
+
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 4 0)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 4 1)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 4 2)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 4 3)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 4 4)) location-space))
+  :parent_space input-space)
+
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 5 0)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 5 1)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 5 2)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 5 3)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 5 4)) location-space))
+  :parent_space input-space)

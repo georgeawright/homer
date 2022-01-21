@@ -19,10 +19,10 @@ class Interpreter:
             "Chunk": structures.nodes.Chunk,
             "LetterChunk": structures.nodes.chunks.LetterChunk,
             # Classifier Types
-            "DifferenceClassifier": classifiers.DifferenceClassifier(),
-            "DifferentnessClassifier": classifiers.DifferentnessClassifier(),
-            "ProximityClassifier": classifiers.ProximityClassifier(),
-            "SamenessClassifier": classifiers.SamenessClassifier(),
+            "DifferenceClassifier": classifiers.DifferenceClassifier,
+            "DifferentnessClassifier": classifiers.DifferentnessClassifier,
+            "ProximityClassifier": classifiers.ProximityClassifier,
+            "SamenessClassifier": classifiers.SamenessClassifier,
             # Distance Functions
             "centroid_euclidean_distance": centroid_euclidean_distance,
             # Structure Factory Methods
