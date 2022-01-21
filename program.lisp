@@ -472,7 +472,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 """))))))
 (define location-space
   (def-conceptual-space :name "location" :parent_concept location-concept
-    :no_of_dimensions 1
+    :no_of_dimensions 2
     :dimensions (list north-south-space west-east-space)
     :sub_spaces (list north-south-space west-east-space nw-se-space ne-sw-space)
     :is_basic_level True))

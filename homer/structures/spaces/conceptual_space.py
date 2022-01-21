@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import Callable, Dict, List
 
 from homer.location import Location
@@ -83,6 +84,8 @@ class ConceptualSpace(Space):
     def location_from_super_space_location(self, location: Location) -> Location:
         if location.coordinates[0][0] is None:
             coordinates = [[None for _ in range(self.no_of_dimensions)]]
+        if math.isnan(location.coordinates[0][0]):
+            coordinates = [[math.nan for _ in range(self.no_of_dimensions)]]
         else:
             coordinates_function = self.super_space_to_coordinate_function_map[
                 location.space.name
