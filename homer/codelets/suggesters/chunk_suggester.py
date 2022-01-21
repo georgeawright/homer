@@ -124,7 +124,7 @@ class ChunkSuggester(Suggester):
             "target_node": self.target_node,
             "target_slot": self.target_slot,
             "target_slot_filler": self.target_slot_filler,
-            "target_brach": self.target_branch,
+            "target_branch": self.target_branch,
         }
 
     def _passes_preliminary_checks(self):
