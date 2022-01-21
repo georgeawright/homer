@@ -94,7 +94,7 @@ class Suggester(Codelet):
             self.get_follow_up_class().spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self._target_structures,
+                self.targets_dict,
                 self.confidence,
             )
         )

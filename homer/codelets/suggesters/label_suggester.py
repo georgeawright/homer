@@ -92,7 +92,7 @@ class LabelSuggester(Suggester):
         return self.bubble_chamber.concepts["label"]
 
     @property
-    def target_dict(self):
+    def targets_dict(self):
         return {
             "target_node": self.target_node,
             "parent_concept": self.parent_concept,

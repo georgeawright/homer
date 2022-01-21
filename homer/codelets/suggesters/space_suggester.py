@@ -89,7 +89,7 @@ class SpaceSuggester(Suggester):
         return self.bubble_chamber.concepts["conceptual-space"]
 
     @property
-    def target_dict(self):
+    def targets_dict(self):
         return {
             "projectable_space": self.projectable_space,
             "metaphor_space": self.metaphor_space,

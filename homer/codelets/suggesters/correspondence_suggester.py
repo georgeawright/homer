@@ -58,7 +58,7 @@ class CorrespondenceSuggester(Suggester):
         return self.bubble_chamber.concepts["correspondence"]
 
     @property
-    def target_dict(self):
+    def targets_dict(self):
         return {
             "target_structure_one": self.target_structure_one,
             "target_structure_two": self.target_structure_two,

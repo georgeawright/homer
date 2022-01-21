@@ -116,7 +116,7 @@ class ChunkSuggester(Suggester):
         return self.bubble_chamber.concepts["chunk"]
 
     @property
-    def target_dict(self):
+    def targets_dict(self):
         return {
             "target_space": self.target_space,
             "target_rule": self.target_rule,
