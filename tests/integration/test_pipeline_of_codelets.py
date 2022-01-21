@@ -63,3 +63,12 @@ def test_pipeline_of_codelets(homer):
     label.update_activation()
     assert CodeletResult.FINISH == codelet.result
     assert original_label_activation < label.activation
+
+    codelet = ChunkSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_space": None, "target_node": target_node, "target_rule": None},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result

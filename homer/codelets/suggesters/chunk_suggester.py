@@ -136,14 +136,7 @@ class ChunkSuggester(Suggester):
                 self.target_root = None
                 self.target_rule = self.bubble_chamber.rules.where(
                     instance_type=type(self.target_node)
-                ).get(
-                    key=lambda x: fuzzy.OR(
-                        x.left_concept.proximity_to(self.target_node),
-                        x.right_concept.proximity_to(self.target_node),
-                    )
-                    if x.right_concept is not None
-                    else x.left_concept.proximity_to(self.target_node)
-                )
+                ).get()
         else:
             try:
                 self.target_root = self.target_node.super_chunks.where(
