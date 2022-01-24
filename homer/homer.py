@@ -24,8 +24,8 @@ class Homer:
         self.activation_update_frequency = activation_update_frequency
 
     @classmethod
-    def setup(cls, logger: Logger):
-        bubble_chamber = BubbleChamber.setup(logger)
+    def setup(cls, logger: Logger, random_seed: int = None):
+        bubble_chamber = BubbleChamber.setup(logger, random_seed=random_seed)
         coderack = Coderack.setup(bubble_chamber, logger)
         interpreter = Interpreter(bubble_chamber)
         return cls(bubble_chamber, coderack, interpreter, logger)

@@ -154,6 +154,7 @@ class ChunkSuggester(Suggester):
                     self.target_slot_filler = (
                         self.target_root.nearby()
                         .where(is_slot=False)
+                        .filter(lambda x: x not in self.target_root.members)
                         .get(key=chunking_exigency)
                     )
                 else:

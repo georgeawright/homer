@@ -658,6 +658,6 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 
 @pytest.fixture(scope="module")
 def homer(program):
-    system = Homer.setup(logger=Mock())
+    system = Homer.setup(logger=Mock(), random_seed=1)
     system.interpreter.interpret_string(program)
     return system
