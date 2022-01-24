@@ -127,6 +127,71 @@ def test_pipeline_of_codelets(homer):
     # END: build and enlarge a sameness chunk
 
     # START: label the sameness chunk
+    parent_concept = bubble_chamber.concepts["cold"]
+    codelet = LabelSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_node": chunk, "parent_concept": parent_concept},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelBuilder)
+    assert not chunk.has_label_with_name("cold")
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert chunk.has_label_with_name("cold")
+
+    label = codelet.child_structures.get()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelEvaluator)
+    assert 0 == label.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < label.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelSelector)
+    original_label_activation = label.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    label.update_activation()
+    assert original_label_activation < label.activation
+
+    parent_concept = bubble_chamber.concepts["northwest"]
+    codelet = LabelSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_node": chunk, "parent_concept": parent_concept},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelBuilder)
+    assert not chunk.has_label_with_name("northwest")
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert chunk.has_label_with_name("northwest")
+
+    label = codelet.child_structures.get()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelEvaluator)
+    assert 0 == label.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < label.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelSelector)
+    original_label_activation = label.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    label.update_activation()
+    assert original_label_activation < label.activation
     # END: label the sameness chunk
 
     # START: make and label another sameness chunk
