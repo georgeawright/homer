@@ -76,15 +76,19 @@ def program():
     
 (def-relation :start suggest-concept :end chunk-concept)
 (def-relation :start suggest-concept :end label-concept)
+(def-relation :start suggest-concept :end relation-concept)
 
 (def-relation :start build-concept :end chunk-concept)
 (def-relation :start build-concept :end label-concept)
+(def-relation :start build-concept :end relation-concept)
 
 (def-relation :start evaluate-concept :end chunk-concept)
 (def-relation :start evaluate-concept :end label-concept)
+(def-relation :start evaluate-concept :end relation-concept)
 
 (def-relation :start select-concept :end chunk-concept)
 (def-relation :start select-concept :end label-concept)
+(def-relation :start select-concept :end relation-concept)
 
 (define grammar-distance-to-proximity 0.1)
 (define grammar-concept (def-concept :name "grammar"))
@@ -181,7 +185,7 @@ def program():
 
 (define same-different-concept
   (def-concept :name "same-different" :locations (list) :classifier None :instance_type None
-    :structure_type None :parent_space None
+    :structure_type Correspondence :parent_space None
     :distance_function centroid_euclidean_distance))
 (define same-different-space
   (def-conceptual-space :name "same-different" :parent_concept same-different-concept
@@ -207,19 +211,19 @@ def program():
 (def-relation :start different-concept :end different-word :parent_concept jj-concept)
 
 (define more-less-concept
-  (def-concept :name "more-less" :locations (list) :classifier None :instance_type None
-    :structure_type None :parent_space None
+  (def-concept :name "more-less" :locations (list) :classifier None :instance_type Chunk
+    :structure_type Relation :parent_space None
     :distance_function centroid_euclidean_distance))
 (define more-less-space
   (def-conceptual-space :name "more-less" :parent_concept more-less-concept
     :no_of_dimensions 1))
 (define more-concept
   (def-concept :name "more" :locations (list (Location (list (list 5)) more-less-space))
-    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Relation
+    :classifier (DifferenceClassifier 5) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
 (define less-concept
   (def-concept :name "less" :locations (list (Location (list (list -5)) more-less-space))
-    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Relation
+    :classifier (DifferenceClassifier -5) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
 
 (define more-word (def-letter-chunk :name "more" :locations (list)))
@@ -257,7 +261,7 @@ def program():
 
 (define height-concept
   (def-concept :name "height" :locations (list) :classifier None
-    :instance_type None :structure_type None :parent_space None
+    :instance_type Chunk :structure_type Label :parent_space None
     :distance_function centroid_euclidean_distance))
 (define height-space
   (def-conceptual-space :name "height" :parent_concept height-concept
@@ -282,7 +286,7 @@ def program():
 
 (define goodness-concept
   (def-concept :name "goodness" :locations (list) :classifier None
-    :instance_type None :structure_type None :parent_space None
+    :instance_type Chunk :structure_type Label :parent_space None
     :distance_function centroid_euclidean_distance))
 (define goodness-space
   (def-conceptual-space :name "goodness" :parent_concept goodness-concept
@@ -309,7 +313,7 @@ def program():
 
 (define extremeness-concept
   (def-concept :name "extremeness" :locations (list) :classifier None
-    :instance_type None :structure_type None :parent_space None
+    :instance_type Chunk :structure_type Label :parent_space None
     :distance_function centroid_euclidean_distance))
 (define extremeness-space
   (def-conceptual-space :name "extremeness" :parent_concept extremeness-concept
@@ -324,7 +328,7 @@ def program():
 
 (define temperature-concept
   (def-concept :name "temperature" :locations (list) :classifier None
-    :instance_type None :structure_type None :parent_space None
+    :instance_type Chunk :structure_type Label :parent_space None
     :distance_function centroid_euclidean_distance))
 (define temperature-space
   (def-conceptual-space :name "temperature" :parent_concept temperature-concept
@@ -381,7 +385,7 @@ def program():
 
 (define peripheralness-concept
   (def-concept :name "peripheralness" :locations (list) :classifier None
-    :instance_type None :structure_type None :parent_space None
+    :instance_type Chunk :structure_type Label :parent_space None
     :distance_function centroid_euclidean_distance))
 (define peripheralness-space
   (def-conceptual-space :name "peripheralness" :parent_concept peripheralness-concept
@@ -397,7 +401,7 @@ def program():
 
 (define location-concept
   (def-concept :name "location" :locations (list) :classifier None
-    :instance_type None :structure_type None :parent_space None
+    :instance_type Chunk :structure_type Label :parent_space None
     :distance_function centroid_euclidean_distance))
 (define north-south-space
   (def-conceptual-space :name "north-south" :parent_concept location-concept

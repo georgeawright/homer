@@ -141,41 +141,12 @@ class RelationSuggester(Suggester):
 
     def _passes_preliminary_checks(self):
         if self.parent_concept is None:
-            conceptual_space = (
-                self.bubble_chamber.conceptual_spaces.where(
-                    is_basic_level=True, instance_type=type(self.target_structure_one)
-                )
-                .filter(lambda x: self.target_structure_one.has_location_in_space(x))
+            self.parent_concept = (
+                self.bubble_chamber.conceptual_spaces.where(structure_type=Relation)
+                .get()
+                .contents.where(is_concept=True)
                 .get()
             )
-            location = self.target_structure_one.location_in_space(conceptual_space)
-            try:
-                self.parent_concept = (
-                    conceptual_space.contents.where(
-                        is_concept=True, structure_type=Relation
-                    )
-                    .filter(
-                        lambda x: any(
-                            [
-                                location.start_is_near(location)
-                                for location in x.locations
-                                if location.space == conceptual_space
-                            ]
-                        )
-                    )
-                    .get()
-                )
-            except MissingStructureError:
-                try:
-                    self.parent_concept = (
-                        conceptual_space.contents.where(
-                            is_concept=True, structure_type=Relation
-                        )
-                        .where_not(classifier=None)
-                        .get()
-                    )
-                except MissingStructureError:
-                    return False
         if self.target_structure_two is None:
             try:
                 self.target_structure_two = (

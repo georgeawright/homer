@@ -57,6 +57,10 @@ class ConceptualSpace(Space):
         return self.parent_concept.instance_type
 
     @property
+    def structure_type(self):
+        return self.parent_concept.structure_type
+
+    @property
     def dimensions(self) -> List[Space]:
         if self.no_of_dimensions < 1:
             return []
