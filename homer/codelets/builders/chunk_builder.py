@@ -179,9 +179,9 @@ class ChunkBuilder(Builder):
                 self.target_root, self.target_slot
             )
             for location in self.target_root.locations:
-                location.coordinates.append(
-                    self.target_slot_filler.location_in_space(location.space)
-                )
+                location.coordinates += self.target_slot_filler.location_in_space(
+                    location.space
+                ).coordinates
             if self.target_branch == "left":
                 self.target_root.left_branch.add(self.target_slot_filler)
             if self.target_branch == "right":

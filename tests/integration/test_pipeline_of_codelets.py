@@ -28,6 +28,7 @@ def test_pipeline_of_codelets(homer):
     input_space = bubble_chamber.contextual_spaces["input"]
     location_space = bubble_chamber.conceptual_spaces["location"]
 
+    # START: label a raw chunk
     target_node = input_space.contents.filter(
         lambda x: x.location_in_space(location_space).coordinates == [[0, 0]]
     ).get()
@@ -63,7 +64,9 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     label.update_activation()
     assert original_label_activation < label.activation
+    # END: label a raw chunk
 
+    # START: build and enlarge a sameness chunk
     codelet = ChunkSuggester.spawn(
         "",
         bubble_chamber,
@@ -95,3 +98,48 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     chunk.update_activation()
     assert original_chunk_activation < chunk.activation
+
+    codelet = [c for c in codelet.child_codelets if isinstance(c, ChunkSuggester)][0]
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    chunk = codelet.child_structures.where(is_slot=False).get()
+    assert 3 == chunk.size
+
+    chunk_quality = chunk.quality
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkEvaluator)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert chunk_quality <= chunk.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkSelector)
+    original_chunk_activation = chunk.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    chunk.update_activation()
+    assert original_chunk_activation <= chunk.activation
+    # END: build and enlarge a sameness chunk
+
+    # START: label the sameness chunk
+    # END: label the sameness chunk
+
+    # START: make and label another sameness chunk
+    # END: make and label another sameness chunk
+
+    # START: relate the two chunks in temperature as well as location space
+    # END: relate the two chunks in temperature as well as location space
+
+    # START: build comparative phrase
+    # END: build comparative phrase
+
+    # START: chunk and describe more data
+    # END: chunk and describe more data
+
+    # START: compile longer piece of text
+    # END: compile longer piece of text
