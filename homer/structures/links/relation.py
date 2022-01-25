@@ -110,3 +110,12 @@ class Relation(Link):
             .filter(lambda x: x.parent_spaces == self.parent_spaces)
             .excluding(self)
         )
+
+    def __repr__(self) -> str:
+        concept = "none" if self.parent_concept is None else self.parent_concept.name
+        conceptual_space = (
+            "" if self.conceptual_space is None else self.conceptual_space.name
+        )
+        args = ", ".join([arg.structure_id for arg in self.arguments])
+        spaces = ", ".join([location.space.name for location in self.locations])
+        return f"<{self.structure_id} {concept}-{conceptual_space}({args}) in {spaces}>"

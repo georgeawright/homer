@@ -2,7 +2,10 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builder import Builder
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
+from homer.locations import TwoPointLocation
 from homer.structure import Structure
+from homer.tools import centroid_difference
 
 
 class RelationBuilder(Builder):
@@ -65,12 +68,25 @@ class RelationBuilder(Builder):
         )
 
     def _process_structure(self):
+        start_coordinates = self.target_structure_one.location_in_space(
+            self.target_space
+        ).coordinates
+        end_coordinates = self.target_structure_two.location_in_space(
+            self.target_space
+        ).coordinates
+        location_coordinates = centroid_difference(start_coordinates, end_coordinates)
+        locations = [
+            Location([], self.target_structure_one.parent_space),
+            Location([[location_coordinates]], self.parent_concept.parent_space),
+            TwoPointLocation(start_coordinates, end_coordinates, self.target_space),
+        ]
         relation = self.bubble_chamber.new_relation(
             parent_id=self.codelet_id,
             start=self.target_structure_one,
             end=self.target_structure_two,
+            locations=locations,
             parent_concept=self.parent_concept,
-            parent_space=self.target_space,
+            conceptual_space=self.target_space,
             quality=0,
         )
         self.child_structures = self.bubble_chamber.new_structure_collection(relation)

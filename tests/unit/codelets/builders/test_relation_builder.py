@@ -18,6 +18,9 @@ def parent_concept():
 @pytest.fixture
 def target_structure_two():
     structure = Mock()
+    location = Mock()
+    location.coordinates = [[1]]
+    structure.location_in_space.return_value = location
     return structure
 
 
@@ -29,6 +32,9 @@ def target_structure_one(target_structure_two):
     structure.parent_spaces.get_random.return_value = parent_space_contents
     structure.has_relation.return_value = False
     structure.nearby.get_unhappy.return_value = Mock()
+    location = Mock()
+    location.coordinates = [[10]]
+    structure.location_in_space.return_value = location
     return structure
 
 

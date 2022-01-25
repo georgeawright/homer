@@ -14,22 +14,18 @@ class RelationSelector(Selector):
         if self.challengers is not None:
             return True
         champion_relation = self.champions.get()
-        space = champion_relation.parent_space
+        space = champion_relation.conceptual_space
         candidates = champion_relation.start.relations_in_space_with(
             space, champion_relation.end
         )
-        if len(candidates) == 1:
-            return False
-        try:
+        if len(candidates) > 1:
             challenger_relation = candidates.get(
                 key=activation, exclude=[champion_relation]
             )
             self.challengers = self.bubble_chamber.new_structure_collection(
                 challenger_relation
             )
-            return True
-        except MissingStructureError:
-            return False
+        return True
 
     def _fizzle(self):
         pass

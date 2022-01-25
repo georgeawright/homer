@@ -192,6 +192,7 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     label.update_activation()
     assert original_label_activation < label.activation
+    chunk_one = chunk
     # END: label the sameness chunk
 
     # START: make and label another sameness chunk
@@ -321,22 +322,50 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     label.update_activation()
     assert original_label_activation < label.activation
+    chunk_two = chunk
     # END: make and label another sameness chunk
 
     # START: relate the two chunks in temperature as well as location space
     target_space = bubble_chamber.conceptual_spaces["temperature"]
+    parent_concept = bubble_chamber.concepts["less"]
     codelet = RelationSuggester.spawn(
         "",
         bubble_chamber,
         {
             "target_space": target_space,
-            "target_structure_one": chunk,
-            "parent_concept": None,
+            "target_structure_one": chunk_one,
+            "target_structure_two": chunk_two,
+            "parent_concept": parent_concept,
         },
         1.0,
     )
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationBuilder)
+    assert not chunk_one.has_relation_with_name("less")
+    assert not chunk_two.has_relation_with_name("less")
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert chunk_one.has_relation_with_name("less")
+    assert chunk_two.has_relation_with_name("less")
+
+    relation = codelet.child_structures.get()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationEvaluator)
+    assert 0 == relation.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < relation.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationSelector)
+    original_relation_activation = relation.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    relation.update_activation()
+    assert original_relation_activation < relation.activation
     # END: relate the two chunks in temperature as well as location space
 
     # START: build comparative phrase
