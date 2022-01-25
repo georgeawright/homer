@@ -366,6 +366,39 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     relation.update_activation()
     assert original_relation_activation < relation.activation
+
+    codelet = [c for c in codelet.child_codelets if isinstance(c, RelationSuggester)][0]
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationBuilder)
+    assert 1 == len(chunk_one.relations)
+    assert 1 == len(chunk_two.relations)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 2 == len(chunk_one.relations)
+    assert 2 == len(chunk_two.relations)
+
+    relation = codelet.child_structures.get()
+    assert (
+        relation.conceptual_space
+        == bubble_chamber.conceptual_spaces["northwest-southeast"]
+    )
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationEvaluator)
+    assert 0 == relation.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < relation.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationSelector)
+    original_relation_activation = relation.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    relation.update_activation()
+    assert original_relation_activation < relation.activation
     # END: relate the two chunks in temperature as well as location space
 
     # START: build comparative phrase

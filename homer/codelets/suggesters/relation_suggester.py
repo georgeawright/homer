@@ -5,7 +5,6 @@ from homer.codelets import Suggester
 from homer.errors import MissingStructureError, NoLocationError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import relating_exigency
 from homer.structures.links import Relation
 from homer.structures.nodes import Concept
@@ -61,12 +60,8 @@ class RelationSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_space = bubble_chamber.working_spaces.where(no_of_dimensions=1).get()
-        potential_targets = StructureCollection.union(
-            target_space.contents.where(is_chunk=True),
-            target_space.contents.where(is_word=True),
-        )
-        target = potential_targets.get(key=relating_exigency)
+        target_space = bubble_chamber.conceptual_spaces.where(no_of_dimensions=1).get()
+        target = target_space.contents.where(is_node=True).get(key=relating_exigency)
         urgency = urgency if urgency is not None else target.unrelatedness
         return cls.spawn(
             parent_id,
@@ -88,16 +83,13 @@ class RelationSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_space = bubble_chamber.new_structure_collection(
-            space
-            for space in bubble_chamber.contextual_spaces
-            if space.no_of_dimensions == 1
-            and parent_concept.is_compatible_with(space.parent_concept)
-        ).get()
-        potential_targets = StructureCollection.union(
-            target_space.contents.where(is_chunk=True),
-            target_space.contents.where(is_word=True),
+        # TODO: this may need work
+        target_space = (
+            bubble_chamber.conceptual_spaces.where(no_of_dimensions=1)
+            .filter(lambda x: parent_concept.is_compatible_with(x.parent_concept))
+            .get()
         )
+        potential_targets = target_space.contents.where(is_node=True)
         try:
             target_structure_one = potential_targets.get(
                 key=lambda x: parent_concept.proximity_to_start(x),
