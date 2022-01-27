@@ -19,7 +19,7 @@ class CorrespondenceBuilder(Builder):
         self.target_view = target_structures.get("target_view")
         self.target_space_one = target_structures.get("target_space_one")
         self.target_structure_one = target_structures.get("target_structure_one")
-        self.target_space_two = target_structures.get("target_structure_two")
+        self.target_space_two = target_structures.get("target_space_two")
         self.target_structure_two = target_structures.get("target_structure_two")
         self.target_conceptual_space = target_structures.get("target_conceptual_space")
         self.parent_concept = target_structures.get("parent_concept")
@@ -68,10 +68,9 @@ class CorrespondenceBuilder(Builder):
     def _passes_preliminary_checks(self):
         return self.target_view.can_accept_member(
             self.parent_concept,
+            self.target_conceptual_space,
             self.target_structure_one,
             self.target_structure_two,
-            self.target_space_one,
-            self.target_space_two,
         )
 
     def _process_structure(self):

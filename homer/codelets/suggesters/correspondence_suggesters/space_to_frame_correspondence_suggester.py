@@ -82,15 +82,16 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             else None
         )
         if self.parent_concept is None:
-            self.parent_concept = self.bubble_chamber.concepts.where(
-                structure_type=Correspondence
-            ).get()
+            self.parent_concept = (
+                self.bubble_chamber.concepts.where(structure_type=Correspondence)
+                .where_not(classifier=None)
+                .get()
+            )
         return self.target_view.can_accept_member(
             self.parent_concept,
+            self.target_conceptual_space,
             self.target_structure_one,
             self.target_structure_two,
-            self.target_space_one,
-            self.target_space_two,
         )
 
     def _fizzle(self):

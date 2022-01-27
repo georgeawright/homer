@@ -63,7 +63,7 @@ class View(Structure):
 
     @property
     def slots(self):
-        return StructureCollection.union(*[frame.slots for frame in self.input_frames])
+        return self.parent_frame.slots
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

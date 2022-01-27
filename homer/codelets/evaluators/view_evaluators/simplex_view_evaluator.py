@@ -37,7 +37,7 @@ class SimplexViewEvaluator(ViewEvaluator):
             if len(target_view.members) > 0
             else 0
         )
-        frame = target_view.input_frames.get()
+        frame = target_view.parent_frame
         proportion_of_frame_items_projected_into_output_space = sum(
             1
             for item in frame.output_space.contents.where(is_correspondence=False)

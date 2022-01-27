@@ -4,6 +4,11 @@ from homer.codelets.builders import (
     LabelBuilder,
     RelationBuilder,
 )
+from homer.codelets.builders.correspondence_builders import (
+    PotentialSubFrameToFrameCorrespondenceBuilder,
+    SpaceToFrameCorrespondenceBuilder,
+    SubFrameToFrameCorrespondenceBuilder,
+)
 from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators import (
     CorrespondenceEvaluator,
@@ -23,6 +28,11 @@ from homer.codelets.suggesters import (
     ChunkSuggester,
     LabelSuggester,
     RelationSuggester,
+)
+from homer.codelets.suggesters.correspondence_suggesters import (
+    PotentialSubFrameToFrameCorrespondenceSuggester,
+    SpaceToFrameCorrespondenceSuggester,
+    SubFrameToFrameCorrespondenceSuggester,
 )
 from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 
@@ -417,6 +427,33 @@ def test_pipeline_of_codelets(homer):
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, SimplexViewBuilder)
     codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    view = codelet.child_structures.get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, SimplexViewEvaluator)
+    assert 0 == view.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 == view.quality
+
+    codelet = SpaceToFrameCorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view,
+            "target_space_one": input_space,
+            "target_structure_one": chunk_one,
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
     # END: build comparative phrase
 
     # START: chunk and describe more data

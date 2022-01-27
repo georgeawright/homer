@@ -62,7 +62,7 @@ class CorrespondenceSuggester(Suggester):
         return {
             "target_structure_one": self.target_structure_one,
             "target_structure_two": self.target_structure_two,
-            "target_space_one": self.target_space_two,
+            "target_space_one": self.target_space_one,
             "target_space_two": self.target_space_two,
             "target_conceptual_space": self.target_conceptual_space,
             "parent_concept": self.parent_concept,

@@ -44,7 +44,7 @@ def test_changes_target_structure_quality(
         item.is_correspondence = False
         item.has_correspondence_to_space.return_value = False
         frame.output_space.contents.add(item)
-    view.input_frames = bubble_chamber.new_structure_collection(frame)
+    view.parent_frame = frame
 
     view.output_space.quality = output_quality
 

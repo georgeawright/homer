@@ -79,21 +79,25 @@ def program():
     :parent_space structure-space))
     
 (def-relation :start suggest-concept :end chunk-concept)
+(def-relation :start suggest-concept :end correspondence-concept)
 (def-relation :start suggest-concept :end label-concept)
 (def-relation :start suggest-concept :end relation-concept)
 (def-relation :start suggest-concept :end view-simplex-concept)
 
 (def-relation :start build-concept :end chunk-concept)
+(def-relation :start build-concept :end correspondence-concept)
 (def-relation :start build-concept :end label-concept)
 (def-relation :start build-concept :end relation-concept)
 (def-relation :start build-concept :end view-simplex-concept)
 
 (def-relation :start evaluate-concept :end chunk-concept)
+(def-relation :start evaluate-concept :end correspondence-concept)
 (def-relation :start evaluate-concept :end label-concept)
 (def-relation :start evaluate-concept :end relation-concept)
 (def-relation :start evaluate-concept :end view-simplex-concept)
 
 (def-relation :start select-concept :end chunk-concept)
+(def-relation :start select-concept :end correspondence-concept)
 (def-relation :start select-concept :end label-concept)
 (def-relation :start select-concept :end relation-concept)
 (def-relation :start select-concept :end view-simplex-concept)
@@ -201,12 +205,12 @@ def program():
 (define same-concept
   (def-concept :name "same"
     :locations (list (Location (list (list 10)) same-different-space))
-    :classifier (SamenessClassifier) :instance_type Chunk :structure_type Relation
+    :classifier (SamenessClassifier) :instance_type Chunk :structure_type Correspondence
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 (define different-concept
   (def-concept :name "different"
     :locations (list (Location (list (list 10)) same-different-space))
-    :classifier (DifferentnessClassifier) :instance_type Chunk :structure_type Relation
+    :classifier (DifferentnessClassifier) :instance_type Chunk :structure_type Correspondence
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 
 (define sameness-rule
