@@ -26,6 +26,7 @@ class SimplexViewBuilder(ViewBuilder):
         )
         frame_instance = self.frame.instantiate(
             input_space=frame_input_space,
+            conceptual_spaces_map=self.conceptual_spaces_map,
             parent_id=self.codelet_id,
             bubble_chamber=self.bubble_chamber,
         )

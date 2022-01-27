@@ -2,6 +2,7 @@ from __future__ import annotations
 import statistics
 
 from homer.id import ID
+from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
@@ -82,11 +83,12 @@ class ContextualSpace(Space):
         bubble_chamber.logger.log(new_space)
         copies = {}
         for item in self.contents.where(is_node=True):
+            new_location = Location(item.location_in_space(self).coordinates, new_space)
             new_item, copies = item.copy_with_contents(
                 copies=copies,
                 bubble_chamber=bubble_chamber,
                 parent_id=parent_id,
-                parent_space=new_space,
+                new_location=new_location,
             )
             new_space.add(new_item)
             copies[item] = new_item

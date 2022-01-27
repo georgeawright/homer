@@ -234,7 +234,8 @@ class BubbleChamber:
         name: str,
         parent_concept: Concept,
         parent_frame: Frame,
-        contents: StructureCollection,
+        sub_frames: StructureCollection,
+        concepts: StructureCollection,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
         parent_id: str = "",
@@ -245,7 +246,8 @@ class BubbleChamber:
             name=name,
             parent_concept=parent_concept,
             parent_frame=parent_frame,
-            contents=contents,
+            sub_frames=sub_frames,
+            concepts=concepts,
             input_space=input_space,
             output_space=output_space,
             links_in=self.new_structure_collection(),
@@ -270,6 +272,10 @@ class BubbleChamber:
     ) -> Chunk:
         if members is None:
             members = self.new_structure_collection()
+        if left_branch is None:
+            left_branch = self.new_structure_collection()
+        if right_branch is None:
+            right_branch = self.new_structure_collection()
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )
@@ -358,6 +364,7 @@ class BubbleChamber:
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         activation: FloatBetweenOneAndZero = None,
+        is_slot: bool = False,
     ) -> Concept:
         locations = [] if locations is None else locations
         parent_spaces = self.new_structure_collection(
@@ -379,6 +386,7 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
+            is_slot=is_slot,
         )
         if activation is not None:
             concept._activation = activation

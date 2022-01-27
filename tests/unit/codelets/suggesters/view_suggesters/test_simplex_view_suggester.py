@@ -28,11 +28,14 @@ def input_space():
 
 
 @pytest.fixture
-def frame():
-    space = Mock()
-    space.is_frame = True
-    space.activation = 1.0
-    return space
+def frame(input_space):
+    f = Mock()
+    f.is_frame = True
+    f.activation = 1.0
+    f.input_space = Mock()
+    f.input_space.parent_concept = input_space.parent_concept
+    f.input_space.conceptual_spaces = [Mock()]
+    return f
 
 
 def test_gives_high_confidence_for_highly_activated_spaces(

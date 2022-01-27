@@ -1,6 +1,10 @@
 (define input-concept (def-concept :name "input"))
 (define text-concept (def-concept :name "text"))
 
+(define views-space
+  (def-contextual-space :name "views" :parent_concept None
+    :conceptual_spaces (StructureCollection)))
+
 (define activity-concept (def-concept :name "activity"))
 (define activity-space
   (def-conceptual-space :name "activity" :parent_concept activity-concept))
@@ -535,6 +539,48 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (def-relation :start central-concept :end centre-word :parent_concept nn-concept)
 (define midlands-word (def-letter-chunk :name "midlands" :locations (list)))
 (def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
+
+(define space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define conceptual-space
+  (def-conceptual-space :name "" :parent_concept space-parent-concept
+    :no_of_dimensions Nan))
+(define label-concept
+  (def-concept :name "" :is_slot True :parent_space conceptual-space))
+(define nn-input
+  (def-contextual-space :name "np[nn].meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection conceptual-space)))
+(define nn-output
+  (def-contextual-space :name "np[nn].text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
+(define nn-frame
+  (def-frame :name "np[nn]"
+    :parent_concept np-concept :parent_frame None
+    :sub_frames (StructureCollection)
+    :concepts (StructureCollection space-parent-concept label-concept)
+    :input_space nn-input :output_space nn-output))
+(define chunk
+  (def-chunk :locations (list (Location (list) conceptual-space)
+			      (Location (list) nn-input))
+    :parent_space nn-input))
+(define chunk-label
+  (def-label :start chunk :parent_concept label-concept
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) nn-input))))
+(define letter-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) nn-output))))
+(define letter-chunk-grammar-label
+  (def-label :start letter-chunk :parent_concept nn-concept
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) nn-input))))
+(define letter-chunk-meaning-label
+  (def-label :start letter-chunk :parent_concept label-concept
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) nn-input))))
+
+
 
 (define input-space
   (def-contextual-space :name "input" :parent_concept input-concept

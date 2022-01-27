@@ -1,4 +1,4 @@
-import re
+import math
 
 from . import classifiers
 from . import structures
@@ -45,6 +45,7 @@ class Interpreter:
             "StructureCollection": bubble_chamber.new_structure_collection,
             "Location": Location,
             "None": None,
+            "Nan": math.nan,
             "True": True,
             "False": False,
         }

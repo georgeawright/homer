@@ -24,6 +24,7 @@ class ViewSuggester(Suggester):
         self.output_space = target_structures.get("ouptut_space")
         self.frame = target_structures.get("frame")
         self.contextual_space = target_structures.get("contextual_space")
+        self.conceptual_spaces_map = {}
 
     @classmethod
     def spawn(
@@ -57,6 +58,7 @@ class ViewSuggester(Suggester):
             "output_space": self.output_space,
             "frame": self.frame,
             "contextual_space": self.contextual_space,
+            "conceptual_spaces_map": self.conceptual_spaces_map,
         }
 
     def _passes_preliminary_checks(self):

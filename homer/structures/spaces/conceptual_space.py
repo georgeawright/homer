@@ -53,6 +53,10 @@ class ConceptualSpace(Space):
         self.is_conceptual_space = True
 
     @property
+    def is_slot(self) -> bool:
+        return self.parent_concept.is_slot
+
+    @property
     def instance_type(self):
         return self.parent_concept.instance_type
 
@@ -84,6 +88,17 @@ class ConceptualSpace(Space):
                 )
                 structure.locations.append(location_in_sub_space)
                 sub_space.add(structure)
+
+    def subsumes(self, other) -> bool:
+        return all(
+            [
+                self.parent_concept.is_slot
+                or self.parent_concept == other.parent_concept,
+                math.isnan(self.no_of_dimensions)
+                or self.no_of_dimensions == other.no_of_dimensions,
+                self.is_symbolic == other.is_symbolic,
+            ]
+        )
 
     def location_from_super_space_location(self, location: Location) -> Location:
         if location.coordinates[0][0] is None:

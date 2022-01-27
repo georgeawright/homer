@@ -4,23 +4,27 @@ from homer.codelets.builders import (
     LabelBuilder,
     RelationBuilder,
 )
+from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators import (
     CorrespondenceEvaluator,
     ChunkEvaluator,
     LabelEvaluator,
     RelationEvaluator,
 )
+from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.codelets.selectors import (
     CorrespondenceSelector,
     ChunkSelector,
     LabelSelector,
     RelationSelector,
 )
+from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.codelets.suggesters import (
     ChunkSuggester,
     LabelSuggester,
     RelationSuggester,
 )
+from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 
 
 def test_pipeline_of_codelets(homer):
@@ -372,6 +376,7 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
 
     codelet = codelet.child_codelets[0]
+    codelet.target_space = bubble_chamber.conceptual_spaces["northwest-southeast"]
     assert isinstance(codelet, RelationBuilder)
     assert 1 == len(chunk_one.relations)
     assert 1 == len(chunk_two.relations)
@@ -402,6 +407,16 @@ def test_pipeline_of_codelets(homer):
     # END: relate the two chunks in temperature as well as location space
 
     # START: build comparative phrase
+    frame = bubble_chamber.frames["np[nn]"]
+    codelet = SimplexViewSuggester.spawn(
+        "", bubble_chamber, {"frame": frame, "contextual_space": input_space}, 1.0
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, SimplexViewBuilder)
+    codelet.run()
     # END: build comparative phrase
 
     # START: chunk and describe more data

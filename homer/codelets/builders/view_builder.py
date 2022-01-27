@@ -22,6 +22,7 @@ class ViewBuilder(Builder):
         self.contextual_space = target_structures.get("contextual_space")
         self.input_spaces = target_structures.get("input_spaces")
         self.output_space = target_structures.get("output_space")
+        self.conceptual_spaces_map = target_structures.get("conceptual_spaces_map")
 
     @classmethod
     def spawn(

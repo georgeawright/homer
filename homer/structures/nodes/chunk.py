@@ -209,18 +209,13 @@ class Chunk(Node):
         copies: dict,
         bubble_chamber: "BubbleChamber",
         parent_id: str,
-        parent_space: ContextualSpace,
+        new_location: Location,
     ):
         new_locations = [
             location
             for location in self.locations
             if location.space.is_conceptual_space
-        ]
-        new_locations.append(
-            Location(
-                self.location_in_space(self.parent_space).coordinates, parent_space
-            )
-        )
+        ] + [new_location]
         new_members = bubble_chamber.new_structure_collection()
         for member in self.members:
             if member not in copies:
@@ -228,7 +223,7 @@ class Chunk(Node):
                     copies=copies,
                     bubble_chamber=bubble_chamber,
                     parent_id=parent_id,
-                    parent_space=parent_space,
+                    new_location=new_location,
                 )
             new_members.add(copies[member])
         new_left_branch = bubble_chamber.new_structure_collection(
@@ -242,7 +237,7 @@ class Chunk(Node):
             parent_id=parent_id,
             locations=new_locations,
             members=new_members,
-            parent_space=parent_space,
+            parent_space=new_location.space,
             quality=self.quality,
             left_branch=new_left_branch,
             right_branch=new_right_branch,

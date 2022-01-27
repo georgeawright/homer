@@ -1,6 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
-from homer.structure_collection import StructureCollection
+from homer.errors import MissingStructureError
 from homer.structure_collection_keys import activation
 
 
@@ -32,3 +32,30 @@ class SimplexViewSuggester(ViewSuggester):
         return self.bubble_chamber.new_structure_collection(
             self.frame, self.contextual_space
         )
+
+    def _passes_preliminary_checks(self) -> bool:
+        input_space_concept = self.contextual_space.parent_concept
+        frame_input_space = (
+            self.frame.input_space
+            if self.frame.input_space.parent_concept == input_space_concept
+            else self.frame.output_space
+        )
+        for conceptual_space in frame_input_space.conceptual_spaces:
+            if (
+                not conceptual_space.is_slot
+                and conceptual_space not in self.contextual_space.conceptual_spaces
+            ):
+                return False
+            if conceptual_space.is_slot:
+                try:
+                    self.conceptual_spaces_map[
+                        conceptual_space
+                    ] = self.contextual_space.conceptual_spaces.filter(
+                        lambda x: x not in self.conceptual_spaces_map.values()
+                        and conceptual_space.subsumes(x)
+                    ).get(
+                        key=activation
+                    )
+                except MissingStructureError:
+                    return False
+        return True
