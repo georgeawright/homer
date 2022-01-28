@@ -30,14 +30,24 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 exclude=[relative.abstract_chunk]
             )
         else:
-            grammar_label = self.target_projectee.labels.where(
-                parent_space=self.bubble_chamber.conceptual_spaces["grammar"]
+            grammar_label = self.target_projectee.labels.filter(
+                lambda x: x.parent_concept.parent_space
+                == self.bubble_chamber.conceptual_spaces["grammar"]
             ).get()
-            grammar_concept = grammar_label.parent_concept
-            meaning_label = self.target_projectee.labels.where_not(
-                parent_space=self.bubble_chamber.conceptual_spaces["grammar"]
+            grammar_concept = (
+                grammar_label.parent_concept
+                if not grammar_label.parent_concept.is_slot
+                else grammar_label.parent_concept.relatives.where(is_slot=False).get()
+            )
+            meaning_label = self.target_projectee.labels.filter(
+                lambda x: x.parent_concept.parent_space
+                != self.bubble_chamber.conceptual_spaces["grammar"]
             ).get()
-            meaning_concept = meaning_label.parent_concept
+            meaning_concept = (
+                meaning_label.parent_concept
+                if not meaning_label.parent_concept.is_slot
+                else meaning_label.parent_concept.relatives.where(is_slot=False).get()
+            )
             abstract_chunk = (
                 meaning_concept.relations.where(parent_concept=grammar_concept)
                 .get(key=lambda x: x.end.activation)

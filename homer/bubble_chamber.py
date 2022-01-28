@@ -315,7 +315,7 @@ class BubbleChamber:
         meaning_concept: Concept = None,
         grammar_concept: Concept = None,
         abstract_chunk: LetterChunk = None,
-    ) -> Chunk:
+    ) -> LetterChunk:
         if members is None:
             members = self.new_structure_collection()
         if left_branch is None:
@@ -326,7 +326,7 @@ class BubbleChamber:
             *[location.space for location in locations]
         )
         letter_chunk = LetterChunk(
-            structure_id=ID.new(Chunk),
+            structure_id=ID.new(LetterChunk),
             parent_id=parent_id,
             name=name,
             locations=locations,

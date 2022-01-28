@@ -76,4 +76,6 @@ class Node(Structure):
         raise NotImplementedError
 
     def __repr__(self) -> str:
+        if self.parent_space is None:
+            return f"<{self.structure_id}>"
         return f"<{self.structure_id} in {self.parent_space.structure_id} {self.locations}>"

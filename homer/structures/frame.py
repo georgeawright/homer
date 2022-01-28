@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from homer.errors import MissingStructureError
+from homer.errors import MissingStructureError, NoLocationError
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
@@ -80,7 +80,7 @@ class Frame(Structure):
                     ]
                     item.location_in_space(abstract_space).space = specified_space
                     specified_space.add(item)
-                except MissingStructureError:
+                except NoLocationError:
                     pass
 
         concepts = self.concepts.copy()

@@ -203,7 +203,6 @@ class Chunk(Node):
 
         return copy_recursively(self, location, bubble_chamber, parent_id, {})
 
-    # TODO: get rid of
     def copy_with_contents(
         self,
         copies: dict,

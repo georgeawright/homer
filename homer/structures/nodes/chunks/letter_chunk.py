@@ -1,4 +1,5 @@
 from __future__ import annotations
+from math import prod
 from typing import List, Union
 
 from homer.errors import MissingStructureError
@@ -8,7 +9,6 @@ from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
 from homer.structures.nodes import Chunk, Rule
-from homer.structures.spaces import ContextualSpace
 
 
 class LetterChunk(Chunk):
@@ -48,6 +48,7 @@ class LetterChunk(Chunk):
             abstract_chunk=abstract_chunk,
         )
         self.name = name
+        self.is_letter_chunk = True
 
     @property
     def is_slot(self):
@@ -65,7 +66,9 @@ class LetterChunk(Chunk):
     def unchunkedness(self):
         if self.is_abstract:
             return 0
-        return Chunk.unchunkedness(self)
+        if len(self.super_chunks) == 0:
+            return 1
+        return 0.5 * prod([chunk.unchunkedness for chunk in self.super_chunks])
 
     @property
     def free_branch_concept(self):
@@ -135,9 +138,10 @@ class LetterChunk(Chunk):
             new_right_branch = bubble_chamber.new_structure_collection(
                 *[copies[member] for member in chunk.right_branch]
             )
-            chunk_copy = Chunk(
-                structure_id=ID.new(Chunk),
+            chunk_copy = LetterChunk(
+                structure_id=ID.new(LetterChunk),
                 parent_id=parent_id,
+                name=self.name,
                 locations=locations,
                 members=members,
                 parent_space=location.space,
@@ -149,7 +153,9 @@ class LetterChunk(Chunk):
                 links_out=bubble_chamber.new_structure_collection(),
                 parent_spaces=bubble_chamber.new_structure_collection(),
                 super_chunks=bubble_chamber.new_structure_collection(),
-                is_raw=chunk.is_raw,
+                abstract_chunk=self
+                if self.abstract_chunk is None
+                else self.abstract_chunk,
             )
             location.space.contents.add(chunk_copy)
             bubble_chamber.chunks.add(chunk_copy)
@@ -161,7 +167,6 @@ class LetterChunk(Chunk):
 
         return copy_recursively(self, location, bubble_chamber, parent_id, {})
 
-    # TODO: get rid of
     def copy_with_contents(
         self,
         copies: dict,
@@ -190,9 +195,10 @@ class LetterChunk(Chunk):
         new_right_branch = bubble_chamber.new_structure_collection(
             *[copies[member] for member in self.right_branch]
         )
-        chunk_copy = Chunk(
-            structure_id=ID.new(Chunk),
+        chunk_copy = LetterChunk(
+            structure_id=ID.new(LetterChunk),
             parent_id=parent_id,
+            name=self.name,
             locations=new_locations,
             members=new_members,
             parent_space=new_location.space,
@@ -204,10 +210,13 @@ class LetterChunk(Chunk):
             links_out=bubble_chamber.new_structure_collection(),
             parent_spaces=bubble_chamber.new_structure_collection(),
             super_chunks=bubble_chamber.new_structure_collection(),
-            is_raw=self.is_raw,
+            abstract_chunk=self if self.abstract_chunk is None else self.abstract_chunk,
         )
         bubble_chamber.logger.log(chunk_copy)
         for member in chunk_copy.members:
             member.super_chunks.add(chunk_copy)
             bubble_chamber.logger.log(member)
         return (chunk_copy, copies)
+
+    def __repr__(self) -> str:
+        return f"<{self.structure_id} {self.name} in {self.locations}>"

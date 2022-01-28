@@ -38,8 +38,15 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
             urgency,
         )
 
-    # TODO: reduce urgency of builder if the letter chunk is the end of a sameness relation
-
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["letter-chunk"]
+
+    def _passes_preliminary_checks(self) -> bool:
+        if self.target_projectee.is_slot:
+            for link in self.target_projectee.links:
+                if link.parent_concept.is_slot and not link.parent_concept.is_filled_in:
+                    return False
+        return not self.target_projectee.has_correspondence_to_space(
+            self.target_view.output_space
+        )

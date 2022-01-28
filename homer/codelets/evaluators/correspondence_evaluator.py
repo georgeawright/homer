@@ -29,7 +29,9 @@ class CorrespondenceEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_correspondence = self.target_structures.get()
+        target_correspondence = self.target_structures.where(
+            is_correspondence=True
+        ).get()
         self.confidence = target_correspondence.parent_concept.classifier.classify(
             space=target_correspondence.conceptual_space,
             concept=target_correspondence.parent_concept,

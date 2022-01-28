@@ -81,24 +81,28 @@ def program():
 (def-relation :start suggest-concept :end chunk-concept)
 (def-relation :start suggest-concept :end correspondence-concept)
 (def-relation :start suggest-concept :end label-concept)
+(def-relation :start suggest-concept :end letter-chunk-concept)
 (def-relation :start suggest-concept :end relation-concept)
 (def-relation :start suggest-concept :end view-simplex-concept)
 
 (def-relation :start build-concept :end chunk-concept)
 (def-relation :start build-concept :end correspondence-concept)
 (def-relation :start build-concept :end label-concept)
+(def-relation :start build-concept :end letter-chunk-concept)
 (def-relation :start build-concept :end relation-concept)
 (def-relation :start build-concept :end view-simplex-concept)
 
 (def-relation :start evaluate-concept :end chunk-concept)
 (def-relation :start evaluate-concept :end correspondence-concept)
 (def-relation :start evaluate-concept :end label-concept)
+(def-relation :start evaluate-concept :end letter-chunk-concept)
 (def-relation :start evaluate-concept :end relation-concept)
 (def-relation :start evaluate-concept :end view-simplex-concept)
 
 (def-relation :start select-concept :end chunk-concept)
 (def-relation :start select-concept :end correspondence-concept)
 (def-relation :start select-concept :end label-concept)
+(def-relation :start select-concept :end letter-chunk-concept)
 (def-relation :start select-concept :end relation-concept)
 (def-relation :start select-concept :end view-simplex-concept)
 
@@ -539,10 +543,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define letter-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) conceptual-space)
+                     (Location (list) grammar-space)
 		     (Location (list) nn-output))))
 (define letter-chunk-grammar-label
   (def-label :start letter-chunk :parent_concept nn-concept
-    :locations (list (Location (list) conceptual-space)
+    :locations (list (Location (list) grammar-space)
 		     (Location (list) nn-input))))
 (define letter-chunk-meaning-label
   (def-label :start letter-chunk :parent_concept label-concept

@@ -9,6 +9,12 @@ from homer.codelets.builders.correspondence_builders import (
     SpaceToFrameCorrespondenceBuilder,
     SubFrameToFrameCorrespondenceBuilder,
 )
+from homer.codelets.builders.projection_builders import (
+    ChunkProjectionBuilder,
+    LabelProjectionBuilder,
+    LetterChunkProjectionBuilder,
+    RelationProjectionBuilder,
+)
 from homer.codelets.builders.view_builders import SimplexViewBuilder
 from homer.codelets.evaluators import (
     CorrespondenceEvaluator,
@@ -16,12 +22,24 @@ from homer.codelets.evaluators import (
     LabelEvaluator,
     RelationEvaluator,
 )
+from homer.codelets.evaluators.projection_evaluators import (
+    ChunkProjectionEvaluator,
+    LabelProjectionEvaluator,
+    LetterChunkProjectionEvaluator,
+    RelationProjectionEvaluator,
+)
 from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from homer.codelets.selectors import (
     CorrespondenceSelector,
     ChunkSelector,
     LabelSelector,
     RelationSelector,
+)
+from homer.codelets.selectors.projection_selectors import (
+    ChunkProjectionSelector,
+    LabelProjectionSelector,
+    LetterChunkProjectionSelector,
+    RelationProjectionSelector,
 )
 from homer.codelets.selectors.view_selectors import SimplexViewSelector
 from homer.codelets.suggesters import (
@@ -33,6 +51,12 @@ from homer.codelets.suggesters.correspondence_suggesters import (
     PotentialSubFrameToFrameCorrespondenceSuggester,
     SpaceToFrameCorrespondenceSuggester,
     SubFrameToFrameCorrespondenceSuggester,
+)
+from homer.codelets.suggesters.projection_suggesters import (
+    ChunkProjectionSuggester,
+    LabelProjectionSuggester,
+    LetterChunkProjectionSuggester,
+    RelationProjectionSuggester,
 )
 from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 
@@ -494,6 +518,7 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
 
     codelet = codelet.child_codelets[0]
+    codelet.parent_concept = bubble_chamber.concepts["same"]
     assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
@@ -528,6 +553,39 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     view.update_activation()
     assert original_view_activation < view.activation
+
+    letter_chunk_slot = view.parent_frame.output_space.contents.where(
+        is_letter_chunk=True
+    ).get()
+    codelet = LetterChunkProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": letter_chunk_slot},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionEvaluator)
+    assert 0 == letter_chunk.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < letter_chunk.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionSelector)
+    original_letter_chunk_activation = letter_chunk.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk.update_activation()
+    assert original_letter_chunk_activation < letter_chunk.activation
     # END: build comparative phrase
 
     # START: chunk and describe more data
