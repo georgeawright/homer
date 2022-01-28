@@ -67,20 +67,25 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         )
 
     def _passes_preliminary_checks(self):
-        try:
-            if self.target_space_two is None:
-                self.target_space_two = self.target_view.parent_frame.input_space
-            if self.target_structure_two is None:
-                self.target_structure_two = self.target_space_two.contents.of_type(
-                    type(self.target_structure_one)
-                ).get(key=lambda x: x.similarity_with(self.target_structure_one))
-        except MissingStructureError:
-            return False
         self.target_conceptual_space = (
             self.target_structure_one.parent_concept.parent_space
             if self.target_structure_one.is_link
             else None
         )
+        try:
+            if self.target_space_two is None:
+                self.target_space_two = self.target_view.parent_frame.input_space
+            if self.target_structure_two is None:
+                self.target_structure_two = self.target_space_two.contents.filter(
+                    lambda x: (type(x) == type(self.target_structure_one))
+                    and (
+                        x.has_location_in_space(self.target_conceptual_space)
+                        if self.target_conceptual_space is not None
+                        else True
+                    )
+                ).get(key=lambda x: x.similarity_with(self.target_structure_one))
+        except MissingStructureError:
+            return False
         if self.parent_concept is None:
             self.parent_concept = (
                 self.bubble_chamber.concepts.where(structure_type=Correspondence)

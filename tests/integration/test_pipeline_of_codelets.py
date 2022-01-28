@@ -211,7 +211,8 @@ def test_pipeline_of_codelets(homer):
 
     # START: make and label another sameness chunk
     target_node = input_space.contents.filter(
-        lambda x: x.location_in_space(location_space).coordinates == [[0, 4]]
+        lambda x: x.has_location_in_space(location_space)
+        and x.location_in_space(location_space).coordinates == [[0, 4]]
     ).get()
     codelet = ChunkSuggester.spawn(
         "",
@@ -425,6 +426,10 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
 
     codelet = codelet.child_codelets[0]
+    slot_space = codelet.frame.input_space.conceptual_spaces.where(is_slot=True).get()
+    codelet.conceptual_spaces_map[slot_space] = bubble_chamber.conceptual_spaces[
+        "location"
+    ]
     assert isinstance(codelet, SimplexViewBuilder)
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
@@ -436,6 +441,44 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     assert 0 == view.quality  # empty view has quality of 0
+
+    target_label = chunk_one.labels_in_space(
+        bubble_chamber.conceptual_spaces["location"]
+    ).get()
+    codelet = SpaceToFrameCorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view,
+            "target_space_one": input_space,
+            "target_structure_one": target_label,
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.where(is_correspondence=True).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
 
     codelet = SpaceToFrameCorrespondenceSuggester.spawn(
         "",

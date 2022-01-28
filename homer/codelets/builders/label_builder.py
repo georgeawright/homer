@@ -66,7 +66,8 @@ class LabelBuilder(Builder):
             start=self.target_node,
             parent_concept=self.parent_concept,
             locations=[
-                self.target_node.location_in_space(self.parent_concept.parent_space)
+                self.target_node.location_in_space(self.target_node.parent_space),
+                self.target_node.location_in_space(self.parent_concept.parent_space),
             ],
             quality=0,
         )
