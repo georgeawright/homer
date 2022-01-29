@@ -78,8 +78,8 @@ class Relation(Link):
         ]
         new_locations.append(
             TwoPointLocation(
-                self.location.start_coordinates,
-                self.location.end_coordinates,
+                start.location_in_space(start.parent_space).coordinates,
+                end.location_in_space(end.parent_space).coordinates,
                 parent_space,
             )
         )

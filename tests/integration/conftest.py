@@ -554,6 +554,70 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) nn-input))))
 
+(define space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define conceptual-space
+  (def-conceptual-space :name "" :parent_concept space-parent-concept
+    :no_of_dimensions 1))
+(define label-concept
+  (def-concept :name "" :is_slot True :parent_space conceptual-space))
+(define relation-concept
+  (def-concept :name "" :is_slot True :parent_space more-less-space))
+(def-relation :start label-concept :end relation-concept
+  :parent_concept more-concept)
+(define rp-input
+  (def-contextual-space :name "rp[jjr].meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection conceptual-space)))
+(define rp-output
+  (def-contextual-space :name "rp[jjr].text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
+(define rp-frame
+  (def-frame :name "rp[jjr]"
+    :parent_concept rp-concept :parent_frame None
+    :sub_frames (StructureCollection)
+    :concepts (StructureCollection space-parent-concept label-concept relation-concept)
+    :input_space rp-input :output_space rp-output))
+(define chunk-start
+  (def-chunk :locations (list (Location (list) conceptual-space)
+			      (Location (list) rp-input))
+    :parent_space nn-input))
+(define chunk-end
+  (def-chunk :locations (list (Location (list) conceptual-space)
+			      (Location (list) rp-input))
+    :parent_space nn-input))
+(define chunk-end-label
+  (def-label :start chunk-end :parent_concept label-concept
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) rp-input))))
+(define relation
+  (def-relation :start chunk-start :end chunk-end :parent_concept relation-concept
+    :locations (list (Location (list (list Nan)) more-less-space)
+		     (TwoPointLocation (list) (list) conceptual-space)
+		     (TwoPointLocation (list) (list) rp-input))
+    :conceptual_space conceptual-space))
+(define jjr-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) grammar-space)
+		     (Location (list) rp-output))))
+(define er-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) grammar-space)
+		     (Location (list) rp-output))))
+(define jjr-chunk-grammar-label
+  (def-label :start jjr-chunk :parent_concept jjr-concept
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) rp-input))))
+(define jjr-chunk-meaning-label
+  (def-label :start jjr-chunk :parent_concept label-concept
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) rp-input))))
+(define er-chunk-relation
+  (def-relation :start jjr-chunk :end er-chunk :parent_concept jjr-concept
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) rp-input))))
+
 (define input-space
   (def-contextual-space :name "input" :parent_concept input-concept
     :conceptual_spaces (StructureCollection temperature-space location-space)))

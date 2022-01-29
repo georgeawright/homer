@@ -586,6 +586,83 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     letter_chunk.update_activation()
     assert original_letter_chunk_activation < letter_chunk.activation
+
+    frame = bubble_chamber.frames["rp[jjr]"]
+    codelet = SimplexViewSuggester.spawn(
+        "", bubble_chamber, {"frame": frame, "contextual_space": input_space}, 1.0
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    slot_space = codelet.frame.input_space.conceptual_spaces.where(is_slot=True).get()
+    codelet.conceptual_spaces_map[slot_space] = bubble_chamber.conceptual_spaces[
+        "temperature"
+    ]
+    assert isinstance(codelet, SimplexViewBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    view = codelet.child_structures.get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, SimplexViewEvaluator)
+    assert 0 == view.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 == view.quality  # empty view has quality of 0
+
+    target_relation = chunk_one.relations_in_space(
+        bubble_chamber.conceptual_spaces["temperature"]
+    ).get()
+    codelet = SpaceToFrameCorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view,
+            "target_space_one": input_space,
+            "target_structure_one": target_relation,
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.where(is_correspondence=True).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+
+    codelet = SimplexViewEvaluator.spawn(
+        "", bubble_chamber, bubble_chamber.new_structure_collection(view), 1.0
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < view.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, SimplexViewSelector)
+    original_view_activation = view.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    view.update_activation()
+    assert original_view_activation < view.activation
     # END: build comparative phrase
 
     # START: chunk and describe more data

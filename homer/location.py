@@ -6,11 +6,19 @@ from .tools import average_vector
 
 class Location:
     def __init__(self, coordinates: List[List[float]], space: "Space"):
-        self.coordinates = coordinates
+        self._coordinates = coordinates
         self.space = space
 
     def __repr__(self):
         return f"({self.coordinates}, {self.space.name})"
+
+    @property
+    def coordinates(self):
+        return self._coordinates
+
+    @coordinates.setter
+    def coordinates(self, c):
+        self._coordinates = c
 
     @classmethod
     def average(cls, locations: List[Location]) -> Location:

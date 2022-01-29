@@ -325,6 +325,9 @@ class Structure(ABC):
                 return relation
         raise MissingStructureError
 
+    def relations_in_space(self, space: Structure) -> StructureCollection:
+        return self.relations.filter(lambda x: x in space.contents)
+
     def relations_in_space_with(
         self, space: Structure, other: Structure
     ) -> StructureCollection:

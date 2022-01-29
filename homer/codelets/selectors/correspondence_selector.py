@@ -12,7 +12,7 @@ class CorrespondenceSelector(Selector):
     def _passes_preliminary_checks(self):
         if self.challengers is not None:
             return True
-        champion_correspondence = self.champions.get()
+        champion_correspondence = self.champions.where(is_correspondence=True).get()
         candidates = champion_correspondence.nearby()
         try:
             challenger_correspondence = candidates.get(
@@ -29,7 +29,7 @@ class CorrespondenceSelector(Selector):
         pass
 
     def _engender_follow_up(self):
-        winner_correspondence = self.winners.get()
+        winner_correspondence = self.winners.where(is_correspondence=True).get()
         target_view = winner_correspondence.parent_view
         try:
             target_structure_one = (

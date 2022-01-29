@@ -3,6 +3,7 @@ import math
 from . import classifiers
 from . import structures
 from .location import Location
+from .locations import TwoPointLocation
 from .tools import centroid_euclidean_distance
 
 # strings can't contain spaces. '~' is used to represent a space
@@ -44,6 +45,7 @@ class Interpreter:
             "python": lambda *x: eval(x[-1]),
             "StructureCollection": bubble_chamber.new_structure_collection,
             "Location": Location,
+            "TwoPointLocation": TwoPointLocation,
             "None": None,
             "Nan": math.nan,
             "True": True,

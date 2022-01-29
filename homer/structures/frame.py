@@ -80,6 +80,15 @@ class Frame(Structure):
                     ]
                     item.location_in_space(abstract_space).space = specified_space
                     specified_space.add(item)
+                except NotImplementedError:
+                    item.location_in_space(abstract_space).start_coordinates = [
+                        [math.nan for _ in range(specified_space.no_of_dimensions)]
+                    ]
+                    item.location_in_space(abstract_space).end_coordinates = [
+                        [math.nan for _ in range(specified_space.no_of_dimensions)]
+                    ]
+                    item.location_in_space(abstract_space).space = specified_space
+                    specified_space.add(item)
                 except NoLocationError:
                     pass
 

@@ -16,6 +16,14 @@ class TwoPointLocation(Location):
         self.end_coordinates = end_coordinates
         self.space = space
 
+    @property
+    def coordinates(self):
+        raise NotImplementedError
+
+    @coordinates.setter
+    def coordinates(self, c):
+        raise NotImplementedError
+
     def __repr__(self):
         return (
             f"({self.start_coordinates} to {self.end_coordinates}, {self.space.name})"
