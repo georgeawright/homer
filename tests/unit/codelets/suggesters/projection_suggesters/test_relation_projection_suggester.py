@@ -7,42 +7,25 @@ from homer.structure_collection import StructureCollection
 
 
 @pytest.fixture
-def target_view():
+def target_view(bubble_chamber):
     view = Mock()
     view.slot_values = {}
+    input_space = Mock()
+    input_space.quality = 1
+    view.input_spaces = bubble_chamber.new_structure_collection(input_space)
     return view
 
 
 @pytest.fixture
 def target_projectee(bubble_chamber, target_view):
     relation = Mock()
+    relation.has_correspondence_to_space.return_value = False
     relation.start.has_correspondence_to_space.return_value = True
     relation.end.has_correspondence_to_space.return_value = True
-    frame_correspondee = Mock()
-    frame_correspondee.structure_id = "frame_correspondee"
-    frame_correspondence = Mock()
-    frame_correspondence.start = frame_correspondee
-    frame_correspondence.end = relation
-    relation.correspondences = bubble_chamber.new_structure_collection(
-        frame_correspondence
-    )
-    non_frame_correspondee = Mock()
-    non_frame_correspondence = Mock()
-    non_frame_correspondence.start = non_frame_correspondee
-    non_frame_correspondence.end = frame_correspondee
-    frame_correspondee.correspondences = bubble_chamber.new_structure_collection(
-        non_frame_correspondence
-    )
-    target_view.members = bubble_chamber.new_structure_collection(
-        frame_correspondence, non_frame_correspondence
-    )
-    target_view.slot_values[frame_correspondee.structure_id] = Mock()
     return relation
 
 
-def test_gives_suggests_projection_from_slot(
-    bubble_chamber, target_view, target_projectee
-):
+def test_suggests_projection_from_slot(bubble_chamber, target_view, target_projectee):
     target_structures = {
         "target_view": target_view,
         "target_projectee": target_projectee,
@@ -75,7 +58,7 @@ def test_gives_full_confidence_to_project_non_slot(
 def test_fizzles_if_relation_projection_exists(
     bubble_chamber, target_view, target_projectee
 ):
-    target_view.slot_values[target_projectee.structure_id] = Mock()
+    target_projectee.has_correspondence_to_space.return_value = True
     target_structures = {
         "target_view": target_view,
         "target_projectee": target_projectee,

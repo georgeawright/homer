@@ -39,12 +39,16 @@ class RelationProjectionSuggester(ProjectionSuggester):
         )
 
     def _passes_preliminary_checks(self) -> bool:
-        if not ProjectionSuggester._passes_preliminary_checks(self):
-            return False
-        return self.target_projectee.start.has_correspondence_to_space(
-            self.target_view.output_space
-        ) and self.target_projectee.end.has_correspondence_to_space(
-            self.target_view.output_space
+        return (
+            not self.target_projectee.has_correspondence_to_space(
+                self.target_view.output_space
+            )
+            and self.target_projectee.start.has_correspondence_to_space(
+                self.target_view.output_space
+            )
+            and self.target_projectee.end.has_correspondence_to_space(
+                self.target_view.output_space
+            )
         )
 
     @property

@@ -52,7 +52,6 @@ class LetterChunk(Chunk):
 
     @property
     def name(self):
-        print(self.structure_id, len(self.left_branch), len(self.right_branch))
         if self._name is not None:
             return self._name
         if not self.left_branch.is_empty() and not self.right_branch.is_empty():

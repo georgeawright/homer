@@ -11,11 +11,13 @@ from homer.tools import hasinstance
 
 def test_finds_challenger_when_not_given_one(bubble_chamber):
     champion = Mock()
-    challenger = Mock()
+    champion.is_correspondence = True
     champion.size = 1
     champion.quality = 1.0
     champion.activation = 1.0
 
+    challenger = Mock()
+    challenger.is_correspondence = True
     challenger.size = 1
     challenger.quality = 1.0
     challenger.activation = 1.0
@@ -86,6 +88,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         start_argument.parent_space = new_space_one
 
         champion = Mock()
+        champion.is_correspondence = True
         champion.name = "champion"
         champion.size = 1
         champion.quality = champion_quality
@@ -94,6 +97,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         champion.parent_view = view
 
         challenger = Mock()
+        challenger.is_correspondence = True
         challenger.name = "challenger"
         challenger.size = 1
         challenger.quality = challenger_quality

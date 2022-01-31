@@ -13,6 +13,7 @@ def test_changes_target_structure_quality(
     concept = Mock()
     concept.classifier.classify.return_value = classification
     correspondence = Mock()
+    correspondence.is_correspondence = True
     correspondence.quality = current_quality
     correspondence.parent_concept = concept
     evaluator = CorrespondenceEvaluator(

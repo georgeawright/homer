@@ -9,38 +9,32 @@ from homer.structure_collection import StructureCollection
 
 
 @pytest.fixture
-def target_view():
+def target_view(bubble_chamber):
     view = Mock()
     view.slot_values = {}
+    input_space = Mock()
+    input_space.quality = 1
+    view.input_spaces = bubble_chamber.new_structure_collection(input_space)
     return view
 
 
 @pytest.fixture
 def target_projectee(bubble_chamber, target_view):
     word = Mock()
-    frame_correspondee = Mock()
-    frame_correspondee.structure_id = "frame_correspondee"
-    frame_correspondence = Mock()
-    frame_correspondence.start = frame_correspondee
-    frame_correspondence.end = word
-    word.correspondences = bubble_chamber.new_structure_collection(frame_correspondence)
-    non_frame_correspondee = Mock()
-    non_frame_correspondence = Mock()
-    non_frame_correspondence.start = non_frame_correspondee
-    non_frame_correspondence.end = frame_correspondee
-    frame_correspondee.correspondences = bubble_chamber.new_structure_collection(
-        non_frame_correspondence
-    )
-    target_view.members = bubble_chamber.new_structure_collection(
-        frame_correspondence, non_frame_correspondence
-    )
-    target_view.slot_values[frame_correspondee.structure_id] = Mock()
+    grammar_label = Mock()
+    grammar_label.parent_concept.is_slot = True
+    grammar_label.parent_concept.is_filled_in = True
+    meaning_label = Mock()
+    meaning_label.parent_concept.is_slot = True
+    meaning_label.parent_concept.is_filled_in = True
+    word.labels = bubble_chamber.new_structure_collection(grammar_label, meaning_label)
+    word.relations = bubble_chamber.new_structure_collection()
     return word
 
 
-def test_gives_suggests_projection_from_slot(
-    bubble_chamber, target_view, target_projectee
-):
+def test_suggests_projection_from_slot(bubble_chamber, target_view, target_projectee):
+    target_projectee.is_slot = True
+    target_projectee.has_correspondence_to_space.return_value = False
     target_structures = {
         "target_view": target_view,
         "target_projectee": target_projectee,
@@ -55,7 +49,6 @@ def test_gives_suggests_projection_from_slot(
 def test_gives_full_confidence_to_project_non_slot(
     bubble_chamber, target_view, target_projectee
 ):
-    target_projectee.correspondences = bubble_chamber.new_structure_collection()
     target_projectee.is_slot = False
     target_projectee.has_correspondence_to_space.return_value = False
     target_structures = {
@@ -73,7 +66,7 @@ def test_gives_full_confidence_to_project_non_slot(
 def test_fizzles_if_word_projection_exists(
     bubble_chamber, target_view, target_projectee
 ):
-    target_view.slot_values[target_projectee.structure_id] = Mock()
+    target_projectee.has_correspondence_to_space.return_value = True
     target_structures = {
         "target_view": target_view,
         "target_projectee": target_projectee,
