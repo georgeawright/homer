@@ -649,6 +649,44 @@ def test_pipeline_of_codelets(homer):
     correspondence.update_activation()
     assert original_correspondence_activation < correspondence.activation
 
+    target_label = chunk_two.labels_in_space(
+        bubble_chamber.conceptual_spaces["temperature"]
+    ).get()
+    codelet = SpaceToFrameCorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": view,
+            "target_space_one": input_space,
+            "target_structure_one": target_label,
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.where(is_correspondence=True).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+
     codelet = SimplexViewEvaluator.spawn(
         "", bubble_chamber, bubble_chamber.new_structure_collection(view), 1.0
     )
@@ -663,6 +701,94 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     view.update_activation()
     assert original_view_activation < view.activation
+
+    letter_chunk_slot = view.parent_frame.output_space.contents.filter(
+        lambda x: x.is_letter_chunk == True
+        and x.is_slot == True
+        and x.labels.is_empty()
+    ).get()
+    codelet = LetterChunkProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": letter_chunk_slot},
+        1.0,
+    )
+    codelet.run()
+
+    assert CodeletResult.FIZZLE == codelet.result
+
+    letter_chunk_slot = view.parent_frame.output_space.contents.filter(
+        lambda x: x.is_letter_chunk == True
+        and x.is_slot == True
+        and not x.labels.is_empty()
+    ).get()
+    codelet = LetterChunkProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": letter_chunk_slot},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
+    assert letter_chunk.name == "cool"
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionEvaluator)
+    assert 0 == letter_chunk.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < letter_chunk.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionSelector)
+    original_letter_chunk_activation = letter_chunk.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk.update_activation()
+    assert original_letter_chunk_activation < letter_chunk.activation
+
+    letter_chunk_slot = view.parent_frame.output_space.contents.filter(
+        lambda x: x.is_letter_chunk == True
+        and x.is_slot == True
+        and x.labels.is_empty()
+    ).get()
+    codelet = LetterChunkProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": letter_chunk_slot},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
+    assert letter_chunk.name == "er"
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionEvaluator)
+    assert 0 == letter_chunk.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < letter_chunk.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionSelector)
+    original_letter_chunk_activation = letter_chunk.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk.update_activation()
+    assert original_letter_chunk_activation < letter_chunk.activation
+
     # END: build comparative phrase
 
     # START: chunk and describe more data

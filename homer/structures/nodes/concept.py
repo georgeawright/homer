@@ -1,4 +1,5 @@
 from __future__ import annotations
+import statistics
 from typing import Callable, List
 
 from homer.classifier import Classifier
@@ -100,10 +101,24 @@ class Concept(Node):
         return friend_concepts
 
     def distance_from(self, other: Node):
-        return self.distance_function(
-            self.location_in_space(self.parent_space).coordinates,
-            other.location_in_space(self.parent_space).coordinates,
-        )
+        try:
+            return self.distance_function(
+                self.location_in_space(self.parent_space).coordinates,
+                other.location_in_space(self.parent_space).coordinates,
+            )
+        except NotImplementedError:
+            return statistics.mean(
+                [
+                    self.distance_function(
+                        self.location_in_space(self.parent_space).start_coordinates,
+                        other.location_in_space(self.parent_space).start_coordinates,
+                    ),
+                    self.distance_function(
+                        self.location_in_space(self.parent_space).end_coordinates,
+                        other.location_in_space(self.parent_space).end_coordinates,
+                    ),
+                ]
+            )
 
     def distance_from_start(self, other: Node, end: Location = None):
         return self.distance_function(
@@ -128,10 +143,24 @@ class Concept(Node):
 
     def distance_between(self, a: Node, b: Node, space: "Space" = None):
         space = self.parent_space if space is None else space
-        return self.distance_function(
-            a.location_in_space(space).coordinates,
-            b.location_in_space(space).coordinates,
-        )
+        try:
+            return self.distance_function(
+                a.location_in_space(space).coordinates,
+                b.location_in_space(space).coordinates,
+            )
+        except NotImplementedError:
+            return statistics.mean(
+                [
+                    self.distance_function(
+                        a.location_in_space(space).start_coordinates,
+                        b.location_in_space(space).start_coordinates,
+                    ),
+                    self.distance_function(
+                        a.location_in_space(space).end_coordinates,
+                        b.location_in_space(space).end_coordinates,
+                    ),
+                ]
+            )
 
     def proximity_between(self, a: Node, b: Node, space: "Space" = None):
         return self._distance_to_proximity(self.distance_between(a, b, space=space))

@@ -316,12 +316,12 @@ class BubbleChamber:
         grammar_concept: Concept = None,
         abstract_chunk: LetterChunk = None,
     ) -> LetterChunk:
-        if members is None:
-            members = self.new_structure_collection()
         if left_branch is None:
             left_branch = self.new_structure_collection()
         if right_branch is None:
             right_branch = self.new_structure_collection()
+        if members is None:
+            members = StructureCollection.union(left_branch, right_branch)
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )

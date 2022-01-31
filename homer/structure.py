@@ -47,8 +47,8 @@ class Structure(ABC):
         self.is_node = False
         self.is_concept = False
         self.is_chunk = False
+        self.is_letter_chunk = False
         self.is_rule = False
-        self.is_phrase = False
         self.is_link = False
         self.is_correspondence = False
         self.is_label = False

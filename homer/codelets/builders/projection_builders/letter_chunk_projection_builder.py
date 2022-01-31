@@ -23,11 +23,17 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         elif not self.target_projectee.relations.is_empty():
             relation = self.target_projectee.relations.get()
             relative = self.target_projectee.relatives.get()
-            abstract_relation = relative.abstract_chunk.relations.where(
-                parent_concept=relation.parent_concept
+            relative_correspondee = (
+                relative.correspondences_to_space(self.target_view.output_space)
+                .get()
+                .end
+            )
+            abstract_relation = relative_correspondee.abstract_chunk.relations.where(
+                parent_concept=relation.parent_concept,
+                start=relative_correspondee.abstract_chunk,
             ).get()
             abstract_chunk = abstract_relation.arguments.get(
-                exclude=[relative.abstract_chunk]
+                exclude=[relative_correspondee.abstract_chunk]
             )
         else:
             grammar_label = self.target_projectee.labels.filter(

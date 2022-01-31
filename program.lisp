@@ -215,7 +215,7 @@
 (define but (def-letter-chunk :name "but" :locations (list (Location (list) grammar-space))))
 (define comma (def-letter-chunk :name "comma" :locations (list (Location (list) grammar-space))))
 (define fstop (def-letter-chunk :name "fstop" :locations (list (Location (list) grammar-space))))
-(define -er (def-letter-chunk :name "-er" :locations (list (Location (list) grammar-space))))
+(define -er (def-letter-chunk :name "er" :locations (list (Location (list) grammar-space))))
 (define null (def-letter-chunk :name "" :locations (list (Location (list) grammar-space))))
 
 (define same-different-concept
@@ -632,6 +632,13 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) grammar-space)
 		     (Location (list) rp-output))))
+(define jjr-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) grammar-space)
+		     (Location (list) rp-output))
+    :left_branch (StructureCollection jjr-chunk)
+    :right_branch (StructureCollection er-chunk)))
 (define jjr-chunk-grammar-label
   (def-label :start jjr-chunk :parent_concept jjr-concept
     :locations (list (Location (list) grammar-space)

@@ -35,13 +35,6 @@ class SamenessClassifier(Classifier):
         ]
         if distinct_pairs == []:
             distinct_pairs = [(collection[0], collection[0])]
-        print("\n")
-        if start is not None:
-            print(start.locations)
-            print(end.locations)
-        print(spaces)
-        print(distinct_pairs)
-        print("\n")
         return fuzzy.OR(
             *[
                 fuzzy.AND(
