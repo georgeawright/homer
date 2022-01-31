@@ -47,8 +47,21 @@ class LetterChunk(Chunk):
             super_chunks=super_chunks,
             abstract_chunk=abstract_chunk,
         )
-        self.name = name
+        self._name = name
         self.is_letter_chunk = True
+
+    @property
+    def name(self):
+        print(self.structure_id, len(self.left_branch), len(self.right_branch))
+        if self._name is not None:
+            return self._name
+        if not self.left_branch.is_empty() and not self.right_branch.is_empty():
+            left_name = self.left_branch.get().name
+            right_name = self.right_branch.get().name
+            if left_name is None or right_name is None:
+                return None
+            return left_name + right_name
+        return None
 
     @property
     def is_slot(self):

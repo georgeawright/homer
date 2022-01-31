@@ -720,6 +720,7 @@ def test_pipeline_of_codelets(homer):
     letter_chunk_slot = view.parent_frame.output_space.contents.filter(
         lambda x: x.is_letter_chunk == True
         and x.is_slot == True
+        and not x.super_chunks.is_empty()
         and not x.labels.is_empty()
     ).get()
     codelet = LetterChunkProjectionSuggester.spawn(
@@ -756,6 +757,7 @@ def test_pipeline_of_codelets(homer):
     letter_chunk_slot = view.parent_frame.output_space.contents.filter(
         lambda x: x.is_letter_chunk == True
         and x.is_slot == True
+        and not x.super_chunks.is_empty()
         and x.labels.is_empty()
     ).get()
     codelet = LetterChunkProjectionSuggester.spawn(
@@ -773,6 +775,40 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
     assert letter_chunk.name == "er"
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionEvaluator)
+    assert 0 == letter_chunk.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < letter_chunk.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionSelector)
+    original_letter_chunk_activation = letter_chunk.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk.update_activation()
+    assert original_letter_chunk_activation < letter_chunk.activation
+
+    letter_chunk_slot = view.parent_frame.output_space.contents.filter(
+        lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+    ).get()
+    codelet = LetterChunkProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": letter_chunk_slot},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
+    assert letter_chunk.name == "cooler"
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LetterChunkProjectionEvaluator)
