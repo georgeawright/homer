@@ -189,7 +189,9 @@ class Chunk(Node):
                 rule=chunk.rule,
                 links_in=bubble_chamber.new_structure_collection(),
                 links_out=bubble_chamber.new_structure_collection(),
-                parent_spaces=bubble_chamber.new_structure_collection(),
+                parent_spaces=bubble_chamber.new_structure_collection(
+                    *[location.space for location in locations]
+                ),
                 super_chunks=bubble_chamber.new_structure_collection(),
                 is_raw=chunk.is_raw,
             )
@@ -243,7 +245,9 @@ class Chunk(Node):
             rule=self.rule,
             links_in=bubble_chamber.new_structure_collection(),
             links_out=bubble_chamber.new_structure_collection(),
-            parent_spaces=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(
+                *[location.space for location in new_locations]
+            ),
             super_chunks=bubble_chamber.new_structure_collection(),
             is_raw=self.is_raw,
         )

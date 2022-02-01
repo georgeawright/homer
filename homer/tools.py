@@ -4,6 +4,9 @@ from typing import Iterable, List, Union
 
 
 def centroid_euclidean_distance(a, b) -> float:
+    if len(a) == len(b) == 0:
+        # TODO: possibly get rid of this if statment
+        return 0.0
     distance = math.dist(average_vector(a), average_vector(b))
     return distance if not math.isnan(distance) else 0
 

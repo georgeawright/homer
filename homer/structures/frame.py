@@ -112,9 +112,14 @@ class Frame(Structure):
             )
         sub_frames = bubble_chamber.new_structure_collection()
         for sub_frame in self.sub_frames:
+            sub_frame_input_space = (
+                sub_frame.input_space
+                if sub_frame.input_space.parent_concept == input_space.parent_concept
+                else sub_frame.output_space
+            )
             sub_frames.add(
                 sub_frame.instantiate(
-                    input_space=input_space,
+                    input_space=sub_frame_input_space,
                     parent_id=parent_id,
                     bubble_chamber=bubble_chamber,
                     conceptual_spaces_map=conceptual_spaces_map,
@@ -127,6 +132,6 @@ class Frame(Structure):
             parent_frame=self,
             sub_frames=sub_frames,
             concepts=concepts,
-            input_space=input_space,
+            input_space=input_space_copy,
             output_space=output_space_copy,
         )

@@ -124,6 +124,7 @@ class ContextualSpace(Space):
                     end=new_item,
                     parent_space=new_space,
                     bubble_chamber=bubble_chamber,
+                    parent_id=parent_id,
                 )
                 new_item.links_in.add(new_relation)
                 new_space.add(new_relation)

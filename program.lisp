@@ -126,10 +126,11 @@
 (def-relation :start select-concept :end view-monitoring-concept)
 
 (define grammar-distance-to-proximity 0.1)
-(define grammar-concept (def-concept :name "grammar"))
+(define grammar-concept
+  (def-concept :name "grammar" :distance_function centroid_euclidean_distance))
 (define grammar-space
   (def-conceptual-space :name "grammar" :parent_concept grammar-concept
-    :no_of_dimensions 0))
+    :no_of_dimensions 0 :is_basic_level True))
 (define sentence-concept
   (def-concept :name "sentence" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
@@ -620,7 +621,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list) rp-input))))
 (define relation
   (def-relation :start chunk-start :end chunk-end :parent_concept relation-concept
-    :locations (list (Location (list Nan) more-less-space)
+    :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list) (list) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-input))
     :conceptual_space conceptual-space))
@@ -628,31 +629,34 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-letter-chunk :name None
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) grammar-space)
-		     (Location (list) rp-output))))
+		     (Location (list) rp-output))
+    :parent_space rp-output))
 (define er-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) grammar-space)
-		     (Location (list) rp-output))))
+		     (Location (list) rp-output))
+    :parent_space rp-output))
 (define jjr-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) grammar-space)
 		     (Location (list) rp-output))
+    :parent_space rp-output
     :left_branch (StructureCollection jjr-chunk)
     :right_branch (StructureCollection er-chunk)))
 (define jjr-chunk-grammar-label
   (def-label :start jjr-chunk :parent_concept jjr-concept
     :locations (list (Location (list) grammar-space)
-		     (Location (list) rp-input))))
+		     (Location (list) rp-output))))
 (define jjr-chunk-meaning-label
   (def-label :start jjr-chunk :parent_concept label-concept
     :locations (list (Location (list) conceptual-space)
-		     (Location (list) rp-input))))
+		     (Location (list) rp-output))))
 (define er-chunk-relation
   (def-relation :start jjr-chunk :end er-chunk :parent_concept jjr-concept
     :locations (list (Location (list) grammar-space)
-		     (Location (list) rp-input))))
+		     (Location (list) rp-output))))
 
 ;;; check that the relation-label relation actually does something in correspondence suggesting
 
@@ -723,7 +727,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :concepts (StructureCollection
 	       label-concept relation-concept location-concept-1 location-concept-2)
     :input_space comparative-sentence-input
-    :output_space comparative-sentence-input))
+    :output_space comparative-sentence-output))
  (define chunk-start
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
 			      (Location (list) conceptual-space)
@@ -753,7 +757,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list) comparative-sentence-input))))
 (define relation
   (def-relation :start chunk-start :end chunk-end :parent_concept relation-concept
-    :locations (list (Location (list Nan) more-less-space)
+    :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list) (list) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-sub-frame-input)
 		     (TwoPointLocation (list) (list) comparative-sentence-input))
@@ -762,39 +766,54 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-letter-chunk :name "it"
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :abstract_chunk it))
 (define sentence-word-2
   (def-letter-chunk :name "will"
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :abstract_chunk will))
 (define sentence-word-3
   (def-letter-chunk :name "be"
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :abstract_chunk be))
 (define sentence-word-4
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) rp-sub-frame-output)
 		     (Location (list) comparative-sentence-output))
-    :abstract_chunk in))
+    :parent_space comparative-sentence-output
+(define jjr-chunk-grammar-label
+  (def-label :start sentence-word-4 :parent_concept jjr-concept
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) rp-sub-frame-output))
+    :parent_space rp-sub-frame-output))
 (define sentence-word-5
   (def-letter-chunk :name "in"
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :abstract_chunk in))
 (define sentence-word-6
   (def-letter-chunk :name "the"
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :abstract_chunk the))
 (define sentence-word-7
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list Nan Nan)) location-space)
 		     (Location (list) nn-sub-frame-1-output)
-		     (Location (list) comparative-sentence-output))))
+		     (Location (list) comparative-sentence-output))
+    :parent_space nn-sub-frame-1-output))
+(define nn-1-grammar-label
+  (def-label :start sentence-word-7 :parent_concept nn-concept
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) nn-sub-frame-1-output))))
 (define sentence-word-8
   (def-letter-chunk :name "than"
     :locations (list (Location (list) grammar-space)
@@ -815,7 +834,12 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list Nan Nan)) location-space)
 		     (Location (list) nn-sub-frame-2-output)
-		     (Location (list) comparative-sentence-output))))
+		     (Location (list) comparative-sentence-output))
+    :parent_space nn-sub-frame-2-output))
+(define nn-2-chunk-grammar-label
+  (def-label :start sentence-word-11 :parent_concept nn-concept
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) nn-sub-frame-2-output))))
 (define vb-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)

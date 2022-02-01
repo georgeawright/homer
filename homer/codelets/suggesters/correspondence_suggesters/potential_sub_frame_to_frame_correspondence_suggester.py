@@ -47,7 +47,10 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         try:
             sub_view = self.bubble_chamber.production_views.filter(
                 lambda x: x.parent_frame.parent_concept
-                in self.target_view.parent_frame.sub_frame_concepts
+                in {
+                    frame.parent_concept
+                    for frame in self.target_view.parent_frame.sub_frames
+                }
             ).get(key=activation)
             frame_one = sub_view.parent_frame
             spaces = self.bubble_chamber.new_structure_collection(
@@ -78,10 +81,9 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         self.parent_concept = self.bubble_chamber.concepts["same"]
         return self.target_view.can_accept_member(
             self.parent_concept,
+            self.target_conceptual_space,
             self.target_structure_one,
             self.target_structure_two,
-            self.target_space_one,
-            self.target_space_two,
         )
 
     def _fizzle(self):

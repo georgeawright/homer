@@ -163,7 +163,9 @@ class LetterChunk(Chunk):
                 rule=chunk.rule,
                 links_in=bubble_chamber.new_structure_collection(),
                 links_out=bubble_chamber.new_structure_collection(),
-                parent_spaces=bubble_chamber.new_structure_collection(),
+                parent_spaces=bubble_chamber.new_structure_collection(
+                    *[location.space for location in locations]
+                ),
                 super_chunks=bubble_chamber.new_structure_collection(),
                 abstract_chunk=self
                 if self.abstract_chunk is None
@@ -220,7 +222,9 @@ class LetterChunk(Chunk):
             rule=self.rule,
             links_in=bubble_chamber.new_structure_collection(),
             links_out=bubble_chamber.new_structure_collection(),
-            parent_spaces=bubble_chamber.new_structure_collection(),
+            parent_spaces=bubble_chamber.new_structure_collection(
+                *[location.space for location in new_locations]
+            ),
             super_chunks=bubble_chamber.new_structure_collection(),
             abstract_chunk=self if self.abstract_chunk is None else self.abstract_chunk,
         )
