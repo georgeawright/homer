@@ -5,6 +5,8 @@ from homer.codelets import Suggester
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 
+# TODO: possibly need restriction on space to frame correspondence suggester to prevent corresponding to sub-space items
+
 
 class CorrespondenceSuggester(Suggester):
     def __init__(

@@ -114,6 +114,7 @@ class Frame(Structure):
         for sub_frame in self.sub_frames:
             sub_frames.add(
                 sub_frame.instantiate(
+                    input_space=input_space,
                     parent_id=parent_id,
                     bubble_chamber=bubble_chamber,
                     conceptual_spaces_map=conceptual_spaces_map,

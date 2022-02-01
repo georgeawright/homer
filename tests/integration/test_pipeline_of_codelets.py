@@ -825,6 +825,23 @@ def test_pipeline_of_codelets(homer):
     letter_chunk.update_activation()
     assert original_letter_chunk_activation < letter_chunk.activation
 
+    frame = bubble_chamber.frames["s-comparative"]
+    codelet = SimplexViewSuggester.spawn(
+        "", bubble_chamber, {"frame": frame, "contextual_space": input_space}, 1.0
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    slot_space = codelet.frame.input_space.conceptual_spaces.where(is_slot=True).get()
+    codelet.conceptual_spaces_map[slot_space] = bubble_chamber.conceptual_spaces[
+        "temperature"
+    ]
+    assert isinstance(codelet, SimplexViewBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    view = codelet.child_structures.get()
+
     # END: build comparative phrase
 
     # START: chunk and describe more data

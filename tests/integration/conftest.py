@@ -189,6 +189,8 @@ def program():
 
 (define the (def-letter-chunk :name "the" :locations (list (Location (list) grammar-space))))
 (define is (def-letter-chunk :name "is" :locations (list (Location (list) grammar-space))))
+(define will (def-letter-chunk :name "will" :locations (list (Location (list) grammar-space))))
+(define be (def-letter-chunk :name "be" :locations (list (Location (list) grammar-space))))
 (define it (def-letter-chunk :name "it" :locations (list (Location (list) grammar-space))))
 (define in (def-letter-chunk :name "in" :locations (list (Location (list) grammar-space))))
 (define than (def-letter-chunk :name "than" :locations (list (Location (list) grammar-space))))
@@ -624,6 +626,228 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-relation :start jjr-chunk :end er-chunk :parent_concept jjr-concept
     :locations (list (Location (list) grammar-space)
 		     (Location (list) rp-input))))
+
+(define space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define conceptual-space
+  (def-conceptual-space :name "" :parent_concept space-parent-concept
+    :no_of_dimensions 1))
+(define label-concept
+  (def-concept :name "" :is_slot True :parent_space conceptual-space))
+(define location-concept-1
+  (def-concept :name "" :is_slot True :parent_space location-space))
+(define location-concept-2
+  (def-concept :name "" :is_slot True :parent_space location-space))
+(define relation-concept
+  (def-concept :name "" :is_slot True :parent_space more-less-space))
+(def-relation :start label-concept :end relation-concept
+  :parent_concept more-concept)
+(define rp-sub-frame-input
+  (def-contextual-space :name "rp-sub-frame.meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+(define rp-sub-frame-output
+  (def-contextual-space :name "rp-sub-frame.text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection
+			grammar-space location-space conceptual-space)))
+(define rp-sub-frame
+  (def-frame :name "s-comparative-rp-sub" :parent_concept rp-concept :parent_frame None
+    :sub_frames (StructureCollection)
+    :concepts (StructureCollection label-concept relation-concept)
+    :input_space rp-sub-frame-input
+    :output_space rp-sub-frame-output))
+(define nn-sub-frame-1-input
+  (def-contextual-space :name "nn-sub-frame-1.meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+(define nn-sub-frame-1-output
+  (def-contextual-space :name "nn-sub-frame-1.text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection
+			grammar-space location-space conceptual-space)))
+(define nn-sub-frame-1
+  (def-frame :name "s-comparative-nn-sub-1" :parent_concept nn-concept :parent_frame None
+    :sub_frames (StructureCollection)
+    :concepts (StructureCollection location-concept-1)
+    :input_space nn-sub-frame-1-input
+    :output_space nn-sub-frame-1-output))
+(define nn-sub-frame-2-input
+  (def-contextual-space :name "nn-sub-frame-2.meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+(define nn-sub-frame-2-output
+  (def-contextual-space :name "nn-sub-frame-2.text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection
+			grammar-space location-space conceptual-space)))
+(define nn-sub-frame-2
+  (def-frame :name "s-comparative-nn-sub-2" :parent_concept nn-concept :parent_frame None
+    :sub_frames (StructureCollection)
+    :concepts (StructureCollection location-concept-2)
+    :input_space nn-sub-frame-2-input
+    :output_space nn-sub-frame-2-output))
+(define comparative-sentence-input
+  (def-contextual-space :name "s-comparative.meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+(define comparative-sentence-output
+  (def-contextual-space :name "s-comparative.text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection
+			grammar-space location-space conceptual-space)))
+(define comparative-sentence
+  (def-frame :name "s-comparative" :parent_concept sentence-concept :parent_frame None
+    :sub_frames (StructureCollection rp-sub-frame nn-sub-frame-1 nn-sub-frame-2)
+    :concepts (StructureCollection
+	       label-concept relation-concept location-concept-1 location-concept-2)
+    :input_space comparative-sentence-input
+    :output_space comparative-sentence-input))
+ (define chunk-start
+  (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
+			      (Location (list) conceptual-space)
+			      (Location (list) nn-sub-frame-1-input)
+			      (Location (list) comparative-sentence-input))
+    :parent_space nn-sub-frame-1-input))
+(define chunk-end
+  (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
+			      (Location (list) conceptual-space)
+			      (Location (list) nn-sub-frame-2-input)
+			      (Location (list) comparative-sentence-input))
+    :parent_space nn-sub-frame-2-input))
+(define chunk-start-location-label
+  (def-label :start chunk-start :parent_concept label-concept
+    :locations (list (Location (list (list Nan Nan)) location-space)
+		     (Location (list) nn-sub-frame-1-input)
+		     (Location (list) comparative-sentence-input))))
+(define chunk-end-location-label
+  (def-label :start chunk-end :parent_concept label-concept
+    :locations (list (Location (list (list Nan Nan)) location-space)
+		     (Location (list) nn-sub-frame-2-input)
+		     (Location (list) comparative-sentence-input))))
+(define chunk-end-conceptual-label
+  (def-label :start chunk-end :parent_concept label-concept
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) rp-sub-frame-input)
+		     (Location (list) comparative-sentence-input))))
+(define relation
+  (def-relation :start chunk-start :end chunk-end :parent_concept relation-concept
+    :locations (list (Location (list Nan) more-less-space)
+		     (TwoPointLocation (list) (list) conceptual-space)
+		     (TwoPointLocation (list) (list) rp-sub-frame-input)
+		     (TwoPointLocation (list) (list) comparative-sentence-input))
+    :conceptual_space conceptual-space))
+(define sentence-word-1
+  (def-letter-chunk :name "it"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk it))
+(define sentence-word-2
+  (def-letter-chunk :name "will"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk will))
+(define sentence-word-3
+  (def-letter-chunk :name "be"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk be))
+(define sentence-word-4
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) rp-sub-frame-output)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk in))
+(define sentence-word-5
+  (def-letter-chunk :name "in"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk in))
+(define sentence-word-6
+  (def-letter-chunk :name "the"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk the))
+(define sentence-word-7
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list Nan Nan)) location-space)
+		     (Location (list) nn-sub-frame-1-output)
+		     (Location (list) comparative-sentence-output))))
+(define sentence-word-8
+  (def-letter-chunk :name "than"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk than))
+(define sentence-word-9
+  (def-letter-chunk :name "in"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk in))
+(define sentence-word-10
+  (def-letter-chunk :name "the"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :abstract_chunk the))
+(define sentence-word-11
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list Nan Nan)) location-space)
+		     (Location (list) nn-sub-frame-2-output)
+		     (Location (list) comparative-sentence-output))))
+(define vb-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection sentence-word-2)
+    :right_branch (StructureCollection sentence-word-3)))
+(define vp-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection vb-super-chunk)
+    :right_branch (StructureCollection sentence-word-4)))
+(define np-1-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection sentence-word-6)
+    :right_branch (StructureCollection sentence-word-7)))
+(define np-2-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection sentence-word-10)
+    :right_branch (StructureCollection sentence-word-11)))
+(define pp-1-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection sentence-word-5)
+    :right_branch (StructureCollection np-1-super-chunk)))
+(define pp-2-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection sentence-word-9)
+    :right_branch (StructureCollection np-2-super-chunk)))
+(define comp-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection sentence-word-8)
+    :right_branch (StructureCollection pp-2-super-chunk)))
+(define vp-super-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection vp-super-chunk)
+    :right_branch (StructureCollection pp-1-super-chunk)))
+(define vp-super-super-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection vp-super-super-chunk)
+    :right_branch (StructureCollection comp-super-chunk)))
+(define sentence-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) comparative-sentence-output))
+    :left_branch (StructureCollection sentence-word-1)
+    :right_branch (StructureCollection vp-super-super-super-chunk)))
+
 
 (define input-space
   (def-contextual-space :name "input" :parent_concept input-concept
