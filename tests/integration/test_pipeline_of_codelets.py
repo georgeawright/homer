@@ -611,7 +611,7 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     assert 0 == view.quality  # empty view has quality of 0
 
-    target_relation = chunk_one.relations_in_space(
+    target_label = chunk_two.labels_in_space(
         bubble_chamber.conceptual_spaces["temperature"]
     ).get()
     codelet = SpaceToFrameCorrespondenceSuggester.spawn(
@@ -620,7 +620,7 @@ def test_pipeline_of_codelets(homer):
         {
             "target_view": view,
             "target_space_one": input_space,
-            "target_structure_one": target_relation,
+            "target_structure_one": target_label,
         },
         1.0,
     )
@@ -649,7 +649,7 @@ def test_pipeline_of_codelets(homer):
     correspondence.update_activation()
     assert original_correspondence_activation < correspondence.activation
 
-    target_label = chunk_two.labels_in_space(
+    target_relation = chunk_one.relations_in_space(
         bubble_chamber.conceptual_spaces["temperature"]
     ).get()
     codelet = SpaceToFrameCorrespondenceSuggester.spawn(
@@ -658,7 +658,7 @@ def test_pipeline_of_codelets(homer):
         {
             "target_view": view,
             "target_space_one": input_space,
-            "target_structure_one": target_label,
+            "target_structure_one": target_relation,
         },
         1.0,
     )
@@ -705,6 +705,7 @@ def test_pipeline_of_codelets(homer):
     letter_chunk_slot = view.parent_frame.output_space.contents.filter(
         lambda x: x.is_letter_chunk == True
         and x.is_slot == True
+        and not x.super_chunks.is_empty()
         and x.labels.is_empty()
     ).get()
     codelet = LetterChunkProjectionSuggester.spawn(
@@ -714,7 +715,6 @@ def test_pipeline_of_codelets(homer):
         1.0,
     )
     codelet.run()
-
     assert CodeletResult.FIZZLE == codelet.result
 
     letter_chunk_slot = view.parent_frame.output_space.contents.filter(

@@ -580,11 +580,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define chunk-start
   (def-chunk :locations (list (Location (list) conceptual-space)
 			      (Location (list) rp-input))
-    :parent_space nn-input))
+    :parent_space rp-input))
 (define chunk-end
   (def-chunk :locations (list (Location (list) conceptual-space)
 			      (Location (list) rp-input))
-    :parent_space nn-input))
+    :parent_space rp-input))
 (define chunk-end-label
   (def-label :start chunk-end :parent_concept label-concept
     :locations (list (Location (list) conceptual-space)
