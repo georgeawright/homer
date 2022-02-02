@@ -99,6 +99,8 @@ class Relation(Link):
                 *[location.space for location in new_locations]
             ),
         )
+        for location in new_locations:
+            location.space.add(new_relation)
         return new_relation
 
     def nearby(self, space: Space = None) -> StructureCollection:

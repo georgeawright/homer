@@ -30,9 +30,6 @@ class SimplexViewBuilder(ViewBuilder):
             parent_id=self.codelet_id,
             bubble_chamber=self.bubble_chamber,
         )
-        input_spaces = self.bubble_chamber.new_structure_collection(
-            self.contextual_space, frame_instance
-        )
         view_output = ContextualSpace(
             structure_id=ID.new(ContextualSpace),
             parent_id=self.codelet_id,
@@ -51,7 +48,9 @@ class SimplexViewBuilder(ViewBuilder):
             locations=[Location([], self.bubble_chamber.spaces["views"])],
             members=self.bubble_chamber.new_structure_collection(),
             frames=self.bubble_chamber.new_structure_collection(frame_instance),
-            input_spaces=input_spaces,
+            input_spaces=self.bubble_chamber.new_structure_collection(
+                self.contextual_space
+            ),
             output_space=view_output,
             quality=0,
             links_in=self.bubble_chamber.new_structure_collection(),

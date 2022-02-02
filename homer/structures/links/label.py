@@ -89,6 +89,8 @@ class Label(Link):
                 *[location.space for location in new_locations]
             ),
         )
+        for location in new_locations:
+            location.space.add(new_label)
         return new_label
 
     def nearby(self, space: Space = None) -> StructureCollection:

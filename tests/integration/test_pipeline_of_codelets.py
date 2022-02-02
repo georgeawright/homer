@@ -458,6 +458,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     view = codelet.child_structures.get()
+    assert len(view.input_spaces) == 1
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, SimplexViewEvaluator)
@@ -465,6 +466,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     assert 0 == view.quality  # empty view has quality of 0
+    assert len(view.input_spaces) == 1
 
     target_label = chunk_one.labels_in_space(
         bubble_chamber.conceptual_spaces["location"]
@@ -481,6 +483,7 @@ def test_pipeline_of_codelets(homer):
     )
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
+    assert len(view.input_spaces) == 1
 
     codelet = codelet.child_codelets[0]
     codelet.parent_concept = bubble_chamber.concepts["same"]
@@ -488,6 +491,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     correspondence = codelet.child_structures.where(is_correspondence=True).get()
+    assert len(view.input_spaces) == 1
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, CorrespondenceEvaluator)
@@ -495,6 +499,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     assert 0 < correspondence.quality
+    assert len(view.input_spaces) == 1
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, CorrespondenceSelector)
@@ -503,6 +508,7 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     correspondence.update_activation()
     assert original_correspondence_activation < correspondence.activation
+    assert len(view.input_spaces) == 1
 
     codelet = SpaceToFrameCorrespondenceSuggester.spawn(
         "",
@@ -516,6 +522,7 @@ def test_pipeline_of_codelets(homer):
     )
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
+    assert len(view.input_spaces) == 1
 
     codelet = codelet.child_codelets[0]
     codelet.parent_concept = bubble_chamber.concepts["same"]
@@ -523,6 +530,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     correspondence = codelet.child_structures.get()
+    assert len(view.input_spaces) == 1
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, CorrespondenceEvaluator)
@@ -530,11 +538,13 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     assert 0 < correspondence.quality
+    assert len(view.input_spaces) == 1
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, CorrespondenceSelector)
     original_correspondence_activation = correspondence.activation
     codelet.run()
+    assert len(view.input_spaces) == 1
     assert CodeletResult.FINISH == codelet.result
     correspondence.update_activation()
     assert original_correspondence_activation < correspondence.activation

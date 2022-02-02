@@ -205,6 +205,7 @@ class Chunk(Node):
 
         return copy_recursively(self, location, bubble_chamber, parent_id, {})
 
+    # TODO: copy with contents doesn't add item to space
     def copy_with_contents(
         self,
         copies: dict,

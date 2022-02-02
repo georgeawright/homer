@@ -28,18 +28,18 @@ class SimplexView(View):
     ):
         View.__init__(
             self,
-            structure_id,
-            parent_id,
-            parent_frame,
-            locations,
-            members,
-            frames,
-            input_spaces,
-            output_space,
-            quality,
-            links_in,
-            links_out,
-            parent_spaces,
+            structure_id=structure_id,
+            parent_id=parent_id,
+            parent_frame=parent_frame,
+            locations=locations,
+            members=members,
+            frames=frames,
+            input_spaces=input_spaces,
+            output_space=output_space,
+            quality=quality,
+            links_in=links_in,
+            links_out=links_out,
+            parent_spaces=parent_spaces,
         )
         self.is_simplex_view = True
 

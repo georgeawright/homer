@@ -29,6 +29,11 @@ class CorrespondenceSelector(Selector):
         pass
 
     def _engender_follow_up(self):
+        from homer.codelets.suggesters.correspondence_suggesters import (
+            SpaceToFrameCorrespondenceSuggester,
+            SubFrameToFrameCorrespondenceSuggester,
+        )
+
         winner_correspondence = self.winners.where(is_correspondence=True).get()
         target_view = winner_correspondence.parent_view
         try:
@@ -67,8 +72,13 @@ class CorrespondenceSelector(Selector):
             target_concept = winner_correspondence.parent_concept.friends().get()
         except MissingStructureError:
             return
+        follow_up_class = SubFrameToFrameCorrespondenceSuggester
+        for input_space in target_view.input_spaces:
+            if winner_correspondence.start in input_space.contents:
+                follow_up_class = SpaceToFrameCorrespondenceSuggester
+                break
         self.child_codelets.append(
-            CorrespondenceSuggester.spawn(
+            follow_up_class.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 {

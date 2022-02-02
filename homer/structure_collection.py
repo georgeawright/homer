@@ -156,7 +156,9 @@ class StructureCollection:
         )
 
     def get(self, key: callable = lambda x: 0, exclude: list = None):
-        return self.bubble_chamber.random_machine.select(self.structures, key, exclude)
+        return self.bubble_chamber.random_machine.select(
+            {structure: True for structure in self.structures}, key, exclude
+        )
 
     def _arrange_structures_by_name(self):
         self.structures_by_name = {}

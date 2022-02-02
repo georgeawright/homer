@@ -732,12 +732,14 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
 			      (Location (list) conceptual-space)
 			      (Location (list) nn-sub-frame-1-input)
+			      (Location (list) rp-sub-frame-input)
 			      (Location (list) comparative-sentence-input))
     :parent_space nn-sub-frame-1-input))
 (define chunk-end
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
 			      (Location (list) conceptual-space)
 			      (Location (list) nn-sub-frame-2-input)
+			      (Location (list) rp-sub-frame-input)
 			      (Location (list) comparative-sentence-input))
     :parent_space nn-sub-frame-2-input))
 (define chunk-start-location-label
