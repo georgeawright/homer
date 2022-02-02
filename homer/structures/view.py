@@ -21,6 +21,7 @@ class View(Structure):
         parent_frame: Frame,
         locations: List[Location],
         members: StructureCollection,
+        frames: StructureCollection,
         input_spaces: StructureCollection,
         output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
@@ -40,6 +41,7 @@ class View(Structure):
         )
         self.parent_frame = parent_frame
         self.value = None
+        self.frames = frames
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members

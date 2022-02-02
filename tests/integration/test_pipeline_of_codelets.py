@@ -603,6 +603,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     view = codelet.child_structures.get()
+    rp_view = view
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, SimplexViewEvaluator)
@@ -848,34 +849,41 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
 
+    codelet = codelet.child_codelets[0]
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    sub_view = rp_view
+    codelet.target_structure_one = rp_view.parent_frame.input_space.contents.where(
+        is_relation=True
+    ).get()
+    codelet.target_space_one = rp_view.parent_frame.input_space
+    codelet.target_structure_two = view.parent_frame.input_space.contents.where(
+        is_relation=True
+    ).get()
+    codelet.target_space_two = view.parent_frame.input_space
+    codelet.target_conceptual_space = bubble_chamber.conceptual_spaces["more-less"]
+    assert isinstance(codelet, PotentialSubFrameToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.where(is_correspondence=True).get()
 
-#    codelet = codelet.child_codelets[0]
-#    codelet.parent_concept = bubble_chamber.concepts["same"]
-#    assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
-#    codelet.run()
-#    assert CodeletResult.FINISH == codelet.result
-#    correspondence = codelet.child_structures.where(is_correspondence=True).get()
-#
-#    codelet = codelet.child_codelets[0]
-#    assert isinstance(codelet, CorrespondenceEvaluator)
-#    assert 0 == correspondence.quality
-#    codelet.run()
-#    assert CodeletResult.FINISH == codelet.result
-#    assert 0 < correspondence.quality
-#
-#    codelet = codelet.child_codelets[0]
-#    assert isinstance(codelet, CorrespondenceSelector)
-#    original_correspondence_activation = correspondence.activation
-#    codelet.run()
-#    assert CodeletResult.FINISH == codelet.result
-#    correspondence.update_activation()
-#    assert original_correspondence_activation < correspondence.activation
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
 
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+    # END: build comparative phrase
 
-# END: build comparative phrase
+    # START: chunk and describe more data
+    # END: chunk and describe more data
 
-# START: chunk and describe more data
-# END: chunk and describe more data
-
-# START: compile longer piece of text
-# END: compile longer piece of text
+    # START: compile longer piece of text
+    # END: compile longer piece of text

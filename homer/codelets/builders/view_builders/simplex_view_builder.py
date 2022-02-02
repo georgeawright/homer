@@ -50,6 +50,7 @@ class SimplexViewBuilder(ViewBuilder):
             parent_frame=frame_instance,
             locations=[Location([], self.bubble_chamber.spaces["views"])],
             members=self.bubble_chamber.new_structure_collection(),
+            frames=self.bubble_chamber.new_structure_collection(frame_instance),
             input_spaces=input_spaces,
             output_space=view_output,
             quality=0,
