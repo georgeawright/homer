@@ -34,6 +34,15 @@ class CorrespondenceSelector(Selector):
             SubFrameToFrameCorrespondenceSuggester,
         )
 
+        self.child_codelets.append(
+            self.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.winners,
+                self.follow_up_urgency,
+                challengers=self.losers,
+            )
+        )
         winner_correspondence = self.winners.where(is_correspondence=True).get()
         target_view = winner_correspondence.parent_view
         try:
@@ -91,14 +100,5 @@ class CorrespondenceSelector(Selector):
                     "parent_concept": target_concept,
                 },
                 target_structure_one.uncorrespondedness,
-            )
-        )
-        self.child_codelets.append(
-            self.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winners,
-                self.follow_up_urgency,
-                challengers=self.losers,
             )
         )

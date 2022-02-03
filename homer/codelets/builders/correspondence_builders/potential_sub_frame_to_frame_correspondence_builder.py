@@ -1,5 +1,4 @@
 from homer.codelets.builders import CorrespondenceBuilder
-from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
 
@@ -47,37 +46,4 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             parent_view=self.target_view,
         )
         self.child_structures.add(sub_frame_correspondence)
-        try:
-            contextual_space_to_sub_frame_correspondence = (
-                self.target_structure_one.correspondences.filter(
-                    lambda x: x.end == self.target_structure_one
-                    and x.start.parent_space in self.target_view.input_spaces
-                ).get()
-            )
-            contextual_space_structure = (
-                contextual_space_to_sub_frame_correspondence.start
-            )
-        except MissingStructureError:
-            contextual_space_to_sub_frame_correspondence = (
-                self.target_structure_one.correspondences.filter(
-                    lambda x: x.start == self.target_structure_one
-                    and x.end.parent_space.is_contextual_space
-                ).get()
-            )
-            contextual_space_structure = (
-                contextual_space_to_sub_frame_correspondence.end
-            )
-        contextual_space = contextual_space_structure.parent_space
-        contextual_space_correspondence = self.bubble_chamber.new_correspondence(
-            parent_id=self.codelet_id,
-            start=contextual_space_structure,
-            end=self.target_structure_two,
-            locations=[
-                contextual_space_structure.location_in_space(contextual_space),
-                self.target_structure_two.location_in_space(self.target_space_two),
-            ],
-            parent_concept=self.parent_concept,
-            conceptual_space=self.target_conceptual_space,
-            parent_view=self.target_view,
-        )
-        self.child_structures.add(contextual_space_correspondence)
+        self._add_contextual_space_correspondence()

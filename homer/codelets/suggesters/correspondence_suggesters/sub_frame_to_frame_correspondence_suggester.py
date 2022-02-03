@@ -45,7 +45,9 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
 
     def _passes_preliminary_checks(self):
         try:
-            frame_one = self.target_view.sub_frames.get(key=corresponding_exigency)
+            frame_one = self.target_view.frames.get(
+                key=corresponding_exigency, exclude=[self.target_view.parent_frame]
+            )
             spaces = self.bubble_chamber.new_structure_collection(
                 frame_one.input_space, frame_one.output_space
             )
@@ -74,10 +76,9 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         self.parent_concept = self.bubble_chamber.concepts["same"]
         return self.target_view.can_accept_member(
             self.parent_concept,
+            self.target_conceptual_space,
             self.target_structure_one,
             self.target_structure_two,
-            self.target_space_one,
-            self.target_space_two,
         )
 
     def _fizzle(self):

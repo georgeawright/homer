@@ -25,11 +25,13 @@ def test_add(bubble_chamber):
     correspondence.node_pairs = [(node_1, node_2)]
 
     assert view.members.is_empty()
-    assert [] == view.input_node_pairs
+    assert [] == view.node_groups
 
     view.add(correspondence)
     assert correspondence in view.members
-    assert [(node_1, node_2)] == view.input_node_pairs
+    assert [
+        {node_1.parent_space: node_1, node_2.parent_space: node_2}
+    ] == view.node_groups
 
 
 def test_can_accept_member(bubble_chamber):
@@ -48,10 +50,17 @@ def test_can_accept_member(bubble_chamber):
         Mock(),
     )
 
+    space_1 = Mock()
+    space_2 = Mock()
+
     node_1 = Mock()
+    node_1.parent_space = space_1
     node_2 = Mock()
+    node_2.parent_space = space_2
     node_3 = Mock()
+    node_3.parent_space = space_1
     node_4 = Mock()
+    node_4.parent_space = space_2
 
     correspondence_1 = Mock()
     correspondence_1.parent_concept = Mock()

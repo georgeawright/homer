@@ -1,4 +1,3 @@
-import operator
 from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -45,7 +44,8 @@ class View(Structure):
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members
-        self.input_node_pairs = []
+        self.node_groups = []
+        self.grouped_nodes = {}
         self.slot_values = {}
         self.is_view = True
 
@@ -73,8 +73,26 @@ class View(Structure):
     def add(self, correspondence: "Correspondence"):
         self.members.add(correspondence)
         for node_pair in correspondence.node_pairs:
-            if node_pair not in self.input_node_pairs:
-                self.input_node_pairs.append(node_pair)
+            if all(node in self.grouped_nodes for node in node_pair):
+                continue
+            for node_group in self.node_groups:
+                if (
+                    node_group.get(node_pair[0].parent_space) == node_pair[0]
+                    or node_group.get(node_pair[1].parent_space) == node_pair[1]
+                ):
+                    node_group[node_pair[0].parent_space] = node_pair[0]
+                    node_group[node_pair[1].parent_space] = node_pair[1]
+                    self.grouped_nodes[node_pair[0]] = True
+                    self.grouped_nodes[node_pair[1]] = True
+            if node_pair[0] not in self.grouped_nodes:
+                self.node_groups.append(
+                    {
+                        node_pair[0].parent_space: node_pair[0],
+                        node_pair[1].parent_space: node_pair[1],
+                    }
+                )
+                self.grouped_nodes[node_pair[0]] = True
+                self.grouped_nodes[node_pair[1]] = True
 
     def has_member(
         self,
@@ -101,26 +119,41 @@ class View(Structure):
             return False
         if not end.correspondences.filter(lambda x: x in self.members).is_empty():
             return False
-        potential_node_pairs = (
-            [(start, end)]
+        potential_node_groups = (
+            [{start.parent_space: start, end.parent_space: end}]
             if start.is_node
-            else [(start.start, end.start)]
+            else [
+                {
+                    start.start.parent_space: start.start,
+                    end.start.parent_space: end.start,
+                }
+            ]
             if start.is_label
-            else [(start.start, end.start), (start.end, end.end)]
+            else [
+                {
+                    start.start.parent_space: start.start,
+                    end.start.parent_space: end.start,
+                },
+                {
+                    start.end.parent_space: start.end,
+                    end.end.parent_space: end.end,
+                },
+            ]
         )
-        if all(
-            potential_node_pair in self.input_node_pairs
-            for potential_node_pair in potential_node_pairs
-        ):
-            return True
-        return not any(
-            operator.xor(
-                potential_node_pair[0] == existing_node_pair[0],
-                potential_node_pair[1] == existing_node_pair[1],
-            )
-            for potential_node_pair in potential_node_pairs
-            for existing_node_pair in self.input_node_pairs
-        )
+        for existing_node_group in self.node_groups:
+            for potential_group in potential_node_groups:
+                if all(
+                    node in existing_node_group.values()
+                    for node in potential_group.values()
+                ):
+                    return True
+                if all(space in existing_node_group for space in potential_group):
+                    if any(
+                        node in existing_node_group.values()
+                        for node in potential_group.values()
+                    ):
+                        return False
+        return True
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])

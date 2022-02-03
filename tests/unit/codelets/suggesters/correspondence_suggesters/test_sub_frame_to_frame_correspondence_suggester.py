@@ -12,7 +12,7 @@ def test_fizzles_if_view_cannot_accept_correspondence(bubble_chamber):
     sub_frame.input_space.corresponding_exigency = 1.0
     sub_frame.output_space.corresponding_exigency = 0.0
     target_view = Mock()
-    target_view.sub_frames.get.return_value = sub_frame
+    target_view.frames.get.return_value = sub_frame
     target_view.can_accept_member.return_value = False
 
     target_structure_one = Mock()
@@ -34,7 +34,7 @@ def test_gets_second_target_structure_if_needed(bubble_chamber):
     sub_frame.input_space.corresponding_exigency = 1.0
     sub_frame.output_space.corresponding_exigency = 0.0
     target_view = Mock()
-    target_view.sub_frames.get.return_value = sub_frame
+    target_view.frames.get.return_value = sub_frame
     target_view.can_accept_member.return_value = True
 
     target_structure_one = Mock()
@@ -60,7 +60,7 @@ def test_gets_parent_concept_if_needed(bubble_chamber):
     sub_frame.input_space.corresponding_exigency = 1.0
     sub_frame.output_space.corresponding_exigency = 0.0
     target_view = Mock()
-    target_view.sub_frames.get.return_value = sub_frame
+    target_view.frames.get.return_value = sub_frame
     target_view.can_accept_member.return_value = True
 
     target_structure_one = Mock()
