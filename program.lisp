@@ -657,6 +657,10 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-relation :start jjr-chunk :end er-chunk :parent_concept jjr-concept
     :locations (list (Location (list) grammar-space)
 		     (Location (list) rp-output))))
+(define jjr-super-chunk-label
+  (def-label :start jjr-super-chunk :parent_concept jjr-concept
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) rp-output))))
 
 ;;; check that the relation-label relation actually does something in correspondence suggesting
 
@@ -696,7 +700,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_spaces (StructureCollection
 			grammar-space location-space conceptual-space)))
 (define nn-sub-frame-1
-  (def-frame :name "s-comparative-nn-sub-1" :parent-concept nn-concept :parent-frame None
+  (def-frame :name "s-comparative-nn-sub-1" :parent-concept np-concept :parent-frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection location-concept-1)
     :input_space nn-sub-frame-1-input
@@ -709,7 +713,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_spaces (StructureCollection
 			grammar-space location-space conceptual-space)))
 (define nn-sub-frame-2
-  (def-frame :name "s-comparative-nn-sub-2" :parent-concept nn-concept :parent-frame None
+  (def-frame :name "s-comparative-nn-sub-2" :parent-concept np-concept :parent-frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection location-concept-2)
     :input_space nn-sub-frame-2-input

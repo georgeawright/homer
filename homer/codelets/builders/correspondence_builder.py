@@ -97,7 +97,7 @@ class CorrespondenceBuilder(Builder):
                 contextual_space_to_sub_frame_correspondence = (
                     self.target_structure_one.correspondences.filter(
                         lambda x: x.start == self.target_structure_one
-                        and x.end.parent_space.is_contextual_space
+                        and x.end in x.parent_view.output_space.contents
                     ).get(exclude=[sub_frame_correspondence])
                 )
                 contextual_space_structure = (

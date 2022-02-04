@@ -8,13 +8,16 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             self.target_structure_two.is_link
             and not self.target_structure_two.parent_concept.is_filled_in
         ):
-            slot_value = (
-                self.target_structure_one.parent_concept.relations.filter(
-                    lambda x: not x.end.is_slot
+            if self.target_structure_one.parent_concept.is_slot:
+                slot_value = (
+                    self.target_structure_one.parent_concept.relations.filter(
+                        lambda x: not x.end.is_slot
+                    )
+                    .get()
+                    .end
                 )
-                .get()
-                .end
-            )
+            else:
+                slot_value = self.target_structure_one.parent_concept
             concept_link = self.bubble_chamber.new_relation(
                 parent_id=self.codelet_id,
                 start=self.target_structure_two.parent_concept,
