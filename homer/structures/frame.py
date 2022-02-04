@@ -64,6 +64,8 @@ class Frame(Structure):
         conceptual_spaces_map: dict,
         parent_id: str,
         bubble_chamber,
+        input_copies: dict = None,
+        output_copies: dict = None,
     ):
         def specify_space(parent_space, abstract_space, specified_space, concepts):
             parent_space.conceptual_spaces.remove(abstract_space)
@@ -96,18 +98,20 @@ class Frame(Structure):
                 except NoLocationError:
                     pass
 
+        input_copies = {} if input_copies is None else input_copies
+        output_copies = {} if output_copies is None else output_copies
         concepts = self.concepts.copy()
         output_space = (
             self.output_space if input_space == self.input_space else self.input_space
         )
-        input_space_copy, _ = input_space.copy(
-            bubble_chamber=bubble_chamber, parent_id=parent_id
+        input_space_copy, input_copies = input_space.copy(
+            bubble_chamber=bubble_chamber, parent_id=parent_id, copies=input_copies
         )
         for conceptual_space in input_space_copy.conceptual_spaces.where(is_slot=True):
             specified_space = conceptual_spaces_map[conceptual_space]
             specify_space(input_space_copy, conceptual_space, specified_space, concepts)
-        output_space_copy, _ = output_space.copy(
-            bubble_chamber=bubble_chamber, parent_id=parent_id
+        output_space_copy, output_copies = output_space.copy(
+            bubble_chamber=bubble_chamber, parent_id=parent_id, copies=output_copies
         )
         for conceptual_space in output_space_copy.conceptual_spaces.where(is_slot=True):
             specified_space = conceptual_spaces_map[conceptual_space]
@@ -127,6 +131,8 @@ class Frame(Structure):
                     parent_id=parent_id,
                     bubble_chamber=bubble_chamber,
                     conceptual_spaces_map=conceptual_spaces_map,
+                    input_copies=input_copies,
+                    output_copies=output_copies,
                 )
             )
         return bubble_chamber.new_frame(

@@ -45,6 +45,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
 
     def _passes_preliminary_checks(self):
         try:
+            # TODO: possibly pick a sub view with high corresponding exigency first
             sub_view = self.bubble_chamber.production_views.filter(
                 lambda x: x.parent_frame.parent_concept
                 in {

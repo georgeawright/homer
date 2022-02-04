@@ -92,7 +92,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             return self.target_projectee
         if not self.target_projectee.correspondences.is_empty():
             return self.target_projectee.correspondees.get().abstract_chunk
-        if not self.target_projectee.relations.is_empty():
+        if not self.target_projectee.links_in.where(is_relation=True).is_empty():
             relation = self.target_projectee.relations.get()
             relative = self.target_projectee.relatives.get()
             relative_correspondee = (

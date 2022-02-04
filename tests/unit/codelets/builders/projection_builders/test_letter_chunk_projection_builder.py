@@ -92,6 +92,7 @@ def test_projects_slot_into_output_according_to_relation(bubble_chamber):
     abstract_relation.arguments.get.return_value = abstract_chunk
     abstract_relations = bubble_chamber.new_structure_collection(abstract_relation)
     relation = Mock()
+    relation.is_relation = True
     relation.parent_concept = parent_concept
     relative_correspondee = Mock()
     relative_correspondee.abstract_chunk.relations = abstract_relations
@@ -107,6 +108,7 @@ def test_projects_slot_into_output_according_to_relation(bubble_chamber):
     target_projectee.is_slot = True
     target_projectee.has_correspondence_to_space.return_value = False
     target_projectee.correspondences.is_empty.return_value = True
+    target_projectee.links_in = bubble_chamber.new_structure_collection(relation)
     target_projectee.relations = bubble_chamber.new_structure_collection(relation)
     target_projectee.relatives.get.return_value = relative_slot
 

@@ -3,6 +3,7 @@ import statistics
 
 from homer.id import ID
 from homer.location import Location
+from homer.locations import TwoPointLocation
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
@@ -69,6 +70,7 @@ class ContextualSpace(Space):
         """Requires keyword arguments 'bubble_chamber' and 'parent_id'."""
         bubble_chamber = kwargs["bubble_chamber"]
         parent_id = kwargs["parent_id"]
+        copies = kwargs.get("copies", {})
         new_space = ContextualSpace(
             structure_id=ID.new(ContextualSpace),
             parent_id=parent_id,
@@ -81,8 +83,21 @@ class ContextualSpace(Space):
             parent_spaces=bubble_chamber.new_structure_collection(),
         )
         bubble_chamber.logger.log(new_space)
-        copies = {}
-        for item in self.contents.where(is_node=True):
+        for old_item, new_item in copies.items():
+            if old_item.has_location_in_space(self):
+                old_location = old_item.location_in_space(self)
+                try:
+                    new_location = Location(old_location.coordinates, new_space)
+                except NotImplementedError:
+                    new_location = TwoPointLocation(
+                        old_location.start_coordinates,
+                        old_location.end_coordinates,
+                        new_space,
+                    )
+                new_item.locations.append(new_location)
+                new_item.parent_spaces.add(new_location.space)
+                new_location.space.add(new_item)
+        for item in self.contents.filter(lambda x: x.is_node and x not in copies):
             new_location = Location(item.location_in_space(self).coordinates, new_space)
             new_item, copies = item.copy_with_contents(
                 copies=copies,
@@ -112,6 +127,7 @@ class ContextualSpace(Space):
                     parent_space=new_space,
                     bubble_chamber=bubble_chamber,
                 )
+                new_end.links_in.add(new_relation)
                 new_item.links_out.add(new_relation)
                 new_space.add(new_relation)
                 copies[relation] = new_relation
@@ -127,6 +143,7 @@ class ContextualSpace(Space):
                     parent_id=parent_id,
                 )
                 new_item.links_in.add(new_relation)
+                new_start.links_out.add(new_relation)
                 new_space.add(new_relation)
                 copies[relation] = new_relation
         return new_space, copies
