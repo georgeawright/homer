@@ -158,5 +158,7 @@ class View(Structure):
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])
         return (
-            f"<{self.structure_id} from {inputs} to {self.output_space.structure_id}>"
+            f"<{self.structure_id} "
+            + f"from {inputs} to {self.output_space.structure_id} "
+            + f"with {self.parent_frame} ({self.parent_frame.parent_concept.name})>"
         )
