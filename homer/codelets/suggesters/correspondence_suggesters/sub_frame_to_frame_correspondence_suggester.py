@@ -55,9 +55,11 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             self.target_structure_one = self.target_space_one.contents.where(
                 is_correspondence=False
             ).get(key=corresponding_exigency)
-            frame_two = self.target_view.parent_frame.sub_frames.where(
-                parent_concept=frame_one.parent_concept
-            ).get(key=corresponding_exigency)
+            frame_two = [
+                frame
+                for frame in self.target_view.matched_sub_frames
+                if self.target_view.matched_sub_frames.get(frame) == frame_one
+            ][0]
             self.target_space_two = (
                 frame_two.input_space
                 if self.target_space_one == frame_one.input_space

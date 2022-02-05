@@ -1310,9 +1310,13 @@ def test_pipeline_of_codelets(homer):
     assert original_correspondence_activation < correspondence.activation
 
     # build correspondence from second np view and comparative sentence view (np label)
-    codelet = SubFrameToFrameCorrespondenceBuilder.spawn(
+    codelet = SubFrameToFrameCorrespondenceSuggester.spawn(
         "", bubble_chamber, {"target_view": sentence_view}, 1.0
     )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
     codelet.parent_concept = bubble_chamber.concepts["same"]
     codelet.target_space_one = np_view_2.parent_frame.output_space
     codelet.target_structure_one = (
