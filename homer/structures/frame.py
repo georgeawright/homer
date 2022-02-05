@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 from homer.errors import MissingStructureError, NoLocationError
+from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 
@@ -137,7 +138,7 @@ class Frame(Structure):
             )
         return bubble_chamber.new_frame(
             parent_id=parent_id,
-            name=self.name,
+            name=ID.new_frame_instance(self.name),
             parent_concept=self.parent_concept,
             parent_frame=self,
             sub_frames=sub_frames,
@@ -145,3 +146,6 @@ class Frame(Structure):
             input_space=input_space_copy,
             output_space=output_space_copy,
         )
+
+    def __repr__(self) -> str:
+        return f"<{self.structure_id} {self.parent_concept.name}>"

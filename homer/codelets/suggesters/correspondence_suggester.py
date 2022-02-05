@@ -27,6 +27,7 @@ class CorrespondenceSuggester(Suggester):
         self.target_space_two = target_structures.get("target_space_two")
         self.target_conceptual_space = target_structures.get("target_conceptual_space")
         self.parent_concept = target_structures.get("parent_concept")
+        self.sub_frame = target_structures.get("sub_frame")
         self.correspondence = None
         self.child_structure = None
 
@@ -69,6 +70,7 @@ class CorrespondenceSuggester(Suggester):
             "target_conceptual_space": self.target_conceptual_space,
             "parent_concept": self.parent_concept,
             "target_view": self.target_view,
+            "sub_frame": self.sub_frame,
         }
 
     def _passes_preliminary_checks(self):

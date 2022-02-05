@@ -817,7 +817,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list) comparative-sentence-output))
     :parent_space nn-sub-frame-1-output))
 (define nn-1-grammar-label
-  (def-label :start sentence-word-7 :parent_concept nn-concept
+  (def-label :start sentence-word-7 :parent_concept np-concept
     :locations (list (Location (list) grammar-space)
 		     (Location (list) nn-sub-frame-1-output))))
 (define sentence-word-8
@@ -843,7 +843,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list) comparative-sentence-output))
     :parent_space nn-sub-frame-2-output))
 (define nn-2-chunk-grammar-label
-  (def-label :start sentence-word-11 :parent_concept nn-concept
+  (def-label :start sentence-word-11 :parent_concept np-concept
     :locations (list (Location (list) grammar-space)
 		     (Location (list) nn-sub-frame-2-output))))
 (define vb-super-chunk

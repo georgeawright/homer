@@ -10,3 +10,8 @@ class ID:
         type_name = qualifier + typ.__name__
         cls.COUNTS[type_name] += 1
         return type_name + str(cls.COUNTS[type_name])
+
+    @classmethod
+    def new_frame_instance(cls, frame_name: str) -> str:
+        cls.COUNTS[frame_name] += 1
+        return frame_name + str(cls.COUNTS[frame_name])

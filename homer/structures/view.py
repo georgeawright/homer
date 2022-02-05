@@ -46,6 +46,7 @@ class View(Structure):
         self.members = members
         self.node_groups = []
         self.grouped_nodes = {}
+        self.matched_sub_frames = {}
         self.slot_values = {}
         self.is_view = True
 
@@ -160,5 +161,5 @@ class View(Structure):
         return (
             f"<{self.structure_id} "
             + f"from {inputs} to {self.output_space.structure_id} "
-            + f"with {self.parent_frame} ({self.parent_frame.parent_concept.name})>"
+            + f"with {self.parent_frame}>"
         )

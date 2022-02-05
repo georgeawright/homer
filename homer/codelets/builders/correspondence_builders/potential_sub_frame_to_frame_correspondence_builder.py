@@ -9,6 +9,7 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
         self.target_view.frames = StructureCollection.union(
             self.target_view.frames, sub_view.frames
         )
+        self.target_view.matched_sub_frames[self.sub_frame] = sub_view.parent_frame
         for correspondence in sub_view.members:
             correspondence.parent_view = self.target_view
             self.target_view.add(correspondence)

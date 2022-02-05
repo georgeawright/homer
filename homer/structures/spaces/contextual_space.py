@@ -77,7 +77,7 @@ class ContextualSpace(Space):
             name=self.name,
             parent_concept=self.parent_concept,
             contents=bubble_chamber.new_structure_collection(),
-            conceptual_spaces=self.conceptual_spaces,
+            conceptual_spaces=self.conceptual_spaces.copy(),
             links_in=bubble_chamber.new_structure_collection(),
             links_out=bubble_chamber.new_structure_collection(),
             parent_spaces=bubble_chamber.new_structure_collection(),

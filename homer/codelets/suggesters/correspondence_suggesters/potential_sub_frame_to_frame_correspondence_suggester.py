@@ -61,13 +61,14 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             self.target_structure_one = self.target_space_one.contents.where(
                 is_correspondence=False
             ).get(key=corresponding_exigency)
-            frame_two = self.target_view.parent_frame.sub_frames.where(
-                parent_concept=frame_one.parent_concept
+            self.sub_frame = self.target_view.parent_frame.sub_frames.filter(
+                lambda x: x.parent_concept == frame_one.parent_concept
+                and x not in self.target_view.matched_sub_frames
             ).get(key=corresponding_exigency)
             self.target_space_two = (
-                frame_two.input_space
+                self.sub_frame.input_space
                 if self.target_space_one == frame_one.input_space
-                else frame_two.output_space
+                else self.sub_frame.output_space
             )
             self.target_structure_two = self.target_space_two.contents.of_type(
                 type(self.target_structure_one)

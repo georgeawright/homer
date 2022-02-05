@@ -24,6 +24,7 @@ class CorrespondenceBuilder(Builder):
         self.target_structure_two = target_structures.get("target_structure_two")
         self.target_conceptual_space = target_structures.get("target_conceptual_space")
         self.parent_concept = target_structures.get("parent_concept")
+        self.sub_frame = target_structures.get("sub_frame")
         self.correspondence = None
         self.child_structure = None
 
