@@ -98,11 +98,14 @@ class CorrespondenceBuilder(Builder):
                 contextual_space_to_sub_frame_correspondence = (
                     self.target_structure_one.correspondences.filter(
                         lambda x: x.start == self.target_structure_one
-                        and x.end in x.parent_view.output_space.contents
+                        and not x.end.is_slot
                     ).get(exclude=[sub_frame_correspondence])
                 )
                 contextual_space_structure = (
-                    contextual_space_to_sub_frame_correspondence.end
+                    (contextual_space_to_sub_frame_correspondence.end)
+                    if contextual_space_to_sub_frame_correspondence.end
+                    != self.target_structure_two
+                    else None
                 )
             except MissingStructureError:
                 contextual_space_structure = None

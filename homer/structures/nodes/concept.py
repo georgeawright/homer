@@ -174,8 +174,26 @@ class Concept(Node):
         proximity = inverse * self.distance_to_proximity_weight
         return min(proximity, 1.0)
 
+    def copy(self, bubble_chamber: "BubbleChamber", parent_id: str = "") -> Concept:
+        return bubble_chamber.new_concept(
+            parent_id=parent_id,
+            name=self.name,
+            locations=self.locations,
+            classifier=self.classifier,
+            instance_type=self.instance_type,
+            structure_type=self.structure_type,
+            parent_space=self.parent_space,
+            distance_function=self.distance_function,
+            depth=self.depth,
+            distance_to_proximity_weight=self.distance_to_proximity_weight,
+            is_slot=self.is_slot,
+        )
+
     def __repr__(self) -> str:
+        parent_space_structure_id = (
+            self.parent_space.structure_id if self.parent_space is not None else "-"
+        )
         return (
             f"<{self.structure_id} {self.name} in "
-            + f"{self.parent_space.structure_id} {self.locations}>"
+            + f"{parent_space_structure_id} {self.locations}>"
         )

@@ -495,27 +495,58 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function centroid_euclidean_distance))
 
-(define north-word (def-letter-chunk :name "north" :locations (list)))
+(define north-word
+  (def-letter-chunk :name "north"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 0 4)) location-space))))
 (def-relation :start north-concept :end north-word :parent_concept nn-concept)
-(define south-word (def-letter-chunk :name "south" :locations (list)))
+(define south-word
+  (def-letter-chunk :name "south"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 10 4)) location-space))))
 (def-relation :start south-concept :end south-word :parent_concept nn-concept)
-(define west-word (def-letter-chunk :name "west" :locations (list)))
+(define west-word
+  (def-letter-chunk :name "west"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 5 0)) location-space))))
 (def-relation :start west-concept :end west-word :parent_concept nn-concept)
-(define east-word (def-letter-chunk :name "east" :locations (list)))
+(define east-word
+  (def-letter-chunk :name "east"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 5 8)) location-space))))
 (def-relation :start east-concept :end east-word :parent_concept nn-concept)
-(define northwest-word (def-letter-chunk :name "northwest" :locations (list)))
+(define northwest-word
+  (def-letter-chunk :name "northwest"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 0 0)) location-space))))
 (def-relation :start northwest-concept :end northwest-word :parent_concept nn-concept)
-(define northeast-word (def-letter-chunk :name "northeast" :locations (list)))
+(define northeast-word
+  (def-letter-chunk :name "northeast"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 0 8)) location-space))))
 (def-relation :start northeast-concept :end northeast-word :parent_concept nn-concept)
-(define southwest-word (def-letter-chunk :name "southwest" :locations (list)))
+(define southwest-word
+  (def-letter-chunk :name "southwest"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 10 0)) location-space))))
 (def-relation :start southwest-concept :end southwest-word :parent_concept nn-concept)
-(define southeast-word (def-letter-chunk :name "southeast" :locations (list)))
+(define southeast-word
+  (def-letter-chunk :name "southeast"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 10 8)) location-space))))
 (def-relation :start southeast-concept :end southeast-word :parent_concept nn-concept)
-(define centre-word (def-letter-chunk :name "centre" :locations (list)))
+(define centre-word
+  (def-letter-chunk :name "centre"
+    :locations (list (Location (list) grammar-space))))
 (def-relation :start central-concept :end centre-word :parent_concept nn-concept)
-(define midlands-word (def-letter-chunk :name "midlands" :locations (list)))
+(define midlands-word
+  (def-letter-chunk :name "midlands"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list (list 5 4)) location-space)
+		     (Location (list (list 0)) peripheralness-space))))
 (def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
-    
+
+
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
 (define conceptual-space
@@ -563,9 +594,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-conceptual-space :name "" :parent_concept space-parent-concept
     :no_of_dimensions 1))
 (define label-concept
-  (def-concept :name "" :is_slot True :parent_space conceptual-space))
+  (def-concept :name "" :is_slot True :parent_space conceptual-space
+    :locations (list (Location (list) conceptual-space))))
 (define relation-concept
-  (def-concept :name "" :is_slot True :parent_space more-less-space))
+  (def-concept :name "" :is_slot True :parent_space more-less-space
+    :locations (list (Location (list) more-less-space))))
 (def-relation :start label-concept :end relation-concept
   :parent_concept more-concept)
 (define rp-input
@@ -641,13 +674,15 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-conceptual-space :name "" :parent_concept space-parent-concept
     :no_of_dimensions 1))
 (define label-concept
-  (def-concept :name "" :is_slot True :parent_space conceptual-space))
+  (def-concept :name "" :is_slot True :parent_space conceptual-space
+    :locations (list (Location (list) conceptual-space))))
 (define location-concept-1
   (def-concept :name "" :is_slot True :parent_space location-space))
 (define location-concept-2
   (def-concept :name "" :is_slot True :parent_space location-space))
 (define relation-concept
-  (def-concept :name "" :is_slot True :parent_space more-less-space))
+  (def-concept :name "" :is_slot True :parent_space more-less-space
+    :locations (list (Location (list) more-less-space))))
 (def-relation :start label-concept :end relation-concept
   :parent_concept more-concept)
 (define rp-sub-frame-input

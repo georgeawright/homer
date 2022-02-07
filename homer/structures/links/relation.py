@@ -76,13 +76,14 @@ class Relation(Link):
             for location in self.locations
             if location.space.is_conceptual_space
         ]
-        new_locations.append(
-            TwoPointLocation(
-                start.location_in_space(start.parent_space).coordinates,
-                end.location_in_space(end.parent_space).coordinates,
-                parent_space,
+        if parent_space is not None:
+            new_locations.append(
+                TwoPointLocation(
+                    start.location_in_space(start.parent_space).coordinates,
+                    end.location_in_space(end.parent_space).coordinates,
+                    parent_space,
+                )
             )
-        )
         parent_id = kwargs["parent_id"] if "parent_id" in kwargs else ""
         new_relation = Relation(
             structure_id=ID.new(Relation),

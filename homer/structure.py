@@ -259,9 +259,7 @@ class Structure(ABC):
                 if end is not None and location.end_coordinates != end.coordinates:
                     continue
                 return location
-        raise NoLocationError(
-            f"{self.structure_id} has no location in space {space.structure_id}"
-        )
+        raise NoLocationError(f"{self} has no location in space {space}")
 
     def location_in_conceptual_space(self, space: Structure) -> Location:
         locations = self.locations

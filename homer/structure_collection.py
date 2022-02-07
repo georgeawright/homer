@@ -106,6 +106,8 @@ class StructureCollection:
     def near(self, location: Location) -> StructureCollection:
         return self.filter(
             lambda x: x.location_in_space(location.space).is_near(location)
+            if location.space.parent_concept.distance_function is not None
+            else True
         )
 
     def where(self, **kwargs) -> StructureCollection:

@@ -17,17 +17,32 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
 
     def _process_structure(self):
         if not self.target_projectee.is_slot:
+            abstract_chunk = self.target_projectee.abstract_chunk
             output_location = Location(
                 self.target_projectee.location.coordinates,
                 self.target_view.output_space,
             )
-            word = self.target_projectee.abstract_chunk.copy_to_location(
-                output_location,
-                parent_id=self.codelet_id,
-                bubble_chamber=self.bubble_chamber,
-            )
+            if abstract_chunk.members.is_empty():
+                word = self.target_projectee.abstract_chunk.copy_to_location(
+                    output_location,
+                    parent_id=self.codelet_id,
+                    bubble_chamber=self.bubble_chamber,
+                )
+            else:
+                locations = [
+                    location
+                    for location in abstract_chunk.locations
+                    if location.space.is_conceptual_space
+                ] + [output_location]
+                word = self.bubble_chamber.new_letter_chunk(
+                    name=None,
+                    locations=locations,
+                    parent_space=self.target_view.output_space,
+                    abstract_chunk=abstract_chunk,
+                )
         else:
             abstract_chunk = self._get_abstract_chunk()
+            self.target_projectee.abstract_chunk = abstract_chunk
             output_location = Location(
                 self.target_projectee.location.coordinates,
                 self.target_view.output_space,
@@ -43,36 +58,36 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 parent_space=self.target_view.output_space,
                 abstract_chunk=abstract_chunk,
             )
-            for member in abstract_chunk.left_branch:
-                if member.has_correspondence_to_space(self.target_view.output_space):
-                    correspondence = member.correspondences_to_space(
-                        self.target_view.output_space
-                    ).get()
-                    correspondee = correspondence.end
-                    word.left_branch.add(correspondee)
-                    word.members.add(correspondee)
-                    correspondee.super_chunks.add(word)
-            for member in abstract_chunk.right_branch:
-                if member.has_correspondence_to_space(self.target_view.output_space):
-                    correspondence = member.correspondences_to_space(
-                        self.target_view.output_space
-                    ).get()
-                    correspondee = correspondence.end
-                    word.right_branch.add(correspondee)
-                    word.members.add(correspondee)
-                    correspondee.super_chunks.add(word)
-            for super_chunk in abstract_chunk.super_chunks:
-                if super_chunk.has_correspondence_to_space(self.target_view.output):
-                    correspondence = super_chunk.correspondences_to_space(
-                        self.target_view.output_space
-                    ).get()
-                    correspondee = correspondence.end
-                    if abstract_chunk in super_chunk.left_branch:
-                        correspondee.left_branch.add(correspondee)
-                    else:
-                        correspondee.right_branch.add(correspondee)
-                    correspondee.members.add(word)
-                    word.super_chunks.add(correspondee)
+        for member in self.target_projectee.left_branch:
+            if member.has_correspondence_to_space(self.target_view.output_space):
+                correspondence = member.correspondences_to_space(
+                    self.target_view.output_space
+                ).get()
+                correspondee = correspondence.end
+                word.left_branch.add(correspondee)
+                word.members.add(correspondee)
+                correspondee.super_chunks.add(word)
+        for member in self.target_projectee.right_branch:
+            if member.has_correspondence_to_space(self.target_view.output_space):
+                correspondence = member.correspondences_to_space(
+                    self.target_view.output_space
+                ).get()
+                correspondee = correspondence.end
+                word.right_branch.add(correspondee)
+                word.members.add(correspondee)
+                correspondee.super_chunks.add(word)
+        for super_chunk in self.target_projectee.super_chunks:
+            if super_chunk.has_correspondence_to_space(self.target_view.output_space):
+                correspondence = super_chunk.correspondences_to_space(
+                    self.target_view.output_space
+                ).get()
+                correspondee = correspondence.end
+                if abstract_chunk in super_chunk.left_branch:
+                    correspondee.left_branch.add(correspondee)
+                else:
+                    correspondee.right_branch.add(correspondee)
+                correspondee.members.add(word)
+                word.super_chunks.add(correspondee)
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
             start=self.target_projectee,
@@ -91,7 +106,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         if not self.target_projectee.members.is_empty():
             return self.target_projectee
         if not self.target_projectee.correspondences.is_empty():
-            return self.target_projectee.correspondees.get().abstract_chunk
+            return self.target_projectee.correspondees.where_not(name=None).get()
         if not self.target_projectee.links_in.where(is_relation=True).is_empty():
             relation = self.target_projectee.relations.get()
             relative = self.target_projectee.relatives.get()

@@ -98,22 +98,52 @@ class Frame(Structure):
                     item.parent_spaces.add(specified_space)
                 except NoLocationError:
                     pass
+            for concept in concepts:
+                if concept.parent_space == abstract_space:
+                    concept.parent_space = specified_space
+                if concept.has_location_in_space(abstract_space):
+                    concept.location_in_space(abstract_space).space = specified_space
 
         input_copies = {} if input_copies is None else input_copies
         output_copies = {} if output_copies is None else output_copies
-        concepts = self.concepts.copy()
+        # need to copy the concepts to prevent interference between frame instances
+        # concepts may need spaces to be changed due to space specification
+        concept_copies = {}
+        for concept in self.concepts:
+            concept_copies[concept] = concept.copy(
+                bubble_chamber=bubble_chamber, parent_id=parent_id
+            )
+            for relation in concept.relations:
+                if relation.start in concept_copies and relation.end in concept_copies:
+                    new_relation = relation.copy(
+                        bubble_chamber=bubble_chamber,
+                        parent_id=parent_id,
+                        start=concept_copies[relation.start],
+                        end=concept_copies[relation.end],
+                    )
+                    concept_copies[relation.start].links_out.add(new_relation)
+                    concept_copies[relation.end].links_in.add(new_relation)
+        concepts = bubble_chamber.new_structure_collection(
+            *[new for old, new in concept_copies.items()]
+        )
         output_space = (
             self.output_space if input_space == self.input_space else self.input_space
         )
         input_space_copy, input_copies = input_space.copy(
             bubble_chamber=bubble_chamber, parent_id=parent_id, copies=input_copies
         )
+        for structure in input_space_copy.contents.where(is_link=True):
+            if structure.parent_concept in concept_copies:
+                structure._parent_concept = concept_copies[structure.parent_concept]
         for conceptual_space in input_space_copy.conceptual_spaces.where(is_slot=True):
             specified_space = conceptual_spaces_map[conceptual_space]
             specify_space(input_space_copy, conceptual_space, specified_space, concepts)
         output_space_copy, output_copies = output_space.copy(
             bubble_chamber=bubble_chamber, parent_id=parent_id, copies=output_copies
         )
+        for structure in output_space_copy.contents.where(is_link=True):
+            if structure.parent_concept in concept_copies:
+                structure._parent_concept = concept_copies[structure.parent_concept]
         for conceptual_space in output_space_copy.conceptual_spaces.where(is_slot=True):
             specified_space = conceptual_spaces_map[conceptual_space]
             specify_space(

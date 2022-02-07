@@ -59,7 +59,7 @@ class LetterChunk(Chunk):
             right_name = self.right_branch.get().name
             if left_name is None or right_name is None:
                 return None
-            return left_name + right_name
+            return f"{left_name} {right_name}"
         return None
 
     @property
@@ -235,4 +235,4 @@ class LetterChunk(Chunk):
         return (chunk_copy, copies)
 
     def __repr__(self) -> str:
-        return f"<{self.structure_id} {self.name} in {self.locations}>"
+        return f'<{self.structure_id} "{self.name}" in {self.locations}>'
