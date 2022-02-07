@@ -218,7 +218,7 @@
 (define but (def-letter-chunk :name "but" :locations (list (Location (list) grammar-space))))
 (define comma (def-letter-chunk :name "comma" :locations (list (Location (list) grammar-space))))
 (define fstop (def-letter-chunk :name "fstop" :locations (list (Location (list) grammar-space))))
-(define -er (def-letter-chunk :name "er" :locations (list (Location (list) grammar-space))))
+(define -er (def-letter-chunk :name "\ber" :locations (list (Location (list) grammar-space))))
 (define null (def-letter-chunk :name "" :locations (list (Location (list) grammar-space))))
 
 (define same-different-concept

@@ -802,7 +802,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
-    assert letter_chunk.name == "er"
+    assert letter_chunk.name == "\ber"
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LetterChunkProjectionEvaluator)
@@ -837,7 +837,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
-    assert letter_chunk.name == "cold er"
+    assert letter_chunk.name == "colder"
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LetterChunkProjectionEvaluator)
@@ -1536,7 +1536,7 @@ def test_pipeline_of_codelets(homer):
         )
         .get()
         .name
-        == "it will be cold er in the northwest than in the northeast"
+        == "it will be colder in the northwest than in the northeast"
     )
 
     # END: build comparative phrase

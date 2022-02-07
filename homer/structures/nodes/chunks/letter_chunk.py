@@ -1,5 +1,6 @@
 from __future__ import annotations
 from math import prod
+import re
 from typing import List, Union
 
 from homer.errors import MissingStructureError
@@ -59,7 +60,10 @@ class LetterChunk(Chunk):
             right_name = self.right_branch.get().name
             if left_name is None or right_name is None:
                 return None
-            return f"{left_name} {right_name}"
+            name = f"{left_name} {right_name}"
+            while "\b" in name:
+                name = re.sub("[^\b]\b", "", name)
+            return name
         return None
 
     @property
