@@ -20,6 +20,9 @@ def test_projects_non_slot_into_output(bubble_chamber):
     target_projectee = Mock()
     target_projectee.is_slot = False
     target_projectee.abstract_chunk = abstract_chunk
+    target_projectee.left_branch = bubble_chamber.new_structure_collection()
+    target_projectee.right_branch = bubble_chamber.new_structure_collection()
+    target_projectee.super_chunks = bubble_chamber.new_structure_collection()
     target_projectee.has_correspondence_to_space.return_value = False
 
     target_view = Mock()
@@ -44,20 +47,23 @@ def test_projects_correspondee_of_slot_into_output(bubble_chamber):
         grammar_space
     )
 
-    abstract_chunk = Mock()
-    abstract_chunk.locations = []
-    abstract_chunk.left_branch = []
-    abstract_chunk.right_branch = []
-    abstract_chunk.super_chunks = []
-
     corresponding_word = Mock()
-    corresponding_word.abstract_chunk = abstract_chunk
+    corresponding_word.name = "word"
+    corresponding_word.locations = []
+    corresponding_word.left_branch = []
+    corresponding_word.right_branch = []
+    corresponding_word.super_chunks = []
 
     target_projectee = Mock()
     target_projectee.is_slot = True
+    target_projectee.left_branch = bubble_chamber.new_structure_collection()
+    target_projectee.right_branch = bubble_chamber.new_structure_collection()
+    target_projectee.super_chunks = bubble_chamber.new_structure_collection()
     target_projectee.has_correspondence_to_space.return_value = False
     target_projectee.correspondences.is_empty.return_value = False
-    target_projectee.correspondees.get.return_value = corresponding_word
+    target_projectee.correspondees = bubble_chamber.new_structure_collection(
+        corresponding_word
+    )
 
     target_view = Mock()
 
@@ -85,7 +91,6 @@ def test_projects_slot_into_output_according_to_relation(bubble_chamber):
     abstract_chunk.left_branch = []
     abstract_chunk.right_branch = []
     abstract_chunk.super_chunks = []
-
     parent_concept = Mock()
     abstract_relation = Mock()
     abstract_relation.parent_concept = parent_concept
@@ -106,6 +111,10 @@ def test_projects_slot_into_output_according_to_relation(bubble_chamber):
 
     target_projectee = Mock()
     target_projectee.is_slot = True
+    target_projectee.left_branch = bubble_chamber.new_structure_collection()
+    target_projectee.right_branch = bubble_chamber.new_structure_collection()
+    target_projectee.super_chunks = bubble_chamber.new_structure_collection()
+
     target_projectee.has_correspondence_to_space.return_value = False
     target_projectee.correspondences.is_empty.return_value = True
     target_projectee.links_in = bubble_chamber.new_structure_collection(relation)
@@ -162,6 +171,9 @@ def test_projects_slot_into_output_according_to_label(bubble_chamber):
 
     target_projectee = Mock()
     target_projectee.is_slot = True
+    target_projectee.left_branch = bubble_chamber.new_structure_collection()
+    target_projectee.right_branch = bubble_chamber.new_structure_collection()
+    target_projectee.super_chunks = bubble_chamber.new_structure_collection()
     target_projectee.has_correspondence_to_space.return_value = False
     target_projectee.correspondences.is_empty.return_value = True
     target_projectee.relations.is_empty.return_value = True

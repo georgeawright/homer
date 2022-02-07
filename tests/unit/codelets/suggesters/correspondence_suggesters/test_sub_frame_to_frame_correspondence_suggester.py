@@ -8,18 +8,28 @@ from homer.codelets.suggesters.correspondence_suggesters import (
 
 
 def test_fizzles_if_view_cannot_accept_correspondence(bubble_chamber):
+    target_structure_one = Mock()
+    target_structure_one.is_correspondence = False
+    target_structure_one.corresponding_exigency = 1.0
+
     sub_frame = Mock()
+    sub_frame.corresponding_exigency = 1.0
     sub_frame.input_space.corresponding_exigency = 1.0
+    sub_frame.input_space.contents = bubble_chamber.new_structure_collection(
+        target_structure_one
+    )
     sub_frame.output_space.corresponding_exigency = 0.0
+
+    matched_sub_frame = Mock()
+    matched_sub_frame.input_space = Mock()
+
     target_view = Mock()
     target_view.frames.get.return_value = sub_frame
+    target_view.matched_sub_frames = {matched_sub_frame: sub_frame}
     target_view.can_accept_member.return_value = False
-
-    target_structure_one = Mock()
 
     target_structures = {
         "target_view": target_view,
-        "target_structure_one": target_structure_one,
     }
 
     correspondence_suggester = SubFrameToFrameCorrespondenceSuggester(
@@ -30,18 +40,28 @@ def test_fizzles_if_view_cannot_accept_correspondence(bubble_chamber):
 
 
 def test_gets_second_target_structure_if_needed(bubble_chamber):
+    target_structure_one = Mock()
+    target_structure_one.is_correspondence = False
+    target_structure_one.corresponding_exigency = 1.0
+
     sub_frame = Mock()
+    sub_frame.corresponding_exigency = 1.0
     sub_frame.input_space.corresponding_exigency = 1.0
+    sub_frame.input_space.contents = bubble_chamber.new_structure_collection(
+        target_structure_one
+    )
     sub_frame.output_space.corresponding_exigency = 0.0
+
+    matched_sub_frame = Mock()
+    matched_sub_frame.input_space = Mock()
+
     target_view = Mock()
     target_view.frames.get.return_value = sub_frame
+    target_view.matched_sub_frames = {matched_sub_frame: sub_frame}
     target_view.can_accept_member.return_value = True
-
-    target_structure_one = Mock()
 
     target_structures = {
         "target_view": target_view,
-        "target_structure_one": target_structure_one,
     }
 
     correspondence_suggester = SubFrameToFrameCorrespondenceSuggester(
@@ -56,18 +76,28 @@ def test_gets_second_target_structure_if_needed(bubble_chamber):
 
 
 def test_gets_parent_concept_if_needed(bubble_chamber):
+    target_structure_one = Mock()
+    target_structure_one.is_correspondence = False
+    target_structure_one.corresponding_exigency = 1.0
+
     sub_frame = Mock()
+    sub_frame.corresponding_exigency = 1.0
     sub_frame.input_space.corresponding_exigency = 1.0
+    sub_frame.input_space.contents = bubble_chamber.new_structure_collection(
+        target_structure_one
+    )
     sub_frame.output_space.corresponding_exigency = 0.0
+
+    matched_sub_frame = Mock()
+    matched_sub_frame.input_space = Mock()
+
     target_view = Mock()
     target_view.frames.get.return_value = sub_frame
+    target_view.matched_sub_frames = {matched_sub_frame: sub_frame}
     target_view.can_accept_member.return_value = True
-
-    target_structure_one = Mock()
 
     target_structures = {
         "target_view": target_view,
-        "target_structure_one": target_structure_one,
     }
 
     correspondence_suggester = SubFrameToFrameCorrespondenceSuggester(

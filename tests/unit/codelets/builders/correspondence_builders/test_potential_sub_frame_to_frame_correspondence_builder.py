@@ -33,6 +33,7 @@ def test_builds_correspondence_when_view_can_accept_it(bubble_chamber):
     input_space = Mock()
 
     target_view = Mock()
+    target_view.matched_sub_frames = {}
     target_view.input_spaces = bubble_chamber.new_structure_collection(input_space)
     target_view.frames = bubble_chamber.new_structure_collection(Mock())
     target_view.can_accept_member.return_value = True
@@ -77,6 +78,7 @@ def test_fills_in_target_structure_two_parent_concept(bubble_chamber):
     input_space = Mock()
 
     target_view = Mock()
+    target_view.matched_sub_frames = {}
     target_view.input_spaces = bubble_chamber.new_structure_collection(input_space)
     target_view.frames = bubble_chamber.new_structure_collection(Mock())
     target_view.can_accept_member.return_value = True
