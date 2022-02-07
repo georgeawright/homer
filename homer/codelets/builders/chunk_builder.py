@@ -95,7 +95,9 @@ class ChunkBuilder(Builder):
                     Location([[math.nan for _ in range(space.no_of_dimensions)]], space)
                     for space in self.target_space.conceptual_spaces
                 ]
-                chunk_locations = self.target_node.locations
+                chunk_locations = [
+                    location.copy() for location in self.target_node.locations
+                ]
             elif self.target_rule.right_concept is None:
                 root_location = self.target_node.location_in_space(self.target_space)
                 root_conceptual_location = (

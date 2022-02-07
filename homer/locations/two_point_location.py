@@ -57,3 +57,16 @@ class TwoPointLocation(Location):
             self.end_coordinates, other.end_coordinates
         )
         return distance <= self.space.parent_concept.distance_to_proximity_weight
+
+    def copy(self) -> TwoPointLocation:
+        return TwoPointLocation(
+            [
+                [c for c in coordinates_list]
+                for coordinates_list in self.start_coordinates
+            ],
+            [
+                [c for c in coordinates_list]
+                for coordinates_list in self.end_coordinates
+            ],
+            self.space,
+        )

@@ -55,3 +55,9 @@ class Location:
 
     def get_adjacent_location_left(self) -> Location:
         return Location([[self.coordinates[0][0] - 1]], self.space)
+
+    def copy(self) -> Location:
+        return Location(
+            [[c for c in coordinates_list] for coordinates_list in self.coordinates],
+            self.space,
+        )
