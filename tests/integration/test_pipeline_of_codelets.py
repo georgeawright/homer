@@ -632,8 +632,8 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     assert 0 == view.quality  # empty view has quality of 0
 
-    # build a correspondence between the relations' end labels
-    target_label = chunk_two.labels_in_space(
+    # build a correspondence between the relations' temperature labels
+    target_label = chunk_one.labels_in_space(
         bubble_chamber.conceptual_spaces["temperature"]
     ).get()
     codelet = SpaceToFrameCorrespondenceSuggester.spawn(
@@ -743,7 +743,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FIZZLE == codelet.result
 
-    # project jjr-root slot into output ("cool")
+    # project jjr-root slot into output ("cold")
     letter_chunk_slot = view.parent_frame.output_space.contents.filter(
         lambda x: x.is_letter_chunk == True
         and x.is_slot == True
@@ -764,7 +764,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
-    assert letter_chunk.name == "cool"
+    assert letter_chunk.name == "cold"
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LetterChunkProjectionEvaluator)
@@ -819,7 +819,7 @@ def test_pipeline_of_codelets(homer):
     letter_chunk.update_activation()
     assert original_letter_chunk_activation < letter_chunk.activation
 
-    # project the jjr container chunk into output ("cooler")
+    # project the jjr container chunk into output ("colder")
     letter_chunk_slot = view.parent_frame.output_space.contents.filter(
         lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
     ).get()
@@ -837,7 +837,7 @@ def test_pipeline_of_codelets(homer):
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
     letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
-    assert letter_chunk.name == "cool er"
+    assert letter_chunk.name == "cold er"
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LetterChunkProjectionEvaluator)
@@ -920,7 +920,7 @@ def test_pipeline_of_codelets(homer):
     correspondence.update_activation()
     assert original_correspondence_activation < correspondence.activation
 
-    # construct correspondence from rp-frame to sentence frame (relation end label)
+    # construct correspondence from rp-frame to sentence frame (relation start label)
     # codelet = SubFrameToFrameCorrespondenceSuggester.spawn(
     #    "", bubble_chamber, {"target_view": view}, 1.0
     # )
@@ -932,11 +932,11 @@ def test_pipeline_of_codelets(homer):
         "", bubble_chamber, {"target_view": view}, 1.0
     )
     codelet.parent_concept = bubble_chamber.concepts["same"]
-    codelet.target_structure_one = relation_correspondence.start.end.labels.filter(
+    codelet.target_structure_one = relation_correspondence.start.start.labels.filter(
         lambda x: bubble_chamber.conceptual_spaces["temperature"] in x.parent_spaces
     ).get()
     codelet.target_space_one = rp_view.parent_frame.input_space
-    codelet.target_structure_two = relation_correspondence.end.end.labels.filter(
+    codelet.target_structure_two = relation_correspondence.end.start.labels.filter(
         lambda x: bubble_chamber.conceptual_spaces["temperature"] in x.parent_spaces
     ).get()
     codelet.target_space_two = view.parent_frame.input_space
@@ -1536,7 +1536,7 @@ def test_pipeline_of_codelets(homer):
         )
         .get()
         .name
-        == "it will be cool er in the northwest than in the northeast"
+        == "it will be cold er in the northwest than in the northeast"
     )
 
     # END: build comparative phrase

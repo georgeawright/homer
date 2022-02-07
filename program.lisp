@@ -780,6 +780,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 			      (Location (list) rp-sub-frame-input)
 			      (Location (list) comparative-sentence-input))
     :parent_space nn-sub-frame-2-input))
+(define chunk-start-conceptual-label
+  (def-label :start chunk-start :parent_concept label-concept
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) rp-sub-frame-input)
+		     (Location (list) comparative-sentence-input))))
 (define chunk-start-location-label
   (def-label :start chunk-start :parent_concept label-concept
     :locations (list (Location (list (list Nan Nan)) location-space)
@@ -789,11 +794,6 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-label :start chunk-end :parent_concept label-concept
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list) nn-sub-frame-2-input)
-		     (Location (list) comparative-sentence-input))))
-(define chunk-end-conceptual-label
-  (def-label :start chunk-end :parent_concept label-concept
-    :locations (list (Location (list) conceptual-space)
-		     (Location (list) rp-sub-frame-input)
 		     (Location (list) comparative-sentence-input))))
 (define relation
   (def-relation :start chunk-start :end chunk-end :parent_concept relation-concept
