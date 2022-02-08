@@ -1809,6 +1809,49 @@ def test_pipeline_of_codelets(homer):
     assert CodeletResult.FINISH == codelet.result
     label.update_activation()
     assert original_label_activation < label.activation
+
+    # relate the third and fourth chunks in height space
+    target_space = bubble_chamber.conceptual_spaces["height"]
+    parent_concept = bubble_chamber.concepts["more"]
+    codelet = RelationSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_space": target_space,
+            "target_structure_one": chunk_four,
+            "target_structure_two": chunk_three,
+            "parent_concept": parent_concept,
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationBuilder)
+    assert not chunk_three.has_relation_with_name("more")
+    assert not chunk_four.has_relation_with_name("more")
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert chunk_three.has_relation_with_name("more")
+    assert chunk_four.has_relation_with_name("more")
+
+    relation = codelet.child_structures.get()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationEvaluator)
+    assert 0 == relation.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < relation.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationSelector)
+    original_relation_activation = relation.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    relation.update_activation()
+    assert original_relation_activation < relation.activation
+
     # END: chunk and describe more data
 
     # START: compile longer piece of text
