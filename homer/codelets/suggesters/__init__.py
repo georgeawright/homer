@@ -3,4 +3,5 @@ from .correspondence_suggester import CorrespondenceSuggester
 from .label_suggester import LabelSuggester
 from .projection_suggester import ProjectionSuggester
 from .relation_suggester import RelationSuggester
+from .space_suggester import SpaceSuggester
 from .view_suggester import ViewSuggester

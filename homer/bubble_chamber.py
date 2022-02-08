@@ -178,6 +178,8 @@ class BubbleChamber:
         self,
         name: str,
         parent_concept: Concept,
+        source_space: ConceptualSpace = None,
+        target_space: ConceptualSpace = None,
         no_of_dimensions: int = 0,
         parent_id: str = "",
         dimensions: List[ConceptualSpace] = None,
@@ -193,6 +195,8 @@ class BubbleChamber:
             parent_id=parent_id,
             name=name,
             parent_concept=parent_concept,
+            source_space=source_space,
+            target_space=target_space,
             contents=self.new_structure_collection(),
             no_of_dimensions=no_of_dimensions,
             dimensions=dimensions,
@@ -448,14 +452,22 @@ class BubbleChamber:
         self,
         start: Structure,
         end: Structure,
-        locations: List[Location],
         parent_concept: Concept,
-        conceptual_space: ConceptualSpace,
-        parent_view: View,
+        locations: List[Location] = None,
+        conceptual_space: ConceptualSpace = None,
+        parent_view: View = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         is_privileged: bool = False,
     ) -> Correspondence:
+        if locations is None:
+            if start.parent_space is not None and end.parent_space is not None:
+                locations = [
+                    start.location_in_space(start.parent_space),
+                    end.location_in_space(end.parent_space),
+                ]
+            else:
+                locations = []
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )

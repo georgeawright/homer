@@ -3,6 +3,7 @@ from homer.codelets.builders import (
     ChunkBuilder,
     LabelBuilder,
     RelationBuilder,
+    SpaceBuilder,
 )
 from homer.codelets.builders.correspondence_builders import (
     PotentialSubFrameToFrameCorrespondenceBuilder,
@@ -21,6 +22,7 @@ from homer.codelets.evaluators import (
     ChunkEvaluator,
     LabelEvaluator,
     RelationEvaluator,
+    SpaceEvaluator,
 )
 from homer.codelets.evaluators.projection_evaluators import (
     ChunkProjectionEvaluator,
@@ -34,6 +36,7 @@ from homer.codelets.selectors import (
     ChunkSelector,
     LabelSelector,
     RelationSelector,
+    SpaceSelector,
 )
 from homer.codelets.selectors.projection_selectors import (
     ChunkProjectionSelector,
@@ -46,6 +49,7 @@ from homer.codelets.suggesters import (
     ChunkSuggester,
     LabelSuggester,
     RelationSuggester,
+    SpaceSuggester,
 )
 from homer.codelets.suggesters.correspondence_suggesters import (
     PotentialSubFrameToFrameCorrespondenceSuggester,
@@ -1542,135 +1546,122 @@ def test_pipeline_of_codelets(homer):
     # END: build comparative phrase
 
     # START: chunk and describe more data
-    # target_node = input_space.contents.filter(
-    #    lambda x: x.has_location_in_space(location_space)
-    #    and x.location_in_space(location_space).coordinates == [[0, 4]]
-    # ).get()
-    # codelet = ChunkSuggester.spawn(
-    #    "",
-    #    bubble_chamber,
-    #    {"target_space": input_space, "target_node": target_node, "target_rule": None},
-    #    1.0,
-    # )
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
+    # build a third sameness chunk
+    target_node = input_space.contents.filter(
+        lambda x: x.has_location_in_space(location_space)
+        and x.location_in_space(location_space).coordinates == [[5, 0]]
+    ).get()
+    codelet = ChunkSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_space": input_space, "target_node": target_node, "target_rule": None},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
 
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, ChunkBuilder)
-    # assert target_node.super_chunks.is_empty()
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # assert not target_node.super_chunks.is_empty()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkBuilder)
+    assert target_node.super_chunks.is_empty()
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert not target_node.super_chunks.is_empty()
 
-    # chunk = codelet.child_structures.where(is_slot=False).get()
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, ChunkEvaluator)
-    # assert 0 == chunk.quality
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # assert 0 < chunk.quality
+    chunk = codelet.child_structures.where(is_slot=False).get()
+    chunk_three = chunk
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkEvaluator)
+    assert 0 == chunk.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < chunk.quality
 
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, ChunkSelector)
-    # original_chunk_activation = chunk.activation
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # chunk.update_activation()
-    # assert original_chunk_activation < chunk.activation
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkSelector)
+    original_chunk_activation = chunk.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    chunk.update_activation()
+    assert original_chunk_activation < chunk.activation
 
-    # codelet = [c for c in codelet.child_codelets if isinstance(c, ChunkSuggester)][0]
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
+    codelet = [c for c in codelet.child_codelets if isinstance(c, ChunkSuggester)][0]
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
 
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, ChunkBuilder)
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # chunk = codelet.child_structures.where(is_slot=False).get()
-    # assert 3 == chunk.size
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    chunk = codelet.child_structures.where(is_slot=False).get()
+    assert 3 == chunk.size
 
-    # chunk_quality = chunk.quality
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, ChunkEvaluator)
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # assert chunk_quality <= chunk.quality
+    chunk_quality = chunk.quality
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkEvaluator)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert chunk_quality <= chunk.quality
 
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, ChunkSelector)
-    # original_chunk_activation = chunk.activation
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # chunk.update_activation()
-    # assert original_chunk_activation <= chunk.activation
-    # parent_concept = bubble_chamber.concepts["cool"]
-    # codelet = LabelSuggester.spawn(
-    #    "",
-    #    bubble_chamber,
-    #    {"target_node": chunk, "parent_concept": parent_concept},
-    #    1.0,
-    # )
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, ChunkSelector)
+    original_chunk_activation = chunk.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    chunk.update_activation()
+    assert original_chunk_activation <= chunk.activation
 
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, LabelBuilder)
-    # assert not chunk.has_label_with_name("cool")
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # assert chunk.has_label_with_name("cool")
+    # label the third chunk "southwest"
+    parent_concept = bubble_chamber.concepts["southwest"]
+    codelet = LabelSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_node": chunk, "parent_concept": parent_concept},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
 
-    # label = codelet.child_structures.get()
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, LabelEvaluator)
-    # assert 0 == label.quality
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # assert 0 < label.quality
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelBuilder)
+    assert not chunk.has_label_with_name("southwest")
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert chunk.has_label_with_name("southwest")
 
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, LabelSelector)
-    # original_label_activation = label.activation
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # label.update_activation()
-    # assert original_label_activation < label.activation
+    label = codelet.child_structures.get()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelEvaluator)
+    assert 0 == label.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < label.quality
 
-    # parent_concept = bubble_chamber.concepts["northeast"]
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelSelector)
+    original_label_activation = label.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    label.update_activation()
+    assert original_label_activation < label.activation
 
-    # codelet = LabelSuggester.spawn(
-    #    "",
-    #    bubble_chamber,
-    #    {"target_node": chunk, "parent_concept": parent_concept},
-    #    1.0,
-    # )
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
+    # build a new conceptual space for a temperature is height metaphor
+    codelet = SpaceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "projectable_space": bubble_chamber.conceptual_spaces["temperature"],
+            "metaphor_space": bubble_chamber.conceptual_spaces["height"],
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
 
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, LabelBuilder)
-    # assert not chunk.has_label_with_name("northeast")
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # assert chunk.has_label_with_name("northeast")
-
-    # label = codelet.child_structures.get()
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, LabelEvaluator)
-    # assert 0 == label.quality
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # assert 0 < label.quality
-
-    # codelet = codelet.child_codelets[0]
-    # assert isinstance(codelet, LabelSelector)
-    # original_label_activation = label.activation
-    # codelet.run()
-    # assert CodeletResult.FINISH == codelet.result
-    # label.update_activation()
-    # assert original_label_activation < label.activation
-    # chunk_two = chunk
-
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, SpaceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    space = codelet.child_structures.get()
     # END: chunk and describe more data
 
     # START: compile longer piece of text

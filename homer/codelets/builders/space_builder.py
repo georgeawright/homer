@@ -42,7 +42,7 @@ class SpaceBuilder(Builder):
 
     @property
     def _structure_concept(self):
-        return self.bubble_chamber.concepts["conceptual-space"]
+        return self.bubble_chamber.concepts["space-conceptual"]
 
     @property
     def targets_dict(self):
@@ -57,9 +57,16 @@ class SpaceBuilder(Builder):
         ).is_empty()
 
     def _process_structure(self):
-        space = self.bubble_chamber.new_conceptual_space()
-        correspondence = self.bubble_chamber.new_correspondence()
-        # give metaphor space concepts locations in new space
+        space = self.metaphor_space.make_projection(
+            parent_id=self.codelet_id,
+            bubble_chamber=self.bubble_chamber,
+            target_space=self.projectable_space,
+        )
+        correspondence = self.bubble_chamber.new_correspondence(
+            start=self.projectable_space,
+            end=space,
+            parent_concept=self.bubble_chamber.concepts["same"],
+        )
         self.child_structures = self.bubble_chamber.new_structure_collection(
             space, correspondence
         )

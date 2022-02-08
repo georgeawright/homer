@@ -62,6 +62,9 @@
 (define letter-chunk-concept
   (def-concept :name "letter-chunk" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
+(define space-conceptual-concept
+  (def-concept :name "space-conceptual" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
 (define view-monitoring-concept
   (def-concept :name "view-monitoring" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
@@ -402,6 +405,11 @@
   (def-concept :name "cold" :locations (list (Location (list (list 4)) temperature-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space temperature-space :distance_function centroid_euclidean_distance))
+
+(def-correspondence :start hot-concept :end high-concept :parent_concept same-concept)
+(def-correspondence :start hot-concept :end good-concept :parent_concept same-concept)
+(def-correspondence :start cold-concept :end low-concept :parent_concept same-concept)
+(def-correspondence :start cold-concept :end bad-concept :parent_concept same-concept)
 
 (define hot-word (def-letter-chunk :name "hot" :locations (list)))
 (def-relation :start hot-concept :end hot-word :parent_concept jj-concept)

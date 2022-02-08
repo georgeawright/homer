@@ -18,8 +18,8 @@ class SpaceSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.projectable_space = self.target_structures.get("projectable_space")
-        self.metaphor_space = self.target_structures.get("metaphor_space")
+        self.projectable_space = target_structures.get("projectable_space")
+        self.metaphor_space = target_structures.get("metaphor_space")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -36,7 +36,7 @@ class SpaceSuggester(Suggester):
         urgency: FloatBetweenOneAndZero,
     ):
         qualifier = (
-            "TopDown" if target_structures["parent_concept"] is not None else "BottomUp"
+            "TopDown" if target_structures["metaphor_space"] is not None else "BottomUp"
         )
         codelet_id = ID.new(cls, qualifier)
         return cls(
@@ -86,7 +86,7 @@ class SpaceSuggester(Suggester):
 
     @property
     def _structure_concept(self):
-        return self.bubble_chamber.concepts["conceptual-space"]
+        return self.bubble_chamber.concepts["space-conceptual"]
 
     @property
     def targets_dict(self):
@@ -96,12 +96,24 @@ class SpaceSuggester(Suggester):
         }
 
     def _passes_preliminary_checks(self):
+        if self.metaphor_space is None:
+            self.metaphor_space = self.bubble_chamber.conceptual_spaces.filter(
+                lambda x: not x.contents.where(is_concept=True)
+                .filter(lambda y: y.has_correspondence_to_space(self.projectable_space))
+                .is_empty()
+            ).get()
+        elif (
+            self.metaphor_space.contents.where(is_concept=True)
+            .filter(lambda x: x.has_correspondence_to_space(self.projectable_space))
+            .is_empty()
+        ):
+            return False
         return self.projectable_space.correspondees.where(
             parent_concept=self.metaphor_space.parent_concept
         ).is_empty()
 
     def _calculate_confidence(self):
-        self.confidence = self.metaphor_space.parent_concept.conceptual_depth
+        self.confidence = self.metaphor_space.parent_concept.depth
 
     def _fizzle(self):
         pass
