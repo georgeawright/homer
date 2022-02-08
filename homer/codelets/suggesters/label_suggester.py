@@ -1,8 +1,9 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
-from homer.errors import MissingStructureError
+from homer.errors import MissingStructureError, NoLocationError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
+from homer.location import Location
 from homer.structure_collection_keys import activation, labeling_exigency
 from homer.structures.links import Label
 from homer.structures.nodes import Concept
@@ -132,9 +133,63 @@ class LabelSuggester(Suggester):
         return not self.target_node.has_label(self.parent_concept)
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classifier.classify(
-            concept=self.parent_concept, start=self.target_node
-        )
+        try:
+            self.confidence = self.parent_concept.classifier.classify(
+                concept=self.parent_concept, start=self.target_node
+            )
+        except NoLocationError:
+            for space in self.target_node.parent_spaces:
+                if (
+                    not space.contents.where(is_concept=True)
+                    .filter(
+                        lambda x: x.has_correspondence_to_space(
+                            self.parent_concept.parent_space
+                        )
+                    )
+                    .is_empty()
+                ):
+                    source_space = self.parent_concept.parent_space
+                    target_space = space
+                    break
+            source_concepts = [
+                concept for concept in source_space.contents.where(is_concept=True)
+            ]
+            source_concepts.sort(
+                key=lambda x: x.location_in_space(source_space).coordinates[0][0]
+            )
+            source_min_concept = source_concepts[0]
+            source_max_concept = source_concepts[-1]
+            target_min_concept = source_min_concept.correspondees.filter(
+                lambda x: x.has_correspondence_to_space(source_space)
+            ).get()
+            target_max_concept = source_max_concept.correspondees.filter(
+                lambda x: x.has_correspondence_to_space(source_space)
+            ).get()
+            source_min = source_min_concept.location_in_space(source_space).coordinates[
+                0
+            ][0]
+            source_max = source_max_concept.location_in_space(source_space).coordinates[
+                0
+            ][0]
+            target_min = target_min_concept.location_in_space(target_space).coordinates[
+                0
+            ][0]
+            target_max = target_max_concept.location_in_space(target_space).coordinates[
+                0
+            ][0]
+            conversion_ratio = (source_max - source_min) / (target_max - target_min)
+            new_location_coordinates = [
+                [(coordinates[0] - target_min) * conversion_ratio]
+                for coordinates in self.target_node.location_in_space(
+                    target_space
+                ).coordinates
+            ]
+            projected_location = Location(new_location_coordinates, source_space)
+            self.target_node.locations.append(projected_location)
+            self.confidence = self.parent_concept.classifier.classify(
+                concept=self.parent_concept, start=self.target_node
+            )
+            self.target_node.locations.remove(projected_location)
 
     def _fizzle(self):
         pass

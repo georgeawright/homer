@@ -1644,24 +1644,39 @@ def test_pipeline_of_codelets(homer):
     label.update_activation()
     assert original_label_activation < label.activation
 
-    # build a new conceptual space for a temperature is height metaphor
-    codelet = SpaceSuggester.spawn(
+    # label the third chunk "high"
+    parent_concept = bubble_chamber.concepts["high"]
+    codelet = LabelSuggester.spawn(
         "",
         bubble_chamber,
-        {
-            "projectable_space": bubble_chamber.conceptual_spaces["temperature"],
-            "metaphor_space": bubble_chamber.conceptual_spaces["height"],
-        },
+        {"target_node": chunk, "parent_concept": parent_concept},
         1.0,
     )
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
 
     codelet = codelet.child_codelets[0]
-    assert isinstance(codelet, SpaceBuilder)
+    assert isinstance(codelet, LabelBuilder)
+    assert not chunk.has_label_with_name("high")
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    space = codelet.child_structures.get()
+    assert chunk.has_label_with_name("high")
+
+    label = codelet.child_structures.get()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelEvaluator)
+    assert 0 == label.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < label.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelSelector)
+    original_label_activation = label.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    label.update_activation()
+    assert original_label_activation < label.activation
     # END: chunk and describe more data
 
     # START: compile longer piece of text
