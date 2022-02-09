@@ -937,6 +937,80 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :left_branch (StructureCollection sentence-word-1)
     :right_branch (StructureCollection vp-super-super-super-chunk)))
 
+(define and-sub-frame-1-input
+  (def-contextual-space :name "and-sub-frame-1.meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection)))
+(define and-sub-frame-1-output
+  (def-contextual-space :name "and-sub-frame-1.text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection grammar-space)))
+(define and-sub-frame-1
+  (def-frame :name "s-and-and-sub-1" :parent_concept sentence-concept :parent_frame None
+    :sub_frames (StructureCollection)
+    :concepts (StructureCollection)
+    :input_space and-sub-frame-1-input
+    :output_space and-sub-frame-1-output))
+(define and-sub-frame-2-input
+  (def-contextual-space :name "and-sub-frame-2.meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection)))
+(define and-sub-frame-2-output
+  (def-contextual-space :name "and-sub-frame-2.text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection grammar-space)))
+(define and-sub-frame-2
+  (def-frame :name "s-and-and-sub-2" :parent_concept sentence-concept :parent_frame None
+    :sub_frames (StructureCollection)
+    :concepts (StructureCollection)
+    :input_space and-sub-frame-2-input
+    :output_space and-sub-frame-2-output))
+(define and-sentence-input
+  (def-contextual-space :name "s-and.meaning" :parent_concept input-concept
+    :conceptual_spaces (StructureCollection)))
+(define and-sentence-output
+  (def-contextual-space :name "s-and.text" :parent_concept text-concept
+    :conceptual_spaces (StructureCollection grammar-space)))
+(define and-sentence
+  (def-frame :name "s-and" :parent_concept sentence-concept :parent_frame None
+    :sub_frames (StructureCollection and-sub-frame-1 and-sub-frame-2)
+    :concepts (StructureCollection)
+    :input_space and-sentence-input
+    :output_space and-sentence-output))
+(define s-and-word-1
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) and-sentence-output)
+		     (Location (list) and-sub-frame-1-output))
+    :parent_space and-sub-frame-1-output))
+(define s-and-word-1-grammar-label
+  (def-label :start s-and-word-1 :parent_concept sentence-concept
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) and-sub-frame-1-output))))
+(define s-and-word-2
+  (def-letter-chunk :name "and"
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) and-sentence-output))
+    :parent_space and-sentence-output
+    :abstract_chunk and))
+(define s-and-word-3
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) and-sentence-output)
+		     (Location (list) and-sub-frame-2-output))
+    :parent_space and-sub-frame-2-output))
+(define s-and-word-3-grammar-label
+  (def-label :start s-and-word-3 :parent_concept sentence-concept
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) and-sub-frame-2-output))))
+(define conjunction-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) and-sentence-output))
+    :left_branch (StructureCollection s-and-word-2)
+    :right_branch (StructureCollection s-and-word-3)))
+(define sentence-super-chunk
+  (def-letter-chunk :name None
+    :locations (list (Location (list) grammar-space)
+		     (Location (list) and-sentence-output))
+    :left_branch (StructureCollection s-and-word-1)
+    :right_branch (StructureCollection conjunction-super-chunk)))
 
 (define input-space
   (def-contextual-space :name "input" :parent_concept input-concept
