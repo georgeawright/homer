@@ -214,7 +214,7 @@
 (define is (def-letter-chunk :name "is" :locations (list (Location (list) grammar-space))))
 (define will (def-letter-chunk :name "will" :locations (list (Location (list) grammar-space))))
 (define be (def-letter-chunk :name "be" :locations (list (Location (list) grammar-space))))
-(define it (def-letter-chunk :name "it" :locations (list (Location (list) grammar-space))))
+(define temperatures (def-letter-chunk :name "temperatures" :locations (list (Location (list) grammar-space))))
 (define in (def-letter-chunk :name "in" :locations (list (Location (list) grammar-space))))
 (define than (def-letter-chunk :name "than" :locations (list (Location (list) grammar-space))))
 (define and (def-letter-chunk :name "and" :locations (list (Location (list) grammar-space))))
@@ -811,11 +811,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (TwoPointLocation (list) (list) comparative-sentence-input))
     :conceptual_space conceptual-space))
 (define sentence-word-1
-  (def-letter-chunk :name "it"
+  (def-letter-chunk :name "temperatures"
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :abstract_chunk it))
+    :abstract_chunk temperatures))
 (define sentence-word-2
   (def-letter-chunk :name "will"
     :locations (list (Location (list) grammar-space)

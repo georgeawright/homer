@@ -178,7 +178,7 @@ class Concept(Node):
         return bubble_chamber.new_concept(
             parent_id=parent_id,
             name=self.name,
-            locations=self.locations,
+            locations=[location.copy() for location in self.locations],
             classifier=self.classifier,
             instance_type=self.instance_type,
             structure_type=self.structure_type,

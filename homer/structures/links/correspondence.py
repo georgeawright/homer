@@ -99,8 +99,8 @@ class Correspondence(Link):
             start,
             bubble_chamber.new_structure_collection(start, end),
             [
-                start.location_in_space(start.parent_space),
-                end.location_in_space(end.parent_space),
+                start.location_in_space(start.parent_space).copy(),
+                end.location_in_space(end.parent_space).copy(),
             ],
             self.parent_concept,
             self.conceptual_space,

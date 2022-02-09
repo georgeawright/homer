@@ -72,7 +72,7 @@ class Relation(Link):
             kwargs["parent_space"] if "parent_space" in kwargs else self.parent_space
         )
         new_locations = [
-            location
+            location.copy()
             for location in self.locations
             if location.space.is_conceptual_space
         ]
