@@ -3098,5 +3098,3 @@ def test_pipeline_of_codelets(homer):
         == "temperatures will be higher in the southeast than in the southwest and temperatures will be colder in the northwest than in the northeast"
     )
     # END: compile longer piece of text
-
-    assert False
