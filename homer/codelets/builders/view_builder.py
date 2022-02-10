@@ -63,5 +63,5 @@ class ViewBuilder(Builder):
             parent_id=self.codelet_id, bubble_chamber=self.bubble_chamber
         )
         self.bubble_chamber.frame_instances.add(frame_instance)
-        self.bubble_chamber.logger.log(frame_instance)
+        self.bubble_chamber.loggers["structure"].log(frame_instance)
         return frame_instance

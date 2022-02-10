@@ -33,6 +33,6 @@ class MonitoringViewBuilder(ViewBuilder):
             links_out=self.bubble_chamber.new_structure_collection(),
             parent_spaces=self.bubble_chamber.new_structure_collection(),
         )
-        self.bubble_chamber.logger.log(view)
+        self.bubble_chamber.loggers["structure"].log(view)
         self.bubble_chamber.views.add(view)
         self.child_structures = self.bubble_chamber.new_structure_collection(view)

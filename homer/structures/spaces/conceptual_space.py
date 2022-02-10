@@ -17,8 +17,6 @@ class ConceptualSpace(Space):
         parent_id: str,
         name: str,
         parent_concept: Concept,
-        source_space: ConceptualSpace,
-        target_space: ConceptualSpace,
         contents: StructureCollection,
         no_of_dimensions: int,
         dimensions: List[ConceptualSpace],
@@ -42,8 +40,6 @@ class ConceptualSpace(Space):
             links_out=links_out,
             parent_spaces=parent_spaces,
         )
-        self.source_space = source_space
-        self.target_space = target_space
         self.no_of_dimensions = no_of_dimensions
         self._dimensions = dimensions
         self.sub_spaces = sub_spaces

@@ -47,6 +47,8 @@ class Selector(Codelet):
         )
 
     def run(self) -> CodeletResult:
+        self.bubble_chamber.loggers["activity"].log_champions(self)
+        self.bubble_chamber.loggers["activity"].log_challengers(self)
         if not self._passes_preliminary_checks():
             self._fizzle()
             self._decay_activations()
@@ -54,10 +56,13 @@ class Selector(Codelet):
             return self.result
         if self.challengers is not None:
             self._hold_competition()
+            self.bubble_chamber.loggers["activity"].log_winners(self)
+            self.bubble_chamber.loggers["activity"].log_losers(self)
             self._boost_winners()
             self._decay_losers()
         else:
             self.winners = self.champions
+            self.bubble_chamber.loggers["activity"].log_winners(self)
             self.confidence = self.winners.get().quality
             self._boost_winners()
         self._boost_activations()
@@ -65,7 +70,9 @@ class Selector(Codelet):
             self.winners.get().quality - self.winners.get().activation
         )
         self._engender_follow_up()
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.result = CodeletResult.FINISH
+        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     def _hold_competition(self):

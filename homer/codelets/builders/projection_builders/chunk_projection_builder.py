@@ -31,8 +31,8 @@ class ChunkProjectionBuilder(ProjectionBuilder):
         self.target_view.output_space.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         for location in chunk.locations:
-            self.bubble_chamber.logger.log(location.space)
-        self.bubble_chamber.logger.log(chunk)
+            self.bubble_chamber.loggers["structure"].log(location.space)
+        self.bubble_chamber.loggers["structure"].log(chunk)
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
             start=self.target_projectee,

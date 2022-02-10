@@ -6,7 +6,8 @@ from homer.interpreter import Interpreter
 
 
 def test_parse():
-    bubble_chamber = BubbleChamber.setup(Mock())
+    loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
+    bubble_chamber = BubbleChamber.setup(loggers)
     interpreter = Interpreter(bubble_chamber)
 
     program = (
@@ -23,7 +24,8 @@ def test_parse():
 
 
 def test_evaluate():
-    bubble_chamber = BubbleChamber.setup(Mock())
+    loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
+    bubble_chamber = BubbleChamber.setup(loggers)
     interpreter = Interpreter(bubble_chamber)
 
     program = '(define s """hello world""")'
@@ -49,7 +51,8 @@ def test_evaluate():
 
 
 def test_interpret_string():
-    bubble_chamber = BubbleChamber.setup(Mock())
+    loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
+    bubble_chamber = BubbleChamber.setup(loggers)
     interpreter = Interpreter(bubble_chamber)
 
     string = """
@@ -74,7 +77,8 @@ def test_interpret_string():
 
 
 def test_interpret_file(tmpdir):
-    bubble_chamber = BubbleChamber.setup(Mock())
+    loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
+    bubble_chamber = BubbleChamber.setup(loggers)
     interpreter = Interpreter(bubble_chamber)
 
     test_file = tmpdir.join("test_file")

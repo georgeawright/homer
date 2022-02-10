@@ -9,6 +9,9 @@ from homer.structures.links import Correspondence
 @pytest.fixture(scope="module")
 def bubble_chamber():
     chamber = Mock()
+
+    chamber.loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
+
     chamber.satisfaction = 0.5
     chamber.random_machine = RandomMachine(chamber, seed=1)
     chamber.new_structure_collection = lambda *x: StructureCollection(chamber, x)

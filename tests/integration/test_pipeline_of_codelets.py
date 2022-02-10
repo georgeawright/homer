@@ -3,7 +3,6 @@ from homer.codelets.builders import (
     ChunkBuilder,
     LabelBuilder,
     RelationBuilder,
-    SpaceBuilder,
 )
 from homer.codelets.builders.correspondence_builders import (
     PotentialSubFrameToFrameCorrespondenceBuilder,
@@ -22,7 +21,6 @@ from homer.codelets.evaluators import (
     ChunkEvaluator,
     LabelEvaluator,
     RelationEvaluator,
-    SpaceEvaluator,
 )
 from homer.codelets.evaluators.projection_evaluators import (
     ChunkProjectionEvaluator,
@@ -36,7 +34,6 @@ from homer.codelets.selectors import (
     ChunkSelector,
     LabelSelector,
     RelationSelector,
-    SpaceSelector,
 )
 from homer.codelets.selectors.projection_selectors import (
     ChunkProjectionSelector,
@@ -49,7 +46,6 @@ from homer.codelets.suggesters import (
     ChunkSuggester,
     LabelSuggester,
     RelationSuggester,
-    SpaceSuggester,
 )
 from homer.codelets.suggesters.correspondence_suggesters import (
     PotentialSubFrameToFrameCorrespondenceSuggester,
@@ -3088,13 +3084,19 @@ def test_pipeline_of_codelets(homer):
         letter_chunk.update_activation()
         assert original_letter_chunk_activation < letter_chunk.activation
 
-    assert (
+    result = (
         and_sentence_view.output_space.contents.filter(
             lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
         )
         .get()
         .name
-        == "temperatures will be colder in the northwest than in the northeast and temperatures will be higher in the southeast than in the southwest"
     )
-
+    assert (
+        result
+        == "temperatures will be colder in the northwest than in the northeast and temperatures will be higher in the southeast than in the southwest"
+        or result
+        == "temperatures will be higher in the southeast than in the southwest and temperatures will be colder in the northwest than in the northeast"
+    )
     # END: compile longer piece of text
+
+    assert False

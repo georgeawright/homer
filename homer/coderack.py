@@ -1,3 +1,5 @@
+from typing import Dict
+
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
 from .codelets import CoderackCleaner, Factory
@@ -13,16 +15,16 @@ class Coderack:
     MAXIMUM_POPULATION = HyperParameters.MAXIMUM_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
-    def __init__(self, bubble_chamber: BubbleChamber, logger: Logger):
+    def __init__(self, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         self.bubble_chamber = bubble_chamber
         self._codelets = []
         self.recently_run = set()
         self.codelets_run = 0
-        self.logger = logger
+        self.loggers = loggers
 
     @classmethod
-    def setup(cls, bubble_chamber: BubbleChamber, logger: Logger):
-        coderack = cls(bubble_chamber, logger)
+    def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
+        coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
             CoderackCleaner.spawn("", bubble_chamber, coderack, 0.0, 1.0),
             ConceptDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
@@ -36,7 +38,6 @@ class Coderack:
     def add_codelet(self, codelet: Codelet):
         if codelet.urgency < self.MINIMUM_CODELET_URGENCY:
             return
-        self.logger.log(codelet)
         self._codelets.append(codelet)
 
     def remove_codelet(self, codelet: Codelet):
@@ -47,7 +48,7 @@ class Coderack:
         codelet = self._select_a_codelet()
         codelet.run()
         self.recently_run.add(type(codelet))
-        self.logger.log_codelet_run(codelet)
+        self.loggers["activity"].log(codelet, f"Time: {self.codelets_run}")
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)

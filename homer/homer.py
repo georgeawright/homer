@@ -1,3 +1,5 @@
+from typing import Dict
+
 from .bubble_chamber import BubbleChamber
 from .coderack import Coderack
 from .errors import NoMoreCodelets
@@ -14,21 +16,21 @@ class Homer:
         bubble_chamber: BubbleChamber,
         coderack: Coderack,
         interpreter: Interpreter,
-        logger: Logger,
+        loggers: Dict[str, Logger],
         activation_update_frequency: int = HyperParameters.ACTIVATION_UPDATE_FREQUENCY,
     ):
         self.bubble_chamber = bubble_chamber
         self.coderack = coderack
         self.interpreter = interpreter
-        self.logger = logger
+        self.loggers = loggers
         self.activation_update_frequency = activation_update_frequency
 
     @classmethod
-    def setup(cls, logger: Logger, random_seed: int = None):
-        bubble_chamber = BubbleChamber.setup(logger, random_seed=random_seed)
-        coderack = Coderack.setup(bubble_chamber, logger)
+    def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
+        bubble_chamber = BubbleChamber.setup(loggers, random_seed=random_seed)
+        coderack = Coderack.setup(bubble_chamber, loggers)
         interpreter = Interpreter(bubble_chamber)
-        return cls(bubble_chamber, coderack, interpreter, logger)
+        return cls(bubble_chamber, coderack, interpreter, loggers)
 
     def run_program(self, program: str):
         # possibly first interpret / sort out internal stuff
@@ -44,7 +46,6 @@ class Homer:
     def run(self):
         while self.bubble_chamber.result is None:
             try:
-                self.logger.log(self.coderack)
                 if self.coderack.codelets_run % self.activation_update_frequency == 0:
                     self.print_status_update()
                     self.bubble_chamber.spread_activations()
@@ -53,12 +54,11 @@ class Homer:
                     raise NoMoreCodelets
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
-                self.logger.log("no more codelets")
+                self.loggers["error"].log("No more codelets.")
                 self.print_results()
                 break
             except Exception as e:
                 raise e
-        self.logger.log(self.coderack)
         self.print_results()
         return {
             "result": self.bubble_chamber.result,

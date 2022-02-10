@@ -24,8 +24,8 @@ from .structures.views import SimplexView, MonitoringView
 
 
 class BubbleChamber:
-    def __init__(self, logger: Logger):
-        self.logger = logger
+    def __init__(self, loggers: Dict[str, Logger]):
+        self.loggers = loggers
         self.random_machine = None
 
         self.conceptual_spaces = None
@@ -49,8 +49,8 @@ class BubbleChamber:
         self.log_count = 0
 
     @classmethod
-    def setup(cls, logger: Logger, random_seed: int = None):
-        bubble_chamber = cls(logger)
+    def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
+        bubble_chamber = cls(loggers)
         bubble_chamber.random_machine = RandomMachine(bubble_chamber, random_seed)
         bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection()
         bubble_chamber.contextual_spaces = bubble_chamber.new_structure_collection()
@@ -140,7 +140,7 @@ class BubbleChamber:
         for structure in self.structures:
             structure.update_activation()
             if self.log_count % 500 == 0:
-                self.logger.log(structure)
+                self.loggers["structure"].log(structure)
         self.log_count += 1
 
     def new_structure_collection(
@@ -149,10 +149,10 @@ class BubbleChamber:
         return StructureCollection(self, structures)
 
     def add(self, item):
-        self.logger.log(item)
+        self.loggers["structure"].log(item)
         for space in item.parent_spaces:
             space.add(item)
-            self.logger.log(space)
+            self.loggers["structure"].log(space)
         collections = {
             # views
             MonitoringView: "monitoring_views",
@@ -178,8 +178,6 @@ class BubbleChamber:
         self,
         name: str,
         parent_concept: Concept,
-        source_space: ConceptualSpace = None,
-        target_space: ConceptualSpace = None,
         no_of_dimensions: int = 0,
         parent_id: str = "",
         dimensions: List[ConceptualSpace] = None,
@@ -195,8 +193,6 @@ class BubbleChamber:
             parent_id=parent_id,
             name=name,
             parent_concept=parent_concept,
-            source_space=source_space,
-            target_space=target_space,
             contents=self.new_structure_collection(),
             no_of_dimensions=no_of_dimensions,
             dimensions=dimensions,
@@ -488,14 +484,14 @@ class BubbleChamber:
         )
         if parent_view is not None:
             parent_view.members.add(correspondence)
-            self.logger.log(parent_view)
+            self.loggers["structure"].log(parent_view)
         start.links_out.add(correspondence)
         start.links_in.add(correspondence)
         end.links_out.add(correspondence)
         end.links_in.add(correspondence)
         self.add(correspondence)
-        self.logger.log(start)
-        self.logger.log(end)
+        self.loggers["structure"].log(start)
+        self.loggers["structure"].log(end)
         return correspondence
 
     def new_label(
@@ -523,7 +519,7 @@ class BubbleChamber:
         )
         start.links_out.add(label)
         self.add(label)
-        self.logger.log(start)
+        self.loggers["structure"].log(start)
         return label
 
     def new_relation(
@@ -561,8 +557,8 @@ class BubbleChamber:
         start.links_out.add(relation)
         end.links_in.add(relation)
         self.add(relation)
-        self.logger.log(start)
-        self.logger.log(end)
+        self.loggers["structure"].log(start)
+        self.loggers["structure"].log(end)
         return relation
 
     def new_simplex_view(self) -> SimplexView:

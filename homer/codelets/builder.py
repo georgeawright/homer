@@ -41,15 +41,19 @@ class Builder(Codelet):
         raise NotImplementedError
 
     def run(self) -> CodeletResult:
+        self.bubble_chamber.loggers["activity"].log_targets_dict(self)
         if not self._passes_preliminary_checks():
             self._decay_activations()
             self._fizzle()
             self.result = CodeletResult.FIZZLE
-            return self.result
-        self._boost_activations()
-        self._process_structure()
-        self._engender_follow_up()
-        self.result = CodeletResult.FINISH
+        else:
+            self._boost_activations()
+            self._process_structure()
+            self.bubble_chamber.loggers["activity"].log_child_structures(self)
+            self._engender_follow_up()
+            self.result = CodeletResult.FINISH
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
+        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     @property

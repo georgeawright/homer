@@ -67,7 +67,7 @@ class DiscourseViewBuilder(ViewBuilder):
             output_space=view_output,
             quality=0,
         )
-        self.bubble_chamber.logger.log(view_output)
-        self.bubble_chamber.logger.log(view)
+        self.bubble_chamber.loggers["structure"].log(view_output)
+        self.bubble_chamber.loggers["structure"].log(view)
         self.bubble_chamber.views.add(view)
         self.child_structures = self.bubble_chamber.new_structure_collection(view)

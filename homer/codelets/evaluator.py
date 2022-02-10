@@ -39,7 +39,11 @@ class Evaluator(Codelet):
         return cls(codelet_id, parent_id, bubble_chamber, target_structures, urgency)
 
     def run(self):
+        self.bubble_chamber.loggers["activity"].log_targets_collection(self)
         self._calculate_confidence()
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Confidence: {self.confidence}"
+        )
         for structure in self.target_structures:
             structure.quality = self.confidence
         self._engender_follow_up()
@@ -49,6 +53,8 @@ class Evaluator(Codelet):
             self._boost_activations()
         else:
             self._decay_activations()
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
+        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     @classmethod

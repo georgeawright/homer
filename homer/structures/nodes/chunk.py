@@ -197,10 +197,10 @@ class Chunk(Node):
             )
             location.space.contents.add(chunk_copy)
             bubble_chamber.chunks.add(chunk_copy)
-            bubble_chamber.logger.log(chunk_copy)
+            bubble_chamber.loggers["structure"].log(chunk_copy)
             for member in chunk_copy.members:
                 member.super_chunks.add(chunk_copy)
-                bubble_chamber.logger.log(member)
+                bubble_chamber.loggers["structure"].log(member)
             return chunk_copy
 
         return copy_recursively(self, location, bubble_chamber, parent_id, {})
@@ -252,8 +252,8 @@ class Chunk(Node):
             super_chunks=bubble_chamber.new_structure_collection(),
             is_raw=self.is_raw,
         )
-        bubble_chamber.logger.log(chunk_copy)
+        bubble_chamber.loggers["structure"].log(chunk_copy)
         for member in chunk_copy.members:
             member.super_chunks.add(chunk_copy)
-            bubble_chamber.logger.log(member)
+            bubble_chamber.loggers["structure"].log(member)
         return (chunk_copy, copies)

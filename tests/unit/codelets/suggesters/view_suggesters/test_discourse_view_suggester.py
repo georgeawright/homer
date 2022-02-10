@@ -13,6 +13,7 @@ from homer.tools import hasinstance
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
+    chamber.loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
     chamber.has_view.return_value = False
     chamber.concepts = {
         "suggest": Mock(),

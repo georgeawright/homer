@@ -1,7 +1,9 @@
 import pytest
+import sys
 from unittest.mock import Mock
 
 from homer import Homer
+from homer.loggers import ActivityLogger
 
 
 @pytest.fixture(scope="module")
@@ -86,7 +88,6 @@ def program():
 (def-relation :start suggest-concept :end label-concept)
 (def-relation :start suggest-concept :end letter-chunk-concept)
 (def-relation :start suggest-concept :end relation-concept)
-(def-relation :start suggest-concept :end space-conceptual-concept)
 (def-relation :start suggest-concept :end view-simplex-concept)
 
 (def-relation :start build-concept :end chunk-concept)
@@ -94,7 +95,6 @@ def program():
 (def-relation :start build-concept :end label-concept)
 (def-relation :start build-concept :end letter-chunk-concept)
 (def-relation :start build-concept :end relation-concept)
-(def-relation :start build-concept :end space-conceptual-concept)
 (def-relation :start build-concept :end view-simplex-concept)
 
 (def-relation :start evaluate-concept :end chunk-concept)
@@ -102,7 +102,6 @@ def program():
 (def-relation :start evaluate-concept :end label-concept)
 (def-relation :start evaluate-concept :end letter-chunk-concept)
 (def-relation :start evaluate-concept :end relation-concept)
-(def-relation :start evaluate-concept :end space-conceptual-concept)
 (def-relation :start evaluate-concept :end view-simplex-concept)
 
 (def-relation :start select-concept :end chunk-concept)
@@ -110,7 +109,6 @@ def program():
 (def-relation :start select-concept :end label-concept)
 (def-relation :start select-concept :end letter-chunk-concept)
 (def-relation :start select-concept :end relation-concept)
-(def-relation :start select-concept :end space-conceptual-concept)
 (def-relation :start select-concept :end view-simplex-concept)
 
 (define grammar-distance-to-proximity 0.1)
@@ -1177,6 +1175,12 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 
 @pytest.fixture(scope="module")
 def homer(program):
-    system = Homer.setup(logger=Mock(), random_seed=1)
+    activity_logger = ActivityLogger(sys.stdout)
+    loggers = {
+        "structure": Mock(),
+        "activity": activity_logger,
+        "errors": Mock(),
+    }
+    system = Homer.setup(loggers=loggers, random_seed=1)
     system.interpreter.interpret_string(program)
     return system

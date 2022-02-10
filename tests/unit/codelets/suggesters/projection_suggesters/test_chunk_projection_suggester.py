@@ -9,6 +9,7 @@ from homer.structure_collection import StructureCollection
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
+    chamber.loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
     chamber.concepts = {"suggest": Mock(), "same": Mock(), "chunk": Mock()}
     return chamber
 
