@@ -1126,14 +1126,9 @@ def test_pipeline_of_codelets(homer):
         )
         .get()
     )
-    np_frame = bubble_chamber.frames.filter(
-        lambda x: x.input_space == correspondence.end.parent_space
-    ).get()
     codelet.target_space_two = view.parent_frame.output_space
-    codelet.target_structure_two = codelet.target_space_two.contents.filter(
-        lambda x: x.is_label
-        and x.parent_concept == bubble_chamber.concepts["np"]
-        and x in np_frame.output_space.contents
+    codelet.target_structure_two = codelet.target_space_two.contents.where(
+        structure_id="Label32"
     ).get()
     codelet.target_conceptual_space = bubble_chamber.conceptual_spaces["grammar"]
     assert isinstance(codelet, SubFrameToFrameCorrespondenceBuilder)

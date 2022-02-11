@@ -163,3 +163,40 @@ class View(Structure):
             + f"from {inputs} to {self.output_space.structure_id} "
             + f"with {self.parent_frame}>"
         )
+
+    def to_long_string(self) -> str:
+        def space_to_long_string(space):
+            string = "-" * 120 + "\n"
+            string += f"{space.structure_id}\n"
+            string += "-" * 120 + "\n"
+            for structure in space.contents.filter(
+                lambda x: not x.correspondences.filter(
+                    lambda y: y in self.members
+                ).is_empty()
+            ):
+                string += f"{structure}\n"
+            return string
+
+        string = "-" * 120 + "\n"
+        string += f"{self.structure_id}\n"
+        string += "-" * 120 + "\n"
+        string += "Inputs:\n"
+        for input_space in self.input_spaces:
+            string += space_to_long_string(input_space)
+        string += "Frames:'n"
+        for frame in self.frames:
+            string += "-" * 120 + "\n"
+            string += f"{frame.structure_id}\n"
+            string += space_to_long_string(frame.input_space)
+            string += space_to_long_string(frame.output_space)
+        string += "-" * 120 + "\n"
+        string += "Output:\n" + space_to_long_string(self.output_space)
+        string += "-" * 120 + "\n"
+        string += "Correspondences:\n"
+        for correspondence in self.members:
+            string += f"{correspondence}\n"
+        return string
+
+    def to_dot_string(self) -> str:
+        # TODO: this would be useful
+        pass

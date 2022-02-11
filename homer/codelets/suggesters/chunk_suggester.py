@@ -131,12 +131,18 @@ class ChunkSuggester(Suggester):
         if self.target_rule is None:
             try:
                 self.target_root = self.target_node.super_chunks.get()
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found target_root: {self.target_root}"
+                )
                 self.target_rule = self.target_root.rule
             except MissingStructureError:
                 self.target_root = None
                 self.target_rule = self.bubble_chamber.rules.where(
                     instance_type=type(self.target_node)
                 ).get()
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found target_rule: {self.target_rule}"
+            )
         else:
             try:
                 self.target_root = self.target_node.super_chunks.where(
@@ -144,9 +150,15 @@ class ChunkSuggester(Suggester):
                 ).get()
             except MissingStructureError:
                 self.target_root = None
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found target_root: {self.target_root}"
+            )
         if self.target_root is not None:
             try:
                 self.target_slot = self.target_root.members.where(is_slot=True).get()
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found target_slot: {self.target_slot}"
+                )
                 if (
                     self.target_slot.location_in_space(self.target_space).coordinates
                     == []
@@ -163,6 +175,9 @@ class ChunkSuggester(Suggester):
                         .at(self.target_slot.location)
                         .get(key=chunking_exigency)
                     )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found target_slot_filler: {self.target_slot_filler}"
+                )
             except MissingStructureError:
                 return False
         suggested_members = StructureCollection.union(
@@ -173,6 +188,9 @@ class ChunkSuggester(Suggester):
             self.bubble_chamber.new_structure_collection(self.target_slot_filler)
             if self.target_slot_filler is not None
             else self.bubble_chamber.new_structure_collection(),
+        )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, suggested_members, "Suggested members"
         )
         return self.bubble_chamber.chunks.filter(
             lambda x: x.rule == self.target_rule

@@ -35,6 +35,7 @@ class Structure(ABC):
         self.links_in = links_in
         self.links_out = links_out
         self.parent_spaces = parent_spaces
+        # TODO: get rid of randomness
         self._activation = FloatBetweenOneAndZero(
             random.random() if stable_activation is None else stable_activation
         )
@@ -236,19 +237,10 @@ class Structure(ABC):
         except NoLocationError:
             return False
 
-    def has_location_in_conceptual_space(self, space: Structure) -> bool:
-        try:
-            self.location_in_conceptual_space(space)
-            return True
-        except NoLocationError:
-            return False
-
     def location_in_space(
         self, space: Structure, start: Location = None, end: Location = None
     ) -> Location:
-        # TODO: workout location if space is a projection of another space
         locations = self.locations
-        random.shuffle(locations)
         for location in locations:
             if location is not None and location.space == space:
                 if (
@@ -260,18 +252,6 @@ class Structure(ABC):
                     continue
                 return location
         raise NoLocationError(f"{self} has no location in space {space}")
-
-    def location_in_conceptual_space(self, space: Structure) -> Location:
-        locations = self.locations
-        random.shuffle(locations)
-        for location in locations:
-            if location is not None and (
-                location.space == space or location.space.conceptual_space == space
-            ):
-                return location
-        raise NoLocationError(
-            f"{self.structure_id} has no location for conceputal space {space.structure_id}"
-        )
 
     def has_label(self, concept: Structure) -> FloatBetweenOneAndZero:
         for label in self.labels:

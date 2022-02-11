@@ -133,13 +133,18 @@ class Chunk(Node):
                 .near(self.location_in_space(space))
                 .excluding(self),
             )
-        return StructureCollection.intersection(
-            *[
-                location.space.contents.where(is_chunk=True).near(location)
-                for location in self.locations
-                if location.space.is_conceptual_space and location.space.is_basic_level
-            ]
-        ).excluding(self)
+        return (
+            StructureCollection.intersection(
+                *[
+                    location.space.contents.where(is_chunk=True).near(location)
+                    for location in self.locations
+                    if location.space.is_conceptual_space
+                    and location.space.is_basic_level
+                ]
+            )
+            # .filter(lambda x: x in self.parent_space.contents)
+            .excluding(self)
+        )
 
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None

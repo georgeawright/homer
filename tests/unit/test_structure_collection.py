@@ -1,4 +1,3 @@
-import math
 import pytest
 from unittest.mock import Mock
 
@@ -18,10 +17,12 @@ def test_intersection():
     structure_1 = Mock()
     structure_2 = Mock()
     structure_3 = Mock()
+
     collection_1 = StructureCollection(Mock(), [structure_1, structure_2])
     collection_2 = StructureCollection(Mock(), [structure_2, structure_3])
     collection_3 = StructureCollection(Mock(), [structure_1])
     collection_4 = StructureCollection(Mock(), [structure_3])
+    collection_5 = StructureCollection(Mock(), [structure_1, structure_2, structure_2])
 
     intersection = StructureCollection.intersection(collection_1, collection_2)
     assert intersection.structures == {structure_2: True}
@@ -31,6 +32,21 @@ def test_intersection():
 
     intersection = StructureCollection.intersection(collection_1, collection_3)
     assert intersection.structures == {structure_1: True}
+
+    intersection = StructureCollection.intersection(
+        collection_1, collection_2, collection_3
+    )
+    assert intersection.structures == {}
+
+    intersection = StructureCollection.intersection(
+        collection_1, collection_2, collection_5
+    )
+    assert intersection.structures == {structure_2: True}
+
+    intersection = StructureCollection.intersection(
+        collection_1, collection_2, collection_3, collection_4, collection_5
+    )
+    assert intersection.structures == {}
 
 
 def test_difference():

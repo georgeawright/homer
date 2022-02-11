@@ -175,7 +175,7 @@ class LetterChunk(Chunk):
                 if self.abstract_chunk is None
                 else self.abstract_chunk,
             )
-            location.space.contents.add(chunk_copy)
+            location.space.add(chunk_copy)
             bubble_chamber.chunks.add(chunk_copy)
             bubble_chamber.loggers["structure"].log(chunk_copy)
             for member in chunk_copy.members:
