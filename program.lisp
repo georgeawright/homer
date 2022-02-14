@@ -794,12 +794,12 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list) rp-sub-frame-input)
 		     (Location (list) comparative-sentence-input))))
 (define chunk-start-location-label
-  (def-label :start chunk-start :parent_concept label-concept
+  (def-label :start chunk-start :parent_concept location-concept-1
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list) nn-sub-frame-1-input)
 		     (Location (list) comparative-sentence-input))))
 (define chunk-end-location-label
-  (def-label :start chunk-end :parent_concept label-concept
+  (def-label :start chunk-end :parent_concept location-concept-2
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list) nn-sub-frame-2-input)
 		     (Location (list) comparative-sentence-input))))
