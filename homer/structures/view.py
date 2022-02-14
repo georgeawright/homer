@@ -197,6 +197,444 @@ class View(Structure):
             string += f"{correspondence}\n"
         return string
 
-    def to_dot_string(self) -> str:
-        # TODO: this would be useful
-        pass
+    def to_concise_dot_string(self) -> str:
+        dot_string = """
+digraph G {"""
+        cluster_count = 0
+        for space in self.input_spaces:
+            dot_string += f"""
+subgraph cluster_{cluster_count} {{
+    style=filled;
+    color=lightblue;
+    node [style=filled, color=white];"""
+            for node in space.contents.filter(
+                lambda x: x.is_node and x in self.grouped_nodes
+            ):
+                node_label = (
+                    node.name
+                    if node.is_letter_chunk and node.name is not None
+                    else node.structure_id
+                )
+                dot_string += f"""
+    {node.structure_id} [label="{node_label}"];"""
+            for letter_chunk in space.contents.filter(
+                lambda x: x.is_letter_chunk and x.in_self.grouped_nodes
+            ):
+                for left_member in letter_chunk.left_branch:
+                    dot_string += f"""
+    {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
+                for right_member in letter_chunk.right_branch:
+                    dot_string += f"""
+    {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
+            for label in space.contents.filter(
+                lambda x: x.is_label and x.has_correspondence_in_view(self)
+            ):
+                dot_string += f"""
+    {label.structure_id} [label="{label.parent_concept.name}"];
+    {label.structure_id} -> {label.start.structure_id} [label="start"];"""
+            for relation in space.contents.filter(
+                lambda x: x.is_relation and x.has_correspondence_in_view(self)
+            ):
+                concept_label = (
+                    relation.parent_concept.name
+                    if not relation.parent_concept.is_slot
+                    else relation.structure_id
+                )
+                dot_string += f"""
+    {relation.structure_id} [label="{relation.parent_concept.name}"];
+    {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+    {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+            dot_string += f"""
+    label = "{space.structure_id}";
+}}"""
+            cluster_count += 1
+        dot_string += f"""
+subgraph cluster_{cluster_count} {{
+    style=filled;
+    color=palegreen;
+    node [style=filled, color=white];"""
+        for node in self.output_space.contents.where(is_node=True):
+            node_label = (
+                node.name
+                if node.is_letter_chunk and node.name is not None
+                else node.structure_id
+            )
+            dot_string += f"""
+    {node.structure_id} [label="{node_label}"];"""
+        for letter_chunk in self.output_space.contents.where(is_letter_chunk=True):
+            for left_member in letter_chunk.left_branch:
+                dot_string += f"""
+    {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
+            for right_member in letter_chunk.right_branch:
+                dot_string += f"""
+    {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
+        for label in self.output_space.contents.where(is_label=True):
+            dot_string += f"""
+    {label.structure_id} [label="{label.parent_concept.name}"];
+    {label.structure_id} -> {label.start.structure_id} [label="start"];"""
+        for relation in self.output_space.contents.where(is_relation=True):
+            dot_string += f"""
+    {relation.structure_id} [label="{relation.parent_concept.name}"];
+    {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+    {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+        dot_string += f"""
+    label = "{self.output_space.structure_id}";
+}}"""
+        cluster_count += 1
+        dot_string += f"""
+subgraph cluster_{cluster_count} {{
+    style=filled;
+    color=lightgray;
+    node [style=filled, color=white];"""
+        cluster_count += 1
+        dot_string += f"""
+    subgraph cluster_{cluster_count} {{
+        style=filled;
+        color=pink;
+        node [style=filled, color=white];"""
+        for concept in self.parent_frame.concepts.where(is_concept=True):
+            dot_string += f"""
+        {concept.structure_id};"""
+        for concept in self.parent_frame.concepts.where(is_concept=True):
+            for relation in concept.links_out.filter(
+                lambda x: x.is_relation and x.end in self.parent_frame.concepts
+            ):
+                dot_string += f"""
+        {relation.structure_id} [label={relation.parent_concept.name}];
+        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+        dot_string += f"""
+        label = "Concepts";
+    }}"""
+        cluster_count += 1
+        dot_string += f"""
+    subgraph cluster_{cluster_count} {{
+        style=filled;
+        color=lightblue;
+        node [style=filled, color=white];"""
+        for node in self.parent_frame.input_space.contents.where(is_node=True):
+            node_label = (
+                node.name
+                if node.is_letter_chunk and node.name is not None
+                else node.structure_id
+            )
+            dot_string += f"""
+        {node.structure_id} [label="{node_label}"];"""
+        for letter_chunk in self.parent_frame.input_space.contents.where(
+            is_letter_chunk=True
+        ):
+            for left_member in letter_chunk.left_branch:
+                dot_string += f"""
+        {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
+            for right_member in letter_chunk.right_branch:
+                dot_string += f"""
+        {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
+        for label in self.parent_frame.input_space.contents.where(is_label=True):
+            concept_label = (
+                label.parent_concept.name
+                if not label.parent_concept.is_slot
+                else label.structure_id
+            )
+            dot_string += f"""
+        {label.structure_id} [label="{concept_label}"];
+        {label.structure_id} -> {label.start.structure_id} [label="start"];"""
+        for relation in self.parent_frame.input_space.contents.where(is_relation=True):
+            concept_label = (
+                relation.parent_concept.name
+                if not relation.parent_concept.is_slot
+                else relation.structure_id
+            )
+            dot_string += f"""
+        {relation.structure_id} [label="{concept_label}"];
+        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+        dot_string += f"""
+        label = "{self.parent_frame.input_space.structure_id}";
+    }}"""
+        cluster_count += 1
+        dot_string += f"""
+    subgraph cluster_{cluster_count} {{
+        style=filled;
+        color=palegreen;
+        node [style=filled, color=white];"""
+        for node in self.parent_frame.output_space.contents.where(is_node=True):
+            node_label = (
+                node.name
+                if node.is_letter_chunk and node.name is not None
+                else node.structure_id
+            )
+            dot_string += f"""
+        {node.structure_id} [label="{node_label}"];"""
+        for letter_chunk in self.parent_frame.output_space.contents.where(
+            is_letter_chunk=True
+        ):
+            for left_member in letter_chunk.left_branch:
+                dot_string += f"""
+        {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
+            for right_member in letter_chunk.right_branch:
+                dot_string += f"""
+        {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
+        for label in self.parent_frame.output_space.contents.where(is_label=True):
+            concept_label = (
+                label.parent_concept.name
+                if not label.parent_concept.is_slot
+                else label.structure_id
+            )
+            dot_string += f"""
+        {label.structure_id} [label="{concept_label}"];
+        {label.structure_id} -> {label.start.structure_id} [label="start"];"""
+        for relation in self.parent_frame.output_space.contents.where(is_relation=True):
+            concept_label = (
+                relation.parent_concept.name
+                if not relation.parent_concept.is_slot
+                else relation.structure_id
+            )
+            dot_string += f"""
+        {relation.structure_id} [label="{concept_label}"];
+        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+        dot_string += f"""
+        label = "{self.parent_frame.output_space.structure_id}";
+    }}"""
+        for label in self.parent_frame.input_space.contents.where(is_label=True):
+            if label.parent_concept in self.parent_frame.concepts:
+                dot_string += f"""
+    {label.structure_id} -> {label.parent_concept.structure_id} [label="parent_concept"];"""
+        for relation in self.parent_frame.input_space.contents.where(is_relation=True):
+            if relation.parent_concept in self.parent_frame.concepts:
+                dot_string += f"""
+    {relation.structure_id} -> {relation.parent_concept.structure_id} [label="parent_concept"];"""
+        for label in self.parent_frame.output_space.contents.where(is_label=True):
+            if label.parent_concept in self.parent_frame.concepts:
+                dot_string += f"""
+    {label.structure_id} -> {label.parent_concept.structure_id} [label="parent_concept"];"""
+        for relation in self.parent_frame.output_space.contents.where(is_relation=True):
+            if relation.parent_concept in self.parent_frame.concepts:
+                dot_string += f"""
+    {relation.structure_id} -> {relation.parent_concept.structure_id} [label="parent_concept"];"""
+        dot_string += f"""
+    label = "{self.parent_frame.structure_id}";
+}}"""
+        for correspondence in self.members:
+            if (
+                correspondence.start.parent_space in self.input_spaces
+                or correspondence.start in self.parent_frame.output_space.contents
+            ) and (
+                correspondence.end in self.parent_frame.input_space.contents
+                or correspondence.end in self.output_space.contents
+            ):
+                dot_string += f"""
+    {correspondence.structure_id} [label="{correspondence.parent_concept.name}"];
+    {correspondence.structure_id} -> {correspondence.start.structure_id};
+    {correspondence.structure_id} -> {correspondence.end.structure_id};"""
+        dot_string += """
+}"""
+        return dot_string
+
+    def to_long_dot_string(self) -> str:
+        # TODO: should show sub_view output spaces and letter chunk names
+        # TODO: check why frame elements have the wrong parent concept
+        dot_string = """
+digraph G {"""
+        cluster_count = 0
+        for space in self.input_spaces:
+            dot_string += f"""
+subgraph cluster_{cluster_count} {{
+    style=filled;
+    color=lightblue;
+    node [style=filled, color=white];"""
+            for node in space.contents.filter(
+                lambda x: x.is_node and x in self.grouped_nodes
+            ):
+                dot_string += f"""
+    {node.structure_id};"""
+            for letter_chunk in space.contents.filter(
+                lambda x: x.is_letter_chunk and x.in_self.grouped_nodes
+            ):
+                for left_member in letter_chunk.left_branch:
+                    dot_string += f"""
+    {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
+                for right_member in letter_chunk.right_branch:
+                    dot_string += f"""
+    {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
+            for label in space.contents.filter(
+                lambda x: x.is_label and x.has_correspondence_in_view(self)
+            ):
+                dot_string += f"""
+    {label.structure_id} [label="{label.parent_concept.name}"];
+    {label.structure_id} -> {label.start.structure_id} [label="start"];"""
+            for relation in space.contents.filter(
+                lambda x: x.is_relation and x.has_correspondence_in_view(self)
+            ):
+                concept_label = (
+                    relation.parent_concept.name
+                    if not relation.parent_concept.is_slot
+                    else relation.structure_id
+                )
+                dot_string += f"""
+    {relation.structure_id} [label="{relation.parent_concept.name}"];
+    {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+    {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+            dot_string += f"""
+    label = "{space.structure_id}";
+}}"""
+            cluster_count += 1
+        dot_string += f"""
+subgraph cluster_{cluster_count} {{
+    style=filled;
+    color=palegreen;
+    node [style=filled, color=white];"""
+        for node in self.output_space.contents.where(is_node=True):
+            dot_string += f"""
+    {node.structure_id};"""
+        for letter_chunk in self.output_space.contents.where(is_letter_chunk=True):
+            for left_member in letter_chunk.left_branch:
+                dot_string += f"""
+    {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
+            for right_member in letter_chunk.right_branch:
+                dot_string += f"""
+    {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
+        for label in self.output_space.contents.where(is_label=True):
+            dot_string += f"""
+    {label.structure_id} [label="{label.parent_concept.name}"];
+    {label.structure_id} -> {label.start.structure_id} [label="start"];"""
+        for relation in self.output_space.contents.where(is_relation=True):
+            dot_string += f"""
+    {relation.structure_id} [label="{relation.parent_concept.name}"];
+    {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+    {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+        dot_string += f"""
+    label = "{self.output_space.structure_id}";
+}}"""
+        cluster_count += 1
+        for frame in self.frames:
+            dot_string += f"""
+subgraph cluster_{cluster_count} {{
+    style=filled;
+    color=lightgray;
+    node [style=filled, color=white];"""
+            cluster_count += 1
+            dot_string += f"""
+    subgraph cluster_{cluster_count} {{
+        style=filled;
+        color=pink;
+        node [style=filled, color=white];"""
+            for concept in frame.concepts.where(is_concept=True):
+                dot_string += f"""
+        {concept.structure_id};"""
+            for concept in frame.concepts.where(is_concept=True):
+                for relation in concept.links_out.filter(
+                    lambda x: x.is_relation and x.end in frame.concepts
+                ):
+                    dot_string += f"""
+        {relation.structure_id} [label={relation.parent_concept.name}];
+        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+            dot_string += f"""
+        label = "Concepts";
+    }}"""
+            cluster_count += 1
+            dot_string += f"""
+    subgraph cluster_{cluster_count} {{
+        style=filled;
+        color=lightblue;
+        node [style=filled, color=white];"""
+            for node in frame.input_space.contents.where(is_node=True):
+                dot_string += f"""
+        {node.structure_id};"""
+            for letter_chunk in frame.input_space.contents.where(is_letter_chunk=True):
+                for left_member in letter_chunk.left_branch:
+                    dot_string += f"""
+        {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
+                for right_member in letter_chunk.right_branch:
+                    dot_string += f"""
+        {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
+            for label in frame.input_space.contents.where(is_label=True):
+                concept_label = (
+                    label.parent_concept.name
+                    if not label.parent_concept.is_slot
+                    else label.structure_id
+                )
+                dot_string += f"""
+        {label.structure_id} [label="{concept_label}"];
+        {label.structure_id} -> {label.start.structure_id} [label="start"];"""
+            for relation in frame.input_space.contents.where(is_relation=True):
+                concept_label = (
+                    relation.parent_concept.name
+                    if not relation.parent_concept.is_slot
+                    else relation.structure_id
+                )
+                dot_string += f"""
+        {relation.structure_id} [label="{concept_label}"];
+        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+            dot_string += f"""
+        label = "{frame.input_space.structure_id}";
+    }}"""
+            cluster_count += 1
+            dot_string += f"""
+    subgraph cluster_{cluster_count} {{
+        style=filled;
+        color=palegreen;
+        node [style=filled, color=white];"""
+            for node in frame.output_space.contents.where(is_node=True):
+                dot_string += f"""
+        {node.structure_id};"""
+            for letter_chunk in frame.output_space.contents.where(is_letter_chunk=True):
+                for left_member in letter_chunk.left_branch:
+                    dot_string += f"""
+        {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
+                for right_member in letter_chunk.right_branch:
+                    dot_string += f"""
+        {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
+            for label in frame.output_space.contents.where(is_label=True):
+                concept_label = (
+                    label.parent_concept.name
+                    if not label.parent_concept.is_slot
+                    else label.structure_id
+                )
+                dot_string += f"""
+        {label.structure_id} [label="{concept_label}"];
+        {label.structure_id} -> {label.start.structure_id} [label="start"];"""
+            for relation in frame.output_space.contents.where(is_relation=True):
+                concept_label = (
+                    relation.parent_concept.name
+                    if not relation.parent_concept.is_slot
+                    else relation.structure_id
+                )
+                dot_string += f"""
+        {relation.structure_id} [label="{concept_label}"];
+        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
+        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
+            dot_string += f"""
+        label = "{frame.output_space.structure_id}";
+    }}"""
+            for label in frame.input_space.contents.where(is_label=True):
+                if label.parent_concept in frame.concepts:
+                    dot_string += f"""
+    {label.structure_id} -> {label.parent_concept.structure_id} [label="parent_concept"];"""
+            for relation in frame.input_space.contents.where(is_relation=True):
+                if relation.parent_concept in frame.concepts:
+                    dot_string += f"""
+    {relation.structure_id} -> {relation.parent_concept.structure_id} [label="parent_concept"];"""
+            for label in frame.output_space.contents.where(is_label=True):
+                if label.parent_concept in frame.concepts:
+                    dot_string += f"""
+    {label.structure_id} -> {label.parent_concept.structure_id} [label="parent_concept"];"""
+            for relation in frame.output_space.contents.where(is_relation=True):
+                if relation.parent_concept in frame.concepts:
+                    dot_string += f"""
+    {relation.structure_id} -> {relation.parent_concept.structure_id} [label="parent_concept"];"""
+            dot_string += f"""
+    label = "{frame.structure_id}";
+}}"""
+        for correspondence in self.members:
+            #            dot_string += f"""
+            #    {correspondence.structure_id} [label="{correspondence.parent_concept.name}"];
+            #    {correspondence.structure_id} -> {correspondence.start.structure_id};
+            #    {correspondence.structure_id} -> {correspondence.end.structure_id};"""
+            dot_string += f"""
+    {correspondence.start.structure_id} -> {correspondence.end.structure_id};"""
+        dot_string += """
+}"""
+        return dot_string

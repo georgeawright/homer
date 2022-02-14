@@ -346,6 +346,9 @@ class Structure(ABC):
     def has_correspondence_to_space(self, space: Structure) -> bool:
         return len(self.correspondences_to_space(space)) > 0
 
+    def has_correspondence_in_view(self, view: Structure) -> bool:
+        return len(self.correspondences.where(parent_view=view)) > 0
+
     def correspondences_with(self, other: Structure):
         return self.correspondences.filter(
             lambda x: (x.start == self and x.end == other)
