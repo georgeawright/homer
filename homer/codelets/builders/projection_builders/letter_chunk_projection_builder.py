@@ -43,6 +43,22 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         else:
             abstract_chunk = self._get_abstract_chunk()
             self.target_projectee.abstract_chunk = abstract_chunk
+            sameness_relations = self.target_projectee.links_in.where(
+                is_relation=True, parent_concept=self.bubble_chamber.concepts["same"]
+            )
+            output_chunk_name = abstract_chunk.name
+            if not sameness_relations.is_empty():
+                sameness_start_correspondences_to_output = (
+                    sameness_relations.get().start.correspondences_to_space(
+                        self.target_view.output_space
+                    )
+                )
+                if not sameness_start_correspondences_to_output.is_empty():
+                    if (
+                        sameness_start_correspondences_to_output.get().end.name
+                        == abstract_chunk.name
+                    ):
+                        output_chunk_name = ""
             output_location = Location(
                 self.target_projectee.location.coordinates,
                 self.target_view.output_space,
@@ -53,7 +69,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 if location.space.is_conceptual_space
             ] + [output_location]
             word = self.bubble_chamber.new_letter_chunk(
-                name=abstract_chunk.name,
+                name=output_chunk_name,
                 locations=locations,
                 parent_space=self.target_view.output_space,
                 abstract_chunk=abstract_chunk,
