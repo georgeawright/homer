@@ -1167,19 +1167,19 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :output_space but-sentence-output))
 
 (define input-chunk-1
-  (def-chunk :locations (list (Location (list) conceptual-space-1)
+  (def-chunk :locations (list (Location (list (list Nan)) conceptual-space-1)
 			       (Location (list) but-sub-frame-1-input)
 			       (Location (list) but-sentence-input))
     :parent_space but-sub-frame-1-input))
 (define input-chunk-2
-  (def-chunk :locations (list (Location (list) conceptual-space-1)
+  (def-chunk :locations (list (Location (list (list Nan)) conceptual-space-1)
 			       (Location (list) but-sub-frame-2-input)
 			       (Location (list) but-sentence-input))
     :parent_space but-sub-frame-2-input))
 (def-relation :start input-chunk-1 :end input-chunk-2 :parent_concept different-concept
   :locations (list (Location (list) but-sentence-input)
-		   (Location (list) same-different-space)
-		   (TwoPointLocation (list) (list) conceptual-space-1)))
+		   (Location (list (list Nan)) same-different-space)
+		   (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space-1)))
 
 (define s-but-subject-1
   (def-letter-chunk :name None

@@ -3717,6 +3717,99 @@ def test_pipeline_of_codelets(homer):
 
     # "but" view lacks correspondences to difference relations
     assert but_sentence_view.quality < and_sentence_view.quality
+
+    # build differentness relation between chunks from each clause
+    target_space = bubble_chamber.conceptual_spaces["temperature"]
+    parent_concept = bubble_chamber.concepts["different"]
+    codelet = RelationSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_space": target_space,
+            "target_structure_one": chunk_one,
+            "target_structure_two": chunk_three,
+            "parent_concept": parent_concept,
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationBuilder)
+    assert not chunk_one.has_relation_with_name("different")
+    assert not chunk_three.has_relation_with_name("different")
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert chunk_one.has_relation_with_name("different")
+    assert chunk_three.has_relation_with_name("different")
+
+    relation = codelet.child_structures.get()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationEvaluator)
+    assert 0 == relation.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < relation.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, RelationSelector)
+    original_relation_activation = relation.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    relation.update_activation()
+    assert original_relation_activation < relation.activation
+
+    # build correspondence from differentness relation
+    # to differentness relation in "but" frame
+    codelet = SpaceToFrameCorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": but_sentence_view,
+            "target_space_one": input_space,
+            "target_structure_one": relation,
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.where(is_correspondence=True).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+
+    but_sentence_view_previous_quality = but_sentence_view.quality
+    # re-evaluate "but" sentence view
+    codelet = SimplexViewEvaluator.spawn(
+        "",
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(but_sentence_view),
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < but_sentence_view.quality
+
+    assert but_sentence_view.quality > but_sentence_view_previous_quality
     # END: compare quality of "and" and "but" views
 
     end_time = time.time()

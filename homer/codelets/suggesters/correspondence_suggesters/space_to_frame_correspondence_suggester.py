@@ -72,9 +72,15 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             if self.target_structure_one.is_link
             else None
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Found conceptual space: {self.target_conceptual_space}"
+        )
         try:
             if self.target_space_two is None:
                 self.target_space_two = self.target_view.parent_frame.input_space
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found target space two: {self.target_space_two}"
+                )
             if self.target_structure_two is None:
                 self.target_structure_two = self.target_space_two.contents.filter(
                     lambda x: (type(x) == type(self.target_structure_one))
@@ -84,7 +90,14 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         else True
                     )
                 ).get(key=lambda x: x.similarity_with(self.target_structure_one))
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found target structure two: {self.target_structure_two}"
+                )
         except MissingStructureError:
+            self.bubble_chamber.loggers["activity"].log(
+                self,
+                "MissingStructureError when searching for second target space and structure",
+            )
             return False
         if self.parent_concept is None:
             self.parent_concept = (
@@ -92,12 +105,20 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 .where_not(classifier=None)
                 .get()
             )
-        return self.target_view.can_accept_member(
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found parent concept: {self.parent_concept}"
+            )
+        if not self.target_view.can_accept_member(
             self.parent_concept,
             self.target_conceptual_space,
             self.target_structure_one,
             self.target_structure_two,
-        )
+        ):
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Target view cannot accept suggested member."
+            )
+            return False
+        return True
 
     def _fizzle(self):
         from .potential_sub_frame_to_frame_correspondence_suggester import (
