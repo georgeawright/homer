@@ -24,11 +24,14 @@ class ActivityLogger(Logger):
             )
         self.stream.write(f"{message}\n")
 
-    def log_targets_dict(self, codelet: "Codelet"):
-        self.log(codelet, "Target structures: {")
-        for name, structure in codelet.targets_dict.items():
-            self.log(codelet, f"    {name}: {structure},")
-        self.log(codelet, "}")
+    def log_dict(self, codelet: "Codelet", dictionary, name: str):
+        if dictionary is None or len(dictionary) == 0:
+            self.log(codelet, "No " + name.lower())
+        else:
+            self.log(codelet, f"{name}: {{")
+            for key, value in dictionary.items():
+                self.log(codelet, f"    {key}: {value},")
+            self.log(codelet, "}")
 
     def log_collection(self, codelet: "Codelet", collection, name: str):
         if collection is None or len(collection) == 0:
@@ -45,6 +48,9 @@ class ActivityLogger(Logger):
         if CodeletResult.FIZZLE == codelet.result:
             self.log(codelet, "Result: FIZZLE")
         self.log(codelet, "-" * self.LINE_WIDTH)
+
+    def log_targets_dict(self, codelet: "Codelet"):
+        self.log_dict(codelet, codelet.targets_dict, "Target structures")
 
     def log_targets_collection(self, codelet: "Codelet"):
         self.log_collection(codelet, codelet.target_structures, "Target structures")

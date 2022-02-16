@@ -45,6 +45,11 @@ class SimplexViewSuggester(ViewSuggester):
                 not conceptual_space.is_slot
                 and conceptual_space not in self.contextual_space.conceptual_spaces
             ):
+                self.bubble_chamber.loggers["activity"].log(
+                    self,
+                    f"{conceptual_space.structure_id} is not a slot and "
+                    + f"is not in {self.contextual_space.structure_id} conceptual spaces",
+                )
                 return False
             if conceptual_space.is_slot:
                 try:
@@ -57,5 +62,12 @@ class SimplexViewSuggester(ViewSuggester):
                         key=activation
                     )
                 except MissingStructureError:
+                    self.bubble_chamber.loggers["activity"].log_dict(
+                        self, self.conceptual_spaces_map, "Conceptual Space Map"
+                    )
+                    self.bubble_chamber.loggers["activity"].log(
+                        self,
+                        f"Unable to find space subsumed by {conceptual_space.structure_id}",
+                    )
                     return False
         return True

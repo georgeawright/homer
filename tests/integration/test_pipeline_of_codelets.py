@@ -1130,7 +1130,7 @@ def test_pipeline_of_codelets(homer):
     )
     codelet.target_space_two = view.parent_frame.output_space
     codelet.target_structure_two = codelet.target_space_two.contents.where(
-        structure_id="Label45"
+        structure_id="Label55"
     ).get()
     codelet.target_conceptual_space = bubble_chamber.conceptual_spaces["grammar"]
     assert isinstance(codelet, SubFrameToFrameCorrespondenceBuilder)
@@ -2594,7 +2594,7 @@ def test_pipeline_of_codelets(homer):
     )
     codelet.target_space_two = view.parent_frame.output_space
     codelet.target_structure_two = codelet.target_space_two.contents.where(
-        structure_id="Label74"
+        structure_id="Label84"
     ).get()
     codelet.target_conceptual_space = bubble_chamber.conceptual_spaces["grammar"]
     assert isinstance(codelet, SubFrameToFrameCorrespondenceBuilder)
@@ -3380,6 +3380,344 @@ def test_pipeline_of_codelets(homer):
         == "temperatures will be colder in the northwest than in the northeast and higher in the southeast than in the southwest"
     )
     # END: compile longer piece of text
+
+    # START: compile alternative longer piece of text using "but"
+    frame = bubble_chamber.frames["s-but"]
+    codelet = SimplexViewSuggester.spawn(
+        "", bubble_chamber, {"frame": frame, "contextual_space": input_space}, 1.0
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, SimplexViewBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    view = codelet.child_structures.get()
+    but_sentence_view = view
+
+    sentence_1_space = sentence_1_view.output_space
+    sentence_1_sentence_chunk = sentence_1_space.contents.filter(
+        lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+    ).get()
+    sentence_1_sentence_label = sentence_1_sentence_chunk.labels.get()
+    sentence_1_nsubj_chunk = sentence_1_sentence_chunk.left_branch.get()
+    sentence_1_nsubj_label = sentence_1_nsubj_chunk.labels.get()
+    sentence_1_vp_chunk = sentence_1_sentence_chunk.right_branch.get()
+    sentence_1_vb_chunk = sentence_1_vp_chunk.left_branch.get()
+    sentence_1_vb_label = sentence_1_vb_chunk.labels.get()
+    sentence_1_pred_chunk = sentence_1_vp_chunk.right_branch.get()
+    sentence_1_pred_label = sentence_1_pred_chunk.labels.get()
+
+    sentence_2_space = sentence_2_view.output_space
+    sentence_2_sentence_chunk = sentence_2_space.contents.filter(
+        lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+    ).get()
+    sentence_2_sentence_label = sentence_2_sentence_chunk.labels.get()
+    sentence_2_nsubj_chunk = sentence_2_sentence_chunk.left_branch.get()
+    sentence_2_nsubj_label = sentence_2_nsubj_chunk.labels.get()
+    sentence_2_vp_chunk = sentence_2_sentence_chunk.right_branch.get()
+    sentence_2_vb_chunk = sentence_2_vp_chunk.left_branch.get()
+    sentence_2_vb_label = sentence_2_vb_chunk.labels.get()
+    sentence_2_pred_chunk = sentence_2_vp_chunk.right_branch.get()
+    sentence_2_pred_label = sentence_2_pred_chunk.labels.get()
+
+    but_frame_output_space = but_sentence_view.parent_frame.output_space
+    but_sentence_sentence_chunk = but_frame_output_space.contents.filter(
+        lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+    ).get()
+    but_sentence_clause_1_chunk = but_sentence_sentence_chunk.left_branch.get()
+    but_sentence_clause_1_label = but_sentence_clause_1_chunk.labels.get()
+    but_sentence_clause_1_nsubj_chunk = but_sentence_clause_1_chunk.left_branch.get()
+    but_sentence_clause_1_nsubj_label = but_sentence_clause_1_nsubj_chunk.labels.get()
+    but_sentence_clause_1_vp_chunk = but_sentence_clause_1_chunk.right_branch.get()
+    but_sentence_clause_1_vb_chunk = but_sentence_clause_1_vp_chunk.left_branch.get()
+    but_sentence_clause_1_vb_label = but_sentence_clause_1_vb_chunk.labels.get()
+    but_sentence_clause_1_pred_chunk = but_sentence_clause_1_vp_chunk.right_branch.get()
+    but_sentence_clause_1_pred_label = but_sentence_clause_1_pred_chunk.labels.get()
+    but_sentence_conj_chunk = but_sentence_sentence_chunk.right_branch.get()
+    but_sentence_but_chunk = but_sentence_conj_chunk.left_branch.get()
+    but_sentence_clause_2_chunk = but_sentence_conj_chunk.right_branch.get()
+    but_sentence_clause_2_label = but_sentence_clause_2_chunk.labels.get()
+    but_sentence_clause_2_nsubj_chunk = but_sentence_clause_2_chunk.left_branch.get()
+    but_sentence_clause_2_nsubj_label = but_sentence_clause_2_nsubj_chunk.labels.get()
+    but_sentence_clause_2_vp_chunk = but_sentence_clause_2_chunk.right_branch.get()
+    but_sentence_clause_2_vb_chunk = but_sentence_clause_2_vp_chunk.left_branch.get()
+    but_sentence_clause_2_vb_label = but_sentence_clause_2_vb_chunk.labels.get()
+    but_sentence_clause_2_pred_chunk = but_sentence_clause_2_vp_chunk.right_branch.get()
+    but_sentence_clause_2_pred_label = but_sentence_clause_2_pred_chunk.labels.get()
+
+    # construct correspondence from sentence_1_frame to but-sentence frame (sentence label)
+    # codelet = PotentialSubFrameToFrameCorrespondenceSuggester.spawn(
+    #    "", bubble_chamber, {"target_view": view}, 1.0
+    # )
+    # codelet.run()
+    # assert CodeletResult.FINISH == codelet.result
+
+    # codelet = codelet.child_codelets[0]
+    codelet = PotentialSubFrameToFrameCorrespondenceBuilder.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view},
+        1.0,
+    )
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    codelet.target_space_one = sentence_1_space
+    codelet.target_structure_one = sentence_1_sentence_label
+    codelet.target_space_two = view.parent_frame.output_space
+    codelet.target_structure_two = but_sentence_clause_1_label
+    codelet.target_conceptual_space = bubble_chamber.spaces["grammar"]
+    assert isinstance(codelet, PotentialSubFrameToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.filter(
+        lambda x: x.is_correspondence
+        and x.start in sentence_1_space.contents
+        and x.end in view.parent_frame.output_space.contents
+    ).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+
+    codelet = PotentialSubFrameToFrameCorrespondenceBuilder.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view},
+        1.0,
+    )
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    codelet.target_space_one = sentence_2_space
+    codelet.target_structure_one = sentence_2_sentence_label
+    codelet.target_space_two = view.parent_frame.output_space
+    codelet.target_structure_two = but_sentence_clause_2_label
+    codelet.target_conceptual_space = bubble_chamber.spaces["grammar"]
+    assert isinstance(codelet, PotentialSubFrameToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.filter(
+        lambda x: x.is_correspondence
+        and x.start in sentence_2_space.contents
+        and x.end in view.parent_frame.output_space.contents
+    ).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+
+    for structure_1, structure_2 in zip(
+        [
+            sentence_1_nsubj_label,
+            sentence_1_vb_label,
+            sentence_1_pred_label,
+            sentence_1_sentence_chunk,
+            sentence_1_nsubj_chunk,
+            sentence_1_vb_chunk,
+            sentence_1_pred_chunk,
+            sentence_1_vp_chunk,
+        ],
+        [
+            but_sentence_clause_1_nsubj_label,
+            but_sentence_clause_1_vb_label,
+            but_sentence_clause_1_pred_label,
+            but_sentence_clause_1_chunk,
+            but_sentence_clause_1_nsubj_chunk,
+            but_sentence_clause_1_vb_chunk,
+            but_sentence_clause_1_pred_chunk,
+            but_sentence_clause_1_vp_chunk,
+        ],
+    ):
+        codelet = SubFrameToFrameCorrespondenceBuilder.spawn(
+            "",
+            bubble_chamber,
+            {"target_view": view},
+            1.0,
+        )
+        codelet.parent_concept = bubble_chamber.concepts["same"]
+        codelet.target_space_one = sentence_1_space
+        codelet.target_structure_one = structure_1
+        codelet.target_space_two = view.parent_frame.output_space
+        codelet.target_structure_two = structure_2
+        codelet.target_conceptual_space = (
+            bubble_chamber.spaces["grammar"] if structure_1.is_label else None
+        )
+        assert isinstance(codelet, SubFrameToFrameCorrespondenceBuilder)
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        correspondence = codelet.child_structures.filter(
+            lambda x: x.is_correspondence
+            and x.start in sentence_1_space.contents
+            and x.end in view.parent_frame.output_space.contents
+        ).get()
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, CorrespondenceEvaluator)
+        assert 0 == correspondence.quality
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        assert 0 < correspondence.quality
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, CorrespondenceSelector)
+        original_correspondence_activation = correspondence.activation
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        correspondence.update_activation()
+        assert original_correspondence_activation < correspondence.activation
+
+    for structure_1, structure_2 in zip(
+        [
+            sentence_2_nsubj_label,
+            sentence_2_vb_label,
+            sentence_2_pred_label,
+            sentence_2_sentence_chunk,
+            sentence_2_nsubj_chunk,
+            sentence_2_vb_chunk,
+            sentence_2_pred_chunk,
+            sentence_2_vp_chunk,
+        ],
+        [
+            but_sentence_clause_2_nsubj_label,
+            but_sentence_clause_2_vb_label,
+            but_sentence_clause_2_pred_label,
+            but_sentence_clause_2_chunk,
+            but_sentence_clause_2_nsubj_chunk,
+            but_sentence_clause_2_vb_chunk,
+            but_sentence_clause_2_pred_chunk,
+            but_sentence_clause_2_vp_chunk,
+        ],
+    ):
+        codelet = SubFrameToFrameCorrespondenceBuilder.spawn(
+            "",
+            bubble_chamber,
+            {"target_view": view},
+            1.0,
+        )
+        codelet.parent_concept = bubble_chamber.concepts["same"]
+        codelet.target_space_one = sentence_2_space
+        codelet.target_structure_one = structure_1
+        codelet.target_space_two = view.parent_frame.output_space
+        codelet.target_structure_two = structure_2
+        codelet.target_conceptual_space = (
+            bubble_chamber.spaces["grammar"] if structure_1.is_label else None
+        )
+        assert isinstance(codelet, SubFrameToFrameCorrespondenceBuilder)
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        correspondence = codelet.child_structures.filter(
+            lambda x: x.is_correspondence
+            and x.start in sentence_2_space.contents
+            and x.end in view.parent_frame.output_space.contents
+        ).get()
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, CorrespondenceEvaluator)
+        assert 0 == correspondence.quality
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        assert 0 < correspondence.quality
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, CorrespondenceSelector)
+        original_correspondence_activation = correspondence.activation
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        correspondence.update_activation()
+        assert original_correspondence_activation < correspondence.activation
+
+    # project all of the letter chunks
+    for letter_chunk in but_sentence_view.parent_frame.output_space.contents.where(
+        is_letter_chunk=True
+    ):
+        codelet = LetterChunkProjectionSuggester.spawn(
+            "",
+            bubble_chamber,
+            {"target_view": but_sentence_view, "target_projectee": letter_chunk},
+            1.0,
+        )
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, LetterChunkProjectionBuilder)
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, LetterChunkProjectionEvaluator)
+        assert 0 == letter_chunk.quality
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        assert 0 < letter_chunk.quality
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, LetterChunkProjectionSelector)
+        original_letter_chunk_activation = letter_chunk.activation
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        letter_chunk.update_activation()
+        assert original_letter_chunk_activation < letter_chunk.activation
+
+    result = (
+        but_sentence_view.output_space.contents.filter(
+            lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+        )
+        .get()
+        .name
+    )
+    assert (
+        result
+        == "temperatures will be colder in the northwest than in the northeast but higher in the southeast than in the southwest"
+    )
+    # END: compile longer piece of text
+
+    # START: compare quality of "and" and "but" views
+    codelet = SimplexViewEvaluator.spawn(
+        "",
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(and_sentence_view),
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < and_sentence_view.quality
+
+    codelet = SimplexViewEvaluator.spawn(
+        "",
+        bubble_chamber,
+        bubble_chamber.new_structure_collection(but_sentence_view),
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < but_sentence_view.quality
+
+    # "but" view lacks correspondences to difference relations
+    assert but_sentence_view.quality < and_sentence_view.quality
+    # END: compare quality of "and" and "but" views
 
     end_time = time.time()
     total_codelets_run = bubble_chamber.loggers["activity"].codelets_run
