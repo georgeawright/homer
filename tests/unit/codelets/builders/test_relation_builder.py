@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from homer.codelet_result import CodeletResult
 from homer.codelets.builders import ChunkBuilder, RelationBuilder
 from homer.codelets.evaluators import RelationEvaluator
+from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures.links import Relation
 from homer.tools import hasinstance
@@ -12,6 +13,8 @@ from homer.tools import hasinstance
 @pytest.fixture
 def parent_concept():
     concept = Mock()
+    concept.location_in_space.return_value = Location([[10]], Mock())
+    concept.proximity_to.return_value = 1.0
     return concept
 
 
@@ -38,9 +41,10 @@ def target_structure_one(target_structure_two):
     return structure
 
 
-def test_successful_creates_chunk_and_spawns_follow_up(
+def test_successful_creates_relation_and_spawns_follow_up(
     bubble_chamber, target_structure_one, target_structure_two, parent_concept
 ):
+    bubble_chamber.conceptual_spaces = {"magnitude": Mock()}
     target_structures = {
         "target_structure_one": target_structure_one,
         "target_structure_two": target_structure_two,

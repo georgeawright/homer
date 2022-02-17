@@ -51,6 +51,9 @@ class Suggester(Codelet):
             self._fizzle()
             self.result = CodeletResult.FIZZLE
         else:
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Preliminary checks passed"
+            )
             self._calculate_confidence()
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Confidence: {self.confidence}"

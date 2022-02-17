@@ -12,6 +12,7 @@ def test_changes_target_structure_quality(
     concept = Mock()
     concept.classifier.classify.return_value = classification
     label = Mock()
+    label.start.is_label = False
     label.labels = bubble_chamber.new_structure_collection()
     label.quality = current_quality
     label.parent_concept = concept
@@ -30,6 +31,7 @@ def test_changes_target_structure_quality(
 
 def test_changes_labeled_label_quality(bubble_chamber):
     label = Mock()
+    label.start.is_label = False
     label.parent_concept.classifier.classify.return_value = 0.5
     label.quality = 0.5
 

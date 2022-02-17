@@ -89,6 +89,7 @@ class Label(Link):
                 *[location.space for location in new_locations]
             ),
         )
+        start.links_out.add(new_label)
         for space in new_label.parent_spaces:
             space.add(new_label)
         return new_label

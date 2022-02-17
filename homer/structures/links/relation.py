@@ -100,6 +100,8 @@ class Relation(Link):
                 *[location.space for location in new_locations]
             ),
         )
+        start.links_out.add(new_relation)
+        end.links_in.add(new_relation)
         for location in new_locations:
             location.space.add(new_relation)
         return new_relation

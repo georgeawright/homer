@@ -76,8 +76,16 @@ class Selector(Codelet):
         return self.result
 
     def _hold_competition(self):
-        champions_quality = self.champions.get().quality
-        challengers_quality = self.challengers.get().quality
+        champion_representative = self._get_representative(self.champions)
+        challenger_representative = self._get_representative(self.challengers)
+        champions_quality = champion_representative.quality
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Champion quality: {champions_quality}"
+        )
+        challengers_quality = challenger_representative.quality
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Challenger quality: {challengers_quality}"
+        )
         champ_size_adjusted_quality = champions_quality * self._champions_size
         chall_size_adjusted_quality = challengers_quality * self._challengers_size
         total_quality = champ_size_adjusted_quality + chall_size_adjusted_quality
@@ -115,11 +123,11 @@ class Selector(Codelet):
 
     @property
     def _champions_size(self):
-        return self.champions.get().size
+        return self._get_representative(self.champions).size
 
     @property
     def _challengers_size(self):
-        return self.challengers.get().size
+        return self._get_representative(self.challengers).size
 
     def _boost_activations(self):
         self._select_concept.boost_activation(self.confidence)
@@ -136,6 +144,9 @@ class Selector(Codelet):
     def _decay_losers(self):
         for loser in self.losers:
             loser.decay_activation(self.confidence)
+
+    def _get_representative(self, collection: StructureCollection):
+        return collection.get()
 
     def _passes_preliminary_checks(self):
         raise NotImplementedError

@@ -3812,6 +3812,47 @@ def test_pipeline_of_codelets(homer):
     assert but_sentence_view.quality > but_sentence_view_previous_quality
     # END: compare quality of "and" and "but" views
 
+    # START: make a sentence with "very"
+    parent_concept = bubble_chamber.concepts["very"]
+    target = chunk_one.labels_in_space(
+        bubble_chamber.conceptual_spaces["temperature"]
+    ).get()
+    codelet = LabelSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_node": target, "parent_concept": parent_concept},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelBuilder)
+    assert 1 == len(
+        chunk_one.labels_in_space(bubble_chamber.conceptual_spaces["temperature"])
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 2 == len(
+        chunk_one.labels_in_space(bubble_chamber.conceptual_spaces["temperature"])
+    )
+
+    label = codelet.child_structures.get()
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelEvaluator)
+    assert 0 == label.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < label.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LabelSelector)
+    label_original_activation = label.activation
+    target_original_activation = target.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    # END: make a sentence with "very"
+
     end_time = time.time()
     total_codelets_run = bubble_chamber.loggers["activity"].codelets_run
     # You can expect at least 100 codelets to run per second.

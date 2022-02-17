@@ -28,7 +28,9 @@ class LabelEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_label = self.target_structures.get()
+        target_label = self.target_structures.filter(
+            lambda x: not x.start.is_label
+        ).get()
         labels = []
         while target_label is not None:
             labels.append(target_label)

@@ -59,6 +59,10 @@ def bubble_chamber():
     same_concept = Mock()
     same_concept.structure_type = Correspondence
     same_concept.name = "same"
+    more_concept = Mock()
+    more_concept.name = "more"
+    less_concept = Mock()
+    less_concept.name = "less"
     chamber.concepts = chamber.new_structure_collection(
         suggest_concept,
         build_concept,
@@ -78,6 +82,8 @@ def bubble_chamber():
         text_concept,
         interpretation_concept,
         same_concept,
+        more_concept,
+        less_concept,
     )
     for concept in chamber.concepts:
         concept.activation = 0.5

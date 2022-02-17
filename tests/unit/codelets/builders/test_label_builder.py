@@ -12,6 +12,7 @@ from homer.tools import hasinstance
 
 
 def test_fizzles_if_label_exists(bubble_chamber):
+    bubble_chamber.conceptual_spaces = {"magnitude": Mock()}
     target_node = Mock()
     target_node.has_label.return_value = True
 
@@ -23,11 +24,13 @@ def test_fizzles_if_label_exists(bubble_chamber):
 
 
 def test_creates_new_label(bubble_chamber):
+    bubble_chamber.conceptual_spaces = {"magnitude": Mock()}
     target_node = Mock()
     target_node.is_link = False
     target_node.has_label.return_value = False
 
     parent_concept = Mock()
+    parent_concept.has_relation_with.return_value = False
     parent_concept.parent_space.contents = [target_node]
 
     target_structures = {"target_node": target_node, "parent_concept": parent_concept}
@@ -39,6 +42,7 @@ def test_creates_new_label(bubble_chamber):
 
 
 def test_copies_label_and_adds_label(bubble_chamber):
+    bubble_chamber.conceptual_spaces = {"magnitude": Mock()}
     node = Mock()
     node.is_link = False
     node.is_node = True
@@ -51,6 +55,7 @@ def test_copies_label_and_adds_label(bubble_chamber):
     label.labels = bubble_chamber.new_structure_collection()
 
     parent_concept = Mock()
+    parent_concept.has_relation_with.return_value = False
     parent_concept.parent_space.contents = [label]
 
     target_structures = {"target_node": label, "parent_concept": parent_concept}
@@ -62,6 +67,7 @@ def test_copies_label_and_adds_label(bubble_chamber):
 
 
 def test_copies_labels_label_and_adds_label(bubble_chamber):
+    bubble_chamber.conceptual_spaces = {"magnitude": Mock()}
     node = Mock()
     node.is_link = False
     node.is_node = True
@@ -81,6 +87,7 @@ def test_copies_labels_label_and_adds_label(bubble_chamber):
     label_label.labels = bubble_chamber.new_structure_collection()
 
     parent_concept = Mock()
+    parent_concept.has_relation_with.return_value = False
     parent_concept.parent_space.contents = [label_label]
 
     target_structures = {"target_node": label_label, "parent_concept": parent_concept}

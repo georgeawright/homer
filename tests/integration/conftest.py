@@ -259,6 +259,9 @@ def program():
   (def-concept :name "less" :locations (list (Location (list (list -5)) more-less-space))
     :classifier (DifferenceClassifier -5) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
+    
+(def-relation :start more-concept :end more-concept)
+(def-relation :start less-concept :end less-concept)
 
 (define more-word (def-letter-chunk :name "more" :locations (list)))
 (def-relation :start more-concept :end more-word :parent_concept jj-concept)
@@ -309,6 +312,9 @@ def program():
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space height-space :distance_function centroid_euclidean_distance))
 
+(def-relation :start high-concept :end more-concept)
+(def-relation :start low-concept :end less-concept)
+
 (define high-word (def-letter-chunk :name "high" :locations (list)))
 (def-relation :start high-concept :end high-word :parent_concept jj-concept)
 (def-relation :start high-concept :end high-word :parent_concept jjr-concept)
@@ -333,6 +339,9 @@ def program():
   (def-concept :name "bad" :locations (list (Location (list (list 0)) goodness-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space goodness-space :distance_function centroid_euclidean_distance))
+
+(def-relation :start good-concept :end more-concept)
+(def-relation :start bad-concept :end less-concept)
 
 (define good-word (def-letter-chunk :name "good" :locations (list)))
 (def-relation :start good-concept :end good-word :parent_concept jj-concept)
@@ -390,6 +399,13 @@ def program():
   (def-concept :name "cold" :locations (list (Location (list (list 4)) temperature-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space temperature-space :distance_function centroid_euclidean_distance))
+    
+(def-relation :start hot-concept :end more-concept)
+(def-relation :start warm-concept :end more-concept)
+(def-relation :start extreme-concept :end more-concept)
+(def-relation :start cool-concept :end less-concept)
+(def-relation :start cold-concept :end less-concept)
+(def-relation :start mild-concept :end less-concept)
 
 (def-correspondence :start hot-concept :end high-concept :parent_concept same-concept)
 (def-correspondence :start hot-concept :end good-concept :parent_concept same-concept)
