@@ -8,7 +8,6 @@ from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Node, Space
-from homer.structures.spaces import ContextualSpace
 
 from .concept import Concept
 from .rule import Rule

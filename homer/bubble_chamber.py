@@ -1,4 +1,3 @@
-from itertools import chain
 import statistics
 from typing import Callable, Dict, List, Union
 
@@ -13,7 +12,7 @@ from .problem import Problem
 from .random_machine import RandomMachine
 from .structure import Structure
 from .structure_collection import StructureCollection
-from .structures import Frame, Space, View
+from .structures import Frame, LinkOrNode, Space, View
 from .structures.links import Correspondence, Label, Relation
 from .structures.nodes import Chunk, Concept, Rule
 from .structures.nodes.chunks import LetterChunk
@@ -444,6 +443,31 @@ class BubbleChamber:
         self.add(rule)
         return rule
 
+    def new_link_or_node(
+        self,
+        parent_space: Space = None,
+        locations: List[Location] = None,
+        parent_id: str = "",
+        quality: FloatBetweenOneAndZero = 0.0,
+    ) -> LinkOrNode:
+        parent_spaces = self.new_structure_collection(
+            *[location.space for location in locations]
+        )
+        link_or_node = LinkOrNode(
+            structure_id=ID.new(LinkOrNode),
+            parent_id=parent_id,
+            parent_space=parent_space,
+            locations=locations,
+            quality=quality,
+            links_in=self.new_structure_collection(),
+            links_out=self.new_structure_collection(),
+            parent_spaces=parent_spaces,
+        )
+        for space in parent_spaces:
+            space.add(link_or_node)
+        self.loggers["structure"].log(link_or_node)
+        return link_or_node
+
     def new_correspondence(
         self,
         start: Structure,
@@ -517,7 +541,8 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
         )
-        start.links_out.add(label)
+        if start is not None:
+            start.links_out.add(label)
         self.add(label)
         self.loggers["structure"].log(start)
         return label

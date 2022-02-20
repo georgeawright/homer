@@ -137,6 +137,9 @@ class LabelBuilder(Builder):
                     self.bubble_chamber.conceptual_spaces["magnitude"],
                 )
             )
+            self.target_node.parent_space.conceptual_spaces.add(
+                self.bubble_chamber.conceptual_spaces["magnitude"]
+            )
         if self.parent_concept.has_relation_with(self.bubble_chamber.concepts["less"]):
             proximity_to_prototype = self.parent_concept.proximity_to(self.target_node)
             concept_location = self.parent_concept.location_in_space(
@@ -157,6 +160,9 @@ class LabelBuilder(Builder):
                     magnitude_coordinates,
                     self.bubble_chamber.conceptual_spaces["magnitude"],
                 )
+            )
+            self.target_node.parent_space.conceptual_spaces.add(
+                self.bubble_chamber.conceptual_spaces["magnitude"]
             )
         self.child_structures = self.bubble_chamber.new_structure_collection()
         if self.target_node.is_link:

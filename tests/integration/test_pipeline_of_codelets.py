@@ -1130,7 +1130,7 @@ def test_pipeline_of_codelets(homer):
     )
     codelet.target_space_two = view.parent_frame.output_space
     codelet.target_structure_two = codelet.target_space_two.contents.where(
-        structure_id="Label55"
+        structure_id="Label63"
     ).get()
     codelet.target_conceptual_space = bubble_chamber.conceptual_spaces["grammar"]
     assert isinstance(codelet, SubFrameToFrameCorrespondenceBuilder)
@@ -2593,8 +2593,9 @@ def test_pipeline_of_codelets(homer):
         .get()
     )
     codelet.target_space_two = view.parent_frame.output_space
+
     codelet.target_structure_two = codelet.target_space_two.contents.where(
-        structure_id="Label84"
+        structure_id="Label92"
     ).get()
     codelet.target_conceptual_space = bubble_chamber.conceptual_spaces["grammar"]
     assert isinstance(codelet, SubFrameToFrameCorrespondenceBuilder)
@@ -3837,7 +3838,9 @@ def test_pipeline_of_codelets(homer):
         chunk_one.labels_in_space(bubble_chamber.conceptual_spaces["temperature"])
     )
 
-    label = codelet.child_structures.get()
+    label = codelet.child_structures.filter(
+        lambda x: x not in bubble_chamber.conceptual_spaces["temperature"].contents
+    ).get()
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelEvaluator)
     assert 0 == label.quality
@@ -3851,10 +3854,250 @@ def test_pipeline_of_codelets(homer):
     target_original_activation = target.activation
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
+
+    # build simple adectival phrase view
+    frame = bubble_chamber.frames["ap[jj]"]
+    codelet = SimplexViewSuggester.spawn(
+        "", bubble_chamber, {"frame": frame, "contextual_space": input_space}, 1.0
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    slot_space = codelet.frame.input_space.conceptual_spaces.where(is_slot=True).get()
+    codelet.conceptual_spaces_map[slot_space] = bubble_chamber.conceptual_spaces[
+        "temperature"
+    ]
+    assert isinstance(codelet, SimplexViewBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    view = codelet.child_structures.get()
+    jj_view = view
+    assert len(view.input_spaces) == 1
+
+    # build sameness correspondence between temperature labels
+    target_label = chunk_one.labels.filter(
+        lambda x: x in bubble_chamber.conceptual_spaces["temperature"].contents
+        and not x.labels.is_empty()
+    ).get()
+    codelet = SpaceToFrameCorrespondenceSuggester.spawn(
+        "",
+        bubble_chamber,
+        {
+            "target_view": jj_view,
+            "target_space_one": input_space,
+            "target_structure_one": target_label,
+        },
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert len(jj_view.input_spaces) == 1
+
+    codelet = codelet.child_codelets[0]
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.where(is_correspondence=True).get()
+    assert len(jj_view.input_spaces) == 1
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+    assert len(view.input_spaces) == 1
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+    assert len(view.input_spaces) == 1
+
+    # project adjective into outupt space
+    letter_chunk_slot = view.parent_frame.output_space.contents.where(
+        is_letter_chunk=True
+    ).get()
+    codelet = LetterChunkProjectionSuggester.spawn(
+        "",
+        bubble_chamber,
+        {"target_view": view, "target_projectee": letter_chunk_slot},
+        1.0,
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
+    assert "cold" == view.output_space.contents.where(is_letter_chunk=True).get().name
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionEvaluator)
+    assert 0 == letter_chunk.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < letter_chunk.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, LetterChunkProjectionSelector)
+    original_letter_chunk_activation = letter_chunk.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    letter_chunk.update_activation()
+    assert original_letter_chunk_activation < letter_chunk.activation
+
+    # build compound adectival phrase view
+    frame = bubble_chamber.frames["ap-frame"]
+    codelet = SimplexViewSuggester.spawn(
+        "", bubble_chamber, {"frame": frame, "contextual_space": input_space}, 1.0
+    )
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+
+    codelet = codelet.child_codelets[0]
+    slot_space = codelet.frame.input_space.conceptual_spaces.where(is_slot=True).get()
+    codelet.conceptual_spaces_map[slot_space] = bubble_chamber.conceptual_spaces[
+        "temperature"
+    ]
+    assert isinstance(codelet, SimplexViewBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    view = codelet.child_structures.get()
+    ap_view = view
+    assert len(view.input_spaces) == 1
+
+    # build correspondence from ap sub-frame label to ap frame label
+    from homer.tools import print_out
+
+    codelet = PotentialSubFrameToFrameCorrespondenceBuilder.spawn(
+        "", bubble_chamber, {"target_view": view}, 1.0
+    )
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    sub_view = jj_view
+    codelet.target_structure_one = jj_view.parent_frame.input_space.contents.where(
+        is_label=True
+    ).get()
+    print_out(codelet.target_structure_one)
+    codelet.target_space_one = jj_view.parent_frame.input_space
+    print_out(ap_view.parent_frame.input_space)
+    print_out(ap_view.parent_frame.input_space.contents)
+    codelet.target_structure_two = ap_view.parent_frame.input_space.contents.filter(
+        lambda x: x.is_label
+        and x.has_location_in_space(bubble_chamber.conceptual_spaces["temperature"])
+    ).get()
+    print_out(codelet.target_structure_two)
+    codelet.target_space_two = view.parent_frame.input_space
+    codelet.target_conceptual_space = bubble_chamber.conceptual_spaces["temperature"]
+    assert isinstance(codelet, PotentialSubFrameToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.filter(
+        lambda x: x.is_correspondence
+        and x.start in jj_view.parent_frame.input_space.contents
+        and x.end in ap_view.parent_frame.input_space.contents
+    ).get()
+    adj_label_correspondence = correspondence
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+
+    # build correspondence from ap sub-frame word to ap frame word
+    codelet = SubFrameToFrameCorrespondenceBuilder.spawn(
+        "", bubble_chamber, {"target_view": view}, 1.0
+    )
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    codelet.target_space_one = jj_view.parent_frame.output_space
+    codelet.target_structure_one = codelet.target_space_one.contents.where(
+        is_letter_chunk=True
+    ).get()
+    codelet.target_space_two = ap_view.parent_frame.output_space
+    codelet.target_structure_two = (
+        codelet.target_space_two.contents.where(
+            is_letter_chunk=True, super_chunks=bubble_chamber.new_structure_collection()
+        )
+        .get()
+        .right_branch.get()
+    )
+    codelet.target_conceptual_space = None
+    assert isinstance(codelet, SubFrameToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.where(is_correspondence=True).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+
+    # build correspondence from very label to magnitude slot label
+    codelet = SpaceToFrameCorrespondenceBuilder.spawn(
+        "", bubble_chamber, {"target_view": view}, 1.0
+    )
+    codelet.parent_concept = bubble_chamber.concepts["same"]
+    codelet.target_space_one = input_space
+    codelet.target_structure_one = input_space.contents.where(
+        is_label=True, parent_concept=bubble_chamber.concepts["very"]
+    ).get()
+    codelet.target_space_two = ap_view.parent_frame.input_space
+    codelet.target_structure_two = codelet.target_space_two.contents.filter(
+        lambda x: x in bubble_chamber.conceptual_spaces["magnitude"].contents
+        and x not in bubble_chamber.conceptual_spaces["temperature"].contents
+    ).get()
+    codelet.conceptual_space = bubble_chamber.conceptual_spaces["magnitude"]
+    assert isinstance(codelet, SpaceToFrameCorrespondenceBuilder)
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence = codelet.child_structures.where(is_correspondence=True).get()
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceEvaluator)
+    assert 0 == correspondence.quality
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    assert 0 < correspondence.quality
+
+    codelet = codelet.child_codelets[0]
+    assert isinstance(codelet, CorrespondenceSelector)
+    original_correspondence_activation = correspondence.activation
+    codelet.run()
+    assert CodeletResult.FINISH == codelet.result
+    correspondence.update_activation()
+    assert original_correspondence_activation < correspondence.activation
+
     # END: make a sentence with "very"
 
     end_time = time.time()
     total_codelets_run = bubble_chamber.loggers["activity"].codelets_run
-    # You can expect at least 100 codelets to run per second.
+    # Expect at least 60 codelets to run per second.
     # Remove/alter the below assertion if running with less resources.
-    assert (end_time - start_time) < (total_codelets_run / 100)
+    assert (end_time - start_time) < (total_codelets_run // 60)

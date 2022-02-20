@@ -1,6 +1,7 @@
 from __future__ import annotations
 import statistics
 
+from homer.errors import MissingStructureError
 from homer.id import ID
 from homer.location import Location
 from homer.locations import TwoPointLocation
@@ -146,6 +147,22 @@ class ContextualSpace(Space):
                 new_start.links_out.add(new_relation)
                 new_space.add(new_relation)
                 copies[relation] = new_relation
+            while True:
+                try:
+                    label = self.contents.filter(
+                        lambda x: x.is_label and x.start in copies and x not in copies
+                    ).get()
+                    new_label = label.copy(
+                        start=new_item,
+                        parent_space=new_space,
+                        parent_id=parent_id,
+                        bubble_chamber=bubble_chamber,
+                    )
+                    new_item.links_out.add(new_label)
+                    new_space.add(new_label)
+                    copies[label] = new_label
+                except MissingStructureError:
+                    break
         return new_space, copies
 
     def to_long_string(self) -> str:

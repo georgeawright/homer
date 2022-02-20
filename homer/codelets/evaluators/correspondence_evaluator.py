@@ -32,6 +32,9 @@ class CorrespondenceEvaluator(Evaluator):
         target_correspondence = self.target_structures.where(
             is_correspondence=True
         ).get()
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Evaluating {target_correspondence}"
+        )
         self.confidence = target_correspondence.parent_concept.classifier.classify(
             space=target_correspondence.conceptual_space,
             concept=target_correspondence.parent_concept,
