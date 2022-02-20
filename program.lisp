@@ -320,7 +320,7 @@
 (def-relation :start very-concept :end very-word :parent_concept rb-concept)
 (define quite-word (def-letter-chunk :name "quite" :locations (list)))
 (def-relation :start quite-concept :end quite-word :parent_concept rb-concept)
-(define bit-word (def-letter-chunk :name "a bit" :locations (list)))
+(define bit-word (def-letter-chunk :name """a bit""" :locations (list)))
 (def-relation :start bit-concept :end bit-word :parent_concept rb-concept)
 
 (define height-concept
@@ -705,7 +705,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list) ap-frame-output))))
 (define qualifier-word-magnitude-label
-  (def-label :start qualifier-word :parent_concept rb-concept
+  (def-label :start qualifier-word :parent_concept magnitude-label-concept
     :locations (list (Location (list) magnitude-space)
 		     (Location (list) ap-frame-output))))
 (define adjective-word

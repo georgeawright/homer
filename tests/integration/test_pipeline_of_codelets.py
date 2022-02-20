@@ -4094,6 +4094,48 @@ def test_pipeline_of_codelets(homer):
     correspondence.update_activation()
     assert original_correspondence_activation < correspondence.activation
 
+    # project all of the letter chunks
+    for letter_chunk in view.parent_frame.output_space.contents.where(
+        is_letter_chunk=True
+    ):
+        codelet = LetterChunkProjectionSuggester.spawn(
+            "",
+            bubble_chamber,
+            {"target_view": view, "target_projectee": letter_chunk},
+            1.0,
+        )
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, LetterChunkProjectionBuilder)
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        letter_chunk = codelet.child_structures.where(is_letter_chunk=True).get()
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, LetterChunkProjectionEvaluator)
+        assert 0 == letter_chunk.quality
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        assert 0 < letter_chunk.quality
+
+        codelet = codelet.child_codelets[0]
+        assert isinstance(codelet, LetterChunkProjectionSelector)
+        original_letter_chunk_activation = letter_chunk.activation
+        codelet.run()
+        assert CodeletResult.FINISH == codelet.result
+        letter_chunk.update_activation()
+        assert original_letter_chunk_activation < letter_chunk.activation
+
+    assert (
+        view.output_space.contents.filter(
+            lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+        )
+        .get()
+        .name
+        == "very cold"
+    )
     # END: make a sentence with "very"
 
     end_time = time.time()

@@ -3,6 +3,10 @@ import statistics
 from typing import Iterable, List, Union
 
 
+def print_out(x):
+    print(x)
+
+
 def centroid_euclidean_distance(a, b) -> float:
     if len(a) == len(b) == 0:
         # TODO: possibly get rid of this if statment

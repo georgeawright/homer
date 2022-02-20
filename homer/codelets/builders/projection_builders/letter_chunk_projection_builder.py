@@ -42,6 +42,9 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 )
         else:
             abstract_chunk = self._get_abstract_chunk()
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found abstract chunk: {abstract_chunk}"
+            )
             self.target_projectee.abstract_chunk = abstract_chunk
             sameness_relations = self.target_projectee.links_in.where(
                 is_relation=True, parent_concept=self.bubble_chamber.concepts["same"]
@@ -120,10 +123,19 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
 
     def _get_abstract_chunk(self):
         if not self.target_projectee.members.is_empty():
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Target projectee is abstract chunk"
+            )
             return self.target_projectee
         if not self.target_projectee.correspondences.is_empty():
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Correspondee to target projectee is abstract chunk"
+            )
             return self.target_projectee.correspondees.where_not(name=None).get()
         if not self.target_projectee.links_in.where(is_relation=True).is_empty():
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Abstract chunk is based on relations"
+            )
             relation = self.target_projectee.relations.get()
             relative = self.target_projectee.relatives.get()
             relative_correspondee = (
@@ -138,10 +150,16 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             return abstract_relation.arguments.get(
                 exclude=[relative_correspondee.abstract_chunk]
             )
+        self.bubble_chamber.loggers["activity"].log(
+            self, "Abstract chunk is based on labels"
+        )
         grammar_label = self.target_projectee.labels.filter(
             lambda x: x.parent_concept.parent_space
             == self.bubble_chamber.conceptual_spaces["grammar"]
         ).get()
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Grammar label: {grammar_label}"
+        )
         grammar_concept = (
             grammar_label.parent_concept
             if not grammar_label.parent_concept.is_slot
@@ -151,6 +169,9 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             lambda x: x.parent_concept.parent_space
             != self.bubble_chamber.conceptual_spaces["grammar"]
         ).get()
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Meaning label: {meaning_label}"
+        )
         meaning_concept = (
             meaning_label.parent_concept
             if not meaning_label.parent_concept.is_slot
