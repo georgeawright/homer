@@ -14,7 +14,8 @@ class LabelEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["label"]
-        target = bubble_chamber.labels.get()
+        input_space = bubble_chamber.input_spaces.get()
+        target = input_space.contents.where(is_label=True).get()
         return cls.spawn(
             parent_id,
             bubble_chamber,

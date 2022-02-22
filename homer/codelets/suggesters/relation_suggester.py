@@ -60,8 +60,11 @@ class RelationSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_space = bubble_chamber.conceptual_spaces.where(no_of_dimensions=1).get()
-        target = target_space.contents.where(is_node=True).get(key=relating_exigency)
+        input_space = bubble_chamber.input_spaces.get()
+        target = input_space.contents.where(is_chunk=True).get(key=relating_exigency)
+        target_space = target.parent_spaces.where(
+            is_conceptual_space=True, no_of_dimensions=1
+        ).get()
         urgency = urgency if urgency is not None else target.unrelatedness
         return cls.spawn(
             parent_id,
@@ -85,7 +88,7 @@ class RelationSuggester(Suggester):
     ):
         # TODO: this may need work
         input_space = bubble_chamber.input_spaces.get()
-        conceptual_space = input_space.conceptual_spaces.get()
+        conceptual_space = input_space.conceptual_spaces.where(no_of_dimensions=1).get()
         potential_targets = input_space.contents.where(is_node=True)
         try:
             target_structure_one, target_structure_two = potential_targets.pairs.get(
@@ -106,7 +109,7 @@ class RelationSuggester(Suggester):
             parent_id,
             bubble_chamber,
             {
-                "target_space": target_space,
+                "target_space": conceptual_space,
                 "target_structure_one": target_structure_one,
                 "target_structure_two": target_structure_two,
                 "parent_concept": parent_concept,
@@ -132,8 +135,11 @@ class RelationSuggester(Suggester):
             self.parent_concept = (
                 self.bubble_chamber.conceptual_spaces.where(structure_type=Relation)
                 .get()
-                .contents.where(is_concept=True)
+                .contents.where(is_concept=True, is_slot=False)
                 .get()
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found parent concept: {self.parent_concept}"
             )
         if self.target_structure_two is None:
             try:

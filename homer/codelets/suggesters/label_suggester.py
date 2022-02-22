@@ -112,7 +112,7 @@ class LabelSuggester(Suggester):
             try:
                 self.parent_concept = (
                     conceptual_space.contents.where(
-                        is_concept=True, structure_type=Label
+                        is_concept=True, structure_type=Label, is_slot=False
                     )
                     .near(location)
                     .get()
@@ -130,6 +130,9 @@ class LabelSuggester(Suggester):
                     return False
         if self.parent_concept is None:
             return False
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Found parent concept: {self.parent_concept}"
+        )
         return not self.target_node.has_label(self.parent_concept)
 
     def _calculate_confidence(self):

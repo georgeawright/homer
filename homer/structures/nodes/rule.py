@@ -59,6 +59,8 @@ class Rule(Node):
         ).filter(
             lambda x: x != self and x.is_rule and x.parent_space == self.parent_space
         )
+        if linked_rules.is_empty():
+            linked_rules.add(self)
         return linked_rules
 
     def compatibility_with(
@@ -103,7 +105,7 @@ class Rule(Node):
 
     def is_compatible_with(self, *fragments: List[Structure]) -> bool:
         # TODO: update for chunks
-        raise NotImplementedError
+        return True
         if len(fragments) == 1:
             fragment = fragments[0]
             return (

@@ -67,7 +67,7 @@ class ChunkSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = bubble_chamber.production_views.get(key=activation)
-        target_space = target_view.spaces.where_not(is_frame=True).get()
+        target_space = target_view.input_spaces.get()
         target_node = target_space.contents.where(is_node=True).get(
             key=chunking_exigency
         )
@@ -92,7 +92,7 @@ class ChunkSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = bubble_chamber.production_views.get(key=activation)
-        target_space = target_view.spaces.where_not(is_frame=True).get()
+        target_space = target_view.input_spaces.get()
         target_node = bubble_chamber.new_structure_collection(
             *[
                 node
@@ -100,6 +100,7 @@ class ChunkSuggester(Suggester):
                 if target_rule.is_compatible_with(node)
             ]
         ).get(key=chunking_exigency)
+        urgency = target_node.chunking_exigency if urgency is None else urgency
         return cls.spawn(
             parent_id,
             bubble_chamber,
