@@ -88,11 +88,10 @@ class RelationSuggester(Suggester):
         conceptual_space = input_space.conceptual_spaces.get()
         potential_targets = input_space.contents.where(is_node=True)
         try:
-            target_structure_one = potential_targets.get(
-                key=lambda x: parent_concept.proximity_to_start(x),
-            )
-            target_structure_two = target_structure_one.get_potential_relative(
-                space=conceptual_space, concept=parent_concept
+            target_structure_one, target_structure_two = potential_targets.pairs.get(
+                key=lambda x: parent_concept.classifier.classify(
+                    start=x[0], end=x[1], space=conceptual_space
+                )
             )
         except NoLocationError:
             raise MissingStructureError

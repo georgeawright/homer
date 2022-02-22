@@ -37,6 +37,13 @@ class StructureCollection:
             a.bubble_chamber, [structure for structure in a if structure not in b]
         )
 
+    @property
+    def pairs(self) -> StructureCollection:
+        return StructureCollection(
+            self.bubble_chamber,
+            [(a, b) for a in self.structures for b in self.structures],
+        )
+
     def __len__(self):
         return len(self.structures)
 
