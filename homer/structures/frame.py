@@ -56,9 +56,6 @@ class Frame(Structure):
             self.output_space.contents.where(is_slot=True),
         )
 
-    def update_activation(self):
-        raise NotImplementedError
-
     def instantiate(
         self,
         input_space: "ContextualSpace",

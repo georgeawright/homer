@@ -19,6 +19,8 @@ class LetterChunkProjectionEvaluator(ProjectionEvaluator):
         structure_type = bubble_chamber.concepts["letter-chunk"]
         word = bubble_chamber.input_nodes.where(is_letter_chunk=True).get()
         correspondences = word.correspondences.where(end=word)
+        if correspondences.is_empty():
+            raise MissingStructureError
         target_structures = StructureCollection.union(
             bubble_chamber.new_structure_collection(word), correspondences
         )

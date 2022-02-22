@@ -29,6 +29,7 @@ class Label(Link):
             structure_id=structure_id,
             parent_id=parent_id,
             start=start,
+            end=None,
             arguments=arguments,
             locations=locations,
             parent_concept=parent_concept,

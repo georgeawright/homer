@@ -23,6 +23,7 @@ class ContextualSpace(Space):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        is_main_input: bool = False,
     ):
         Space.__init__(
             self,
@@ -37,6 +38,7 @@ class ContextualSpace(Space):
             parent_spaces=parent_spaces,
         )
         self.conceptual_spaces = conceptual_spaces
+        self.is_main_input = is_main_input
         self.is_contextual_space = True
 
     @property

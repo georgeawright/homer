@@ -13,7 +13,9 @@ class ChunkEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["chunk"]
-        target = bubble_chamber.input_nodes.where(is_chunk=True).get()
+        target = bubble_chamber.input_nodes.where(
+            is_chunk=True, is_letter_chunk=False, is_raw=False
+        ).get()
         return cls.spawn(
             parent_id,
             bubble_chamber,

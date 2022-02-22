@@ -28,6 +28,8 @@ class LabelProjectionEvaluator(ProjectionEvaluator):
         ).get()
         label = view.ouptut_space.contents.where(is_label=True).get()
         correspondences = label.correspondences.where(end=label)
+        if correspondences.is_empty():
+            raise MissingStructureError
         target_structures = StructureCollection.union(
             bubble_chamber.new_structure_collection(label), correspondences
         )

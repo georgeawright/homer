@@ -13,7 +13,7 @@ class SimplexViewSuggester(ViewSuggester):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
-        contextual_space = bubble_chamber.contextual_spaces.get(key=activation)
+        contextual_space = bubble_chamber.input_spaces.get(key=activation)
         frame = bubble_chamber.frames.get(key=activation)
         urgency = urgency if urgency is not None else frame.activation
         return cls.spawn(

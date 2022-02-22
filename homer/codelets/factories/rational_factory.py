@@ -19,7 +19,7 @@ class RationalFactory(Factory):
 
     def _engender_follow_up(self):
         follow_up_class = self._decide_follow_up_class()
-        rand = self.bubble_chamber.random_machine.generate_random_number()
+        rand = self.bubble_chamber.random_machine.generate_number()
         if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make(self.codelet_id, self.bubble_chamber)
             self.child_codelets.append(follow_up)

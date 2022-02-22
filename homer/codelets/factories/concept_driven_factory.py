@@ -23,7 +23,7 @@ class ConceptDrivenFactory(Factory):
     def _engender_follow_up(self):
         parent_concept = self._get_parent_concept()
         follow_up_class = self._get_follow_up_class(parent_concept)
-        rand = self.bubble_chamber.random_machine.generate_random_number()
+        rand = self.bubble_chamber.random_machine.generate_number()
         if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make_top_down(
                 self.codelet_id, self.bubble_chamber, parent_concept

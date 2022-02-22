@@ -1,4 +1,3 @@
-;;; define more-less relations for concepts for very usage
 (define input-concept (def-concept :name "input"))
 (define text-concept (def-concept :name "text"))
 
@@ -73,61 +72,33 @@
   (def-concept :name "view-simplex" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
 
-(def-relation :start inner-concept :end chunk-concept :activation 1.0)
-(def-relation :start chunk-concept :end label-concept :activation 1.0)
-(def-relation :start chunk-concept :end relation-concept :activation 1.0)
-(def-relation :start chunk-concept :end view-concept :activation 1.0)
-(def-relation :start inner-concept :end label-concept :activation 1.0)
-(def-relation :start inner-concept :end relation-concept :activation 1.0)
-(def-relation :start view-concept :end view-simplex-concept :activation 1.0)
-(def-relation :start view-concept :end view-monitoring-concept :activation 1.0)
-(def-relation :start view-monitoring-concept :end reverse-concept :activation 1.0)
-(def-relation :start view-monitoring-concept :end outer-concept :activation 1.0)
-(def-relation :start reverse-concept :end outer-concept :activation 1.0)
-(def-relation :start view-simplex-concept :end correspondence-concept :activation 1.0)
-(def-relation :start view-simplex-concept :end letter-chunk-concept :activation 1.0)
-(def-relation :start view-monitoring-concept :end letter-chunk-concept :activation 1.0)
-(def-relation :start label-concept :end letter-chunk-concept :activation 1.0)
-(def-relation :start relation-concept :end letter-chunk-concept :activation 1.0)
-(def-relation :start view-monitoring-concept :end publish-concept :activation 1.0)
-
-(def-relation :start suggest-concept :end build-concept
-  :activation 1.0 :is_bidirectional False)
-(def-relation :start build-concept :end evaluate-concept
-  :activation 1.0 :is_bidirectional False)
-(def-relation :start evaluate-concept :end select-concept
-  :activation 1.0 :is_bidirectional False)
-(def-relation :start select-concept :end suggest-concept
-  :activation 1.0 :is_bidirectional False)
-
-(def-relation :start suggest-concept :end correspondence-concept)
-(def-relation :start suggest-concept :end label-concept :activation 1.0)
-(def-relation :start suggest-concept :end relation-concept)
 (def-relation :start suggest-concept :end chunk-concept)
+(def-relation :start suggest-concept :end correspondence-concept)
+(def-relation :start suggest-concept :end label-concept)
 (def-relation :start suggest-concept :end letter-chunk-concept)
+(def-relation :start suggest-concept :end relation-concept)
 (def-relation :start suggest-concept :end view-simplex-concept)
-(def-relation :start suggest-concept :end view-monitoring-concept)
-(def-relation :start build-concept :end correspondence-concept)
-(def-relation :start build-concept :end label-concept :activation 1.0)
-(def-relation :start build-concept :end relation-concept)
+
 (def-relation :start build-concept :end chunk-concept)
+(def-relation :start build-concept :end correspondence-concept)
+(def-relation :start build-concept :end label-concept)
 (def-relation :start build-concept :end letter-chunk-concept)
+(def-relation :start build-concept :end relation-concept)
 (def-relation :start build-concept :end view-simplex-concept)
-(def-relation :start build-concept :end view-monitoring-concept)
-(def-relation :start evaluate-concept :end correspondence-concept)
-(def-relation :start evaluate-concept :end label-concept :activation 1.0)
-(def-relation :start evaluate-concept :end relation-concept)
+
 (def-relation :start evaluate-concept :end chunk-concept)
+(def-relation :start evaluate-concept :end correspondence-concept)
+(def-relation :start evaluate-concept :end label-concept)
 (def-relation :start evaluate-concept :end letter-chunk-concept)
+(def-relation :start evaluate-concept :end relation-concept)
 (def-relation :start evaluate-concept :end view-simplex-concept)
-(def-relation :start evaluate-concept :end view-monitoring-concept)
-(def-relation :start select-concept :end correspondence-concept)
-(def-relation :start select-concept :end label-concept :activation 1.0)
-(def-relation :start select-concept :end relation-concept)
+
 (def-relation :start select-concept :end chunk-concept)
+(def-relation :start select-concept :end correspondence-concept)
+(def-relation :start select-concept :end label-concept)
 (def-relation :start select-concept :end letter-chunk-concept)
+(def-relation :start select-concept :end relation-concept)
 (def-relation :start select-concept :end view-simplex-concept)
-(def-relation :start select-concept :end view-monitoring-concept)
 
 (define grammar-distance-to-proximity 0.1)
 (define grammar-concept
@@ -263,8 +234,8 @@
 (def-relation :start different-concept :end different-word :parent_concept jj-concept)
 
 (define more-less-concept
-  (def-concept :name "more-less" :locations (list) :classifier None :instance_type None
-    :structure_type None :parent_space None
+  (def-concept :name "more-less" :locations (list) :classifier None :instance_type Chunk
+    :structure_type Relation :parent_space None
     :distance_function centroid_euclidean_distance))
 (define more-less-space
   (def-conceptual-space :name "more-less" :parent_concept more-less-concept
@@ -775,10 +746,10 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :no_of_dimensions 1))
 (define label-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space
-    :locations (list (Location (list) conceptual-space))
+    :locations (list (Location (list) conceptual-space))))
 (define relation-concept
   (def-concept :name "" :is_slot True :parent_space more-less-space
-    :locations (list (Location (list) more-less-space))))))
+    :locations (list (Location (list) more-less-space))))
 (def-relation :start label-concept :end relation-concept
   :parent_concept more-concept)
 (define rp-input
@@ -848,8 +819,6 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list) rp-output))))
 
-;;; check that the relation-label relation actually does something in correspondence suggesting
-
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
 (define conceptual-space
@@ -901,7 +870,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_spaces (StructureCollection
 			grammar-space location-space conceptual-space)))
 (define nn-sub-frame-2
-  (def-frame :name "s-comparative-nn-sub-2" :parent-concept np-concept :parent-frame None
+  (def-frame :name "s-comparative-nn-sub-2" :parent_concept np-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection location-concept-2)
     :input_space nn-sub-frame-2-input
@@ -1482,159 +1451,190 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 
 (define input-space
   (def-contextual-space :name "input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection temperature-space location-space)))
+    :conceptual_spaces (StructureCollection temperature-space location-space)
+    :is_main_input True))
 
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 4)) temperature-space)
 		   (Location (list (list 0 0)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 4)) temperature-space)
 		   (Location (list (list 0 1)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 0 2)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 0 3)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 0 4)) location-space))
   :parent_space input-space)
 
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 4)) temperature-space)
 		   (Location (list (list 1 0)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 4)) temperature-space)
 		   (Location (list (list 1 1)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 1 2)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 1 3)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 1 4)) location-space))
   :parent_space input-space)
 
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 4)) temperature-space)
 		   (Location (list (list 2 0)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 4)) temperature-space)
 		   (Location (list (list 2 1)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 2 2)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 2 3)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 2 4)) location-space))
   :parent_space input-space)
 
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 3 0)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 3 1)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 3 2)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
 		   (Location (list (list 3 3)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
 		   (Location (list (list 3 4)) location-space))
   :parent_space input-space)
 
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 4 0)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 4 1)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 4 2)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
 		   (Location (list (list 4 3)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
 		   (Location (list (list 4 4)) location-space))
   :parent_space input-space)
 
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 5 0)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 5 1)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
 		   (Location (list (list 5 2)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
 		   (Location (list (list 5 3)) location-space))
   :parent_space input-space)
 (def-chunk
+  :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
 		   (Location (list (list 5 4)) location-space))

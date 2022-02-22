@@ -3,6 +3,7 @@ import statistics
 from typing import Callable, List
 
 from homer.classifier import Classifier
+from homer.errors import NoLocationError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 from homer.location import Location
@@ -95,7 +96,9 @@ class Concept(Node):
 
     def friends(self, space: Space = None) -> StructureCollection:
         space = self.parent_space if space is None else space
-        friend_concepts = self.relatives.filter(lambda x: x in space.contents)
+        friend_concepts = self.relatives.filter(
+            lambda x: x.is_concept and x in space.contents
+        )
         if friend_concepts.is_empty():
             friend_concepts.add(self)
         return friend_concepts
@@ -133,7 +136,11 @@ class Concept(Node):
         )
 
     def proximity_to(self, other: Node):
-        return self._distance_to_proximity(self.distance_from(other))
+        try:
+            return self._distance_to_proximity(self.distance_from(other))
+        except NoLocationError:
+            # TODO: this should be improved for conceptual metaphor
+            return 0.0
 
     def proximity_to_start(self, other: Node, end: Location = None):
         return self._distance_to_proximity(self.distance_from_start(other, end=end))

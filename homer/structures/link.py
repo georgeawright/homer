@@ -13,6 +13,7 @@ class Link(Structure):
         structure_id: str,
         parent_id: str,
         start: Structure,
+        end: Structure,
         arguments: StructureCollection,
         locations: List[Location],
         parent_concept: "Concept",
@@ -32,6 +33,7 @@ class Link(Structure):
             parent_spaces=parent_spaces,
         )
         self.start = start
+        self.end = end
         self.arguments = arguments
         self._parent_concept = parent_concept
         self.value = parent_concept.name if hasattr(parent_concept, "name") else None
@@ -45,10 +47,6 @@ class Link(Structure):
             if location.space.is_contextual_space
         ]
         return contextual_spaces[0] if len(contextual_spaces) > 0 else None
-
-    @property
-    def end(self) -> StructureCollection:
-        return self.arguments.excluding(self.start).get()
 
     @property
     def is_slot(self) -> bool:

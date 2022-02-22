@@ -84,18 +84,15 @@ class RelationSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         # TODO: this may need work
-        target_space = (
-            bubble_chamber.conceptual_spaces.where(no_of_dimensions=1)
-            .filter(lambda x: parent_concept.is_compatible_with(x.parent_concept))
-            .get()
-        )
-        potential_targets = target_space.contents.where(is_node=True)
+        input_space = bubble_chamber.input_spaces.get()
+        conceptual_space = input_space.conceptual_spaces.get()
+        potential_targets = input_space.contents.where(is_node=True)
         try:
             target_structure_one = potential_targets.get(
                 key=lambda x: parent_concept.proximity_to_start(x),
             )
             target_structure_two = target_structure_one.get_potential_relative(
-                space=target_space, concept=parent_concept
+                space=conceptual_space, concept=parent_concept
             )
         except NoLocationError:
             raise MissingStructureError

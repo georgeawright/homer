@@ -3975,8 +3975,6 @@ def test_pipeline_of_codelets(homer):
     assert len(view.input_spaces) == 1
 
     # build correspondence from ap sub-frame label to ap frame label
-    from homer.tools import print_out
-
     codelet = PotentialSubFrameToFrameCorrespondenceBuilder.spawn(
         "", bubble_chamber, {"target_view": view}, 1.0
     )
@@ -3985,15 +3983,11 @@ def test_pipeline_of_codelets(homer):
     codelet.target_structure_one = jj_view.parent_frame.input_space.contents.where(
         is_label=True
     ).get()
-    print_out(codelet.target_structure_one)
     codelet.target_space_one = jj_view.parent_frame.input_space
-    print_out(ap_view.parent_frame.input_space)
-    print_out(ap_view.parent_frame.input_space.contents)
     codelet.target_structure_two = ap_view.parent_frame.input_space.contents.filter(
         lambda x: x.is_label
         and x.has_location_in_space(bubble_chamber.conceptual_spaces["temperature"])
     ).get()
-    print_out(codelet.target_structure_two)
     codelet.target_space_two = view.parent_frame.input_space
     codelet.target_conceptual_space = bubble_chamber.conceptual_spaces["temperature"]
     assert isinstance(codelet, PotentialSubFrameToFrameCorrespondenceBuilder)

@@ -75,7 +75,8 @@ class BubbleChamber:
     @property
     def input_spaces(self) -> StructureCollection:
         return StructureCollection.union(
-            *[view.input_spaces for view in self.production_views]
+            *[view.input_spaces for view in self.production_views],
+            self.contextual_spaces.where(is_main_input=True)
         )
 
     @property
@@ -212,6 +213,7 @@ class BubbleChamber:
         parent_concept: Concept,
         conceptual_spaces: StructureCollection,
         parent_id: str = "",
+        is_main_input: bool = False,
     ) -> ContextualSpace:
         space = ContextualSpace(
             structure_id=ID.new(ContextualSpace),
@@ -223,6 +225,7 @@ class BubbleChamber:
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=self.new_structure_collection(),
+            is_main_input=is_main_input,
         )
         self.add(space)
         return space
@@ -495,6 +498,7 @@ class BubbleChamber:
             structure_id=ID.new(Correspondence),
             parent_id=parent_id,
             start=start,
+            end=end,
             arguments=self.new_structure_collection(start, end),
             locations=locations,
             parent_concept=parent_concept,
@@ -567,6 +571,7 @@ class BubbleChamber:
             structure_id=ID.new(Relation),
             parent_id=parent_id,
             start=start,
+            end=end,
             arguments=self.new_structure_collection(start, end),
             parent_concept=parent_concept,
             conceptual_space=conceptual_space,

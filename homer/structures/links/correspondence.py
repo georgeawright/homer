@@ -18,6 +18,7 @@ class Correspondence(Link):
         structure_id: str,
         parent_id: str,
         start: Structure,
+        end: Structure,
         arguments: StructureCollection,
         locations: List[Location],
         parent_concept: Concept,
@@ -28,12 +29,14 @@ class Correspondence(Link):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         is_privileged: bool = False,
+        is_bidirectional: bool = True,
     ):
         Link.__init__(
             self,
             structure_id,
             parent_id,
             start,
+            end,
             arguments,
             locations,
             parent_concept,
@@ -45,6 +48,7 @@ class Correspondence(Link):
         self.conceptual_space = conceptual_space
         self.parent_view = parent_view
         self.is_privileged = is_privileged
+        self.is_bidirectional = is_bidirectional
         self.is_correspondence = True
 
     @classmethod
@@ -97,6 +101,7 @@ class Correspondence(Link):
             ID.new(Correspondence),
             parent_id,
             start,
+            end,
             bubble_chamber.new_structure_collection(start, end),
             [
                 start.location_in_space(start.parent_space).copy(),

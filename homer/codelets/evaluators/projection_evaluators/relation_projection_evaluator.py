@@ -19,13 +19,17 @@ class RelationProjectionEvaluator(ProjectionEvaluator):
         structure_type = bubble_chamber.concepts["relation"]
         input_concept = bubble_chamber.concepts["input"]
         view = bubble_chamber.new_structure_collection(
-            view
-            for view in bubble_chamber.views
-            if view.output_space.parent_concept == input_concept
-            and not view.contents.where(is_relation=True).is_empty()
+            *[
+                view
+                for view in bubble_chamber.views
+                if view.output_space.parent_concept == input_concept
+                and not view.contents.where(is_relation=True).is_empty()
+            ]
         ).get()
-        relation = view.ouptut_space.contents.where(is_relation=True).get()
+        relation = view.output_space.contents.where(is_relation=True).get()
         correspondences = relation.correspondences.where(end=relation)
+        if correspondences.is_empty():
+            raise MissingStructureError
         target_structures = StructureCollection.union(
             bubble_chamber.new_structure_collection({relation}), correspondences
         )

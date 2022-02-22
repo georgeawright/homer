@@ -24,9 +24,11 @@ def test_correspondences_returns_correspondences(bubble_chamber):
             Mock(),
             Mock(),
             Mock(),
+            Mock(),
         )
         links_out.add(correspondence)
         correspondence = Correspondence(
+            Mock(),
             Mock(),
             Mock(),
             Mock(),
@@ -133,6 +135,7 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         structure,
+        end,
         bubble_chamber.new_structure_collection(structure, end),
         Mock(),
         Mock(),
@@ -146,6 +149,7 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         structure,
+        Mock(),
         bubble_chamber.new_structure_collection(structure, Mock()),
         Mock(),
         Mock(),
@@ -159,6 +163,7 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         structure,
+        end,
         bubble_chamber.new_structure_collection(structure, end),
         Mock(),
         Mock(),
@@ -199,6 +204,7 @@ def test_correspondences_to_space(bubble_chamber):
         Mock(),
         Mock(),
         start=structure,
+        end=structure_in_space,
         arguments=bubble_chamber.new_structure_collection(
             structure, structure_in_space
         ),
@@ -215,6 +221,7 @@ def test_correspondences_to_space(bubble_chamber):
         Mock(),
         Mock(),
         start=structure_in_space,
+        end=structure,
         arguments=bubble_chamber.new_structure_collection(
             structure_in_space, structure
         ),
@@ -231,6 +238,7 @@ def test_correspondences_to_space(bubble_chamber):
         Mock(),
         Mock(),
         start=structure,
+        end=Mock(),
         arguments=bubble_chamber.new_structure_collection(structure, Mock()),
         locations=Mock(),
         parent_concept=None,
@@ -245,6 +253,7 @@ def test_correspondences_to_space(bubble_chamber):
         Mock(),
         Mock(),
         start=Mock(),
+        end=Mock(),
         arguments=bubble_chamber.new_structure_collection(Mock(), Mock()),
         locations=Mock(),
         parent_concept=Mock(),

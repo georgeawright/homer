@@ -1,5 +1,6 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluators import ProjectionEvaluator
+from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
 
@@ -17,6 +18,8 @@ class ChunkProjectionEvaluator(ProjectionEvaluator):
         structure_type = bubble_chamber.concepts["chunk"]
         chunk = bubble_chamber.input_nodes.where(is_chunk=True).get()
         correspondences = chunk.correspondences.where(end=chunk)
+        if correspondences.is_empty():
+            raise MissingStructureError
         target_structures = StructureCollection.union(
             bubble_chamber.new_structure_collection(chunk), correspondences
         )
