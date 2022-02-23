@@ -81,7 +81,7 @@ class CoderackCleaner(Codelet):
                 self.bubble_chamber,
                 self.coderack,
                 self.bubble_chamber.satisfaction,
-                1 - self.bubble_chamber.satisfaction,
+                self.follow_up_urgency(),
             )
         )
         self.bubble_chamber.loggers["activity"].log(
@@ -90,3 +90,11 @@ class CoderackCleaner(Codelet):
         self.result = CodeletResult.FINISH
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
+
+    def follow_up_urgency(self) -> FloatBetweenOneAndZero:
+        urgency = (1 - self.bubble_chamber.satisfaction) * (
+            1 - (1 / self.coderack.population_size)
+        )
+        if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
+            return urgency
+        return self.coderack.MINIMUM_CODELET_URGENCY

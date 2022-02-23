@@ -18,7 +18,10 @@ class RationalFactory(Factory):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
     def follow_up_satisfaction(self) -> FloatBetweenOneAndZero:
-        return self.bubble_chamber.satisfaction
+        urgency = self.bubble_chamber.satisfaction
+        if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
+            return urgency
+        return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):
         follow_up_class = self._decide_follow_up_class()

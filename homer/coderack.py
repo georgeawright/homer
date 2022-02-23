@@ -55,7 +55,9 @@ class Coderack:
         self.recently_run.add(type(codelet))
         self.loggers["activity"].log(
             codelet,
-            f"Time: {self.codelets_run} | Satisfaction: {self.bubble_chamber.satisfaction}",
+            f"Time: {self.codelets_run} | "
+            + f"Satisfaction: {self.bubble_chamber.satisfaction} | "
+            + f"Coderack Population Size: {self.population_size}",
         )
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:
