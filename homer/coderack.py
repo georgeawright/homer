@@ -3,7 +3,12 @@ from typing import Dict
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
 from .codelets import CoderackCleaner, Factory
-from .codelets.factories import ConceptDrivenFactory, RandomFactory, RationalFactory
+from .codelets.factories import (
+    ConceptDrivenFactory,
+    RandomFactory,
+    RationalFactory,
+    ViewDrivenFactory,
+)
 from .errors import MissingStructureError, NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
@@ -31,6 +36,7 @@ class Coderack:
             ConceptDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
             RandomFactory.spawn("", bubble_chamber, coderack, 1.0),
             RationalFactory.spawn("", bubble_chamber, coderack, 1.0),
+            ViewDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
         ]
         for codelet in meta_codelets:
             coderack.add_codelet(codelet)

@@ -20,14 +20,16 @@ class ViewDrivenFactory(Factory):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
     def follow_up_satisfaction(self) -> FloatBetweenOneAndZero:
-        urgency = 1 - self.bubble_chamber.satisfaction
+        urgency = (1 - self.bubble_chamber.satisfaction) * (
+            len(self.bubble_chamber.production_views) > 1
+        )
         if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
             return urgency
         return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):
         view = self.bubble_chamber.production_views.get(key=exigency)
-        slot = view.slots.where(is_unfilled=True)
+        slot = view.slots.where(is_unfilled=True).get()
         follow_up_class = self._get_follow_up_class(slot)
         rand = self.bubble_chamber.random_machine.generate_random_number()
         if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
