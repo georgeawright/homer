@@ -4,6 +4,7 @@ from typing import List
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
+from homer.locations import TwoPointLocation
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
 from homer.structures import Link, Space
@@ -74,7 +75,16 @@ class Label(Link):
             for location in self.locations
             if location.space.is_conceptual_space
         ]
-        new_locations.append(Location(self.location.coordinates, parent_space))
+        try:
+            new_locations.append(Location(self.location.coordinates, parent_space))
+        except NotImplementedError:
+            new_locations.append(
+                TwoPointLocation(
+                    self.location.start_coordinates,
+                    self.location.end_coordinates,
+                    parent_space,
+                )
+            )
         parent_id = kwargs["parent_id"] if "parent_id" in kwargs else ""
         new_label = Label(
             structure_id=ID.new(Label),

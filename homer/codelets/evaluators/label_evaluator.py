@@ -15,7 +15,9 @@ class LabelEvaluator(Evaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["label"]
         input_space = bubble_chamber.input_spaces.get()
-        target = input_space.contents.where(is_label=True).get()
+        target = input_space.contents.filter(
+            lambda x: x.is_label and not x.start.is_label
+        ).get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -30,7 +32,7 @@ class LabelEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_label = self.target_structures.filter(
-            lambda x: not x.start.is_label
+            lambda x: x.is_label and not x.start.is_label
         ).get()
         labels = []
         while target_label is not None:

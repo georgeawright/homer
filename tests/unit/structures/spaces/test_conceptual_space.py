@@ -105,7 +105,7 @@ def test_add(
         "",
         "",
         [location],
-        Mock(),
+        [],
         Mock(),
         Mock(),
         Mock(),

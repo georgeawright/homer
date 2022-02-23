@@ -102,7 +102,8 @@
 
 (define grammar-distance-to-proximity 0.1)
 (define grammar-concept
-  (def-concept :name "grammar" :distance_function centroid_euclidean_distance))
+  (def-concept :name "grammar" :distance_function centroid_euclidean_distance
+    :instance_type LetterChunk))
 (define grammar-space
   (def-conceptual-space :name "grammar" :parent_concept grammar-concept
     :no_of_dimensions 0 :is_basic_level True))
@@ -258,7 +259,7 @@
 (def-relation :start less-concept :end less-word :parent_concept jj-concept)
 
 (define magnitude-concept
-  (def-concept :name "magnitude" :locations (list) :classifier None :instance_type None
+  (def-concept :name "magnitude" :locations (list) :classifier None :instance_type Link
     :structure_type None :parent_space None
     :distance_function centroid_euclidean_distance))
 (define magnitude-space
@@ -267,22 +268,22 @@
 (define extremely-concept
   (def-concept :name "extremely"
     :locations (list (Location (list (list 2)) magnitude-space))
-    :classifier (ProximityClassifier) :instance_type Label :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Link :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 (define very-concept
   (def-concept :name "very"
     :locations (list (Location (list (list 1)) magnitude-space))
-    :classifier (ProximityClassifier) :instance_type Label :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Link :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 (define quite-concept
   (def-concept :name "quite"
     :locations (list (Location (list (list -1)) magnitude-space))
-    :classifier (ProximityClassifier) :instance_type Label :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Link :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 (define bit-concept
   (def-concept :name "bit"
     :locations (list (Location (list (list -2)) magnitude-space))
-    :classifier (ProximityClassifier) :instance_type Label :structure_type Label
+    :classifier (ProximityClassifier) :instance_type Link :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 
 (define extremely-word (def-letter-chunk :name "extremely" :locations (list)))

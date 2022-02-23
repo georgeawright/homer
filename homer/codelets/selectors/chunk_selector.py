@@ -44,7 +44,9 @@ class ChunkSelector(Selector):
         except MissingStructureError:
             winning_chunk = self.winners.where(is_slot=False).get()
             target_space = winning_chunk.parent_space
-            new_target = target_space.contents.get(key=chunking_exigency)
+            new_target = target_space.contents.where(is_chunk=True).get(
+                key=chunking_exigency
+            )
             target_rule = winning_chunk.rule.friends.get(key=activation)
         self.child_codelets = [
             ChunkSuggester.spawn(

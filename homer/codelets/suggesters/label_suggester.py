@@ -101,14 +101,15 @@ class LabelSuggester(Suggester):
 
     def _passes_preliminary_checks(self):
         if self.parent_concept is None:
-            conceptual_space = (
-                self.bubble_chamber.conceptual_spaces.where(
-                    is_basic_level=True, instance_type=type(self.target_node)
-                )
-                .filter(lambda x: self.target_node.has_location_in_space(x))
-                .get()
-            )
-            location = self.target_node.location_in_space(conceptual_space)
+            try:
+                conceptual_space = self.bubble_chamber.conceptual_spaces.filter(
+                    lambda x: x.is_basic_level
+                    and isinstance(self.target_node, x.instance_type)
+                    and self.target_node.has_location_in_space(x)
+                ).get()
+                location = self.target_node.location_in_space(conceptual_space)
+            except MissingStructureError:
+                return False
             try:
                 self.parent_concept = (
                     conceptual_space.contents.where(
@@ -116,6 +117,9 @@ class LabelSuggester(Suggester):
                     )
                     .near(location)
                     .get()
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found parent concept: {self.parent_concept}"
                 )
             except MissingStructureError:
                 try:
@@ -126,13 +130,13 @@ class LabelSuggester(Suggester):
                         .where_not(classifier=None)
                         .get()
                     )
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, f"Found parent concept: {self.parent_concept}"
+                    )
                 except MissingStructureError:
                     return False
         if self.parent_concept is None:
             return False
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found parent concept: {self.parent_concept}"
-        )
         return not self.target_node.has_label(self.parent_concept)
 
     def _calculate_confidence(self):

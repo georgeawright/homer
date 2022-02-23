@@ -14,6 +14,7 @@ class Interpreter:
         self.bubble_chamber = bubble_chamber
         self.names = {
             # Structure Types
+            "Link": structures.Link,
             "Correspondence": structures.links.Correspondence,
             "Label": structures.links.Label,
             "Relation": structures.links.Relation,

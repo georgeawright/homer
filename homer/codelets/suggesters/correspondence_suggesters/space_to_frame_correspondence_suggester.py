@@ -82,6 +82,17 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     self, f"Found target space two: {self.target_space_two}"
                 )
             if self.target_structure_two is None:
+                candidates = self.target_space_two.contents.filter(
+                    lambda x: (type(x) == type(self.target_structure_one))
+                    and (
+                        x.has_location_in_space(self.target_conceptual_space)
+                        if self.target_conceptual_space is not None
+                        else True
+                    )
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"structure two candidates {candidates}"
+                )
                 self.target_structure_two = self.target_space_two.contents.filter(
                     lambda x: (type(x) == type(self.target_structure_one))
                     and (

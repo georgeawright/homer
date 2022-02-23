@@ -97,7 +97,7 @@ class Concept(Node):
     def friends(self, space: Space = None) -> StructureCollection:
         space = self.parent_space if space is None else space
         friend_concepts = self.relatives.filter(
-            lambda x: x.is_concept and x in space.contents
+            lambda x: not x.is_slot and x.is_concept and x in space.contents
         )
         if friend_concepts.is_empty():
             friend_concepts.add(self)
@@ -156,18 +156,21 @@ class Concept(Node):
                 b.location_in_space(space).coordinates,
             )
         except NotImplementedError:
-            return statistics.mean(
-                [
-                    self.distance_function(
-                        a.location_in_space(space).start_coordinates,
-                        b.location_in_space(space).start_coordinates,
-                    ),
-                    self.distance_function(
-                        a.location_in_space(space).end_coordinates,
-                        b.location_in_space(space).end_coordinates,
-                    ),
-                ]
-            )
+            try:
+                return statistics.mean(
+                    [
+                        self.distance_function(
+                            a.location_in_space(space).start_coordinates,
+                            b.location_in_space(space).start_coordinates,
+                        ),
+                        self.distance_function(
+                            a.location_in_space(space).end_coordinates,
+                            b.location_in_space(space).end_coordinates,
+                        ),
+                    ]
+                )
+            except AttributeError:
+                return 0.0
 
     def proximity_between(self, a: Node, b: Node, space: "Space" = None):
         return self._distance_to_proximity(self.distance_between(a, b, space=space))

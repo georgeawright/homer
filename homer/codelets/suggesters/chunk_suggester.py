@@ -167,12 +167,23 @@ class ChunkSuggester(Suggester):
                     self.target_slot_filler = (
                         self.target_root.nearby()
                         .where(is_slot=False)
-                        .filter(lambda x: x not in self.target_root.members)
+                        .filter(
+                            lambda x: StructureCollection.intersection(
+                                x.raw_members, self.target_root.raw_members
+                            ).is_empty()
+                        )
                         .get(key=chunking_exigency)
                     )
                 else:
+                    # TODO: probably don't need this else branch
                     self.target_slot_filler = (
-                        self.target_space.contents.where(is_node=True, is_slot=False)
+                        self.target_space.contents.filter(
+                            lambda x: x.is_node
+                            and x.is_slot
+                            and StructureCollection.intersection(
+                                x.raw_members, self.target_root.members
+                            ).is_empty()
+                        )
                         .at(self.target_slot.location)
                         .get(key=chunking_exigency)
                     )

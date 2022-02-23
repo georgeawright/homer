@@ -79,10 +79,12 @@ class Chunk(Node):
     @property
     def raw_members(self) -> StructureCollection:
         if self.is_raw:
-            raw_members = self.members
+            raw_members = self.members.copy()
             raw_members.add(self)
             return raw_members
-        return StructureCollection.union(*[chunk.raw_members for chunk in self.members])
+        return StructureCollection.union(
+            *[chunk.raw_members for chunk in self.members.where(is_slot=False)]
+        )
 
     @property
     def unchunkedness(self):
@@ -261,3 +263,9 @@ class Chunk(Node):
             member.super_chunks.add(chunk_copy)
             bubble_chamber.loggers["structure"].log(member)
         return (chunk_copy, copies)
+
+    def __repr__(self) -> str:
+        members = "{" + ",".join([member.structure_id for member in self.members]) + "}"
+        if self.parent_space is None:
+            return f"<{self.structure_id} {members}>"
+        return f"<{self.structure_id} {members} in {self.parent_space.structure_id} {self.locations}>"

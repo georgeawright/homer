@@ -3,6 +3,7 @@ from homer.codelets.suggesters import LabelSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation, labeling_exigency
+from homer.structures.links import Label
 
 
 class LabelSelector(Selector):
@@ -44,7 +45,9 @@ class LabelSelector(Selector):
     def _engender_follow_up(self):
         try:
             winning_label = self.winners.get()
-            parent_concept = winning_label.parent_concept.friends().get()
+            parent_concept = (
+                winning_label.parent_concept.friends().where(structure_type=Label).get()
+            )
             target_node = winning_label.start.nearby().get(key=labeling_exigency)
             self.child_codelets.append(
                 LabelSuggester.spawn(
