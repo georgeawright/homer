@@ -58,7 +58,8 @@
     :parent_space structure-space))
 (define chunk-concept
   (def-concept :name "chunk" :locations (list (Location (list) structure-space))
-    :parent_space structure-space))
+    :parent_space structure-space
+    :activation 1.0))
 (define letter-chunk-concept
   (def-concept :name "letter-chunk" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
@@ -99,6 +100,27 @@
 (def-relation :start select-concept :end letter-chunk-concept)
 (def-relation :start select-concept :end relation-concept)
 (def-relation :start select-concept :end view-simplex-concept)
+
+(def-relation :start inner-concept :end outer-concept)
+
+(def-relation :start suggest-concept :end build-concept :is_bidirectional False)
+(def-relation :start build-concept :end evaluate-concept :is_bidirectional False)
+(def-relation :start evaluate-concept :end select-concept :is_bidirectional False)
+(def-relation :start select-concept :end suggest-concept :is_bidirectional False)
+(def-relation :start select-concept :end publish-concept :is_bidirectional False)
+
+(def-relation :start chunk-concept :end label-concept :is_bidirectional False)
+(def-relation :start chunk-concept :end relation-concept :is_bidirectional False)
+(def-relation :start chunk-concept :end view-simplex-concept :is_bidirectional False)
+(def-relation :start letter-chunk-concept :end label-concept :is_bidirectional False)
+(def-relation :start letter-chunk-concept :end relation-concept :is_bidirectional False)
+(def-relation :start letter-chunk-concept :end view-simplex-concept :is_bidirectional False)
+(def-relation :start view-simplex-concept :end correspondence-concept :is_bidirectional False)
+(def-relation :start correspondence-concept :end chunk-concept :is_bidirectional False)
+(def-relation :start correspondence-concept :end letter-chunk-concept :is_bidirectional False)
+(def-relation :start correspondence-concept :end label-concept :is_bidirectional False)
+(def-relation :start correspondence-concept :end relation-concept :is_bidirectional False)
+(def-relation :start correspondence-concept :end view-monitoring-concept)
 
 (define grammar-distance-to-proximity 0.1)
 (define grammar-concept
