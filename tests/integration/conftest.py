@@ -1464,7 +1464,8 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 
 (define input-space
   (def-contextual-space :name "input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection temperature-space location-space)))
+    :conceptual_spaces (StructureCollection temperature-space location-space)
+    :is_main_input True))
 
 (def-chunk
   :is_raw True

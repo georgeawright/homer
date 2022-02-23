@@ -80,6 +80,12 @@ class BubbleChamber:
         )
 
     @property
+    def output_spaces(self) -> StructureCollection:
+        return self.new_structure_collection(
+            *[view.output_space for view in self.production_views]
+        )
+
+    @property
     def input_nodes(self) -> StructureCollection:
         return StructureCollection.union(
             *[space.contents.where(is_node=True) for space in self.input_spaces]
@@ -130,7 +136,14 @@ class BubbleChamber:
 
     @property
     def satisfaction(self):
-        return statistics.fmean([space.quality for space in self.contextual_spaces])
+        return statistics.fmean(
+            [
+                space.quality
+                for space in StructureCollection.union(
+                    self.input_spaces, self.output_spaces
+                )
+            ]
+        )
 
     def spread_activations(self):
         for structure in self.structures:
