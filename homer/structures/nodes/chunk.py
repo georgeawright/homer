@@ -151,7 +151,9 @@ class Chunk(Node):
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:
         space = self.parent_space if space is None else space
-        chunks = space.contents.where(is_chunk=True)
+        chunks = space.contents.where(
+            is_chunk=True, is_letter_chunk=False, parent_space=self.parent_space
+        )
         key = lambda x: 1 - space.proximity_between(x, self)
         return chunks.get(key=key, exclude=[self])
 

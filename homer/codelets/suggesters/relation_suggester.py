@@ -61,7 +61,9 @@ class RelationSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         input_space = bubble_chamber.input_spaces.get()
-        target = input_space.contents.where(is_chunk=True).get(key=relating_exigency)
+        target = input_space.contents.where(is_chunk=True, is_slot=False).get(
+            key=relating_exigency
+        )
         target_space = target.parent_spaces.where(
             is_conceptual_space=True, no_of_dimensions=1
         ).get()
@@ -89,7 +91,7 @@ class RelationSuggester(Suggester):
         # TODO: this may need work
         input_space = bubble_chamber.input_spaces.get()
         conceptual_space = input_space.conceptual_spaces.where(no_of_dimensions=1).get()
-        potential_targets = input_space.contents.where(is_node=True)
+        potential_targets = input_space.contents.where(is_node=True, is_slot=False)
         try:
             target_structure_one, target_structure_two = potential_targets.pairs.get(
                 key=lambda x: parent_concept.classifier.classify(
@@ -147,6 +149,9 @@ class RelationSuggester(Suggester):
                     self.target_structure_one.get_potential_relative(
                         space=self.target_space, concept=self.parent_concept
                     )
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found target structure two: {self.target_structure_two}"
                 )
             except MissingStructureError:
                 return False
