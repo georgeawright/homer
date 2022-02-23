@@ -9,6 +9,8 @@ class HyperParameters:
     MAXIMUM_CODERACK_POPULATION = 100
     MINIMUM_CODELET_URGENCY = 0.01
 
+    DETERMINISM_SMOOTHING_FUNCTION = lambda x: (x + 0.5) / 2
+
     # TODO: these ought to be removed when suggesters are implemented
     CONFIDENCE_THRESHOLD = 0.5
 

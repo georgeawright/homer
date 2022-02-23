@@ -37,6 +37,7 @@ def test_select_a_codelet(
     bubble_chamber = Mock()
     bubble_chamber.satisfaction = bubble_chamber_satisfaction
     bubble_chamber.random_machine = RandomMachine(bubble_chamber, random_seed)
+    bubble_chamber.random_machine.determinism_smoothing_function = lambda x: x
     coderack = Coderack(bubble_chamber, Mock())
     coderack.IDEAL_POPULATION = 1
     for urgency_value in urgency_values:

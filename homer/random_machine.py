@@ -4,6 +4,7 @@ from typing import Union
 
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
+from .hyper_parameters import HyperParameters
 
 
 class RandomMachine:
@@ -12,10 +13,13 @@ class RandomMachine:
         self.seed = seed
         if seed is not None:
             random.seed(seed)
+        self.determinism_smoothing_function = (
+            HyperParameters.DETERMINISM_SMOOTHING_FUNCTION
+        )
 
     @property
     def determinism(self) -> FloatBetweenOneAndZero:
-        return self.bubble_chamber.satisfaction
+        return self.determinism_smoothing_function(self.bubble_chamber.satisfaction)
 
     @property
     def randomness(self) -> FloatBetweenOneAndZero:
