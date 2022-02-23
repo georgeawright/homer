@@ -19,6 +19,9 @@ class ViewDrivenFactory(Factory):
     ):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
+    def follow_up_satisfaction(self) -> FloatBetweenOneAndZero:
+        return 1 - self.bubble_chamber.satisfaction
+
     def _engender_follow_up(self):
         view = self.bubble_chamber.production_views.get(key=exigency)
         slot = view.slots.where(is_unfilled=True)

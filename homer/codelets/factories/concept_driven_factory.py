@@ -20,6 +20,9 @@ class ConceptDrivenFactory(Factory):
     ):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
+    def follow_up_satisfaction(self) -> FloatBetweenOneAndZero:
+        return self.bubble_chamber.satisfaction
+
     def _engender_follow_up(self):
         parent_concept = self._get_parent_concept()
         follow_up_class = self._get_follow_up_class(parent_concept)

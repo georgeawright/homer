@@ -48,9 +48,11 @@ class Factory(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                1 - self.bubble_chamber.satisfaction,
+                self.follow_up_satisfaction(),
             )
         )
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
+        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     def _engender_follow_up(self):

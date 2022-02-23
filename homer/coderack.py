@@ -14,6 +14,7 @@ class Coderack:
 
     MAXIMUM_POPULATION = HyperParameters.MAXIMUM_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
+    PROTECTED_CODELET_TYPES = (CoderackCleaner, Factory)
 
     def __init__(self, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         self.bubble_chamber = bubble_chamber
@@ -35,20 +36,27 @@ class Coderack:
             coderack.add_codelet(codelet)
         return coderack
 
+    @property
+    def population_size(self) -> int:
+        return len(self._codelets)
+
     def add_codelet(self, codelet: Codelet):
         if codelet.urgency < self.MINIMUM_CODELET_URGENCY:
             return
         self._codelets.append(codelet)
 
     def remove_codelet(self, codelet: Codelet):
-        if not isinstance(codelet, (CoderackCleaner, Factory)):
+        if not isinstance(codelet, self.PROTECTED_CODELET_TYPES):
             self._codelets.remove(codelet)
 
     def select_and_run_codelet(self):
         codelet = self._select_a_codelet()
         codelet.run()
         self.recently_run.add(type(codelet))
-        self.loggers["activity"].log(codelet, f"Time: {self.codelets_run}")
+        self.loggers["activity"].log(
+            codelet,
+            f"Time: {self.codelets_run} | Satisfaction: {self.bubble_chamber.satisfaction}",
+        )
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)
