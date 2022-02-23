@@ -25,6 +25,7 @@ class Factory(Codelet):
         Codelet.__init__(self, codelet_id, parent_id, urgency)
         self.bubble_chamber = bubble_chamber
         self.coderack = coderack
+        self.result = None
 
     @classmethod
     def spawn(
@@ -42,13 +43,13 @@ class Factory(Codelet):
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
         except MissingStructureError:
-            self.result = CodeletResult.FAIL
+            self.result = CodeletResult.FIZZLE
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                self.follow_up_satisfaction(),
+                self.follow_up_urgency(),
             )
         )
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
@@ -56,6 +57,9 @@ class Factory(Codelet):
         return self.result
 
     def _engender_follow_up(self):
+        raise NotImplementedError
+
+    def follow_up_urgency(self):
         raise NotImplementedError
 
     def _get_codelet_type_from_concepts(

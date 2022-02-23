@@ -19,7 +19,7 @@ class ViewDrivenFactory(Factory):
     ):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
-    def follow_up_satisfaction(self) -> FloatBetweenOneAndZero:
+    def follow_up_urgency(self) -> FloatBetweenOneAndZero:
         urgency = (1 - self.bubble_chamber.satisfaction) * (
             len(self.bubble_chamber.production_views) > 1
         )

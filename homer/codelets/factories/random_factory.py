@@ -16,7 +16,7 @@ class RandomFactory(Factory):
     ):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
-    def follow_up_satisfaction(self) -> FloatBetweenOneAndZero:
+    def follow_up_urgency(self) -> FloatBetweenOneAndZero:
         urgency = 1 - self.bubble_chamber.satisfaction
         if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
             return urgency
@@ -24,6 +24,9 @@ class RandomFactory(Factory):
 
     def _engender_follow_up(self):
         follow_up_class = self._decide_follow_up_class()
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Follow-up class: {follow_up_class.__name__}"
+        )
         rand = self.bubble_chamber.random_machine.generate_number()
         if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make(self.codelet_id, self.bubble_chamber)

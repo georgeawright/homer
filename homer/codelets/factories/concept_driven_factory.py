@@ -20,7 +20,7 @@ class ConceptDrivenFactory(Factory):
     ):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
-    def follow_up_satisfaction(self) -> FloatBetweenOneAndZero:
+    def follow_up_urgency(self) -> FloatBetweenOneAndZero:
         urgency = self.bubble_chamber.satisfaction
         if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
             return urgency
