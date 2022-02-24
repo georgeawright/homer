@@ -66,7 +66,7 @@ class Selector(Codelet):
             self.confidence = self.winners.get().quality
             self._boost_winners()
         self._boost_activations()
-        self.follow_up_urgency = (
+        self.follow_up_urgency = FloatBetweenOneAndZero(
             self.winners.get().quality - self.winners.get().activation
         )
         self._engender_follow_up()
