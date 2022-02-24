@@ -35,10 +35,12 @@ def test_add(bubble_chamber):
 
 
 def test_can_accept_member(bubble_chamber):
+    parent_frame = Mock()
+    parent_frame.concepts = bubble_chamber.new_structure_collection()
     view = View(
         "",
         "",
-        Mock(),
+        parent_frame,
         [],
         bubble_chamber.new_structure_collection(),
         bubble_chamber.new_structure_collection(),
@@ -54,12 +56,16 @@ def test_can_accept_member(bubble_chamber):
     space_2 = Mock()
 
     node_1 = Mock()
+    node_1.is_link = False
     node_1.parent_space = space_1
     node_2 = Mock()
+    node_2.is_link = False
     node_2.parent_space = space_2
     node_3 = Mock()
+    node_3.is_link = False
     node_3.parent_space = space_1
     node_4 = Mock()
+    node_4.is_link = False
     node_4.parent_space = space_2
 
     correspondence_1 = Mock()
@@ -109,7 +115,10 @@ def test_can_accept_member(bubble_chamber):
     )
 
     start_relation = Mock()
+    start_relation.is_link = True
     end_relation = Mock()
+    end_relation.is_link = True
+    end_relation.parent_concept.is_slot = False
     end_relation.correspondences = bubble_chamber.new_structure_collection()
     assert end_relation.correspondences.is_empty()
     correspondence_4 = Mock()

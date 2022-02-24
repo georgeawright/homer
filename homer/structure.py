@@ -314,10 +314,7 @@ class Structure(ABC):
         )
 
     def relations_with(self, other: Structure) -> StructureCollection:
-        return StructureCollection.union(
-            self.relations.filter(lambda x: other in x.arguments.excluding(self)),
-            self.relations.filter(lambda x: len(x.arguments) == 1 and other == self),
-        )
+        return self.relations.filter(lambda x: other in x.arguments)
 
     def has_relation_with(
         self, other: Structure, parent_concept: Structure = None

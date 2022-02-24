@@ -118,6 +118,32 @@ class View(Structure):
     ) -> bool:
         if self.has_member(parent_concept, conceptual_space, start, end):
             return False
+        if start.is_link and end.is_link:
+            start_concept = (
+                start.parent_concept
+                if not start.parent_concept.is_slot
+                else start.parent_concept.relatives.filter(
+                    lambda x: x not in self.parent_frame.concepts and not x.is_slot
+                ).get()
+            )
+            if end.parent_concept.is_slot:
+                for relative in end.parent_concept.relatives.filter(
+                    lambda x: x in self.parent_frame.concepts
+                ):
+                    relation_concept = (
+                        end.parent_concept.relations_with(relative).get().parent_concept
+                    )
+                    if relative.is_slot and relative.is_filled_in:
+                        relative_concept = relative.relatives.where(is_slot=False).get()
+                        if not start_concept.has_relation_with(
+                            relative_concept, relation_concept
+                        ):
+                            return False
+                    if not relative.is_slot:
+                        if not start_concept.has_relation_with(
+                            end.parent_concept, relation_concept
+                        ):
+                            return False
         if not end.correspondences.filter(lambda x: x in self.members).is_empty():
             return False
         potential_node_groups = (

@@ -272,8 +272,8 @@
     :classifier (DifferenceClassifier -5) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start more-concept :end more-concept)
-(def-relation :start less-concept :end less-concept)
+(def-relation :start more-concept :end more-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start less-concept :end less-concept :parent_concept more-concept :activation 1.0)
 
 (define more-word (def-letter-chunk :name "more" :locations (list)))
 (def-relation :start more-concept :end more-word :parent_concept jj-concept)
@@ -333,8 +333,8 @@
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space height-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start high-concept :end more-concept)
-(def-relation :start low-concept :end less-concept)
+(def-relation :start high-concept :end more-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start low-concept :end less-concept :parent_concept more-concept :activation 1.0)
 
 (define high-word (def-letter-chunk :name "high" :locations (list)))
 (def-relation :start high-concept :end high-word :parent_concept jj-concept)
@@ -361,8 +361,8 @@
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space goodness-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start good-concept :end more-concept)
-(def-relation :start bad-concept :end less-concept)
+(def-relation :start good-concept :end more-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start bad-concept :end less-concept :parent_concept more-concept :activation 1.0)
 
 (define good-word (def-letter-chunk :name "good" :locations (list)))
 (def-relation :start good-concept :end good-word :parent_concept jj-concept)
@@ -420,12 +420,12 @@
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space temperature-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start hot-concept :end more-concept)
-(def-relation :start warm-concept :end more-concept)
-(def-relation :start extreme-concept :end more-concept)
-(def-relation :start cool-concept :end less-concept)
-(def-relation :start cold-concept :end less-concept)
-(def-relation :start mild-concept :end less-concept)
+(def-relation :start hot-concept :end more-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start warm-concept :end more-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start extreme-concept :end more-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start cool-concept :end less-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start cold-concept :end less-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start mild-concept :end less-concept :parent_concept more-concept :activation 1.0)
 
 (def-correspondence :start hot-concept :end high-concept :parent_concept same-concept)
 (def-correspondence :start hot-concept :end good-concept :parent_concept same-concept)
@@ -774,7 +774,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True :parent_space more-less-space
     :locations (list (Location (list) more-less-space))))
 (def-relation :start label-concept :end relation-concept
-  :parent_concept more-concept)
+  :parent_concept more-concept :activation 1.0)
 (define rp-input
   (def-contextual-space :name "rp[jjr].meaning" :parent_concept input-concept
     :conceptual_spaces (StructureCollection conceptual-space)))
