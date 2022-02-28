@@ -50,8 +50,8 @@ class SimplexViewSuggester(ViewSuggester):
             ):
                 self.bubble_chamber.loggers["activity"].log(
                     self,
-                    f"{conceptual_space.structure_id} is not a slot and "
-                    + f"is not in {self.contextual_space.structure_id} conceptual spaces",
+                    f"{conceptual_space} is not a slot and "
+                    + f"is not in {self.contextual_space} conceptual spaces",
                 )
                 return False
             if conceptual_space.is_slot:

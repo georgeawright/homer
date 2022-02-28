@@ -20,8 +20,6 @@ class ViewSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.input_spaces = target_structures.get("input_spaces")
-        self.output_space = target_structures.get("ouptut_space")
         self.frame = target_structures.get("frame")
         self.contextual_space = target_structures.get("contextual_space")
         self.conceptual_spaces_map = {}
@@ -54,8 +52,6 @@ class ViewSuggester(Suggester):
     @property
     def targets_dict(self):
         return {
-            "input_spaces": self.input_spaces,
-            "output_space": self.output_space,
             "frame": self.frame,
             "contextual_space": self.contextual_space,
             "conceptual_spaces_map": self.conceptual_spaces_map,
