@@ -94,7 +94,7 @@ class StructureLogger(Logger):
             f.write(
                 "style=filled; color=lightblue; node [style=filled, color=white];\n"
             )
-            for item in space.contents:
+            for item in space.contents.where(is_correspondence=False):
                 if item.is_node:
                     item_name = (
                         item.name if hasattr(item, "name") else item.structure_id
@@ -109,7 +109,7 @@ class StructureLogger(Logger):
                 f.write(
                     f'{item.structure_id} [label="{item_name}" fontsize={item_size}];\n'
                 )
-            for item in space.contents:
+            for item in space.contents.where(is_correspondence=False):
                 if item.is_node:
                     for left_node in item.left_branch:
                         f.write(
