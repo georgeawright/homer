@@ -79,7 +79,9 @@ def test_gives_low_confidence_bad_example(bubble_chamber, target_chunk):
 
 
 def test_fizzles_when_label_exists(bubble_chamber, target_chunk):
-    target_chunk.has_label.return_value = True
+    labels_where = Mock()
+    labels_where.is_empty.return_value = False
+    target_chunk.labels.where.return_value = labels_where
     target_structures = {"target_node": target_chunk, "parent_concept": None}
     label_suggester = LabelSuggester(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0

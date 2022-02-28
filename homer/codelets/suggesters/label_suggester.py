@@ -139,7 +139,9 @@ class LabelSuggester(Suggester):
                     return False
         if self.parent_concept is None:
             return False
-        return not self.target_node.has_label(self.parent_concept)
+        return self.target_node.labels.where(
+            parent_concept=self.parent_concept
+        ).is_empty()
 
     def _calculate_confidence(self):
         try:
