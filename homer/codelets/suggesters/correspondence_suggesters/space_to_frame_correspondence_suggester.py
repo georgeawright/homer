@@ -73,11 +73,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             else None
         )
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Found conceptual space: {self.target_conceptual_space}"
-        )
-        conceptual_spaces = self.target_view.parent_frame.input_space.conceptual_spaces
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Frame conceptual spaces: {conceptual_spaces}"
+            self, f"Found target conceptual space: {self.target_conceptual_space}"
         )
         try:
             if self.target_space_two is None:
