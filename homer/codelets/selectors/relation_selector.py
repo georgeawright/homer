@@ -37,7 +37,7 @@ class RelationSelector(Selector):
             target_space = StructureCollection.intersection(
                 winner_relation.start.parent_spaces.where(no_of_dimensions=1),
                 winner_relation.end.parent_spaces.where(no_of_dimensions=1),
-            ).get(exclude=[winner_relation.parent_space])
+            ).get(exclude=[winner_relation.conceptual_space])
             self.child_codelets.append(
                 RelationSuggester.spawn(
                     self.codelet_id,
