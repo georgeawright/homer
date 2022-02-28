@@ -106,18 +106,34 @@
 (def-relation :start select-concept :end suggest-concept :is_bidirectional False)
 (def-relation :start select-concept :end publish-concept :is_bidirectional False)
 
-(def-relation :start chunk-concept :end label-concept :is_bidirectional False)
-(def-relation :start chunk-concept :end relation-concept :is_bidirectional False)
-(def-relation :start chunk-concept :end view-simplex-concept :is_bidirectional False)
-(def-relation :start letter-chunk-concept :end label-concept :is_bidirectional False)
-(def-relation :start letter-chunk-concept :end relation-concept :is_bidirectional False)
-(def-relation :start letter-chunk-concept :end view-simplex-concept :is_bidirectional False)
-(def-relation :start view-simplex-concept :end correspondence-concept :is_bidirectional False)
-(def-relation :start correspondence-concept :end chunk-concept :is_bidirectional False)
-(def-relation :start correspondence-concept :end letter-chunk-concept :is_bidirectional False)
-(def-relation :start correspondence-concept :end label-concept :is_bidirectional False)
-(def-relation :start correspondence-concept :end relation-concept :is_bidirectional False)
-(def-relation :start correspondence-concept :end view-monitoring-concept)
+(def-relation :start chunk-concept :end label-concept
+  :is_bidirectional False :activation 0.33)
+(def-relation :start chunk-concept :end relation-concept
+  :is_bidirectional False :activation 0.33)
+(def-relation :start chunk-concept :end view-simplex-concept
+  :is_bidirectional False :activation 0.33)
+(def-relation :start letter-chunk-concept :end label-concept
+  :is_bidirectional False :activation 0.33)
+(def-relation :start letter-chunk-concept :end relation-concept
+  :is_bidirectional False :activation 0.33)
+(def-relation :start letter-chunk-concept :end view-simplex-concept
+  :is_bidirectional False :activation 0.33)
+(def-relation :start label-concept :end view-simplex-concept
+  :is_bidirectional False :activation 1.0)
+(def-relation :start relation-concept :end view-simplex-concept
+  :is_bidirectional False :activation 1.0)
+(def-relation :start view-simplex-concept :end correspondence-concept
+  :is_bidirectional False :activation 1.0)
+(def-relation :start correspondence-concept :end chunk-concept
+  :is_bidirectional False :activation 0.2)
+(def-relation :start correspondence-concept :end letter-chunk-concept
+  :is_bidirectional False :activation 0.2)
+(def-relation :start correspondence-concept :end label-concept
+  :is_bidirectional False :activation 0.2)
+(def-relation :start correspondence-concept :end relation-concept
+  :is_bidirectional False :activation 0.2)
+(def-relation :start correspondence-concept :end view-monitoring-concept
+  :activation 0.2)
 
 (define grammar-distance-to-proximity 0.1)
 (define grammar-concept
@@ -671,7 +687,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
     :no_of_dimensions Nan))
-(define label-concept
+(define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
 (define jj-input
   (def-contextual-space :name "ap[jj].meaning" :parent_concept input-concept
@@ -683,14 +699,14 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-frame :name "ap[jj]"
     :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection space-parent-concept label-concept)
+    :concepts (StructureCollection space-parent-concept label-parent-concept)
     :input_space jj-input :output_space jj-output))
 (define chunk
   (def-chunk :locations (list (Location (list) conceptual-space)
 			      (Location (list) jj-input))
     :parent_space jj-input))
 (define chunk-label
-  (def-label :start chunk :parent_concept label-concept
+  (def-label :start chunk :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) jj-input))))
 (define letter-chunk
@@ -703,18 +719,29 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list) jj-input))))
 (define letter-chunk-meaning-label
-  (def-label :start letter-chunk :parent_concept label-concept
+  (def-label :start letter-chunk :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) jj-input))))
+
+(def-relation :start label-concept :end jj-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start chunk-concept :end jj-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start letter-chunk-concept :end jj-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start jj-concept :end jj-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start ap-concept :end jj-frame
+  :is_bidirectional True :activation 1.0)
 
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
     :no_of_dimensions Nan))
-(define magnitude-label-concept
+(define magnitude-label-parent-concept
   (def-concept :name "" :is_slot True :parent_space magnitude-space))
-(define label-concept
+(define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
 (define ap-sub-frame-input
   (def-contextual-space :name "ap-ap-sub.meaning" :parent_concept input-concept
@@ -737,7 +764,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define ap-frame
   (def-frame :name "ap-frame" :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureCollection ap-sub-frame)
-    :concepts (StructureCollection magnitude-label-concept)
+    :concepts (StructureCollection magnitude-label-parent-concept)
     :input_space ap-frame-input
     :output_space ap-frame-output))
 (define label-start
@@ -745,12 +772,12 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 				     (Location (list) ap-frame-input))
   :parent_space ap-frame-input))
 (define label-start-label
-  (def-label :start label-start :parent_concept label-concept
+  (def-label :start label-start :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list (list Nan)) magnitude-space)
 		     (Location (list) ap-frame-input))))
 (define magnitude-label
-  (def-label :start label-start-label :parent_concept magnitude-label-concept
+  (def-label :start label-start-label :parent_concept magnitude-label-parent-concept
     :locations (list (Location (list (list Nan)) magnitude-space)
 		     (Location (list) ap-frame-input))))
 (define qualifier-word
@@ -763,7 +790,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list) ap-frame-output))))
 (define qualifier-word-magnitude-label
-  (def-label :start qualifier-word :parent_concept magnitude-label-concept
+  (def-label :start qualifier-word :parent_concept magnitude-label-parent-concept
     :locations (list (Location (list) magnitude-space)
 		     (Location (list) ap-frame-output))))
 (define adjective-word
@@ -785,12 +812,25 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :right_branch (StructureCollection adjective-word)
     :parent_space ap-sub-frame-output))
 
+(def-relation :start label-concept :end ap-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start chunk-concept :end ap-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start letter-chunk-concept :end ap-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start jj-concept :end ap-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start rb-concept :end ap-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start ap-concept :end ap-frame
+  :is_bidirectional True :activation 1.0)
+
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
     :no_of_dimensions Nan))
-(define label-concept
+(define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
 (define nn-input
   (def-contextual-space :name "np[nn].meaning" :parent_concept input-concept
@@ -802,14 +842,14 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-frame :name "np[nn]"
     :parent_concept np-concept :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection space-parent-concept label-concept)
+    :concepts (StructureCollection space-parent-concept label-parent-concept)
     :input_space nn-input :output_space nn-output))
 (define chunk
   (def-chunk :locations (list (Location (list) conceptual-space)
 			      (Location (list) nn-input))
     :parent_space nn-input))
 (define chunk-label
-  (def-label :start chunk :parent_concept label-concept
+  (def-label :start chunk :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) nn-input))))
 (define letter-chunk
@@ -822,22 +862,33 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list) nn-input))))
 (define letter-chunk-meaning-label
-  (def-label :start letter-chunk :parent_concept label-concept
+  (def-label :start letter-chunk :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) nn-input))))
+
+(def-relation :start label-concept :end nn-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start chunk-concept :end nn-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start letter-chunk-concept :end nn-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start nn-concept :end nn-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start np-concept :end nn-frame
+  :is_bidirectional True :activation 1.0)
 
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
     :no_of_dimensions 1))
-(define label-concept
+(define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space
     :locations (list (Location (list) conceptual-space))))
-(define relation-concept
+(define relation-parent-concept
   (def-concept :name "" :is_slot True :parent_space more-less-space
     :locations (list (Location (list) more-less-space))))
-(def-relation :start label-concept :end relation-concept
+(def-relation :start label-parent-concept :end relation-parent-concept
   :parent_concept more-concept :activation 1.0)
 (define rp-input
   (def-contextual-space :name "rp[jjr].meaning" :parent_concept input-concept
@@ -849,7 +900,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-frame :name "rp[jjr]"
     :parent_concept rp-concept :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection space-parent-concept label-concept relation-concept)
+    :concepts (StructureCollection space-parent-concept label-parent-concept relation-parent-concept)
     :input_space rp-input :output_space rp-output))
 (define chunk-start
   (def-chunk :locations (list (Location (list) conceptual-space)
@@ -860,11 +911,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 			      (Location (list) rp-input))
     :parent_space rp-input))
 (define chunk-end-label
-  (def-label :start chunk-end :parent_concept label-concept
+  (def-label :start chunk-end :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) rp-input))))
 (define relation
-  (def-relation :start chunk-start :end chunk-end :parent_concept relation-concept
+  (def-relation :start chunk-start :end chunk-end :parent_concept relation-parent-concept
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list) (list) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-input))
@@ -894,7 +945,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list) rp-output))))
 (define jjr-chunk-meaning-label
-  (def-label :start jjr-chunk :parent_concept label-concept
+  (def-label :start jjr-chunk :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) rp-output))))
 (define er-chunk-relation
@@ -906,6 +957,21 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list) rp-output))))
 
+(def-relation :start label-concept :end rp-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start relation-concept :end rp-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start chunk-concept :end rp-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start letter-chunk-concept :end rp-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start jj-concept :end rp-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start jjr-concept :end rp-frame
+  :is_bidirectional True :activation 1.0)
+(def-relation :start rp-concept :end rp-frame
+  :is_bidirectional True :activation 1.0)
+
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
 (define conceptual-space
@@ -915,13 +981,13 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True :parent_space location-space))
 (define location-concept-2
   (def-concept :name "" :is_slot True :parent_space location-space))
-(define label-concept
+(define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space
     :locations (list (Location (list) conceptual-space))))
-(define relation-concept
+(define relation-parent-concept
   (def-concept :name "" :is_slot True :parent_space more-less-space
     :locations (list (Location (list) more-less-space))))
-(def-relation :start label-concept :end relation-concept
+(def-relation :start label-parent-concept :end relation-parent-concept
   :parent_concept more-concept)
 (define rp-sub-frame-input
   (def-contextual-space :name "rp-sub-frame.meaning" :parent_concept input-concept
@@ -933,7 +999,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define rp-sub-frame
   (def-frame :name "s-comparative-rp-sub" :parent_concept rp-concept :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection label-concept relation-concept)
+    :concepts (StructureCollection label-parent-concept relation-parent-concept)
     :input_space rp-sub-frame-input
     :output_space rp-sub-frame-output))
 (define nn-sub-frame-1-input
@@ -973,7 +1039,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-frame :name "s-comparative" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureCollection rp-sub-frame nn-sub-frame-1 nn-sub-frame-2)
     :concepts (StructureCollection
-	       label-concept relation-concept location-concept-1 location-concept-2)
+	       label-parent-concept relation-parent-concept location-concept-1 location-concept-2)
     :input_space comparative-sentence-input
     :output_space comparative-sentence-output))
 (define chunk-start
@@ -991,7 +1057,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 			      (Location (list) comparative-sentence-input))
     :parent_space nn-sub-frame-2-input))
 (define chunk-start-conceptual-label
-  (def-label :start chunk-start :parent_concept label-concept
+  (def-label :start chunk-start :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) rp-sub-frame-input)
 		     (Location (list) comparative-sentence-input))))
@@ -1006,7 +1072,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list) nn-sub-frame-2-input)
 		     (Location (list) comparative-sentence-input))))
 (define relation
-  (def-relation :start chunk-start :end chunk-end :parent_concept relation-concept
+  (def-relation :start chunk-start :end chunk-end :parent_concept relation-parent-concept
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list) (list) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-sub-frame-input)
@@ -1165,6 +1231,25 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))))
+
+(def-relation :start label-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start relation-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start chunk-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start letter-chunk-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start nn-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start jj-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start jjr-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start rp-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start sentence-concept :end comparative-sentence
+  :is_bidirectional True :activation 1.0)
 
 (define and-sub-frame-1-input
   (def-contextual-space :name "and-sub-frame-1.meaning" :parent_concept input-concept
@@ -1340,6 +1425,15 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   :start s-and-verb-1 :end s-and-verb-2 :parent_concept same-concept)
 (def-relation
   :start s-and-predicate-1 :end s-and-predicate-2 :parent_concept same-concept)
+
+(def-relation :start same-concept :end and-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start conj-concept :end and-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start and :end and-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start sentence-concept :end and-sentence
+  :is_bidirectional True :activation 1.0)
 
 (define conceptual-space-1-parent-concept
   (def-concept :name "" :is_slot True))
@@ -1535,6 +1629,15 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   :start s-but-verb-1 :end s-but-verb-2 :parent_concept same-concept)
 (def-relation
   :start s-but-predicate-1 :end s-but-predicate-2 :parent_concept same-concept)
+
+(def-relation :start different-concept :end but-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start conj-concept :end but-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start but :end but-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start sentence-concept :end but-sentence
+  :is_bidirectional True :activation 1.0)
 
 (define input-space
   (def-contextual-space :name "input" :parent_concept input-concept
