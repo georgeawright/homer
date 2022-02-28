@@ -11,6 +11,10 @@ class StructureLogger(Logger):
 
     def log_concepts_and_frames(self, bubble_chamber, coderack):
         """output dot file of concepts, frames, connections, and activations"""
+
+        def activation_to_font_size(activation):
+            return activation * 30 + 10
+
         codelets_run = coderack.codelets_run
         output_file_path = f"{self.directory}/concepts_and_frames/{codelets_run}.dot"
         with open(output_file_path, "w") as f:
@@ -31,7 +35,7 @@ class StructureLogger(Logger):
                     node_name = (
                         node.name.upper() if node.is_concept else node.name.lower()
                     )
-                    node_size = node.activation * 30 + 10
+                    node_size = activation_to_font_size(node.activation)
                     f.write(
                         f'{node.structure_id} [label="{node_name}" fontsize={node_size}];\n'
                     )
@@ -40,6 +44,19 @@ class StructureLogger(Logger):
                 f.write(f'label="{space_name}";\n')
                 f.write("}\n")
                 space_count += 1
+            f.write(f"subgraph cluster_{space_count} {{\n")
+            f.write(
+                "style=filled; color=lightblue; node [style=filled, color=white];\n"
+            )
+            for frame in bubble_chamber.frames:
+                node_name = frame.name
+                node_size = activation_to_font_size(frame.activation)
+                f.write(
+                    f'{frame.structure_id} [label="{node_name}" fontsize={node_size}];\n'
+                )
+                graphed_nodes[frame] = True
+            f.write('label="frames";\n')
+            f.write("}\n")
             for node in graphed_nodes:
                 for link in node.links_out.filter(
                     lambda x: x.start in graphed_nodes and x.end in graphed_nodes
