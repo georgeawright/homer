@@ -84,10 +84,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not target_node.has_label_with_name("cold")
+    assert target_node.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert target_node.has_label_with_name("cold")
+    assert not target_node.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -180,10 +180,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not chunk.has_label_with_name("cold")
+    assert chunk.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk.has_label_with_name("cold")
+    assert not chunk.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -213,10 +213,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not chunk.has_label_with_name("northwest")
+    assert chunk.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk.has_label_with_name("northwest")
+    assert not chunk.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -313,10 +313,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not chunk.has_label_with_name("cool")
+    assert chunk.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk.has_label_with_name("cool")
+    assert not chunk.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -347,10 +347,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not chunk.has_label_with_name("northeast")
+    assert chunk.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk.has_label_with_name("northeast")
+    assert not chunk.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -389,12 +389,12 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, RelationBuilder)
-    assert not chunk_one.has_relation_with_name("less")
-    assert not chunk_two.has_relation_with_name("less")
+    assert chunk_one.relations.where(parent_concept=parent_concept).is_empty()
+    assert chunk_two.relations.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk_one.has_relation_with_name("less")
-    assert chunk_two.has_relation_with_name("less")
+    assert not chunk_one.relations.where(parent_concept=parent_concept).is_empty()
+    assert not chunk_two.relations.where(parent_concept=parent_concept).is_empty()
 
     relation = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -1682,10 +1682,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not chunk.has_label_with_name("southwest")
+    assert chunk.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk.has_label_with_name("southwest")
+    assert not chunk.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -1716,10 +1716,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not chunk.has_label_with_name("high")
+    assert chunk.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk.has_label_with_name("high")
+    assert not chunk.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -1814,10 +1814,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not chunk.has_label_with_name("southeast")
+    assert chunk.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk.has_label_with_name("southeast")
+    assert not chunk.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -1848,10 +1848,10 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, LabelBuilder)
-    assert not chunk.has_label_with_name("high")
+    assert chunk.labels.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk.has_label_with_name("high")
+    assert not chunk.labels.where(parent_concept=parent_concept).is_empty()
 
     label = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -1888,12 +1888,12 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, RelationBuilder)
-    assert not chunk_three.has_relation_with_name("more")
-    assert not chunk_four.has_relation_with_name("more")
+    assert chunk_three.relations.where(parent_concept=parent_concept).is_empty()
+    assert chunk_four.relations.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk_three.has_relation_with_name("more")
-    assert chunk_four.has_relation_with_name("more")
+    assert not chunk_three.relations.where(parent_concept=parent_concept).is_empty()
+    assert not chunk_four.relations.where(parent_concept=parent_concept).is_empty()
 
     relation = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
@@ -3738,12 +3738,12 @@ def test_pipeline_of_codelets(homer):
 
     codelet = codelet.child_codelets[0]
     assert isinstance(codelet, RelationBuilder)
-    assert not chunk_one.has_relation_with_name("different")
-    assert not chunk_three.has_relation_with_name("different")
+    assert chunk_one.relations.where(parent_concept=parent_concept).is_empty()
+    assert chunk_three.relations.where(parent_concept=parent_concept).is_empty()
     codelet.run()
     assert CodeletResult.FINISH == codelet.result
-    assert chunk_one.has_relation_with_name("different")
-    assert chunk_three.has_relation_with_name("different")
+    assert not chunk_one.relations.where(parent_concept=parent_concept).is_empty()
+    assert not chunk_three.relations.where(parent_concept=parent_concept).is_empty()
 
     relation = codelet.child_structures.get()
     codelet = codelet.child_codelets[0]
