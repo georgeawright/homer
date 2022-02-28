@@ -67,6 +67,10 @@ class Node(Structure):
             ]
         )
 
+    @property
+    def uncorrespondedness(self) -> FloatBetweenOneAndZero:
+        return 0.5 * 0.5 ** sum(link.activation for link in self.correspondences)
+
     def nearby(self, space: Space = None) -> StructureCollection:
         raise NotImplementedError
 
