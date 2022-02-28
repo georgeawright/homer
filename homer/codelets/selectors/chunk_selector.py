@@ -15,6 +15,12 @@ class ChunkSelector(Selector):
             return True
         try:
             champion_chunk = self.champions.where(is_chunk=True, is_slot=False).get()
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Champion chunk: {champion_chunk}"
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Nearby champion chunk: {champion_chunk.nearby()}"
+            )
             challenger_chunk = champion_chunk.nearby().get(key=activation)
             self.challengers = self.bubble_chamber.new_structure_collection(
                 challenger_chunk
