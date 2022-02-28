@@ -1,4 +1,6 @@
 import math
+import os
+
 from homer.logger import Logger
 
 
@@ -11,10 +13,6 @@ class StructureLogger(Logger):
 
     def log_concepts_and_frames(self, bubble_chamber, coderack):
         """output dot file of concepts, frames, connections, and activations"""
-
-        def activation_to_font_size(activation):
-            return activation * 30 + 10
-
         codelets_run = coderack.codelets_run
         output_file_path = f"{self.directory}/concepts_and_frames/{codelets_run}.dot"
         with open(output_file_path, "w") as f:
@@ -35,7 +33,7 @@ class StructureLogger(Logger):
                     node_name = (
                         node.name.upper() if node.is_concept else node.name.lower()
                     )
-                    node_size = activation_to_font_size(node.activation)
+                    node_size = self._activation_to_font_size(node.activation)
                     f.write(
                         f'{node.structure_id} [label="{node_name}" fontsize={node_size}];\n'
                     )
@@ -50,7 +48,7 @@ class StructureLogger(Logger):
             )
             for frame in bubble_chamber.frames:
                 node_name = frame.name
-                node_size = activation_to_font_size(frame.activation)
+                node_size = self._activation_to_font_size(frame.activation)
                 f.write(
                     f'{frame.structure_id} [label="{node_name}" fontsize={node_size}];\n'
                 )
@@ -79,5 +77,64 @@ class StructureLogger(Logger):
                     )
             f.write("}\n")
 
+    def log_contextual_space(self, space, coderack):
+        """output dot file of nodes and links in contextual space"""
+        codelets_run = coderack.codelets_run
+        spaces_directory = f"{self.directory}/spaces"
+        directory = f"{spaces_directory}/{space.structure_id}"
+        try:
+            os.mkdir(spaces_directory)
+            os.mkdir(directory)
+        except FileExistsError:
+            pass
+        output_file_path = f"{directory}/{codelets_run}.dot"
+        with open(output_file_path, "w") as f:
+            f.write("digraph G {\n")
+            f.write("subgraph cluster_0 {\n")
+            f.write(
+                "style=filled; color=lightblue; node [style=filled, color=white];\n"
+            )
+            for item in space.contents:
+                if item.is_node:
+                    item_name = (
+                        item.name if hasattr(item, "name") else item.structure_id
+                    )
+                else:
+                    item_name = (
+                        item.parent_concept.name.upper()
+                        if item.parent_concept is not None
+                        else item.structure_id
+                    )
+                item_size = self._activation_to_font_size(item.activation)
+                f.write(
+                    f'{item.structure_id} [label="{item_name}" fontsize={item_size}];\n'
+                )
+            for item in space.contents:
+                if item.is_node:
+                    for left_node in item.left_branch:
+                        f.write(
+                            f"{item.structure_id} -> {left_node.structure_id} "
+                            + '[label="left"];\n'
+                        )
+                    for right_node in item.right_branch:
+                        f.write(
+                            f"{item.structure_id} -> {right_node.structure_id} "
+                            + '[label="left"];\n'
+                        )
+                else:
+                    f.write(
+                        f'{item.structure_id} -> {item.start.structure_id} [label="start"];\n'
+                    )
+                    if item.end is not None:
+                        f.write(
+                            f'{item.structure_id} -> {item.end.structure_id} [label="end"];\n'
+                        )
+            f.write(f'label="{space.structure_id}";\n')
+            f.write("}\n")
+            f.write("}\n")
+
     def log_structure(self, structure):
         """output json file of structure attributes"""
+
+    def _activation_to_font_size(self, activation):
+        return activation * 30 + 10

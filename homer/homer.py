@@ -50,6 +50,10 @@ class Homer:
                     self.bubble_chamber.loggers["structure"].log_concepts_and_frames(
                         self.bubble_chamber, self.coderack
                     )
+                    for input_space in self.bubble_chamber.input_spaces:
+                        self.bubble_chamber.loggers["structure"].log_contextual_space(
+                            input_space, self.coderack
+                        )
                     self.print_status_update()
                     self.bubble_chamber.spread_activations()
                     self.bubble_chamber.update_activations()
