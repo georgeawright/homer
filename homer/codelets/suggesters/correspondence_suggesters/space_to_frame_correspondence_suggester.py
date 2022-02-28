@@ -110,15 +110,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 "MissingStructureError when searching for second target space and structure",
             )
             return False
-        if self.parent_concept is None:
-            self.parent_concept = (
-                self.bubble_chamber.concepts.where(structure_type=Correspondence)
-                .where_not(classifier=None)
-                .get()
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found parent concept: {self.parent_concept}"
-            )
+        self.parent_concept = self.bubble_chamber.concepts["same"]
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Found parent concept: {self.parent_concept}"
+        )
         if not self.target_view.can_accept_member(
             self.parent_concept,
             self.target_conceptual_space,
