@@ -173,19 +173,19 @@ class Factory(Codelet):
 
         return {
             "inner-or-outer": {
-                "actions": nsc(suggest, evaluate),
+                "actions": nsc(suggest),
                 "spaces": nsc(inner, outer),
                 "directions": nsc(forward),
                 "structures": nsc(chunk, correspondence, label, relation),
             },
             "inner": {
-                "actions": nsc(suggest, evaluate),
+                "actions": nsc(suggest),
                 "spaces": nsc(inner),
                 "directions": nsc(forward),
                 "structures": nsc(view_monitoring, view_simplex),
             },
             "outer": {
-                "actions": nsc(suggest, evaluate),
+                "actions": nsc(suggest),
                 "spaces": nsc(outer),
                 "directions": nsc(forward),
                 "structures": nsc(letter_chunk),

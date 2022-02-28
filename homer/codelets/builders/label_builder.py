@@ -176,6 +176,7 @@ class LabelBuilder(Builder):
             locations=locations,
             quality=0,
         )
+        self._structure_concept.instances.add(label)
         self.child_structures.add(label)
 
     def _recursively_copy_links(self):

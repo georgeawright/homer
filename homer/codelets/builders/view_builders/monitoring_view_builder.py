@@ -35,4 +35,5 @@ class MonitoringViewBuilder(ViewBuilder):
         )
         self.bubble_chamber.loggers["structure"].log(view)
         self.bubble_chamber.views.add(view)
+        self._structure_concept.instances.add(view)
         self.child_structures = self.bubble_chamber.new_structure_collection(view)

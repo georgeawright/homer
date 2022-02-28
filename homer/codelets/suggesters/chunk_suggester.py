@@ -66,8 +66,7 @@ class ChunkSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get(key=activation)
-        target_space = target_view.input_spaces.get()
+        target_space = bubble_chamber.input_spaces.get()
         target_node = target_space.contents.where(is_node=True).get(
             key=chunking_exigency
         )
@@ -91,8 +90,7 @@ class ChunkSuggester(Suggester):
         target_rule: Rule,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get(key=activation)
-        target_space = target_view.input_spaces.get()
+        target_space = bubble_chamber.input_spaces.get()
         target_node = bubble_chamber.new_structure_collection(
             *[
                 node

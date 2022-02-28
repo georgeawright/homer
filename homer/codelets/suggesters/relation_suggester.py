@@ -88,7 +88,6 @@ class RelationSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        # TODO: this may need work
         input_space = bubble_chamber.input_spaces.get()
         conceptual_space = input_space.conceptual_spaces.where(no_of_dimensions=1).get()
         potential_targets = input_space.contents.where(is_node=True, is_slot=False)

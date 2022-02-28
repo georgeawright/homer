@@ -40,4 +40,5 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             parent_view=self.target_view,
         )
         self.child_structures.add(sub_frame_correspondence)
+        self._structure_concept.instances.add(sub_frame_correspondence)
         self._add_contextual_space_correspondence()

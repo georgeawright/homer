@@ -8,6 +8,10 @@ from .codelets.factories import (
     RandomFactory,
     RationalFactory,
     ViewDrivenFactory,
+    RandomStructureConceptDrivenFactory,
+    ActiveStructureConceptDrivenFactory,
+    ExigentStructureConceptDrivenFactory,
+    UnhappyStructureConceptDrivenFactory,
 )
 from .errors import MissingStructureError, NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -34,9 +38,19 @@ class Coderack:
         meta_codelets = [
             CoderackCleaner.spawn("", bubble_chamber, coderack, 0.0, 1.0),
             ConceptDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
-            RandomFactory.spawn("", bubble_chamber, coderack, 1.0),
-            RationalFactory.spawn("", bubble_chamber, coderack, 1.0),
             ViewDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
+            RandomStructureConceptDrivenFactory.spawn(
+                "", bubble_chamber, coderack, 1.0
+            ),
+            ActiveStructureConceptDrivenFactory.spawn(
+                "", bubble_chamber, coderack, 1.0
+            ),
+            ExigentStructureConceptDrivenFactory.spawn(
+                "", bubble_chamber, coderack, 1.0
+            ),
+            UnhappyStructureConceptDrivenFactory.spawn(
+                "", bubble_chamber, coderack, 1.0
+            ),
         ]
         for codelet in meta_codelets:
             coderack.add_codelet(codelet)

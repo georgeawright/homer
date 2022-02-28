@@ -36,9 +36,10 @@ class Structure(ABC):
         self.links_out = links_out
         self.parent_spaces = parent_spaces
         # TODO: get rid of randomness
-        self._activation = FloatBetweenOneAndZero(
-            random.random() if stable_activation is None else stable_activation
-        )
+        # self._activation = FloatBetweenOneAndZero(
+        #    random.random() if stable_activation is None else stable_activation
+        # )
+        self._activation = 0.0 if stable_activation is None else stable_activation
         self.stable = stable_activation is not None
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT

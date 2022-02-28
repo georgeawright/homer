@@ -47,10 +47,13 @@ class Homer:
         while self.bubble_chamber.result is None:
             try:
                 if self.coderack.codelets_run % self.activation_update_frequency == 0:
+                    self.bubble_chamber.loggers["structure"].log_concepts_and_frames(
+                        self.bubble_chamber, self.coderack
+                    )
                     self.print_status_update()
                     self.bubble_chamber.spread_activations()
                     self.bubble_chamber.update_activations()
-                if self.coderack.codelets_run >= 30000:
+                if self.coderack.codelets_run >= 5000:
                     raise NoMoreCodelets
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:

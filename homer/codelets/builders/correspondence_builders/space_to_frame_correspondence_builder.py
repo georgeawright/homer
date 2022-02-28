@@ -29,4 +29,5 @@ class SpaceToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             conceptual_space=self.target_conceptual_space,
             parent_view=self.target_view,
         )
+        self._structure_concept.instances.add(correspondence)
         self.child_structures.add(correspondence)

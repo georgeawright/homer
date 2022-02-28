@@ -34,6 +34,9 @@ class SimplexViewSuggester(ViewSuggester):
         )
 
     def _passes_preliminary_checks(self) -> bool:
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"frame activation: {self.frame.activation}"
+        )
         input_space_concept = self.contextual_space.parent_concept
         frame_input_space = (
             self.frame.input_space

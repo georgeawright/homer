@@ -27,6 +27,7 @@ class Concept(Node):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        instances: StructureCollection,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         is_slot: bool = False,
@@ -49,6 +50,7 @@ class Concept(Node):
         self.structure_type = structure_type
         self.child_spaces = child_spaces
         self.distance_function = distance_function
+        self.instances = instances
         self.depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
         self.is_concept = True
@@ -65,6 +67,10 @@ class Concept(Node):
     @property
     def is_filled_in(self) -> bool:
         return not self.relatives.where(is_slot=False).is_empty()
+
+    @property
+    def unhappiness(self) -> FloatBetweenOneAndZero:
+        return 0.5 ** sum(instance.activation for instance in self.instances)
 
     def letter_chunk_forms(
         self, grammar_concept: Concept = None

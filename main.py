@@ -1,13 +1,13 @@
 from unittest.mock import Mock
 
 from homer import Homer
-from homer.loggers import ActivityLogger
+from homer.loggers import ActivityLogger, StructureLogger
 
 
-activity_stream = open("activity.log", "w")
+activity_stream = open("logs/activity.log", "w")
 loggers = {
     "activity": ActivityLogger(activity_stream),
-    "structure": Mock(),
+    "structure": StructureLogger("logs/structures"),
     "errors": Mock(),
 }
 narrator = Homer.setup(loggers, random_seed=1)

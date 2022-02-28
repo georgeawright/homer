@@ -123,4 +123,5 @@ class CorrespondenceBuilder(Builder):
                 conceptual_space=self.target_conceptual_space,
                 parent_view=self.target_view,
             )
+            self._structure_concept.instances.add(contextual_space_correspondence)
             self.child_structures.add(contextual_space_correspondence)

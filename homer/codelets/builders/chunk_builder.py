@@ -168,6 +168,7 @@ class ChunkBuilder(Builder):
                 right_branch=right_branch,
                 rule=self.target_rule,
             )
+            self._structure_concept.instances.add(chunk)
             self.child_structures = self.bubble_chamber.new_structure_collection(chunk)
             if chunk.has_free_branch:
                 chunk.free_branch.add(slot)

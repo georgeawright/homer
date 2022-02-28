@@ -399,6 +399,7 @@ class BubbleChamber:
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
+            instances=self.new_structure_collection(),
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
             is_slot=is_slot,

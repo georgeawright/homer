@@ -21,6 +21,7 @@ def test_letter_chunk_forms(bubble_chamber):
         bubble_chamber.new_structure_collection(),
         bubble_chamber.new_structure_collection(),
         bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
     )
     hot_word = Mock()
     hot_word.name = "hot"
@@ -97,6 +98,7 @@ def test_distance_from(prototype, space_name, distance_function, expected, struc
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     assert expected == concept.distance_from(structure)
 
@@ -133,6 +135,7 @@ def test_proximity_to(
         parent_space,
         Mock(),
         distance_function,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

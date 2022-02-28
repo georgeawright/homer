@@ -63,9 +63,6 @@
 (define letter-chunk-concept
   (def-concept :name "letter-chunk" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
-(define space-conceptual-concept
-  (def-concept :name "space-conceptual" :locations (list (Location (list) structure-space))
-    :parent_space structure-space))
 (define view-monitoring-concept
   (def-concept :name "view-monitoring" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
@@ -215,19 +212,45 @@
     :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 
-(define the (def-letter-chunk :name "the" :locations (list (Location (list) grammar-space))))
-(define is (def-letter-chunk :name "is" :locations (list (Location (list) grammar-space))))
-(define will (def-letter-chunk :name "will" :locations (list (Location (list) grammar-space))))
-(define be (def-letter-chunk :name "be" :locations (list (Location (list) grammar-space))))
-(define temperatures (def-letter-chunk :name "temperatures" :locations (list (Location (list) grammar-space))))
-(define in (def-letter-chunk :name "in" :locations (list (Location (list) grammar-space))))
-(define than (def-letter-chunk :name "than" :locations (list (Location (list) grammar-space))))
-(define and (def-letter-chunk :name "and" :locations (list (Location (list) grammar-space))))
-(define but (def-letter-chunk :name "but" :locations (list (Location (list) grammar-space))))
-(define comma (def-letter-chunk :name "comma" :locations (list (Location (list) grammar-space))))
-(define fstop (def-letter-chunk :name "fstop" :locations (list (Location (list) grammar-space))))
-(define -er (def-letter-chunk :name "\ber" :locations (list (Location (list) grammar-space))))
-(define null (def-letter-chunk :name "" :locations (list (Location (list) grammar-space))))
+(define the
+  (def-letter-chunk :name "the" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define is
+  (def-letter-chunk :name "is" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define will
+  (def-letter-chunk :name "will" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define be
+  (def-letter-chunk :name "be" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define temperatures
+  (def-letter-chunk :name "temperatures" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define in
+  (def-letter-chunk :name "in" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define than
+  (def-letter-chunk :name "than" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define and
+  (def-letter-chunk :name "and" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define but
+  (def-letter-chunk :name "but" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define comma
+  (def-letter-chunk :name "comma" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define fstop
+  (def-letter-chunk :name "fstop" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define -er
+  (def-letter-chunk :name "\ber" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
+(define null
+  (def-letter-chunk :name "" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
 
 (define same-different-concept
   (def-concept :name "same-different" :locations (list) :classifier None :instance_type None
@@ -308,13 +331,21 @@
     :classifier (ProximityClassifier) :instance_type Link :structure_type Label
     :parent_space magnitude-space :distance_function centroid_euclidean_distance))
 
-(define extremely-word (def-letter-chunk :name "extremely" :locations (list)))
+(define extremely-word
+  (def-letter-chunk :name "extremely" :parent_space magnitude-space
+    :locations (list (Location (list (list 2)) magnitude-space))))
 (def-relation :start extremely-concept :end extremely-word :parent_concept rb-concept)
-(define very-word (def-letter-chunk :name "very" :locations (list)))
+(define very-word
+  (def-letter-chunk :name "very" :parent_space magnitude-space
+    :locations (list (Location (list (list 1)) magnitude-space))))
 (def-relation :start very-concept :end very-word :parent_concept rb-concept)
-(define quite-word (def-letter-chunk :name "quite" :locations (list)))
+(define quite-word
+  (def-letter-chunk :name "quite" :parent_space magnitude-space
+    :locations (list (Location (list (list -1)) magnitude-space))))
 (def-relation :start quite-concept :end quite-word :parent_concept rb-concept)
-(define bit-word (def-letter-chunk :name """a bit""" :locations (list)))
+(define bit-word
+  (def-letter-chunk :name """a bit""" :parent_space magnitude-space
+    :locations (list (Location (list (list -2)) magnitude-space))))
 (def-relation :start bit-concept :end bit-word :parent_concept rb-concept)
 
 (define height-concept
@@ -336,11 +367,15 @@
 (def-relation :start high-concept :end more-concept :parent_concept more-concept :activation 1.0)
 (def-relation :start low-concept :end less-concept :parent_concept more-concept :activation 1.0)
 
-(define high-word (def-letter-chunk :name "high" :locations (list)))
+(define high-word
+  (def-letter-chunk :name "high" :parent_space height-space
+    :locations (list (Location (list (list 10)) height-space))))
 (def-relation :start high-concept :end high-word :parent_concept jj-concept)
 (def-relation :start high-concept :end high-word :parent_concept jjr-concept)
 (def-relation :start high-word :end -er :parent_concept jjr-concept)
-(define low-word (def-letter-chunk :name "low" :locations (list)))
+(define low-word
+  (def-letter-chunk :name "low" :parent_space height-space
+    :locations (list (Location (list (list 0)) height-space))))
 (def-relation :start low-concept :end low-word :parent_concept jj-concept)
 (def-relation :start low-concept :end low-word :parent_concept jjr-concept)
 (def-relation :start low-word :end -er :parent_concept jjr-concept)
@@ -364,14 +399,22 @@
 (def-relation :start good-concept :end more-concept :parent_concept more-concept :activation 1.0)
 (def-relation :start bad-concept :end less-concept :parent_concept more-concept :activation 1.0)
 
-(define good-word (def-letter-chunk :name "good" :locations (list)))
+(define good-word
+  (def-letter-chunk :name "good" :parent_space goodness-space
+    :locations (list (Location (list (list 10)) goodness-space))))
 (def-relation :start good-concept :end good-word :parent_concept jj-concept)
-(define bett-word (def-letter-chunk :name "bett" :locations (list)))
+(define bett-word
+  (def-letter-chunk :name "bett" :parent_space goodness-space
+    :locations (list (Location (list (list 10)) goodness-space))))
 (def-relation :start good-concept :end bett-word :parent_concept jjr-concept)
 (def-relation :start bett-word :end -er :parent_concept jjr-concept)
-(define bad-word (def-letter-chunk :name "bad" :locations (list)))
+(define bad-word
+  (def-letter-chunk :name "bad" :parent_space goodness-space
+    :locations (list (Location (list (list 0)) goodness-space))))
 (def-relation :start bad-concept :end bad-word :parent_concept jj-concept)
-(define worse-word (def-letter-chunk :name "worse" :locations (list)))
+(define worse-word
+  (def-letter-chunk :name "worse" :parent_space goodness-space
+    :locations (list (Location (list (list 0)) goodness-space))))
 (def-relation :start bad-concept :end worse-word :parent_concept jjr-concept)
 (def-relation :start worse-word :end null :parent_concept jjr-concept)
 
@@ -432,31 +475,52 @@
 (def-correspondence :start cold-concept :end low-concept :parent_concept same-concept)
 (def-correspondence :start cold-concept :end bad-concept :parent_concept same-concept)
 
-(define hot-word (def-letter-chunk :name "hot" :locations (list)))
+(define hot-word
+  (def-letter-chunk :name "hot" :parent_space temperature-space
+    :locations (list (Location (list (list 22)) temperature-space))))
 (def-relation :start hot-concept :end hot-word :parent_concept jj-concept)
-(define hott-word (def-letter-chunk :name "hott" :locations (list)))
+(define hott-word
+  (def-letter-chunk :name "hott" :parent_space temperature-space
+    :locations (list (Location (list (list 22)) temperature-space))))
 (def-relation :start hot-concept :end hott-word :parent_concept jjr-concept)
 (def-relation :start hott-word :end -er :parent_concept jjr-concept)
-(define heat-word (def-letter-chunk :name "heat" :locations (list)))
+(define heat-word
+  (def-letter-chunk :name "heat" :parent_space temperature-space
+    :locations (list (Location (list (list 22)) temperature-space))))
 (def-relation :start hot-concept :end heat-word :parent_concept nn-concept)
-(define warm-word (def-letter-chunk :name "warm" :locations (list)))
+(define warm-word
+  (def-letter-chunk :name "warm" :parent_space temperature-space
+    :locations (list (Location (list (list 18)) temperature-space))))
 (def-relation :start warm-concept :end warm-word :parent_concept jj-concept)
 (def-relation :start warm-concept :end warm-word :parent_concept jjr-concept)
 (def-relation :start warm-word :end -er :parent_concept jjr-concept)
-(define warmth-word (def-letter-chunk :name "warmth" :locations (list)))
+(define warmth-word
+  (def-letter-chunk :name "warmth" :parent_space temperature-space
+    :locations (list (Location (list (list 18)) temperature-space))))
 (def-relation :start warm-concept :end warmth-word :parent_concept nn-concept)
-(define mild-word (def-letter-chunk :name "mild" :locations (list)))
-(def-relation :start mild-concept :end mild-word :parent_concept jj-concept)
-(def-relation :start mild-concept :end mild-word :parent_concept jjr-concept)
-(def-relation :start mild-word :end -er :parent_concept jjr-concept)
-(define cool-word (def-letter-chunk :name "cool" :locations (list)))
+(define cool-word
+  (def-letter-chunk :name "cool" :parent_space temperature-space
+    :locations (list (Location (list (list 8)) temperature-space))))
 (def-relation :start cool-concept :end cool-word :parent_concept jj-concept)
 (def-relation :start cool-concept :end cool-word :parent_concept jjr-concept)
 (def-relation :start cool-word :end -er :parent_concept jjr-concept)
-(define cold-word (def-letter-chunk :name "cold" :locations (list)))
+(define cold-word
+  (def-letter-chunk :name "cold" :parent_space temperature-space
+    :locations (list (Location (list (list 4)) temperature-space))))
 (def-relation :start cold-concept :end cold-word :parent_concept jj-concept)
 (def-relation :start cold-concept :end cold-word :parent_concept jjr-concept)
 (def-relation :start cold-word :end -er :parent_concept jjr-concept)
+
+(define mild-word
+  (def-letter-chunk :name "mild" :parent_space extremeness-space
+    :locations (list (Location (list (list 0)) extremeness-space))))
+(def-relation :start mild-concept :end mild-word :parent_concept jj-concept)
+(def-relation :start mild-concept :end mild-word :parent_concept jjr-concept)
+(def-relation :start mild-word :end -er :parent_concept jjr-concept)
+(define extreme-word
+  (def-letter-chunk :name "extreme" :parent_space extremeness-space
+    :locations (list (Location (list (list 10)) extremeness-space))))
+(def-relation :start extreme-concept :end extreme-word :parent_concept jj-concept)
 
 (define peripheralness-concept
   (def-concept :name "peripheralness" :locations (list) :classifier None
@@ -549,54 +613,54 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list (list 5 4)) location-space)
 		     (Location (list (list 0)) peripheralness-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space peripheralness-space :distance_function centroid_euclidean_distance))
 
 (define north-word
-  (def-letter-chunk :name "north"
+  (def-letter-chunk :name "north" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 0 4)) location-space))))
 (def-relation :start north-concept :end north-word :parent_concept nn-concept)
 (define south-word
-  (def-letter-chunk :name "south"
+  (def-letter-chunk :name "south" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 10 4)) location-space))))
 (def-relation :start south-concept :end south-word :parent_concept nn-concept)
 (define west-word
-  (def-letter-chunk :name "west"
+  (def-letter-chunk :name "west" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 5 0)) location-space))))
 (def-relation :start west-concept :end west-word :parent_concept nn-concept)
 (define east-word
-  (def-letter-chunk :name "east"
+  (def-letter-chunk :name "east" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 5 8)) location-space))))
 (def-relation :start east-concept :end east-word :parent_concept nn-concept)
 (define northwest-word
-  (def-letter-chunk :name "northwest"
+  (def-letter-chunk :name "northwest" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 0 0)) location-space))))
 (def-relation :start northwest-concept :end northwest-word :parent_concept nn-concept)
 (define northeast-word
-  (def-letter-chunk :name "northeast"
+  (def-letter-chunk :name "northeast" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 0 8)) location-space))))
 (def-relation :start northeast-concept :end northeast-word :parent_concept nn-concept)
 (define southwest-word
-  (def-letter-chunk :name "southwest"
+  (def-letter-chunk :name "southwest" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 10 0)) location-space))))
 (def-relation :start southwest-concept :end southwest-word :parent_concept nn-concept)
 (define southeast-word
-  (def-letter-chunk :name "southeast"
+  (def-letter-chunk :name "southeast" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 10 8)) location-space))))
 (def-relation :start southeast-concept :end southeast-word :parent_concept nn-concept)
 (define centre-word
-  (def-letter-chunk :name "centre"
+  (def-letter-chunk :name "centre" :parent_space peripheralness-space
     :locations (list (Location (list) grammar-space))))
 (def-relation :start central-concept :end centre-word :parent_concept nn-concept)
 (define midlands-word
-  (def-letter-chunk :name "midlands"
+  (def-letter-chunk :name "midlands" :parent_space peripheralness-space
     :locations (list (Location (list) grammar-space)
 		     (Location (list (list 5 4)) location-space)
 		     (Location (list (list 0)) peripheralness-space))))
