@@ -18,14 +18,12 @@ class SimplexViewSuggester(ViewSuggester):
         views_with_frame = bubble_chamber.views.filter(
             lambda x: x.parent_frame in frame.instances or x.parent_frame == frame
         )
-        print(len(views_with_frame))
         urgency = (
             urgency
             if urgency is not None
             else frame.activation
             * 0.5 ** sum([1 - view.activation for view in views_with_frame])
         )
-        print(urgency)
         return cls.spawn(
             parent_id,
             bubble_chamber,
