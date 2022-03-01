@@ -88,6 +88,9 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             SpaceToFrameCorrespondenceSuggester,
         )
 
-        return SpaceToFrameCorrespondenceSuggester.make(
-            self.codelet_id, self.bubble_chamber
-        )
+        try:
+            return SpaceToFrameCorrespondenceSuggester.make(
+                self.codelet_id, self.bubble_chamber
+            )
+        except MissingStructureError:
+            pass

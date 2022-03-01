@@ -32,6 +32,7 @@ class CorrespondenceEvaluator(Evaluator):
         target_correspondence = self.target_structures.where(
             is_correspondence=True
         ).get()
+        self.original_confidence = target_correspondence.quality
         self.bubble_chamber.loggers["activity"].log(
             self, f"Evaluating {target_correspondence}"
         )

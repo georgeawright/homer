@@ -46,39 +46,16 @@ class CorrespondenceSelector(Selector):
         winner_correspondence = self.winners.where(is_correspondence=True).get()
         target_view = winner_correspondence.parent_view
         try:
-            target_structure_one = (
-                winner_correspondence.start.nearby().get(key=corresponding_exigency)
-                if winner_correspondence.start.is_node
-                else (
-                    winner_correspondence.start.arguments.get()
-                    .links.where(is_correspondence=False)
-                    .get(
-                        key=corresponding_exigency,
-                        exclude=[winner_correspondence.start],
-                    )
-                )
+            target_space_two = (
+                target_view.parent_frame.input_space
+                if winner_correspondence
+                in target_view.parent_frame.input_space.contents
+                else target_view.parent_frame.output_space
             )
-            target_space_one = target_structure_one.parent_space
-            target_conceptual_space = target_structure_one.parent_spaces.where(
-                is_conceptual_space=True, is_basic_level=True
-            ).get()
-            target_space_two = target_view.input_spaces.get(exclude=[target_space_one])
-            target_structure_two = (
-                None
-                if winner_correspondence.start.is_node
-                else (
-                    self.bubble_chamber.new_structure_collection(
-                        *[
-                            structure
-                            for structure in winner_correspondence.end.arguments.get()
-                            .links.of_type(type(target_structure_one))
-                            .where(parent_space=target_space_two)
-                            if structure in target_conceptual_space.contents
-                        ]
-                    ).get(key=corresponding_exigency)
-                )
-            )
-            target_concept = winner_correspondence.parent_concept.friends().get()
+            target_structure_two = target_space_two.contents.where(
+                is_correspondence=False
+            ).get(key=corresponding_exigency)
+            parent_concept = winner_correspondence.parent_concept.friends().get()
         except MissingStructureError:
             return
         follow_up_class = SubFrameToFrameCorrespondenceSuggester
@@ -91,14 +68,11 @@ class CorrespondenceSelector(Selector):
                 self.codelet_id,
                 self.bubble_chamber,
                 {
-                    "target_view": winner_correspondence.parent_view,
-                    "target_space_one": target_space_one,
-                    "target_structure_one": target_structure_one,
+                    "target_view": target_view,
                     "target_space_two": target_space_two,
                     "target_structure_two": target_structure_two,
-                    "target_conceptual_space": target_conceptual_space,
-                    "parent_concept": target_concept,
+                    "parent_concept": parent_concept,
                 },
-                target_structure_one.uncorrespondedness,
+                target_view.exigency,
             )
         )

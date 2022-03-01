@@ -40,9 +40,18 @@ class Evaluator(Codelet):
 
     def run(self):
         self.bubble_chamber.loggers["activity"].log_targets_collection(self)
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Original confidence: {self.original_confidence}"
+        )
         self._calculate_confidence()
         self.bubble_chamber.loggers["activity"].log(
+            self, f"Original confidence: {self.original_confidence}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
             self, f"Confidence: {self.confidence}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Change in confidence: {self.change_in_confidence}"
         )
         for structure in self.target_structures:
             structure.quality = self.confidence

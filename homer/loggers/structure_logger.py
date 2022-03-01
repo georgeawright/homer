@@ -90,6 +90,9 @@ class StructureLogger(Logger):
         directory = f"{spaces_directory}/{space.structure_id}"
         try:
             os.mkdir(spaces_directory)
+        except FileExistsError:
+            pass
+        try:
             os.mkdir(directory)
         except FileExistsError:
             pass
