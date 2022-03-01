@@ -26,10 +26,9 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
             if target_view is not None
             else bubble_chamber.views.get(key=activation)
         )
-        frame = target_view.input_spaces.where(is_frame=True).get()
-        target_letter_chunk = frame.contents.where(is_chunk=True).get(
-            key=corresponding_exigency
-        )
+        target_letter_chunk = target_view.parent_frame.output_space.contents.where(
+            is_letter_chunk=True
+        ).get(key=corresponding_exigency)
         urgency = urgency if urgency is not None else target_view.activation
         return cls.spawn(
             parent_id,
