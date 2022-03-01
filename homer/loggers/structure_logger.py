@@ -75,6 +75,12 @@ class StructureLogger(Logger):
                         f"{start_id} -> {end_id} "
                         + f'[label="{label_name}", color="{color_code}"];\n'
                     )
+                if node.is_frame:
+                    for instance in node.instances:
+                        f.write(
+                            f"{node.structure_id} -> {instance.structure_id} "
+                            + '[label="instance", color="#000000"]\n'
+                        )
             f.write("}\n")
 
     def log_contextual_space(self, space, coderack):

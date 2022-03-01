@@ -31,6 +31,7 @@ class Interpreter:
             "def-conceptual-space": bubble_chamber.new_conceptual_space,
             "def-contextual-space": bubble_chamber.new_contextual_space,
             "def-frame": bubble_chamber.new_frame,
+            "def-sub-frame": bubble_chamber.new_sub_frame,
             "def-chunk": bubble_chamber.new_chunk,
             "def-concept": bubble_chamber.new_concept,
             "def-letter-chunk": bubble_chamber.new_letter_chunk,

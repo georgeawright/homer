@@ -14,8 +14,18 @@ class SimplexViewSuggester(ViewSuggester):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
         contextual_space = bubble_chamber.input_spaces.get(key=activation)
-        frame = bubble_chamber.frames.get(key=activation)
-        urgency = urgency if urgency is not None else frame.activation
+        frame = bubble_chamber.frames.where(is_sub_frame=False).get(key=activation)
+        views_with_frame = bubble_chamber.views.filter(
+            lambda x: x.parent_frame in frame.instances or x.parent_frame == frame
+        )
+        print(len(views_with_frame))
+        urgency = (
+            urgency
+            if urgency is not None
+            else frame.activation
+            * 0.5 ** sum([1 - view.activation for view in views_with_frame])
+        )
+        print(urgency)
         return cls.spawn(
             parent_id,
             bubble_chamber,

@@ -254,6 +254,7 @@ class BubbleChamber:
         input_space: ContextualSpace,
         output_space: ContextualSpace,
         parent_id: str = "",
+        is_sub_frame: bool = False,
     ) -> Frame:
         frame = Frame(
             structure_id=ID.new(Frame),
@@ -268,9 +269,36 @@ class BubbleChamber:
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=self.new_structure_collection(),
+            instances=self.new_structure_collection(),
+            is_sub_frame=is_sub_frame,
         )
+        if parent_frame is not None:
+            parent_frame.instances.add(frame)
         self.add(frame)
         return frame
+
+    def new_sub_frame(
+        self,
+        name: str,
+        parent_concept: Concept,
+        parent_frame: Frame,
+        sub_frames: StructureCollection,
+        concepts: StructureCollection,
+        input_space: ContextualSpace,
+        output_space: ContextualSpace,
+        parent_id: str = "",
+    ) -> Frame:
+        return self.new_frame(
+            name,
+            parent_concept,
+            parent_frame,
+            sub_frames,
+            concepts,
+            input_space,
+            output_space,
+            parent_id,
+            is_sub_frame=True,
+        )
 
     def new_chunk(
         self,

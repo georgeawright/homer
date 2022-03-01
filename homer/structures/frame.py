@@ -27,6 +27,8 @@ class Frame(Structure):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        instances: StructureCollection,
+        is_sub_frame: bool = False,
     ):
         quality = 1
         Structure.__init__(
@@ -47,6 +49,8 @@ class Frame(Structure):
         self.input_space = input_space
         self.output_space = output_space
         self.slot_values = {}
+        self.instances = instances
+        self.is_sub_frame = is_sub_frame
         self.is_frame = True
 
     @property
@@ -172,6 +176,7 @@ class Frame(Structure):
             concepts=concepts,
             input_space=input_space_copy,
             output_space=output_space_copy,
+            is_sub_frame=self.is_sub_frame,
         )
 
     def __repr__(self) -> str:

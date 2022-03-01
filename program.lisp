@@ -992,7 +992,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_spaces (StructureCollection
 			grammar-space location-space conceptual-space)))
 (define rp-sub-frame
-  (def-frame :name "s-comparative-rp-sub" :parent_concept rp-concept :parent_frame None
+  (def-sub-frame :name "s-comparative-rp-sub" :parent_concept rp-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection label-parent-concept relation-parent-concept)
     :input_space rp-sub-frame-input
@@ -1005,7 +1005,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_spaces (StructureCollection
 			grammar-space location-space conceptual-space)))
 (define nn-sub-frame-1
-  (def-frame :name "s-comparative-nn-sub-1" :parent_concept np-concept :parent_frame None
+  (def-sub-frame :name "s-comparative-nn-sub-1" :parent_concept np-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection location-concept-1)
     :input_space nn-sub-frame-1-input
@@ -1018,7 +1018,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_spaces (StructureCollection
 			grammar-space location-space conceptual-space)))
 (define nn-sub-frame-2
-  (def-frame :name "s-comparative-nn-sub-2" :parent_concept np-concept :parent_frame None
+  (def-sub-frame :name "s-comparative-nn-sub-2" :parent_concept np-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection location-concept-2)
     :input_space nn-sub-frame-2-input
@@ -1253,7 +1253,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-contextual-space :name "and-sub-frame-1.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space)))
 (define and-sub-frame-1
-  (def-frame :name "s-and-sub-1" :parent_concept sentence-concept :parent_frame None
+  (def-sub-frame :name "s-and-sub-1" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection)
     :input_space and-sub-frame-1-input
@@ -1265,7 +1265,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-contextual-space :name "and-sub-frame-2.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space)))
 (define and-sub-frame-2
-  (def-frame :name "s-and-sub-2" :parent_concept sentence-concept :parent_frame None
+  (def-sub-frame :name "s-and-sub-2" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection)
     :input_space and-sub-frame-2-input
@@ -1442,7 +1442,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-contextual-space :name "but-sub-frame-1.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space conceptual-space-1)))
 (define but-sub-frame-1
-  (def-frame :name "s-but-sub-1" :parent_concept sentence-concept :parent_frame None
+  (def-sub-frame :name "s-but-sub-1" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection)
     :input_space but-sub-frame-1-input
@@ -1454,7 +1454,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-contextual-space :name "but-sub-frame-2.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space conceptual-space-1)))
 (define but-sub-frame-2
-  (def-frame :name "s-but-sub-2" :parent_concept sentence-concept :parent_frame None
+  (def-sub-frame :name "s-but-sub-2" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection)
     :input_space but-sub-frame-2-input
