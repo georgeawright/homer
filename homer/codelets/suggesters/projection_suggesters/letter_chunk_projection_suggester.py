@@ -43,6 +43,12 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
 
     def _passes_preliminary_checks(self) -> bool:
         if self.target_projectee.is_slot:
+            no_of_parent_spaces = len(
+                self.target_projectee.parent_spaces.where(is_contextual_space=True)
+            )
+            no_of_correspondences = len(self.target_projectee.correspondences)
+            if no_of_parent_spaces - 1 != no_of_correspondences:
+                return False
             for label in self.target_projectee.labels:
                 parent_concept = label.parent_concept
                 if parent_concept.is_slot and not parent_concept.is_filled_in:
