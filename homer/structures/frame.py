@@ -180,4 +180,4 @@ class Frame(Structure):
         )
 
     def __repr__(self) -> str:
-        return f"<{self.structure_id} {self.parent_concept.name}>"
+        return f"<{self.structure_id} {self.name}>"
