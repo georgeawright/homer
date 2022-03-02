@@ -24,6 +24,7 @@ class Relation(Link):
         conceptual_space: ConceptualSpace,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
+        parent_space: Space,
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
@@ -43,6 +44,7 @@ class Relation(Link):
             links_out=links_out,
             parent_spaces=parent_spaces,
         )
+        self._parent_space = parent_space
         self.conceptual_space = conceptual_space
         self.is_relation = True
         self.is_bidirectional = is_bidirectional
@@ -97,6 +99,7 @@ class Relation(Link):
             conceptual_space=self.conceptual_space,
             locations=new_locations,
             quality=self.quality,
+            parent_space=parent_space,
             links_in=bubble_chamber.new_structure_collection(),
             links_out=bubble_chamber.new_structure_collection(),
             parent_spaces=bubble_chamber.new_structure_collection(

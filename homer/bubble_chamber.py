@@ -571,7 +571,9 @@ class BubbleChamber:
         locations: List[Location],
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
+        parent_space: ContextualSpace = None,
     ) -> Label:
+        parent_space = start.parent_space if parent_space is None else parent_space
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )
@@ -583,6 +585,7 @@ class BubbleChamber:
             parent_concept=parent_concept,
             locations=locations,
             quality=quality,
+            parent_space=parent_space,
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
@@ -601,10 +604,12 @@ class BubbleChamber:
         locations: List[Location] = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
+        parent_space: ContextualSpace = None,
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
         activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
+        parent_space = start.parent_space if parent_space is None else parent_space
         locations = [] if locations is None else locations
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
@@ -619,6 +624,7 @@ class BubbleChamber:
             conceptual_space=conceptual_space,
             locations=locations,
             quality=quality,
+            parent_space=parent_space,
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,

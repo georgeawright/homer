@@ -49,6 +49,7 @@ class Chunk(Node):
         self.right_branch = right_branch
         self.rule = rule
         self.super_chunks = super_chunks
+        self._parent_space = parent_space
         self.is_raw = is_raw
         self.is_chunk = True
 

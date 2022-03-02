@@ -41,12 +41,7 @@ class Link(Structure):
 
     @property
     def parent_space(self) -> Space:
-        contextual_spaces = [
-            location.space
-            for location in self.locations
-            if location.space.is_contextual_space
-        ]
-        return contextual_spaces[0] if len(contextual_spaces) > 0 else None
+        return self._parent_space
 
     @property
     def is_slot(self) -> bool:
@@ -69,6 +64,8 @@ class Link(Structure):
 
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name
-        args = ", ".join([arg.structure_id for arg in self.arguments])
+        args = f"{self.start.structure_id}"
+        if self.end is not None:
+            args += f", {self.end.structure_id}"
         spaces = ", ".join([location.space.name for location in self.locations])
         return f"<{self.structure_id} {concept}({args}) in {spaces}>"

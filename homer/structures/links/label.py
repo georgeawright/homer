@@ -21,6 +21,7 @@ class Label(Link):
         parent_concept: Concept,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
+        parent_space: Space,
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
@@ -39,6 +40,7 @@ class Label(Link):
             links_out=links_out,
             parent_spaces=parent_spaces,
         )
+        self._parent_space = parent_space
         self.is_label = True
 
     @classmethod
@@ -94,6 +96,7 @@ class Label(Link):
             parent_concept=self.parent_concept,
             locations=new_locations,
             quality=self.quality,
+            parent_space=parent_space,
             links_in=bubble_chamber.new_structure_collection(),
             links_out=bubble_chamber.new_structure_collection(),
             parent_spaces=bubble_chamber.new_structure_collection(

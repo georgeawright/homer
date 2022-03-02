@@ -151,22 +151,36 @@ class Frame(Structure):
                 output_space_copy, conceptual_space, specified_space, concepts
             )
         sub_frames = bubble_chamber.new_structure_collection()
+        space_copies = {input_space: input_space_copy, output_space: output_space_copy}
         for sub_frame in self.sub_frames:
-            sub_frame_input_space = (
-                sub_frame.input_space
+            (sub_frame_input_space, sub_frame_output_space) = (
+                (sub_frame.input_space, sub_frame.output_space)
                 if sub_frame.input_space.parent_concept == input_space.parent_concept
-                else sub_frame.output_space
+                else (sub_frame.output_space, sub_frame.input_space)
             )
-            sub_frames.add(
-                sub_frame.instantiate(
-                    input_space=sub_frame_input_space,
-                    parent_id=parent_id,
-                    bubble_chamber=bubble_chamber,
-                    conceptual_spaces_map=conceptual_spaces_map,
-                    input_copies=input_copies,
-                    output_copies=output_copies,
-                )
+            sub_frame_instance = sub_frame.instantiate(
+                input_space=sub_frame_input_space,
+                parent_id=parent_id,
+                bubble_chamber=bubble_chamber,
+                conceptual_spaces_map=conceptual_spaces_map,
+                input_copies=input_copies,
+                output_copies=output_copies,
             )
+            sub_frames.add(sub_frame_instance)
+            space_copies[sub_frame_input_space] = sub_frame_instance.input_space
+            space_copies[sub_frame_output_space] = sub_frame_instance.output_space
+        for original, copy in input_copies.items():
+            if original.parent_space in space_copies:
+                if original.is_node:
+                    copy.parent_space = space_copies[original.parent_space]
+                elif original.is_label or original.is_relation:
+                    copy._parent_space = space_copies[original.parent_space]
+        for original, copy in output_copies.items():
+            if original.parent_space in space_copies:
+                if original.is_node:
+                    copy.parent_space = space_copies[original.parent_space]
+                elif original.is_label or original.is_relation:
+                    copy._parent_space = space_copies[original.parent_space]
         return bubble_chamber.new_frame(
             parent_id=parent_id,
             name=ID.new_frame_instance(self.name),
