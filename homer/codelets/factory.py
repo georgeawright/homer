@@ -73,6 +73,7 @@ class Factory(Codelet):
         )
         from homer.codelets.suggesters.correspondence_suggesters import (
             SpaceToFrameCorrespondenceSuggester,
+            PotentialSubFrameToFrameCorrespondenceSuggester,
             SubFrameToFrameCorrespondenceSuggester,
         )
         from homer.codelets.suggesters.projection_suggesters import (
@@ -117,7 +118,7 @@ class Factory(Codelet):
                 "outer": {
                     "forward": {
                         "chunk": ChunkProjectionSuggester,
-                        "correspondence": SubFrameToFrameCorrespondenceSuggester,
+                        "correspondence": PotentialSubFrameToFrameCorrespondenceSuggester,
                         "label": LabelProjectionSuggester,
                         "relation": RelationProjectionSuggester,
                         "letter-chunk": LetterChunkProjectionSuggester,

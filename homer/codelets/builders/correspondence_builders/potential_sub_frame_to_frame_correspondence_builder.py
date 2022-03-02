@@ -5,15 +5,16 @@ from homer.structure_collection import StructureCollection
 class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     def _process_structure(self):
         self.child_structures = self.bubble_chamber.new_structure_collection()
-        sub_view = self.target_structure_one.correspondences.get().parent_view
         self.target_view.frames = StructureCollection.union(
-            self.target_view.frames, sub_view.frames
+            self.target_view.frames, self.target_sub_view.frames
         )
-        self.target_view.matched_sub_frames[self.sub_frame] = sub_view.parent_frame
-        for correspondence in sub_view.members:
+        self.target_view.matched_sub_frames[
+            self.sub_frame
+        ] = self.target_sub_view.parent_frame
+        for correspondence in self.target_sub_view.members:
             correspondence.parent_view = self.target_view
             self.target_view.add(correspondence)
-        self.bubble_chamber.views.remove(sub_view)
+        self.bubble_chamber.views.remove(self.target_sub_view)
         if (
             self.target_structure_two.is_link
             and not self.target_structure_two.parent_concept.is_filled_in

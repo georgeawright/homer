@@ -46,12 +46,7 @@ class CorrespondenceSelector(Selector):
         winner_correspondence = self.winners.where(is_correspondence=True).get()
         target_view = winner_correspondence.parent_view
         try:
-            target_space_two = (
-                target_view.parent_frame.input_space
-                if winner_correspondence
-                in target_view.parent_frame.input_space.contents
-                else target_view.parent_frame.output_space
-            )
+            target_space_two = winner_correspondence.end.parent_space
             target_structure_two = target_space_two.contents.where(
                 is_correspondence=False
             ).get(key=corresponding_exigency)

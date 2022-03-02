@@ -2,7 +2,8 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import CorrespondenceSuggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structure_collection_keys import activation, corresponding_exigency, exigency
+from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import activation, exigency, uncorrespondedness
 from homer.structures.nodes import Concept
 
 
@@ -23,12 +24,33 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = bubble_chamber.production_views.get(key=exigency)
+        non_matched_sub_frame = target_view.parent_frame.sub_frames.filter(
+            lambda x: x not in target_view.matched_sub_frames
+        ).get(key=uncorrespondedness)
+        target_space_two_candidates = bubble_chamber.new_structure_collection(
+            non_matched_sub_frame.input_space, non_matched_sub_frame.output_space
+        )
+        if len(target_space_two_candidates) == 0:
+            raise MissingStructureError
+        target_structure_two_candidates = StructureCollection.union(
+            *[
+                space.contents.where(is_correspondence=False)
+                for space in target_space_two_candidates
+            ]
+        )
+        target_structure_two = target_structure_two_candidates.get(
+            key=uncorrespondedness
+        )
+        target_space_two = target_structure_two.parent_space
         urgency = urgency if urgency is not None else target_view.exigency
         return cls.spawn(
             parent_id,
             bubble_chamber,
             {
                 "target_view": target_view,
+                "target_space_two": target_space_two,
+                "target_structure_two": target_structure_two,
+                "sub_frame": non_matched_sub_frame,
             },
             urgency,
         )
@@ -44,42 +66,37 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         return cls.make(parent_id, bubble_chamber, urgency)
 
     def _passes_preliminary_checks(self):
+        self._get_target_conceptual_space()
         try:
-            # TODO: possibly pick a sub view with high corresponding exigency first
-            sub_view = self.bubble_chamber.production_views.filter(
+            self.target_sub_view = self.bubble_chamber.production_views.filter(
                 lambda x: x.parent_frame.parent_concept
                 in {
                     frame.parent_concept
                     for frame in self.target_view.parent_frame.sub_frames
                 }
+                and (
+                    (
+                        self.target_conceptual_space
+                        in x.parent_frame.input_space.conceptual_spaces
+                        if self.target_space_two
+                        == self.target_view.parent_frame.input_space
+                        else self.target_conceptual_space
+                        in x.parent_frame.output_space.conceptual_spaces
+                    )
+                    or self.target_conceptual_space is None
+                )
             ).get(key=activation)
-            frame_one = sub_view.parent_frame
-            spaces = self.bubble_chamber.new_structure_collection(
-                frame_one.input_space, frame_one.output_space
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found target sub view: {self.target_sub_view}"
             )
-            self.target_space_one = spaces.get(key=corresponding_exigency)
-            self.target_structure_one = self.target_space_one.contents.where(
-                is_correspondence=False
-            ).get(key=corresponding_exigency)
-            self.sub_frame = self.target_view.parent_frame.sub_frames.filter(
-                lambda x: x.parent_concept == frame_one.parent_concept
-                and x not in self.target_view.matched_sub_frames
-            ).get(key=corresponding_exigency)
-            self.target_space_two = (
-                self.sub_frame.input_space
-                if self.target_space_one == frame_one.input_space
-                else self.sub_frame.output_space
+            self.target_space_one = (
+                self.target_sub_view.parent_frame.input_space
+                if self.target_space_two == self.target_view.parent_frame.input_space
+                else self.target_sub_view.parent_frame.output_space
             )
-            self.target_structure_two = self.target_space_two.contents.of_type(
-                type(self.target_structure_one)
-            ).get(key=lambda x: x.similarity_with(self.target_structure_one))
+            self._get_target_structure_one()
         except MissingStructureError:
             return False
-        self.target_conceptual_space = (
-            self.target_structure_one.parent_concept.parent_space
-            if self.target_structure_one.is_link
-            else None
-        )
         self.parent_concept = self.bubble_chamber.concepts["same"]
         return self.target_view.can_accept_member(
             self.parent_concept,
@@ -93,6 +110,9 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             SubFrameToFrameCorrespondenceSuggester,
         )
 
-        return SubFrameToFrameCorrespondenceSuggester.make(
-            self.codelet_id, self.bubble_chamber
-        )
+        try:
+            return SubFrameToFrameCorrespondenceSuggester.make(
+                self.codelet_id, self.bubble_chamber
+            )
+        except MissingStructureError:
+            pass
