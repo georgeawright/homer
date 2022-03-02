@@ -713,15 +713,16 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-letter-chunk :name None
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) grammar-space)
-		     (Location (list) jj-output))))
+		     (Location (list) jj-output))
+    :parent_space jj-output))
 (define letter-chunk-grammar-label
   (def-label :start letter-chunk :parent_concept jj-concept
     :locations (list (Location (list) grammar-space)
-		     (Location (list) jj-input))))
+		     (Location (list) jj-output))))
 (define letter-chunk-meaning-label
   (def-label :start letter-chunk :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
-		     (Location (list) jj-input))))
+		     (Location (list) jj-output))))
 
 (def-relation :start label-concept :end jj-frame
   :is_bidirectional True :activation 1.0)
@@ -765,15 +766,16 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-letter-chunk :name None
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) grammar-space)
-		     (Location (list) nn-output))))
+		     (Location (list) nn-output))
+    :parent_space nn-output))
 (define letter-chunk-grammar-label
   (def-label :start letter-chunk :parent_concept nn-concept
     :locations (list (Location (list) grammar-space)
-		     (Location (list) nn-input))))
+		     (Location (list) nn-output))))
 (define letter-chunk-meaning-label
   (def-label :start letter-chunk :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
-		     (Location (list) nn-input))))
+		     (Location (list) nn-output))))
 
 (def-relation :start label-concept :end nn-frame
   :is_bidirectional True :activation 1.0)
@@ -964,7 +966,8 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-label :start chunk-start :parent_concept label-parent-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) rp-sub-frame-input)
-		     (Location (list) comparative-sentence-input))))
+		     (Location (list) comparative-sentence-input))
+    :parent_space comparative-sentence-input))
 (define chunk-start-location-label
   (def-label :start chunk-start :parent_concept location-concept-1
     :locations (list (Location (list (list Nan Nan)) location-space)
@@ -981,6 +984,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (TwoPointLocation (list) (list) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-sub-frame-input)
 		     (TwoPointLocation (list) (list) comparative-sentence-input))
+    :parent_space comparative-sentence-input
     :conceptual_space conceptual-space))
 (define sentence-word-1
   (def-letter-chunk :name "temperatures"
@@ -1067,6 +1071,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-2)
     :right_branch (StructureCollection sentence-word-3)))
 (define vb-super-chunk-label
@@ -1077,42 +1082,49 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-6)
     :right_branch (StructureCollection sentence-word-7)))
 (define np-2-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-10)
     :right_branch (StructureCollection sentence-word-11)))
 (define pp-1-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-5)
     :right_branch (StructureCollection np-1-super-chunk)))
 (define pp-2-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-9)
     :right_branch (StructureCollection np-2-super-chunk)))
 (define rp-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-4)
     :right_branch (StructureCollection pp-1-super-chunk)))
 (define comp-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-8)
     :right_branch (StructureCollection pp-2-super-chunk)))
 (define pred-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection rp-super-chunk)
     :right_branch (StructureCollection comp-super-chunk)))
 (define pred-super-chunk-label
@@ -1123,12 +1135,14 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection vb-super-chunk)
     :right_branch (StructureCollection pred-super-chunk)))
 (define sentence-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list) grammar-space)
 		     (Location (list) comparative-sentence-output))
+    :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-1)
     :right_branch (StructureCollection vp-super-chunk)))
 (define sentence-super-chunk-label
