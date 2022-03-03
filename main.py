@@ -5,8 +5,9 @@ from homer.loggers import ActivityLogger, StructureLogger
 
 
 activity_stream = open("logs/activity.log", "w")
+satisfaction_stream = open("logs/satisfaction.csv", "w")
 loggers = {
-    "activity": ActivityLogger(activity_stream),
+    "activity": ActivityLogger(activity_stream, satisfaction_stream),
     "structure": StructureLogger("logs/structures"),
     "errors": Mock(),
 }

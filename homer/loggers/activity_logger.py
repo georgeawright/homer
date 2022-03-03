@@ -3,8 +3,9 @@ from homer.logger import Logger
 
 
 class ActivityLogger(Logger):
-    def __init__(self, stream):
+    def __init__(self, stream, satisfaction_stream=None):
         self.stream = stream
+        self.satisfaction_stream = satisfaction_stream
         self.previous_codelet_id = None
         self.codelets_run = 0
         self.LINE_WIDTH = 120
@@ -12,6 +13,7 @@ class ActivityLogger(Logger):
     def log(self, codelet: "Codelet", message: str):
         if codelet.codelet_id != self.previous_codelet_id:
             self.codelets_run += 1
+            self._log_satisfaction(codelet)
             self.previous_codelet_id = codelet.codelet_id
             codelet_title = f" Codelet run {self.codelets_run}: {codelet.codelet_id} "
             no_of_dashes = (self.LINE_WIDTH - len(codelet_title)) // 2
@@ -23,6 +25,12 @@ class ActivityLogger(Logger):
                 f"Parent: {codelet.parent_id} | Urgency: {codelet.urgency}\n"
             )
         self.stream.write(f"{message}\n")
+
+    def _log_satisfaction(self, codelet: "Codelet"):
+        if self.satisfaction_stream is not None:
+            self.satisfaction_stream.write(
+                f"{self.codelets_run},{codelet.bubble_chamber.satisfaction}\n"
+            )
 
     def log_dict(self, codelet: "Codelet", dictionary, name: str):
         if dictionary is None or len(dictionary) == 0:
