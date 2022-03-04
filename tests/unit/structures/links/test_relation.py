@@ -24,6 +24,7 @@ def test_copy(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     copy = relation.copy(
         start=new_start, end=new_end, parent_id=parent_id, bubble_chamber=bubble_chamber
@@ -47,6 +48,7 @@ def test_nearby(bubble_chamber):
         Mock(),
         Mock(),
         [Mock(), Mock()],
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

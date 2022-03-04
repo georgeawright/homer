@@ -29,6 +29,10 @@ def target_projectee(bubble_chamber, target_view):
     meaning_label.parent_concept.is_filled_in = True
     word.labels = bubble_chamber.new_structure_collection(grammar_label, meaning_label)
     word.relations = bubble_chamber.new_structure_collection()
+    parent_space = Mock()
+    parent_space.is_contextual_space = True
+    word.parent_spaces = bubble_chamber.new_structure_collection(parent_space)
+    word.correspondences = bubble_chamber.new_structure_collection()
     return word
 
 

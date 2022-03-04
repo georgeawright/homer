@@ -75,6 +75,7 @@ def test_labels_returns_labels(bubble_chamber):
             Mock(),
             Mock(),
             Mock(),
+            Mock(),
         )
         links_out.add(label)
     for _ in range(number_of_labels):
@@ -106,11 +107,31 @@ def test_labels_in_space(bubble_chamber):
     space = Mock()
     space.contents = bubble_chamber.new_structure_collection()
     label_in_space = Label(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     space.contents.add(label_in_space)
     label_not_in_space = Label(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     structure.links_out.add(label_in_space)
     structure.links_out.add(label_not_in_space)
@@ -144,6 +165,7 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     relation_in_space_not_with_end = Relation(
         Mock(),
@@ -158,6 +180,7 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     relation_not_in_space_with_end = Relation(
         Mock(),
@@ -168,6 +191,7 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         None,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
