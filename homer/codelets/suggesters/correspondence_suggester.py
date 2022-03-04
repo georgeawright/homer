@@ -175,7 +175,7 @@ class CorrespondenceSuggester(Suggester):
                 node_group = [
                     group
                     for group in self.target_view.node_groups
-                    if self.target_structure_two in group
+                    if self.target_structure_two in group.values()
                 ][0]
                 self.bubble_chamber.loggers["activity"].log(
                     self, f"Target structure two in node group: {node_group}"

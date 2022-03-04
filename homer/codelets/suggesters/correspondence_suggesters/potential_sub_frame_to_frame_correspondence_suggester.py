@@ -85,6 +85,16 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     )
                     or self.target_conceptual_space is None
                 )
+                and all(
+                    [
+                        item.has_correspondence_to_space(x.output_space)
+                        or not item.relations.where(
+                            end=item,
+                            parent_concept=self.bubble_chamber.concepts["same"],
+                        ).is_empty()
+                        for item in x.parent_frame.output_space.contents
+                    ]
+                )
             ).get(key=activation)
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Found target sub view: {self.target_sub_view}"

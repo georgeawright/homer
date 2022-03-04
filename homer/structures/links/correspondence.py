@@ -152,5 +152,6 @@ class Correspondence(Link):
     def __repr__(self) -> str:
         return (
             f"<{self.structure_id} {self.parent_concept.name}("
-            + f"{self.start.structure_id}, {self.end.structure_id})>"
+            + f"{self.start.structure_id}, {self.end.structure_id}) "
+            + f"in {self.parent_view.structure_id}>"
         )

@@ -11,9 +11,23 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
         self.target_view.matched_sub_frames[
             self.sub_frame
         ] = self.target_sub_view.parent_frame
+        for (
+            matched_sub_frame,
+            matching_sub_frame,
+        ) in self.target_sub_view.matched_sub_frames.items():
+            self.target_view.matched_sub_frames[matched_sub_frame] = matching_sub_frame
         for correspondence in self.target_sub_view.members:
+            self.bubble_chamber.loggers["activity"].log_collection(
+                self, self.target_view.node_groups, "Target_view node groups"
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Adding {correspondence} to {self.target_view}"
+            )
             correspondence.parent_view = self.target_view
             self.target_view.add(correspondence)
+            self.bubble_chamber.loggers["activity"].log_collection(
+                self, self.target_view.node_groups, "Target_view node groups"
+            )
         self.bubble_chamber.views.remove(self.target_sub_view)
         if (
             self.target_structure_two.is_link
