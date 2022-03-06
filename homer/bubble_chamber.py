@@ -103,7 +103,7 @@ class BubbleChamber:
 
     @property
     def production_views(self) -> StructureCollection:
-        return StructureCollection.union(self.discourse_views, self.simplex_views)
+        return StructureCollection.union(self.simplex_views)
 
     @property
     def monitoring_views(self) -> StructureCollection:
