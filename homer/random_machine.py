@@ -41,11 +41,11 @@ class RandomMachine:
         for element in exclude:
             if element in collection:
                 collection.pop(element)
-        if len(collection) == 0:
+        if len(collection) < 1:
             raise MissingStructureError
         sample_size = math.ceil(len(collection) * self.determinism)
-        if sample_size <= 1:
-            sample = list(collection)
+        if sample_size == 1:
+            return list(collection)[0]
         else:
             sample = random.sample(list(collection), sample_size)
         key_weights = [key(item) for item in sample]
