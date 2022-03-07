@@ -77,12 +77,24 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 parent_space=self.target_view.output_space,
                 abstract_chunk=abstract_chunk,
             )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Built Letter Chunk {word}"
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Left branch {word.left_branch}"
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Right branch {word.right_branch}"
+            )
         for member in self.target_projectee.left_branch:
             if member.has_correspondence_to_space(self.target_view.output_space):
                 correspondence = member.correspondences_to_space(
                     self.target_view.output_space
                 ).get()
                 correspondee = correspondence.end
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Adding {correspondee} to left branch of {word}"
+                )
                 word.left_branch.add(correspondee)
                 word.members.add(correspondee)
                 correspondee.super_chunks.add(word)
@@ -92,6 +104,9 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                     self.target_view.output_space
                 ).get()
                 correspondee = correspondence.end
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Adding {correspondee} to right branch of {word}"
+                )
                 word.right_branch.add(correspondee)
                 word.members.add(correspondee)
                 correspondee.super_chunks.add(word)
@@ -102,9 +117,15 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 ).get()
                 correspondee = correspondence.end
                 if abstract_chunk in super_chunk.left_branch:
-                    correspondee.left_branch.add(correspondee)
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, f"Adding {word} to left branch of {correspondee}"
+                    )
+                    correspondee.left_branch.add(word)
                 else:
-                    correspondee.right_branch.add(correspondee)
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, f"Adding {word} to right branch of {correspondee}"
+                    )
+                    correspondee.right_branch.add(word)
                 correspondee.members.add(word)
                 word.super_chunks.add(correspondee)
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(

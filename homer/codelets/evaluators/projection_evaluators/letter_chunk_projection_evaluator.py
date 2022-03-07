@@ -37,6 +37,10 @@ class LetterChunkProjectionEvaluator(ProjectionEvaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
+        letter_chunk = self.target_structures.where(is_letter_chunk=True).get()
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Letter chunk: {letter_chunk} {letter_chunk.name}"
+        )
         try:
             non_frame_item = (
                 self.target_structures.where(is_correspondence=True)
