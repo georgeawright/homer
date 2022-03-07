@@ -1,8 +1,9 @@
+import statistics
 from typing import Dict
 
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
-from .codelets import CoderackCleaner, Factory
+from .codelets import Builder, CoderackCleaner, Evaluator, Factory, Selector, Suggester
 from .codelets.factories import (
     ConceptDrivenFactory,
     RandomFactory,
@@ -63,6 +64,37 @@ class Coderack:
     def add_codelet(self, codelet: Codelet):
         if codelet.urgency < self.MINIMUM_CODELET_URGENCY:
             return
+        if not isinstance(codelet, self.PROTECTED_CODELET_TYPES):
+            for existing_codelet in self._codelets:
+                if isinstance(codelet, Suggester) or isinstance(codelet, Builder):
+                    if (
+                        type(codelet) == type(existing_codelet)
+                        and codelet.targets_dict == existing_codelet.targets_dict
+                    ):
+                        existing_codelet.urgency = statistics.fmean(
+                            [codelet.urgency, existing_codelet.urgency]
+                        )
+                        return
+                if isinstance(codelet, Evaluator):
+                    if (
+                        type(codelet) == type(existing_codelet)
+                        and codelet.target_structures
+                        == existing_codelet.target_structures
+                    ):
+                        existing_codelet.urgency = statistics.fmean(
+                            [codelet.urgency, existing_codelet.urgency]
+                        )
+                        return
+                if isinstance(codelet, Selector):
+                    if (
+                        type(codelet) == type(existing_codelet)
+                        and codelet.champions == existing_codelet.champions
+                        and codelet.challengers == existing_codelet.challengers
+                    ):
+                        existing_codelet.urgency = statistics.fmean(
+                            [codelet.urgency, existing_codelet.urgency]
+                        )
+                        return
         self._codelets.append(codelet)
 
     def remove_codelet(self, codelet: Codelet):
