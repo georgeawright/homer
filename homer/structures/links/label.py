@@ -61,10 +61,6 @@ class Label(Link):
 
         return LabelSelector
 
-    @property
-    def is_slot(self) -> bool:
-        return self.parent_concept is None
-
     def copy(self, **kwargs: dict) -> Label:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
         bubble_chamber = kwargs["bubble_chamber"]

@@ -107,188 +107,133 @@ class CorrespondenceSuggester(Suggester):
             self, f"Found target conceptual space: {self.target_conceptual_space}"
         )
 
-    def _get_target_structure_one(self):
-        if self.target_structure_two.is_link and self.target_structure_two.is_node:
-            self.target_structure_one = self.target_space_one.contents.filter(
-                lambda x: x.has_location_in_space(self.target_conceptual_space)
-            ).get(key=corresponding_exigency)
-        if self.target_structure_two.is_link and not self.target_structure_two.is_node:
-            if self.target_structure_two.start in self.target_view.grouped_nodes:
+    @staticmethod
+    def _get_target_structure_one(calling_codelet, correspondence_suggester):
+        if (
+            correspondence_suggester.target_structure_two.is_link
+            and correspondence_suggester.target_structure_two.is_node
+        ):
+            correspondence_suggester.target_structure_one = (
+                correspondence_suggester.target_space_one.contents.filter(
+                    lambda x: x.has_location_in_space(
+                        correspondence_suggester.target_conceptual_space
+                    )
+                ).get(key=corresponding_exigency)
+            )
+        if (
+            correspondence_suggester.target_structure_two.is_link
+            and not correspondence_suggester.target_structure_two.is_node
+        ):
+            if (
+                correspondence_suggester.target_structure_two.start
+                in correspondence_suggester.target_view.grouped_nodes
+            ):
                 start_node_group = [
                     group
-                    for group in self.target_view.node_groups
-                    if self.target_structure_two in group
+                    for group in correspondence_suggester.target_view.node_groups
+                    if correspondence_suggester.target_structure_two in group
                 ][0]
                 structure_one_start = [
                     node
                     for node in start_node_group
-                    if node.parent_space == self.target_space_one
+                    if node.parent_space == correspondence_suggester.target_space_one
                 ][0]
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found structure one start: {structure_one_start}"
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet, f"Found structure one start: {structure_one_start}"
                 )
             else:
                 structure_one_start = None
-        if self.target_structure_two.is_label:
-            self.target_structure_one = self.target_space_one.contents.filter(
-                lambda x: x.is_label
-                and (
-                    x.start == structure_one_start
-                    if structure_one_start is not None
-                    else True
-                )
-                and x.has_location_in_space(self.target_conceptual_space)
-            ).get(key=corresponding_exigency)
-        if self.target_structure_two.is_relation:
-            if self.target_structure_two.end in self.target_view.grouped_nodes:
+        if correspondence_suggester.target_structure_two.is_label:
+            correspondence_suggester.target_structure_one = (
+                correspondence_suggester.target_space_one.contents.filter(
+                    lambda x: x.is_label
+                    and (
+                        (x.start == structure_one_start)
+                        or (structure_one_start is None)
+                    )
+                    and x.has_location_in_space(
+                        correspondence_suggester.target_conceptual_space
+                    )
+                ).get(key=corresponding_exigency)
+            )
+        if correspondence_suggester.target_structure_two.is_relation:
+            if (
+                correspondence_suggester.target_structure_two.end
+                in correspondence_suggester.target_view.grouped_nodes
+            ):
                 end_node_group = [
                     group
-                    for group in self.target_view.node_groups
-                    if self.target_structure_two in group
+                    for group in correspondence_suggester.target_view.node_groups
+                    if correspondence_suggester.target_structure_two in group
                 ][0]
                 structure_one_end = [
                     node
                     for node in end_node_group
-                    if node.parent_space == self.target_space_one
+                    if node.parent_space == correspondence_suggester.target_space_one
                 ][0]
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found structure one end: {structure_one_end}"
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet, f"Found structure one end: {structure_one_end}"
                 )
             else:
                 structure_one_end = None
-            self.target_structure_one = self.target_space_one.contents.filter(
-                lambda x: x.is_relation
-                and (
-                    x.start == structure_one_start
-                    if structure_one_start is not None
-                    else True
-                )
-                and (
-                    x.end == structure_one_end
-                    if structure_one_start is not None
-                    else True
-                )
-                and x.conceptual_space == self.target_conceptual_space
-            ).get(key=corresponding_exigency)
-        if self.target_structure_two.is_node and not self.target_structure_two.is_link:
-            if self.target_structure_two in self.target_view.grouped_nodes:
-                node_group = [
-                    group
-                    for group in self.target_view.node_groups
-                    if self.target_structure_two in group.values()
-                ][0]
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Target structure two in node group: {node_group}"
-                )
-                self.target_structure_one = [
-                    node
-                    for node in node_group
-                    if node.parent_space == self.target_space_one
-                ][0]
-            else:
-                self.bubble_chamber.loggers["activity"].log(
-                    self, "Target structure two not in node group"
-                )
-                self.target_structure_one = self.target_space_one.contents.filter(
-                    lambda x: type(x) == type(self.target_structure_two)
+            correspondence_suggester.target_structure_one = (
+                correspondence_suggester.target_space_one.contents.filter(
+                    lambda x: x.is_relation
                     and (
-                        x.has_location_in_space(self.target_conceptual_space)
-                        if self.target_conceptual_space is not None
+                        x.start == structure_one_start
+                        if structure_one_start is not None
                         else True
                     )
-                ).get(key=corresponding_exigency)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found target structure one: {self.target_structure_one}"
-        )
-        if self.target_structure_two.is_link and self.target_structure_two.is_node:
-            self.target_structure_one = self.target_space_one.contents.filter(
-                lambda x: x.has_location_in_space(self.target_conceptual_space)
-            ).get(key=corresponding_exigency)
-        if self.target_structure_two.is_link and not self.target_structure_two.is_node:
-            if self.target_structure_two.start in self.target_view.grouped_nodes:
-                start_node_group = [
-                    group
-                    for group in self.target_view.node_groups
-                    if self.target_structure_two in group
-                ][0]
-                structure_one_start = [
-                    node
-                    for node in start_node_group
-                    if node.parent_space == self.target_space_one
-                ][0]
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found structure one start: {structure_one_start}"
-                )
-            else:
-                structure_one_start = None
-        if self.target_structure_two.is_label:
-            self.target_structure_one = self.target_space_one.contents.filter(
-                lambda x: x.is_label
-                and (
-                    x.start == structure_one_start
-                    if structure_one_start is not None
-                    else True
-                )
-                and x.has_location_in_space(self.target_conceptual_space)
-            ).get(key=corresponding_exigency)
-        if self.target_structure_two.is_relation:
-            if self.target_structure_two.end in self.target_view.grouped_nodes:
-                end_node_group = [
-                    group
-                    for group in self.target_view.node_groups
-                    if self.target_structure_two in group
-                ][0]
-                structure_one_end = [
-                    node
-                    for node in end_node_group
-                    if node.parent_space == self.target_space_one
-                ][0]
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found structure one end: {structure_one_end}"
-                )
-            else:
-                structure_one_end = None
-            self.target_structure_one = self.target_space_one.contents.filter(
-                lambda x: x.is_relation
-                and (
-                    x.start == structure_one_start
-                    if structure_one_start is not None
-                    else True
-                )
-                and (
-                    x.end == structure_one_end
-                    if structure_one_start is not None
-                    else True
-                )
-                and x.conceptual_space == self.target_conceptual_space
-            ).get(key=corresponding_exigency)
-        if self.target_structure_two.is_node and not self.target_structure_two.is_link:
-            if self.target_structure_two in self.target_view.grouped_nodes:
-                node_group = [
-                    group
-                    for group in self.target_view.node_groups
-                    if self.target_structure_two in group
-                ][0]
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Target structure two in node group: {node_group}"
-                )
-                self.target_structure_one = [
-                    node
-                    for node in node_group
-                    if node.parent_space == self.target_space_one
-                ][0]
-            else:
-                self.bubble_chamber.loggers["activity"].log(
-                    self, "Target structure two not in node group"
-                )
-                self.target_structure_one = self.target_space_one.contents.filter(
-                    lambda x: type(x) == type(self.target_structure_two)
                     and (
-                        x.has_location_in_space(self.target_conceptual_space)
-                        if self.target_conceptual_space is not None
+                        x.end == structure_one_end
+                        if structure_one_start is not None
                         else True
                     )
+                    and x.conceptual_space
+                    == correspondence_suggester.target_conceptual_space
                 ).get(key=corresponding_exigency)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found target structure one: {self.target_structure_one}"
+            )
+        if (
+            correspondence_suggester.target_structure_two.is_node
+            and not correspondence_suggester.target_structure_two.is_link
+        ):
+            if (
+                correspondence_suggester.target_structure_two
+                in correspondence_suggester.target_view.grouped_nodes
+            ):
+                node_group = [
+                    group
+                    for group in correspondence_suggester.target_view.node_groups
+                    if correspondence_suggester.target_structure_two in group.values()
+                ][0]
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet,
+                    f"Target structure two in node group: {node_group}",
+                )
+                correspondence_suggester.target_structure_one = [
+                    node
+                    for node in node_group
+                    if node.parent_space == correspondence_suggester.target_space_one
+                ][0]
+            else:
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet, "Target structure two not in node group"
+                )
+                correspondence_suggester.target_structure_one = (
+                    correspondence_suggester.target_space_one.contents.filter(
+                        lambda x: type(x)
+                        == type(correspondence_suggester.target_structure_two)
+                        and (
+                            x.has_location_in_space(
+                                correspondence_suggester.target_conceptual_space
+                            )
+                            if correspondence_suggester.target_conceptual_space
+                            is not None
+                            else True
+                        )
+                    ).get(key=corresponding_exigency)
+                )
+        calling_codelet.bubble_chamber.loggers["activity"].log(
+            calling_codelet,
+            f"Found target structure one: {correspondence_suggester.target_structure_one}",
         )

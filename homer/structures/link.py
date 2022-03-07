@@ -45,7 +45,7 @@ class Link(Structure):
 
     @property
     def is_slot(self) -> bool:
-        return self.parent_concept is None
+        return self.parent_concept.is_slot
 
     @property
     def unlabeledness(self) -> FloatBetweenOneAndZero:

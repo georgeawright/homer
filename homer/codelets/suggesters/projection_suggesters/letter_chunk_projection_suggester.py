@@ -52,10 +52,16 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
             )
             no_of_correspondences = len(self.target_projectee.correspondences)
             if no_of_parent_spaces - 1 != no_of_correspondences:
+                self.bubble_chamber.loggers["activity"].log(
+                    self, "Not enough correspondences to target projectee"
+                )
                 return False
             for label in self.target_projectee.labels:
                 parent_concept = label.parent_concept
                 if parent_concept.is_slot and not parent_concept.is_filled_in:
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, "Target projectee has label with unfilled parent concept"
+                    )
                     return False
             for relation in self.target_projectee.relations.where(
                 end=self.target_projectee
@@ -66,6 +72,9 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
                         self.target_view.output_space
                     )
                 ):
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, "Target projectee is related to a non projected slot"
+                    )
                     return False
         return not self.target_projectee.has_correspondence_to_space(
             self.target_view.output_space

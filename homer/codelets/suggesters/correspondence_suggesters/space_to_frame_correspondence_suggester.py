@@ -84,7 +84,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     self, f"Found target space one: {self.target_space_one}"
                 )
             if self.target_structure_one is None:
-                self._get_target_structure_one()
+                self._get_target_structure_one(self, self)
         except MissingStructureError:
             self.bubble_chamber.loggers["activity"].log(
                 self,

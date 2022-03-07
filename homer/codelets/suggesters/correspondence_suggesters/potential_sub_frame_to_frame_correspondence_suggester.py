@@ -104,7 +104,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 if self.target_space_two == self.target_view.parent_frame.input_space
                 else self.target_sub_view.parent_frame.output_space
             )
-            self._get_target_structure_one()
+            self._get_target_structure_one(self, self)
         except MissingStructureError:
             return False
         self.parent_concept = self.bubble_chamber.concepts["same"]

@@ -90,7 +90,7 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     else frame_one.output_space
                 )
             if self.target_structure_one is None:
-                self._get_target_structure_one()
+                self._get_target_structure_one(self, self)
         except MissingStructureError:
             return False
         self.parent_concept = self.bubble_chamber.concepts["same"]
