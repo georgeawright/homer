@@ -553,7 +553,7 @@ class BubbleChamber:
             is_privileged=is_privileged,
         )
         if parent_view is not None:
-            parent_view.members.add(correspondence)
+            parent_view.add(correspondence)
             self.loggers["structure"].log(parent_view)
         start.links_out.add(correspondence)
         start.links_in.add(correspondence)

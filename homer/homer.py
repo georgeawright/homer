@@ -29,6 +29,7 @@ class Homer:
     def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
         bubble_chamber = BubbleChamber.setup(loggers, random_seed=random_seed)
         coderack = Coderack.setup(bubble_chamber, loggers)
+        loggers["structure"].coderack = coderack
         interpreter = Interpreter(bubble_chamber)
         return cls(bubble_chamber, coderack, interpreter, loggers)
 

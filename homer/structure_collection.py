@@ -48,6 +48,8 @@ class StructureCollection:
         return len(self.structures)
 
     def __eq__(self, other: StructureCollection) -> bool:
+        if other is None:
+            return False
         if len(self) != len(other):
             return False
         for structure in self:

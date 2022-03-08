@@ -55,3 +55,4 @@ class LabelProjectionBuilder(ProjectionBuilder):
         self.child_structures = self.bubble_chamber.new_structure_collection(
             label, frame_to_output_correspondence
         )
+        self.bubble_chamber.loggers["structure"].log_view(self.target_view)

@@ -31,3 +31,4 @@ class SpaceToFrameCorrespondenceBuilder(CorrespondenceBuilder):
         )
         self._structure_concept.instances.add(correspondence)
         self.child_structures.add(correspondence)
+        self.bubble_chamber.loggers["structure"].log_view(self.target_view)

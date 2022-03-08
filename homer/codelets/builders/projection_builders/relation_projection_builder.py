@@ -69,3 +69,4 @@ class RelationProjectionBuilder(ProjectionBuilder):
                 quality=0.0,
             )
             self.child_structures.add(non_frame_to_output_correspondence)
+        self.bubble_chamber.loggers["structure"].log_view(self.target_view)

@@ -131,13 +131,12 @@ class CorrespondenceSuggester(Suggester):
                 start_node_group = [
                     group
                     for group in correspondence_suggester.target_view.node_groups
-                    if correspondence_suggester.target_structure_two in group
+                    if correspondence_suggester.target_structure_two.start
+                    in group.values()
                 ][0]
-                structure_one_start = [
-                    node
-                    for node in start_node_group
-                    if node.parent_space == correspondence_suggester.target_space_one
-                ][0]
+                structure_one_start = start_node_group[
+                    correspondence_suggester.target_space_one
+                ]
                 calling_codelet.bubble_chamber.loggers["activity"].log(
                     calling_codelet, f"Found structure one start: {structure_one_start}"
                 )
@@ -164,13 +163,12 @@ class CorrespondenceSuggester(Suggester):
                 end_node_group = [
                     group
                     for group in correspondence_suggester.target_view.node_groups
-                    if correspondence_suggester.target_structure_two in group
+                    if correspondence_suggester.target_structure_two.end
+                    in group.values()
                 ][0]
-                structure_one_end = [
-                    node
-                    for node in end_node_group
-                    if node.parent_space == correspondence_suggester.target_space_one
-                ][0]
+                structure_one_end = end_node_group[
+                    correspondence_suggester.target_space_one
+                ]
                 calling_codelet.bubble_chamber.loggers["activity"].log(
                     calling_codelet, f"Found structure one end: {structure_one_end}"
                 )
@@ -210,11 +208,9 @@ class CorrespondenceSuggester(Suggester):
                     calling_codelet,
                     f"Target structure two in node group: {node_group}",
                 )
-                correspondence_suggester.target_structure_one = [
-                    node
-                    for node in node_group
-                    if node.parent_space == correspondence_suggester.target_space_one
-                ][0]
+                correspondence_suggester.target_structure_one = node_group[
+                    correspondence_suggester.target_space_one
+                ]
             else:
                 calling_codelet.bubble_chamber.loggers["activity"].log(
                     calling_codelet, "Target structure two not in node group"
