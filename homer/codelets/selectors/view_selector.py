@@ -30,12 +30,11 @@ class ViewSelector(Selector):
             self.get_follow_up_class().make(self.codelet_id, self.bubble_chamber)
         )
         self.child_codelets.append(
-            self.spawn(
+            self.get_follow_up_evaluator().spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,
                 self.follow_up_urgency,
-                challengers=self.challengers,
             )
         )
 

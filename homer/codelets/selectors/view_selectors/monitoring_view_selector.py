@@ -10,6 +10,12 @@ class MonitoringViewSelector(ViewSelector):
         return MonitoringViewSuggester
 
     @classmethod
+    def get_follow_up_evaluator(cls) -> type:
+        from homer.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
+
+        return MonitoringViewEvaluator
+
+    @classmethod
     def get_target_class(cls):
         return MonitoringView
 

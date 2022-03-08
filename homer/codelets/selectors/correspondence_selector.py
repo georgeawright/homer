@@ -1,5 +1,5 @@
 from homer.codelets.selector import Selector
-from homer.codelets.suggesters import CorrespondenceSuggester
+from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.errors import MissingStructureError
 from homer.structure_collection_keys import activation, corresponding_exigency
 
@@ -35,12 +35,11 @@ class CorrespondenceSelector(Selector):
         )
 
         self.child_codelets.append(
-            self.spawn(
+            CorrespondenceEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,
                 self.follow_up_urgency,
-                challengers=self.losers,
             )
         )
         winner_correspondence = self.winners.where(is_correspondence=True).get()

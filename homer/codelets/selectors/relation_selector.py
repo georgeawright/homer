@@ -1,4 +1,5 @@
 from homer.codelets.selector import Selector
+from homer.codelets.evaluators import RelationEvaluator
 from homer.codelets.suggesters import RelationSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
@@ -54,11 +55,10 @@ class RelationSelector(Selector):
         except MissingStructureError:
             pass
         self.child_codelets.append(
-            self.spawn(
+            RelationEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,
                 self.follow_up_urgency,
-                challengers=self.losers,
             )
         )

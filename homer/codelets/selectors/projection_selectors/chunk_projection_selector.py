@@ -1,4 +1,5 @@
 from homer.codelets.selectors import ProjectionSelector
+from homer.codelets.evaluators.projection_evaluators import ChunkProjectionEvaluator
 from homer.codelets.suggesters.projection_suggesters import ChunkProjectionSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection_keys import uncorrespondedness

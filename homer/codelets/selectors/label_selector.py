@@ -1,4 +1,5 @@
 from homer.codelets.selector import Selector
+from homer.codelets.evaluators import LabelEvaluator
 from homer.codelets.suggesters import LabelSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
@@ -60,11 +61,10 @@ class LabelSelector(Selector):
         except MissingStructureError:
             pass
         self.child_codelets.append(
-            LabelSelector.spawn(
+            LabelEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,
                 self.follow_up_urgency,
-                challengers=self.losers,
             )
         )

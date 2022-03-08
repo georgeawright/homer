@@ -11,6 +11,12 @@ class SimplexViewSelector(ViewSelector):
         return SimplexViewSuggester
 
     @classmethod
+    def get_follow_up_evaluator(cls) -> type:
+        from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
+
+        return SimplexViewEvaluator
+
+    @classmethod
     def get_target_class(cls):
         return SimplexView
 

@@ -1,4 +1,5 @@
 from homer.codelets.selectors import ProjectionSelector
+from homer.codelets.evaluators.projection_evaluators import RelationProjectionEvaluator
 from homer.codelets.suggesters.projection_suggesters import RelationProjectionSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection_keys import uncorrespondedness
@@ -40,7 +41,7 @@ class RelationProjectionSelector(ProjectionSelector):
         except MissingStructureError:
             pass
         self.child_codelets.append(
-            self.spawn(
+            RelationProjectionEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,

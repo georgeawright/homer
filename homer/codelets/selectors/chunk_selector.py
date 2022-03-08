@@ -1,4 +1,5 @@
 from homer.codelets.selector import Selector
+from homer.codelets.evaluators import ChunkEvaluator
 from homer.codelets.suggesters import ChunkSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
@@ -65,7 +66,7 @@ class ChunkSelector(Selector):
                 },
                 new_target.activation,
             ),
-            self.spawn(
+            ChunkEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,

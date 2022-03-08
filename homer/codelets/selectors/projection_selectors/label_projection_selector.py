@@ -1,4 +1,5 @@
 from homer.codelets.selectors import ProjectionSelector
+from homer.codelets.evaluators.projection_evaluators import LabelProjectionEvaluator
 from homer.codelets.suggesters.projection_suggesters import LabelProjectionSuggester
 from homer.errors import MissingStructureError
 from homer.structure_collection_keys import uncorrespondedness
@@ -40,7 +41,7 @@ class LabelProjectionSelector(ProjectionSelector):
         except MissingStructureError:
             pass
         self.child_codelets.append(
-            self.spawn(
+            LabelProjectionEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,

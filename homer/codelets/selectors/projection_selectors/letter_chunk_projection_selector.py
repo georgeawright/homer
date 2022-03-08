@@ -1,4 +1,7 @@
 from homer.codelets.selectors import ProjectionSelector
+from homer.codelets.evaluators.projection_evaluators import (
+    LetterChunkProjectionEvaluator,
+)
 from homer.codelets.suggesters.projection_suggesters import (
     LetterChunkProjectionSuggester,
 )
@@ -36,7 +39,7 @@ class LetterChunkProjectionSelector(ProjectionSelector):
             )
         )
         self.child_codelets.append(
-            self.spawn(
+            LetterChunkProjectionEvaluator.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.winners,
