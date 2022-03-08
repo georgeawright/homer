@@ -50,6 +50,27 @@ class View(Structure):
         self.slot_values = {}
         self.is_view = True
 
+    def __dict__(self):
+        return {
+            "structure_id": self.structure_id,
+            "parent_id": self.parent_id,
+            "parent_frame": self.parent_frame.structure_id,
+            "frames": [frame.structure_id for frame in self.frames],
+            "input_spaces": [space.structure_id for space in self.input_spaces],
+            "output_space": self.output_space.structure_id,
+            "members": [correspondence.structure_id for correspondence in self.members],
+            "node_groups": [
+                {space.structure_id: node.structure_id for space, node in group.items()}
+                for group in self.node_groups
+            ],
+            "grouped_nodes": [node.structure_id for node in self.grouped_nodes],
+            "matched_sub_frames": {
+                frame_1: frame_2 for frame_1, frame_2 in self.matched_sub_frames.items()
+            },
+            "quality": self.quality,
+            "activation": self.activation,
+        }
+
     @property
     def raw_input_space(self) -> Space:
         return self.input_spaces.filter(
