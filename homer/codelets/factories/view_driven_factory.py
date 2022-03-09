@@ -102,13 +102,18 @@ class ViewDrivenFactory(Factory):
                     node = node_group[input_space]
                     break
             if node is None:
-                node = input_space.contents.where(is_labellable=True).get(
-                    key=labeling_exigency
-                )
+                if slot.is_link and slot.is_node:
+                    node = input_space.contents.where(
+                        is_labellable=True, is_slot=False
+                    ).get(key=labeling_exigency)
+                else:
+                    node = input_space.contents.where(is_node=True, is_slot=False).get(
+                        key=labeling_exigency
+                    )
             parent_concept = (
                 slot.parent_spaces.where(is_conceptual_space=True)
                 .get()
-                .contents.where(is_concept=True)
+                .contents.where(is_concept=True, is_slot=False)
                 .get(key=lambda x: x.proximity_to(node))
             )
             return LabelSuggester.spawn(
@@ -126,7 +131,7 @@ class ViewDrivenFactory(Factory):
                 parent_concept = (
                     slot.parent_spaces.where(is_conceptual_space=True)
                     .get()
-                    .contents.where(is_concept=True)
+                    .contents.where(is_concept=True, is_slot=False)
                     .get(key=activation)
                 )
             potential_targets = input_space.contents.where(is_node=True, is_slot=False)

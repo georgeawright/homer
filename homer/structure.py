@@ -390,8 +390,8 @@ class Structure(ABC):
             self.rule.boost_activation(self.activation)
         except AttributeError:
             pass
-        for link in self.links.where(is_label=False, is_bidirectional=True):
-            if link.start != self:
+        for link in self.links.where(is_label=False):
+            if link.start != self and link.is_bidirectional:
                 link.start.boost_activation(link.activation)
             else:
                 link.end.boost_activation(link.activation)
