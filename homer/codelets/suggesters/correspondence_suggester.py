@@ -94,18 +94,6 @@ class CorrespondenceSuggester(Suggester):
         )
 
     @classmethod
-    def make_top_down(
-        cls,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        parent_concept: Concept,
-        urgency: FloatBetweenOneAndZero = None,
-    ):
-        codelet = cls.make(parent_id, bubble_chamber, urgency)
-        codelet.target_structures["parent_concept"] = parent_concept
-        return codelet
-
-    @classmethod
     def spawn(
         cls,
         parent_id: str,
