@@ -4,7 +4,13 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection_keys import corresponding_exigency
+from homer.structure_collection import StructureCollection
+from homer.structure_collection_keys import (
+    corresponding_exigency,
+    exigency,
+    uncorrespondedness,
+)
+from homer.structures.nodes import Concept
 
 # TODO: possibly need restriction on space to frame correspondence suggester to prevent corresponding to sub-space items
 
@@ -38,6 +44,66 @@ class CorrespondenceSuggester(Suggester):
         from homer.codelets.builders import CorrespondenceBuilder
 
         return CorrespondenceBuilder
+
+    @classmethod
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        from homer.codelets.suggesters.correspondence_suggesters import (
+            PotentialSubFrameToFrameCorrespondenceSuggester,
+            SpaceToFrameCorrespondenceSuggester,
+            SubFrameToFrameCorrespondenceSuggester,
+        )
+
+        target_view = bubble_chamber.production_views.get(key=exigency)
+        target_structure_two = StructureCollection.union(
+            target_view.parent_frame.input_space.contents,
+            target_view.parent_frame.output_space.contents.filter(
+                lambda x: x.parent_space != target_view.parent_frame.output_space
+            ),
+        ).get(key=uncorrespondedness)
+        target_space_two = target_structure_two.parent_space
+
+        if target_space_two == target_view.parent_frame.input_space:
+            follow_up_class = SpaceToFrameCorrespondenceSuggester
+            sub_frame = None
+        else:
+            sub_frame = target_view.parent_frame.sub_frames.filter(
+                lambda x: target_space_two in (x.input_space, x.output_space)
+            ).get()
+            if sub_frame in target_view.matched_sub_frames:
+                follow_up_class = SubFrameToFrameCorrespondenceSuggester
+            else:
+                follow_up_class = PotentialSubFrameToFrameCorrespondenceSuggester
+        urgency = (
+            urgency if urgency is not None else target_structure_two.uncorrespondedness
+        )
+        return follow_up_class.spawn(
+            parent_id,
+            bubble_chamber,
+            {
+                "target_view": target_view,
+                "target_space_two": target_space_two,
+                "target_structure_two": target_structure_two,
+                "sub_frame": sub_frame,
+            },
+            urgency,
+        )
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        parent_concept: Concept,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        codelet = cls.make(parent_id, bubble_chamber, urgency)
+        codelet.target_structures["parent_concept"] = parent_concept
+        return codelet
 
     @classmethod
     def spawn(
