@@ -6,8 +6,6 @@ from .codelet import Codelet
 from .codelets import Builder, CoderackCleaner, Evaluator, Factory, Selector, Suggester
 from .codelets.factories import (
     ConceptDrivenFactory,
-    RandomFactory,
-    RationalFactory,
     ViewDrivenFactory,
     RandomStructureConceptDrivenFactory,
     ActiveStructureConceptDrivenFactory,
