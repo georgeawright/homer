@@ -50,7 +50,7 @@ class View(Structure):
         self.slot_values = {}
         self.is_view = True
 
-    def __dict__(self):
+    def __dict__(self) -> dict:
         return {
             "structure_id": self.structure_id,
             "parent_id": self.parent_id,

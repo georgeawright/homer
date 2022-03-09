@@ -64,6 +64,8 @@ class Evaluator(Codelet):
             self._decay_activations()
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
+        for structure in self.target_structures:
+            self.bubble_chamber.loggers["structure"].log(structure)
         return self.result
 
     @classmethod

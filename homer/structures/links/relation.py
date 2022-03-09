@@ -49,6 +49,32 @@ class Relation(Link):
         self.is_relation = True
         self.is_bidirectional = is_bidirectional
 
+    def __dict__(self) -> dict:
+        return {
+            "structure_id": self.structure_id,
+            "parent_id": self.parent_id,
+            "parent_concept": self.parent_concept.structure_id
+            if self.parent_concept is not None
+            else None,
+            "parent_concept_name": self.parent_concept.name
+            if self.parent_concept is not None
+            else None,
+            "conceptual_space": self.conceptual_space.structure_id
+            if self.conceptual_space is not None
+            else None,
+            "conceptual_space_name": self.conceptual_space.name
+            if self.conceptual_space is not None
+            else None,
+            "start": self.start.structure_id,
+            "end": self.end.structure_id,
+            "locations": [str(location) for location in self.locations],
+            "parent_space": self.parent_space.structure_id
+            if self.parent_space is not None
+            else None,
+            "quality": self.quality,
+            "activation": self.activation,
+        }
+
     @classmethod
     def get_builder_class(cls):
         from homer.codelets.builders import RelationBuilder

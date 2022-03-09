@@ -56,6 +56,26 @@ class Concept(Node):
         self.is_concept = True
         self._is_slot = is_slot
 
+    def __dict__(self) -> dict:
+        return {
+            "structure_id": self.structure_id,
+            "parent_id": self.parent_id,
+            "name": self.name,
+            "locations": [str(location) for location in self.locations],
+            "parent_space": self.parent_space.structure_id
+            if self.parent_space is not None
+            else None,
+            "instance_type": self.instance_type.__name__
+            if self.instance_type is not None
+            else None,
+            "structure_type": self.structure_type.__name__
+            if self.structure_type is not None
+            else None,
+            "depth": self.depth,
+            "quality": self.quality,
+            "activation": self.activation,
+        }
+
     @property
     def prototype(self) -> list:
         return self.location.coordinates

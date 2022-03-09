@@ -41,6 +41,19 @@ class ContextualSpace(Space):
         self.is_main_input = is_main_input
         self.is_contextual_space = True
 
+    def __dict__(self) -> dict:
+        return {
+            "structure_id": self.structure_id,
+            "parent_id": self.parent_id,
+            "contents": [item.structure_id for item in self.contents],
+            "conceptual_spaces": [
+                space.structure_id for space in self.conceptual_spaces
+            ],
+            "conceptual_space_names": [space.name for space in self.conceptual_spaces],
+            "quality": self.quality,
+            "activation": self.activation,
+        }
+
     @property
     def quality(self):
         active_contents = {

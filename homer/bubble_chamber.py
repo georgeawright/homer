@@ -47,6 +47,8 @@ class BubbleChamber:
         self.result = None
         self.log_count = 0
 
+        self.ACTIVATION_LOGGING_FREQUENCY = HyperParameters.ACTIVATION_LOGGING_FREQUENCY
+
     @classmethod
     def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
         bubble_chamber = cls(loggers)
@@ -136,14 +138,10 @@ class BubbleChamber:
 
     @property
     def satisfaction(self):
-        return statistics.fmean(
-            [
-                space.quality
-                for space in StructureCollection.union(
-                    self.input_spaces, self.output_spaces
-                )
-            ]
-        )
+        spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
+        if len(spaces) == 0:
+            return 0
+        return statistics.fmean([space.quality for space in spaces])
 
     def spread_activations(self):
         for structure in self.structures:
@@ -152,7 +150,7 @@ class BubbleChamber:
     def update_activations(self) -> None:
         for structure in self.structures:
             structure.update_activation()
-            if self.log_count % 500 == 0:
+            if self.log_count % self.ACTIVATION_LOGGING_FREQUENCY == 0:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
 

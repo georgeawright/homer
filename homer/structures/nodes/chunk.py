@@ -53,6 +53,21 @@ class Chunk(Node):
         self.is_raw = is_raw
         self.is_chunk = True
 
+    def __dict__(self) -> dict:
+        return {
+            "structure_id": self.structure_id,
+            "parent_id": self.parent_id,
+            "locations": [str(location) for location in self.locations],
+            "parent_space": self.parent_space.structure_id
+            if self.parent_space is not None
+            else None,
+            "left_branch": [member.structure_id for member in self.left_branch],
+            "right_branch": [member.structure_id for member in self.right_branch],
+            "super_chunks": [member.structure_id for member in self.super_chunks],
+            "quality": self.quality,
+            "activation": self.activation,
+        }
+
     @classmethod
     def get_builder_class(cls):
         from homer.codelets.builders import ChunkBuilder

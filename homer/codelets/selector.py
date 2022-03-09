@@ -60,11 +60,15 @@ class Selector(Codelet):
             self.bubble_chamber.loggers["activity"].log_losers(self)
             self._boost_winners()
             self._decay_losers()
+            for structure in StructureCollection.union(self.winners, self.losers):
+                self.bubble_chamber.loggers["structure"].log(structure)
         else:
             self.winners = self.champions
             self.bubble_chamber.loggers["activity"].log_winners(self)
             self.confidence = self.winners.get().quality
             self._boost_winners()
+            for structure in self.winners:
+                self.bubble_chamber.loggers["structure"].log(structure)
         self._boost_activations()
         self.follow_up_urgency = FloatBetweenOneAndZero(
             self.winners.get().quality - self.winners.get().activation

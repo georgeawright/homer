@@ -12,6 +12,21 @@ class StructureLogger(Logger):
         self.coderack = coderack
 
     def log(self, structure):
+        codelets_run = self.coderack.codelets_run
+        structures_directory = f"{self.directory}/structures"
+        directory = f"{structures_directory}/{structure.structure_id}"
+        try:
+            os.mkdir(structures_directory)
+        except FileExistsError:
+            pass
+        try:
+            os.mkdir(directory)
+        except FileExistsError:
+            pass
+        output_file_path = f"{directory}/{codelets_run}.json"
+        with open(output_file_path, "w") as f:
+            json.dump(structure.__dict__(), f, sort_keys=False, indent=4)
+
         pass
 
     def log_concepts_and_frames(self, bubble_chamber, coderack):

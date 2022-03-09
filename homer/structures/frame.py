@@ -53,6 +53,9 @@ class Frame(Structure):
         self.is_sub_frame = is_sub_frame
         self.is_frame = True
 
+    def __dict__(self) -> dict:
+        return {}
+
     @property
     def slots(self) -> StructureCollection:
         return StructureCollection.union(

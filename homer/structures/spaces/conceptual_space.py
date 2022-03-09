@@ -52,6 +52,9 @@ class ConceptualSpace(Space):
         )
         self.is_conceptual_space = True
 
+    def __dict__(self) -> dict:
+        return {}
+
     @property
     def is_slot(self) -> bool:
         return self.parent_concept.is_slot

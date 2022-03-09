@@ -51,6 +51,29 @@ class Correspondence(Link):
         self.is_bidirectional = is_bidirectional
         self.is_correspondence = True
 
+    def __dict__(self) -> dict:
+        return {
+            "structure_id": self.structure_id,
+            "parent_id": self.parent_id,
+            "parent_concept": self.parent_concept.structure_id,
+            "parent_concept_name": self.parent_concept.name,
+            "conceptual_space": self.conceptual_space.structure_id
+            if self.conceptual_space is not None
+            else None,
+            "conceptual_space_name": self.conceptual_space.name
+            if self.conceptual_space is not None
+            else None,
+            "start": self.start.structure_id,
+            "end": self.end.structure_id,
+            "locations": [str(location) for location in self.locations],
+            "parent_view": self.parent_view.structure_id
+            if self.parent_view is not None
+            else None,
+            "parent_view_name": str(self.parent_view),
+            "quality": self.quality,
+            "activation": self.activation,
+        }
+
     @classmethod
     def get_builder_class(cls):
         from homer.codelets.builders import CorrespondenceBuilder

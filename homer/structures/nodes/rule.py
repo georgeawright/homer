@@ -45,6 +45,9 @@ class Rule(Node):
         self.right_concept = right_concept
         self.is_rule = True
 
+    def __dict__(self) -> dict:
+        return {}
+
     @property
     def instance_type(self) -> type:
         return self.left_concept.instance_type
