@@ -1,6 +1,5 @@
 from __future__ import annotations
 from abc import ABC
-import random
 import statistics
 from typing import List
 
@@ -388,6 +387,14 @@ class Structure(ABC):
             pass
         try:
             self.rule.boost_activation(self.activation)
+        except AttributeError:
+            pass
+        try:
+            self.parent_view.boost_activation(self.activation)
+        except AttributeError:
+            pass
+        try:
+            self.parent_frame.boost_activation(self.activation)
         except AttributeError:
             pass
         for link in self.links.where(is_label=False):
