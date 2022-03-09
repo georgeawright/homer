@@ -37,13 +37,9 @@ class StructureConceptDrivenFactory(Factory):
         from homer.codelets import Publisher
         from homer.codelets.suggesters import (
             ChunkSuggester,
+            CorrespondenceSuggester,
             LabelSuggester,
             RelationSuggester,
-        )
-        from homer.codelets.suggesters.correspondence_suggesters import (
-            SpaceToFrameCorrespondenceSuggester,
-            PotentialSubFrameToFrameCorrespondenceSuggester,
-            SubFrameToFrameCorrespondenceSuggester,
         )
         from homer.codelets.suggesters.projection_suggesters import (
             ChunkProjectionSuggester,
@@ -136,7 +132,7 @@ class StructureConceptDrivenFactory(Factory):
         )
         try:
             return {
-                suggest_correspondence: SpaceToFrameCorrespondenceSuggester,
+                suggest_correspondence: CorrespondenceSuggester,
                 suggest_view_simplex: SimplexViewSuggester,
                 suggest_view_monitoring: MonitoringViewSuggester,
             }[structure_link]
