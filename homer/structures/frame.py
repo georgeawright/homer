@@ -63,6 +63,19 @@ class Frame(Structure):
             self.output_space.contents.where(is_slot=True),
         )
 
+    @property
+    def items(self) -> StructureCollection:
+        return StructureCollection.union(
+            self.input_space.contents, self.output_space.contents
+        )
+
+    @property
+    def uncorresponded_items(self) -> StructureCollection:
+        return StructureCollection.union(
+            self.input_space.contents.filter(lambda x: x.correspondences.is_empty()),
+            self.output_space.contents.filter(lambda x: x.correspondences.is_empty()),
+        )
+
     def instantiate(
         self,
         input_space: "ContextualSpace",
