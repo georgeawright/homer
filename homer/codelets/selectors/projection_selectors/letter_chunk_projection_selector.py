@@ -26,6 +26,7 @@ class LetterChunkProjectionSelector(ProjectionSelector):
             ]
         ).get()
         frame = correspondence_from_frame.start.parent_space
+        # TODO: exclude winner
         new_target = frame.contents.where(is_chunk=True).get(key=uncorrespondedness)
         self.child_codelets.append(
             LetterChunkProjectionSuggester.spawn(

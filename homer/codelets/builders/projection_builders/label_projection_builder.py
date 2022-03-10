@@ -18,11 +18,9 @@ class LabelProjectionBuilder(ProjectionBuilder):
         parent_concept = (
             self.target_projectee.parent_concept
             if not self.target_projectee.is_slot
-            else self.target_projectee.parent_concept.relations.filter(
-                lambda x: x.end not in self.target_view.concepts
-            )
-            .get()
-            .end
+            else self.target_projectee.parent_concept.relatives.where(
+                is_slot=False
+            ).get()
         )
         start_correspondence = self.target_projectee.start.correspondences_to_space(
             self.target_view.output_space

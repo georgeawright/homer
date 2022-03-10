@@ -62,7 +62,11 @@ class ViewSuggester(Suggester):
 
     def _calculate_confidence(self):
         self.confidence = statistics.fmean(
-            [self.frame.activation, self.contextual_space.activation]
+            [
+                (1 - self.bubble_chamber.focus.focussedness),
+                self.frame.activation,
+                self.contextual_space.activation,
+            ]
         )
 
     def _fizzle(self):

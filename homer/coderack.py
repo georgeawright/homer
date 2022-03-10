@@ -3,7 +3,15 @@ from typing import Dict
 
 from .bubble_chamber import BubbleChamber
 from .codelet import Codelet
-from .codelets import Builder, CoderackCleaner, Evaluator, Factory, Selector, Suggester
+from .codelets import (
+    Builder,
+    CoderackCleaner,
+    Evaluator,
+    Factory,
+    FocusSetter,
+    Selector,
+    Suggester,
+)
 from .codelets.factories import (
     ConceptDrivenFactory,
     ViewDrivenFactory,
@@ -22,7 +30,7 @@ class Coderack:
 
     MAXIMUM_POPULATION = HyperParameters.MAXIMUM_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-    PROTECTED_CODELET_TYPES = (CoderackCleaner, Factory)
+    PROTECTED_CODELET_TYPES = (CoderackCleaner, Factory, FocusSetter)
 
     def __init__(self, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         self.bubble_chamber = bubble_chamber
@@ -35,6 +43,7 @@ class Coderack:
     def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
+            FocusSetter.spawn("", bubble_chamber, coderack, 0.5),
             CoderackCleaner.spawn("", bubble_chamber, coderack, 0.0, 1.0),
             ConceptDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
             ViewDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),

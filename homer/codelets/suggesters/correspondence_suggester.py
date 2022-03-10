@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Suggester
+from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure_collection import StructureCollection
@@ -58,7 +59,9 @@ class CorrespondenceSuggester(Suggester):
             SubFrameToFrameCorrespondenceSuggester,
         )
 
-        target_view = bubble_chamber.production_views.get(key=exigency)
+        target_view = bubble_chamber.focus.view
+        if target_view is None:
+            raise MissingStructureError
         target_structure_two = StructureCollection.union(
             target_view.parent_frame.input_space.contents,
             target_view.parent_frame.output_space.contents.filter(
@@ -134,12 +137,15 @@ class CorrespondenceSuggester(Suggester):
         raise NotImplementedError
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classifier.classify(
-            concept=self.parent_concept,
-            space=self.target_conceptual_space,
-            start=self.target_structure_one,
-            end=self.target_structure_two,
-            view=self.target_view,
+        self.confidence = (
+            self.parent_concept.classifier.classify(
+                concept=self.parent_concept,
+                space=self.target_conceptual_space,
+                start=self.target_structure_one,
+                end=self.target_structure_two,
+                view=self.target_view,
+            )
+            * self.target_structure_one.quality
         )
 
     def _fizzle(self):

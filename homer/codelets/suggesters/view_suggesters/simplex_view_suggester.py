@@ -21,7 +21,8 @@ class SimplexViewSuggester(ViewSuggester):
         urgency = (
             urgency
             if urgency is not None
-            else frame.activation
+            else (1 - bubble_chamber.focus.focussedness)
+            * frame.activation
             * 0.5 ** sum([1 - view.activation for view in views_with_frame])
         )
         return cls.spawn(

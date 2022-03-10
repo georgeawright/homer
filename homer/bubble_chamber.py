@@ -4,6 +4,7 @@ from typing import Callable, Dict, List, Union
 from .classifier import Classifier
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
+from .focus import Focus
 from .hyper_parameters import HyperParameters
 from .id import ID
 from .location import Location
@@ -26,6 +27,7 @@ class BubbleChamber:
     def __init__(self, loggers: Dict[str, Logger]):
         self.loggers = loggers
         self.random_machine = None
+        self.focus = Focus()
 
         self.conceptual_spaces = None
         self.contextual_spaces = None
@@ -138,6 +140,8 @@ class BubbleChamber:
 
     @property
     def satisfaction(self):
+        if self.focus.view is not None:
+            return self.focus.satisfaction
         spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
         if len(spaces) == 0:
             return 0

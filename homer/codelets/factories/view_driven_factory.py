@@ -18,7 +18,12 @@ from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from homer.errors import MissingStructureError, NoLocationError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure import Structure
-from homer.structure_collection_keys import activation, exigency, labeling_exigency
+from homer.structure_collection_keys import (
+    activation,
+    exigency,
+    labeling_exigency,
+    uncorrespondedness,
+)
 from homer.structures import View
 
 
@@ -37,38 +42,35 @@ class ViewDrivenFactory(Factory):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        urgency = self.coderack.MINIMUM_CODELET_URGENCY
-        if not self.bubble_chamber.production_views.is_empty():
-            urgency = (
-                1
-                - statistics.median(
-                    [
-                        view.output_space.quality
-                        for view in self.bubble_chamber.production_views
-                    ]
-                )
-            ) / (len(self.child_codelets) + 1)
-        return urgency
+        urgency = (
+            self.bubble_chamber.focus.view.unhappiness
+            if self.bubble_chamber.focus.view is not None
+            else 1 - self.bubble_chamber.satisfaction
+        )
+        if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
+            return urgency
+        return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):
-        view = self.bubble_chamber.production_views.get(key=exigency)
+        view = (
+            self.bubble_chamber.focus.view
+            if self.bubble_chamber.focus.view is not None
+            else self.bubble_chamber.production_views.get(key=exigency)
+        )
         self.bubble_chamber.loggers["activity"].log(self, f"Targeting view {view}")
         input_structures = view.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence and x.correspondences.is_empty()
         )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, input_structures, "Uncorrespondended input structures"
-        )
         try:
-            slot = input_structures.get()
+            slot = input_structures.get(key=uncorrespondedness)
         except MissingStructureError:
-            output_structures = view.parent_frame.input_space.contents.filter(
+            output_structures = view.parent_frame.output_space.contents.filter(
                 lambda x: not x.is_correspondence and x.correspondences.is_empty()
             )
             self.bubble_chamber.loggers["activity"].log_collection(
                 self, output_structures, "Uncorrespondended output structures"
             )
-            slot = output_structures.get()
+            slot = output_structures.get(key=uncorrespondedness)
         self.bubble_chamber.loggers["activity"].log(self, f"Targeting slot {slot}")
         if slot.parent_space == view.parent_frame.input_space:
             try:
@@ -98,7 +100,7 @@ class ViewDrivenFactory(Factory):
         if slot.is_label:
             node = None
             for node_group in view.node_groups:
-                if input_space in node_group and slot in node_group.values():
+                if input_space in node_group and slot.start in node_group.values():
                     node = node_group[input_space]
                     break
             if node is None:
