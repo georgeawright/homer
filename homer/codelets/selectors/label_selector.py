@@ -49,7 +49,11 @@ class LabelSelector(Selector):
             parent_concept = (
                 winning_label.parent_concept.friends().where(structure_type=Label).get()
             )
-            target_node = winning_label.start.nearby().get(key=labeling_exigency)
+            target_node = (
+                winning_label.start.nearby()
+                .where(is_slot=False)
+                .get(key=labeling_exigency)
+            )
             self.child_codelets.append(
                 LabelSuggester.spawn(
                     self.codelet_id,

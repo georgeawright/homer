@@ -199,6 +199,9 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             if not meaning_label.parent_concept.is_slot
             else meaning_label.parent_concept.relatives.where(is_slot=False).get()
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Meaning concept: {meaning_concept}"
+        )
         return (
             meaning_concept.relations.where(parent_concept=grammar_concept)
             .get(key=lambda x: x.end.activation)

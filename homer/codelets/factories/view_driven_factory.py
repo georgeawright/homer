@@ -25,6 +25,7 @@ from homer.structure_collection_keys import (
     uncorrespondedness,
 )
 from homer.structures import View
+from homer.structures.links import Relation
 
 
 class ViewDrivenFactory(Factory):
@@ -52,6 +53,8 @@ class ViewDrivenFactory(Factory):
         return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):
+        from homer.codelets import FocusSetter
+
         view = (
             self.bubble_chamber.focus.view
             if self.bubble_chamber.focus.view is not None
@@ -71,6 +74,12 @@ class ViewDrivenFactory(Factory):
                 self, output_structures, "Uncorrespondended output structures"
             )
             slot = output_structures.get(key=uncorrespondedness)
+            follow_up = FocusSetter.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.coderack,
+                self.bubble_chamber.focus.view.unhappiness,
+            )
         self.bubble_chamber.loggers["activity"].log(self, f"Targeting slot {slot}")
         if slot.parent_space == view.parent_frame.input_space:
             try:
@@ -131,23 +140,50 @@ class ViewDrivenFactory(Factory):
                 ).get()
             else:
                 parent_concept = (
-                    slot.parent_spaces.where(is_conceptual_space=True)
+                    slot.parent_spaces.filter(
+                        lambda x: x.is_conceptual_space
+                        and x.parent_concept.structure_type == Relation
+                    )
                     .get()
                     .contents.where(is_concept=True, is_slot=False)
                     .get(key=activation)
                 )
-            potential_targets = input_space.contents.where(is_node=True, is_slot=False)
-            try:
-                (
-                    target_structure_one,
-                    target_structure_two,
-                ) = potential_targets.pairs.get(
-                    key=lambda x: parent_concept.classifier.classify(
-                        start=x[0], end=x[1], space=slot.conceptual_space
-                    )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found parent concept {parent_concept}"
+            )
+            target_structure_one = None
+            target_structure_two = None
+            for node_group in view.node_groups:
+                if input_space in node_group and slot.start in node_group.values():
+                    target_structure_one = node_group[input_space]
+                if input_space in node_group and slot.end in node_group.values():
+                    target_structure_two = node_group[input_space]
+            if target_structure_one is None or target_structure_two is None:
+                potential_targets = input_space.contents.where(
+                    is_node=True, is_slot=False
                 )
-            except NoLocationError:
-                raise MissingStructureError
+                try:
+                    (
+                        target_structure_one,
+                        target_structure_two,
+                    ) = potential_targets.pairs.filter(
+                        lambda x: (
+                            x[0] == target_structure_one
+                            if target_structure_one is not None
+                            else True
+                        )
+                        and (
+                            x[1] == target_structure_two
+                            if target_structure_two is not None
+                            else True
+                        )
+                    ).get(
+                        key=lambda x: parent_concept.classifier.classify(
+                            start=x[0], end=x[1], space=slot.conceptual_space
+                        )
+                    )
+                except NoLocationError:
+                    raise MissingStructureError
             return RelationSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,

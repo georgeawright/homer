@@ -695,36 +695,31 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list (list 0)) peripheralness-space))))
 (def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
 
-(define space-parent-concept
-  (def-concept :name "" :is_slot True))
-(define conceptual-space
-  (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :no_of_dimensions Nan))
 (define label-parent-concept
-  (def-concept :name "" :is_slot True :parent_space conceptual-space))
+  (def-concept :name "" :is_slot True :parent_space temperature-space))
 (define jj-input
   (def-contextual-space :name "ap[jj].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection conceptual-space)))
+    :conceptual_spaces (StructureCollection temperature-space)))
 (define jj-output
   (def-contextual-space :name "ap[jj].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
+    :conceptual_spaces (StructureCollection grammar-space temperature-space)))
 (define jj-frame
   (def-frame :name "ap[jj]"
     :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection space-parent-concept label-parent-concept)
+    :concepts (StructureCollection label-parent-concept)
     :input_space jj-input :output_space jj-output))
 (define chunk
-  (def-chunk :locations (list (Location (list) conceptual-space)
+  (def-chunk :locations (list (Location (list (list Nan)) temperature-space)
 			      (Location (list) jj-input))
     :parent_space jj-input))
 (define chunk-label
   (def-label :start chunk :parent_concept label-parent-concept
-    :locations (list (Location (list) conceptual-space)
+    :locations (list (Location (list (list Nan)) temperature-space)
 		     (Location (list) jj-input))))
 (define letter-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) conceptual-space)
+    :locations (list (Location (list (list Nan)) temperature-space)
 		     (Location (list) grammar-space)
 		     (Location (list) jj-output))
     :parent_space jj-output))
@@ -734,7 +729,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list) jj-output))))
 (define letter-chunk-meaning-label
   (def-label :start letter-chunk :parent_concept label-parent-concept
-    :locations (list (Location (list) conceptual-space)
+    :locations (list (Location (list (list Nan)) temperature-space)
 		     (Location (list) jj-output))))
 
 (def-relation :start label-concept :end jj-frame
@@ -760,7 +755,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-frame :name "np[nn]"
     :parent_concept np-concept :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection space-parent-concept label-parent-concept)
+    :concepts (StructureCollection label-parent-concept)
     :input_space nn-input :output_space nn-output))
 (define chunk
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
@@ -824,8 +819,8 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-chunk :locations (list (Location (list (list Nan)) temperature-space)
 			      (Location (list) rp-input))
     :parent_space rp-input))
-(define chunk-end-label
-  (def-label :start chunk-end :parent_concept label-parent-concept
+(define chunk-start-label
+  (def-label :start chunk-start :parent_concept label-parent-concept
     :locations (list (Location (list (list Nan)) temperature-space)
 		     (Location (list) rp-input))))
 (define relation
@@ -975,7 +970,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) rp-sub-frame-input)
 		     (Location (list) comparative-sentence-input))
-    :parent_space comparative-sentence-input))
+    :parent_space rp-sub-frame-input))
 (define chunk-start-location-label
   (def-label :start chunk-start :parent_concept location-concept-1
     :locations (list (Location (list (list Nan Nan)) location-space)
@@ -992,7 +987,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (TwoPointLocation (list) (list) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-sub-frame-input)
 		     (TwoPointLocation (list) (list) comparative-sentence-input))
-    :parent_space comparative-sentence-input
+    :parent_space rp-sub-frame-input
     :conceptual_space conceptual-space))
 (define sentence-word-1
   (def-letter-chunk :name "temperatures"

@@ -61,6 +61,7 @@ class FocusSetter(Codelet):
             return
         if (
             self.bubble_chamber.focus.view is None
+            or self.bubble_chamber.focus.view.unhappiness == 0
             or target_view.exigency > self.bubble_chamber.focus.focussedness
         ):
             self.bubble_chamber.focus.view = target_view

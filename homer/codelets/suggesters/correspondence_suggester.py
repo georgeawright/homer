@@ -279,6 +279,7 @@ class CorrespondenceSuggester(Suggester):
                     correspondence_suggester.target_space_one.contents.filter(
                         lambda x: type(x)
                         == type(correspondence_suggester.target_structure_two)
+                        and not x.is_slot
                         and (
                             x.has_location_in_space(
                                 correspondence_suggester.target_conceptual_space

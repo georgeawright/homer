@@ -67,14 +67,14 @@ class Frame(Structure):
     def items(self) -> StructureCollection:
         return StructureCollection.union(
             self.input_space.contents, self.output_space.contents
-        )
+        ).where(is_correspondence=False)
 
     @property
     def uncorresponded_items(self) -> StructureCollection:
         return StructureCollection.union(
             self.input_space.contents.filter(lambda x: x.correspondences.is_empty()),
             self.output_space.contents.filter(lambda x: x.correspondences.is_empty()),
-        )
+        ).where(is_correspondence=False)
 
     def instantiate(
         self,

@@ -111,12 +111,21 @@ class Coderack:
     def select_and_run_codelet(self):
         codelet = self._select_a_codelet()
         codelet.run()
+        if self.bubble_chamber.focus.view is not None:
+            print(self.bubble_chamber.focus.view.unhappiness)
+        if (
+            self.bubble_chamber.focus.view is not None
+            and self.bubble_chamber.focus.view.unhappiness
+            < HyperParameters.FLOATING_POINT_TOLERANCE
+        ):
+            self.bubble_chamber.focus.view = None
         self.recently_run.add(type(codelet))
         self.loggers["activity"].log(
             codelet,
             f"Time: {self.codelets_run} | "
             + f"Satisfaction: {self.bubble_chamber.satisfaction} | "
-            + f"Coderack Population Size: {self.population_size}",
+            + f"Coderack Population Size: {self.population_size}\n"
+            + f"Focus: {self.bubble_chamber.focus.view}",
         )
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:

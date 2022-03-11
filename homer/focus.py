@@ -31,9 +31,15 @@ class Focus:
     def satisfaction(self):
         if self.view is None:
             return 0
-        spaces = self.view.input_spaces.copy()
-        spaces.add(self.view.output_space)
-        return statistics.fmean([space.quality for space in spaces])
+        view_items = StructureCollection.union(
+            self.view.members, *[member.arguments for member in self.view.members]
+        ).filter(lambda x: x.activation > 0)
+        if view_items.is_empty():
+            return 0
+        return statistics.fmean([item.quality for item in view_items])
+        # spaces = self.view.input_spaces.copy()
+        # spaces.add(self.view.output_space)
+        # return statistics.fmean([space.quality for space in spaces])
 
     def change_view(self, view: View):
         self.view = view
