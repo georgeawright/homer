@@ -47,10 +47,12 @@ class Focus:
         ).filter(lambda x: x.activation > 0)
         if view_items.is_empty():
             return 0
-        return statistics.fmean([item.quality for item in view_items])
-        # spaces = self.view.input_spaces.copy()
-        # spaces.add(self.view.output_space)
-        # return statistics.fmean([space.quality for space in spaces])
+        return statistics.fmean(
+            [
+                statistics.fmean([item.quality for item in view_items]),
+                1 - self.view.unhappiness,
+            ]
+        )
 
     def change_view(self, view: View):
         self.view = view
