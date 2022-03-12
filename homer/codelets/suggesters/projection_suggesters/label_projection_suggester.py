@@ -22,6 +22,8 @@ class LabelProjectionSuggester(ProjectionSuggester):
         target_view = (
             target_view
             if target_view is not None
+            else bubble_chamber.focus.view
+            if bubble_chamber.focus.view is not None
             else bubble_chamber.views.get(key=activation)
         )
         frame = target_view.input_spaces.where(is_frame=True).get()

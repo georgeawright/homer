@@ -24,6 +24,8 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
         target_view = (
             target_view
             if target_view is not None
+            else bubble_chamber.focus.view
+            if bubble_chamber.focus.view is not None
             else bubble_chamber.views.get(key=activation)
         )
         target_letter_chunk = target_view.parent_frame.output_space.contents.where(
