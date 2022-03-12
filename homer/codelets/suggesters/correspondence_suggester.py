@@ -151,20 +151,29 @@ class CorrespondenceSuggester(Suggester):
     def _fizzle(self):
         pass
 
-    def _get_target_conceptual_space(self):
-        self.target_conceptual_space = None
-        if self.target_structure_two.is_link and self.target_structure_two.is_node:
-            self.target_conceptual_space = (
-                self.target_structure_two.parent_spaces.where(
+    @staticmethod
+    def _get_target_conceptual_space(calling_codelet, correspondence_suggester):
+        correspondence_suggester.target_conceptual_space = None
+        if (
+            correspondence_suggester.target_structure_two.is_link
+            and correspondence_suggester.target_structure_two.is_node
+        ):
+            correspondence_suggester.target_conceptual_space = (
+                correspondence_suggester.target_structure_two.parent_spaces.where(
                     is_conceptual_space=True, is_basic_level=True
                 ).get()
             )
-        elif self.target_structure_two.is_link:
-            self.target_conceptual_space = (
-                self.target_structure_two.parent_concept.parent_space
+        elif correspondence_suggester.target_structure_two.is_label:
+            correspondence_suggester.target_conceptual_space = (
+                correspondence_suggester.target_structure_two.parent_concept.parent_space
             )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found target conceptual space: {self.target_conceptual_space}"
+        elif correspondence_suggester.target_structure_two.is_relation:
+            correspondence_suggester.target_conceptual_space = (
+                correspondence_suggester.target_structure_two.conceptual_space
+            )
+        calling_codelet.bubble_chamber.loggers["activity"].log(
+            calling_codelet,
+            f"Found target conceptual space: {correspondence_suggester.target_conceptual_space}",
         )
 
     @staticmethod
@@ -233,20 +242,36 @@ class CorrespondenceSuggester(Suggester):
                     calling_codelet, f"Found structure one end: {structure_one_end}"
                 )
             else:
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet, f"Structure two end not in grouped nodes"
+                )
                 structure_one_end = None
+            calling_codelet.bubble_chamber.loggers["activity"].log_collection(
+                calling_codelet,
+                correspondence_suggester.target_space_one.contents.filter(
+                    lambda x: x.is_relation
+                ),
+                "input relations",
+            )
+            calling_codelet.bubble_chamber.loggers["activity"].log(
+                calling_codelet, correspondence_suggester.target_conceptual_space
+            )
+            calling_codelet.bubble_chamber.loggers["activity"].log_collection(
+                calling_codelet,
+                correspondence_suggester.target_space_one.contents.filter(
+                    lambda x: x.is_relation
+                    and (x.start == structure_one_start or structure_one_start is None)
+                    and (x.end == structure_one_end or structure_one_end is None)
+                    and x.conceptual_space
+                    == correspondence_suggester.target_conceptual_space
+                ),
+                "input relations",
+            )
             correspondence_suggester.target_structure_one = (
                 correspondence_suggester.target_space_one.contents.filter(
                     lambda x: x.is_relation
-                    and (
-                        x.start == structure_one_start
-                        if structure_one_start is not None
-                        else True
-                    )
-                    and (
-                        x.end == structure_one_end
-                        if structure_one_start is not None
-                        else True
-                    )
+                    and (x.start == structure_one_start or structure_one_start is None)
+                    and (x.end == structure_one_end or structure_one_end is None)
                     and x.conceptual_space
                     == correspondence_suggester.target_conceptual_space
                 ).get(key=corresponding_exigency)

@@ -76,7 +76,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         )
 
     def _passes_preliminary_checks(self):
-        self._get_target_conceptual_space()
+        self._get_target_conceptual_space(self, self)
         try:
             if self.target_space_one is None:
                 self.target_space_one = self.target_view.input_spaces.get()

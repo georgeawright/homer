@@ -66,7 +66,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         return cls.make(parent_id, bubble_chamber, urgency)
 
     def _passes_preliminary_checks(self):
-        self._get_target_conceptual_space()
+        self._get_target_conceptual_space(self, self)
         try:
             self.target_sub_view = self.bubble_chamber.production_views.filter(
                 lambda x: x.parent_frame.parent_concept

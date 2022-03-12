@@ -64,7 +64,7 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
 
     def _passes_preliminary_checks(self):
         self.target_space_two = self.target_structure_two.parent_space
-        self._get_target_conceptual_space()
+        self._get_target_conceptual_space(self, self)
         try:
             if self.target_space_one is None:
                 self.bubble_chamber.loggers["activity"].log(

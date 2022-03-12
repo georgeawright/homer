@@ -1,5 +1,6 @@
 import statistics
 
+from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Factory
 from homer.codelets.suggesters import LabelSuggester, RelationSuggester
@@ -73,12 +74,17 @@ class ViewDrivenFactory(Factory):
             self.bubble_chamber.loggers["activity"].log_collection(
                 self, output_structures, "Uncorrespondended output structures"
             )
-            slot = output_structures.get(key=uncorrespondedness)
+            try:
+                slot = output_structures.where(is_chunk=True).get(
+                    key=uncorrespondedness
+                )
+            except MissingStructureError:
+                slot = output_structures.get(key=uncorrespondedness)
             follow_up = FocusSetter.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                self.bubble_chamber.focus.view.unhappiness,
+                1 - self.bubble_chamber.satisfaction,
             )
         self.bubble_chamber.loggers["activity"].log(self, f"Targeting slot {slot}")
         if slot.parent_space == view.parent_frame.input_space:
@@ -178,8 +184,12 @@ class ViewDrivenFactory(Factory):
                             else True
                         )
                     ).get(
-                        key=lambda x: parent_concept.classifier.classify(
-                            start=x[0], end=x[1], space=slot.conceptual_space
+                        key=lambda x: fuzzy.AND(
+                            parent_concept.classifier.classify(
+                                start=x[0], end=x[1], space=slot.conceptual_space
+                            ),
+                            x[0].exigency,
+                            x[1].exigency,
                         )
                     )
                 except NoLocationError:
@@ -219,9 +229,6 @@ class ViewDrivenFactory(Factory):
         self.bubble_chamber.loggers["activity"].log(
             self, "Trying to build correspondence suggester"
         )
-        target_conceptual_space = (
-            None if slot.is_chunk else slot.parent_concept.parent_space
-        )
         follow_up = SpaceToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
@@ -230,12 +237,12 @@ class ViewDrivenFactory(Factory):
                 "target_space_one": view.input_spaces.get(),
                 "target_space_two": view.parent_frame.input_space,
                 "target_structure_two": slot,
-                "target_conceptual_space": target_conceptual_space,
                 "parent_concept": self.bubble_chamber.concepts["same"],
             },
             slot.uncorrespondedness,
         )
         self.bubble_chamber.loggers["activity"].log(self, f"follow_up: {follow_up}")
+        follow_up._get_target_conceptual_space(self, follow_up)
         follow_up._get_target_structure_one(self, follow_up)
         return follow_up
 
