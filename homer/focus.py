@@ -17,13 +17,24 @@ class Focus:
         if self.change_in_spaces_quality is None:
             return self.view.unhappiness
         return FloatBetweenOneAndZero(
-            self.view.unhappiness + self.change_in_spaces_quality
+            self.view.unhappiness
+            + self.change_in_spaces_quality * len(self.spaces_quality_history)
         )
 
     @property
     def change_in_spaces_quality(self):
         try:
-            return self.spaces_quality_history[-1] - self.spaces_quality_history[-10]
+            difference = (
+                self.spaces_quality_history[-1] - self.spaces_quality_history[0]
+            )
+            diff_float = (
+                0.5 / difference
+                if difference > 0
+                else -1 * (1 - (0.5 / difference))
+                if difference < 0
+                else 0
+            )
+            return 0.5 + diff_float
         except IndexError:
             return None
 

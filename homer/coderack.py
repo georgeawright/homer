@@ -113,6 +113,9 @@ class Coderack:
         codelet.run()
         if self.bubble_chamber.focus.view is not None:
             print(self.bubble_chamber.focus.view.unhappiness)
+            self.bubble_chamber.focus.spaces_quality_history.append(
+                self.bubble_chamber.focus.satisfaction
+            )
         if (
             self.bubble_chamber.focus.view is not None
             and self.bubble_chamber.focus.view.unhappiness
