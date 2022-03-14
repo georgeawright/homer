@@ -15,6 +15,13 @@ class RelationProjectionBuilder(ProjectionBuilder):
         return self.bubble_chamber.concepts["relation"]
 
     def _process_structure(self):
+        parent_concept = (
+            self.target_projectee.parent_concept
+            if not self.target_projectee.is_slot
+            else self.target_projectee.parent_concept.relatives.where(
+                is_slot=False
+            ).get()
+        )
         start_correspondence = self.target_projectee.start.correspondences_to_space(
             self.target_view.output_space
         ).get()
@@ -23,9 +30,6 @@ class RelationProjectionBuilder(ProjectionBuilder):
             self.target_view.output_space
         ).get()
         corresponding_end = end_correspondence.end
-        parent_concept = self.target_view.slot_values[
-            self.frame_correspondee.structure_id
-        ]
         conceptual_location = self.target_projectee.location_in_space(
             parent_concept.parent_space
         )
