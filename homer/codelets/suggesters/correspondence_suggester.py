@@ -137,15 +137,12 @@ class CorrespondenceSuggester(Suggester):
         raise NotImplementedError
 
     def _calculate_confidence(self):
-        self.confidence = (
-            self.parent_concept.classifier.classify(
-                concept=self.parent_concept,
-                space=self.target_conceptual_space,
-                start=self.target_structure_one,
-                end=self.target_structure_two,
-                view=self.target_view,
-            )
-            * self.target_structure_one.quality
+        self.confidence = self.parent_concept.classifier.classify(
+            concept=self.parent_concept,
+            space=self.target_conceptual_space,
+            start=self.target_structure_one,
+            end=self.target_structure_two,
+            view=self.target_view,
         )
 
     def _fizzle(self):

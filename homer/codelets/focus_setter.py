@@ -62,7 +62,7 @@ class FocusSetter(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                1 - self.bubble_chamber.satisfaction,
+                0.5,
             )
         )
 
@@ -75,12 +75,12 @@ class FocusSetter(Codelet):
                 self.bubble_chamber,
                 self.coderack,
                 self.bubble_chamber.satisfaction,
-                self.follow_up_urgency(),
+                0.5,
             )
         )
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        urgency = 1 - self.bubble_chamber.focus.focussedness
+        urgency = 1 - self.bubble_chamber.focus.view.exigency
         if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
             return urgency
         return self.coderack.MINIMUM_CODELET_URGENCY

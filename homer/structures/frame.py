@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import math
 
-from homer.errors import MissingStructureError, NoLocationError
+from homer.errors import NoLocationError
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
@@ -55,6 +56,10 @@ class Frame(Structure):
 
     def __dict__(self) -> dict:
         return {}
+
+    @property
+    def depth(self) -> FloatBetweenOneAndZero:
+        return self.parent_concept.depth
 
     @property
     def slots(self) -> StructureCollection:

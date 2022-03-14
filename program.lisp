@@ -158,87 +158,87 @@
 (define sentence-concept
   (def-concept :name "sentence" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 4 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define np-concept
   (def-concept :name "np" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define vp-concept
   (def-concept :name "vp" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define ap-concept
   (def-concept :name "ap" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define rp-concept
   (def-concept :name "rp" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define pp-concept
   (def-concept :name "pp" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define nn-concept
   (def-concept :name "nn" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define vb-concept
   (def-concept :name "vb" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define jj-concept
   (def-concept :name "jj" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define jjr-concept
   (def-concept :name "jjr" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define rb-concept
   (def-concept :name "rb" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define cop-concept
   (def-concept :name "cop" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define prep-concept
   (def-concept :name "prep" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define det-concept
   (def-concept :name "det" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define nsubj-concept
   (def-concept :name "nsubj" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define predicate-concept
   (def-concept :name "predicate" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define conj-concept
   (def-concept :name "conj" :locations (list (Location (list (list)) grammar-space))
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 
 (define the

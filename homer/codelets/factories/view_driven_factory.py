@@ -220,7 +220,7 @@ class ViewDrivenFactory(Factory):
             self.codelet_id,
             self.bubble_chamber,
             {"target_view": view, "target_projectee": slot},
-            slot.uncorrespondedness,
+            slot.uncorrespondedness if not slot.is_chunk else 1.0,
         )
 
     def _spawn_space_to_frame_correspondence_suggester(

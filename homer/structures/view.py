@@ -65,7 +65,8 @@ class View(Structure):
             ],
             "grouped_nodes": [node.structure_id for node in self.grouped_nodes],
             "matched_sub_frames": {
-                frame_1: frame_2 for frame_1, frame_2 in self.matched_sub_frames.items()
+                frame_1.structure_id: frame_2.structure_id
+                for frame_1, frame_2 in self.matched_sub_frames.items()
             },
             "quality": self.quality,
             "activation": self.activation,

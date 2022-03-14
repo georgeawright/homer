@@ -53,8 +53,12 @@ class ProjectionSuggester(Suggester):
         raise NotImplementedError
 
     def _calculate_confidence(self):
-        self.confidence = statistics.fmean(
-            [space.quality for space in self.target_view.input_spaces]
+        self.confidence = (
+            statistics.fmean(
+                [correspondence.quality for correspondence in self.target_view.members]
+            )
+            if not self.target_view.members.is_empty()
+            else 0.0
         )
 
     def _fizzle(self):

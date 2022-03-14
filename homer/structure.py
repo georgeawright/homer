@@ -40,6 +40,7 @@ class Structure(ABC):
         # )
         self._activation = 0.0 if stable_activation is None else stable_activation
         self.stable = stable_activation is not None
+        self._depth = 1
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
         self._parent_space = None
@@ -136,6 +137,10 @@ class Structure(ABC):
     @property
     def quality(self) -> FloatBetweenOneAndZero:
         return self._quality
+
+    @property
+    def depth(self) -> FloatBetweenOneAndZero:
+        return self._depth
 
     @quality.setter
     def quality(self, q: FloatBetweenOneAndZero):
@@ -369,14 +374,18 @@ class Structure(ABC):
             return
         if amount is None:
             amount = self.MINIMUM_ACTIVATION_UPDATE
-        self._activation_buffer += self._activation_update_coefficient * amount
+        self._activation_buffer += (
+            self._activation_update_coefficient * (1 / self.depth) * amount
+        )
 
     def decay_activation(self, amount: float = None):
         if self.stable:
             return
         if amount is None:
             amount = self.MINIMUM_ACTIVATION_UPDATE
-        self._activation_buffer -= self._activation_update_coefficient * amount
+        self._activation_buffer -= (
+            self._activation_update_coefficient * (1 / self.depth) * amount
+        )
 
     def spread_activation(self):
         if not self.is_fully_active():

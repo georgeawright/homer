@@ -55,14 +55,17 @@ class FocusUnsetter(Codelet):
         transposed_change_in_satisfaction_score = (
             change_in_satisfaction_score * 0.5
         ) + 0.5
-        probability_of_unsetting_focus = 1 - statistics.fmean(
-            [current_satisfaction_score, transposed_change_in_satisfaction_score]
+        probability_of_unsetting_focus = statistics.fmean(
+            [current_satisfaction_score, 1 - transposed_change_in_satisfaction_score]
         )
         self.bubble_chamber.loggers["activity"].log(
             self, f"Probability of unsetting focus: {probability_of_unsetting_focus}"
         )
         random_number = self.bubble_chamber.random_machine.generate_number()
-        if random_number < probability_of_unsetting_focus:
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Random number: {random_number}"
+        )
+        if random_number > probability_of_unsetting_focus:
             self.bubble_chamber.loggers["activity"].log(self, "Focus left set.")
             self.result = CodeletResult.FIZZLE
             self._fizzle()
@@ -71,6 +74,7 @@ class FocusUnsetter(Codelet):
             self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
@@ -81,7 +85,7 @@ class FocusUnsetter(Codelet):
                 self.bubble_chamber,
                 self.coderack,
                 self.bubble_chamber.satisfaction,
-                self.bubble_chamber.satisfaction,
+                0.5,
             )
         )
 
@@ -93,6 +97,6 @@ class FocusUnsetter(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                1 - self.bubble_chamber.satisfaction,
+                0.5,
             )
         )

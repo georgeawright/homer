@@ -117,12 +117,6 @@ class Coderack:
             self.bubble_chamber.focus.spaces_quality_history.append(
                 self.bubble_chamber.focus.satisfaction
             )
-        if (
-            self.bubble_chamber.focus.view is not None
-            and self.bubble_chamber.focus.view.unhappiness
-            < HyperParameters.FLOATING_POINT_TOLERANCE
-        ):
-            self.bubble_chamber.focus.view = None
         self.recently_run.add(type(codelet))
         self.loggers["activity"].log(
             codelet,

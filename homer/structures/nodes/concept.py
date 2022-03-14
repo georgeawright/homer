@@ -51,7 +51,7 @@ class Concept(Node):
         self.child_spaces = child_spaces
         self.distance_function = distance_function
         self.instances = instances
-        self.depth = depth
+        self._depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
         self.is_concept = True
         self._is_slot = is_slot
