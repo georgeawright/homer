@@ -1,6 +1,7 @@
 from .coderack_cleaner import CoderackCleaner
 from .factory import Factory
 from .focus_setter import FocusSetter
+from .focus_unsetter import FocusUnsetter
 from .builder import Builder
 from .evaluator import Evaluator
 from .publisher import Publisher

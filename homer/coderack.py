@@ -9,6 +9,7 @@ from .codelets import (
     Evaluator,
     Factory,
     FocusSetter,
+    FocusUnsetter,
     Selector,
     Suggester,
 )
@@ -30,7 +31,7 @@ class Coderack:
 
     MAXIMUM_POPULATION = HyperParameters.MAXIMUM_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-    PROTECTED_CODELET_TYPES = (CoderackCleaner, Factory, FocusSetter)
+    PROTECTED_CODELET_TYPES = (CoderackCleaner, Factory, FocusSetter, FocusUnsetter)
 
     def __init__(self, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         self.bubble_chamber = bubble_chamber

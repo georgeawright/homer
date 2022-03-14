@@ -33,19 +33,6 @@ class FocusSetter(Codelet):
         return cls(codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
     def run(self) -> CodeletResult:
-        self._set_focus_view()
-        self._engender_follow_up()
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
-        return self.result
-
-    def _set_focus_view(self):
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Current focus: {self.bubble_chamber.focus.view}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Focussedness: {self.bubble_chamber.focus.focussedness}"
-        )
         try:
             target_view = self.bubble_chamber.production_views.get(
                 key=exigency, exclude=[self.bubble_chamber.focus.view]
@@ -56,31 +43,38 @@ class FocusSetter(Codelet):
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Target view exigency: {target_view.exigency}"
             )
-        except MissingStructureError:
-            self.result = CodeletResult.FIZZLE
-            return
-        if (
-            self.bubble_chamber.focus.view is None
-            or self.bubble_chamber.focus.view.unhappiness == 0
-            or target_view.exigency > self.bubble_chamber.focus.focussedness
-        ):
             self.bubble_chamber.focus.view = target_view
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Set focus: {target_view}"
             )
+            self._engender_follow_up()
             self.result = CodeletResult.FINISH
-        else:
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Focus unchanged: {self.bubble_chamber.focus.view}"
-            )
+        except MissingStructureError:
             self.result = CodeletResult.FIZZLE
+            self._fizzle()
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
+        self.bubble_chamber.loggers["activity"].log_result(self)
+        return self.result
 
-    def _engender_follow_up(self):
+    def _fizzle(self):
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
+                1 - self.bubble_chamber.satisfaction,
+            )
+        )
+
+    def _engender_follow_up(self):
+        from homer.codelets import FocusUnsetter
+
+        self.child_codelets.append(
+            FocusUnsetter.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.coderack,
+                self.bubble_chamber.satisfaction,
                 self.follow_up_urgency(),
             )
         )
