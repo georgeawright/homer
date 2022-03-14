@@ -141,7 +141,11 @@ class BubbleChamber:
     @property
     def satisfaction(self):
         if self.focus.view is not None:
-            return self.focus.satisfaction
+            return max(self._satisfaction, self.focus.satisfaction)
+        return self._satisfaction
+
+    @property
+    def _satisfaction(self):
         spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
         if len(spaces) == 0:
             return 0

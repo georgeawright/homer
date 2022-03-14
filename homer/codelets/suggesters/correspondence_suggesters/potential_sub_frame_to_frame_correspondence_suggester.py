@@ -101,8 +101,12 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
             self.target_space_one = (
                 self.target_sub_view.parent_frame.input_space
-                if self.target_space_two == self.target_view.parent_frame.input_space
+                if self.target_sub_view.parent_frame.input_space.parent_concept
+                == self.target_space_two.parent_concept
                 else self.target_sub_view.parent_frame.output_space
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found target space one: {self.target_space_one}"
             )
             self._get_target_structure_one(self, self)
         except MissingStructureError:

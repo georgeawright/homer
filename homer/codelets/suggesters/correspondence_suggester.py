@@ -286,9 +286,10 @@ class CorrespondenceSuggester(Suggester):
                     for group in correspondence_suggester.target_view.node_groups
                     if correspondence_suggester.target_structure_two in group.values()
                 ][0]
-                calling_codelet.bubble_chamber.loggers["activity"].log(
+                calling_codelet.bubble_chamber.loggers["activity"].log_dict(
                     calling_codelet,
-                    f"Target structure two in node group: {node_group}",
+                    node_group,
+                    "Target structure two node group",
                 )
                 correspondence_suggester.target_structure_one = node_group[
                     correspondence_suggester.target_space_one

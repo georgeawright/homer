@@ -48,16 +48,36 @@ class FocusUnsetter(Codelet):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
         )
-        current_satisfaction_score = self.bubble_chamber.focus.satisfaction
+        current_satisfaction_score = self.bubble_chamber.satisfaction
         change_in_satisfaction_score = (
             current_satisfaction_score - self.last_satisfaction_score
         )
         transposed_change_in_satisfaction_score = (
             change_in_satisfaction_score * 0.5
         ) + 0.5
-        probability_of_unsetting_focus = statistics.fmean(
-            [current_satisfaction_score, 1 - transposed_change_in_satisfaction_score]
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            f"Current bubble chamber satisfaction: {self.bubble_chamber.satisfaction}",
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            f"Change in satisfaction: {change_in_satisfaction_score}",
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            f"Transposed change in satisfaction: {transposed_change_in_satisfaction_score}",
+        )
+        if self.bubble_chamber.focus.view.unhappiness == 0.0:
+            probability_of_unsetting_focus = 1
+        else:
+            probability_of_unsetting_focus = statistics.fmean(
+                # possibly consider adding 1-view.unhappiness
+                [
+                    current_satisfaction_score,
+                    transposed_change_in_satisfaction_score,
+                    1 - self.bubble_chamber.focus.view.unhappiness,
+                ]
+            )
         self.bubble_chamber.loggers["activity"].log(
             self, f"Probability of unsetting focus: {probability_of_unsetting_focus}"
         )
