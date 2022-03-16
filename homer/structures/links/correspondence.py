@@ -3,7 +3,6 @@ from typing import List
 
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
 from homer.location import Location
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
@@ -99,47 +98,6 @@ class Correspondence(Link):
         if self.start.is_label:
             return [(self.start.start, self.end.start)]
         return [(self.start.start, self.end.start), (self.start.end, self.end.end)]
-
-    def copy(self, **kwargs: dict) -> Correspondence:
-        """Requires keyword arguments 'start', 'end', and 'parent_id' OR 'new arg', 'old_arg', and 'parent_id'."""
-        bubble_chamber = kwargs["bubble_chamber"]
-        if "start" in kwargs:
-            start = kwargs["start"]
-        else:
-            start = (
-                kwargs["new_arg"]
-                if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.start
-                else self.start
-            )
-        if "end" in kwargs:
-            end = kwargs["end"]
-        else:
-            end = (
-                kwargs["new_arg"]
-                if kwargs["new_arg"] is not None and kwargs["old_arg"] == self.end
-                else self.end
-            )
-        parent_id = kwargs["parent_id"]
-        new_correspondence = Correspondence(
-            ID.new(Correspondence),
-            parent_id,
-            start,
-            end,
-            bubble_chamber.new_structure_collection(start, end),
-            [
-                start.location_in_space(start.parent_space).copy(),
-                end.location_in_space(end.parent_space).copy(),
-            ],
-            self.parent_concept,
-            self.conceptual_space,
-            self.parent_view,
-            self.quality,
-            bubble_chamber.new_structure_collection(),
-            bubble_chamber.new_structure_collection(),
-            bubble_chamber.new_structure_collection(),
-            is_privileged=self.is_privileged,
-        )
-        return new_correspondence
 
     def nearby(self):
         return StructureCollection.difference(

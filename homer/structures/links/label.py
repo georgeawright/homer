@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import List
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
 from homer.location import Location
 from homer.locations import TwoPointLocation
 from homer.structure import Structure
@@ -101,25 +100,14 @@ class Label(Link):
                 )
             )
         parent_id = kwargs["parent_id"] if "parent_id" in kwargs else ""
-        new_label = Label(
-            structure_id=ID.new(Label),
+        return bubble_chamber.new_label(
             parent_id=parent_id,
             start=start,
-            arguments=bubble_chamber.new_structure_collection(start),
             parent_concept=self.parent_concept,
             locations=new_locations,
             quality=self.quality,
             parent_space=parent_space,
-            links_in=bubble_chamber.new_structure_collection(),
-            links_out=bubble_chamber.new_structure_collection(),
-            parent_spaces=bubble_chamber.new_structure_collection(
-                *[location.space for location in new_locations]
-            ),
         )
-        start.links_out.add(new_label)
-        for space in new_label.parent_spaces:
-            space.add(new_label)
-        return new_label
 
     def nearby(self, space: Space = None) -> StructureCollection:
         return self.start.labels.filter(

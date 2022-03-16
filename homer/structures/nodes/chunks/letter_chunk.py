@@ -5,7 +5,6 @@ from typing import List, Union
 
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.id import ID
 from homer.location import Location
 from homer.structure_collection import StructureCollection
 from homer.structures import Space
@@ -170,34 +169,20 @@ class LetterChunk(Chunk):
             new_right_branch = bubble_chamber.new_structure_collection(
                 *[copies[member] for member in chunk.right_branch]
             )
-            chunk_copy = LetterChunk(
-                structure_id=ID.new(LetterChunk),
+            return bubble_chamber.new_letter_chunk(
                 parent_id=parent_id,
                 name=self.name,
                 locations=locations,
                 members=members,
                 parent_space=location.space,
-                quality=0.0,
                 left_branch=new_left_branch,
                 right_branch=new_right_branch,
                 rule=chunk.rule,
-                links_in=bubble_chamber.new_structure_collection(),
-                links_out=bubble_chamber.new_structure_collection(),
-                parent_spaces=bubble_chamber.new_structure_collection(
-                    *[location.space for location in locations]
-                ),
-                super_chunks=bubble_chamber.new_structure_collection(),
                 abstract_chunk=self
                 if self.abstract_chunk is None
                 else self.abstract_chunk,
+                quality=0.0,
             )
-            location.space.add(chunk_copy)
-            bubble_chamber.chunks.add(chunk_copy)
-            bubble_chamber.loggers["structure"].log(chunk_copy)
-            for member in chunk_copy.members:
-                member.super_chunks.add(chunk_copy)
-                bubble_chamber.loggers["structure"].log(member)
-            return chunk_copy
 
         return copy_recursively(self, location, bubble_chamber, parent_id, {})
 
@@ -229,29 +214,18 @@ class LetterChunk(Chunk):
         new_right_branch = bubble_chamber.new_structure_collection(
             *[copies[member] for member in self.right_branch]
         )
-        chunk_copy = LetterChunk(
-            structure_id=ID.new(LetterChunk),
+        chunk_copy = bubble_chamber.new_letter_chunk(
             parent_id=parent_id,
             name=self.name,
             locations=new_locations,
             members=new_members,
             parent_space=new_location.space,
-            quality=self.quality,
             left_branch=new_left_branch,
             right_branch=new_right_branch,
             rule=self.rule,
-            links_in=bubble_chamber.new_structure_collection(),
-            links_out=bubble_chamber.new_structure_collection(),
-            parent_spaces=bubble_chamber.new_structure_collection(
-                *[location.space for location in new_locations]
-            ),
-            super_chunks=bubble_chamber.new_structure_collection(),
             abstract_chunk=self if self.abstract_chunk is None else self.abstract_chunk,
+            quality=self.quality,
         )
-        bubble_chamber.loggers["structure"].log(chunk_copy)
-        for member in chunk_copy.members:
-            member.super_chunks.add(chunk_copy)
-            bubble_chamber.loggers["structure"].log(member)
         return (chunk_copy, copies)
 
     def __repr__(self) -> str:

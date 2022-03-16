@@ -87,18 +87,12 @@ class ContextualSpace(Space):
         bubble_chamber = kwargs["bubble_chamber"]
         parent_id = kwargs["parent_id"]
         copies = kwargs.get("copies", {})
-        new_space = ContextualSpace(
-            structure_id=ID.new(ContextualSpace),
+        new_space = bubble_chamber.new_contextual_space(
             parent_id=parent_id,
             name=self.name,
             parent_concept=self.parent_concept,
-            contents=bubble_chamber.new_structure_collection(),
             conceptual_spaces=self.conceptual_spaces.copy(),
-            links_in=bubble_chamber.new_structure_collection(),
-            links_out=bubble_chamber.new_structure_collection(),
-            parent_spaces=bubble_chamber.new_structure_collection(),
         )
-        bubble_chamber.loggers["structure"].log(new_space)
         for old_item, new_item in copies.items():
             if old_item.has_location_in_space(self):
                 old_location = old_item.location_in_space(self)

@@ -347,6 +347,7 @@ class BubbleChamber:
         )
         for member in members:
             member.super_chunks.add(chunk)
+            self.loggers["structure"].log(member)
         self.add(chunk)
         return chunk
 
@@ -393,6 +394,7 @@ class BubbleChamber:
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
+            self.loggers["structure"].log(member)
         self.add(letter_chunk)
         if meaning_concept is not None:
             self.new_relation(
