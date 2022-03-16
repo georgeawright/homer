@@ -1,5 +1,3 @@
-import statistics
-
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets import Factory
@@ -19,7 +17,6 @@ from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from homer.errors import MissingStructureError, NoLocationError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure import Structure
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import (
     activation,
     exigency,
@@ -284,7 +281,7 @@ class ViewDrivenFactory(Factory):
             lambda x: x.parent_frame.parent_concept == sub_frame.parent_concept
         ).is_empty():
             raise MissingStructureError
-        return PotentialSubFrameToFrameCorrespondenceSuggester.spawn(
+        follow_up = PotentialSubFrameToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
             {
@@ -295,6 +292,10 @@ class ViewDrivenFactory(Factory):
             },
             slot.uncorrespondedness,
         )
+        follow_up._get_target_conceptual_space(self, follow_up)
+        follow_up._get_target_space_one(self, follow_up)
+        follow_up._get_target_structure_one(self, follow_up)
+        return follow_up
 
     def _spawn_simplex_view_suggester(self, view: View, slot: Structure):
         sub_frame = view.parent_frame.sub_frames.filter(

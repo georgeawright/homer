@@ -67,50 +67,18 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         return cls.make(parent_id, bubble_chamber, urgency)
 
     def _passes_preliminary_checks(self):
-        self._get_target_conceptual_space(self, self)
-        try:
-            views_with_correct_frame = self.bubble_chamber.production_views.filter(
-                lambda x: x.parent_frame.parent_concept == self.sub_frame.parent_concept
-            )
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, views_with_correct_frame, "Views with correct frame"
-            )
-            views_with_correct_conceptual_space = views_with_correct_frame.filter(
-                lambda x: (
-                    self.target_conceptual_space
-                    in x.parent_frame.input_space.conceptual_spaces
-                    if self.target_space_two
-                    == self.target_view.parent_frame.input_space
-                    else self.target_conceptual_space
-                    in x.parent_frame.output_space.conceptual_spaces
+        if self.target_conceptual_space is None:
+            self._get_target_conceptual_space(self, self)
+        if self.target_space_one is None:
+            try:
+                PotentialSubFrameToFrameCorrespondenceSuggester._get_target_space_one(
+                    self, self
                 )
-                or self.target_conceptual_space is None
-            )
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, views_with_correct_conceptual_space, "Views with correct space"
-            )
-            views_that_are_complete = views_with_correct_conceptual_space.filter(
-                lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
-            )
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, views_that_are_complete, "Views that are complete"
-            )
-            self.target_sub_view = views_that_are_complete.get(key=activation)
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target sub view: {self.target_sub_view}"
-            )
-            self.target_space_one = (
-                self.target_sub_view.parent_frame.input_space
-                if self.target_sub_view.parent_frame.input_space.parent_concept
-                == self.target_space_two.parent_concept
-                else self.target_sub_view.parent_frame.output_space
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target space one: {self.target_space_one}"
-            )
-            self._get_target_structure_one(self, self)
-        except MissingStructureError:
-            return False
+                PotentialSubFrameToFrameCorrespondenceSuggester._get_target_structure_one(
+                    self, self
+                )
+            except MissingStructureError:
+                return False
         self.parent_concept = self.bubble_chamber.concepts["same"]
         return self.target_view.can_accept_member(
             self.parent_concept,
@@ -130,3 +98,53 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
         except MissingStructureError:
             pass
+
+    @staticmethod
+    def _get_target_space_one(calling_codelet, correspondence_suggester):
+        bubble_chamber = correspondence_suggester.bubble_chamber
+        views_with_correct_frame = bubble_chamber.production_views.filter(
+            lambda x: x.parent_frame.parent_concept
+            == correspondence_suggester.sub_frame.parent_concept
+        )
+        bubble_chamber.loggers["activity"].log_collection(
+            calling_codelet, views_with_correct_frame, "Views with correct frame"
+        )
+        views_with_correct_conceptual_space = views_with_correct_frame.filter(
+            lambda x: (
+                correspondence_suggester.target_conceptual_space
+                in x.parent_frame.input_space.conceptual_spaces
+                if correspondence_suggester.target_space_two
+                == correspondence_suggester.target_view.parent_frame.input_space
+                else correspondence_suggester.target_conceptual_space
+                in x.parent_frame.output_space.conceptual_spaces
+            )
+            or correspondence_suggester.target_conceptual_space is None
+        )
+        bubble_chamber.loggers["activity"].log_collection(
+            calling_codelet,
+            views_with_correct_conceptual_space,
+            "Views with correct space",
+        )
+        views_that_are_complete = views_with_correct_conceptual_space.filter(
+            lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
+        )
+        bubble_chamber.loggers["activity"].log_collection(
+            calling_codelet, views_that_are_complete, "Views that are complete"
+        )
+        correspondence_suggester.target_sub_view = views_that_are_complete.get(
+            key=activation
+        )
+        bubble_chamber.loggers["activity"].log(
+            calling_codelet,
+            f"Found target sub view: {correspondence_suggester.target_sub_view}",
+        )
+        correspondence_suggester.target_space_one = (
+            correspondence_suggester.target_sub_view.parent_frame.input_space
+            if correspondence_suggester.target_sub_view.parent_frame.input_space.parent_concept
+            == correspondence_suggester.target_space_two.parent_concept
+            else correspondence_suggester.target_sub_view.parent_frame.output_space
+        )
+        bubble_chamber.loggers["activity"].log(
+            calling_codelet,
+            f"Found target space one: {correspondence_suggester.target_space_one}",
+        )
