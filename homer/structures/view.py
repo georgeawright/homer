@@ -24,6 +24,7 @@ class View(Structure):
         input_spaces: StructureCollection,
         output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
+        prioritized_targets: StructureCollection,
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
@@ -44,6 +45,7 @@ class View(Structure):
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members
+        self.prioritized_targets = prioritized_targets
         self.node_groups = []
         self.grouped_nodes = {}
         self.matched_sub_frames = {}

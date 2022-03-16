@@ -1,10 +1,32 @@
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
 from homer.errors import MissingStructureError
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection_keys import activation
 
 
+# TODO: add contextual space targets for correspondence to prioritize
 class SimplexViewSuggester(ViewSuggester):
+    def __init__(
+        self,
+        codelet_id: str,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_structures: dict,
+        urgency: FloatBetweenOneAndZero,
+    ):
+        ViewSuggester.__init__(
+            self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
+        )
+        self.frame = target_structures.get("frame")
+        self.contextual_space = target_structures.get("contextual_space")
+        self.prioritized_conceptual_spaces = target_structures.get(
+            "prioritized_conceptual_spaces", bubble_chamber.new_structure_collection()
+        )
+        self.prioritized_targets = target_structures.get(
+            "prioritized_targets", bubble_chamber.new_structure_collection()
+        )
+
     @classmethod
     def get_follow_up_class(cls) -> type:
         from homer.codelets.builders.view_builders import SimplexViewBuilder
@@ -37,6 +59,16 @@ class SimplexViewSuggester(ViewSuggester):
         return self.bubble_chamber.concepts["view-simplex"]
 
     @property
+    def targets_dict(self):
+        return {
+            "frame": self.frame,
+            "contextual_space": self.contextual_space,
+            "conceptual_spaces_map": self.conceptual_spaces_map,
+            "prioritized_targets": self.prioritized_targets,
+            "prioritized_conceptual_spaces": self.prioritized_conceptual_spaces,
+        }
+
+    @property
     def target_structures(self):
         return self.bubble_chamber.new_structure_collection(
             self.frame, self.contextual_space
@@ -67,19 +99,29 @@ class SimplexViewSuggester(ViewSuggester):
                 try:
                     self.conceptual_spaces_map[
                         conceptual_space
-                    ] = self.contextual_space.conceptual_spaces.filter(
+                    ] = self.prioritized_conceptual_spaces.filter(
                         lambda x: x not in self.conceptual_spaces_map.values()
                         and conceptual_space.subsumes(x)
                     ).get(
                         key=activation
                     )
                 except MissingStructureError:
-                    self.bubble_chamber.loggers["activity"].log_dict(
-                        self, self.conceptual_spaces_map, "Conceptual Space Map"
-                    )
-                    self.bubble_chamber.loggers["activity"].log(
-                        self,
-                        f"Unable to find space subsumed by {conceptual_space.structure_id}",
-                    )
-                    return False
+                    try:
+                        self.conceptual_spaces_map[
+                            conceptual_space
+                        ] = self.contextual_space.conceptual_spaces.filter(
+                            lambda x: x not in self.conceptual_spaces_map.values()
+                            and conceptual_space.subsumes(x)
+                        ).get(
+                            key=activation
+                        )
+                    except MissingStructureError:
+                        self.bubble_chamber.loggers["activity"].log_dict(
+                            self, self.conceptual_spaces_map, "Conceptual Space Map"
+                        )
+                        self.bubble_chamber.loggers["activity"].log(
+                            self,
+                            f"Unable to find space subsumed by {conceptual_space.structure_id}",
+                        )
+                        return False
         return True

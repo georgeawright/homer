@@ -19,6 +19,7 @@ from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from homer.errors import MissingStructureError, NoLocationError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure import Structure
+from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import (
     activation,
     exigency,
@@ -304,9 +305,23 @@ class ViewDrivenFactory(Factory):
         frame = self.bubble_chamber.frames.where(
             is_sub_frame=False, parent_concept=sub_frame.parent_concept
         ).get(key=activation)
+        prioritized_targets = self.bubble_chamber.new_structure_collection(
+            *[
+                correspondence.start
+                for correspondence in sub_frame.input_space.contents.where(
+                    is_correspondence=True
+                )
+            ]
+        )
+        prioritized_conceptual_spaces = sub_frame.input_space.conceptual_spaces
         return SimplexViewSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
-            {"frame": frame, "contextual_space": contextual_space},
+            {
+                "frame": frame,
+                "contextual_space": contextual_space,
+                "prioritized_targets": prioritized_targets,
+                "prioritized_conceptual_spaces": prioritized_conceptual_spaces,
+            },
             slot.uncorrespondedness,
         )

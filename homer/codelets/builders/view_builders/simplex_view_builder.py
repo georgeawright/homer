@@ -1,4 +1,6 @@
+from homer.bubble_chamber import BubbleChamber
 from homer.codelets.builders import ViewBuilder
+from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.location import Location
 from homer.structures.spaces import ContextualSpace
@@ -6,6 +8,22 @@ from homer.structures.views import SimplexView
 
 
 class SimplexViewBuilder(ViewBuilder):
+    def __init__(
+        self,
+        codelet_id: str,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        target_structures: dict,
+        urgency: FloatBetweenOneAndZero,
+    ):
+        ViewBuilder.__init__(
+            self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
+        )
+        self.frame = target_structures.get("frame")
+        self.contextual_space = target_structures.get("contextual_space")
+        self.conceptual_spaces_map = target_structures.get("conceptual_spaces_map")
+        self.prioritized_targets = target_structures.get("prioritized_targets")
+
     @classmethod
     def get_follow_up_class(cls) -> type:
         from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
@@ -15,6 +33,14 @@ class SimplexViewBuilder(ViewBuilder):
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["view-simplex"]
+
+    @property
+    def targets_dict(self):
+        return {
+            "frame": self.frame,
+            "contextual_space": self.contextual_space,
+            "prioritized_targets": self.prioritized_targets,
+        }
 
     def _process_structure(self):
         view_id = ID.new(SimplexView)
@@ -53,6 +79,7 @@ class SimplexViewBuilder(ViewBuilder):
             ),
             output_space=view_output,
             quality=0,
+            prioritized_targets=self.prioritized_targets,
             links_in=self.bubble_chamber.new_structure_collection(),
             links_out=self.bubble_chamber.new_structure_collection(),
             parent_spaces=self.bubble_chamber.new_structure_collection(),
