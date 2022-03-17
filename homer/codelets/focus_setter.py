@@ -47,6 +47,7 @@ class FocusSetter(Codelet):
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Set focus: {target_view}"
             )
+            target_view._activation = 1.0
             self._update_codelet_urgencies()
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
