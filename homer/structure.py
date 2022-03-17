@@ -406,6 +406,9 @@ class Structure(ABC):
             self.parent_frame.boost_activation(self.activation)
         except AttributeError:
             pass
+        if self.is_view:
+            for member in self.members:
+                member.boost_activation(self.activation)
         for link in self.links.where(is_label=False):
             if link.start != self and link.is_bidirectional:
                 link.start.boost_activation(link.activation)
