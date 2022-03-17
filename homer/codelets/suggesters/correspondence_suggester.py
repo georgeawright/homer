@@ -308,7 +308,7 @@ class CorrespondenceSuggester(Suggester):
                     source_collection.filter(
                         lambda x: type(x)
                         == type(correspondence_suggester.target_structure_two)
-                        and not x.is_slot
+                        and (not x.is_slot or not x.correspondences.is_empty())
                         and (
                             x.has_location_in_space(
                                 correspondence_suggester.target_conceptual_space
