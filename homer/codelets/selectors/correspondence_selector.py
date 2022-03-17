@@ -52,11 +52,11 @@ class CorrespondenceSelector(Selector):
             parent_concept = winner_correspondence.parent_concept.friends().get()
         except MissingStructureError:
             return
-        follow_up_class = SubFrameToFrameCorrespondenceSuggester
-        for input_space in target_view.input_spaces:
-            if winner_correspondence.start in input_space.contents:
-                follow_up_class = SpaceToFrameCorrespondenceSuggester
-                break
+        follow_up_class = (
+            SpaceToFrameCorrespondenceSuggester
+            if target_space_two == target_view.parent_frame.input_space
+            else SubFrameToFrameCorrespondenceSuggester
+        )
         self.child_codelets.append(
             follow_up_class.spawn(
                 self.codelet_id,

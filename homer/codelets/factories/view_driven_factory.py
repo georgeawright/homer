@@ -308,10 +308,10 @@ class ViewDrivenFactory(Factory):
         ).get(key=activation)
         prioritized_targets = self.bubble_chamber.new_structure_collection(
             *[
-                correspondence.start
-                for correspondence in sub_frame.input_space.contents.where(
-                    is_correspondence=True
-                )
+                group[contextual_space]
+                for node in sub_frame.input_space.contents
+                for group in view.node_groups
+                if node in group.values()
             ]
         )
         prioritized_conceptual_spaces = sub_frame.input_space.conceptual_spaces
