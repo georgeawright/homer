@@ -47,6 +47,7 @@ class FocusSetter(Codelet):
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Set focus: {target_view}"
             )
+            self._update_codelet_urgencies()
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
         except MissingStructureError:
@@ -55,6 +56,12 @@ class FocusSetter(Codelet):
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
+
+    def _update_codelet_urgencies(self):
+        for codelet in self.coderack._codelets:
+            if "ViewDrivenFactory" in codelet.codelet_id:
+                codelet.urgency = 1.0
+                break
 
     def _fizzle(self):
         self.child_codelets.append(

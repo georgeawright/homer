@@ -175,13 +175,27 @@ class CorrespondenceSuggester(Suggester):
 
     @staticmethod
     def _get_target_structure_one(calling_codelet, correspondence_suggester):
+        bubble_chamber = calling_codelet.bubble_chamber
+        bubble_chamber.loggers["activity"].log_collection(
+            calling_codelet,
+            correspondence_suggester.target_view.prioritized_targets,
+            "prioritized targets",
+        )
         try:
+            bubble_chamber.loggers["activity"].log(
+                calling_codelet,
+                f"Attempting to find target structure one from priortitized targets",
+            )
             CorrespondenceSuggester._get_target_structure_one_from_collection(
                 calling_codelet,
                 correspondence_suggester,
                 correspondence_suggester.target_view.prioritized_targets,
             )
         except MissingStructureError:
+            bubble_chamber.loggers["activity"].log(
+                calling_codelet,
+                f"Attempting to find target structure one from target space one",
+            )
             CorrespondenceSuggester._get_target_structure_one_from_collection(
                 calling_codelet,
                 correspondence_suggester,

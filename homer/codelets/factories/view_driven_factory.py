@@ -252,7 +252,14 @@ class ViewDrivenFactory(Factory):
             if slot in view.parent_frame.input_space.contents
             else view.parent_frame.output_space
         )
-        if target_space_two not in view.matched_sub_frames.keys():
+        sub_frame = view.parent_frame.sub_frames.filter(
+            lambda x: x.input_space == slot.parent_space
+            or x.output_space == slot.parent_space
+        ).get()
+        self.bubble_chamber.loggers["activity"].log_dict(
+            self, view.matched_sub_frames, "view matched sub frames"
+        )
+        if sub_frame not in view.matched_sub_frames:
             raise MissingStructureError
         return SubFrameToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,

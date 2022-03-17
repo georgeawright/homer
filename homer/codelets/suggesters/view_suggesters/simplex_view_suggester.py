@@ -1,3 +1,5 @@
+import statistics
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
 from homer.errors import MissingStructureError
@@ -125,3 +127,23 @@ class SimplexViewSuggester(ViewSuggester):
                         )
                         return False
         return True
+
+    def _calculate_confidence(self):
+        equivalent_views = self.bubble_chamber.views.filter(
+            lambda x: x.input_spaces
+            == self.bubble_chamber.new_structure_collection(self.contextual_space)
+            and x.parent_frame in self.frame.instances
+            or x.parent_frame == self.frame
+            and x.prioritized_targets == self.prioritized_targets
+            and x.members.is_empty()
+        )
+        if not equivalent_views.is_empty():
+            self.confidence = 0
+        else:
+            self.confidence = statistics.fmean(
+                [
+                    (1 - self.bubble_chamber.focus.focussedness),
+                    self.frame.activation,
+                    self.contextual_space.activation,
+                ]
+            )
