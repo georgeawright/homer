@@ -158,7 +158,7 @@ class Chunk(Node):
                     and location.space.is_basic_level
                 ]
             )
-            # .filter(lambda x: x in self.parent_space.contents)
+            .filter(lambda x: x in self.parent_space.contents)
             .excluding(self)
         )
 
