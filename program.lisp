@@ -1205,6 +1205,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_spaces (StructureCollection grammar-space)))
 (define and-sentence
   (def-frame :name "s-and" :parent_concept sentence-concept :parent_frame None
+    :depth 8
     :sub_frames (StructureCollection and-sub-frame-1 and-sub-frame-2)
     :concepts (StructureCollection)
     :input_space and-sentence-input
@@ -1394,6 +1395,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_spaces (StructureCollection grammar-space conceptual-space-1)))
 (define but-sentence
   (def-frame :name "s-but" :parent_concept sentence-concept :parent_frame None
+    :depth 8
     :sub_frames (StructureCollection but-sub-frame-1 but-sub-frame-2)
     :concepts (StructureCollection)
     :input_space but-sentence-input

@@ -261,6 +261,7 @@ class BubbleChamber:
         output_space: ContextualSpace,
         parent_id: str = "",
         is_sub_frame: bool = False,
+        depth: int = None,
     ) -> Frame:
         frame = Frame(
             structure_id=ID.new(Frame),
@@ -277,6 +278,7 @@ class BubbleChamber:
             parent_spaces=self.new_structure_collection(),
             instances=self.new_structure_collection(),
             is_sub_frame=is_sub_frame,
+            depth=depth,
         )
         if parent_frame is not None:
             parent_frame.instances.add(frame)

@@ -83,9 +83,17 @@ class Node(Structure):
         if not self.is_fully_active():
             return
         for link in self.links_out.where(is_label=False):
-            link.end.boost_activation(link.activation)
+            link.end.boost_activation(
+                link.parent_concept.activation
+                if link.parent_concept is not None
+                else None
+            )
         for link in self.links_in.where(is_bidirectional=True):
-            link.start.boost_activation(link.activation)
+            link.start.boost_activation(
+                link.parent_concept.activation
+                if link.parent_concept is not None
+                else None
+            )
 
     def __repr__(self) -> str:
         if self.parent_space is None:

@@ -30,6 +30,7 @@ class Frame(Structure):
         parent_spaces: StructureCollection,
         instances: StructureCollection,
         is_sub_frame: bool = False,
+        depth: int = None,
     ):
         quality = 1
         Structure.__init__(
@@ -51,6 +52,7 @@ class Frame(Structure):
         self.output_space = output_space
         self.slot_values = {}
         self.instances = instances
+        self._depth = depth
         self.is_sub_frame = is_sub_frame
         self.is_frame = True
 
@@ -59,7 +61,7 @@ class Frame(Structure):
 
     @property
     def depth(self) -> FloatBetweenOneAndZero:
-        return self.parent_concept.depth
+        return self._depth if self._depth is not None else self.parent_concept.depth
 
     @property
     def slots(self) -> StructureCollection:

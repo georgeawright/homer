@@ -264,14 +264,22 @@ class Chunk(Node):
             return
         if self.rule is not None:
             self.rule.boost_activation(self.activation)
-        if self.parent_space.is_contextual_space:
+        if self.parent_space is not None and self.parent_space.is_contextual_space:
             for link in self.links:
                 link.boost_activation(self.quality)
         else:
             for link in self.links_out.where(is_label=False):
-                link.end.boost_activation(link.activation)
+                link.end.boost_activation(
+                    link.parent_concept.activation
+                    if link.parent_concept is not None
+                    else None
+                )
             for link in self.links_in.where(is_bidirectional=True):
-                link.start.boost_activation(link.activation)
+                link.start.boost_activation(
+                    link.parent_concept.activation
+                    if link.parent_concept is not None
+                    else None
+                )
 
     def __repr__(self) -> str:
         members = "{" + ",".join([member.structure_id for member in self.members]) + "}"
