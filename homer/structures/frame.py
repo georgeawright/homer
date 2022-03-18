@@ -214,5 +214,17 @@ class Frame(Structure):
             is_sub_frame=self.is_sub_frame,
         )
 
+    def spread_activation(self):
+        if not self.is_fully_active():
+            return
+        for link in self.links_out.where(is_label=False):
+            link.end.boost_activation(link.activation)
+        for link in self.links_in.where(is_bidirectional=True):
+            link.start.boost_activation(link.activation)
+        for instance in self.instances:
+            instance.boost_activation()
+        if self.parent_frame is not None:
+            self.parent_frame.boost_activation()
+
     def __repr__(self) -> str:
         return f"<{self.structure_id} {self.name}>"

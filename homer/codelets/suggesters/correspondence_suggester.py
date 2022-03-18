@@ -229,13 +229,24 @@ class CorrespondenceSuggester(Suggester):
                     if correspondence_suggester.target_structure_two.start
                     in group.values()
                 ][0]
-                structure_one_start = start_node_group[
-                    correspondence_suggester.target_space_one
-                ]
-                calling_codelet.bubble_chamber.loggers["activity"].log(
-                    calling_codelet, f"Found structure one start: {structure_one_start}"
-                )
+                try:
+                    structure_one_start = start_node_group[
+                        correspondence_suggester.target_space_one
+                    ]
+                    calling_codelet.bubble_chamber.loggers["activity"].log(
+                        calling_codelet,
+                        f"Found structure one start: {structure_one_start}",
+                    )
+                except KeyError:
+                    calling_codelet.bubble_chamber.loggers["activity"].log(
+                        calling_codelet,
+                        f"Start node group has no member in target space one",
+                    )
+                    structure_one_start = None
             else:
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet, f"Structure two end not in grouped nodes"
+                )
                 structure_one_start = None
         if correspondence_suggester.target_structure_two.is_label:
             correspondence_suggester.target_structure_one = source_collection.filter(
@@ -256,12 +267,19 @@ class CorrespondenceSuggester(Suggester):
                     if correspondence_suggester.target_structure_two.end
                     in group.values()
                 ][0]
-                structure_one_end = end_node_group[
-                    correspondence_suggester.target_space_one
-                ]
-                calling_codelet.bubble_chamber.loggers["activity"].log(
-                    calling_codelet, f"Found structure one end: {structure_one_end}"
-                )
+                try:
+                    structure_one_end = end_node_group[
+                        correspondence_suggester.target_space_one
+                    ]
+                    calling_codelet.bubble_chamber.loggers["activity"].log(
+                        calling_codelet, f"Found structure one end: {structure_one_end}"
+                    )
+                except KeyError:
+                    calling_codelet.bubble_chamber.loggers["activity"].log(
+                        calling_codelet,
+                        f"End node group has no member in target space one",
+                    )
+                    structure_one_end = None
             else:
                 calling_codelet.bubble_chamber.loggers["activity"].log(
                     calling_codelet, f"Structure two end not in grouped nodes"

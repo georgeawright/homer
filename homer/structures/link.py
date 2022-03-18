@@ -60,7 +60,11 @@ class Link(Structure):
 
     def spread_activation(self):
         if self.parent_concept is not None:
-            self.parent_concept.boost_activation(self.activation)
+            self.parent_concept.boost_activation(self.quality)
+        for argument in self.arguments.filter(
+            lambda x: x.parent_space is not None and x.parent_space.is_contextual_space
+        ):
+            argument.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name

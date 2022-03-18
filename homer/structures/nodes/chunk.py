@@ -259,6 +259,20 @@ class Chunk(Node):
         )
         return (chunk_copy, copies)
 
+    def spread_activation(self):
+        if not self.is_fully_active():
+            return
+        if self.rule is not None:
+            self.rule.boost_activation(self.activation)
+        if self.parent_space.is_contextual_space:
+            for link in self.links:
+                link.boost_activation(self.quality)
+        else:
+            for link in self.links_out.where(is_label=False):
+                link.end.boost_activation(link.activation)
+            for link in self.links_in.where(is_bidirectional=True):
+                link.start.boost_activation(link.activation)
+
     def __repr__(self) -> str:
         members = "{" + ",".join([member.structure_id for member in self.members]) + "}"
         if self.parent_space is None:

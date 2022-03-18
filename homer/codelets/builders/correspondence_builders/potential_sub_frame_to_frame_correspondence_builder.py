@@ -3,6 +3,17 @@ from homer.structure_collection import StructureCollection
 
 
 class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
+    def _passes_preliminary_checks(self):
+        return (
+            self.target_view.can_accept_member(
+                self.parent_concept,
+                self.target_conceptual_space,
+                self.target_structure_one,
+                self.target_structure_two,
+            )
+            and self.sub_frame not in self.target_view.matched_sub_frames
+        )
+
     def _process_structure(self):
         self.child_structures = self.bubble_chamber.new_structure_collection()
         self.target_view.frames = StructureCollection.union(

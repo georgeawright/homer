@@ -388,32 +388,7 @@ class Structure(ABC):
         )
 
     def spread_activation(self):
-        if not self.is_fully_active():
-            return
-        try:
-            self.parent_concept.boost_activation(self.activation)
-        except AttributeError:
-            pass
-        try:
-            self.rule.boost_activation(self.activation)
-        except AttributeError:
-            pass
-        try:
-            self.parent_view.boost_activation(self.activation)
-        except AttributeError:
-            pass
-        try:
-            self.parent_frame.boost_activation(self.activation)
-        except AttributeError:
-            pass
-        if self.is_view:
-            for member in self.members:
-                member.boost_activation(self.activation)
-        for link in self.links.where(is_label=False):
-            if link.start != self and link.is_bidirectional:
-                link.start.boost_activation(link.activation)
-            else:
-                link.end.boost_activation(link.activation)
+        raise NotImplementedError
 
     def update_activation(self):
         if self._activation_buffer == 0.0:

@@ -43,5 +43,8 @@ class Space(Structure):
     def proximity_between(self, a: Structure, b: Structure):
         return self.parent_concept.proximity_between(a, b, space=self)
 
+    def spread_activation(self):
+        pass
+
     def __repr__(self) -> str:
         return f"<{self.structure_id} {self.name}>"

@@ -212,6 +212,14 @@ class View(Structure):
                         return False
         return True
 
+    def spread_activation(self):
+        if not self.is_fully_active():
+            return
+        for member in self.members:
+            member.boost_activation(self.quality)
+        for frame in self.frames:
+            frame.boost_activation(self.quality)
+
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])
         return (

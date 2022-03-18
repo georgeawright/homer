@@ -79,6 +79,14 @@ class Node(Structure):
     ) -> Node:
         raise NotImplementedError
 
+    def spread_activation(self):
+        if not self.is_fully_active():
+            return
+        for link in self.links_out.where(is_label=False):
+            link.end.boost_activation(link.activation)
+        for link in self.links_in.where(is_bidirectional=True):
+            link.start.boost_activation(link.activation)
+
     def __repr__(self) -> str:
         if self.parent_space is None:
             return f"<{self.structure_id}>"
