@@ -130,12 +130,21 @@ class SimplexViewSuggester(ViewSuggester):
 
     def _calculate_confidence(self):
         equivalent_views = self.bubble_chamber.views.filter(
-            lambda x: x.input_spaces
-            == self.bubble_chamber.new_structure_collection(self.contextual_space)
-            and x.parent_frame in self.frame.instances
-            or x.parent_frame == self.frame
-            and x.prioritized_targets == self.prioritized_targets
-            and x.members.is_empty()
+            lambda x: all(
+                [
+                    x.input_spaces
+                    == self.bubble_chamber.new_structure_collection(
+                        self.contextual_space
+                    ),
+                    x.parent_frame in self.frame.instances
+                    or x.parent_frame == self.frame,
+                    x.prioritized_targets == self.prioritized_targets,
+                    x.members.is_empty(),
+                ]
+            )
+        )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, equivalent_views, "Equivalent views"
         )
         if not equivalent_views.is_empty():
             self.confidence = 0
