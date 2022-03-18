@@ -118,6 +118,7 @@ class Coderack:
                 self.bubble_chamber.focus.satisfaction
             )
         self.recently_run.add(type(codelet))
+        self.codelets_run += 1
         self.loggers["activity"].log(
             codelet,
             f"Time: {self.codelets_run} | "
@@ -125,7 +126,6 @@ class Coderack:
             + f"Coderack Population Size: {self.population_size}\n"
             + f"Focus: {self.bubble_chamber.focus.view}",
         )
-        self.codelets_run += 1
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)
 
