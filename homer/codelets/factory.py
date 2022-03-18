@@ -5,6 +5,7 @@ from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structures.nodes import Concept
+from homer.tools import hasinstance
 
 # TODO: also need to implement instances based on bubble chamber structures
 # definitely: unhappiness and exigency
@@ -44,14 +45,15 @@ class Factory(Codelet):
             self.result = CodeletResult.FINISH
         except MissingStructureError:
             self.result = CodeletResult.FIZZLE
-        self.child_codelets.append(
-            self.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.coderack,
-                self.follow_up_urgency(),
+        if not hasinstance(self.child_codelets, Factory):
+            self.child_codelets.append(
+                self.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    self.coderack,
+                    self.follow_up_urgency(),
+                )
             )
-        )
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
