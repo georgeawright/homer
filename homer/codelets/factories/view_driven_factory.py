@@ -380,6 +380,9 @@ class ViewDrivenFactory(Factory):
             conceptual_space = self.target_slot.parent_concept.parent_space
         elif self.target_slot.is_relation:
             conceptual_space = self.target_slot.conceptual_space
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Conceptual space: {conceptual_space}"
+        )
         views_with_correct_conceptual_space = (
             views_with_correct_prioritized_targets.filter(
                 lambda x: (
