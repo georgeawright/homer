@@ -200,17 +200,18 @@ class View(Structure):
         )
         for existing_node_group in self.node_groups:
             for potential_group in potential_node_groups:
-                if all(
-                    node in existing_node_group.values()
-                    for node in potential_group.values()
-                ):
-                    return True
-                if all(space in existing_node_group for space in potential_group):
-                    if any(
+                if (
+                    all(space in existing_node_group for space in potential_group)
+                    and not all(
                         node in existing_node_group.values()
                         for node in potential_group.values()
-                    ):
-                        return False
+                    )
+                    and any(
+                        node in existing_node_group.values()
+                        for node in potential_group.values()
+                    )
+                ):
+                    return False
         return True
 
     def spread_activation(self):

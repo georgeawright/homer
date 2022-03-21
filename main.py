@@ -11,10 +11,10 @@ os.mkdir(logs_dir_path)
 structure_logs_dir_path = f"{logs_dir_path}/structures"
 os.mkdir(structure_logs_dir_path)
 
-activity_stream = open(f"{logs_dir_path}/activity.log", "w")
+log_file_name = f"{logs_dir_path}/activity"
 satisfaction_stream = open(f"{logs_dir_path}/satisfaction.csv", "w")
 loggers = {
-    "activity": ActivityLogger(activity_stream, satisfaction_stream),
+    "activity": ActivityLogger(log_file_name, satisfaction_stream),
     "structure": StructureLogger(f"{structure_logs_dir_path}"),
     "errors": Mock(),
 }
@@ -23,5 +23,3 @@ narrator = Homer.setup(loggers, random_seed=1)
 with open("program.lisp", "r") as f:
     program = f.read()
     narrator.run_program(program)
-
-activity_stream.close()

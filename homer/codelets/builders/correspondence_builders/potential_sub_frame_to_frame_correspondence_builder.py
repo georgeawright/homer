@@ -4,14 +4,31 @@ from homer.structure_collection import StructureCollection
 
 class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
-        return (
-            self.target_view.can_accept_member(
-                self.parent_concept,
-                self.target_conceptual_space,
-                self.target_structure_one,
-                self.target_structure_two,
+        for correspondence in self.target_sub_view.members:
+            if not self.target_view.can_accept_member(
+                correspondence.parent_concept,
+                correspondence.conceptual_space,
+                correspondence.start,
+                correspondence.end,
+            ):
+                return False
+        target_structure_zero = (
+            self.target_structure_one.correspondences.filter(
+                lambda x: x.start.parent_space in self.target_view.input_spaces
             )
-            and self.sub_frame not in self.target_view.matched_sub_frames
+            .get()
+            .start
+        )
+        return self.target_view.can_accept_member(
+            self.parent_concept,
+            self.target_conceptual_space,
+            self.target_structure_one,
+            self.target_structure_two,
+        ) and self.target_view.can_accept_member(
+            self.parent_concept,
+            self.target_conceptual_space,
+            target_structure_zero,
+            self.target_structure_two,
         )
 
     def _process_structure(self):

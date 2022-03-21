@@ -145,8 +145,11 @@ class LabelSuggester(Suggester):
 
     def _calculate_confidence(self):
         try:
-            self.confidence = self.parent_concept.classifier.classify(
-                concept=self.parent_concept, start=self.target_node
+            self.confidence = (
+                self.parent_concept.classifier.classify(
+                    concept=self.parent_concept, start=self.target_node
+                )
+                * self.target_node.quality
             )
         except NoLocationError:
             for space in self.target_node.parent_spaces:

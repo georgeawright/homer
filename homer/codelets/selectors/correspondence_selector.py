@@ -30,6 +30,7 @@ class CorrespondenceSelector(Selector):
 
     def _engender_follow_up(self):
         from homer.codelets.suggesters.correspondence_suggesters import (
+            PotentialSubFrameToFrameCorrespondenceSuggester,
             SpaceToFrameCorrespondenceSuggester,
             SubFrameToFrameCorrespondenceSuggester,
         )
@@ -56,7 +57,14 @@ class CorrespondenceSelector(Selector):
             SpaceToFrameCorrespondenceSuggester
             if target_space_two == target_view.parent_frame.input_space
             else SubFrameToFrameCorrespondenceSuggester
+            if target_space_two in target_view.node_groups
+            else PotentialSubFrameToFrameCorrespondenceSuggester
         )
+        sub_frame = None
+        if follow_up_class == PotentialSubFrameToFrameCorrespondenceSuggester:
+            sub_frame = target_view.parent_frame.sub_frames.filter(
+                lambda x: target_space_two in (x.input_space, x.output_space)
+            ).get()
         self.child_codelets.append(
             follow_up_class.spawn(
                 self.codelet_id,
@@ -66,6 +74,7 @@ class CorrespondenceSelector(Selector):
                     "target_space_two": target_space_two,
                     "target_structure_two": target_structure_two,
                     "parent_concept": parent_concept,
+                    "sub_frame": sub_frame,
                 },
                 target_view.exigency,
             )

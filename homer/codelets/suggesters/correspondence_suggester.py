@@ -354,9 +354,24 @@ class CorrespondenceSuggester(Suggester):
                     node_group,
                     "Target structure two node group",
                 )
-                correspondence_suggester.target_structure_one = node_group[
-                    correspondence_suggester.target_space_one
-                ]
+                if correspondence_suggester.target_space_one in node_group:
+                    correspondence_suggester.target_structure_one = node_group[
+                        correspondence_suggester.target_space_one
+                    ]
+                else:
+                    for (
+                        input_space
+                    ) in correspondence_suggester.target_view.input_spaces:
+                        if input_space in node_group:
+                            target_structure_zero = node_group[input_space]
+                            break
+                    correspondence_suggester.target_structure_one = (
+                        target_structure_zero.correspondences_to_space(
+                            correspondence_suggester.target_space_one
+                        )
+                        .get()
+                        .end
+                    )
             else:
                 calling_codelet.bubble_chamber.loggers["activity"].log(
                     calling_codelet, "Target structure two not in node group"

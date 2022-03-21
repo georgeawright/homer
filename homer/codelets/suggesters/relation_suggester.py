@@ -162,11 +162,14 @@ class RelationSuggester(Suggester):
         ).is_empty()
 
     def _calculate_confidence(self):
-        self.confidence = self.parent_concept.classifier.classify(
-            concept=self.parent_concept,
-            space=self.target_space,
-            start=self.target_structure_one,
-            end=self.target_structure_two,
+        self.confidence = (
+            self.parent_concept.classifier.classify(
+                concept=self.parent_concept,
+                space=self.target_space,
+                start=self.target_structure_one,
+                end=self.target_structure_two,
+            )
+            * min(self.target_structure_one.quality, self.target_structure_two.quality)
         )
 
     def _fizzle(self):

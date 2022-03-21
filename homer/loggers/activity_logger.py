@@ -3,12 +3,28 @@ from homer.logger import Logger
 
 
 class ActivityLogger(Logger):
-    def __init__(self, stream, satisfaction_stream=None):
-        self.stream = stream
+    def __init__(self, log_file_name: str, satisfaction_stream=None):
+        self.log_file_name = log_file_name
         self.satisfaction_stream = satisfaction_stream
+        self._stream = None
         self.previous_codelet_id = None
         self.codelets_run = 0
+        self.log_files_count = 0
+        self.LOG_LENGTH = 1000
         self.LINE_WIDTH = 120
+
+    @property
+    def stream(self):
+        if self.codelets_run % self.LOG_LENGTH == 1 and (
+            self.log_files_count == 0
+            or self.codelets_run // self.log_files_count > self.LOG_LENGTH
+        ):
+            if self._stream is not None:
+                self._stream.close()
+            self.log_files_count += 1
+            new_log_file_name = f"{self.log_file_name}{self.log_files_count}.log"
+            self._stream = open(new_log_file_name, "w")
+        return self._stream
 
     def log(self, codelet: "Codelet", message: str):
         if codelet.codelet_id != self.previous_codelet_id:

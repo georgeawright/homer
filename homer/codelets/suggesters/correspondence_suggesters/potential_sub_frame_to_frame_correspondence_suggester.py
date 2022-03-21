@@ -80,6 +80,14 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             except MissingStructureError:
                 return False
         self.parent_concept = self.bubble_chamber.concepts["same"]
+        for correspondence in self.target_sub_view.members:
+            if not self.target_view.can_accept_member(
+                correspondence.parent_concept,
+                correspondence.conceptual_space,
+                correspondence.start,
+                correspondence.end,
+            ):
+                return False
         target_structure_zero = (
             self.target_structure_one.correspondences.filter(
                 lambda x: x.start.parent_space in self.target_view.input_spaces

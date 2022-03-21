@@ -80,58 +80,72 @@ class ViewDrivenFactory(Factory):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Targeting view {self.target_view}"
         )
+        try:
+            self.target_slot = self._get_target_slot()
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Targeting slot {self.target_slot}"
+            )
+            if (
+                self.target_slot.parent_space
+                == self.target_view.parent_frame.input_space
+            ):
+                try:
+                    follow_up = self._spawn_space_to_frame_correspondence_suggester()
+                except MissingStructureError:
+                    follow_up = self._spawn_non_projection_suggester()
+            elif (
+                self.target_slot.parent_space
+                == self.target_view.parent_frame.output_space
+            ):
+                follow_up = self._spawn_projection_suggester()
+            else:  # slot is in sub-frame
+                try:
+                    follow_up = (
+                        self._spawn_sub_frame_to_frame_correspondence_suggester()
+                    )
+                except MissingStructureError:
+                    try:
+                        follow_up = (
+                            self._spawn_potential_sub_frame_to_frame_correspondence_suggester()
+                        )
+                    except MissingStructureError:
+                        try:
+                            follow_up = self._spawn_view_driven_factory()
+                        except MissingStructureError:
+                            follow_up = self._spawn_simplex_view_suggester()
+            self.child_codelets.append(follow_up)
+        except MissingStructureError:
+            pass
+
+    def _get_target_slot(self):
         input_structures = self.target_view.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence and x.correspondences.is_empty()
         )
-        try:
-            self.target_slot = input_structures.get(key=uncorrespondedness)
-        except MissingStructureError:
+        if input_structures.is_empty():
             output_structures = (
                 self.target_view.parent_frame.output_space.contents.filter(
                     lambda x: not x.is_correspondence and x.correspondences.is_empty()
                 )
             )
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, output_structures, "Uncorrespondended output structures"
-            )
-            try:
-                self.target_slot = output_structures.where(is_chunk=True).get(
-                    key=uncorrespondedness
-                )
-            except MissingStructureError:
-                self.target_slot = output_structures.get(key=uncorrespondedness)
-            follow_up = FocusSetter.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.coderack,
-                1 - self.bubble_chamber.satisfaction,
-            )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Targeting slot {self.target_slot}"
-        )
-        if self.target_slot.parent_space == self.target_view.parent_frame.input_space:
-            try:
-                follow_up = self._spawn_space_to_frame_correspondence_suggester()
-            except MissingStructureError:
-                follow_up = self._spawn_non_projection_suggester()
-        elif (
-            self.target_slot.parent_space == self.target_view.parent_frame.output_space
-        ):
-            follow_up = self._spawn_projection_suggester()
-        else:  # slot is in sub-frame
-            try:
-                follow_up = self._spawn_sub_frame_to_frame_correspondence_suggester()
-            except MissingStructureError:
-                try:
-                    follow_up = (
-                        self._spawn_potential_sub_frame_to_frame_correspondence_suggester()
-                    )
-                except MissingStructureError:
-                    try:
-                        follow_up = self._spawn_view_driven_factory()
-                    except MissingStructureError:
-                        follow_up = self._spawn_simplex_view_suggester()
-        self.child_codelets.append(follow_up)
+            output_chunks = output_structures.where(is_chunk=True)
+            if not output_chunks.is_empty():
+                return output_chunks.get()
+            output_labels = output_structures.where(is_label=True)
+            if not output_labels.is_empty():
+                return output_labels.get()
+            output_relations = output_structures.where(is_relation=True)
+            if not output_relations.is_empty():
+                return output_relations.get()
+        input_relations = input_structures.where(is_relation=True)
+        if not input_relations.is_empty():
+            return input_relations.get()
+        input_labels = input_structures.where(is_label=True)
+        if not input_labels.is_empty():
+            return input_labels.get()
+        input_chunks = input_structures.where(is_chunk=True)
+        if not input_chunks.is_empty():
+            return input_chunks.get()
+        raise MissingStructureError
 
     def _spawn_non_projection_suggester(self):
         input_space = self.target_view.input_spaces.get()
