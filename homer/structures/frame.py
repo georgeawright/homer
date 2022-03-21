@@ -101,6 +101,8 @@ class Frame(Structure):
                 self.concepts.add(specified_space.parent_concept)
                 if item.parent_space == abstract_space:
                     item.parent_space = specified_space
+                if item.is_relation and item.conceptual_space == abstract_space:
+                    item.conceptual_space = specified_space
                 try:
                     item.location_in_space(abstract_space).coordinates = [
                         [math.nan for _ in range(specified_space.no_of_dimensions)]
