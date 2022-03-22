@@ -62,14 +62,27 @@ class CorrespondenceSuggester(Suggester):
         target_view = bubble_chamber.focus.view
         if target_view is None:
             raise MissingStructureError
-        target_structure_two = StructureCollection.union(
-            target_view.parent_frame.input_space.contents,
-            target_view.parent_frame.output_space.contents.filter(
-                lambda x: x.parent_space != target_view.parent_frame.output_space
-            ),
-        ).get(key=uncorrespondedness)
+        input_structures = target_view.parent_frame.input_space.contents.filter(
+            lambda x: not x.is_correspondence and x.correspondences.is_empty()
+        )
+        output_structures = target_view.parent_frame.output_space.contents.filter(
+            lambda x: not x.is_correspondence and x.correspondences.is_empty()
+        )
+        if not input_structures.where(is_relation=True).is_empty():
+            target_structure_two = input_structures.where(is_relation=True).get()
+        elif not input_structures.where(is_label=True).is_empty():
+            target_structure_two = input_structures.where(is_label=True).get()
+        elif not input_structures.where(is_chunk=True).is_empty():
+            target_structure_two = input_structures.where(is_chunk=True).get()
+        elif not output_structures.where(is_chunk=True).is_empty():
+            target_structure_two = output_structures.where(is_chunk=True).get()
+        elif not output_structures.where(is_label=True).is_empty():
+            target_structure_two = output_structures.where(is_label=True).get()
+        elif not output_structures.where(is_relation=True).is_empty():
+            target_structure_two = output_structures.where(is_relation=True).get()
+        else:
+            raise MissingStructureError
         target_space_two = target_structure_two.parent_space
-
         if target_space_two == target_view.parent_frame.input_space:
             follow_up_class = SpaceToFrameCorrespondenceSuggester
             sub_frame = None
@@ -349,6 +362,7 @@ class CorrespondenceSuggester(Suggester):
                     for group in correspondence_suggester.target_view.node_groups
                     if correspondence_suggester.target_structure_two in group.values()
                 ][0]
+                print(node_group)
                 calling_codelet.bubble_chamber.loggers["activity"].log_dict(
                     calling_codelet,
                     node_group,

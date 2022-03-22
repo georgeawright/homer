@@ -1,4 +1,5 @@
 from homer.codelets.builders import CorrespondenceBuilder
+from homer.errors import MissingStructureError
 from homer.structure_collection import StructureCollection
 
 
@@ -12,22 +13,27 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                 correspondence.end,
             ):
                 return False
-        target_structure_zero = (
-            self.target_structure_one.correspondences.filter(
-                lambda x: x.start.parent_space in self.target_view.input_spaces
+        try:
+            target_structure_zero = (
+                self.target_structure_one.correspondences.filter(
+                    lambda x: x.start.parent_space in self.target_view.input_spaces
+                )
+                .get()
+                .start
             )
-            .get()
-            .start
-        )
+            if not self.target_view.can_accept_member(
+                self.parent_concept,
+                self.target_conceptual_space,
+                target_structure_zero,
+                self.target_structure_two,
+            ):
+                return False
+        except MissingStructureError:
+            pass
         return self.target_view.can_accept_member(
             self.parent_concept,
             self.target_conceptual_space,
             self.target_structure_one,
-            self.target_structure_two,
-        ) and self.target_view.can_accept_member(
-            self.parent_concept,
-            self.target_conceptual_space,
-            target_structure_zero,
             self.target_structure_two,
         )
 

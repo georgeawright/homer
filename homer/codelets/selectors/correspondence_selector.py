@@ -57,7 +57,14 @@ class CorrespondenceSelector(Selector):
             SpaceToFrameCorrespondenceSuggester
             if target_space_two == target_view.parent_frame.input_space
             else SubFrameToFrameCorrespondenceSuggester
-            if target_space_two in target_view.node_groups
+            if len(
+                [
+                    group
+                    for group in target_view.node_groups
+                    if target_space_two in group
+                ]
+            )
+            > 0
             else PotentialSubFrameToFrameCorrespondenceSuggester
         )
         sub_frame = None

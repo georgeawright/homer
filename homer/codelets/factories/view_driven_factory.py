@@ -403,7 +403,7 @@ class ViewDrivenFactory(Factory):
                     conceptual_space in x.parent_frame.input_space.conceptual_spaces
                     if self.target_slot.parent_space == sub_frame.input_space
                     else conceptual_space
-                    in x.parent_frame.output_space.contextual_spaces
+                    in x.parent_frame.output_space.conceptual_spaces
                 )
                 or conceptual_space is None
             )
