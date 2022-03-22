@@ -29,11 +29,7 @@ class CorrespondenceSelector(Selector):
         pass
 
     def _engender_follow_up(self):
-        from homer.codelets.suggesters.correspondence_suggesters import (
-            PotentialSubFrameToFrameCorrespondenceSuggester,
-            SpaceToFrameCorrespondenceSuggester,
-            SubFrameToFrameCorrespondenceSuggester,
-        )
+        from homer.codelets.suggesters import CorrespondenceSuggester
 
         self.child_codelets.append(
             CorrespondenceEvaluator.spawn(
@@ -46,43 +42,13 @@ class CorrespondenceSelector(Selector):
         winner_correspondence = self.winners.where(is_correspondence=True).get()
         target_view = winner_correspondence.parent_view
         try:
-            target_space_two = winner_correspondence.end.parent_space
-            target_structure_two = target_space_two.contents.where(
-                is_correspondence=False
-            ).get(key=corresponding_exigency)
-            parent_concept = winner_correspondence.parent_concept.friends().get()
+            self.child_codelets.append(
+                CorrespondenceSuggester.make(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    target_view=target_view,
+                    urgency=target_view.exigency,
+                )
+            )
         except MissingStructureError:
-            return
-        follow_up_class = (
-            SpaceToFrameCorrespondenceSuggester
-            if target_space_two == target_view.parent_frame.input_space
-            else SubFrameToFrameCorrespondenceSuggester
-            if len(
-                [
-                    group
-                    for group in target_view.node_groups
-                    if target_space_two in group
-                ]
-            )
-            > 0
-            else PotentialSubFrameToFrameCorrespondenceSuggester
-        )
-        sub_frame = None
-        if follow_up_class == PotentialSubFrameToFrameCorrespondenceSuggester:
-            sub_frame = target_view.parent_frame.sub_frames.filter(
-                lambda x: target_space_two in (x.input_space, x.output_space)
-            ).get()
-        self.child_codelets.append(
-            follow_up_class.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                {
-                    "target_view": target_view,
-                    "target_space_two": target_space_two,
-                    "target_structure_two": target_structure_two,
-                    "parent_concept": parent_concept,
-                    "sub_frame": sub_frame,
-                },
-                target_view.exigency,
-            )
-        )
+            pass

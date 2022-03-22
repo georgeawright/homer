@@ -77,22 +77,37 @@ class Homer:
     def print_status_update(self):
         codelets_run = self.coderack.codelets_run
         bubble_chamber_satisfaction = self.bubble_chamber.satisfaction
+        suggest_activation = self.bubble_chamber.concepts["suggest"].activation
         build_activation = self.bubble_chamber.concepts["build"].activation
         evaluate_activation = self.bubble_chamber.concepts["evaluate"].activation
         select_activation = self.bubble_chamber.concepts["select"].activation
-        print(
-            "================================================================================"
+        focus = (
+            self.bubble_chamber.focus.view.structure_id
+            + self.bubble_chamber.focus.view.parent_frame.name
+            if self.bubble_chamber.focus.view is not None
+            else None
         )
+        focus_unhappiness = (
+            self.bubble_chamber.focus.view.unhappiness
+            if self.bubble_chamber.focus.view is not None
+            else "-"
+        )
+        focus_satisfaction = (
+            self.bubble_chamber.focus.satisfaction
+            if self.bubble_chamber.focus.view is not None
+            else "-"
+        )
+        print("=" * 200)
         print(
             f"codelets run: {codelets_run}; "
-            + f"satisfaction: {bubble_chamber_satisfaction}; "
-            + f"build: {build_activation}; "
-            + f"evaluate: {evaluate_activation}; "
-            + f"select: {select_activation}; "
+            + f"satisf.: {bubble_chamber_satisfaction}; "
+            + f"SUGGEST: {suggest_activation}; "
+            + f"BUILD: {build_activation}; "
+            + f"EVALUATE: {evaluate_activation}; "
+            + f"SELECT: {select_activation}; "
+            + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
-        print(
-            "================================================================================"
-        )
+        print("=" * 200)
 
     def print_results(self):
         print(f"codelets run: {self.coderack.codelets_run}")

@@ -62,7 +62,8 @@ class FocusSetter(Codelet):
         for codelet in self.coderack._codelets:
             if "ViewDrivenFactory" in codelet.codelet_id:
                 codelet.urgency = 1.0
-                break
+                return
+        raise Exception
 
     def _fizzle(self):
         self.child_codelets.append(

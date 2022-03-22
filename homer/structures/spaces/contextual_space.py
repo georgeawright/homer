@@ -1,8 +1,8 @@
 from __future__ import annotations
 import statistics
 
+from homer import fuzzy
 from homer.errors import MissingStructureError
-from homer.id import ID
 from homer.location import Location
 from homer.locations import TwoPointLocation
 from homer.structure import Structure
@@ -56,13 +56,14 @@ class ContextualSpace(Space):
 
     @property
     def quality(self):
-        active_contents = {
-            structure for structure in self.contents if structure.activation > 0
-        }
-        if len(active_contents) == 0:
+        active_contents = self.contents.filter(lambda x: x.activation > 0.5)
+        if active_contents.is_empty():
             return 0.0
         return statistics.fmean(
-            [structure.quality * structure.activation for structure in active_contents]
+            [
+                fuzzy.AND(structure.quality, structure.activation)
+                for structure in active_contents
+            ]
         )
 
     def add(self, structure: Structure):

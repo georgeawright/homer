@@ -8,10 +8,8 @@ from homer.id import ID
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import (
     corresponding_exigency,
-    exigency,
-    uncorrespondedness,
 )
-from homer.structures.nodes import Concept
+from homer.structures import View
 
 # TODO: possibly need restriction on space to frame correspondence suggester to prevent corresponding to sub-space items
 
@@ -52,6 +50,7 @@ class CorrespondenceSuggester(Suggester):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
+        target_view: View = None,
     ):
         from homer.codelets.suggesters.correspondence_suggesters import (
             PotentialSubFrameToFrameCorrespondenceSuggester,
@@ -59,7 +58,7 @@ class CorrespondenceSuggester(Suggester):
             SubFrameToFrameCorrespondenceSuggester,
         )
 
-        target_view = bubble_chamber.focus.view
+        target_view = bubble_chamber.focus.view if target_view is None else target_view
         if target_view is None:
             raise MissingStructureError
         input_structures = target_view.parent_frame.input_space.contents.filter(
@@ -194,7 +193,7 @@ class CorrespondenceSuggester(Suggester):
             correspondence_suggester.target_view.prioritized_targets,
             "prioritized targets",
         )
-        try:
+        if not correspondence_suggester.target_view.prioritized_targets.is_empty():
             bubble_chamber.loggers["activity"].log(
                 calling_codelet,
                 f"Attempting to find target structure one from priortitized targets",
@@ -204,7 +203,7 @@ class CorrespondenceSuggester(Suggester):
                 correspondence_suggester,
                 correspondence_suggester.target_view.prioritized_targets,
             )
-        except MissingStructureError:
+        else:
             bubble_chamber.loggers["activity"].log(
                 calling_codelet,
                 f"Attempting to find target structure one from target space one",
@@ -362,7 +361,6 @@ class CorrespondenceSuggester(Suggester):
                     for group in correspondence_suggester.target_view.node_groups
                     if correspondence_suggester.target_structure_two in group.values()
                 ][0]
-                print(node_group)
                 calling_codelet.bubble_chamber.loggers["activity"].log_dict(
                     calling_codelet,
                     node_group,

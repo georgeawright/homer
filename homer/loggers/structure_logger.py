@@ -89,11 +89,6 @@ class StructureLogger(Logger):
                         if link.parent_concept is not None
                         else ""
                     )
-                    if math.isnan(link.activation):
-                        print(link)
-                        print(link.parent_id)
-                        print(link.start)
-                        print(link.end)
                     color_number = math.ceil((1 - link.activation) * 200)
                     color_hex = hex(color_number)[2:]
                     if len(color_hex) == 1:
