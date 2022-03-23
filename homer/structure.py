@@ -46,6 +46,18 @@ class Structure(ABC):
         self._parent_space = None
         self._parent_concept = None
 
+        self.unchunkedness = 1.0
+        self.unlabeledness = 1.0
+        self.unrelatedness = 1.0
+        self.uncorrespondedness = 1.0
+        self.unhappiness = 1.0
+
+        self.chunking_exigency = 0.5
+        self.labeling_exigency = 0.5
+        self.relating_exigency = 0.5
+        self.corresponding_exigency = 0.5
+        self.exigency = 0.5
+
         self.is_node = False
         self.is_concept = False
         self.is_chunk = False
@@ -114,25 +126,27 @@ class Structure(ABC):
     def is_slot(self) -> bool:
         return False
 
-    @property
-    def exigency(self) -> FloatBetweenOneAndZero:
-        return statistics.fmean([self.activation, self.unhappiness])
+    def recalculate_exigency(self):
+        self.recalculate_unhappiness()
+        self.recalculate_chunking_exigency()
+        self.recalculate_labeling_exigency()
+        self.recalculate_relating_exigency()
+        self.recalculate_corresponding_exigency()
+        self.exigency = statistics.fmean([self.activation, self.unhappiness])
 
-    @property
-    def chunking_exigency(self) -> FloatBetweenOneAndZero:
-        return statistics.fmean([self.activation, self.unchunkedness])
+    def recalculate_chunking_exigency(self):
+        self.chunking_exigency = statistics.fmean([self.activation, self.unchunkedness])
 
-    @property
-    def labeling_exigency(self) -> FloatBetweenOneAndZero:
-        return statistics.fmean([self.activation, self.unlabeledness])
+    def recalculate_labeling_exigency(self):
+        self.labeling_exigency = statistics.fmean([self.activation, self.unlabeledness])
 
-    @property
-    def relating_exigency(self) -> FloatBetweenOneAndZero:
-        return statistics.fmean([self.activation, self.unrelatedness])
+    def recalculate_relating_exigency(self):
+        self.relating_exigency = statistics.fmean([self.activation, self.unrelatedness])
 
-    @property
-    def corresponding_exigency(self) -> FloatBetweenOneAndZero:
-        return statistics.fmean([self.activation, self.uncorrespondedness])
+    def recalculate_corresponding_exigency(self):
+        self.corresponding_exigency = statistics.fmean(
+            [self.activation, self.uncorrespondedness]
+        )
 
     @property
     def quality(self) -> FloatBetweenOneAndZero:
@@ -154,27 +168,27 @@ class Structure(ABC):
     def activation(self, a: FloatBetweenOneAndZero):
         self._activation = a
 
-    @property
-    def unhappiness(self) -> FloatBetweenOneAndZero:
+    def recalculate_unhappiness(self):
+        self.recalculate_unlabeledness()
+        self.recalculate_unrelatedness()
+        self.recalculate_uncorrespondedness()
         return statistics.fmean(
             [self.unlabeledness, self.unrelatedness, self.uncorrespondedness]
         )
 
-    @property
-    def unchunkedness(self) -> FloatBetweenOneAndZero:
-        return 0
+    def recalculate_unchunkedness(self):
+        raise NotImplementedError
 
-    @property
-    def unlabeledness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** sum(link.activation for link in self.labels)
+    def recalculate_unlabeledness(self):
+        self.unlabeledness = 0.5 ** sum(link.activation for link in self.labels)
 
-    @property
-    def unrelatedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** sum(link.activation for link in self.relations)
+    def recalculate_unrelatedness(self):
+        self.unrelatedness = 0.5 ** sum(link.activation for link in self.relations)
 
-    @property
-    def uncorrespondedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** sum(link.activation for link in self.correspondences)
+    def recalculate_uncorrespondedness(self) -> FloatBetweenOneAndZero:
+        self.uncorrespondedness = 0.5 ** sum(
+            link.activation for link in self.correspondences
+        )
 
     @property
     def links(self) -> StructureCollection:
@@ -397,6 +411,7 @@ class Structure(ABC):
             self._activation + self._activation_buffer
         )
         self._activation_buffer = 0.0
+        # TODO: self.recalculate_exigency()
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

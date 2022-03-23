@@ -47,13 +47,13 @@ class Link(Structure):
     def is_slot(self) -> bool:
         return self.parent_concept.is_slot
 
-    @property
-    def unlabeledness(self) -> FloatBetweenOneAndZero:
-        return 0.5 * 0.5 ** sum(link.activation for link in self.labels)
+    def recalculate_unlabeledness(self):
+        self.unlabeledness = 0.5 * 0.5 ** sum(link.activation for link in self.labels)
 
-    @property
-    def unrelatedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 * 0.5 ** sum(link.activation for link in self.relations)
+    def recalculate_unrelatedness(self):
+        self.unrelatedness = 0.5 * 0.5 ** sum(
+            link.activation for link in self.relations
+        )
 
     def is_between(self, a: Structure, b: Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a

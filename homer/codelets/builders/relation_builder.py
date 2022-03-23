@@ -128,6 +128,7 @@ class RelationBuilder(Builder):
             )
             self.bubble_chamber.conceptual_spaces["magnitude"].add(relation)
         self._structure_concept.instances.add(relation)
+        self._structure_concept.recalculate_exigency()
         self.child_structures = self.bubble_chamber.new_structure_collection(relation)
 
     def _fizzle(self):

@@ -93,11 +93,10 @@ class View(Structure):
     def slots(self):
         return self.parent_frame.slots
 
-    @property
-    def unhappiness(self):
+    def recalculate_unhappiness(self):
         no_of_uncorresponded_items = len(self.parent_frame.uncorresponded_items)
         no_of_items = len(self.parent_frame.items)
-        return no_of_uncorresponded_items / no_of_items
+        self.unhappiness = no_of_uncorresponded_items / no_of_items
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

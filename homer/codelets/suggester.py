@@ -87,10 +87,15 @@ class Suggester(Codelet):
         self._suggest_concept.boost_activation(self.confidence)
         self._structure_concept.boost_activation(self.confidence)
         self._parent_link.boost_activation(self.confidence)
+        self._suggest_concept.update_activation()
+        self._structure_concept.update_activation()
+        self._parent_link.update_activation()
 
     def _decay_activations(self):
         self._suggest_concept.decay_activation()
         self._parent_link.decay_activation()
+        self._suggest_concept.update_activation()
+        self._parent_link.update_activation()
 
     def _passes_preliminary_checks(self):
         raise NotImplementedError

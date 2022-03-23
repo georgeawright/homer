@@ -149,6 +149,15 @@ class SimplexViewSuggester(ViewSuggester):
         if not equivalent_views.is_empty():
             self.confidence = 0
         else:
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"focussedness: {self.bubble_chamber.focus.focussedness}"
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"frame activation: {self.frame.activation}"
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"space activation: {self.contextual_space.activation}"
+            )
             self.confidence = statistics.fmean(
                 [
                     (1 - self.bubble_chamber.focus.focussedness),

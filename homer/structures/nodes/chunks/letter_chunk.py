@@ -93,13 +93,15 @@ class LetterChunk(Chunk):
     def concepts(self):
         return self.relatives.where(is_concept=True)
 
-    @property
-    def unchunkedness(self):
+    def recalculate_unchunkedness(self):
         if self.is_abstract:
-            return 0
-        if len(self.super_chunks) == 0:
-            return 1
-        return 0.5 * prod([chunk.unchunkedness for chunk in self.super_chunks])
+            self.unchunkedness = 0
+        elif len(self.super_chunks) == 0:
+            self.unchunkedness = 1
+        else:
+            self.unchunkedness = 0.5 * prod(
+                [chunk.unchunkedness for chunk in self.super_chunks]
+            )
 
     @property
     def free_branch_concept(self):

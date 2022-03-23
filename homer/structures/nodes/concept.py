@@ -88,9 +88,10 @@ class Concept(Node):
     def is_filled_in(self) -> bool:
         return not self.relatives.where(is_slot=False).is_empty()
 
-    @property
-    def unhappiness(self) -> FloatBetweenOneAndZero:
-        return 0.5 ** sum(instance.activation for instance in self.instances)
+    def recalculate_unhappiness(self):
+        self.unhappiness = 0.5 ** sum(
+            instance.activation for instance in self.instances
+        )
 
     def letter_chunk_forms(
         self, grammar_concept: Concept = None

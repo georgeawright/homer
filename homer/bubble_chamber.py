@@ -46,6 +46,7 @@ class BubbleChamber:
 
         self.views = None
 
+        self.satisfaction = 0
         self.result = None
         self.log_count = 0
 
@@ -138,14 +139,14 @@ class BubbleChamber:
             self.rules,
         )
 
-    @property
-    def satisfaction(self):
+    def recalculate_satisfaction(self):
+        self.focus.recalculate_satisfaction()
+        general_satisfaction = self.general_satisfaction()
         if self.focus.view is not None:
-            return max(self._satisfaction, self.focus.satisfaction)
-        return self._satisfaction
+            self.satisfaction = max(general_satisfaction, self.focus.satisfaction)
+        return general_satisfaction
 
-    @property
-    def _satisfaction(self):
+    def general_satisfaction(self):
         spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
         if len(spaces) == 0:
             return 0
@@ -349,6 +350,7 @@ class BubbleChamber:
         )
         for member in members:
             member.super_chunks.add(chunk)
+            member.recalculate_exigency()
             self.loggers["structure"].log(member)
         self.add(chunk)
         return chunk
@@ -396,6 +398,7 @@ class BubbleChamber:
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
+            member.recalculate_exigency()
             self.loggers["structure"].log(member)
         self.add(letter_chunk)
         if meaning_concept is not None:
@@ -563,12 +566,15 @@ class BubbleChamber:
             is_privileged=is_privileged,
         )
         if parent_view is not None:
+            parent_view.recalculate_exigency()
             parent_view.add(correspondence)
             self.loggers["structure"].log(parent_view)
         start.links_out.add(correspondence)
         start.links_in.add(correspondence)
+        start.recalculate_exigency()
         end.links_out.add(correspondence)
         end.links_in.add(correspondence)
+        end.recalculate_exigency()
         self.add(correspondence)
         self.loggers["structure"].log(start)
         self.loggers["structure"].log(end)
@@ -602,8 +608,9 @@ class BubbleChamber:
         )
         if start is not None:
             start.links_out.add(label)
+            start.recalculate_exigency()
+            self.loggers["structure"].log(start)
         self.add(label)
-        self.loggers["structure"].log(start)
         return label
 
     def new_relation(
@@ -644,6 +651,8 @@ class BubbleChamber:
             relation._activation = activation
         start.links_out.add(relation)
         end.links_in.add(relation)
+        start.recalculate_exigency()
+        end.recalculate_exigency()
         self.add(relation)
         self.loggers["structure"].log(start)
         self.loggers["structure"].log(end)

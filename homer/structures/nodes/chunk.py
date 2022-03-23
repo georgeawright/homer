@@ -1,5 +1,6 @@
 from __future__ import annotations
 from math import prod
+import statistics
 from typing import List
 
 from homer.errors import MissingStructureError
@@ -101,11 +102,27 @@ class Chunk(Node):
             *[chunk.raw_members for chunk in self.members.where(is_slot=False)]
         )
 
-    @property
-    def unchunkedness(self):
+    def recalculate_unhappiness(self) -> FloatBetweenOneAndZero:
+        self.recalculate_unchunkedness()
+        self.recalculate_unlabeledness()
+        self.recalculate_unrelatedness()
+        self.recalculate_uncorrespondedness()
+        return statistics.fmean(
+            [
+                self.unchunkedness,
+                self.unlabeledness,
+                self.unrelatedness,
+                self.uncorrespondedness,
+            ]
+        )
+
+    def recalculate_unchunkedness(self):
         if len(self.super_chunks) == 0:
-            return 1
-        return 0.5 * prod([chunk.unchunkedness for chunk in self.super_chunks])
+            self.unchunkedness = 1
+        else:
+            self.unchunkedness = 0.5 * prod(
+                [chunk.unchunkedness for chunk in self.super_chunks]
+            )
 
     @property
     def free_branch_concept(self):

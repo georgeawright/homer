@@ -56,20 +56,10 @@ class Node(Structure):
             ]
         )
 
-    @property
-    def unhappiness(self) -> FloatBetweenOneAndZero:
-        return statistics.fmean(
-            [
-                self.unchunkedness,
-                self.unlabeledness,
-                self.unrelatedness,
-                self.uncorrespondedness,
-            ]
+    def recalculate_uncorrespondedness(self):
+        self.uncorrespondedness = 0.5 * 0.5 ** sum(
+            link.activation for link in self.correspondences
         )
-
-    @property
-    def uncorrespondedness(self) -> FloatBetweenOneAndZero:
-        return 0.5 * 0.5 ** sum(link.activation for link in self.correspondences)
 
     def nearby(self, space: Space = None) -> StructureCollection:
         raise NotImplementedError

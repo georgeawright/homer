@@ -177,6 +177,7 @@ class LabelBuilder(Builder):
             quality=0,
         )
         self._structure_concept.instances.add(label)
+        self._structure_concept.recalculate_exigency()
         self.child_structures.add(label)
 
     def _recursively_copy_links(self):

@@ -83,10 +83,14 @@ class Evaluator(Codelet):
     def _boost_activations(self):
         self._evaluate_concept.boost_activation(1)
         self._parent_link.boost_activation(self.change_in_confidence)
+        self._evaluate_concept.update_activation()
+        self._parent_link.update_activation()
 
     def _decay_activations(self):
         self._evaluate_concept.decay_activation()
         self._parent_link.decay_activation()
+        self._evaluate_concept.update_activation()
+        self._parent_link.update_activation()
 
     def _calculate_confidence(self):
         raise NotImplementedError

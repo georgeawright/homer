@@ -136,18 +136,24 @@ class Selector(Codelet):
     def _boost_activations(self):
         self._select_concept.boost_activation(self.confidence)
         self._parent_link.boost_activation(self.confidence)
+        self._select_concept.update_activation()
+        self._parent_link.update_activation()
 
     def _decay_activations(self):
         self._select_concept.decay_activation()
         self._parent_link.decay_activation(1 - self.confidence)
+        self._select_concept.update_activation()
+        self._parent_link.update_activation()
 
     def _boost_winners(self):
         for winner in self.winners:
             winner.boost_activation(self.confidence)
+            winner.update_activation()
 
     def _decay_losers(self):
         for loser in self.losers:
             loser.decay_activation(self.confidence)
+            loser.update_activation()
 
     def _get_representative(self, collection: StructureCollection):
         return collection.get()

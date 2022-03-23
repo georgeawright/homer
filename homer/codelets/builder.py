@@ -78,10 +78,15 @@ class Builder(Codelet):
         self._build_concept.boost_activation(1)
         self._structure_concept.boost_activation(1)
         self._parent_link.boost_activation(self.urgency)
+        self._build_concept.update_activation()
+        self._structure_concept.update_activation()
+        self._parent_link.update_activation()
 
     def _decay_activations(self):
         self._build_concept.decay_activation()
         self._parent_link.decay_activation(1 - self.urgency)
+        self._build_concept.update_activation()
+        self._parent_link.update_activation()
 
     def _passes_preliminary_checks(self):
         raise NotImplementedError

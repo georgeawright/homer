@@ -9,6 +9,7 @@ class Focus:
     def __init__(self):
         self.view = None
         self.spaces_quality_history = []
+        self.satisfaction = 0
 
     @property
     def focussedness(self):
@@ -38,21 +39,22 @@ class Focus:
         except IndexError:
             return None
 
-    @property
-    def satisfaction(self):
+    def recalculate_satisfaction(self):
         if self.view is None:
-            return 0
-        view_items = StructureCollection.union(
-            self.view.members, *[member.arguments for member in self.view.members]
-        ).filter(lambda x: x.activation > 0)
-        if view_items.is_empty():
-            return 0
-        return statistics.fmean(
-            [
-                statistics.fmean([item.quality for item in view_items]),
-                1 - self.view.unhappiness,
-            ]
-        )
+            self.satisfaction = 0
+        else:
+            view_items = StructureCollection.union(
+                self.view.members, *[member.arguments for member in self.view.members]
+            ).filter(lambda x: x.activation > 0)
+            if view_items.is_empty():
+                self.satisfaction = 0
+            else:
+                self.satisfaction = statistics.fmean(
+                    [
+                        statistics.fmean([item.quality for item in view_items]),
+                        1 - self.view.unhappiness,
+                    ]
+                )
 
     def change_view(self, view: View):
         self.view = view
