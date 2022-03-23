@@ -35,7 +35,7 @@ class FocusSetter(Codelet):
     def run(self) -> CodeletResult:
         try:
             target_view = self.bubble_chamber.production_views.get(
-                key=exigency, exclude=[self.bubble_chamber.focus.view]
+                key=exigency,
             )
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Found target view: {target_view}"

@@ -411,7 +411,7 @@ class Structure(ABC):
             self._activation + self._activation_buffer
         )
         self._activation_buffer = 0.0
-        # TODO: self.recalculate_exigency()
+        self.recalculate_exigency()
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError
