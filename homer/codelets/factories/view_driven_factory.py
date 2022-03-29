@@ -115,7 +115,10 @@ class ViewDrivenFactory(Factory):
         if input_structures.is_empty():
             output_structures = (
                 self.target_view.parent_frame.output_space.contents.filter(
-                    lambda x: not x.is_correspondence and x.correspondences.is_empty()
+                    lambda x: not x.is_correspondence
+                    and x.correspondences_to_space(
+                        self.target_view.output_space
+                    ).is_empty()
                 )
             )
             output_chunks = output_structures.where(is_chunk=True)
