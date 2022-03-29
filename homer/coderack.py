@@ -12,6 +12,7 @@ from .codelets import (
     FocusUnsetter,
     Selector,
     Suggester,
+    WorldviewSetter,
 )
 from .codelets.factories import (
     ConceptDrivenFactory,
@@ -31,7 +32,13 @@ class Coderack:
 
     MAXIMUM_POPULATION = HyperParameters.MAXIMUM_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-    PROTECTED_CODELET_TYPES = (CoderackCleaner, Factory, FocusSetter, FocusUnsetter)
+    PROTECTED_CODELET_TYPES = (
+        CoderackCleaner,
+        Factory,
+        FocusSetter,
+        FocusUnsetter,
+        WorldviewSetter,
+    )
 
     def __init__(self, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         self.bubble_chamber = bubble_chamber
@@ -45,6 +52,9 @@ class Coderack:
         coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
             FocusSetter.spawn("", bubble_chamber, coderack, 0.5),
+            WorldviewSetter.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
             CoderackCleaner.spawn("", bubble_chamber, coderack, 0.0, 1.0),
             ConceptDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
             ViewDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
@@ -124,7 +134,8 @@ class Coderack:
             f"Time: {self.codelets_run} | "
             + f"Satisfaction: {self.bubble_chamber.satisfaction} | "
             + f"Coderack Population Size: {self.population_size}\n"
-            + f"Focus: {self.bubble_chamber.focus.view}",
+            + f"Focus: {self.bubble_chamber.focus.view}\n"
+            + f"Worldview: {self.bubble_chamber.worldview.view}\n",
         )
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)

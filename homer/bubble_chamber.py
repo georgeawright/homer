@@ -19,6 +19,7 @@ from .structures.nodes import Chunk, Concept, Rule
 from .structures.nodes.chunks import LetterChunk
 from .structures.spaces import ConceptualSpace, ContextualSpace
 from .structures.views import SimplexView, MonitoringView
+from .worldview import Worldview
 
 # TODO: new_structure methods should accept activation as arg with rand as default
 
@@ -28,6 +29,7 @@ class BubbleChamber:
         self.loggers = loggers
         self.random_machine = None
         self.focus = Focus()
+        self.worldview = Worldview()
 
         self.conceptual_spaces = None
         self.contextual_spaces = None
@@ -123,6 +125,15 @@ class BubbleChamber:
         return self.views.where(is_simplex_view=True)
 
     @property
+    def size_of_raw_input(self) -> int:
+        return sum(
+            [
+                len(space.contents.where(is_raw=True)) * len(space.conceptual_spaces)
+                for space in self.contextual_spaces.where(is_main_input=True)
+            ]
+        )
+
+    @property
     def structures(self) -> StructureCollection:
         return StructureCollection.union(
             self.conceptual_spaces,
@@ -150,7 +161,12 @@ class BubbleChamber:
         spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
         if len(spaces) == 0:
             return 0
-        return statistics.fmean([space.quality for space in spaces])
+        return statistics.fmean(
+            [
+                statistics.fmean([space.quality for space in spaces]),
+                self.worldview.satisfaction,
+            ]
+        )
 
     def spread_activations(self):
         for structure in self.structures:

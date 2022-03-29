@@ -231,4 +231,15 @@ class LetterChunk(Chunk):
         return (chunk_copy, copies)
 
     def __repr__(self) -> str:
-        return f'<{self.structure_id} "{self.name}" in {self.locations}>'
+        left = (
+            self.left_branch.get().structure_id
+            if not self.left_branch.is_empty()
+            else ""
+        )
+        right = (
+            self.right_branch.get().structure_id
+            if not self.right_branch.is_empty()
+            else ""
+        )
+        members = ",".join([left, right])
+        return f'<{self.structure_id} "{self.name}" [{members}] in {self.locations}>'

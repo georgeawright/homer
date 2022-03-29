@@ -3,10 +3,8 @@ import statistics
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
-from homer.structure_collection_keys import exigency
 
 
 class FocusUnsetter(Codelet):
@@ -69,6 +67,7 @@ class FocusUnsetter(Codelet):
         )
         if self.bubble_chamber.focus.view.unhappiness == 0.0:
             probability_of_unsetting_focus = 1
+            self._update_worldview_setter_urgency()
         else:
             probability_of_unsetting_focus = statistics.fmean(
                 # possibly consider adding 1-view.unhappiness
@@ -90,6 +89,10 @@ class FocusUnsetter(Codelet):
             self.result = CodeletResult.FIZZLE
             self._fizzle()
         else:
+            if change_in_satisfaction_score < 0:
+                self.bubble_chamber.focus.view.decay_activation(
+                    1 - transposed_change_in_satisfaction_score
+                )
             self.bubble_chamber.focus.view = None
             self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
             self._engender_follow_up()
@@ -97,6 +100,13 @@ class FocusUnsetter(Codelet):
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
+
+    def _update_worldview_setter_urgency(self):
+        for codelet in self.coderack._codelets:
+            if "WorldviewSetter" in codelet.codelet_id:
+                codelet.urgency = self.bubble_chamber.focus.satisfaction
+                return
+        raise Exception
 
     def _fizzle(self):
         self.child_codelets.append(

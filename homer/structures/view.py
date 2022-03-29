@@ -73,6 +73,7 @@ class View(Structure):
             },
             "quality": self.quality,
             "activation": self.activation,
+            "unhappiness": self.unhappiness,
         }
 
     @property

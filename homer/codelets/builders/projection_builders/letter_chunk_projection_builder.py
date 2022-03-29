@@ -116,12 +116,12 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                     self.target_view.output_space
                 ).get()
                 correspondee = correspondence.end
-                if abstract_chunk in super_chunk.left_branch:
+                if self.target_projectee in super_chunk.left_branch:
                     self.bubble_chamber.loggers["activity"].log(
                         self, f"Adding {word} to left branch of {correspondee}"
                     )
                     correspondee.left_branch.add(word)
-                else:
+                elif self.target_projectee in super_chunk.right_branch:
                     self.bubble_chamber.loggers["activity"].log(
                         self, f"Adding {word} to right branch of {correspondee}"
                     )
@@ -153,6 +153,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             self.bubble_chamber.loggers["activity"].log(
                 self, "Correspondee to target projectee is abstract chunk"
             )
+            # TODO: below causes problem
             return self.target_projectee.correspondees.where_not(name=None).get()
         if not self.target_projectee.links_in.where(is_relation=True).is_empty():
             self.bubble_chamber.loggers["activity"].log(

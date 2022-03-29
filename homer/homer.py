@@ -11,6 +11,8 @@ from .structures.spaces import ConceptualSpace
 
 
 class Homer:
+    CODELET_RUN_LIMIT = HyperParameters.CODELET_RUN_LIMIT
+
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
@@ -58,7 +60,7 @@ class Homer:
                     self.print_status_update()
                     self.bubble_chamber.spread_activations()
                     self.bubble_chamber.update_activations()
-                if self.coderack.codelets_run >= 20000:
+                if self.coderack.codelets_run >= self.CODELET_RUN_LIMIT:
                     raise NoMoreCodelets
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
@@ -107,6 +109,13 @@ class Homer:
             + f"SELECT: {select_activation}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
+        if self.bubble_chamber.worldview.view is not None:
+            view_output = self.bubble_chamber.worldview.view.output_space
+            main_chunk = view_output.contents.filter(
+                lambda x: x.is_chunk and x.super_chunks.is_empty()
+            ).get()
+            text = main_chunk.name
+            print(text)
         print("=" * 200)
 
     def print_results(self):

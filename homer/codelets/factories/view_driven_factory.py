@@ -441,6 +441,9 @@ class ViewDrivenFactory(Factory):
                 if node in group.values()
             ]
         )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, prioritized_targets, "prioritized_targets"
+        )
         views_with_correct_frame_and_spaces = (
             self.bubble_chamber.production_views.filter(
                 lambda x: (x.parent_frame.parent_concept == sub_frame.parent_concept)
@@ -453,18 +456,22 @@ class ViewDrivenFactory(Factory):
             "Views with correct frame and spaces",
         )
         views_with_correct_prioritized_targets = (
-            views_with_correct_frame_and_spaces.filter(
-                lambda x: x.prioritized_targets == prioritized_targets
-                if x.members.is_empty()
-                else self.bubble_chamber.new_structure_collection(
-                    *[
-                        member.start
-                        for member in x.members
-                        if member.start in contextual_space.contents
-                    ]
+            (
+                views_with_correct_frame_and_spaces.filter(
+                    lambda x: x.prioritized_targets == prioritized_targets
+                    if x.members.is_empty()
+                    else self.bubble_chamber.new_structure_collection(
+                        *[
+                            member.start
+                            for member in x.members
+                            if member.start in contextual_space.contents
+                        ]
+                    )
+                    == prioritized_targets
                 )
-                == prioritized_targets
             )
+            if not prioritized_targets.is_empty()
+            else views_with_correct_frame_and_spaces
         )
         self.bubble_chamber.loggers["activity"].log_collection(
             self,

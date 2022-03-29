@@ -7,3 +7,4 @@ from .evaluator import Evaluator
 from .publisher import Publisher
 from .selector import Selector
 from .suggester import Suggester
+from .worldview_setter import WorldviewSetter
