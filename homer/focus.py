@@ -49,10 +49,14 @@ class Focus:
             if view_items.is_empty():
                 self.satisfaction = 0
             else:
+                no_of_corresponded_items = len(
+                    self.view.parent_frame.corresponded_items
+                )
+                no_of_items = len(self.view.parent_frame.items)
                 self.satisfaction = statistics.fmean(
                     [
                         statistics.fmean([item.quality for item in view_items]),
-                        1 - self.view.unhappiness,
+                        no_of_corresponded_items / no_of_items,
                     ]
                 )
 

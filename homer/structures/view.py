@@ -96,8 +96,7 @@ class View(Structure):
 
     def recalculate_unhappiness(self):
         no_of_uncorresponded_items = len(self.parent_frame.uncorresponded_items)
-        no_of_items = len(self.parent_frame.items)
-        self.unhappiness = no_of_uncorresponded_items / no_of_items
+        self.unhappiness = 1 - 0.5 ** no_of_uncorresponded_items
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

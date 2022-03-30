@@ -1,6 +1,7 @@
 import statistics
 from typing import Callable, Dict, List, Union
 
+from . import fuzzy
 from .classifier import Classifier
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -49,6 +50,7 @@ class BubbleChamber:
         self.views = None
 
         self.satisfaction = 0
+        self.general_satisfaction = 0
         self.result = None
         self.log_count = 0
 
@@ -152,21 +154,21 @@ class BubbleChamber:
 
     def recalculate_satisfaction(self):
         self.focus.recalculate_satisfaction()
-        general_satisfaction = self.general_satisfaction()
+        self.recalculate_general_satisfaction()
         if self.focus.view is not None:
-            self.satisfaction = max(general_satisfaction, self.focus.satisfaction)
-        return general_satisfaction
+            self.satisfaction = max(self.general_satisfaction, self.focus.satisfaction)
+        else:
+            self.satisfaction = self.general_satisfaction
 
-    def general_satisfaction(self):
+    def recalculate_general_satisfaction(self):
         spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
         if len(spaces) == 0:
-            return 0
-        return statistics.fmean(
-            [
+            self.general_satisfaction = 0
+        else:
+            self.general_satisfaction = fuzzy.AND(
                 statistics.fmean([space.quality for space in spaces]),
                 self.worldview.satisfaction,
-            ]
-        )
+            )
 
     def spread_activations(self):
         for structure in self.structures:

@@ -129,39 +129,48 @@ class SimplexViewSuggester(ViewSuggester):
         return True
 
     def _calculate_confidence(self):
-        equivalent_views = self.bubble_chamber.views.filter(
-            lambda x: all(
-                [
-                    x.input_spaces
-                    == self.bubble_chamber.new_structure_collection(
-                        self.contextual_space
-                    ),
-                    x.parent_frame in self.frame.instances
-                    or x.parent_frame == self.frame,
-                    x.prioritized_targets == self.prioritized_targets,
-                    x.members.is_empty(),
-                ]
+        # if prioritized targets not empty, no view with same targets, 1
+        # otherwise confidence divided by number of views with equivalent frame and space
+        if not self.prioritized_targets.is_empty():
+            equivalent_views = self.bubble_chamber.views.filter(
+                lambda x: all(
+                    [
+                        x.input_spaces
+                        == self.bubble_chamber.new_structure_collection(
+                            self.contextual_space
+                        ),
+                        x.parent_frame.progenitor == self.frame.progenitor,
+                        x.prioritized_targets == self.prioritized_targets,
+                        x.members.is_empty(),
+                    ]
+                )
             )
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, equivalent_views, "Equivalent views"
-        )
-        if not equivalent_views.is_empty():
-            self.confidence = 0
+            self.bubble_chamber.loggers["activity"].log_collection(
+                self, equivalent_views, "Equivalent views"
+            )
+            self.confidence = 1 if equivalent_views.is_empty() else 0
         else:
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"focussedness: {self.bubble_chamber.focus.focussedness}"
+            no_of_equivalent_views = len(
+                self.bubble_chamber.views.filter(
+                    lambda x: all(
+                        [
+                            x.input_spaces
+                            == self.bubble_chamber.new_structure_collection(
+                                self.contextual_space
+                            ),
+                            x.parent_frame.progenitor == self.frame.progenitor,
+                        ]
+                    )
+                )
             )
             self.bubble_chamber.loggers["activity"].log(
-                self, f"frame activation: {self.frame.activation}"
+                self, f"Frame activation: {self.frame.activation}"
             )
             self.bubble_chamber.loggers["activity"].log(
-                self, f"space activation: {self.contextual_space.activation}"
+                self, f"Number of equivalent views: {no_of_equivalent_views}"
             )
-            self.confidence = statistics.fmean(
-                [
-                    (1 - self.bubble_chamber.focus.focussedness),
-                    self.frame.activation,
-                    self.contextual_space.activation,
-                ]
+            self.confidence = (
+                self.frame.activation * 0.5 ** no_of_equivalent_views
+                if no_of_equivalent_views > 0
+                else self.frame.activation
             )

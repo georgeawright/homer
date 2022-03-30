@@ -53,7 +53,7 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
                 self.target_projectee.parent_spaces.where(is_contextual_space=True)
             )
             no_of_correspondences = len(self.target_projectee.correspondences)
-            if no_of_parent_spaces - 1 != no_of_correspondences:
+            if no_of_parent_spaces > 1 and no_of_correspondences < 1:
                 self.bubble_chamber.loggers["activity"].log(
                     self, "Not enough correspondences to target projectee"
                 )

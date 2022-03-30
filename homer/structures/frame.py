@@ -77,11 +77,29 @@ class Frame(Structure):
         ).where(is_correspondence=False)
 
     @property
+    def corresponded_items(self) -> StructureCollection:
+        return StructureCollection.union(
+            self.input_space.contents.filter(
+                lambda x: not x.correspondences.is_empty()
+            ),
+            self.output_space.contents.filter(
+                lambda x: not x.correspondences.is_empty()
+            ),
+        ).where(is_correspondence=False)
+
+    @property
     def uncorresponded_items(self) -> StructureCollection:
         return StructureCollection.union(
             self.input_space.contents.filter(lambda x: x.correspondences.is_empty()),
             self.output_space.contents.filter(lambda x: x.correspondences.is_empty()),
         ).where(is_correspondence=False)
+
+    @property
+    def progenitor(self) -> Frame:
+        self_progenitor = self
+        while self_progenitor.parent_frame is not None:
+            self_progenitor = self_progenitor.parent_frame
+        return self_progenitor
 
     def instantiate(
         self,

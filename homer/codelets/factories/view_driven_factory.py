@@ -91,6 +91,10 @@ class ViewDrivenFactory(Factory):
                 follow_up = self._spawn_non_projection_suggester()
         elif (
             self.target_slot.parent_space == self.target_view.parent_frame.output_space
+            or (
+                self.target_slot in self.target_view.parent_frame.output_space.contents
+                and not self.target_slot.correspondences.is_empty()
+            )
         ):
             follow_up = self._spawn_projection_suggester()
         else:  # slot is in sub-frame
@@ -112,33 +116,38 @@ class ViewDrivenFactory(Factory):
         input_structures = self.target_view.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence and x.correspondences.is_empty()
         )
-        if input_structures.is_empty():
-            output_structures = (
-                self.target_view.parent_frame.output_space.contents.filter(
-                    lambda x: not x.is_correspondence
-                    and x.correspondences_to_space(
-                        self.target_view.output_space
-                    ).is_empty()
-                )
+        if not input_structures.where(is_relation=True).is_empty():
+            return input_structures.where(is_relation=True).get()
+        if not input_structures.where(is_label=True).is_empty():
+            return input_structures.where(is_label=True).get()
+        if not input_structures.where(is_chunk=True).is_empty():
+            return input_structures.where(is_chunk=True).get()
+
+        output_structures = self.target_view.parent_frame.output_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and x.parent_space != self.target_view.parent_frame.output_space
+            and x.correspondences.is_empty()
+        )
+        if not output_structures.where(is_relation=True).is_empty():
+            return output_structures.where(is_relation=True).get()
+        if not output_structures.where(is_label=True).is_empty():
+            return output_structures.where(is_label=True).get()
+        if not output_structures.where(is_chunk=True).is_empty():
+            return output_structures.where(is_chunk=True).get()
+
+        projectable_structures = (
+            self.target_view.parent_frame.output_space.contents.filter(
+                lambda x: not x.is_correspondence
+                and x.correspondences_to_space(self.target_view.output_space).is_empty()
             )
-            output_chunks = output_structures.where(is_chunk=True)
-            if not output_chunks.is_empty():
-                return output_chunks.get()
-            output_labels = output_structures.where(is_label=True)
-            if not output_labels.is_empty():
-                return output_labels.get()
-            output_relations = output_structures.where(is_relation=True)
-            if not output_relations.is_empty():
-                return output_relations.get()
-        input_relations = input_structures.where(is_relation=True)
-        if not input_relations.is_empty():
-            return input_relations.get()
-        input_labels = input_structures.where(is_label=True)
-        if not input_labels.is_empty():
-            return input_labels.get()
-        input_chunks = input_structures.where(is_chunk=True)
-        if not input_chunks.is_empty():
-            return input_chunks.get()
+        )
+        if not projectable_structures.where(is_chunk=True).is_empty():
+            return projectable_structures.where(is_chunk=True).get()
+        if not projectable_structures.where(is_label=True).is_empty():
+            return projectable_structures.where(is_label=True).get()
+        if not projectable_structures.where(is_relation=True).is_empty():
+            return projectable_structures.where(is_relation=True).get()
+
         raise MissingStructureError
 
     def _spawn_non_projection_suggester(self):
@@ -250,7 +259,7 @@ class ViewDrivenFactory(Factory):
                     "target_structure_two": target_structure_two,
                     "parent_concept": parent_concept,
                 },
-                self.target_slot.uncorrespondedness,
+                self.target_view.unhappiness,
             )
         raise Exception("Slot is not a label or a relation.")
 
@@ -286,7 +295,7 @@ class ViewDrivenFactory(Factory):
                 "target_structure_two": self.target_slot,
                 "parent_concept": self.bubble_chamber.concepts["same"],
             },
-            self.target_slot.uncorrespondedness,
+            self.target_view.unhappiness,
         )
         self.bubble_chamber.loggers["activity"].log(self, f"follow_up: {follow_up}")
         follow_up._get_target_conceptual_space(self, follow_up)
@@ -316,7 +325,7 @@ class ViewDrivenFactory(Factory):
                 "target_space_two": target_space_two,
                 "target_structure_two": self.target_slot,
             },
-            self.target_slot.uncorrespondedness,
+            self.target_view.unhappiness,
         )
 
     def _spawn_potential_sub_frame_to_frame_correspondence_suggester(self):
@@ -388,7 +397,7 @@ class ViewDrivenFactory(Factory):
                 "target_structure_two": self.target_slot,
                 "sub_frame": sub_frame,
             },
-            self.target_slot.uncorrespondedness,
+            self.target_view.unhappiness,
         )
         follow_up._get_target_conceptual_space(self, follow_up)
         views_with_correct_conceptual_space = (
@@ -515,7 +524,7 @@ class ViewDrivenFactory(Factory):
             self.codelet_id,
             self.bubble_chamber,
             self.coderack,
-            self.target_view.exigency,
+            self.target_view.unhappiness,
             target_view=target_sub_view,
         )
 
@@ -552,5 +561,5 @@ class ViewDrivenFactory(Factory):
                 "prioritized_targets": prioritized_targets,
                 "prioritized_conceptual_spaces": prioritized_conceptual_spaces,
             },
-            self.target_slot.uncorrespondedness,
+            self.target_view.unhappiness,
         )

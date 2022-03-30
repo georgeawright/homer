@@ -111,12 +111,16 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 return False
         except MissingStructureError:
             pass
-        return self.target_view.can_accept_member(
+        can_accept = self.target_view.can_accept_member(
             self.parent_concept,
             self.target_conceptual_space,
             self.target_structure_one,
             self.target_structure_two,
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"View can accept member?: {can_accept}"
+        )
+        return can_accept
 
     def _fizzle(self):
         from .space_to_frame_correspondence_suggester import (

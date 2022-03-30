@@ -6,7 +6,6 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 from homer.id import ID
 from homer.structure_collection import StructureCollection
-from homer.structure_collection_keys import activation
 
 
 class WorldviewSetter(Codelet):
@@ -125,7 +124,7 @@ class WorldviewSetter(Codelet):
                 self.bubble_chamber,
                 self.coderack,
                 max(
-                    self.bubble_chamber.general_satisfaction(),
+                    self.bubble_chamber.general_satisfaction,
                     self.MINIMUM_CODELET_URGENCY,
                 ),
             )

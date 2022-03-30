@@ -74,7 +74,7 @@ class FocusUnsetter(Codelet):
                 [
                     current_satisfaction_score,
                     transposed_change_in_satisfaction_score,
-                    1 - self.bubble_chamber.focus.view.unhappiness,
+                    # 1 - self.bubble_chamber.focus.view.unhappiness,
                 ]
             )
         self.bubble_chamber.loggers["activity"].log(
