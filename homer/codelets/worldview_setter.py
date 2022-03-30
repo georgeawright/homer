@@ -94,9 +94,12 @@ class WorldviewSetter(Codelet):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Number of frame types in view: {number_of_frame_types_in_view}"
         )
-        potential_worldview_satisfaction = self.target_view.quality * (
-            proportion_of_input_in_view / number_of_frame_types_in_view
+        potential_worldview_satisfaction = (
+            self.target_view.quality * proportion_of_input_in_view
         )
+        # potential_worldview_satisfaction = self.target_view.quality * (
+        #    proportion_of_input_in_view / number_of_frame_types_in_view
+        # )
         self.bubble_chamber.loggers["activity"].log(
             self,
             f"Potential worldview satisfaction: {potential_worldview_satisfaction}",
