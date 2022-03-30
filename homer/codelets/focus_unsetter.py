@@ -21,6 +21,7 @@ class FocusUnsetter(Codelet):
         self.bubble_chamber = bubble_chamber
         self.coderack = coderack
         self.last_satisfaction_score = last_satisfaction_score
+        self.target_view = self.bubble_chamber.focus.view
         self.result = None
 
     @classmethod
@@ -70,11 +71,9 @@ class FocusUnsetter(Codelet):
             self._update_worldview_setter_urgency()
         else:
             probability_of_unsetting_focus = statistics.fmean(
-                # possibly consider adding 1-view.unhappiness
                 [
                     current_satisfaction_score,
                     transposed_change_in_satisfaction_score,
-                    # 1 - self.bubble_chamber.focus.view.unhappiness,
                 ]
             )
         self.bubble_chamber.loggers["activity"].log(
@@ -121,6 +120,7 @@ class FocusUnsetter(Codelet):
 
     def _engender_follow_up(self):
         from homer.codelets import FocusSetter
+        from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 
         self.child_codelets.append(
             FocusSetter.spawn(
@@ -128,5 +128,13 @@ class FocusUnsetter(Codelet):
                 self.bubble_chamber,
                 self.coderack,
                 0.5,
+            )
+        )
+        self.child_codelets.append(
+            SimplexViewEvaluator.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.bubble_chamber.new_structure_collection(self.target_view),
+                1.0,
             )
         )
