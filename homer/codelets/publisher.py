@@ -1,15 +1,15 @@
-import random
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
 from homer.codelet_result import CodeletResult
-from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from homer.hyper_parameters import HyperParameters
 from homer.id import ID
-from homer.structure_collection_keys import activation
 
 
 class Publisher(Codelet):
+
+    PUBLICATION_PROBABILITY_EXPONENT = HyperParameters.PUBLICATION_PROBABILITY_EXPONENT
+
     def __init__(
         self,
         codelet_id: str,
@@ -30,34 +30,43 @@ class Publisher(Codelet):
         )
 
     def run(self) -> CodeletResult:
-        try:
-            target_view = self.bubble_chamber.new_structure_collection(
-                *[
-                    view
-                    for view in self.bubble_chamber.monitoring_views
-                    if any(
-                        [
-                            structure.has_label_with_name("s")
-                            for structure in view.output_space.contents
-                        ]
-                    )
-                ]
-            ).get(key=activation)
-        except MissingStructureError:
-            return self._fail()
-        if (
-            target_view.quality > random.random()
-            and target_view.activation > random.random()
+        target_view = self.bubble_chamber.worldview.view
+        if target_view is None:
+            self.bubble_chamber.loggers["activity"].log(self, "There is no worldview.")
+            self._fizzle()
+            self.result = CodeletResult.FIZZLE
+        elif (
+            target_view.parent_frame.parent_concept
+            != self.bubble_chamber.concepts["sentence"]
         ):
-            words = list(target_view.output_space.contents.where(is_word=True))
-            words.sort(key=lambda word: word.location.coordinates[0][0])
-            text = " ".join([word.value for word in words])
-            self.bubble_chamber.result = text
-            self.result = CodeletResult.FINISH
-            return self.result
-        return self._fail()
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Worldview has no sentence."
+            )
+            self._fizzle()
+            self.result = CodeletResult.FIZZLE
+        else:
+            random_number = self.bubble_chamber.random_machine.generate_number()
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Random number: {random_number}"
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self,
+                f"Worldview satisfaction: {self.bubble_chamber.worldview.satisfaction}",
+            )
+            if (
+                self.bubble_chamber.worldview.satisfaction
+                ** self.PUBLICATION_PROBABILITY_EXPONENT
+                > random_number
+            ):
+                self._fizzle()
+                self.result = CodeletResult.FIZZLE
+            else:
+                main_chunk = target_view.output_space.contents.filter(
+                    lambda x: x.is_chunk and x.super_chunks.is_empty()
+                ).get()
+                self.bubble_chamber.result = main_chunk.name
+                self.result = CodeletResult.FINISH
+        self.bubble_chamber.loggers["activity"].log_result(self)
 
-    def _fail(self) -> CodeletResult:
+    def _fizzle(self) -> CodeletResult:
         self.bubble_chamber.concepts["publish"].decay_activation()
-        self.result = CodeletResult.FAIL
-        return self.result

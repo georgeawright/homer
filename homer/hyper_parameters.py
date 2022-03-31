@@ -1,6 +1,6 @@
 class HyperParameters:
     FLOATING_POINT_TOLERANCE = 1e-5
-    CODELET_RUN_LIMIT = 30000
+    CODELET_RUN_LIMIT = 1e5
 
     ACTIVATION_UPDATE_FREQUENCY = 10
     ACTIVATION_UPDATE_COEFFICIENT = 0.5
@@ -11,6 +11,7 @@ class HyperParameters:
     MINIMUM_CODELET_URGENCY = 0.01
 
     DETERMINISM_SMOOTHING_FUNCTION = lambda x: (x + 0.5) / 2
+    PUBLICATION_PROBABILITY_EXPONENT = 8
 
     # TODO: these ought to be removed when suggesters are implemented
     CONFIDENCE_THRESHOLD = 0.5

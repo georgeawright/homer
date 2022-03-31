@@ -120,5 +120,5 @@ class Homer:
 
     def print_results(self):
         print(f"codelets run: {self.coderack.codelets_run}")
-        print(f"satisfaction: {self.bubble_chamber.satisfaction}")
+        print(f"satisfaction: {self.bubble_chamber.worldview.satisfaction}")
         print(f"result: {self.bubble_chamber.result}")
