@@ -91,8 +91,18 @@ class Frame(Structure):
     def uncorresponded_items(self) -> StructureCollection:
         return StructureCollection.union(
             self.input_space.contents.filter(lambda x: x.correspondences.is_empty()),
-            self.output_space.contents.filter(lambda x: x.correspondences.is_empty()),
+            self.output_space.contents.filter(
+                lambda x: x.parent_space != self.output_space
+                and x.correspondences.is_empty()
+            ),
         ).where(is_correspondence=False)
+
+    @property
+    def unprojected_items(self) -> StructureCollection:
+        return self.output_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and x.correspondences.where(start=x).is_empty()
+        )
 
     @property
     def progenitor(self) -> Frame:

@@ -95,8 +95,13 @@ class View(Structure):
         return self.parent_frame.slots
 
     def recalculate_unhappiness(self):
-        no_of_uncorresponded_items = len(self.parent_frame.uncorresponded_items)
-        self.unhappiness = 1 - 0.5 ** no_of_uncorresponded_items
+        items_to_process = sum(
+            [
+                len(self.parent_frame.uncorresponded_items),
+                len(self.parent_frame.unprojected_items),
+            ]
+        )
+        self.unhappiness = 1 - 0.5 ** items_to_process
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError
