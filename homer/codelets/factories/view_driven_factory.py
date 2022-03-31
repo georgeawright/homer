@@ -458,7 +458,8 @@ class ViewDrivenFactory(Factory):
         )
         views_with_correct_frame_and_spaces = (
             self.bubble_chamber.production_views.filter(
-                lambda x: (x.parent_frame.parent_concept == sub_frame.parent_concept)
+                lambda x: x != self.target_view
+                and (x.parent_frame.parent_concept == sub_frame.parent_concept)
                 and (x.input_spaces == self.target_view.input_spaces)
             )
         )

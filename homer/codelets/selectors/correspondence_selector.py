@@ -1,7 +1,7 @@
 from homer.codelets.selector import Selector
 from homer.codelets.evaluators import CorrespondenceEvaluator
 from homer.errors import MissingStructureError
-from homer.structure_collection_keys import activation, corresponding_exigency
+from homer.structure_collection_keys import activation
 
 
 class CorrespondenceSelector(Selector):

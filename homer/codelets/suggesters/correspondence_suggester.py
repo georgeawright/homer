@@ -65,7 +65,9 @@ class CorrespondenceSuggester(Suggester):
             lambda x: not x.is_correspondence and x.correspondences.is_empty()
         )
         output_structures = target_view.parent_frame.output_space.contents.filter(
-            lambda x: not x.is_correspondence and x.correspondences.is_empty()
+            lambda x: not x.is_correspondence
+            and x.parent_space != target_view.parent_frame.output_space
+            and x.correspondences.is_empty()
         )
         if not input_structures.where(is_relation=True).is_empty():
             target_structure_two = input_structures.where(is_relation=True).get()
@@ -73,12 +75,12 @@ class CorrespondenceSuggester(Suggester):
             target_structure_two = input_structures.where(is_label=True).get()
         elif not input_structures.where(is_chunk=True).is_empty():
             target_structure_two = input_structures.where(is_chunk=True).get()
-        elif not output_structures.where(is_chunk=True).is_empty():
-            target_structure_two = output_structures.where(is_chunk=True).get()
-        elif not output_structures.where(is_label=True).is_empty():
-            target_structure_two = output_structures.where(is_label=True).get()
         elif not output_structures.where(is_relation=True).is_empty():
             target_structure_two = output_structures.where(is_relation=True).get()
+        elif not output_structures.where(is_label=True).is_empty():
+            target_structure_two = output_structures.where(is_label=True).get()
+        elif not output_structures.where(is_chunk=True).is_empty():
+            target_structure_two = output_structures.where(is_chunk=True).get()
         else:
             raise MissingStructureError
         target_space_two = target_structure_two.parent_space
@@ -207,11 +209,6 @@ class CorrespondenceSuggester(Suggester):
             bubble_chamber.loggers["activity"].log(
                 calling_codelet,
                 f"Attempting to find target structure one from target space one",
-            )
-            bubble_chamber.loggers["activity"].log_collection(
-                calling_codelet,
-                correspondence_suggester.target_space_one.contents,
-                "target space one contents",
             )
             CorrespondenceSuggester._get_target_structure_one_from_collection(
                 calling_codelet,

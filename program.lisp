@@ -150,124 +150,144 @@
 
 (define grammar-distance-to-proximity 0.1)
 (define grammar-concept
-  (def-concept :name "grammar" :distance_function centroid_euclidean_distance
+  (def-concept :name "grammar" :distance_function boolean_distance
     :instance_type LetterChunk))
 (define grammar-space
   (def-conceptual-space :name "grammar" :parent_concept grammar-concept
     :no_of_dimensions 0 :is_basic_level True))
+
+(define sentence-location (Location (list (list 1)) grammar-space))
+(define np-location (Location (list (list 2)) grammar-space))
+(define vp-location (Location (list (list 3)) grammar-space))
+(define ap-location (Location (list (list 4)) grammar-space))
+(define rp-location (Location (list (list 5)) grammar-space))
+(define pp-location (Location (list (list 6)) grammar-space))
+(define nn-location (Location (list (list 7)) grammar-space))
+(define vb-location (Location (list (list 8)) grammar-space))
+(define jj-location (Location (list (list 9)) grammar-space))
+(define jjr-location (Location (list (list 10)) grammar-space))
+(define rb-location (Location (list (list 11)) grammar-space))
+(define cop-location (Location (list (list 12)) grammar-space))
+(define prep-location (Location (list (list 13)) grammar-space))
+(define det-location (Location (list (list 14)) grammar-space))
+(define nsubj-location (Location (list (list 15)) grammar-space))
+(define predicate-location (Location (list (list 16)) grammar-space))
+(define conj-location (Location (list (list 17)) grammar-space))
+(define null-location (Location (list (list 18)) grammar-space))
+
 (define sentence-concept
-  (def-concept :name "sentence" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "sentence" :locations (list sentence-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 4 :distance_function centroid_euclidean_distance
+    :depth 4 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define np-concept
-  (def-concept :name "np" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "np" :locations (list np-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 2 :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define vp-concept
-  (def-concept :name "vp" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "vp" :locations (list vp-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 2 :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define ap-concept
-  (def-concept :name "ap" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "ap" :locations (list ap-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 2 :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define rp-concept
-  (def-concept :name "rp" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "rp" :locations (list rp-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 2 :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define pp-concept
-  (def-concept :name "pp" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "pp" :locations (list pp-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 2 :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define nn-concept
-  (def-concept :name "nn" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "nn" :locations (list nn-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define vb-concept
-  (def-concept :name "vb" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "vb" :locations (list vb-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define jj-concept
-  (def-concept :name "jj" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "jj" :locations (list jj-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define jjr-concept
-  (def-concept :name "jjr" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "jjr" :locations (list jjr-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define rb-concept
-  (def-concept :name "rb" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "rb" :locations (list rb-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define cop-concept
-  (def-concept :name "cop" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "cop" :locations (list cop-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define prep-concept
-  (def-concept :name "prep" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "prep" :locations (list prep-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define det-concept
-  (def-concept :name "det" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "det" :locations (list det-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define nsubj-concept
-  (def-concept :name "nsubj" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "nsubj" :locations (list nsubj-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 1 :distance_function centroid_euclidean_distance
+    :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define predicate-concept
-  (def-concept :name "predicate" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "predicate" :locations (list predicate-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 2 :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define conj-concept
-  (def-concept :name "conj" :locations (list (Location (list (list)) grammar-space))
+  (def-concept :name "conj" :locations (list conj-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
-    :depth 2 :distance_function centroid_euclidean_distance
+    :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 
 (define the
   (def-letter-chunk :name "the" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list det-location)))
 (define is
   (def-letter-chunk :name "is" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list cop-location)))
 (define will
   (def-letter-chunk :name "will" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list vb-location)))
 (define be
   (def-letter-chunk :name "be" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list cop-location)))
 (define temperatures
   (def-letter-chunk :name "temperatures" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list nn-location)))
 (define in
   (def-letter-chunk :name "in" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list prep-location)))
 (define than
   (def-letter-chunk :name "than" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list prep-location)))
 (define and
   (def-letter-chunk :name "and" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list conj-location)))
 (define but
   (def-letter-chunk :name "but" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list conj-location)))
 (define comma
   (def-letter-chunk :name "comma" :parent_space grammar-space
     :locations (list (Location (list) grammar-space))))
@@ -279,7 +299,7 @@
     :locations (list (Location (list) grammar-space))))
 (define null
   (def-letter-chunk :name "" :parent_space grammar-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list null-location)))
 
 (define same-different-concept
   (def-concept :name "same-different" :locations (list) :classifier None :instance_type None
@@ -720,16 +740,32 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define letter-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) temperature-space)
-		     (Location (list) grammar-space)
+		     jj-location
 		     (Location (list) jj-output))
     :parent_space jj-output))
 (define letter-chunk-grammar-label
   (def-label :start letter-chunk :parent_concept jj-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list jj-location
 		     (Location (list) jj-output))))
 (define letter-chunk-meaning-label
   (def-label :start letter-chunk :parent_concept label-parent-concept
     :locations (list (Location (list (list Nan)) temperature-space)
+		     (Location (list) jj-output))))
+(define null-chunk
+  (def-letter-chunk :name ""
+    :locations (list null-location
+		     (Location (list) jj-output))
+    :parent_space jj-output))
+(define ap-super-chunk
+  (def-letter-chunk :name None
+    :locations (list ap-location
+		     (Location (list) jj-output))
+    :parent_space jj-output
+    :left_branch (StructureCollection letter-chunk)
+    :right_branch (StructureCollection null-chunk)))
+(define ap-super-chunk-label
+  (def-label :start ap-super-chunk :parent_concept ap-concept
+    :locations (list ap-location
 		     (Location (list) jj-output))))
 
 (def-relation :start label-concept :end jj-frame
@@ -768,18 +804,34 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define letter-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan Nan)) location-space)
-		     (Location (list) grammar-space)
+		     nn-location
 		     (Location (list) nn-output))
     :parent_space nn-output))
 (define letter-chunk-grammar-label
   (def-label :start letter-chunk :parent_concept nn-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list) nn-output))))
 (define letter-chunk-meaning-label
   (def-label :start letter-chunk :parent_concept label-parent-concept
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list) nn-output))))
-
+(define null-chunk
+  (def-letter-chunk :name ""
+    :locations (list null-location
+		     (Location (list) nn-output))
+    :parent_space nn-output))
+(define np-super-chunk
+  (def-letter-chunk :name None
+    :locations (list np-location
+		     (Location (list) nn-output))
+    :parent_space nn-output
+    :left_branch (StructureCollection letter-chunk)
+    :right_branch (StructureCollection null-chunk)))
+(define np-super-chunk-label
+  (def-label :start np-super-chunk :parent_concept np-concept
+    :locations (list np-location
+		     (Location (list) nn-output))))
+   
 (def-relation :start label-concept :end nn-frame
   :is_bidirectional True :activation 1.0)
 (def-relation :start chunk-concept :end nn-frame
@@ -832,26 +884,26 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define jjr-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) temperature-space)
-		     (Location (list) grammar-space)
+		     jjr-location
 		     (Location (list) rp-output))
     :parent_space rp-output))
 (define er-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) temperature-space)
-		     (Location (list) grammar-space)
+		     jjr-location
 		     (Location (list) rp-output))
     :parent_space rp-output))
 (define jjr-super-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) temperature-space)
-		     (Location (list) grammar-space)
+		     rp-location
 		     (Location (list) rp-output))
     :parent_space rp-output
     :left_branch (StructureCollection jjr-chunk)
     :right_branch (StructureCollection er-chunk)))
 (define jjr-chunk-grammar-label
   (def-label :start jjr-chunk :parent_concept jjr-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list jjr-location
 		     (Location (list) rp-output))))
 (define jjr-chunk-meaning-label
   (def-label :start jjr-chunk :parent_concept label-parent-concept
@@ -862,8 +914,8 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list (Location (list) grammar-space)
 		     (Location (list) rp-output))))
 (define jjr-super-chunk-label
-  (def-label :start jjr-super-chunk :parent_concept jjr-concept
-    :locations (list (Location (list) grammar-space)
+  (def-label :start jjr-super-chunk :parent_concept rp-concept
+    :locations (list rp-location
 		     (Location (list) rp-output))))
 
 (def-relation :start label-concept :end rp-frame
@@ -991,166 +1043,166 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_space conceptual-space))
 (define sentence-word-1
   (def-letter-chunk :name "temperatures"
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :abstract_chunk temperatures))
 (define sentence-word-1-label
   (def-label :start sentence-word-1 :parent_concept nsubj-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) comparative-sentence-output))))
 (define sentence-word-2
   (def-letter-chunk :name "will"
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :abstract_chunk will))
 (define sentence-word-3
   (def-letter-chunk :name "be"
-    :locations (list (Location (list) grammar-space)
+    :locations (list cop-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :abstract_chunk be))
 (define sentence-word-4
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list rp-location
 		     (Location (list) rp-sub-frame-output)
 		     (Location (list) comparative-sentence-output))
     :parent_space rp-sub-frame-output))
 (define jjr-chunk-grammar-label
-  (def-label :start sentence-word-4 :parent_concept jjr-concept
-    :locations (list (Location (list) grammar-space)
+  (def-label :start sentence-word-4 :parent_concept rp-concept
+    :locations (list rp-location
 		     (Location (list) rp-sub-frame-output))))
 (define sentence-word-5
   (def-letter-chunk :name "in"
-    :locations (list (Location (list) grammar-space)
+    :locations (list prep-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :abstract_chunk in))
 (define sentence-word-6
   (def-letter-chunk :name "the"
-    :locations (list (Location (list) grammar-space)
+    :locations (list det-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :abstract_chunk the))
 (define sentence-word-7
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list np-location
 		     (Location (list (list Nan Nan)) location-space)
 		     (Location (list) nn-sub-frame-1-output)
 		     (Location (list) comparative-sentence-output))
     :parent_space nn-sub-frame-1-output))
 (define nn-1-grammar-label
   (def-label :start sentence-word-7 :parent_concept np-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list np-location
 		     (Location (list) nn-sub-frame-1-output))))
 (define sentence-word-8
   (def-letter-chunk :name "than"
-    :locations (list (Location (list) grammar-space)
+    :locations (list prep-location
 		     (Location (list) comparative-sentence-output))
     :abstract_chunk than))
 (define sentence-word-9
   (def-letter-chunk :name "in"
-    :locations (list (Location (list) grammar-space)
+    :locations (list prep-location
 		     (Location (list) comparative-sentence-output))
     :abstract_chunk in))
 (define sentence-word-10
   (def-letter-chunk :name "the"
-    :locations (list (Location (list) grammar-space)
+    :locations (list det-location
 		     (Location (list) comparative-sentence-output))
     :abstract_chunk the))
 (define sentence-word-11
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list np-location
 		     (Location (list (list Nan Nan)) location-space)
 		     (Location (list) nn-sub-frame-2-output)
 		     (Location (list) comparative-sentence-output))
     :parent_space nn-sub-frame-2-output))
 (define nn-2-chunk-grammar-label
   (def-label :start sentence-word-11 :parent_concept np-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list np-location
 		     (Location (list) nn-sub-frame-2-output))))
 (define vb-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-2)
     :right_branch (StructureCollection sentence-word-3)))
 (define vb-super-chunk-label
   (def-label :start vb-super-chunk :parent_concept vb-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) comparative-sentence-output))))
 (define np-1-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list np-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-6)
     :right_branch (StructureCollection sentence-word-7)))
 (define np-2-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list np-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-10)
     :right_branch (StructureCollection sentence-word-11)))
 (define pp-1-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list pp-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-5)
     :right_branch (StructureCollection np-1-super-chunk)))
 (define pp-2-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list pp-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-9)
     :right_branch (StructureCollection np-2-super-chunk)))
 (define rp-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list rp-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-4)
     :right_branch (StructureCollection pp-1-super-chunk)))
 (define comp-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-8)
     :right_branch (StructureCollection pp-2-super-chunk)))
 (define pred-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection rp-super-chunk)
     :right_branch (StructureCollection comp-super-chunk)))
 (define pred-super-chunk-label
    (def-label :start pred-super-chunk :parent_concept predicate-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) comparative-sentence-output))))
 (define vp-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection vb-super-chunk)
     :right_branch (StructureCollection pred-super-chunk)))
 (define sentence-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection sentence-word-1)
     :right_branch (StructureCollection vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) comparative-sentence-output))))
 
 (def-relation :start label-concept :end comparative-sentence
@@ -1213,37 +1265,37 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 
 (define s-and-subject-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-1-output))
     :parent_space and-sub-frame-1-output))
 (define s-and-subject-1-grammar-label
   (def-label :start s-and-subject-1 :parent_concept nsubj-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) and-sub-frame-1-output))))
 (define s-and-verb-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-1-output))
     :parent_space and-sub-frame-1-output))
 (define s-and-verb-1-grammar-label
   (def-label :start s-and-verb-1 :parent_concept vb-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) and-sub-frame-1-output))))
 (define s-and-predicate-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-1-output))
     :parent_space and-sub-frame-1-output))
 (define s-and-predicate-1-grammar-label
   (def-label :start s-and-predicate-1 :parent_concept predicate-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) and-sub-frame-1-output))))
 (define s-and-vp-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-1-output))
     :left_branch (StructureCollection s-and-verb-1)
@@ -1251,11 +1303,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space and-sub-frame-1-output))
 (define s-and-vp-1-grammar-label
   (def-label :start s-and-vp-1 :parent_concept vp-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) and-sub-frame-1-output))))
 (define s-and-clause-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-1-output))
     :left_branch (StructureCollection s-and-subject-1)
@@ -1263,49 +1315,49 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space and-sub-frame-1-output))
 (define s-and-clause-1-grammar-label
   (def-label :start s-and-clause-1 :parent_concept sentence-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) and-sub-frame-1-output))))
 
 (define s-and
   (def-letter-chunk :name "and"
-    :locations (list (Location (list) grammar-space)
+    :locations (list conj-location
 		     (Location (list) and-sentence-output))
     :parent_space and-sentence-output
     :abstract_chunk and))
 
 (define s-and-subject-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-2-output))
     :parent_space and-sub-frame-2-output))
 (define s-and-subject-2-grammar-label
   (def-label :start s-and-subject-2 :parent_concept nsubj-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) and-sub-frame-2-output))))
 (define s-and-verb-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-2-output))
     :parent_space and-sub-frame-2-output))
 (define s-and-verb-2-grammar-label
   (def-label :start s-and-verb-2 :parent_concept vb-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) and-sub-frame-2-output))))
 (define s-and-predicate-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-2-output))
     :parent_space and-sub-frame-2-output))
 (define s-and-predicate-2-grammar-label
   (def-label :start s-and-predicate-2 :parent_concept predicate-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) and-sub-frame-2-output))))
 (define s-and-vp-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-2-output))
     :left_branch (StructureCollection s-and-verb-2)
@@ -1313,11 +1365,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space and-sub-frame-2-output))
 (define s-and-vp-2-grammar-label
   (def-label :start s-and-vp-2 :parent_concept vp-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) and-sub-frame-2-output))))
 (define s-and-clause-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-2-output))
     :left_branch (StructureCollection s-and-subject-2)
@@ -1325,28 +1377,21 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space and-sub-frame-2-output))
 (define s-and-clause-2-grammar-label
   (def-label :start s-and-clause-2 :parent_concept sentence-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) and-sub-frame-2-output))))
 
 (define conjunction-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list conj-location
 		     (Location (list) and-sentence-output))
     :left_branch (StructureCollection s-and)
     :right_branch (StructureCollection s-and-clause-2)))
 (define sentence-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) and-sentence-output))
     :left_branch (StructureCollection s-and-clause-1)
     :right_branch (StructureCollection conjunction-super-chunk)))
-
-(def-relation
-  :start s-and-subject-1 :end s-and-subject-2 :parent_concept same-concept)
-(def-relation
-  :start s-and-verb-1 :end s-and-verb-2 :parent_concept same-concept)
-(def-relation
-  :start s-and-predicate-1 :end s-and-predicate-2 :parent_concept same-concept)
 
 (def-relation :start same-concept :end and-sentence
   :is_bidirectional True :activation 1.0)
@@ -1418,37 +1463,37 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 
 (define s-but-subject-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-1-output))
     :parent_space but-sub-frame-1-output))
 (define s-but-subject-1-grammar-label
   (def-label :start s-but-subject-1 :parent_concept nsubj-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) but-sub-frame-1-output))))
 (define s-but-verb-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-1-output))
     :parent_space but-sub-frame-1-output))
 (define s-but-verb-1-grammar-label
   (def-label :start s-but-verb-1 :parent_concept vb-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) but-sub-frame-1-output))))
 (define s-but-predicate-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-1-output))
     :parent_space but-sub-frame-1-output))
 (define s-but-predicate-1-grammar-label
   (def-label :start s-but-predicate-1 :parent_concept predicate-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) but-sub-frame-1-output))))
 (define s-but-vp-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-1-output))
     :left_branch (StructureCollection s-but-verb-1)
@@ -1456,11 +1501,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space but-sub-frame-1-output))
 (define s-but-vp-1-grammar-label
   (def-label :start s-but-vp-1 :parent_concept vp-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) but-sub-frame-1-output))))
 (define s-but-clause-1
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-1-output))
     :left_branch (StructureCollection s-but-subject-1)
@@ -1468,49 +1513,49 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space but-sub-frame-1-output))
 (define s-but-clause-1-grammar-label
   (def-label :start s-but-clause-1 :parent_concept sentence-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) but-sub-frame-1-output))))
 
 (define s-but
   (def-letter-chunk :name "but"
-    :locations (list (Location (list) grammar-space)
+    :locations (list conj-location
 		     (Location (list) but-sentence-output))
     :parent_space but-sentence-output
     :abstract_chunk but))
 
 (define s-but-subject-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-2-output))
     :parent_space but-sub-frame-2-output))
 (define s-but-subject-2-grammar-label
   (def-label :start s-but-subject-2 :parent_concept nsubj-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list nsubj-location
 		     (Location (list) but-sub-frame-2-output))))
 (define s-but-verb-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-2-output))
     :parent_space but-sub-frame-2-output))
 (define s-but-verb-2-grammar-label
   (def-label :start s-but-verb-2 :parent_concept vb-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vb-location
 		     (Location (list) but-sub-frame-2-output))))
 (define s-but-predicate-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-2-output))
     :parent_space but-sub-frame-2-output))
 (define s-but-predicate-2-grammar-label
   (def-label :start s-but-predicate-2 :parent_concept predicate-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list predicate-location
 		     (Location (list) but-sub-frame-2-output))))
 (define s-but-vp-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-2-output))
     :left_branch (StructureCollection s-but-verb-2)
@@ -1518,11 +1563,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space but-sub-frame-2-output))
 (define s-but-vp-2-grammar-label
   (def-label :start s-but-vp-2 :parent_concept vp-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list vp-location
 		     (Location (list) but-sub-frame-2-output))))
 (define s-but-clause-2
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) but-sentence-output)
 		     (Location (list) but-sub-frame-2-output))
     :left_branch (StructureCollection s-but-subject-2)
@@ -1530,28 +1575,21 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space but-sub-frame-2-output))
 (define s-but-clause-2-grammar-label
   (def-label :start s-but-clause-2 :parent_concept sentence-concept
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) but-sub-frame-2-output))))
 
 (define conjunction-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list conj-location
 		     (Location (list) but-sentence-output))
     :left_branch (StructureCollection s-but)
     :right_branch (StructureCollection s-but-clause-2)))
 (define sentence-super-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list) grammar-space)
+    :locations (list sentence-location
 		     (Location (list) but-sentence-output))
     :left_branch (StructureCollection s-but-clause-1)
     :right_branch (StructureCollection conjunction-super-chunk)))
-
-(def-relation
-  :start s-but-subject-1 :end s-but-subject-2 :parent_concept same-concept)
-(def-relation
-  :start s-but-verb-1 :end s-but-verb-2 :parent_concept same-concept)
-(def-relation
-  :start s-but-predicate-1 :end s-but-predicate-2 :parent_concept same-concept)
 
 (def-relation :start different-concept :end but-sentence
   :is_bidirectional True :activation 1.0)

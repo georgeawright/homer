@@ -16,6 +16,10 @@ def centroid_difference(a, b) -> float:
     return difference if not math.isnan(difference) else 0
 
 
+def boolean_distance(a, b) -> float:
+    return 0.0 if a == b else math.inf
+
+
 def average_vector(vectors: List[List[Union[float, int]]]):
     return [
         statistics.fmean([vectors[j][i] for j in range(len(vectors))])
