@@ -1043,7 +1043,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :conceptual_space conceptual-space))
 (define sentence-word-1
   (def-letter-chunk :name "temperatures"
-    :locations (list nn-location
+    :locations (list nsubj-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
     :abstract_chunk temperatures))
@@ -1122,22 +1122,6 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-label :start sentence-word-11 :parent_concept np-concept
     :locations (list np-location
 		     (Location (list) nn-sub-frame-2-output))))
-(define nsubj-null-word
-  (def-letter-chunk :name ""
-    :locations (list null-location
-		     (Location (list) comparative-sentence-output))
-    :parent_space comparative-sentence-output))
-(define nsubj-super-chunk
-  (def-letter-chunk :name None
-    :locations (list nsubj-location
-		     (Location (list) comparative-sentence-output))
-    :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-1)
-    :right_branch (StructureCollection nsubj-null-word)))
-(define nsubj-super-chunk-label
-  (def-label :start nsubj-super-chunk :parent_concept nsubj-concept
-    :locations (list nsubj-location
-		     (Location (list) comparative-sentence-output))))
 (define vb-super-chunk
   (def-letter-chunk :name None
     :locations (list vb-location
@@ -1218,7 +1202,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :locations (list sentence-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection nsubj-super-chunk)
+    :left_branch (StructureCollection sentence-word-1)
     :right_branch (StructureCollection vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
