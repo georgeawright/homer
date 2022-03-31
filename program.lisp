@@ -1193,6 +1193,10 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :parent_space comparative-sentence-output
     :left_branch (StructureCollection vb-super-chunk)
     :right_branch (StructureCollection pred-super-chunk)))
+(define vp-super-chunk-label
+   (def-label :start vp-super-chunk :parent_concept vp-concept
+    :locations (list vp-location
+		     (Location (list) comparative-sentence-output))))
 (define sentence-super-chunk
   (def-letter-chunk :name None
     :locations (list sentence-location
