@@ -1,5 +1,6 @@
 from homer.codelets.selector import Selector
 from homer.errors import MissingStructureError
+from homer.hyper_parameters import HyperParameters
 
 
 class ViewSelector(Selector):
@@ -26,9 +27,15 @@ class ViewSelector(Selector):
 
     def _engender_follow_up(self):
         # spawn a top-down view suggester with copy of winning view's frame
-        self.child_codelets.append(
-            self.get_follow_up_class().make(self.codelet_id, self.bubble_chamber)
-        )
+        winning_view = self.winners.get()
+        if winning_view.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE:
+            self.child_codelets.append(
+                self.get_follow_up_class().make(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    frame=winning_view.parent_frame,
+                )
+            )
         self.child_codelets.append(
             self.get_follow_up_evaluator().spawn(
                 self.codelet_id,

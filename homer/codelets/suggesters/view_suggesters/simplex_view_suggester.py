@@ -1,13 +1,11 @@
-import statistics
-
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection_keys import activation
+from homer.structures import Frame
 
 
-# TODO: add contextual space targets for correspondence to prioritize
 class SimplexViewSuggester(ViewSuggester):
     def __init__(
         self,
@@ -36,9 +34,16 @@ class SimplexViewSuggester(ViewSuggester):
         return SimplexViewBuilder
 
     @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber, urgency: float = None):
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        frame: Frame = None,
+        urgency: float = None,
+    ):
         contextual_space = bubble_chamber.input_spaces.get(key=activation)
-        frame = bubble_chamber.frames.where(is_sub_frame=False).get(key=activation)
+        if frame is None:
+            frame = bubble_chamber.frames.where(is_sub_frame=False).get(key=activation)
         views_with_frame = bubble_chamber.views.filter(
             lambda x: x.parent_frame in frame.instances or x.parent_frame == frame
         )
