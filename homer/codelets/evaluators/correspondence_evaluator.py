@@ -1,6 +1,7 @@
+import statistics
+
 from homer.bubble_chamber import BubbleChamber
 from homer.codelets.evaluator import Evaluator
-from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation
 
 
@@ -36,11 +37,22 @@ class CorrespondenceEvaluator(Evaluator):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Evaluating {target_correspondence}"
         )
-        self.confidence = target_correspondence.parent_concept.classifier.classify(
-            space=target_correspondence.conceptual_space,
-            concept=target_correspondence.parent_concept,
-            start=target_correspondence.start,
-            end=target_correspondence.end,
-            view=target_correspondence.parent_view,
+        start = target_correspondence.start
+        end = target_correspondence.end
+        argument_compatibility = (
+            target_correspondence.parent_concept.classifier.classify(
+                space=target_correspondence.conceptual_space,
+                concept=target_correspondence.parent_concept,
+                start=start,
+                end=end,
+                view=target_correspondence.parent_view,
+            )
         )
+        average_argument_quality = statistics.fmean(
+            [
+                start.quality if not start.is_slot else 1.0,
+                end.quality if not end.is_slot else 1.0,
+            ]
+        )
+        self.confidence = argument_compatibility * average_argument_quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
