@@ -1463,7 +1463,8 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (def-relation :start input-chunk-1 :end input-chunk-2 :parent_concept different-concept
   :locations (list (Location (list) but-sentence-input)
 		   (Location (list (list Nan)) same-different-space)
-		   (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space-1)))
+		   (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space-1))
+  :parent_space but-sentence-input)
 
 (define s-but-subject-1
   (def-letter-chunk :name None

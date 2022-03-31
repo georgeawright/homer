@@ -190,7 +190,7 @@ class ViewDrivenFactory(Factory):
         if self.target_slot.is_relation:
             if self.target_slot.parent_concept.is_filled_in:
                 parent_concept = self.target_slot.parent_concept.relatives.where(
-                    is_slot=False
+                    is_concept=True, is_slot=False
                 ).get()
             else:
                 parent_concept = (
