@@ -164,12 +164,12 @@ class ContextualSpace(Space):
                         lambda x: x.is_label and x.start in copies and x not in copies
                     ).get()
                     new_label = label.copy(
-                        start=new_item,
+                        start=copies[label.start],
                         parent_space=new_space,
                         parent_id=parent_id,
                         bubble_chamber=bubble_chamber,
                     )
-                    new_item.links_out.add(new_label)
+                    copies[label.start].links_out.add(new_label)
                     new_space.add(new_label)
                     copies[label] = new_label
                 except MissingStructureError:

@@ -58,6 +58,7 @@ class Structure(ABC):
         self.corresponding_exigency = 0.5
         self.exigency = 0.5
 
+        self.is_link_or_node = False
         self.is_node = False
         self.is_concept = False
         self.is_chunk = False

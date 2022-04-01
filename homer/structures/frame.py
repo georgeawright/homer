@@ -95,7 +95,7 @@ class Frame(Structure):
                 lambda x: x.parent_space != self.output_space
                 and x.correspondences.is_empty()
             ),
-        ).where(is_correspondence=False)
+        ).where(is_correspondence=False, is_link_or_node=False)
 
     @property
     def unprojected_items(self) -> StructureCollection:
@@ -224,7 +224,9 @@ class Frame(Structure):
             space_copies[sub_frame_output_space] = sub_frame_instance.output_space
         for original, copy in input_copies.items():
             if original.parent_space in space_copies:
-                if original.is_node:
+                if original.is_link_or_node:
+                    copy._parent_space = space_copies[original.parent_space]
+                elif original.is_node:
                     copy.parent_space = space_copies[original.parent_space]
                 elif original.is_label or original.is_relation:
                     copy._parent_space = space_copies[original.parent_space]

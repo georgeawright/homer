@@ -31,8 +31,12 @@ class LinkOrNode(Structure):
             parent_spaces=parent_spaces,
         )
         self._parent_space = parent_space
+        self.is_link_or_node = True
         self.is_link = True
         self.is_node = True
+
+    def __dict__(self) -> dict:
+        return {}
 
     def copy_with_contents(
         self,

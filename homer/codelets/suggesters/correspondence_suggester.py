@@ -195,7 +195,9 @@ class CorrespondenceSuggester(Suggester):
             correspondence_suggester.target_view.prioritized_targets,
             "prioritized targets",
         )
-        if not correspondence_suggester.target_view.prioritized_targets.is_empty():
+        if not correspondence_suggester.target_view.prioritized_targets.where(
+            parent_space=correspondence_suggester.target_space_one
+        ).is_empty():
             bubble_chamber.loggers["activity"].log(
                 calling_codelet,
                 f"Attempting to find target structure one from priortitized targets",
@@ -270,21 +272,38 @@ class CorrespondenceSuggester(Suggester):
                 )
                 structure_one_start = None
         if correspondence_suggester.target_structure_two.is_label:
-            source_collection_labels = StructureCollection.union(
-                *[item.labels for item in source_collection]
-            )
-            correspondence_suggester.target_structure_one = (
-                source_collection_labels.filter(
-                    lambda x: x.is_label
-                    and (
-                        (x.start == structure_one_start)
-                        or (structure_one_start is None)
+            if not correspondence_suggester.target_structure_two.start.correspondences.where(
+                parent_view=correspondence_suggester.target_view,
+                end=correspondence_suggester.target_structure_two.start,
+            ).is_empty():
+                correspondence_suggester.target_structure_one = (
+                    correspondence_suggester.target_structure_two.start.correspondences.where(
+                        parent_view=correspondence_suggester.target_view,
+                        end=correspondence_suggester.target_structure_two.start,
                     )
-                    and x.has_location_in_space(
-                        correspondence_suggester.target_conceptual_space
+                    .get()
+                    .start.labels.filter(
+                        lambda x: x.parent_concept
+                        in correspondence_suggester.target_conceptual_space.contents
                     )
-                ).get(key=corresponding_exigency)
-            )
+                    .get()
+                )
+            else:
+                source_collection_labels = StructureCollection.union(
+                    *[item.labels for item in source_collection]
+                )
+                correspondence_suggester.target_structure_one = (
+                    source_collection_labels.filter(
+                        lambda x: x.is_label
+                        and (
+                            (x.start == structure_one_start)
+                            or (structure_one_start is None)
+                        )
+                        and x.has_location_in_space(
+                            correspondence_suggester.target_conceptual_space
+                        )
+                    ).get(key=corresponding_exigency)
+                )
         if correspondence_suggester.target_structure_two.is_relation:
             if (
                 correspondence_suggester.target_structure_two.end

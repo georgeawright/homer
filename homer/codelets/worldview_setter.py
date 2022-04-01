@@ -64,6 +64,7 @@ class WorldviewSetter(Codelet):
                     (raw_input_member, correspondence.conceptual_space)
                     for correspondence in self.target_view.members
                     if correspondence.start.is_link
+                    and correspondence.start.start.is_chunk
                     and correspondence.start.parent_space.is_main_input
                     for raw_input_member in StructureCollection.union(
                         *[

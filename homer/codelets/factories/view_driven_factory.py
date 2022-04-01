@@ -113,27 +113,32 @@ class ViewDrivenFactory(Factory):
         self.child_codelets.append(follow_up)
 
     def _get_target_slot(self):
+        sub_frame_input_structures = (
+            self.target_view.parent_frame.input_space.contents.filter(
+                lambda x: not x.is_correspondence
+                and x.parent_space != self.target_view.parent_frame.input_space
+                and x.correspondences.is_empty()
+            )
+        )
         input_structures = self.target_view.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence and x.correspondences.is_empty()
         )
-        if not input_structures.where(is_relation=True).is_empty():
-            return input_structures.where(is_relation=True).get()
-        if not input_structures.where(is_label=True).is_empty():
-            return input_structures.where(is_label=True).get()
-        if not input_structures.where(is_chunk=True).is_empty():
-            return input_structures.where(is_chunk=True).get()
-
         output_structures = self.target_view.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
             and x.parent_space != self.target_view.parent_frame.output_space
             and x.correspondences.is_empty()
         )
-        if not output_structures.where(is_relation=True).is_empty():
-            return output_structures.where(is_relation=True).get()
-        if not output_structures.where(is_label=True).is_empty():
-            return output_structures.where(is_label=True).get()
-        if not output_structures.where(is_chunk=True).is_empty():
-            return output_structures.where(is_chunk=True).get()
+        for structures in [
+            sub_frame_input_structures,
+            input_structures,
+            output_structures,
+        ]:
+            if not structures.where(is_relation=True).is_empty():
+                return structures.where(is_relation=True).get()
+            if not structures.where(is_label=True).is_empty():
+                return structures.where(is_label=True).get()
+            if not structures.where(is_chunk=True).is_empty():
+                return structures.where(is_chunk=True).get()
 
         projectable_structures = (
             self.target_view.parent_frame.output_space.contents.filter(
@@ -162,7 +167,15 @@ class ViewDrivenFactory(Factory):
                     node = node_group[input_space]
                     break
             if node is None:
-                if self.target_slot.is_link and self.target_slot.is_node:
+                if self.target_slot.start.is_label:
+                    node = (
+                        self.target_slot.start.correspondences.where(
+                            parent_view=self.target_view, end=self.target_slot.start
+                        )
+                        .get()
+                        .start
+                    )
+                if self.target_slot.start.is_link and self.target_slot.start.is_node:
                     node = input_space.contents.where(
                         is_labellable=True, is_slot=False
                     ).get(key=labeling_exigency)
