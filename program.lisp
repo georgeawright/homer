@@ -295,7 +295,7 @@
   (def-letter-chunk :name "fstop" :parent_space grammar-space
     :locations (list (Location (list) grammar-space))))
 (define -er
-  (def-letter-chunk :name "\ber" :parent_space grammar-space
+  (def-letter-chunk :name "[b]er" :parent_space grammar-space
     :locations (list (Location (list) grammar-space))))
 (define null
   (def-letter-chunk :name "" :parent_space grammar-space
