@@ -149,6 +149,23 @@ class Concept(Node):
                     ),
                 ]
             )
+        except NoLocationError:
+            new_location = None
+            for location in other.locations:
+                if location.space.is_conceptual_space:
+                    try:
+                        new_location = (
+                            self.parent_space.location_from_super_space_location(
+                                location
+                            )
+                        )
+                        break
+                    except KeyError:
+                        pass
+            mock_node = Node("", "", [new_location], None, None, None, None, None)
+            if new_location is None:
+                raise NoLocationError
+            return self.distance_from(mock_node)
 
     def distance_from_start(self, other: Node, end: Location = None):
         return self.distance_function(
@@ -166,7 +183,6 @@ class Concept(Node):
         try:
             return self._distance_to_proximity(self.distance_from(other))
         except NoLocationError:
-            # TODO: this should be improved for conceptual metaphor
             return 0.0
 
     def proximity_to_start(self, other: Node, end: Location = None):

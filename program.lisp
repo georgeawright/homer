@@ -403,7 +403,11 @@
     :distance_function centroid_euclidean_distance))
 (define height-space
   (def-conceptual-space :name "height" :parent_concept height-concept
-    :no_of_dimensions 1 :is_basic_level True))
+    :no_of_dimensions 1 :is_basic_level True
+    :super_space_to_coordinate_function_map
+    (dict (list (tuple "temperature" (python """
+lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
+"""))))))
 (define high-concept
   (def-concept :name "high" :locations (list (Location (list (list 10)) height-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
@@ -435,7 +439,11 @@
     :distance_function centroid_euclidean_distance))
 (define goodness-space
   (def-conceptual-space :name "goodness" :parent_concept goodness-concept
-    :no_of_dimensions 1 :is_basic_level True))
+    :no_of_dimensions 1 :is_basic_level True
+    :super_space_to_coordinate_function_map
+    (dict (list (tuple "temperature" (python """
+lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
+"""))))))
 (define good-concept
   (def-concept :name "good" :locations (list (Location (list (list 10)) goodness-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
