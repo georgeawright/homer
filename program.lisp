@@ -803,7 +803,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-contextual-space :name "ap-ap-sub.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
 (define ap-sub-frame
-  (def-frame  :name "ap-ap-sub" :parent_concept ap-concept :parent_frame None
+  (def-sub-frame  :name "ap-ap-sub" :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection label-parent-concept)
     :input_space ap-sub-frame-input
