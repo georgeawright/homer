@@ -71,7 +71,7 @@ class Publisher(Codelet):
             if (
                 self.bubble_chamber.worldview.satisfaction
                 ** self.PUBLICATION_PROBABILITY_EXPONENT
-                > random_number
+                < random_number
             ):
                 self._fizzle()
                 self.result = CodeletResult.FIZZLE
