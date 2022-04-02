@@ -161,6 +161,9 @@ class View(Structure):
                     lambda x: x not in self.parent_frame.concepts and not x.is_slot
                 ).get()
             )
+            for concept in self.parent_frame.concepts:
+                if start_concept in concept.relatives:
+                    return False
             if end.parent_concept.is_slot:
                 for relative in end.parent_concept.relatives.filter(
                     lambda x: x in self.parent_frame.concepts
