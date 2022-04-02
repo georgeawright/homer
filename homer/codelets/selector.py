@@ -66,7 +66,9 @@ class Selector(Codelet):
             self.winners = self.champions
             self.bubble_chamber.loggers["activity"].log_winners(self)
             self.confidence = self.winners.get().quality
-            self._boost_winners()
+            random_number = self.bubble_chamber.random_machine.generate_number()
+            if self.confidence > random_number:
+                self._boost_winners()
             for structure in self.winners:
                 self.bubble_chamber.loggers["structure"].log(structure)
         self._boost_activations()
