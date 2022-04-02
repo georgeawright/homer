@@ -3,7 +3,7 @@ from homer.codelets import Factory
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure_collection import StructureCollection
 from homer.structure_collection_keys import activation
-from homer.structures.links import Correspondence, Label, Relation
+from homer.structures.links import Label, Relation
 from homer.structures.nodes import Concept
 
 

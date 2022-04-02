@@ -10,6 +10,7 @@ from .codelets import (
     Factory,
     FocusSetter,
     FocusUnsetter,
+    Publisher,
     Selector,
     Suggester,
     WorldviewSetter,
@@ -37,6 +38,7 @@ class Coderack:
         Factory,
         FocusSetter,
         FocusUnsetter,
+        Publisher,
         WorldviewSetter,
     )
 
@@ -51,6 +53,7 @@ class Coderack:
     def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
+            Publisher.spawn("", bubble_chamber, 0),
             FocusSetter.spawn("", bubble_chamber, coderack, 0.5),
             WorldviewSetter.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY

@@ -34,7 +34,6 @@ class StructureConceptDrivenFactory(Factory):
         self.child_codelets.append(follow_up)
 
     def _decide_follow_up_class(self):
-        from homer.codelets import Publisher
         from homer.codelets.suggesters import (
             ChunkSuggester,
             CorrespondenceSuggester,
@@ -70,7 +69,6 @@ class StructureConceptDrivenFactory(Factory):
 
         suggest = self.bubble_chamber.concepts["suggest"]
         evaluate = self.bubble_chamber.concepts["evaluate"]
-        publish = self.bubble_chamber.concepts["publish"]
 
         intra = self.bubble_chamber.concepts["inner"]
         inter = self.bubble_chamber.concepts["outer"]
@@ -100,15 +98,13 @@ class StructureConceptDrivenFactory(Factory):
         relation_inter = relation.relations.where(end=inter).get()
 
         activity_concepts = self.bubble_chamber.new_structure_collection(
-            suggest, evaluate, publish
+            suggest, evaluate
         )
 
         activity_concept = activity_concepts.get(key=self.node_key)
         self.bubble_chamber.loggers["activity"].log(
             self, f"Found activity concept: {activity_concept}"
         )
-        if activity_concept == publish:
-            return Publisher
         if activity_concept == evaluate:
             structure_link = self.bubble_chamber.new_structure_collection(
                 evaluate_view_simplex, evaluate_view_monitoring
