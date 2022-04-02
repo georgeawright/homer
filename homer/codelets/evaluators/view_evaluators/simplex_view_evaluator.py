@@ -33,7 +33,13 @@ class SimplexViewEvaluator(ViewEvaluator):
             self, f"Found target view: {target_view}"
         )
         average_correspondence_quality = (
-            statistics.fmean([member.quality for member in target_view.members])
+            statistics.fmean(
+                [
+                    member.quality
+                    for member in target_view.members
+                    if member.start.parent_space.is_main_input
+                ]
+            )
             if len(target_view.members) > 0
             else 0
         )
