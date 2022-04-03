@@ -350,7 +350,7 @@ class CorrespondenceSuggester(Suggester):
                     and x.conceptual_space
                     == correspondence_suggester.target_conceptual_space
                 ),
-                "input relations",
+                "matching input relations",
             )
             source_collection_relations = StructureCollection.union(
                 *[item.relations for item in source_collection]

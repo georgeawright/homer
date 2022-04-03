@@ -723,14 +723,20 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list (list 0)) peripheralness-space))))
 (def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
 
+(define space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define conceptual-space
+  (def-conceptual-space :name "" :parent_concept space-parent-concept
+    :possible_instances (StructureCollection height-space goodness-space)
+    :no_of_dimensions 1))
 (define label-parent-concept
-  (def-concept :name "" :is_slot True :parent_space temperature-space))
+  (def-concept :name "" :is_slot True :parent_space conceptual-space))
 (define jj-input
   (def-contextual-space :name "ap[jj].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection temperature-space)))
+    :conceptual_spaces (StructureCollection conceptual-space)))
 (define jj-output
   (def-contextual-space :name "ap[jj].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space temperature-space)))
+    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
 (define jj-frame
   (def-frame :name "ap[jj]"
     :parent_concept ap-concept :parent_frame None
@@ -738,16 +744,16 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
     :concepts (StructureCollection label-parent-concept)
     :input_space jj-input :output_space jj-output))
 (define chunk
-  (def-chunk :locations (list (Location (list (list Nan)) temperature-space)
+  (def-chunk :locations (list (Location (list (list Nan)) conceptual-space)
 			      (Location (list) jj-input))
     :parent_space jj-input))
 (define chunk-label
   (def-label :start chunk :parent_concept label-parent-concept
-    :locations (list (Location (list (list Nan)) temperature-space)
+    :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) jj-input))))
 (define letter-chunk
   (def-letter-chunk :name None
-    :locations (list (Location (list (list Nan)) temperature-space)
+    :locations (list (Location (list (list Nan)) conceptual-space)
 		     jj-location
 		     (Location (list) jj-output))
     :parent_space jj-output))
@@ -757,7 +763,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list) jj-output))))
 (define letter-chunk-meaning-label
   (def-label :start letter-chunk :parent_concept label-parent-concept
-    :locations (list (Location (list (list Nan)) temperature-space)
+    :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) jj-output))))
 (define null-chunk
   (def-letter-chunk :name ""
@@ -791,6 +797,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
+    :possible_instances (StructureCollection height-space goodness-space)
     :no_of_dimensions 1))
 (define magnitude-label-concept
   (def-concept :name "" :is_slot True :parent_space magnitude-space))
@@ -957,6 +964,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
+    :possible_instances (StructureCollection height-space goodness-space)
     :no_of_dimensions 1))
 (define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space
@@ -1052,6 +1060,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
+    :possible_instances (StructureCollection height-space goodness-space)
     :no_of_dimensions 1))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
@@ -1243,6 +1252,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
+    :possible_instances (StructureCollection height-space goodness-space)
     :no_of_dimensions 1))
 (define location-concept-1
   (def-concept :name "" :is_slot True :parent_space location-space))
@@ -1716,6 +1726,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space-1
   (def-conceptual-space :name "" :parent_concept conceptual-space-1-parent-concept
+    :possible_instances (StructureCollection temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define but-sub-frame-1-input
   (def-contextual-space :name "but-sub-frame-1.meaning" :parent_concept input-concept

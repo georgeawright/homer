@@ -145,6 +145,8 @@ class SimplexViewSuggester(ViewSuggester):
                             self.contextual_space
                         ),
                         x.parent_frame.progenitor == self.frame.progenitor,
+                        x.parent_frame.input_space.conceptual_spaces
+                        == self.frame.input_space.conceptual_spaces,
                         x.prioritized_targets == self.prioritized_targets,
                         x.members.is_empty(),
                     ]

@@ -218,12 +218,18 @@ class BubbleChamber:
         parent_concept: Concept,
         no_of_dimensions: int = 0,
         parent_id: str = "",
+        possible_instances: StructureCollection = None,
         dimensions: List[ConceptualSpace] = None,
         sub_spaces: List[ConceptualSpace] = None,
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
     ) -> ConceptualSpace:
+        possible_instances = (
+            self.new_structure_collection()
+            if possible_instances is None
+            else possible_instances
+        )
         dimensions = [] if dimensions is None else dimensions
         sub_spaces = [] if sub_spaces is None else sub_spaces
         space = ConceptualSpace(
@@ -238,6 +244,7 @@ class BubbleChamber:
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=self.new_structure_collection(),
+            possible_instances=possible_instances,
             is_basic_level=is_basic_level,
             is_symbolic=is_symbolic,
             super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,

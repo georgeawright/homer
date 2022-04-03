@@ -24,6 +24,7 @@ class ConceptualSpace(Space):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        possible_instances: StructureCollection,
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
@@ -40,6 +41,7 @@ class ConceptualSpace(Space):
             links_out=links_out,
             parent_spaces=parent_spaces,
         )
+        self.possible_instances = possible_instances
         self.no_of_dimensions = no_of_dimensions
         self._dimensions = dimensions
         self.sub_spaces = sub_spaces
@@ -103,6 +105,7 @@ class ConceptualSpace(Space):
                 math.isnan(self.no_of_dimensions)
                 or self.no_of_dimensions == other.no_of_dimensions,
                 self.is_symbolic == other.is_symbolic,
+                other in self.possible_instances,
             ]
         )
 
