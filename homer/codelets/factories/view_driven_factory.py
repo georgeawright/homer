@@ -158,36 +158,41 @@ class ViewDrivenFactory(Factory):
     def _spawn_non_projection_suggester(self):
         input_space = self.target_view.input_spaces.get()
         if self.target_slot.is_label:
-            node = None
-            for node_group in self.target_view.node_groups:
-                if (
-                    input_space in node_group
-                    and self.target_slot.start in node_group.values()
-                ):
-                    node = node_group[input_space]
-                    break
-            if node is None:
-                if self.target_slot.start.is_label:
-                    node = (
-                        self.target_slot.start.correspondences.where(
-                            parent_view=self.target_view, end=self.target_slot.start
-                        )
-                        .get()
-                        .start
+            if self.target_slot.start.is_label:
+                node = (
+                    self.target_slot.start.correspondences.filter(
+                        lambda x: x.parent_view == self.target_view
+                        and x.start.parent_space == input_space
                     )
-                if self.target_slot.start.is_link and self.target_slot.start.is_node:
-                    node = input_space.contents.where(
-                        is_labellable=True, is_slot=False
-                    ).get(key=labeling_exigency)
-                else:
-                    try:
-                        node = self.target_view.prioritized_targets.filter(
-                            lambda x: x.is_node and not x.is_slot
-                        ).get()
-                    except MissingStructureError:
+                    .get()
+                    .start
+                )
+            else:
+                node = None
+                for node_group in self.target_view.node_groups:
+                    if (
+                        input_space in node_group
+                        and self.target_slot.start in node_group.values()
+                    ):
+                        node = node_group[input_space]
+                        break
+                if node is None:
+                    if (
+                        self.target_slot.start.is_link
+                        and self.target_slot.start.is_node
+                    ):
                         node = input_space.contents.where(
-                            is_node=True, is_slot=False
+                            is_labellable=True, is_slot=False
                         ).get(key=labeling_exigency)
+                    else:
+                        try:
+                            node = self.target_view.prioritized_targets.filter(
+                                lambda x: x.is_node and not x.is_slot
+                            ).get()
+                        except MissingStructureError:
+                            node = input_space.contents.where(
+                                is_node=True, is_slot=False
+                            ).get(key=labeling_exigency)
             parent_concept = (
                 self.target_slot.parent_spaces.where(is_conceptual_space=True)
                 .get()
@@ -476,6 +481,10 @@ class ViewDrivenFactory(Factory):
             self.bubble_chamber.production_views.filter(
                 lambda x: x != self.target_view
                 and (x.parent_frame.parent_concept == sub_frame.parent_concept)
+                and (
+                    x.parent_frame.progenitor
+                    != self.target_view.parent_frame.progenitor
+                )
                 and (x.input_spaces == self.target_view.input_spaces)
             )
         )
