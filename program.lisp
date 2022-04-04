@@ -1721,6 +1721,12 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   :is_bidirectional True :activation 1.0)
 (def-relation :start sentence-concept :end and-sentence
   :is_bidirectional True :activation 1.0)
+(def-relation :start descriptive-sentence :end and-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start comparative-sentence :end and-sentence
+  :is_bidirectional True :activation 1.0)
+
+
 
 (define conceptual-space-1-parent-concept
   (def-concept :name "" :is_slot True))
