@@ -389,11 +389,33 @@ class ViewDrivenFactory(Factory):
             views_with_correct_frame_and_spaces,
             "Views with correct frame and spaces",
         )
+        views_with_compatible_correspondences = (
+            views_with_correct_frame_and_spaces.filter(
+                lambda x: all(
+                    [
+                        self.target_view.can_accept_member(
+                            member.parent_concept,
+                            member.conceptual_space,
+                            member.start,
+                            member.end,
+                        )
+                        for member in x.members
+                    ]
+                )
+            )
+        )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self,
+            views_with_compatible_correspondences,
+            "Views with compatible correspondnces",
+        )
         if prioritized_targets.is_empty():
-            views_with_correct_prioritized_targets = views_with_correct_frame_and_spaces
+            views_with_correct_prioritized_targets = (
+                views_with_compatible_correspondences
+            )
         else:
             views_with_correct_prioritized_targets = (
-                views_with_correct_frame_and_spaces.filter(
+                views_with_compatible_correspondences.filter(
                     lambda x: self.bubble_chamber.new_structure_collection(
                         *[
                             node

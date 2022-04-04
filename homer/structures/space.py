@@ -1,4 +1,5 @@
 from __future__ import annotations
+import statistics
 
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.structure import Structure
@@ -42,6 +43,13 @@ class Space(Structure):
 
     def proximity_between(self, a: Structure, b: Structure):
         return self.parent_concept.proximity_between(a, b, space=self)
+
+    def update_activation(self):
+        self._activation = (
+            statistics.median([item.activation for item in self.contents])
+            if len(self.contents) != 0
+            else 0.0
+        )
 
     def spread_activation(self):
         pass
