@@ -2,7 +2,7 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space-1
   (def-conceptual-space :name "" :parent_concept conceptual-space-1-parent-concept
-    :possible_instances (StructureCollection temperature-space)
+    :possible_instances (StructureCollection temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define but-sub-frame-1-input
   (def-contextual-space :name "but-sub-frame-1.meaning" :parent_concept input-concept
