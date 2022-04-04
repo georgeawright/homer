@@ -727,7 +727,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection height-space goodness-space)
+    :possible_instances (StructureCollection temperature-space)
     :no_of_dimensions 1))
 (define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
@@ -797,7 +797,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection height-space goodness-space)
+    :possible_instances (StructureCollection temperature-space)
     :no_of_dimensions 1))
 (define magnitude-label-concept
   (def-concept :name "" :is_slot True :parent_space magnitude-space))
@@ -964,7 +964,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection height-space goodness-space)
+    :possible_instances (StructureCollection temperature-space)
     :no_of_dimensions 1))
 (define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space
@@ -1060,7 +1060,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection height-space goodness-space)
+    :possible_instances (StructureCollection temperature-space)
     :no_of_dimensions 1))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
@@ -1252,7 +1252,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection height-space goodness-space)
+    :possible_instances (StructureCollection temperature-space)
     :no_of_dimensions 1))
 (define location-concept-1
   (def-concept :name "" :is_slot True :parent_space location-space))
@@ -1726,7 +1726,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-concept :name "" :is_slot True))
 (define conceptual-space-1
   (def-conceptual-space :name "" :parent_concept conceptual-space-1-parent-concept
-    :possible_instances (StructureCollection temperature-space height-space goodness-space)
+    :possible_instances (StructureCollection temperature-space)
     :no_of_dimensions 1))
 (define but-sub-frame-1-input
   (def-contextual-space :name "but-sub-frame-1.meaning" :parent_concept input-concept
