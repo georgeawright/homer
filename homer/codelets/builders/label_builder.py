@@ -65,18 +65,20 @@ class LabelBuilder(Builder):
         except NoLocationError:
             conceptual_space = self.parent_concept.parent_space
             self.target_node.parent_space.conceptual_spaces.add(conceptual_space)
-            for location in self.target_node.locations:
-                if location.space.is_conceptual_space:
-                    try:
-                        conceptual_location = (
-                            conceptual_space.location_from_super_space_location(
-                                location
+            for node in self.target_node.parent_space.contents.where(is_node=True):
+                for location in node.locations:
+                    if location.space.is_conceptual_space:
+                        try:
+                            node.locations.append(
+                                conceptual_space.location_from_super_space_location(
+                                    location
+                                )
                             )
-                        )
-                        break
-                    except KeyError:
-                        pass
-        self.target_node.locations.append(conceptual_location)
+                            conceptual_space.add(node)
+                            break
+                        except KeyError:
+                            pass
+            conceptual_location = self.target_node.location_in_space(conceptual_space)
         locations = [
             self.target_node.location_in_space(self.target_node.parent_space),
             conceptual_location,
