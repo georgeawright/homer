@@ -225,6 +225,13 @@ class CorrespondenceSuggester(Suggester):
         if source_collection.is_empty():
             raise MissingStructureError
         if (
+            correspondence_suggester.target_structure_two.is_label
+            and correspondence_suggester.target_structure_two.start.is_label
+        ):
+            return CorrespondenceSuggester._get_target_structure_one_labeled_label(
+                calling_codelet, correspondence_suggester, source_collection
+            )
+        if (
             correspondence_suggester.target_structure_two.is_link
             and correspondence_suggester.target_structure_two.is_node
         ):
@@ -292,17 +299,25 @@ class CorrespondenceSuggester(Suggester):
                 source_collection_labels = StructureCollection.union(
                     *[item.labels for item in source_collection]
                 )
-                correspondence_suggester.target_structure_one = (
-                    source_collection_labels.filter(
-                        lambda x: x.is_label
-                        and (
-                            (x.start == structure_one_start)
-                            or (structure_one_start is None)
-                        )
-                        and x.has_location_in_space(
-                            correspondence_suggester.target_conceptual_space
-                        )
-                    ).get(key=corresponding_exigency)
+                correspondence_suggester.target_structure_one = source_collection_labels.filter(
+                    lambda x: x.is_label
+                    and (
+                        (x.start == structure_one_start)
+                        or (structure_one_start is None)
+                    )
+                    and x.has_location_in_space(
+                        correspondence_suggester.target_conceptual_space
+                    )
+                    and any(
+                        [
+                            x.parent_concept
+                            == correspondence_suggester.target_structure_two.parent_concept,
+                            x.parent_concept.is_slot,
+                            correspondence_suggester.target_structure_two.parent_concept.is_slot,
+                        ]
+                    )
+                ).get(
+                    key=corresponding_exigency
                 )
         if correspondence_suggester.target_structure_two.is_relation:
             if (
@@ -422,6 +437,38 @@ class CorrespondenceSuggester(Suggester):
                     ).get(key=corresponding_exigency)
                 )
         calling_codelet.bubble_chamber.loggers["activity"].log(
+            calling_codelet,
+            f"Found target structure one: {correspondence_suggester.target_structure_one}",
+        )
+
+    @staticmethod
+    def _get_target_structure_one_labeled_label(
+        calling_codelet, correspondence_suggester, source_collection
+    ):
+        bubble_chamber = calling_codelet.bubble_chamber
+        labelled_slot_label = correspondence_suggester.target_structure_two.start
+        bubble_chamber.loggers["activity"].log(
+            calling_codelet, f"Labelled slot label: {labelled_slot_label}"
+        )
+        labelled_instance_label = (
+            labelled_slot_label.correspondences.filter(
+                lambda x: x.parent_view == correspondence_suggester.target_view
+                and x.start.parent_space.is_main_input
+            )
+            .get()
+            .start
+        )
+        bubble_chamber.loggers["activity"].log(
+            calling_codelet, f"Labelled instance label: {labelled_instance_label}"
+        )
+        correspondence_suggester.target_structure_one = (
+            labelled_instance_label.labels.filter(
+                lambda x: x.parent_concept.has_location_in_space(
+                    correspondence_suggester.target_conceptual_space
+                )
+            ).get()
+        )
+        bubble_chamber.loggers["activity"].log(
             calling_codelet,
             f"Found target structure one: {correspondence_suggester.target_structure_one}",
         )
