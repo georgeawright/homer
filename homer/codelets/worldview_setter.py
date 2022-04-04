@@ -41,6 +41,7 @@ class WorldviewSetter(Codelet):
         try:
             self.target_view = self.bubble_chamber.production_views.filter(
                 lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.name == "sentence"
                 and x != self.bubble_chamber.worldview.view
             ).get(key=lambda x: x.activation * (1 - (1 / len(x.members))))
             self.bubble_chamber.loggers["activity"].log(
