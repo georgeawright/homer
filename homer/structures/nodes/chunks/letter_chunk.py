@@ -62,6 +62,8 @@ class LetterChunk(Chunk):
             "left_branch": [member.structure_id for member in self.left_branch],
             "right_branch": [member.structure_id for member in self.right_branch],
             "super_chunks": [member.structure_id for member in self.super_chunks],
+            "links_out": [link.structure_id for link in self.links_out],
+            "links_in": [link.structure_id for link in self.links_in],
             "quality": self.quality,
             "activation": self.activation,
         }
