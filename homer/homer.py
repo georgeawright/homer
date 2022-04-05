@@ -36,15 +36,12 @@ class Homer:
         return cls(bubble_chamber, coderack, interpreter, loggers)
 
     def run_program(self, program: str):
-        # possibly first interpret / sort out internal stuff
-        # that might be done in bubble chamber setup
         self.interpreter.interpret_string(program)
         self.run()
 
-    def reset(self):
-        self.logger.reset()
-        self.bubble_chamber = BubbleChamber.setup(self.logger)
-        self.coderack = Coderack.setup(self.bubble_chamber, self.logger)
+    def reset(self, loggers: Dict[str, Logger]):
+        self.bubble_chamber = BubbleChamber.reset(loggers)
+        self.coderack = Coderack.setup(self.bubble_chamber, loggers)
 
     def run(self):
         while self.bubble_chamber.result is None:
@@ -64,7 +61,7 @@ class Homer:
                     raise NoMoreCodelets
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
-                self.loggers["error"].log("No more codelets.")
+                self.loggers["errors"].log_message("No more codelets.")
                 self.print_results()
                 break
             except Exception as e:

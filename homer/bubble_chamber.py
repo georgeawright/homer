@@ -26,8 +26,8 @@ from .worldview import Worldview
 
 
 class BubbleChamber:
-    def __init__(self, loggers: Dict[str, Logger]):
-        self.loggers = loggers
+    def __init__(self):
+        self.loggers = {}
         self.random_machine = None
         self.focus = Focus()
         self.worldview = Worldview()
@@ -58,22 +58,30 @@ class BubbleChamber:
 
     @classmethod
     def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
-        bubble_chamber = cls(loggers)
+        bubble_chamber = cls()
         bubble_chamber.random_machine = RandomMachine(bubble_chamber, random_seed)
-        bubble_chamber.conceptual_spaces = bubble_chamber.new_structure_collection()
-        bubble_chamber.contextual_spaces = bubble_chamber.new_structure_collection()
-        bubble_chamber.frames = bubble_chamber.new_structure_collection()
-        bubble_chamber.frame_instances = bubble_chamber.new_structure_collection()
-        bubble_chamber.concepts = bubble_chamber.new_structure_collection()
-        bubble_chamber.chunks = bubble_chamber.new_structure_collection()
-        bubble_chamber.letter_chunks = bubble_chamber.new_structure_collection()
-        bubble_chamber.rules = bubble_chamber.new_structure_collection()
-        bubble_chamber.concept_links = bubble_chamber.new_structure_collection()
-        bubble_chamber.correspondences = bubble_chamber.new_structure_collection()
-        bubble_chamber.labels = bubble_chamber.new_structure_collection()
-        bubble_chamber.relations = bubble_chamber.new_structure_collection()
-        bubble_chamber.views = bubble_chamber.new_structure_collection()
+        bubble_chamber.reset(loggers)
         return bubble_chamber
+
+    def reset(self, loggers: Dict[str, Logger]):
+        self.loggers = loggers
+        self.conceptual_spaces = self.new_structure_collection()
+        self.contextual_spaces = self.new_structure_collection()
+        self.frames = self.new_structure_collection()
+        self.frame_instances = self.new_structure_collection()
+        self.concepts = self.new_structure_collection()
+        self.chunks = self.new_structure_collection()
+        self.letter_chunks = self.new_structure_collection()
+        self.rules = self.new_structure_collection()
+        self.concept_links = self.new_structure_collection()
+        self.correspondences = self.new_structure_collection()
+        self.labels = self.new_structure_collection()
+        self.relations = self.new_structure_collection()
+        self.views = self.new_structure_collection()
+        self.satisfaction = 0
+        self.general_satisfaction = 0
+        self.result = None
+        self.log_count = 0
 
     @property
     def spaces(self) -> StructureCollection:
