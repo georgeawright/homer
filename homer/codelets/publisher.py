@@ -83,6 +83,7 @@ class Publisher(Codelet):
                 )
                 self._fizzle()
                 self.result = CodeletResult.FIZZLE
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
 
     def _fizzle(self) -> CodeletResult:
