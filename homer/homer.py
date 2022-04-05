@@ -40,8 +40,9 @@ class Homer:
         self.run()
 
     def reset(self, loggers: Dict[str, Logger]):
-        self.bubble_chamber = BubbleChamber.reset(loggers)
+        self.bubble_chamber.reset(loggers)
         self.coderack = Coderack.setup(self.bubble_chamber, loggers)
+        loggers["structure"].coderack = self.coderack
 
     def run(self):
         while self.bubble_chamber.result is None:
