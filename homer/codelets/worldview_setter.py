@@ -1,3 +1,5 @@
+import statistics
+
 from homer import fuzzy
 from homer.bubble_chamber import BubbleChamber
 from homer.codelet import Codelet
@@ -7,6 +9,7 @@ from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.hyper_parameters import HyperParameters
 from homer.id import ID
 from homer.structure_collection import StructureCollection
+from homer.structures import View
 
 
 class WorldviewSetter(Codelet):
@@ -70,15 +73,30 @@ class WorldviewSetter(Codelet):
         print("potential worldview")
         print(text)
 
-        potential_worldview_satisfaction = fuzzy.AND(
-            self.target_view.quality,
-            self.proportion_of_input_in_view,
-            fuzzy.OR(
-                # self.conceptual_spaces_score,
-                self.frame_types_score,
-                self.frame_count_score,
-                self.frame_depth_score,
-            ),
+        print("view quality", self.target_view.quality)
+
+        self.bubble_chamber.worldview.satisfaction = (
+            self.calculate_satisfaction(self.bubble_chamber.worldview.view)
+            if self.bubble_chamber.worldview.view is not None
+            else 0
+        )
+        potential_worldview_satisfaction = self.calculate_satisfaction(self.target_view)
+
+        proportion_of_input_in_view = self.proportion_of_input_in_view(self.target_view)
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Proportion of raw input in view: {proportion_of_input_in_view}"
+        )
+        frame_types_score = self.frame_types_score(self.target_view)
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Frame types score: {frame_types_score}"
+        )
+        frame_count_score = self.frame_count_score(self.target_view)
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Frame count score: {frame_count_score}"
+        )
+        frame_depth_score = self.frame_depth_score(self.target_view)
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Frame depth score: {frame_depth_score}"
         )
 
         print("potential:", potential_worldview_satisfaction)
@@ -107,13 +125,30 @@ class WorldviewSetter(Codelet):
             )
             self.result = CodeletResult.FIZZLE
 
-    @property
-    def proportion_of_input_in_view(self) -> FloatBetweenOneAndZero:
+    def calculate_satisfaction(self, view: View) -> FloatBetweenOneAndZero:
+        return fuzzy.AND(
+            statistics.fmean(
+                [
+                    view.quality,
+                    self.proportion_of_input_in_view(view),
+                ]
+            ),
+            statistics.fmean(
+                [
+                    # self.conceptual_spaces_score,
+                    self.frame_types_score(view),
+                    self.frame_count_score(view),
+                    self.frame_depth_score(view),
+                ]
+            ),
+        )
+
+    def proportion_of_input_in_view(self, view: View) -> FloatBetweenOneAndZero:
         size_of_raw_input_in_view = len(
             self.bubble_chamber.new_structure_collection(
                 *[
                     (raw_input_member, correspondence.conceptual_space)
-                    for correspondence in self.target_view.members
+                    for correspondence in view.members
                     if correspondence.start.is_link
                     and correspondence.start.start.is_chunk
                     and correspondence.start.parent_space.is_main_input
@@ -127,49 +162,26 @@ class WorldviewSetter(Codelet):
                 ]
             )
         )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Size of raw input in view: {size_of_raw_input_in_view}"
-        )
-        proportion_of_input_in_view = (
-            size_of_raw_input_in_view / self.bubble_chamber.size_of_raw_input
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Proportion of raw input in view: {proportion_of_input_in_view}"
-        )
-        return proportion_of_input_in_view
+        return size_of_raw_input_in_view / self.bubble_chamber.size_of_raw_input
 
-    @property
-    def conceptual_spaces_score(self) -> FloatBetweenOneAndZero:
+    def conceptual_spaces_score(self, view: View) -> FloatBetweenOneAndZero:
         pass
 
-    @property
-    def frame_types_score(self) -> FloatBetweenOneAndZero:
+    def frame_types_score(self, view: View) -> FloatBetweenOneAndZero:
         frame_types = self.bubble_chamber.new_structure_collection()
-        for frame in self.target_view.frames:
+        for frame in view.frames:
             frame_type = frame
             while frame_type.parent_frame is not None:
                 frame_type = frame_type.parent_frame
             frame_types.add(frame_type)
         number_of_frame_types_in_view = len(frame_types)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Number of frame types in view: {number_of_frame_types_in_view}"
-        )
-        score = 1 / number_of_frame_types_in_view
-        self.bubble_chamber.loggers["activity"].log(self, f"Frame types score: {score}")
-        return score
+        return 1 / number_of_frame_types_in_view
 
-    @property
-    def frame_count_score(self) -> FloatBetweenOneAndZero:
-        frame_count = len(self.target_view.frames)
-        score = 1 / frame_count
-        self.bubble_chamber.loggers["activity"].log(self, f"Frame count score: {score}")
-        return score
+    def frame_count_score(self, view: View) -> FloatBetweenOneAndZero:
+        return 1 / len(view.frames)
 
-    @property
-    def frame_depth_score(self) -> FloatBetweenOneAndZero:
-        score = 1 - (1 / self.target_view.parent_frame.depth)
-        self.bubble_chamber.loggers["activity"].log(self, f"Frame depth score: {score}")
-        return score
+    def frame_depth_score(self, view) -> FloatBetweenOneAndZero:
+        return 1 - (1 / view.parent_frame.depth)
 
     def _engender_follow_up(self):
         self.child_codelets.append(
@@ -178,7 +190,7 @@ class WorldviewSetter(Codelet):
                 self.bubble_chamber,
                 self.coderack,
                 max(
-                    self.bubble_chamber.general_satisfaction,
+                    self.bubble_chamber.worldview.satisfaction,
                     self.MINIMUM_CODELET_URGENCY,
                 ),
             )
