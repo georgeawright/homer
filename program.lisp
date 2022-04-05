@@ -117,7 +117,6 @@
 (def-relation :start build-concept :end evaluate-concept :is_bidirectional False)
 (def-relation :start evaluate-concept :end select-concept :is_bidirectional False)
 (def-relation :start select-concept :end suggest-concept :is_bidirectional False)
-(def-relation :start select-concept :end publish-concept :is_bidirectional False)
 
 (def-relation :start chunk-concept :end label-concept
   :is_bidirectional False :activation 0.33)
