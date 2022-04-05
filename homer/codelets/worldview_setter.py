@@ -178,7 +178,7 @@ class WorldviewSetter(Codelet):
                 self.bubble_chamber,
                 self.coderack,
                 max(
-                    self.bubble_chamber.worldview.satisfaction,
+                    self.bubble_chamber.general_satisfaction,
                     self.MINIMUM_CODELET_URGENCY,
                 ),
             )
