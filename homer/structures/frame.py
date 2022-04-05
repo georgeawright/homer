@@ -250,6 +250,7 @@ class Frame(Structure):
             input_space=input_space_copy,
             output_space=output_space_copy,
             is_sub_frame=self.is_sub_frame,
+            depth=self.depth,
         )
 
     def spread_activation(self):
