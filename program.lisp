@@ -1749,19 +1749,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 4)) temperature-space)
-		   (Location (list (list 0 1)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 0 2)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 10)) temperature-space)
-		   (Location (list (list 0 3)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
@@ -1769,36 +1757,17 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 0 4)) location-space))
   :parent_space input-space)
-
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
-		   (Location (list (list 4)) temperature-space)
-		   (Location (list (list 1 0)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 4)) temperature-space)
-		   (Location (list (list 1 1)) location-space))
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 0 6)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 10)) temperature-space)
-		   (Location (list (list 1 2)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 10)) temperature-space)
-		   (Location (list (list 1 3)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 10)) temperature-space)
-		   (Location (list (list 1 4)) location-space))
+		   (Location (list (list 0 8)) location-space))
   :parent_space input-space)
 
 (def-chunk
@@ -1811,19 +1780,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 4)) temperature-space)
-		   (Location (list (list 2 1)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 2 2)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 10)) temperature-space)
-		   (Location (list (list 2 3)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
@@ -1831,96 +1788,139 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		   (Location (list (list 10)) temperature-space)
 		   (Location (list (list 2 4)) location-space))
   :parent_space input-space)
-
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
-		   (Location (list (list 16)) temperature-space)
-		   (Location (list (list 3 0)) location-space))
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 2 6)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
-		   (Location (list (list 16)) temperature-space)
-		   (Location (list (list 3 1)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 16)) temperature-space)
-		   (Location (list (list 3 2)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 22)) temperature-space)
-		   (Location (list (list 3 3)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 22)) temperature-space)
-		   (Location (list (list 3 4)) location-space))
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 2 8)) location-space))
   :parent_space input-space)
 
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
-		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 4)) temperature-space)
 		   (Location (list (list 4 0)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
-		   (Location (list (list 16)) temperature-space)
-		   (Location (list (list 4 1)) location-space))
-  :parent_space input-space)
-(def-chunk
-  :is_raw True
-  :locations (list (Location (list) input-space)
-		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 4)) temperature-space)
 		   (Location (list (list 4 2)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
-		   (Location (list (list 22)) temperature-space)
-		   (Location (list (list 4 3)) location-space))
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 4 4)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
-		   (Location (list (list 22)) temperature-space)
-		   (Location (list (list 4 4)) location-space))
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 4 6)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 10)) temperature-space)
+		   (Location (list (list 4 8)) location-space))
   :parent_space input-space)
 
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
-		   (Location (list (list 5 0)) location-space))
+		   (Location (list (list 6 0)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
-		   (Location (list (list 5 1)) location-space))
+		   (Location (list (list 6 1)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 16)) temperature-space)
-		   (Location (list (list 5 2)) location-space))
+		   (Location (list (list 6 4)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
-		   (Location (list (list 5 3)) location-space))
+		   (Location (list (list 6 6)) location-space))
   :parent_space input-space)
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
-		   (Location (list (list 5 4)) location-space))
+		   (Location (list (list 6 8)) location-space))
+  :parent_space input-space)
+
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 8 0)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 8 2)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 8 4)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 8 6)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 8 8)) location-space))
+  :parent_space input-space)
+
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 10 0)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 10 2)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 16)) temperature-space)
+		   (Location (list (list 10 4)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 10 6)) location-space))
+  :parent_space input-space)
+(def-chunk
+  :is_raw True
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 22)) temperature-space)
+		   (Location (list (list 10 8)) location-space))
   :parent_space input-space)
