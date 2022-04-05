@@ -5,6 +5,8 @@ from homer.structure_collection import StructureCollection
 
 class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
+        if self.sub_frame in self.target_view.matched_sub_frames:
+            return False
         for correspondence in self.target_sub_view.members:
             if not self.target_view.can_accept_member(
                 correspondence.parent_concept,

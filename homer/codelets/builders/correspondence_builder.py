@@ -65,6 +65,7 @@ class CorrespondenceBuilder(Builder):
             "target_space_two": self.target_space_two,
             "target_conceptual_space": self.target_conceptual_space,
             "parent_concept": self.parent_concept,
+            "sub_frame": self.sub_frame,
             "target_view": self.target_view,
             "target_sub_view": self.target_sub_view,
         }
