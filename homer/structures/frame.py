@@ -57,7 +57,11 @@ class Frame(Structure):
         self.is_frame = True
 
     def __dict__(self) -> dict:
-        return {}
+        return {
+            "structure_id": self.structure_id,
+            "input_space": self.input_space.structure_id,
+            "output_space": self.output_space.structure_id,
+        }
 
     @property
     def depth(self) -> FloatBetweenOneAndZero:

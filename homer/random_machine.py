@@ -33,7 +33,7 @@ class RandomMachine:
 
     def select(
         self,
-        collection: Union[dict, list],
+        collection: dict,
         key: callable = lambda x: 0,
         exclude: list = None,
     ):
@@ -44,10 +44,7 @@ class RandomMachine:
         if len(collection) < 1:
             raise MissingStructureError
         sample_size = math.ceil(len(collection) * self.determinism)
-        if sample_size == 1:
-            return list(collection)[0]
-        else:
-            sample = random.sample(list(collection), sample_size)
+        sample = random.sample(list(collection), sample_size)
         key_weights = [key(item) for item in sample]
         random_weights = [random.random() for item in sample]
         total_key_weights = sum(key_weights)

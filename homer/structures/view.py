@@ -1,5 +1,6 @@
 from typing import List
 
+from homer import fuzzy
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.location import Location
 from homer.structure import Structure
@@ -102,6 +103,10 @@ class View(Structure):
             ]
         )
         self.unhappiness = 1 - 0.5 ** items_to_process
+
+    def recalculate_exigency(self):
+        self.recalculate_unhappiness()
+        self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

@@ -124,10 +124,7 @@ class Coderack:
 
     def select_and_run_codelet(self):
         codelet = self._select_a_codelet()
-        try:
-            codelet.run()
-        except Exception:
-            self.bubble_chamber.loggers["errors"].log(codelet)
+        codelet.run()
         self.bubble_chamber.recalculate_satisfaction()
         if self.bubble_chamber.focus.view is not None:
             self.bubble_chamber.focus.spaces_quality_history.append(

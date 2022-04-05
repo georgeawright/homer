@@ -45,6 +45,9 @@ class SimplexViewBuilder(ViewBuilder):
     def _process_structure(self):
         view_id = ID.new(SimplexView)
         input_space_concept = self.contextual_space.parent_concept
+        self.bubble_chamber.loggers["activity"].log_dict(
+            self, self.conceptual_spaces_map, "Conceptual spaces map"
+        )
         frame_input_space = (
             self.frame.input_space
             if self.frame.input_space.parent_concept == input_space_concept
@@ -56,6 +59,9 @@ class SimplexViewBuilder(ViewBuilder):
             parent_id=self.codelet_id,
             bubble_chamber=self.bubble_chamber,
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Created frame instance: {frame_instance}"
+        )
         view_output = ContextualSpace(
             structure_id=ID.new(ContextualSpace),
             parent_id=self.codelet_id,
@@ -66,6 +72,9 @@ class SimplexViewBuilder(ViewBuilder):
             links_in=self.bubble_chamber.new_structure_collection(),
             links_out=self.bubble_chamber.new_structure_collection(),
             parent_spaces=self.bubble_chamber.new_structure_collection(),
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Created output space: {view_output}"
         )
         view = SimplexView(
             structure_id=view_id,

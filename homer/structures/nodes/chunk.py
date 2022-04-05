@@ -205,7 +205,7 @@ class Chunk(Node):
             copies: dict,
         ):
             locations = [
-                location
+                location.copy()
                 for location in chunk.locations
                 if location.space.is_conceptual_space
             ] + [location]
@@ -245,7 +245,7 @@ class Chunk(Node):
         new_location: Location,
     ):
         new_locations = [
-            location
+            location.copy()
             for location in self.locations
             if location.space.is_conceptual_space
         ] + [new_location]
