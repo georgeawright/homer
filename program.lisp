@@ -1219,6 +1219,7 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 			grammar-space location-space conceptual-space)))
 (define comparative-sentence
   (def-frame :name "s-comparative" :parent_concept sentence-concept :parent_frame None
+    :depth 7
     :sub_frames (StructureCollection rp-sub-frame nn-sub-frame-1 nn-sub-frame-2)
     :concepts (StructureCollection
 	       label-parent-concept relation-parent-concept location-concept-1 location-concept-2)
