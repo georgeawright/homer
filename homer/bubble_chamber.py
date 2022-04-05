@@ -162,13 +162,12 @@ class BubbleChamber:
 
     def recalculate_general_satisfaction(self):
         spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
-        if len(spaces) == 0:
-            self.general_satisfaction = 0
-        else:
-            self.general_satisfaction = fuzzy.AND(
+        self.general_satisfaction = statistics.fmean(
+            [
                 statistics.fmean([space.quality for space in spaces]),
                 self.worldview.satisfaction,
-            )
+            ]
+        )
 
     def spread_activations(self):
         for structure in self.structures:
