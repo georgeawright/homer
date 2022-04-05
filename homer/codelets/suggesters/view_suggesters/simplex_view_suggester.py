@@ -157,27 +157,24 @@ class SimplexViewSuggester(ViewSuggester):
             )
             self.confidence = 1 if equivalent_views.is_empty() else 0
         else:
-            no_of_equivalent_views = len(
-                self.bubble_chamber.views.filter(
-                    lambda x: all(
-                        [
-                            x.input_spaces
-                            == self.bubble_chamber.new_structure_collection(
-                                self.contextual_space
-                            ),
-                            x.parent_frame.progenitor == self.frame.progenitor,
-                        ]
-                    )
+            equivalent_views = self.bubble_chamber.views.filter(
+                lambda x: all(
+                    [
+                        x.input_spaces
+                        == self.bubble_chamber.new_structure_collection(
+                            self.contextual_space
+                        ),
+                        x.parent_frame.progenitor == self.frame.progenitor,
+                    ]
                 )
+            )
+            equivalent_view_activation = sum(
+                [view.activation for view in equivalent_views]
             )
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Frame activation: {self.frame.activation}"
             )
             self.bubble_chamber.loggers["activity"].log(
-                self, f"Number of equivalent views: {no_of_equivalent_views}"
+                self, f"Total equivalent view activation: {equivalent_view_activation}"
             )
-            self.confidence = (
-                self.frame.activation * 0.5 ** no_of_equivalent_views
-                if no_of_equivalent_views > 0
-                else self.frame.activation
-            )
+            self.confidence = self.frame.activation * 0.5 ** equivalent_view_activation
