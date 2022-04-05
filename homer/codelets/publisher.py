@@ -60,27 +60,29 @@ class Publisher(Codelet):
             self._fizzle()
             self.result = CodeletResult.FIZZLE
         else:
-            random_number = self.bubble_chamber.random_machine.generate_number()
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Random number: {random_number}"
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self,
-                f"Worldview satisfaction: {self.bubble_chamber.worldview.satisfaction}",
-            )
-            if (
-                self.bubble_chamber.worldview.satisfaction
-                ** self.PUBLICATION_PROBABILITY_EXPONENT
-                < random_number
-            ):
-                self._fizzle()
-                self.result = CodeletResult.FIZZLE
-            else:
+            self.bubble_chamber.loggers["activity"].log(self, "Worldview has sentence")
+            publish_concept = self.bubble_chamber.concepts["publish"]
+            if publish_concept.is_fully_active():
+                self.bubble_chamber.loggers["activity"].log(
+                    self, "Publish concept is fully active"
+                )
                 main_chunk = target_view.output_space.contents.filter(
                     lambda x: x.is_chunk and x.super_chunks.is_empty()
                 ).get()
                 self.bubble_chamber.result = main_chunk.name
                 self.result = CodeletResult.FINISH
+            else:
+                self.bubble_chamber.loggers["activity"].log(
+                    self, "Boosting publish concept"
+                )
+
+                print("BOOSTING PUBLISH CONCEPT")
+
+                publish_concept.boost_activation(
+                    self.bubble_chamber.worldview.satisfaction * 10
+                )
+                self._fizzle()
+                self.result = CodeletResult.FIZZLE
         self.bubble_chamber.loggers["activity"].log_result(self)
 
     def _fizzle(self) -> CodeletResult:
@@ -88,6 +90,6 @@ class Publisher(Codelet):
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.bubble_chamber.worldview.satisfaction,
+                self.bubble_chamber.concepts["publish"].activation,
             )
         )
