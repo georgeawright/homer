@@ -597,7 +597,7 @@ lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
 (define location-concept
   (def-concept :name "location" :locations (list) :classifier None
     :instance_type Chunk :structure_type Label :parent_space None
-    :distance_function centroid_euclidean_distance))
+    :distance_function centroid_euclidean_distance :activation 1.0))
 (define north-south-space
   (def-conceptual-space :name "north-south" :parent_concept location-concept
     :no_of_dimensions 1
@@ -721,6 +721,15 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 		     (Location (list (list 5 4)) location-space)
 		     (Location (list (list 0)) peripheralness-space))))
 (def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
+
+(def-relation :start north-concept :end south-concept
+  :parent_concept location-concept :quality 1.0)
+(def-relation :start west-concept :end east-concept
+  :parent_concept location-concept :quality 1.0)
+(def-relation :start northwest-concept :end southeast-concept
+  :parent_concept location-concept :quality 1.0)
+(def-relation :start southwest-concept :end northeast-concept
+  :parent_concept location-concept :quality 1.0)
 
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
