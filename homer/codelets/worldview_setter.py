@@ -70,11 +70,7 @@ class WorldviewSetter(Codelet):
             .get()
             .name
         )
-        print("potential worldview")
-        print(text)
-
-        print("view quality", self.target_view.quality)
-
+        self.bubble_chamber.loggers["activity"].log(self, "Potential text")
         self.bubble_chamber.loggers["activity"].log(
             self, "Recalculating worldview satisfaction"
         )
@@ -87,10 +83,6 @@ class WorldviewSetter(Codelet):
             self, "Calculating potential worldview satisfaction"
         )
         potential_worldview_satisfaction = self.calculate_satisfaction(self.target_view)
-
-        print("potential:", potential_worldview_satisfaction)
-        print("current:", self.bubble_chamber.worldview.satisfaction)
-
         self.bubble_chamber.loggers["activity"].log(
             self,
             f"Potential worldview satisfaction: {potential_worldview_satisfaction}",
@@ -135,9 +127,7 @@ class WorldviewSetter(Codelet):
             ),
             statistics.fmean(
                 [
-                    # self.conceptual_spaces_score,
                     self.frame_types_score(view),
-                    # self.frame_count_score(view),
                     self.frame_depth_score(view),
                 ]
             ),
@@ -168,9 +158,6 @@ class WorldviewSetter(Codelet):
         )
         return proportion
 
-    def conceptual_spaces_score(self, view: View) -> FloatBetweenOneAndZero:
-        pass
-
     def frame_types_score(self, view: View) -> FloatBetweenOneAndZero:
         frame_types = self.bubble_chamber.new_structure_collection()
         for frame in view.frames:
@@ -181,11 +168,6 @@ class WorldviewSetter(Codelet):
         number_of_frame_types_in_view = len(frame_types)
         score = 1 / number_of_frame_types_in_view
         self.bubble_chamber.loggers["activity"].log(self, f"Frame types score: {score}")
-        return score
-
-    def frame_count_score(self, view: View) -> FloatBetweenOneAndZero:
-        score = 1 / len(view.frames)
-        self.bubble_chamber.loggers["activity"].log(self, f"Frame count score: {score}")
         return score
 
     def frame_depth_score(self, view) -> FloatBetweenOneAndZero:

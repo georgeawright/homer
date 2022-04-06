@@ -21,3 +21,5 @@ class HyperParameters:
     HOW_FAR_IS_NEAR = 1.5
 
     ACTIVATION_LOGGING_FREQUENCY = 500
+
+    TESTING = False

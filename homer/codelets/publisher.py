@@ -75,9 +75,6 @@ class Publisher(Codelet):
                 self.bubble_chamber.loggers["activity"].log(
                     self, "Boosting publish concept"
                 )
-
-                print("BOOSTING PUBLISH CONCEPT")
-
                 publish_concept.boost_activation(
                     self.bubble_chamber.general_satisfaction
                 )

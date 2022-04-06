@@ -69,6 +69,7 @@ class Homer:
                 raise e
         self.print_results()
         return {
+            "random_seed": self.bubble_chamber.random_machine.seed,
             "result": self.bubble_chamber.result,
             "satisfaction": self.bubble_chamber.satisfaction,
             "codelets_run": self.coderack.codelets_run,
