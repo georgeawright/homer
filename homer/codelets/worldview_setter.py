@@ -99,6 +99,9 @@ class WorldviewSetter(Codelet):
             self.bubble_chamber.worldview.satisfaction = (
                 potential_worldview_satisfaction
             )
+            self.bubble_chamber.concepts["publish"].decay_activation(
+                self.bubble_chamber.general_satisfaction
+            )
             self.result = CodeletResult.FINISH
         else:
             self.bubble_chamber.concepts["publish"].boost_activation(
