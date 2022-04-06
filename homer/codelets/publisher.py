@@ -79,7 +79,7 @@ class Publisher(Codelet):
                 print("BOOSTING PUBLISH CONCEPT")
 
                 publish_concept.boost_activation(
-                    self.bubble_chamber.worldview.satisfaction
+                    self.bubble_chamber.general_satisfaction
                 )
                 self._fizzle()
                 self.result = CodeletResult.FIZZLE

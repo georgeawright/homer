@@ -110,7 +110,7 @@ class WorldviewSetter(Codelet):
             self.result = CodeletResult.FINISH
         else:
             self.bubble_chamber.concepts["publish"].boost_activation(
-                self.bubble_chamber.worldview.satisfaction
+                self.bubble_chamber.general_satisfaction
             )
             self._update_publisher_urgency()
             self.result = CodeletResult.FIZZLE
