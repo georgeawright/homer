@@ -11,7 +11,7 @@ if results_file_name in os.listdir():
     print("output file already exists")
     raise Exception
 
-for i in range(50):
+for i in range(30):
     time_string = str(time.time())
     logs_dir_path = f"logs/{time_string}"
     os.mkdir(logs_dir_path)
