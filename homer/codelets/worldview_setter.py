@@ -75,29 +75,18 @@ class WorldviewSetter(Codelet):
 
         print("view quality", self.target_view.quality)
 
+        self.bubble_chamber.loggers["activity"].log(
+            self, "Recalculating worldview satisfaction"
+        )
         self.bubble_chamber.worldview.satisfaction = (
             self.calculate_satisfaction(self.bubble_chamber.worldview.view)
             if self.bubble_chamber.worldview.view is not None
             else 0
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, "Calculating potential worldview satisfaction"
+        )
         potential_worldview_satisfaction = self.calculate_satisfaction(self.target_view)
-
-        proportion_of_input_in_view = self.proportion_of_input_in_view(self.target_view)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Proportion of raw input in view: {proportion_of_input_in_view}"
-        )
-        frame_types_score = self.frame_types_score(self.target_view)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Frame types score: {frame_types_score}"
-        )
-        frame_count_score = self.frame_count_score(self.target_view)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Frame count score: {frame_count_score}"
-        )
-        frame_depth_score = self.frame_depth_score(self.target_view)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Frame depth score: {frame_depth_score}"
-        )
 
         print("potential:", potential_worldview_satisfaction)
         print("current:", self.bubble_chamber.worldview.satisfaction)
@@ -120,7 +109,9 @@ class WorldviewSetter(Codelet):
             )
             self.result = CodeletResult.FINISH
         else:
-            self.bubble_chamber.concepts["publish"].boost_activation(1)
+            self.bubble_chamber.concepts["publish"].boost_activation(
+                self.bubble_chamber.worldview.satisfaction
+            )
             self._update_publisher_urgency()
             self.result = CodeletResult.FIZZLE
 
@@ -132,6 +123,9 @@ class WorldviewSetter(Codelet):
         raise Exception
 
     def calculate_satisfaction(self, view: View) -> FloatBetweenOneAndZero:
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"View quality: {view.quality}"
+        )
         return fuzzy.AND(
             statistics.fmean(
                 [
@@ -143,7 +137,7 @@ class WorldviewSetter(Codelet):
                 [
                     # self.conceptual_spaces_score,
                     self.frame_types_score(view),
-                    self.frame_count_score(view),
+                    # self.frame_count_score(view),
                     self.frame_depth_score(view),
                 ]
             ),
@@ -168,7 +162,11 @@ class WorldviewSetter(Codelet):
                 ]
             )
         )
-        return size_of_raw_input_in_view / self.bubble_chamber.size_of_raw_input
+        proportion = size_of_raw_input_in_view / self.bubble_chamber.size_of_raw_input
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Proportion of input in view: {proportion}"
+        )
+        return proportion
 
     def conceptual_spaces_score(self, view: View) -> FloatBetweenOneAndZero:
         pass
@@ -181,13 +179,19 @@ class WorldviewSetter(Codelet):
                 frame_type = frame_type.parent_frame
             frame_types.add(frame_type)
         number_of_frame_types_in_view = len(frame_types)
-        return 1 / number_of_frame_types_in_view
+        score = 1 / number_of_frame_types_in_view
+        self.bubble_chamber.loggers["activity"].log(self, f"Frame types score: {score}")
+        return score
 
     def frame_count_score(self, view: View) -> FloatBetweenOneAndZero:
-        return 1 / len(view.frames)
+        score = 1 / len(view.frames)
+        self.bubble_chamber.loggers["activity"].log(self, f"Frame count score: {score}")
+        return score
 
     def frame_depth_score(self, view) -> FloatBetweenOneAndZero:
-        return 1 - (1 / view.parent_frame.depth)
+        score = 1 - (1 / view.parent_frame.depth)
+        self.bubble_chamber.loggers["activity"].log(self, f"Frame depth score: {score}")
+        return score
 
     def _engender_follow_up(self):
         self.child_codelets.append(

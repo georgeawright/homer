@@ -2,7 +2,7 @@ from homer.bubble_chamber import BubbleChamber
 from homer.codelets.suggesters import ViewSuggester
 from homer.errors import MissingStructureError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
-from homer.structure_collection_keys import activation
+from homer.structure_collection_keys import activation, exigency
 from homer.structures import Frame
 
 
@@ -43,7 +43,9 @@ class SimplexViewSuggester(ViewSuggester):
     ):
         contextual_space = bubble_chamber.input_spaces.get(key=activation)
         if frame is None:
-            frame = bubble_chamber.frames.where(is_sub_frame=False).get(key=activation)
+            frame = bubble_chamber.frames.where(
+                parent_frame=None, is_sub_frame=False
+            ).get(key=exigency)
         views_with_frame = bubble_chamber.views.filter(
             lambda x: x.parent_frame in frame.instances or x.parent_frame == frame
         )

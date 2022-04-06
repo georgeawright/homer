@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 import math
+import statistics
 
 from homer.errors import NoLocationError
 from homer.float_between_one_and_zero import FloatBetweenOneAndZero
 from homer.id import ID
 from homer.structure import Structure
 from homer.structure_collection import StructureCollection
-
-# TODO: allow frames to be defined as children of other frames with only parts overwritten
-# TODO: subframes need corresponding exigency to be defined
 
 
 class Frame(Structure):
@@ -114,6 +112,15 @@ class Frame(Structure):
         while self_progenitor.parent_frame is not None:
             self_progenitor = self_progenitor.parent_frame
         return self_progenitor
+
+    def recalculate_unhappiness(self):
+        self.unhappiness = 1 / (
+            sum([instance.activation for instance in self.instances]) + 1
+        )
+
+    def recalculate_exigency(self):
+        self.recalculate_unhappiness()
+        self.exigency = statistics.fmean([self.unhappiness, self.activation])
 
     def instantiate(
         self,
