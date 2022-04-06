@@ -55,7 +55,8 @@ class Homer:
                         self.bubble_chamber.loggers["structure"].log_contextual_space(
                             input_space, self.coderack
                         )
-                    self.print_status_update()
+                    if not HyperParameters.TESTING:
+                        self.print_status_update()
                     self.bubble_chamber.spread_activations()
                     self.bubble_chamber.update_activations()
                 if self.coderack.codelets_run >= self.CODELET_RUN_LIMIT:
