@@ -120,10 +120,16 @@ class WorldviewSetter(Codelet):
             )
             self.result = CodeletResult.FINISH
         else:
-            self.bubble_chamber.concepts["publish"].boost_activation(
-                self.bubble_chamber.worldview.satisfaction
-            )
+            self.bubble_chamber.concepts["publish"].boost_activation(1)
+            self._update_publisher_urgency()
             self.result = CodeletResult.FIZZLE
+
+    def _update_publisher_urgency(self):
+        for codelet in self.coderack._codelets:
+            if "Publisher" in codelet.codelet_id:
+                codelet.urgency = self.bubble_chamber.worldview.satisfaction
+                return
+        raise Exception
 
     def calculate_satisfaction(self, view: View) -> FloatBetweenOneAndZero:
         return fuzzy.AND(

@@ -78,9 +78,7 @@ class Publisher(Codelet):
 
                 print("BOOSTING PUBLISH CONCEPT")
 
-                publish_concept.boost_activation(
-                    self.bubble_chamber.worldview.satisfaction
-                )
+                publish_concept.boost_activation(1)
                 self._fizzle()
                 self.result = CodeletResult.FIZZLE
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
@@ -91,6 +89,6 @@ class Publisher(Codelet):
             self.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.bubble_chamber.concepts["publish"].activation,
+                self.bubble_chamber.worldview.satisfaction,
             )
         )
