@@ -37,7 +37,7 @@ class Homer:
 
     def run_program(self, program: str):
         self.interpreter.interpret_string(program)
-        self.run()
+        return self.run()
 
     def reset(self, loggers: Dict[str, Logger]):
         self.bubble_chamber.reset(loggers)
