@@ -122,17 +122,9 @@ class WorldviewSetter(Codelet):
             self, f"View quality: {view.quality}"
         )
         return fuzzy.AND(
-            statistics.fmean(
-                [
-                    view.quality,
-                    self.proportion_of_input_in_view(view),
-                ]
-            ),
-            statistics.fmean(
-                [
-                    self.frame_types_score(view),
-                    self.frame_depth_score(view),
-                ]
+            fuzzy.OR(view.quality, self.frame_depth_score(view)),
+            fuzzy.OR(
+                self.proportion_of_input_in_view(view), self.frame_types_score(view)
             ),
         )
 
@@ -174,7 +166,7 @@ class WorldviewSetter(Codelet):
         return score
 
     def frame_depth_score(self, view) -> FloatBetweenOneAndZero:
-        score = 1 - (1 / view.parent_frame.depth)
+        score = view.parent_frame.depth / 10
         self.bubble_chamber.loggers["activity"].log(self, f"Frame depth score: {score}")
         return score
 
