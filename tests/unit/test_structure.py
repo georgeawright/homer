@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.structure import Structure
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence, Label, Relation
+from linguoplotter.structure import Structure
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Correspondence, Label, Relation
 
 
 def test_correspondences_returns_correspondences(bubble_chamber):

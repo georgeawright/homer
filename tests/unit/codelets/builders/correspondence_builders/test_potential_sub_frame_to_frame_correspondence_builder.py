@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.correspondence_builders import (
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.correspondence_builders import (
     PotentialSubFrameToFrameCorrespondenceBuilder,
 )
 

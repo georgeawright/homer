@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
-from homer.codelets.selectors.view_selectors import SimplexViewSelector
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelets.evaluators.view_evaluators import SimplexViewEvaluator
+from linguoplotter.codelets.selectors.view_selectors import SimplexViewSelector
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize(

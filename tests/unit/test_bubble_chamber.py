@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.bubble_chamber import BubbleChamber
-from homer.random_machine import RandomMachine
-from homer.structure_collection import StructureCollection
+from linguoplotter.bubble_chamber import BubbleChamber
+from linguoplotter.random_machine import RandomMachine
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_setup():

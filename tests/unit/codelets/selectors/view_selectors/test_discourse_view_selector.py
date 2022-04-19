@@ -2,11 +2,11 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.selectors.view_selectors import DiscourseViewSelector
-from homer.codelets.suggesters.view_suggesters import DiscourseViewSuggester
-from homer.structure_collection import StructureCollection
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.selectors.view_selectors import DiscourseViewSelector
+from linguoplotter.codelets.suggesters.view_suggesters import DiscourseViewSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture

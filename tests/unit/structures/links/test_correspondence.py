@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.location import Location
-from homer.structure import Structure
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence
+from linguoplotter.location import Location
+from linguoplotter.structure import Structure
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Correspondence
 
 
 def test_node_pairs(bubble_chamber):

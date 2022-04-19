@@ -1,12 +1,12 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.view_builders import SimplexViewBuilder
-from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
-from homer.structure_collection import StructureCollection
-from homer.structures.views import SimplexView
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.view_builders import SimplexViewBuilder
+from linguoplotter.codelets.suggesters.view_suggesters import SimplexViewSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.views import SimplexView
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture

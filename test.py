@@ -2,9 +2,9 @@ import os
 import time
 from unittest.mock import Mock
 
-from homer import Homer
-from homer.hyper_parameters import HyperParameters
-from homer.loggers import ActivityLogger, ErrorLogger
+from linguoplotter import Linguoplotter
+from linguoplotter.hyper_parameters import HyperParameters
+from linguoplotter.loggers import ActivityLogger, ErrorLogger
 
 results_file_name = "results-a.txt"
 if results_file_name in os.listdir():
@@ -29,7 +29,7 @@ for i in range(30):
     }
 
     HyperParameters.TESTING = True
-    narrator = Homer.setup(loggers, random_seed=i)
+    narrator = Linguoplotter.setup(loggers, random_seed=i)
     with open(results_file_name, "a") as results, open("program-a.lisp", "r") as f:
         program = f.read()
         result = narrator.run_program(program)
@@ -60,7 +60,7 @@ for i in range(30):
     }
 
     HyperParameters.TESTING = True
-    narrator = Homer.setup(loggers, random_seed=i)
+    narrator = Linguoplotter.setup(loggers, random_seed=i)
     with open(results_file_name, "a") as results, open("program-b.lisp", "r") as f:
         program = f.read()
         result = narrator.run_program(program)
@@ -91,7 +91,7 @@ for i in range(30):
     }
 
     HyperParameters.TESTING = True
-    narrator = Homer.setup(loggers, random_seed=i)
+    narrator = Linguoplotter.setup(loggers, random_seed=i)
     with open(results_file_name, "a") as results, open("program-c.lisp", "r") as f:
         program = f.read()
         result = narrator.run_program(program)
@@ -122,7 +122,7 @@ for i in range(30):
     }
 
     HyperParameters.TESTING = True
-    narrator = Homer.setup(loggers, random_seed=i)
+    narrator = Linguoplotter.setup(loggers, random_seed=i)
     with open(results_file_name, "a") as results, open("program-d.lisp", "r") as f:
         program = f.read()
         result = narrator.run_program(program)

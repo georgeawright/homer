@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.structure_collection import StructureCollection
-from homer.structures.nodes import Concept
-from homer.tools import centroid_euclidean_distance
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.nodes import Concept
+from linguoplotter.tools import centroid_euclidean_distance
 
 
 def test_letter_chunk_forms(bubble_chamber):

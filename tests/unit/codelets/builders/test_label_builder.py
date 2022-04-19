@@ -1,14 +1,14 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from homer.bubble_chamber import BubbleChamber
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders import LabelBuilder
-from homer.codelets.evaluators import LabelEvaluator
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Label
-from homer.structures.nodes import Concept
-from homer.tools import hasinstance
+from linguoplotter.bubble_chamber import BubbleChamber
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders import LabelBuilder
+from linguoplotter.codelets.evaluators import LabelEvaluator
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Label
+from linguoplotter.structures.nodes import Concept
+from linguoplotter.tools import hasinstance
 
 
 def test_fizzles_if_label_exists(bubble_chamber):

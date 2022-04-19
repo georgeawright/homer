@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators import CorrespondenceEvaluator
-from homer.codelets.selectors import CorrespondenceSelector
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelets.evaluators import CorrespondenceEvaluator
+from linguoplotter.codelets.selectors import CorrespondenceSelector
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])

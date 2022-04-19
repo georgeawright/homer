@@ -2,10 +2,10 @@ import pytest
 import statistics
 from unittest.mock import Mock
 
-from homer.location import Location
-from homer.structure_collection import StructureCollection
-from homer.structures.nodes import Chunk
-from homer.structures.spaces import ConceptualSpace
+from linguoplotter.location import Location
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.nodes import Chunk
+from linguoplotter.structures.spaces import ConceptualSpace
 
 
 @pytest.mark.parametrize(

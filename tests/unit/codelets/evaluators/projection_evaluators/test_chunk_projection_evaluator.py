@@ -1,7 +1,9 @@
 from unittest.mock import Mock
 
-from homer.codelets.evaluators.projection_evaluators import ChunkProjectionEvaluator
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelets.evaluators.projection_evaluators import (
+    ChunkProjectionEvaluator,
+)
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_gives_chunk_maximum_quality(bubble_chamber):

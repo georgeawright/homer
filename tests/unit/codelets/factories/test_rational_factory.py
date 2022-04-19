@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets import Evaluator, Publisher, Suggester
-from homer.codelets.factories import RationalFactory
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelets import Evaluator, Publisher, Suggester
+from linguoplotter.codelets.factories import RationalFactory
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_decide_follow_up_class_returns_codelet_class(bubble_chamber):

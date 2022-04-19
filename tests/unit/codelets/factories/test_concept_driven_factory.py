@@ -1,17 +1,17 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.suggesters import (
+from linguoplotter.codelets.suggesters import (
     ChunkSuggester,
     LabelSuggester,
     RelationSuggester,
 )
-from homer.codelets.suggesters.correspondence_suggesters import (
+from linguoplotter.codelets.suggesters.correspondence_suggesters import (
     SpaceToFrameCorrespondenceSuggester,
 )
-from homer.codelets.factories import ConceptDrivenFactory
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence, Label, Relation
+from linguoplotter.codelets.factories import ConceptDrivenFactory
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Correspondence, Label, Relation
 
 
 def test_gets_appropriate_follow_up_class(bubble_chamber):

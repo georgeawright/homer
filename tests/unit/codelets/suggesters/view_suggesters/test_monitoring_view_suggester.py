@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.view_builders import MonitoringViewBuilder
-from homer.codelets.suggesters.view_suggesters import MonitoringViewSuggester
-from homer.structure_collection import StructureCollection
-from homer.structures import Frame
-from homer.structures.views import MonitoringView
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.view_builders import MonitoringViewBuilder
+from linguoplotter.codelets.suggesters.view_suggesters import MonitoringViewSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures import Frame
+from linguoplotter.structures.views import MonitoringView
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture

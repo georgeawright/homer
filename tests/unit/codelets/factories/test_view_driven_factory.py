@@ -1,10 +1,14 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.factories import ViewDrivenFactory
-from homer.codelets.suggesters import ChunkSuggester, LabelSuggester, RelationSuggester
-from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelets.factories import ViewDrivenFactory
+from linguoplotter.codelets.suggesters import (
+    ChunkSuggester,
+    LabelSuggester,
+    RelationSuggester,
+)
+from linguoplotter.codelets.suggesters.view_suggesters import SimplexViewSuggester
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_get_follow_up_class_returns_codelet_class(bubble_chamber):

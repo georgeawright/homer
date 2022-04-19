@@ -2,11 +2,11 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.selectors import LabelSelector
-from homer.codelets.suggesters import LabelSuggester
-from homer.structure_collection import StructureCollection
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.selectors import LabelSelector
+from linguoplotter.codelets.suggesters import LabelSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.tools import hasinstance
 
 
 def test_finds_challenger_when_not_given_one(bubble_chamber):

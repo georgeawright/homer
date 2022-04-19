@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
-from homer.codelets.selectors.view_selectors import MonitoringViewSelector
-from homer.structure_collection import StructureCollection
-from homer.structures.nodes import Chunk
+from linguoplotter.codelets.evaluators.view_evaluators import MonitoringViewEvaluator
+from linguoplotter.codelets.selectors.view_selectors import MonitoringViewSelector
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.nodes import Chunk
 
 
 @pytest.mark.parametrize(

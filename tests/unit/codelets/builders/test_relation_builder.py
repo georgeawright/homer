@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ChunkBuilder, RelationBuilder
-from homer.codelets.evaluators import RelationEvaluator
-from homer.location import Location
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Relation
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders import ChunkBuilder, RelationBuilder
+from linguoplotter.codelets.evaluators import RelationEvaluator
+from linguoplotter.location import Location
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Relation
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture

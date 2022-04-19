@@ -2,7 +2,7 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.random_machine import RandomMachine
+from linguoplotter.random_machine import RandomMachine
 
 
 def test_random_machine_seed():

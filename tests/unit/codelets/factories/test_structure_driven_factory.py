@@ -1,9 +1,13 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.factories import StructureDrivenFactory
-from homer.codelets.suggesters import ChunkSuggester, LabelSuggester, RelationSuggester
-from homer.codelets.suggesters.correspondence_suggesters import (
+from linguoplotter.codelets.factories import StructureDrivenFactory
+from linguoplotter.codelets.suggesters import (
+    ChunkSuggester,
+    LabelSuggester,
+    RelationSuggester,
+)
+from linguoplotter.codelets.suggesters.correspondence_suggesters import (
     SpaceToFrameCorrespondenceSuggester,
 )
 

@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.classifiers import DifferentnessClassifier
-from homer.structure_collection import StructureCollection
+from linguoplotter.classifiers import DifferentnessClassifier
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_differentness_of_single_item_in_collection():

@@ -2,8 +2,8 @@ import os
 import time
 from unittest.mock import Mock
 
-from homer import Homer
-from homer.loggers import ActivityLogger, ErrorLogger, StructureLogger
+from linguoplotter import Linguoplotter
+from linguoplotter.loggers import ActivityLogger, ErrorLogger, StructureLogger
 
 time_string = str(time.time())
 logs_dir_path = f"logs/{time_string}"
@@ -20,7 +20,7 @@ loggers = {
     "structure": StructureLogger(f"{structure_logs_dir_path}"),
     "errors": ErrorLogger(error_stream),
 }
-narrator = Homer.setup(loggers, random_seed=1)
+narrator = Linguoplotter.setup(loggers, random_seed=1)
 
 with open("program.lisp", "r") as f:
     program = f.read()

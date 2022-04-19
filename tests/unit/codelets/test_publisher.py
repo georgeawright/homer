@@ -2,9 +2,9 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.codelet_result import CodeletResult
-from homer.codelets import Publisher
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets import Publisher
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize(

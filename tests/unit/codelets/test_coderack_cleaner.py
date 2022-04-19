@@ -2,8 +2,8 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.codelets import CoderackCleaner
-from homer.coderack import Coderack
+from linguoplotter.codelets import CoderackCleaner
+from linguoplotter.coderack import Coderack
 
 
 @pytest.mark.parametrize(

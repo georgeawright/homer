@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.structures import View
+from linguoplotter.structures import View
 
 
 def test_add(bubble_chamber):

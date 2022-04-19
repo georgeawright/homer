@@ -1,9 +1,11 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.selectors.projection_selectors import ChunkProjectionSelector
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.selectors.projection_selectors import (
+    ChunkProjectionSelector,
+)
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_word_is_boosted(bubble_chamber):

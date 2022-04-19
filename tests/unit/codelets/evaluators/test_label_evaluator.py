@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators import LabelEvaluator
-from homer.codelets.selectors import LabelSelector
+from linguoplotter.codelets.evaluators import LabelEvaluator
+from linguoplotter.codelets.selectors import LabelSelector
 
 
 @pytest.mark.parametrize("current_quality, classification", [(0.75, 0.5), (0.5, 0.75)])

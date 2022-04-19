@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.structure_collection import StructureCollection
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_union():

@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.coderack import Coderack
-from homer.random_machine import RandomMachine
+from linguoplotter.coderack import Coderack
+from linguoplotter.random_machine import RandomMachine
 
 
 @pytest.mark.parametrize(

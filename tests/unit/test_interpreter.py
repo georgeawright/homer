@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.bubble_chamber import BubbleChamber
-from homer.interpreter import Interpreter
+from linguoplotter.bubble_chamber import BubbleChamber
+from linguoplotter.interpreter import Interpreter
 
 
 def test_parse():

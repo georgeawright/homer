@@ -1,70 +1,70 @@
 import time
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders import (
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders import (
     ChunkBuilder,
     LabelBuilder,
     RelationBuilder,
 )
-from homer.codelets.builders.correspondence_builders import (
+from linguoplotter.codelets.builders.correspondence_builders import (
     PotentialSubFrameToFrameCorrespondenceBuilder,
     SpaceToFrameCorrespondenceBuilder,
     SubFrameToFrameCorrespondenceBuilder,
 )
-from homer.codelets.builders.projection_builders import (
+from linguoplotter.codelets.builders.projection_builders import (
     ChunkProjectionBuilder,
     LabelProjectionBuilder,
     LetterChunkProjectionBuilder,
     RelationProjectionBuilder,
 )
-from homer.codelets.builders.view_builders import SimplexViewBuilder
-from homer.codelets.evaluators import (
+from linguoplotter.codelets.builders.view_builders import SimplexViewBuilder
+from linguoplotter.codelets.evaluators import (
     CorrespondenceEvaluator,
     ChunkEvaluator,
     LabelEvaluator,
     RelationEvaluator,
 )
-from homer.codelets.evaluators.projection_evaluators import (
+from linguoplotter.codelets.evaluators.projection_evaluators import (
     ChunkProjectionEvaluator,
     LabelProjectionEvaluator,
     LetterChunkProjectionEvaluator,
     RelationProjectionEvaluator,
 )
-from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
-from homer.codelets.selectors import (
+from linguoplotter.codelets.evaluators.view_evaluators import SimplexViewEvaluator
+from linguoplotter.codelets.selectors import (
     CorrespondenceSelector,
     ChunkSelector,
     LabelSelector,
     RelationSelector,
 )
-from homer.codelets.selectors.projection_selectors import (
+from linguoplotter.codelets.selectors.projection_selectors import (
     ChunkProjectionSelector,
     LabelProjectionSelector,
     LetterChunkProjectionSelector,
     RelationProjectionSelector,
 )
-from homer.codelets.selectors.view_selectors import SimplexViewSelector
-from homer.codelets.suggesters import (
+from linguoplotter.codelets.selectors.view_selectors import SimplexViewSelector
+from linguoplotter.codelets.suggesters import (
     ChunkSuggester,
     LabelSuggester,
     RelationSuggester,
 )
-from homer.codelets.suggesters.correspondence_suggesters import (
+from linguoplotter.codelets.suggesters.correspondence_suggesters import (
     PotentialSubFrameToFrameCorrespondenceSuggester,
     SpaceToFrameCorrespondenceSuggester,
     SubFrameToFrameCorrespondenceSuggester,
 )
-from homer.codelets.suggesters.projection_suggesters import (
+from linguoplotter.codelets.suggesters.projection_suggesters import (
     ChunkProjectionSuggester,
     LabelProjectionSuggester,
     LetterChunkProjectionSuggester,
     RelationProjectionSuggester,
 )
-from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
+from linguoplotter.codelets.suggesters.view_suggesters import SimplexViewSuggester
 
 
-def test_pipeline_of_codelets(homer):
+def test_pipeline_of_codelets(linguoplotter):
     start_time = time.time()
-    bubble_chamber = homer.bubble_chamber
+    bubble_chamber = linguoplotter.bubble_chamber
     input_space = bubble_chamber.contextual_spaces["input"]
     location_space = bubble_chamber.conceptual_spaces["location"]
 

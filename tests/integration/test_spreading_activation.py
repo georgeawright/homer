@@ -1,11 +1,11 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.bubble_chamber import BubbleChamber
-from homer.location import Location
-from homer.structure import Structure
-from homer.structures.links import Correspondence, Label, Relation
-from homer.structures.nodes import Chunk, Concept, Rule
+from linguoplotter.bubble_chamber import BubbleChamber
+from linguoplotter.location import Location
+from linguoplotter.structure import Structure
+from linguoplotter.structures.links import Correspondence, Label, Relation
+from linguoplotter.structures.nodes import Chunk, Concept, Rule
 
 
 @pytest.mark.skip

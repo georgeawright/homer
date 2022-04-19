@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Label
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Label
 
 
 def test_copy(bubble_chamber):

@@ -1,8 +1,10 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.projection_builders import LetterChunkProjectionBuilder
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.projection_builders import (
+    LetterChunkProjectionBuilder,
+)
 
 
 def test_projects_non_slot_into_output(bubble_chamber):

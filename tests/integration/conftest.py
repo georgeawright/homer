@@ -2,8 +2,8 @@ import pytest
 import sys
 from unittest.mock import Mock
 
-from homer import Homer
-from homer.loggers import ActivityLogger
+from linguoplotter import Linguoplotter
+from linguoplotter.loggers import ActivityLogger
 
 
 @pytest.fixture(scope="module")
@@ -1657,13 +1657,13 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 
 
 @pytest.fixture(scope="module")
-def homer(program):
+def linguoplotter(program):
     activity_logger = ActivityLogger(sys.stdout)
     loggers = {
         "structure": Mock(),
         "activity": activity_logger,
         "errors": Mock(),
     }
-    system = Homer.setup(loggers=loggers, random_seed=1)
+    system = Linguoplotter.setup(loggers=loggers, random_seed=1)
     system.interpreter.interpret_string(program)
     return system

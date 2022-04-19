@@ -1,9 +1,11 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.suggesters.projection_suggesters import RelationProjectionSuggester
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.suggesters.projection_suggesters import (
+    RelationProjectionSuggester,
+)
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.fixture
