@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer import fuzzy
-from homer.classifiers import RuleClassifier
-from homer.structure_collection import StructureCollection
+from linguoplotter import fuzzy
+from linguoplotter.classifiers import RuleClassifier
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_classify_det_relation():

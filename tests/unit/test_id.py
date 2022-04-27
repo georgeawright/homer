@@ -2,7 +2,7 @@ from collections import defaultdict
 import pytest
 from unittest.mock import Mock
 
-from homer.id import ID
+from linguoplotter.id import ID
 
 
 @pytest.mark.parametrize(

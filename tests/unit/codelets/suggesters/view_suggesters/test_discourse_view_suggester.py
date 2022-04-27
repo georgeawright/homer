@@ -1,18 +1,19 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.view_builders import DiscourseViewBuilder
-from homer.codelets.suggesters.view_suggesters import DiscourseViewSuggester
-from homer.structure_collection import StructureCollection
-from homer.structures.spaces import Frame
-from homer.structures.views import DiscourseView
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.view_builders import DiscourseViewBuilder
+from linguoplotter.codelets.suggesters.view_suggesters import DiscourseViewSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures import Frame
+from linguoplotter.structures.views import DiscourseView
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
+    chamber.loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
     chamber.has_view.return_value = False
     chamber.concepts = {
         "suggest": Mock(),

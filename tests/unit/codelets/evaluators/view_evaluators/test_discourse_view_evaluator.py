@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators.view_evaluators import DiscourseViewEvaluator
-from homer.codelets.selectors.view_selectors import DiscourseViewSelector
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelets.evaluators.view_evaluators import DiscourseViewEvaluator
+from linguoplotter.codelets.selectors.view_selectors import DiscourseViewSelector
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.mark.skip

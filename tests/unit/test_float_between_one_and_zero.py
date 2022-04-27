@@ -1,6 +1,6 @@
 import pytest
 
-from homer.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 
 
 @pytest.mark.parametrize(

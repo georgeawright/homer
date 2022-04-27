@@ -1,12 +1,11 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.projection_builders import ChunkProjectionBuilder
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence
-from homer.structures.nodes import Word
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.projection_builders import ChunkProjectionBuilder
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Correspondence
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture
@@ -47,7 +46,7 @@ def test_projects_chunk_into_output_space(
     }
     builder = ChunkProjectionBuilder("", "", bubble_chamber, target_structures, 1.0)
     builder.run()
-    assert CodeletResult.SUCCESS == builder.result
+    assert CodeletResult.FINISH == builder.result
 
 
 def test_fizzles_if_chunk_projection_exists(

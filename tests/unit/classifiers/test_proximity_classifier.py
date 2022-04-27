@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.classifiers import ProximityClassifier
-from homer.structure_collection import StructureCollection
+from linguoplotter.classifiers import ProximityClassifier
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize("proximity", [(1.0), (0.0)])

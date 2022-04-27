@@ -1,4 +1,0 @@
-from .chunk_projection_selector import ChunkProjectionSelector
-from .label_projection_selector import LabelProjectionSelector
-from .relation_projection_selector import RelationProjectionSelector
-from .word_projection_selector import WordProjectionSelector

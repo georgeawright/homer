@@ -2,11 +2,11 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.selectors import RelationSelector
-from homer.codelets.suggesters import RelationSuggester
-from homer.structure_collection import StructureCollection
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.selectors import RelationSelector
+from linguoplotter.codelets.suggesters import RelationSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.tools import hasinstance
 
 
 def test_finds_challenger_when_not_given_one(bubble_chamber):
@@ -83,7 +83,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             challengers=bubble_chamber.new_structure_collection(challenger),
         )
         selector.run()
-        assert CodeletResult.SUCCESS == selector.result
+        assert CodeletResult.FINISH == selector.result
         if expected_winner == "champion":
             assert champion.boost_activation.is_called()
             assert challenger.decay_activation.is_called()

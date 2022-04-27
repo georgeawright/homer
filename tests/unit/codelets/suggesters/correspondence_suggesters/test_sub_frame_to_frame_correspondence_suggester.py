@@ -1,0 +1,109 @@
+import pytest
+from unittest.mock import Mock
+
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.suggesters.correspondence_suggesters import (
+    SubFrameToFrameCorrespondenceSuggester,
+)
+
+
+def test_fizzles_if_view_cannot_accept_correspondence(bubble_chamber):
+    target_structure_one = Mock()
+    target_structure_one.is_correspondence = False
+    target_structure_one.corresponding_exigency = 1.0
+
+    sub_frame = Mock()
+    sub_frame.corresponding_exigency = 1.0
+    sub_frame.input_space.corresponding_exigency = 1.0
+    sub_frame.input_space.contents = bubble_chamber.new_structure_collection(
+        target_structure_one
+    )
+    sub_frame.output_space.corresponding_exigency = 0.0
+
+    matched_sub_frame = Mock()
+    matched_sub_frame.input_space = Mock()
+
+    target_view = Mock()
+    target_view.frames.get.return_value = sub_frame
+    target_view.matched_sub_frames = {matched_sub_frame: sub_frame}
+    target_view.can_accept_member.return_value = False
+
+    target_structures = {
+        "target_view": target_view,
+    }
+
+    correspondence_suggester = SubFrameToFrameCorrespondenceSuggester(
+        Mock(), Mock(), bubble_chamber, target_structures, Mock()
+    )
+    correspondence_suggester.run()
+    assert CodeletResult.FIZZLE == correspondence_suggester.result
+
+
+def test_gets_second_target_structure_if_needed(bubble_chamber):
+    target_structure_one = Mock()
+    target_structure_one.is_correspondence = False
+    target_structure_one.corresponding_exigency = 1.0
+
+    sub_frame = Mock()
+    sub_frame.corresponding_exigency = 1.0
+    sub_frame.input_space.corresponding_exigency = 1.0
+    sub_frame.input_space.contents = bubble_chamber.new_structure_collection(
+        target_structure_one
+    )
+    sub_frame.output_space.corresponding_exigency = 0.0
+
+    matched_sub_frame = Mock()
+    matched_sub_frame.input_space = Mock()
+
+    target_view = Mock()
+    target_view.frames.get.return_value = sub_frame
+    target_view.matched_sub_frames = {matched_sub_frame: sub_frame}
+    target_view.can_accept_member.return_value = True
+
+    target_structures = {
+        "target_view": target_view,
+    }
+
+    correspondence_suggester = SubFrameToFrameCorrespondenceSuggester(
+        Mock(), Mock(), bubble_chamber, target_structures, Mock()
+    )
+    assert correspondence_suggester.target_space_two is None
+    assert correspondence_suggester.target_structure_two is None
+    correspondence_suggester.run()
+    assert correspondence_suggester.target_space_two is not None
+    assert correspondence_suggester.target_structure_two is not None
+    assert CodeletResult.FINISH == correspondence_suggester.result
+
+
+def test_gets_parent_concept_if_needed(bubble_chamber):
+    target_structure_one = Mock()
+    target_structure_one.is_correspondence = False
+    target_structure_one.corresponding_exigency = 1.0
+
+    sub_frame = Mock()
+    sub_frame.corresponding_exigency = 1.0
+    sub_frame.input_space.corresponding_exigency = 1.0
+    sub_frame.input_space.contents = bubble_chamber.new_structure_collection(
+        target_structure_one
+    )
+    sub_frame.output_space.corresponding_exigency = 0.0
+
+    matched_sub_frame = Mock()
+    matched_sub_frame.input_space = Mock()
+
+    target_view = Mock()
+    target_view.frames.get.return_value = sub_frame
+    target_view.matched_sub_frames = {matched_sub_frame: sub_frame}
+    target_view.can_accept_member.return_value = True
+
+    target_structures = {
+        "target_view": target_view,
+    }
+
+    correspondence_suggester = SubFrameToFrameCorrespondenceSuggester(
+        Mock(), Mock(), bubble_chamber, target_structures, Mock()
+    )
+    assert correspondence_suggester.parent_concept is None
+    correspondence_suggester.run()
+    assert correspondence_suggester.parent_concept is not None
+    assert CodeletResult.FINISH == correspondence_suggester.result

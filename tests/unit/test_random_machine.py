@@ -2,7 +2,7 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.random_machine import RandomMachine
+from linguoplotter.random_machine import RandomMachine
 
 
 def test_random_machine_seed():
@@ -34,6 +34,7 @@ def test_randomize_number(satisfaction, number, random_number, expected):
     bubble_chamber = Mock()
     bubble_chamber.satisfaction = satisfaction
     random_machine = RandomMachine(bubble_chamber)
+    random_machine.determinism_smoothing_function = lambda x: x
     with patch.object(random, "random", return_value=random_number):
         assert expected == random_machine.randomize_number(number)
 

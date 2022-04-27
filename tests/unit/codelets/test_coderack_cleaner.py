@@ -2,8 +2,8 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.codelets import CoderackCleaner
-from homer.coderack import Coderack
+from linguoplotter.codelets import CoderackCleaner
+from linguoplotter.coderack import Coderack
 
 
 @pytest.mark.parametrize(
@@ -26,6 +26,7 @@ def test_coderack_cleaner_removes_low_urgency_offending_codelets(
 
     with patch.object(random, "random", return_value=0.5):
         bubble_chamber = Mock()
+        bubble_chamber.loggers = {"activity": Mock()}
         bubble_chamber.satisfaction = current_satisfaction_score
         coderack = Coderack(Mock(), Mock())
         coderack._codelets = [

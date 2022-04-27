@@ -1,0 +1,4 @@
+from .chunk_projection_suggester import ChunkProjectionSuggester
+from .label_projection_suggester import LabelProjectionSuggester
+from .letter_chunk_projection_suggester import LetterChunkProjectionSuggester
+from .relation_projection_suggester import RelationProjectionSuggester

@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.view_builders import MonitoringViewBuilder
-from homer.codelets.suggesters.view_suggesters import MonitoringViewSuggester
-from homer.structure_collection import StructureCollection
-from homer.structures.spaces import Frame
-from homer.structures.views import MonitoringView
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.view_builders import MonitoringViewBuilder
+from linguoplotter.codelets.suggesters.view_suggesters import MonitoringViewSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures import Frame
+from linguoplotter.structures.views import MonitoringView
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def test_gives_high_confidence_for_highly_activated_spaces(
         Mock(),
     )
     result = view_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert view_suggester.confidence == 1
     assert len(view_suggester.child_codelets) == 1
     assert isinstance(view_suggester.child_codelets[0], MonitoringViewBuilder)
@@ -65,7 +65,7 @@ def test_gives_low_confidence_for_low_activated_spaces(
         1.0,
     )
     result = view_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert view_suggester.confidence == 0
     assert len(view_suggester.child_codelets) == 1
     assert isinstance(view_suggester.child_codelets[0], MonitoringViewBuilder)

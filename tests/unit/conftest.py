@@ -1,16 +1,26 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.random_machine import RandomMachine
-from homer.structure_collection import StructureCollection
+from linguoplotter.random_machine import RandomMachine
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Correspondence
 
 
 @pytest.fixture(scope="module")
 def bubble_chamber():
     chamber = Mock()
+
+    chamber.loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
+
     chamber.satisfaction = 0.5
     chamber.random_machine = RandomMachine(chamber, seed=1)
     chamber.new_structure_collection = lambda *x: StructureCollection(chamber, x)
+
+    chamber.new_chunk = lambda **x: Mock()
+    chamber.new_letter_chunk = lambda **x: Mock()
+    chamber.new_correspondence = lambda **x: Mock()
+    chamber.new_label = lambda **x: Mock()
+    chamber.new_relation = lambda **x: Mock()
 
     suggest_concept = Mock()
     suggest_concept.name = "suggest"
@@ -22,10 +32,16 @@ def bubble_chamber():
     select_concept.name = "select"
     publish_concept = Mock()
     publish_concept.name = "publish"
+    inner_concept = Mock()
+    inner_concept.name = "inner"
+    outer_concept = Mock()
+    outer_concept.name = "outer"
+    forward_concept = Mock()
+    forward_concept.name = "forward"
     chunk_concept = Mock()
     chunk_concept.name = "chunk"
-    word_concept = Mock()
-    word_concept.name = "word"
+    letter_chunk_concept = Mock()
+    letter_chunk_concept.name = "letter-chunk"
     label_concept = Mock()
     label_concept.name = "label"
     relation_concept = Mock()
@@ -41,15 +57,23 @@ def bubble_chamber():
     interpretation_concept = Mock()
     interpretation_concept.name = "interpretation"
     same_concept = Mock()
+    same_concept.structure_type = Correspondence
     same_concept.name = "same"
+    more_concept = Mock()
+    more_concept.name = "more"
+    less_concept = Mock()
+    less_concept.name = "less"
     chamber.concepts = chamber.new_structure_collection(
         suggest_concept,
         build_concept,
         evaluate_concept,
         select_concept,
         publish_concept,
+        inner_concept,
+        outer_concept,
+        forward_concept,
         chunk_concept,
-        word_concept,
+        letter_chunk_concept,
         label_concept,
         relation_concept,
         correspondence_concept,
@@ -58,9 +82,14 @@ def bubble_chamber():
         text_concept,
         interpretation_concept,
         same_concept,
+        more_concept,
+        less_concept,
     )
+    for concept in chamber.concepts:
+        concept.activation = 0.5
 
     chamber.chunks = chamber.new_structure_collection()
+    chamber.rules = chamber.new_structure_collection()
     chamber.input_nodes = [Mock()]
     input_space = Mock()
     input_space.name = "input"

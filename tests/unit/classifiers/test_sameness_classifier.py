@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.classifiers import SamenessClassifier
-from homer.structure_collection import StructureCollection
+from linguoplotter.classifiers import SamenessClassifier
+from linguoplotter.structure_collection import StructureCollection
 
 
 def test_sameness_of_single_item_in_collection():

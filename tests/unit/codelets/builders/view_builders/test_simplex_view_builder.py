@@ -1,12 +1,12 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.view_builders import SimplexViewBuilder
-from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
-from homer.structure_collection import StructureCollection
-from homer.structures.views import SimplexView
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.view_builders import SimplexViewBuilder
+from linguoplotter.codelets.evaluators.view_evaluators import SimplexViewEvaluator
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.views import SimplexView
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def test_successful_creates_view_and_spawns_follow_up(
         Mock(),
     )
     result = view_builder.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert hasinstance(view_builder.child_structures, SimplexView)
     assert len(view_builder.child_codelets) == 1
     assert isinstance(view_builder.child_codelets[0], SimplexViewEvaluator)

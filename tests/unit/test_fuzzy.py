@@ -1,7 +1,7 @@
 import math
 import pytest
 
-from homer import fuzzy
+from linguoplotter import fuzzy
 
 FLOATING_POINT_TOLERANCE = 1e-5
 

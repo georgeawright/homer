@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.tools import *
+from linguoplotter.tools import *
 
 
 @pytest.mark.parametrize(

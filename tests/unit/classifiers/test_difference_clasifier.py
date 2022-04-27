@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.classifiers import DifferenceClassifier
+from linguoplotter.classifiers import DifferenceClassifier
 
 
 @pytest.mark.parametrize(

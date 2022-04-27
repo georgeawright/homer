@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.location import Location
-from homer.structure_collection import StructureCollection
-from homer.structures.nodes import Chunk
+from linguoplotter.location import Location
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.nodes import Chunk
 
 
 def test_size_no_members(bubble_chamber):

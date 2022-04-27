@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelets.evaluators.view_evaluators import SimplexViewEvaluator
-from homer.codelets.selectors.view_selectors import SimplexViewSelector
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelets.evaluators.view_evaluators import SimplexViewEvaluator
+from linguoplotter.codelets.selectors.view_selectors import SimplexViewSelector
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize(
-    "current_quality, correspondences_quality, no_of_slots, no_of_slot_values, "
-    + "no_of_frame_items, no_of_projected_frame_items, output_quality, "
-    + "expected_view_quality",
+    "current_quality, correspondences_quality, no_of_frame_input_items, "
+    + "no_of_matched_frame_items, no_of_frame_output_items, "
+    + "no_of_projected_frame_items, output_quality, expected_view_quality",
     [
         (0.75, 0.5, 4, 2, 4, 2, 0.5, 0.5),
         (0.75, 1, 4, 4, 4, 0, 0.0, 0.5),
@@ -21,30 +21,40 @@ def test_changes_target_structure_quality(
     bubble_chamber,
     current_quality,
     correspondences_quality,
-    no_of_slots,
-    no_of_slot_values,
-    no_of_frame_items,
+    no_of_frame_input_items,
+    no_of_matched_frame_items,
+    no_of_frame_output_items,
     no_of_projected_frame_items,
     output_quality,
     expected_view_quality,
 ):
     view = Mock()
-    view.slots = [Mock() for _ in range(no_of_slots)]
-    view.slot_values = {Mock(): Mock() for _ in range(no_of_slot_values)}
-
     frame = Mock()
+
+    frame.input_space.contents = bubble_chamber.new_structure_collection()
+    for _ in range(no_of_matched_frame_items):
+        item = Mock()
+        item.is_correspondence = False
+        item.correspondences.is_empty.return_value = False
+        frame.input_space.contents.add(item)
+    for _ in range(no_of_frame_input_items - no_of_matched_frame_items):
+        item = Mock()
+        item.is_correspondence = False
+        item.correspondences.is_empty.return_value = True
+        frame.input_space.contents.add(item)
+
     frame.output_space.contents = bubble_chamber.new_structure_collection()
     for _ in range(no_of_projected_frame_items):
         item = Mock()
         item.is_correspondence = False
         item.has_correspondence_to_space.return_value = True
         frame.output_space.contents.add(item)
-    for _ in range(no_of_frame_items - no_of_projected_frame_items):
+    for _ in range(no_of_frame_output_items - no_of_projected_frame_items):
         item = Mock()
         item.is_correspondence = False
         item.has_correspondence_to_space.return_value = False
         frame.output_space.contents.add(item)
-    view.input_frames = bubble_chamber.new_structure_collection(frame)
+    view.parent_frame = frame
 
     view.output_space.quality = output_quality
 

@@ -2,16 +2,16 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.codelet_result import CodeletResult
-from homer.codelets import Publisher
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets import Publisher
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.mark.parametrize(
     "view_quality, view_activation, random_number, success_or_fail",
     [
-        (1, 1, 0, CodeletResult.SUCCESS),
-        (0.5, 0.5, 0, CodeletResult.SUCCESS),
+        (1, 1, 0, CodeletResult.FINISH),
+        (0.5, 0.5, 0, CodeletResult.FINISH),
     ],
 )
 def test_publishes_text_from_high_quality_active_monitoring_view(
@@ -40,7 +40,7 @@ def test_publishes_text_from_high_quality_active_monitoring_view(
         publisher = Publisher("", "", bubble_chamber, 1)
         publisher.run()
         assert success_or_fail == publisher.result
-        if success_or_fail == CodeletResult.SUCCESS:
+        if success_or_fail == CodeletResult.FINISH:
             assert "hello world" == bubble_chamber.result
         else:
             assert "" == bubble_chamber.result

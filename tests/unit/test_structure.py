@@ -1,10 +1,9 @@
 import pytest
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
-from homer.structure import Structure
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Correspondence, Label, Relation
-from homer.structures.nodes import Lexeme
+from linguoplotter.structure import Structure
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Correspondence, Label, Relation
 
 
 def test_correspondences_returns_correspondences(bubble_chamber):
@@ -25,9 +24,11 @@ def test_correspondences_returns_correspondences(bubble_chamber):
             Mock(),
             Mock(),
             Mock(),
+            Mock(),
         )
         links_out.add(correspondence)
         correspondence = Correspondence(
+            Mock(),
             Mock(),
             Mock(),
             Mock(),
@@ -74,6 +75,7 @@ def test_labels_returns_labels(bubble_chamber):
             Mock(),
             Mock(),
             Mock(),
+            Mock(),
         )
         links_out.add(label)
     for _ in range(number_of_labels):
@@ -92,37 +94,6 @@ def test_labels_returns_labels(bubble_chamber):
         assert isinstance(label, Label)
 
 
-def test_lexemes_returns_lexemes(bubble_chamber):
-    structure = Structure(
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(),
-        bubble_chamber.new_structure_collection(),
-        Mock(),
-    )
-    number_of_lexemes = 10
-    for _ in range(number_of_lexemes):
-        lexeme = Lexeme(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
-        relation = Relation(
-            Mock(),
-            Mock(),
-            structure,
-            bubble_chamber.new_structure_collection(structure, lexeme),
-            Mock(),
-            None,
-            Mock(),
-            Mock(),
-            Mock(),
-            Mock(),
-        )
-        structure.links_out.add(relation)
-    assert number_of_lexemes == len(structure.lexemes)
-    for lexeme in structure.lexemes:
-        assert isinstance(lexeme, Lexeme)
-
-
 def test_labels_in_space(bubble_chamber):
     structure = Structure(
         Mock(),
@@ -136,11 +107,31 @@ def test_labels_in_space(bubble_chamber):
     space = Mock()
     space.contents = bubble_chamber.new_structure_collection()
     label_in_space = Label(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     space.contents.add(label_in_space)
     label_not_in_space = Label(
-        Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock()
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
     )
     structure.links_out.add(label_in_space)
     structure.links_out.add(label_not_in_space)
@@ -165,9 +156,12 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         structure,
+        end,
         bubble_chamber.new_structure_collection(structure, end),
         Mock(),
+        Mock(),
         None,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -177,9 +171,12 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         structure,
+        Mock(),
         bubble_chamber.new_structure_collection(structure, Mock()),
         Mock(),
+        Mock(),
         None,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -189,9 +186,12 @@ def test_relations_in_space_with(bubble_chamber):
         Mock(),
         Mock(),
         structure,
+        end,
         bubble_chamber.new_structure_collection(structure, end),
         Mock(),
+        Mock(),
         None,
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -228,6 +228,7 @@ def test_correspondences_to_space(bubble_chamber):
         Mock(),
         Mock(),
         start=structure,
+        end=structure_in_space,
         arguments=bubble_chamber.new_structure_collection(
             structure, structure_in_space
         ),
@@ -244,6 +245,7 @@ def test_correspondences_to_space(bubble_chamber):
         Mock(),
         Mock(),
         start=structure_in_space,
+        end=structure,
         arguments=bubble_chamber.new_structure_collection(
             structure_in_space, structure
         ),
@@ -260,6 +262,7 @@ def test_correspondences_to_space(bubble_chamber):
         Mock(),
         Mock(),
         start=structure,
+        end=Mock(),
         arguments=bubble_chamber.new_structure_collection(structure, Mock()),
         locations=Mock(),
         parent_concept=None,
@@ -274,6 +277,7 @@ def test_correspondences_to_space(bubble_chamber):
         Mock(),
         Mock(),
         start=Mock(),
+        end=Mock(),
         arguments=bubble_chamber.new_structure_collection(Mock(), Mock()),
         locations=Mock(),
         parent_concept=Mock(),

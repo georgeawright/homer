@@ -2,6 +2,7 @@
 
 clear-logs:
 	rm -rf logs/
+	mkdir logs
 
 integration:
 	pipenv run python -m pytest tests/integration
@@ -21,6 +22,9 @@ unit:
 
 run:
 	pipenv run python main.py
+
+run-test:
+	pipenv run python test.py
 
 runserver:
 	pipenv run python manage.py runserver

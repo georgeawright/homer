@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders import ChunkBuilder
-from homer.codelets.evaluators import ChunkEvaluator
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Label
-from homer.structures.nodes import Chunk
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders import ChunkBuilder
+from linguoplotter.codelets.evaluators import ChunkEvaluator
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Label
+from linguoplotter.structures.nodes import Chunk
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture
@@ -112,7 +112,7 @@ def test_creates_new_chunk_if_necessary(
     urgency = 1
     builder = ChunkBuilder("", "", bubble_chamber, target_structures, urgency)
     builder.run()
-    assert CodeletResult.SUCCESS == builder.result
+    assert CodeletResult.FINISH == builder.result
     assert 2 == len(builder.child_structures)
     assert hasinstance(builder.child_structures, Chunk)
 
@@ -141,7 +141,7 @@ def test_fills_slot_if_necessary(
     assert target_slot_filler not in target_root.members
     builder = ChunkBuilder("", "", bubble_chamber, target_structures, urgency)
     builder.run()
-    assert CodeletResult.SUCCESS == builder.result
+    assert CodeletResult.FINISH == builder.result
     assert target_slot_filler in target_root.members
     assert target_slot not in target_root.members
 
@@ -168,6 +168,6 @@ def test_leaves_slot_if_appropriate(
     assert target_slot_filler not in target_root.members
     builder = ChunkBuilder("", "", bubble_chamber, target_structures, urgency)
     builder.run()
-    assert CodeletResult.SUCCESS == builder.result
+    assert CodeletResult.FINISH == builder.result
     assert target_slot_filler in target_root.members
     assert target_slot in target_root.members

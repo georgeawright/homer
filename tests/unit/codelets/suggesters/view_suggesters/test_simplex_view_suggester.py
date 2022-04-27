@@ -1,17 +1,18 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.builders.view_builders import SimplexViewBuilder
-from homer.codelets.suggesters.view_suggesters import SimplexViewSuggester
-from homer.structure_collection import StructureCollection
-from homer.structures.views import SimplexView
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.builders.view_builders import SimplexViewBuilder
+from linguoplotter.codelets.suggesters.view_suggesters import SimplexViewSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.views import SimplexView
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
+    chamber.loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
     chamber.has_view.return_value = False
     chamber.concepts = {"suggest": Mock(), "view-simplex": Mock(), "text": Mock()}
     chamber.spaces = {"text": Mock(), "top level working": Mock(), "input": Mock()}
@@ -28,11 +29,14 @@ def input_space():
 
 
 @pytest.fixture
-def frame():
-    space = Mock()
-    space.is_frame = True
-    space.activation = 1.0
-    return space
+def frame(input_space):
+    f = Mock()
+    f.is_frame = True
+    f.activation = 1.0
+    f.input_space = Mock()
+    f.input_space.parent_concept = input_space.parent_concept
+    f.input_space.conceptual_spaces = [Mock()]
+    return f
 
 
 def test_gives_high_confidence_for_highly_activated_spaces(
@@ -46,7 +50,7 @@ def test_gives_high_confidence_for_highly_activated_spaces(
         Mock(),
     )
     result = view_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert view_suggester.confidence == 1
     assert len(view_suggester.child_codelets) == 1
     assert isinstance(view_suggester.child_codelets[0], SimplexViewBuilder)
@@ -65,7 +69,7 @@ def test_gives_low_confidence_for_low_activated_spaces(
         1.0,
     )
     result = view_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert view_suggester.confidence == 0
     assert len(view_suggester.child_codelets) == 1
     assert isinstance(view_suggester.child_codelets[0], SimplexViewBuilder)

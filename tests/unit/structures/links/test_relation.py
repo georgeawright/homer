@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Relation
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Relation
 
 
 def test_copy(bubble_chamber):
@@ -15,9 +15,12 @@ def test_copy(bubble_chamber):
         Mock(),
         Mock(),
         old_start,
+        old_end,
         StructureCollection(bubble_chamber, [old_start, old_end]),
         Mock(),
+        Mock(),
         [Mock(), Mock()],
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -40,9 +43,12 @@ def test_nearby(bubble_chamber):
         Mock(),
         Mock(),
         start,
+        end,
         StructureCollection(bubble_chamber, [start, end]),
         Mock(),
+        Mock(),
         [Mock(), Mock()],
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

@@ -1,14 +1,17 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.suggesters.projection_suggesters import ChunkProjectionSuggester
-from homer.structure_collection import StructureCollection
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.suggesters.projection_suggesters import (
+    ChunkProjectionSuggester,
+)
+from linguoplotter.structure_collection import StructureCollection
 
 
 @pytest.fixture
 def bubble_chamber():
     chamber = Mock()
+    chamber.loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
     chamber.concepts = {"suggest": Mock(), "same": Mock(), "chunk": Mock()}
     return chamber
 
@@ -36,7 +39,7 @@ def test_gives_full_confidence_to_project_chunk(
     }
     suggester = ChunkProjectionSuggester("", "", bubble_chamber, target_structures, 1.0)
     suggester.run()
-    assert CodeletResult.SUCCESS == suggester.result
+    assert CodeletResult.FINISH == suggester.result
     assert 1.0 == suggester.confidence
 
 

@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.suggesters import LabelSuggester
-from homer.codelets.builders import LabelBuilder
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Label
-from homer.structures.nodes import Concept
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.suggesters import LabelSuggester
+from linguoplotter.codelets.builders import LabelBuilder
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Label
+from linguoplotter.structures.nodes import Concept
+from linguoplotter.tools import hasinstance
 
 
 @pytest.fixture
@@ -58,7 +58,7 @@ def test_gives_high_confidence_for_positive_example(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     result = label_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert label_suggester.confidence == 1
     assert len(label_suggester.child_codelets) == 1
     assert isinstance(label_suggester.child_codelets[0], LabelBuilder)
@@ -72,14 +72,16 @@ def test_gives_low_confidence_bad_example(bubble_chamber, target_chunk):
         Mock(), Mock(), bubble_chamber, target_structures, 1.0
     )
     result = label_suggester.run()
-    assert CodeletResult.SUCCESS == result
+    assert CodeletResult.FINISH == result
     assert label_suggester.confidence == 0
     assert len(label_suggester.child_codelets) == 1
     assert isinstance(label_suggester.child_codelets[0], LabelBuilder)
 
 
 def test_fizzles_when_label_exists(bubble_chamber, target_chunk):
-    target_chunk.has_label.return_value = True
+    labels_where = Mock()
+    labels_where.is_empty.return_value = False
+    target_chunk.labels.where.return_value = labels_where
     target_structures = {"target_node": target_chunk, "parent_concept": None}
     label_suggester = LabelSuggester(
         Mock(), Mock(), bubble_chamber, target_structures, 1.0

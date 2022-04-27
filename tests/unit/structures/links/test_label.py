@@ -1,22 +1,27 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.structure_collection import StructureCollection
-from homer.structures.links import Label
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structures.links import Label
 
 
 def test_copy(bubble_chamber):
     old_start = Mock()
     new_start = Mock()
     parent_id = "id"
+    location_1 = Mock()
+    location_1.space.name = ""
+    location_2 = Mock()
+    location_2.space.name = ""
     label = Label(
         Mock(),
         Mock(),
         old_start,
         bubble_chamber.new_structure_collection(old_start),
         Mock(),
-        [Mock(), Mock()],
+        [location_1, location_2],
         Mock(),
+        location_1.space,
         Mock(),
         Mock(),
         Mock(),
@@ -32,13 +37,18 @@ def test_copy(bubble_chamber):
 def test_nearby(bubble_chamber):
     parent_spaces = Mock()
     start = Mock()
+    location_1 = Mock()
+    location_1.space.name = ""
+    location_2 = Mock()
+    location_2.space.name = ""
     label = Label(
         Mock(),
         Mock(),
         start,
         Mock(),
         Mock(),
-        [Mock(), Mock()],
+        [location_1, location_2],
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

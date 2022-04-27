@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock
 
-from homer.location import Location
-from homer.tools import centroid_euclidean_distance
+from linguoplotter.location import Location
+from linguoplotter.tools import centroid_euclidean_distance
 
 
 @pytest.mark.parametrize(

@@ -2,20 +2,35 @@ import pytest
 import random
 from unittest.mock import Mock, patch
 
-from homer.codelet_result import CodeletResult
-from homer.codelets.selectors import CorrespondenceSelector
-from homer.codelets.suggesters import CorrespondenceSuggester
-from homer.structure_collection import StructureCollection
-from homer.tools import hasinstance
+from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.selectors import CorrespondenceSelector
+from linguoplotter.codelets.suggesters import CorrespondenceSuggester
+from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.tools import hasinstance
 
 
 def test_finds_challenger_when_not_given_one(bubble_chamber):
+    input_space = Mock()
+    champion_start = Mock()
+    challenger_start = Mock()
+    input_space.contents = bubble_chamber.new_structure_collection(
+        champion_start, challenger_start
+    )
+    view = Mock()
+    view.input_spaces = bubble_chamber.new_structure_collection(input_space)
+
     champion = Mock()
-    challenger = Mock()
+    champion.parent_view = view
+    champion.start = champion_start
+    champion.is_correspondence = True
     champion.size = 1
     champion.quality = 1.0
     champion.activation = 1.0
 
+    challenger = Mock()
+    challenger.parent_view = view
+    challenger.start = challenger_start
+    challenger.is_correspondence = True
     challenger.size = 1
     challenger.quality = 1.0
     challenger.activation = 1.0
@@ -57,10 +72,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
 ):
     with patch.object(random, "random", return_value=random_number):
         space_1 = Mock()
+        space_1.contents = bubble_chamber.new_structure_collection()
         space_2 = Mock()
 
         new_conceptual_space = Mock()
         new_target_one = Mock()
+        space_1.contents.add(new_target_one)
         new_target_one.name = "target1"
         new_target_two = Mock()
         new_space_one = Mock()
@@ -72,12 +89,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         new_space_two.conceptual_space = new_conceptual_space
         new_space_two.is_basic_level = True
         space_2.contents.of_type.return_value = bubble_chamber.new_structure_collection(
-            new_space_two
+            new_target_two
         )
 
         view = Mock()
         view.name = "view"
-        view.input_spaces = bubble_chamber.new_structure_collection(space_1, space_2)
+        view.input_spaces = bubble_chamber.new_structure_collection(space_1)
 
         start_argument = Mock()
         start_argument.links.where.return_value = (
@@ -86,6 +103,8 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         start_argument.parent_space = new_space_one
 
         champion = Mock()
+        space_1.contents.add(champion.start)
+        champion.is_correspondence = True
         champion.name = "champion"
         champion.size = 1
         champion.quality = champion_quality
@@ -94,6 +113,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         champion.parent_view = view
 
         challenger = Mock()
+        challenger.is_correspondence = True
         challenger.name = "challenger"
         challenger.size = 1
         challenger.quality = challenger_quality
@@ -110,7 +130,7 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             challengers=bubble_chamber.new_structure_collection(challenger),
         )
         selector.run()
-        assert CodeletResult.SUCCESS == selector.result
+        assert CodeletResult.FINISH == selector.result
         if expected_winner == "champion":
             assert champion.boost_activation.is_called()
             assert challenger.decay_activation.is_called()
