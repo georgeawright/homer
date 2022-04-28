@@ -36,10 +36,6 @@ def test_gets_appropriate_follow_up_class(bubble_chamber):
         Mock(), Mock(), bubble_chamber, coderack, Mock()
     )
 
-    assert (
-        factory_codelet._get_follow_up_class(example_correspondence_concept)
-        == SpaceToFrameCorrespondenceSuggester
-    )
     assert factory_codelet._get_follow_up_class(example_label_concept) == LabelSuggester
     assert (
         factory_codelet._get_follow_up_class(example_relation_concept)
