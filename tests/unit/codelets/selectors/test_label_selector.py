@@ -3,6 +3,7 @@ import random
 from unittest.mock import Mock, patch
 
 from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.evaluators import LabelEvaluator
 from linguoplotter.codelets.selectors import LabelSelector
 from linguoplotter.codelets.suggesters import LabelSuggester
 from linguoplotter.structure_collection import StructureCollection
@@ -87,5 +88,5 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
         assert 2 == len(selector.child_codelets)
-        assert hasinstance(selector.child_codelets, LabelSelector)
+        assert hasinstance(selector.child_codelets, LabelEvaluator)
         assert hasinstance(selector.child_codelets, LabelSuggester)

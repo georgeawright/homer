@@ -9,6 +9,7 @@ from linguoplotter.structures.links import Correspondence
 @pytest.fixture(scope="module")
 def bubble_chamber():
     chamber = Mock()
+    chamber.focus.focussedness = 1.0
 
     chamber.loggers = {"activity": Mock(), "structure": Mock(), "errors": Mock()}
 
