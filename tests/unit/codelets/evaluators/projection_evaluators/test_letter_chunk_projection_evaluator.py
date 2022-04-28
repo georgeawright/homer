@@ -25,7 +25,7 @@ def test_changes_target_structure_quality(
     slot.is_slot = True
 
     word = Mock()
-    word.is_word = True
+    word.is_letter_chunk = True
     word.quality = current_quality
 
     label_to_word_correspondence = Mock()
@@ -55,7 +55,7 @@ def test_changes_target_structure_quality(
 
 def test_gives_function_word_maximum_quality(bubble_chamber):
     word = Mock()
-    word.is_word = True
+    word.is_letter_chunk = True
     word.quality = 0
     correspondee = Mock()
     correspondee.labels = bubble_chamber.new_structure_collection()
