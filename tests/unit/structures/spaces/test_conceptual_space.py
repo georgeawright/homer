@@ -28,6 +28,7 @@ def test_add(
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [[c[0]] for c in location.coordinates]
         },
@@ -44,6 +45,7 @@ def test_add(
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [[c[1]] for c in location.coordinates]
         },
@@ -57,6 +59,7 @@ def test_add(
         1,
         [],
         [],
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -78,6 +81,7 @@ def test_add(
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
         super_space_to_coordinate_function_map={
             "location": lambda location: [
                 [statistics.fmean([c[0], 4 - c[1]])] for c in location.coordinates
@@ -95,6 +99,7 @@ def test_add(
         2,
         [north_south_space, west_east_space],
         [north_south_space, west_east_space, nw_se_space, ne_sw_space],
+        Mock(),
         Mock(),
         Mock(),
         Mock(),

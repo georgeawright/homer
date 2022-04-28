@@ -18,6 +18,7 @@ def test_add(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
+        Mock(),
     )
     node_1 = Mock()
     node_2 = Mock()
@@ -45,6 +46,7 @@ def test_can_accept_member(bubble_chamber):
         bubble_chamber.new_structure_collection(),
         bubble_chamber.new_structure_collection(),
         bubble_chamber.new_structure_collection(Mock(), Mock()),
+        Mock(),
         Mock(),
         Mock(),
         Mock(),
