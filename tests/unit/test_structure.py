@@ -298,8 +298,16 @@ def test_correspondences_to_space(bubble_chamber):
     assert correspondence_4 not in structure.correspondences_to_space(space)
 
 
-def test_boost_and_update_activation():
-    structure = Structure(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+def test_boost_and_update_activation(bubble_chamber):
+    structure = Structure(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+    )
     structure._activation = 0.0
     structure._activation_update_coefficient = 1
     assert 0.0 == structure.activation
@@ -315,8 +323,16 @@ def test_boost_and_update_activation():
     assert 1.0 == structure.activation
 
 
-def test_decay_and_update_activation():
-    structure = Structure(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+def test_decay_and_update_activation(bubble_chamber):
+    structure = Structure(
+        Mock(),
+        Mock(),
+        Mock(),
+        Mock(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+        bubble_chamber.new_structure_collection(),
+    )
     structure._activation = 0.0
     structure._activation_update_coefficient = 1
     assert 0.0 == structure.activation
