@@ -53,13 +53,13 @@ def test_select():
     collection = {a: True, b: True}
 
     selection = random_machine.select(collection, lambda x: x.quality)
+    assert selection == a
+
+    selection = random_machine.select(collection, lambda x: x.quality)
+    assert selection == a
+
+    selection = random_machine.select(collection, lambda x: x.quality)
     assert selection == b
-
-    selection = random_machine.select(collection, lambda x: x.quality)
-    assert selection == a
-
-    selection = random_machine.select(collection, lambda x: x.quality)
-    assert selection == a
 
     selection = random_machine.select(collection, lambda x: x.quality)
     assert selection == b
