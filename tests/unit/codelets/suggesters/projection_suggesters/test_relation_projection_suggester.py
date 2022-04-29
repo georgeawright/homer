@@ -39,24 +39,6 @@ def test_suggests_projection_from_slot(bubble_chamber, target_view, target_proje
     assert CodeletResult.FINISH == suggester.result
 
 
-def test_gives_full_confidence_to_project_non_slot(
-    bubble_chamber, target_view, target_projectee
-):
-    target_projectee.correspondences = bubble_chamber.new_structure_collection()
-    target_projectee.is_slot = False
-    target_projectee.has_correspondence_to_space.return_value = False
-    target_structures = {
-        "target_view": target_view,
-        "target_projectee": target_projectee,
-    }
-    suggester = RelationProjectionSuggester(
-        "", "", bubble_chamber, target_structures, 1.0
-    )
-    suggester.run()
-    assert CodeletResult.FINISH == suggester.result
-    assert 1.0 == suggester.confidence
-
-
 def test_fizzles_if_relation_projection_exists(
     bubble_chamber, target_view, target_projectee
 ):

@@ -3,6 +3,7 @@ import random
 from unittest.mock import Mock, patch
 
 from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.evaluators import CorrespondenceEvaluator
 from linguoplotter.codelets.selectors import CorrespondenceSelector
 from linguoplotter.codelets.suggesters import CorrespondenceSuggester
 from linguoplotter.structure_collection import StructureCollection
@@ -137,6 +138,4 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
         else:
             assert challenger.boost_activation.is_called()
             assert champion.decay_activation.is_called()
-        assert 2 == len(selector.child_codelets)
-        assert hasinstance(selector.child_codelets, CorrespondenceSuggester)
-        assert hasinstance(selector.child_codelets, CorrespondenceSelector)
+        assert hasinstance(selector.child_codelets, CorrespondenceEvaluator)

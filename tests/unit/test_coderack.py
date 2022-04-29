@@ -8,7 +8,7 @@ from linguoplotter.random_machine import RandomMachine
 @pytest.mark.parametrize(
     "urgency_values, bubble_chamber_satisfaction, random_seed, expected_urgencies",
     [
-        # completetly deterministic
+        # almost deterministic
         (
             [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
             1.0,
@@ -20,14 +20,14 @@ from linguoplotter.random_machine import RandomMachine
             [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
             0.5,
             1,
-            [0.9, 0.7, 0.8, 0.4, 0.5, 0.3, 0.6, 0.1, 0.2],
+            [0.9, 0.7, 0.8, 0.4, 0.5, 0.3, 0.6, 0.2, 0.1],
         ),
-        # completely random
+        # almost random
         (
             [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
             0.0,
             1,
-            [0.2, 0.3, 0.1, 0.9, 0.7, 0.5, 0.6, 0.8, 0.4],
+            [0.3, 0.2, 0.6, 0.7, 0.4, 0.1, 0.8, 0.5, 0.9],
         ),
     ],
 )

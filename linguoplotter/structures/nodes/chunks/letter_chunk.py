@@ -79,7 +79,7 @@ class LetterChunk(Chunk):
                 return None
             name = f"{left_name} {right_name}"
             while "[b]" in name:
-                name = re.sub("\[b\]", "\b", name)
+                name = re.sub(r"\[b\]", "\b", name)
             return " ".join(name.split())
         return None
 

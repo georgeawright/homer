@@ -43,7 +43,7 @@ class RandomMachine:
                 collection.pop(element)
         if len(collection) < 1:
             raise MissingStructureError
-        sample_size = math.ceil(len(collection) * self.determinism)
+        sample_size = max(math.ceil(len(collection) * self.determinism), 1)
         sample = random.sample(list(collection), sample_size)
         key_weights = [key(item) for item in sample]
         random_weights = [random.random() for item in sample]

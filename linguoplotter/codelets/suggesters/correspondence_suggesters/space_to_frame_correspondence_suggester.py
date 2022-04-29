@@ -4,11 +4,9 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection_keys import (
     activation,
-    corresponding_exigency,
     exigency,
     uncorrespondedness,
 )
-from linguoplotter.structures.links import Correspondence
 from linguoplotter.structures.nodes import Concept
 
 

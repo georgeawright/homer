@@ -3,6 +3,7 @@ import random
 from unittest.mock import Mock, patch
 
 from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.codelets.evaluators.view_evaluators import SimplexViewEvaluator
 from linguoplotter.codelets.selectors.view_selectors import SimplexViewSelector
 from linguoplotter.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from linguoplotter.structure_collection import StructureCollection
@@ -19,8 +20,10 @@ def test_finds_challenger_when_not_given_one(bubble_chamber):
     challenger.size = 2
     champion.quality = 1.0
     champion.activation = 1.0
+    champion.unhappiness = 0.0
     challenger.quality = 1.0
     challenger.activation = 1.0
+    challenger.unhappiness = 0.0
     champion.nearby.return_value = bubble_chamber.new_structure_collection(challenger)
 
     parent_frame = Mock()
@@ -72,10 +75,12 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
 ):
     with patch.object(random, "random", return_value=random_number):
         champion = Mock()
+        champion.unhappiness = 0.0
         champion.size = 1
         champion.quality = champion_quality
         champion.activation = champion_activation
         challenger = Mock()
+        challenger.unhappiness = 0.0
         challenger.size = 1
         challenger.quality = challenger_quality
         challenger.activation = challenger_activation
@@ -115,4 +120,4 @@ def test_winner_is_boosted_loser_is_decayed_follow_up_is_spawned(
             assert champion.decay_activation.is_called()
         assert 2 == len(selector.child_codelets)
         assert hasinstance(selector.child_codelets, SimplexViewSuggester)
-        assert hasinstance(selector.child_codelets, SimplexViewSelector)
+        assert hasinstance(selector.child_codelets, SimplexViewEvaluator)
