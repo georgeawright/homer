@@ -1,7 +1,6 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Factory
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.structure_collection_keys import activation, exigency, unhappiness
 
 
 class StructureConceptDrivenFactory(Factory):
