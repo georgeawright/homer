@@ -53,25 +53,33 @@ class Coderack:
     def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
-            Publisher.spawn("", bubble_chamber, 0),
-            FocusSetter.spawn("", bubble_chamber, coderack, 0.5),
+            Publisher.spawn("", bubble_chamber, cls.MINIMUM_CODELET_URGENCY),
+            FocusSetter.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
             WorldviewSetter.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
-            CoderackCleaner.spawn("", bubble_chamber, coderack, 0.0, 1.0),
-            ConceptDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
-            ViewDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
+            CoderackCleaner.spawn(
+                "", bubble_chamber, coderack, 0.0, cls.MINIMUM_CODELET_URGENCY
+            ),
+            ConceptDrivenFactory.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
+            ViewDrivenFactory.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
             RandomStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, 1.0
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
             ActiveStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, 1.0
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
             ExigentStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, 1.0
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
             UnhappyStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, 1.0
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
         ]
         for codelet in meta_codelets:
