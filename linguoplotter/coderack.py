@@ -10,9 +10,11 @@ from .codelets import (
     Factory,
     FocusSetter,
     FocusUnsetter,
+    GarbageCollector,
     Publisher,
     Selector,
     Suggester,
+    Recycler,
     WorldviewSetter,
 )
 from .codelets.factories import (
@@ -38,7 +40,9 @@ class Coderack:
         Factory,
         FocusSetter,
         FocusUnsetter,
+        GarbageCollector,
         Publisher,
+        Recycler,
         WorldviewSetter,
     )
 
@@ -54,6 +58,10 @@ class Coderack:
         coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
             Publisher.spawn("", bubble_chamber, cls.MINIMUM_CODELET_URGENCY),
+            GarbageCollector.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
+            Recycler.spawn("", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY),
             FocusSetter.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
@@ -146,11 +154,13 @@ class Coderack:
             )
         self.recently_run.add(type(codelet))
         self.codelets_run += 1
+        view_count = len(self.bubble_chamber.views)
         self.loggers["activity"].log(
             codelet,
             f"Time: {self.codelets_run} | "
             + f"Satisfaction: {self.bubble_chamber.satisfaction} | "
-            + f"Coderack Population Size: {self.population_size}\n"
+            + f"Coderack Population Size: {self.population_size} | "
+            + f"View Count: {view_count}\n"
             + f"Focus: {self.bubble_chamber.focus.view}\n"
             + f"Worldview: {self.bubble_chamber.worldview.view}\n",
         )
