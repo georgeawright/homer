@@ -20,10 +20,7 @@ from .codelets import (
 from .codelets.factories import (
     ConceptDrivenFactory,
     ViewDrivenFactory,
-    RandomStructureConceptDrivenFactory,
-    ActiveStructureConceptDrivenFactory,
     ExigentStructureConceptDrivenFactory,
-    UnhappyStructureConceptDrivenFactory,
 )
 from .errors import MissingStructureError, NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -77,16 +74,7 @@ class Coderack:
             ViewDrivenFactory.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
-            RandomStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
-            ),
-            ActiveStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
-            ),
             ExigentStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
-            ),
-            UnhappyStructureConceptDrivenFactory.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
         ]
