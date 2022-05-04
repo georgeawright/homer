@@ -1,6 +1,5 @@
 import os
 import time
-from unittest.mock import Mock
 
 from linguoplotter import Linguoplotter
 from linguoplotter.loggers import ActivityLogger, ErrorLogger, StructureLogger
@@ -25,7 +24,7 @@ loggers = {
 narrator = Linguoplotter.setup(loggers, random_seed=1)
 narrator.interpreter.interpret_file("builtin.lisp")
 
-os.chdir("example-programs/weather-description")
-narrator.interpreter.interpret_file("main.lisp")
+os.chdir("example-programs/weather")
+narrator.interpreter.interpret_file("description.lisp")
 os.chdir("../..")
 narrator.run()
