@@ -12,6 +12,7 @@ from .location import Location
 from .logger import Logger
 from .problem import Problem
 from .random_machine import RandomMachine
+from .recycle_bin import RecycleBin
 from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Frame, LinkOrNode, Space, View
@@ -31,6 +32,7 @@ class BubbleChamber:
         self.random_machine = None
         self.focus = Focus()
         self.worldview = Worldview()
+        self.recycle_bin = RecycleBin()
 
         self.conceptual_spaces = None
         self.contextual_spaces = None

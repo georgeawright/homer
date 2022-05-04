@@ -10,18 +10,17 @@ from .codelets import (
     Factory,
     FocusSetter,
     FocusUnsetter,
+    GarbageCollector,
     Publisher,
     Selector,
     Suggester,
+    Recycler,
     WorldviewSetter,
 )
 from .codelets.factories import (
     ConceptDrivenFactory,
     ViewDrivenFactory,
-    RandomStructureConceptDrivenFactory,
-    ActiveStructureConceptDrivenFactory,
     ExigentStructureConceptDrivenFactory,
-    UnhappyStructureConceptDrivenFactory,
 )
 from .errors import MissingStructureError, NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -38,7 +37,9 @@ class Coderack:
         Factory,
         FocusSetter,
         FocusUnsetter,
+        GarbageCollector,
         Publisher,
+        Recycler,
         WorldviewSetter,
     )
 
@@ -53,25 +54,28 @@ class Coderack:
     def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
-            Publisher.spawn("", bubble_chamber, 0),
-            FocusSetter.spawn("", bubble_chamber, coderack, 0.5),
+            Publisher.spawn("", bubble_chamber, cls.MINIMUM_CODELET_URGENCY),
+            GarbageCollector.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
+            Recycler.spawn("", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY),
+            FocusSetter.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
             WorldviewSetter.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
-            CoderackCleaner.spawn("", bubble_chamber, coderack, 0.0, 1.0),
-            ConceptDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
-            ViewDrivenFactory.spawn("", bubble_chamber, coderack, 1.0),
-            RandomStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, 1.0
+            CoderackCleaner.spawn(
+                "", bubble_chamber, coderack, 0.0, cls.MINIMUM_CODELET_URGENCY
             ),
-            ActiveStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, 1.0
+            ConceptDrivenFactory.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
+            ViewDrivenFactory.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
             ExigentStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, 1.0
-            ),
-            UnhappyStructureConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, 1.0
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
         ]
         for codelet in meta_codelets:
@@ -138,11 +142,13 @@ class Coderack:
             )
         self.recently_run.add(type(codelet))
         self.codelets_run += 1
+        view_count = len(self.bubble_chamber.views)
         self.loggers["activity"].log(
             codelet,
             f"Time: {self.codelets_run} | "
             + f"Satisfaction: {self.bubble_chamber.satisfaction} | "
-            + f"Coderack Population Size: {self.population_size}\n"
+            + f"Coderack Population Size: {self.population_size} | "
+            + f"View Count: {view_count}\n"
             + f"Focus: {self.bubble_chamber.focus.view}\n"
             + f"Worldview: {self.bubble_chamber.worldview.view}\n",
         )
