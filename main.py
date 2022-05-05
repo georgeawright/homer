@@ -1,12 +1,13 @@
 import os
 import time
-from unittest.mock import Mock
 
 from linguoplotter import Linguoplotter
 from linguoplotter.loggers import ActivityLogger, ErrorLogger, StructureLogger
 
+pwd = os.getcwd()
+
 time_string = str(time.time())
-logs_dir_path = f"logs/{time_string}"
+logs_dir_path = f"{pwd}/logs/{time_string}"
 os.mkdir(logs_dir_path)
 structure_logs_dir_path = f"{logs_dir_path}/structures"
 os.mkdir(structure_logs_dir_path)
@@ -21,7 +22,9 @@ loggers = {
     "errors": ErrorLogger(error_stream),
 }
 narrator = Linguoplotter.setup(loggers, random_seed=1)
+narrator.interpreter.interpret_file("builtin.lisp")
 
-with open("program.lisp", "r") as f:
-    program = f.read()
-    narrator.run_program(program)
+os.chdir("example-programs/weather")
+narrator.interpreter.interpret_file("description.lisp")
+os.chdir("../..")
+narrator.run()

@@ -42,6 +42,7 @@ class Interpreter:
             "def-label": bubble_chamber.new_label,
             "def-relation": bubble_chamber.new_relation,
             # Other inbuilt classes and functions
+            "load": self.interpret_file,
             "eval": lambda *x: x[-1],
             "list": lambda *x: list(x),
             "tuple": lambda *x: tuple(x),
