@@ -25,6 +25,6 @@ narrator = Linguoplotter.setup(loggers, random_seed=1)
 narrator.interpreter.interpret_file("builtin.lisp")
 
 os.chdir("example-programs/weather")
-narrator.interpreter.interpret_file("description.lisp")
+narrator.interpreter.interpret_file("narration.lisp")
 os.chdir("../..")
 narrator.run()
