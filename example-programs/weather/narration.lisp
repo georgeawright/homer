@@ -4,6 +4,7 @@
 (load "conceptual-spaces/magnitude.lisp")
 (load "conceptual-spaces/height.lisp")
 (load "conceptual-spaces/goodness.lisp")
+(load "conceptual-spaces/size.lisp")
 (load "conceptual-spaces/lateness.lisp")
 (load "conceptual-spaces/extremeness.lisp")
 (load "conceptual-spaces/temperature.lisp")
