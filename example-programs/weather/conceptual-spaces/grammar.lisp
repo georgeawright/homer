@@ -129,6 +129,9 @@
 (define in
   (def-letter-chunk :name "in" :parent_space grammar-space
     :locations (list prep-location)))
+(define on
+  (def-letter-chunk :name "on" :parent_space grammar-space
+    :locations (list prep-location)))
 (define than
   (def-letter-chunk :name "than" :parent_space grammar-space
     :locations (list prep-location)))

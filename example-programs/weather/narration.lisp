@@ -15,7 +15,7 @@
 (load "frames/ap-jj.lisp")
 (load "frames/np-nn.lisp")
 (load "frames/rp-jjr.lisp")
-(load "frames/s-ap-in-np.lisp")
+(load "frames/s-ap-in-loc-on-day.lisp")
 (load "frames/s-comparative.lisp")
 (load "frames/s-and.lisp")
 
