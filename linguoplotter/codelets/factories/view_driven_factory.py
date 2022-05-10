@@ -260,6 +260,7 @@ class ViewDrivenFactory(Factory):
                             parent_concept.classifier.classify(
                                 start=x[0],
                                 end=x[1],
+                                concept=parent_concept,
                                 space=self.target_slot.conceptual_space,
                             ),
                             x[0].exigency,

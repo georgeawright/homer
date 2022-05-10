@@ -55,6 +55,11 @@
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-directional-concept
+  (def-concept :name "pp-directional" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
 (define nn-concept
   (def-concept :name "nn" :locations (list nn-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
@@ -132,6 +137,12 @@
 (define on
   (def-letter-chunk :name "on" :parent_space grammar-space
     :locations (list prep-location)))
+(define from
+  (def-letter-chunk :name "from" :parent_space grammar-space
+    :locations (list prep-location)))
+(define to
+  (def-letter-chunk :name "to" :parent_space grammar-space
+    :locations (list prep-location)))
 (define than
   (def-letter-chunk :name "than" :parent_space grammar-space
     :locations (list prep-location)))
@@ -140,6 +151,9 @@
     :locations (list conj-location)))
 (define but
   (def-letter-chunk :name "but" :parent_space grammar-space
+    :locations (list conj-location)))
+(define then
+  (def-letter-chunk :name "then" :parent_space grammar-space
     :locations (list conj-location)))
 (define comma
   (def-letter-chunk :name "comma" :parent_space grammar-space

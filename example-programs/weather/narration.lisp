@@ -1,5 +1,5 @@
 (load "conceptual-spaces/grammar.lisp")
-(load "conceptual-spaces/sameness.lisp")
+(load "conceptual-spaces/same-different.lisp")
 (load "conceptual-spaces/more-less.lisp")
 (load "conceptual-spaces/magnitude.lisp")
 (load "conceptual-spaces/height.lisp")
@@ -14,10 +14,19 @@
 
 (load "frames/ap-jj.lisp")
 (load "frames/np-nn.lisp")
+(load "frames/pp-ablative-location.lisp")
+(load "frames/pp-ablative-time.lisp")
+(load "frames/pp-allative-location.lisp")
+(load "frames/pp-allative-time.lisp")
+(load "frames/pp-directional-location.lisp")
+(load "frames/pp-directional-time.lisp")
+(load "frames/pp-inessive-location.lisp")
+(load "frames/pp-inessive-time.lisp")
 (load "frames/rp-jjr.lisp")
-(load "frames/s-ap-in-loc-on-day.lisp")
-(load "frames/s-comparative.lisp")
 (load "frames/s-and.lisp")
+(load "frames/s-increase.lisp")
+(load "frames/s-move.lisp")
+(load "frames/s-spread.lisp")
 
 (define input-space
   (def-contextual-space
