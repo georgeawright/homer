@@ -248,7 +248,8 @@ class ViewDrivenFactory(Factory):
                         target_structure_one,
                         target_structure_two,
                     ) = potential_targets.pairs.filter(
-                        lambda x: (
+                        lambda x: x[0] != x[1]
+                        and (
                             x[0] == target_structure_one
                             if target_structure_one is not None
                             else True

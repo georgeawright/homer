@@ -253,6 +253,11 @@ class CorrespondenceSuggester(Suggester):
                 correspondence_suggester.target_structure_two.start
                 in correspondence_suggester.target_view.grouped_nodes
             ):
+                calling_codelet.bubble_chamber.loggers["activity"].log_collection(
+                    calling_codelet,
+                    correspondence_suggester.target_view.node_groups,
+                    "node groups",
+                )
                 start_node_group = [
                     group
                     for group in correspondence_suggester.target_view.node_groups
