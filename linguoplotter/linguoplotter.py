@@ -1,6 +1,7 @@
 from typing import Dict
 
 from .bubble_chamber import BubbleChamber
+from .codelets.suggesters import ChunkSuggester
 from .coderack import Coderack
 from .errors import NoMoreCodelets
 from .hyper_parameters import HyperParameters
@@ -12,6 +13,7 @@ from .structures.spaces import ConceptualSpace
 
 class Linguoplotter:
     CODELET_RUN_LIMIT = HyperParameters.CODELET_RUN_LIMIT
+    NUMBER_OF_START_CHUNK_SUGGESTERS = HyperParameters.NUMBER_OF_START_CHUNK_SUGGESTERS
 
     def __init__(
         self,
@@ -45,6 +47,8 @@ class Linguoplotter:
         loggers["structure"].coderack = self.coderack
 
     def run(self):
+        for _ in range(self.NUMBER_OF_START_CHUNK_SUGGESTERS):
+            self.coderack.add_codelet(ChunkSuggester.make("", self.bubble_chamber, 1.0))
         while self.bubble_chamber.result is None:
             try:
                 if self.coderack.codelets_run % self.activation_update_frequency == 0:
