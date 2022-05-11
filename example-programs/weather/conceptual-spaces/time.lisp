@@ -10,11 +10,11 @@
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space time-space :distance_function centroid_euclidean_distance))
 (define saturday-concept
-  (def-concept :name "saturday" :locations (list (Location (list (list 1)) time-space))
+  (def-concept :name "saturday" :locations (list (Location (list (list 24)) time-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space time-space :distance_function centroid_euclidean_distance))
 (define sunday-concept
-  (def-concept :name "sunday" :locations (list (Location (list (list 2)) time-space))
+  (def-concept :name "sunday" :locations (list (Location (list (list 48)) time-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space time-space :distance_function centroid_euclidean_distance))
 
@@ -27,9 +27,9 @@
 (def-relation :start friday-concept :end friday-word :parent_concept nn-concept)
 (define saturday-word
   (def-letter-chunk :name "saturday" :parent_space time-space
-    :locations (list (Location (list (list 1)) time-space))))
+    :locations (list (Location (list (list 24)) time-space))))
 (def-relation :start saturday-concept :end saturday-word :parent_concept nn-concept)
 (define sunday-word
   (def-letter-chunk :name "sunday" :parent_space time-space
-    :locations (list (Location (list (list 2)) time-space))))
+    :locations (list (Location (list (list 48)) time-space))))
 (def-relation :start sunday-concept :end sunday-word :parent_concept nn-concept)
