@@ -46,7 +46,6 @@ class StructureConceptDrivenFactory(Factory):
             LetterChunkProjectionSuggester,
         )
         from linguoplotter.codelets.suggesters.view_suggesters import (
-            MonitoringViewSuggester,
             SimplexViewSuggester,
         )
         from linguoplotter.codelets.evaluators import (
@@ -62,7 +61,6 @@ class StructureConceptDrivenFactory(Factory):
             LetterChunkProjectionEvaluator,
         )
         from linguoplotter.codelets.evaluators.view_evaluators import (
-            MonitoringViewEvaluator,
             SimplexViewEvaluator,
         )
 
@@ -78,14 +76,11 @@ class StructureConceptDrivenFactory(Factory):
         relation = self.bubble_chamber.concepts["relation"]
         correspondence = self.bubble_chamber.concepts["correspondence"]
         view_simplex = self.bubble_chamber.concepts["view-simplex"]
-        view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
 
         suggest_correspondence = suggest.relations.where(end=correspondence).get()
         suggest_view_simplex = suggest.relations.where(end=view_simplex).get()
-        suggest_view_monitoring = suggest.relations.where(end=view_monitoring).get()
 
         evaluate_view_simplex = evaluate.relations.where(end=view_simplex).get()
-        evaluate_view_monitoring = evaluate.relations.where(end=view_monitoring).get()
 
         chunk_intra = chunk.relations.where(end=intra).get()
         label_intra = label.relations.where(end=intra).get()
@@ -106,7 +101,7 @@ class StructureConceptDrivenFactory(Factory):
         )
         if activity_concept == evaluate:
             structure_link = self.bubble_chamber.new_structure_collection(
-                evaluate_view_simplex, evaluate_view_monitoring
+                evaluate_view_simplex
             ).get(key=self.link_key)
             self.bubble_chamber.loggers["activity"].log(
                 self,
@@ -114,7 +109,6 @@ class StructureConceptDrivenFactory(Factory):
             )
             return {
                 evaluate_view_simplex: SimplexViewEvaluator,
-                evaluate_view_monitoring: MonitoringViewEvaluator,
             }[structure_link]
 
         structure_link = activity_concept.relations.filter(
@@ -129,7 +123,6 @@ class StructureConceptDrivenFactory(Factory):
             return {
                 suggest_correspondence: CorrespondenceSuggester,
                 suggest_view_simplex: SimplexViewSuggester,
-                suggest_view_monitoring: MonitoringViewSuggester,
             }[structure_link]
         except KeyError:
             pass
