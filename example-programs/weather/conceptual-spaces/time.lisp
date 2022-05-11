@@ -1,22 +1,22 @@
 (define time-concept
   (def-concept :name "time" :locations (list) :classifier None
     :instance_type Chunk :structure_type Label :parent_space None
-    :distance_function centroid_euclidean_distance))
+    :distance_function boolean_distance))
 (define time-space
   (def-conceptual-space :name "time" :parent_concept time-concept
     :no_of_dimensions 1 :is_basic_level True))
 (define friday-concept
   (def-concept :name "friday" :locations (list (Location (list (list 0)) time-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space time-space :distance_function centroid_euclidean_distance))
+    :parent_space time-space :distance_function boolean_distance))
 (define saturday-concept
   (def-concept :name "saturday" :locations (list (Location (list (list 24)) time-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space time-space :distance_function centroid_euclidean_distance))
+    :parent_space time-space :distance_function boolean_distance))
 (define sunday-concept
   (def-concept :name "sunday" :locations (list (Location (list (list 48)) time-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space time-space :distance_function centroid_euclidean_distance))
+    :parent_space time-space :distance_function boolean_distance))
 
 (def-correspondence :start friday-concept :end early-concept :parent_concept same-concept)
 (def-correspondence :start sunday-concept :end late-concept :parent_concept same-concept)
