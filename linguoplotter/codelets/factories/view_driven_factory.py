@@ -84,6 +84,9 @@ class ViewDrivenFactory(Factory):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Targeting slot {self.target_slot}"
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Slot parent space: {self.target_slot.parent_space}"
+        )
         if self.target_slot.parent_space == self.target_view.parent_frame.input_space:
             try:
                 follow_up = self._spawn_space_to_frame_correspondence_suggester()
@@ -156,6 +159,9 @@ class ViewDrivenFactory(Factory):
         raise MissingStructureError
 
     def _spawn_non_projection_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            self, "Trying to spawn non-projection suggester"
+        )
         input_space = self.target_view.input_spaces.get()
         if self.target_slot.is_label:
             if self.target_slot.start.is_label:
@@ -287,6 +293,9 @@ class ViewDrivenFactory(Factory):
         raise Exception("Slot is not a label or a relation.")
 
     def _spawn_projection_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            self, "Trying to spawn projection suggester"
+        )
         if self.target_slot.is_letter_chunk:
             follow_up_class = LetterChunkProjectionSuggester
         elif self.target_slot.is_chunk:
@@ -306,7 +315,7 @@ class ViewDrivenFactory(Factory):
 
     def _spawn_space_to_frame_correspondence_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
-            self, "Trying to build correspondence suggester"
+            self, "Trying to spawn space-to-frame-correspondence suggester"
         )
         follow_up = SpaceToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,
@@ -326,6 +335,9 @@ class ViewDrivenFactory(Factory):
         return follow_up
 
     def _spawn_sub_frame_to_frame_correspondence_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            self, "Trying to spawn sub-frame-to-frame-correspondence suggester"
+        )
         target_space_two = (
             self.target_view.parent_frame.input_space
             if self.target_slot in self.target_view.parent_frame.input_space.contents
@@ -352,6 +364,10 @@ class ViewDrivenFactory(Factory):
         )
 
     def _spawn_potential_sub_frame_to_frame_correspondence_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            "Trying to spawn potential sub-frame-to-frame-correspondence suggester",
+        )
         target_space_two = (
             self.target_view.parent_frame.input_space
             if self.target_slot in self.target_view.parent_frame.input_space.contents
@@ -488,6 +504,10 @@ class ViewDrivenFactory(Factory):
         return follow_up
 
     def _spawn_view_driven_factory(self):
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            "Trying to spawn view-driven factory",
+        )
         sub_frame = self.target_view.parent_frame.sub_frames.filter(
             lambda x: x.input_space == self.target_slot.parent_space
             or x.output_space == self.target_slot.parent_space
@@ -582,6 +602,10 @@ class ViewDrivenFactory(Factory):
         )
 
     def _spawn_simplex_view_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            "Trying to spawn simplex view suggester",
+        )
         sub_frame = self.target_view.parent_frame.sub_frames.filter(
             lambda x: x.input_space == self.target_slot.parent_space
             or x.output_space == self.target_slot.parent_space
