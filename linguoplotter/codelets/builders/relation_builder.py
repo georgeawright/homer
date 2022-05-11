@@ -5,7 +5,7 @@ from linguoplotter.id import ID
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
 from linguoplotter.structure import Structure
-from linguoplotter.tools import average_vector, centroid_difference
+from linguoplotter.tools import centroid_difference
 
 
 class RelationBuilder(Builder):

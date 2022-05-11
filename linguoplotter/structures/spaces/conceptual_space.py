@@ -131,7 +131,9 @@ class ConceptualSpace(Space):
                 coordinates_function = self.super_space_to_coordinate_function_map[
                     location.space.name
                 ]
-                start_coordinates = coordinates_function(location)
+                start_coordinates = coordinates_function(
+                    Location(location.start_coordinates, location.space)
+                )
             if location.end_coordinates[0][0] is None:
                 end_coordinates = [[None for _ in range(self.no_of_dimensions)]]
             if math.isnan(location.end_coordinates[0][0]):
@@ -140,7 +142,9 @@ class ConceptualSpace(Space):
                 coordinates_function = self.super_space_to_coordinate_function_map[
                     location.space.name
                 ]
-                end_coordinates = coordinates_function(location)
+                end_coordinates = coordinates_function(
+                    Location(location.end_coordinates, location.space)
+                )
             return TwoPointLocation(start_coordinates, end_coordinates, self)
 
     def make_projection(

@@ -206,7 +206,9 @@ class ViewDrivenFactory(Factory):
                 self.target_slot.uncorrespondedness,
             )
         if self.target_slot.is_relation:
-            if self.target_slot.parent_concept.is_filled_in:
+            if not self.target_slot.parent_concept.is_slot:
+                parent_concept = self.target_slot.parent_concept
+            elif self.target_slot.parent_concept.is_filled_in:
                 parent_concept = self.target_slot.parent_concept.relatives.where(
                     is_concept=True, is_slot=False
                 ).get()
@@ -221,7 +223,8 @@ class ViewDrivenFactory(Factory):
                     .get(key=activation)
                 )
             self.bubble_chamber.loggers["activity"].log(
-                self, f"Found parent concept {parent_concept}"
+                self,
+                f"Found parent concept {parent_concept} {parent_concept.structure_type}",
             )
             target_structure_one = None
             target_structure_two = None
