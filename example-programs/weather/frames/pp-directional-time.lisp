@@ -73,6 +73,7 @@
 		     (TwoPointLocation (list) (list) pp-ablative-input)
 		     (TwoPointLocation (list) (list) pp-allative-input)
 		     (TwoPointLocation (list) (list) pp-directional-time-input))
+    :parent_space pp-directional-time-input
     :conceptual_space time-space))
 
 (define pp-1

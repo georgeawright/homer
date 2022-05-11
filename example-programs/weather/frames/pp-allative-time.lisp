@@ -39,6 +39,7 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) pp-allative-time-input))
+    :parent_space pp-allative-time-input
     :conceptual_space time-space))
 
 (define pp-word-1
