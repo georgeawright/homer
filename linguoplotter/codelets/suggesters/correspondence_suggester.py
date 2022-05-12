@@ -361,33 +361,25 @@ class CorrespondenceSuggester(Suggester):
             calling_codelet.bubble_chamber.loggers["activity"].log(
                 calling_codelet, correspondence_suggester.target_conceptual_space
             )
+            matching_relations = source_collection.filter(
+                lambda x: x.is_relation
+                and (x.start == structure_one_start or structure_one_start is None)
+                and (x.end == structure_one_end or structure_one_end is None)
+                and (
+                    x.parent_concept
+                    == correspondence_suggester.target_structure_two.parent_concept
+                    or correspondence_suggester.target_structure_two.parent_concept.is_slot
+                )
+                and x.conceptual_space
+                == correspondence_suggester.target_conceptual_space
+            )
             calling_codelet.bubble_chamber.loggers["activity"].log_collection(
                 calling_codelet,
-                source_collection.filter(
-                    lambda x: x.is_relation
-                    and (x.start == structure_one_start or structure_one_start is None)
-                    and (x.end == structure_one_end or structure_one_end is None)
-                    and (
-                        x.parent_concept
-                        == correspondence_suggester.target_structure_two.parent_concept
-                        or correspondence_suggester.target_structure_two.parent_concept.is_slot
-                    )
-                    and x.conceptual_space
-                    == correspondence_suggester.target_conceptual_space
-                ),
+                matching_relations,
                 "matching input relations",
             )
-            source_collection_relations = StructureCollection.union(
-                *[item.relations for item in source_collection]
-            )
-            correspondence_suggester.target_structure_one = (
-                source_collection_relations.filter(
-                    lambda x: x.is_relation
-                    and (x.start == structure_one_start or structure_one_start is None)
-                    and (x.end == structure_one_end or structure_one_end is None)
-                    and x.conceptual_space
-                    == correspondence_suggester.target_conceptual_space
-                ).get(key=corresponding_exigency)
+            correspondence_suggester.target_structure_one = matching_relations.get(
+                key=corresponding_exigency
             )
         if (
             correspondence_suggester.target_structure_two.is_node

@@ -30,14 +30,14 @@
     :output_space pp-allative-output))
 
 (define pp-directional-time-input
-  (def-contextual-space :name "pp[to-time].meaning" :parent_concept input-concept
+  (def-contextual-space :name "pp[from-to-time].meaning" :parent_concept input-concept
     :conceptual_spaces (StructureCollection time-space)))
 (define pp-directional-time-output
-  (def-contextual-space :name "pp[to-time].text" :parent_concept text-concept
+  (def-contextual-space :name "pp[from-to-time].text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define pp-directional-time
-  (def-frame :name "pp[to-time]" :parent_concept pp-directional-concept :parent_frame None
-    :sub_frames (StructureCollection)
+  (def-frame :name "pp[from-to-time]" :parent_concept pp-directional-concept :parent_frame None
+    :sub_frames (StructureCollection pp-ablative-sub-frame pp-allative-sub-frame)
     :concepts (StructureCollection early-time-concept late-time-concept)
     :input_space pp-directional-time-input
     :output_space pp-directional-time-output))

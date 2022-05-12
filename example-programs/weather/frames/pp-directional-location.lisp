@@ -43,7 +43,7 @@
     :conceptual_spaces (StructureCollection grammar-space location-space time-space)))
 (define pp-directional-location
   (def-frame :name "pp[from-to-location]" :parent_concept pp-directional-concept :parent_frame None
-    :sub_frames (StructureCollection)
+    :sub_frames (StructureCollection pp-ablative-sub-frame pp-allative-sub-frame)
     :concepts (StructureCollection early-location-concept late-location-concept
 				   early-time-concept late-time-concept)
     :input_space pp-directional-location-input

@@ -17,7 +17,11 @@ def centroid_difference(a, b) -> float:
 
 
 def boolean_distance(a, b) -> float:
-    return 0.0 if a == b else math.inf
+    for coordinates_a, coordinates_b in zip(a, b):
+        for c_a, c_b in zip(coordinates_a, coordinates_b):
+            if c_a != c_b and not math.isnan(c_a) and not math.isnan(c_b):
+                return math.inf
+    return 0.0
 
 
 def average_vector(vectors: List[List[Union[float, int]]]):
