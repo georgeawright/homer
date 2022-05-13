@@ -195,6 +195,13 @@ class ChunkBuilder(Builder):
                 self.target_root.members.remove(self.target_slot)
                 self.target_space.contents.remove(self.target_slot)
                 self.child_structures.remove(self.target_slot)
+        size_space = self.bubble_chamber.spaces["size"]
+        for chunk in self.child_structures:
+            if chunk.has_location_in_space(size_space):
+                chunk.location_in_space(size_space).coordinates = [[chunk.size]]
+            else:
+                chunk.locations.append(Location([[chunk.size]], size_space))
+                size_space.add(chunk)
 
     def _fizzle(self):
         pass
