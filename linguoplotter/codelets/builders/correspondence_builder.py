@@ -26,6 +26,7 @@ class CorrespondenceBuilder(Builder):
         self.parent_concept = target_structures.get("parent_concept")
         self.target_sub_view = target_structures.get("target_sub_view")
         self.sub_frame = target_structures.get("sub_frame")
+        self._target_structures = target_structures
         self.correspondence = None
         self.child_structure = None
 

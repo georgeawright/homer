@@ -14,8 +14,7 @@ class Suggester(Codelet):
         target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self._target_structures = target_structures
         self.confidence = 0.0
 

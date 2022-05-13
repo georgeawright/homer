@@ -18,6 +18,7 @@ from linguoplotter.errors import MissingStructureError, NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
+from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import (
     activation,
     exigency,
@@ -57,6 +58,10 @@ class ViewDrivenFactory(Factory):
         return cls(
             codelet_id, parent_id, bubble_chamber, coderack, urgency, target_view
         )
+
+    @property
+    def target_structures(self) -> StructureCollection:
+        return self.bubble_chamber.new_structure_collection(self.target_view)
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
         urgency = (

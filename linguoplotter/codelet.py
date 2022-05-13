@@ -1,37 +1,36 @@
 from abc import ABC
 
+from .bubble_chamber import BubbleChamber
 from .codelet_result import CodeletResult
 from .float_between_one_and_zero import FloatBetweenOneAndZero
+from .structure_collection import StructureCollection
 
 
 class Codelet(ABC):
     """A unit of work to be carried out in the workspace."""
 
     def __init__(
-        self, codelet_id: str, parent_id: str, urgency: FloatBetweenOneAndZero
+        self,
+        codelet_id: str,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: FloatBetweenOneAndZero,
     ):
         self.codelet_id = codelet_id
         self.parent_id = parent_id
+        self.bubble_chamber = bubble_chamber
         self.urgency = urgency
         self.target_structure = None
         self.child_codelets = []
         self.result = None
 
-    @property
-    def targets_dict(self):
-        raise NotImplementedError
-
-    @property
-    def targets_collection(self):
-        return self.bubble_chamber.new_structure_collection(
-            *[structure for name, structure in self.targets_dict.items()]
-        )
-
-    # TODO: possibly fizzle spawns a factory
-
     @classmethod
     def get_target_class(cls):
         raise NotImplementedError
+
+    @property
+    def target_structures(self) -> StructureCollection:
+        return self.bubble_chamber.new_structure_collection()
 
     def run(self) -> CodeletResult:
         raise NotImplementedError

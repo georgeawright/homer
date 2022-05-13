@@ -127,6 +127,10 @@ class Structure(ABC):
     def is_slot(self) -> bool:
         return False
 
+    @property
+    def is_recyclable(self) -> bool:
+        return False
+
     def recalculate_exigency(self):
         self.recalculate_unhappiness()
         self.recalculate_chunking_exigency()

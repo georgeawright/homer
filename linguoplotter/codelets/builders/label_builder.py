@@ -19,6 +19,7 @@ class LabelBuilder(Builder):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_node = target_structures.get("target_node")
         self.parent_concept = target_structures.get("parent_concept")
+        self._target_structures = target_structures
 
     @classmethod
     def get_follow_up_class(cls) -> type:

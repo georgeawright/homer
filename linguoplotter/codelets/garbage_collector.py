@@ -18,8 +18,7 @@ class GarbageCollector(Codelet):
         coderack: "Coderack",
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.coderack = coderack
 
     @classmethod
@@ -43,29 +42,16 @@ class GarbageCollector(Codelet):
         if self.bubble_chamber.recycle_bin.is_empty:
             self.result = CodeletResult.FIZZLE
         else:
-            target_view = self.bubble_chamber.recycle_bin.remove_oldest()
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target view: {target_view}"
-            )
-            other_codelet_target_views = [
-                codelet.target_view if hasattr(codelet, "target_view") else None
-                for codelet in self.coderack._codelets
-            ]
-            if (
-                target_view in other_codelet_target_views
-                or target_view.activation > 0.0
-            ):
-                self.result = CodeletResult.FIZZLE
-            else:
+            target = self.bubble_chamber.recycle_bin.remove_oldest()
+            self.bubble_chamber.loggers["activity"].log(self, f"Found target: {target}")
+            for codelet in self.coderack._codelets:
+                if target in codelet.target_structures:
+                    self.result = CodeletResult.FIZZLE
+            if not self.result != CodeletResult.FIZZLE:
+                self.bubble_chamber.remove(target)
                 self.result = CodeletResult.FINISH
-                for correspondence in target_view.members:
-                    for argument in correspondence.arguments:
-                        argument.links_out.remove(correspondence)
-                        argument.links_in.remove(correspondence)
-                        self.bubble_chamber.correspondences.remove(correspondence)
-                        self.bubble_chamber.views.remove(target_view)
-                        self.result = CodeletResult.FINISH
         self._engender_follow_up()
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 

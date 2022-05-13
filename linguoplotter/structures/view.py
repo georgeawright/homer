@@ -95,6 +95,10 @@ class View(Structure):
     def slots(self):
         return self.parent_frame.slots
 
+    @property
+    def is_recyclable(self) -> bool:
+        return self.activation == 0.0
+
     def recalculate_unhappiness(self):
         items_to_process = sum(
             [

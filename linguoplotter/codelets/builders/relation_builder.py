@@ -22,6 +22,7 @@ class RelationBuilder(Builder):
         self.target_structure_one = target_structures.get("target_structure_one")
         self.target_structure_two = target_structures.get("target_structure_two")
         self.parent_concept = target_structures.get("parent_concept")
+        self._target_structures = target_structures
 
     @classmethod
     def get_follow_up_class(cls) -> type:

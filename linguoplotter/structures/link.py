@@ -47,6 +47,15 @@ class Link(Structure):
     def is_slot(self) -> bool:
         return self.parent_concept.is_slot
 
+    @property
+    def is_recyclable(self) -> bool:
+        return (
+            self.parent_space is not None
+            and self.parent_space.is_main_input
+            and self.activation == 0.0
+            and self.links.is_empty()
+        )
+
     def recalculate_unlabeledness(self):
         self.unlabeledness = 0.5 * 0.5 ** sum(link.activation for link in self.labels)
 

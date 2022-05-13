@@ -16,7 +16,7 @@ class ChunkBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: StructureCollection,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
@@ -27,6 +27,7 @@ class ChunkBuilder(Builder):
         self.target_slot = target_structures.get("target_slot")
         self.target_slot_filler = target_structures.get("target_slot_filler")
         self.target_branch = target_structures.get("target_branch")
+        self._target_structures = target_structures
 
     @classmethod
     def get_follow_up_class(cls) -> type:

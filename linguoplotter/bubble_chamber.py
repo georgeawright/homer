@@ -164,6 +164,27 @@ class BubbleChamber:
             self.rules,
         )
 
+    @property
+    def collections(self) -> dict:
+        return {
+            # views
+            MonitoringView: "monitoring_views",
+            SimplexView: "simplex_views",
+            # spaces
+            ConceptualSpace: "conceptual_spaces",
+            ContextualSpace: "contextual_spaces",
+            Frame: "frames",
+            # nodes
+            Chunk: "chunks",
+            Concept: "concepts",
+            LetterChunk: "letter_chunks",
+            Rule: "rules",
+            # links
+            Correspondence: "correspondences",
+            Label: "labels",
+            Relation: "relations",
+        }
+
     def recalculate_satisfaction(self):
         self.focus.recalculate_satisfaction()
         self.recalculate_general_satisfaction()
@@ -202,26 +223,28 @@ class BubbleChamber:
         for space in item.parent_spaces:
             space.add(item)
             self.loggers["structure"].log(space)
-        collections = {
-            # views
-            MonitoringView: "monitoring_views",
-            SimplexView: "simplex_views",
-            # spaces
-            ConceptualSpace: "conceptual_spaces",
-            ContextualSpace: "contextual_spaces",
-            Frame: "frames",
-            # nodes
-            Chunk: "chunks",
-            Concept: "concepts",
-            LetterChunk: "letter_chunks",
-            Rule: "rules",
-            # links
-            Correspondence: "correspondences",
-            Label: "labels",
-            Relation: "relations",
-        }
-        collection_name = collections[type(item)]
+        collection_name = self.collections[type(item)]
         getattr(self, collection_name).add(item)
+
+    def remove(self, item):
+        if item.is_view:
+            for correspondence in item.members:
+                self.remove(correspondence)
+            for frame in item.frames:
+                self.remove(frame)
+        if item.is_frame:
+            item.parent_frame.instances.remove(item)
+        if item.is_link:
+            for argument in item.arguments:
+                argument.links_out.remove(item)
+                argument.links_in.remove(item)
+        if item.is_chunk:
+            for member in item.members:
+                member.super_chunks.remove(item)
+        for space in item.parent_spaces:
+            space.contents.remove(item)
+        collection_name = self.collections[type(item)]
+        getattr(self, collection_name).remove(item)
 
     def new_conceptual_space(
         self,

@@ -67,7 +67,7 @@ class ChunkSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_space = bubble_chamber.input_spaces.get()
-        target_node = target_space.contents.where(is_node=True).get(
+        target_node = target_space.contents.where(is_node=True, is_slot=False).get(
             key=chunking_exigency
         )
         urgency = urgency if urgency is not None else target_node.unchunkedness

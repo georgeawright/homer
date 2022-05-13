@@ -161,6 +161,16 @@ class Chunk(Node):
     def adjacent(self) -> StructureCollection:
         return self.parent_space.contents.next_to(self.location).where(is_node=True)
 
+    @property
+    def is_recyclable(self) -> bool:
+        return (
+            self.parent_space is not None
+            and self.parent_space.is_main_input
+            and self.activation == 0.0
+            and self.links.is_empty()
+            and self.super_chunks.is_empty()
+        )
+
     def nearby(self, space: Space = None) -> StructureCollection:
         if space is not None:
             return (

@@ -17,8 +17,7 @@ class FocusUnsetter(Codelet):
         last_satisfaction_score: FloatBetweenOneAndZero,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.coderack = coderack
         self.last_satisfaction_score = last_satisfaction_score
         self.target_view = self.bubble_chamber.focus.view
