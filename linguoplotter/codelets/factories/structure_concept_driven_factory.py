@@ -80,6 +80,7 @@ class StructureConceptDrivenFactory(Factory):
         suggest_correspondence = suggest.relations.where(end=correspondence).get()
         suggest_view_simplex = suggest.relations.where(end=view_simplex).get()
 
+        evaluate_correspondence = suggest.relations.where(end=correspondence).get()
         evaluate_view_simplex = evaluate.relations.where(end=view_simplex).get()
 
         chunk_intra = chunk.relations.where(end=intra).get()
@@ -96,24 +97,10 @@ class StructureConceptDrivenFactory(Factory):
         )
 
         activity_concept = activity_concepts.get(key=self.node_key)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found activity concept: {activity_concept}"
-        )
-        if activity_concept == evaluate:
-            structure_link = self.bubble_chamber.new_structure_collection(
-                evaluate_view_simplex
-            ).get(key=self.link_key)
-            self.bubble_chamber.loggers["activity"].log(
-                self,
-                f"Found structure link: {structure_link.start} -> {structure_link.end}",
-            )
-            return {
-                evaluate_view_simplex: SimplexViewEvaluator,
-            }[structure_link]
-
         structure_link = activity_concept.relations.filter(
             lambda x: x.end.parent_space
             == self.bubble_chamber.conceptual_spaces["structure"]
+            and (not x.end.instances.is_empty() or activity_concept == suggest)
         ).get(key=self.link_key)
         self.bubble_chamber.loggers["activity"].log(
             self,
@@ -121,29 +108,51 @@ class StructureConceptDrivenFactory(Factory):
         )
         try:
             return {
-                suggest_correspondence: CorrespondenceSuggester,
-                suggest_view_simplex: SimplexViewSuggester,
-            }[structure_link]
+                suggest: {
+                    suggest_correspondence: CorrespondenceSuggester,
+                    suggest_view_simplex: SimplexViewSuggester,
+                },
+                evaluate: {
+                    evaluate_correspondence: CorrespondenceEvaluator,
+                    evaluate_view_simplex: SimplexViewEvaluator,
+                },
+            }[activity_concept][structure_link]
         except KeyError:
             pass
 
-        space_link = structure_link.end.relations.filter(
-            lambda x: x.end.parent_space
-            == self.bubble_chamber.conceptual_spaces["space-type"]
-        ).get(key=self.link_key)
+        if self.bubble_chamber.views.is_empty():
+            space_link = structure_link.end.relations.filter(
+                lambda x: x.end == intra
+            ).get()
+        else:
+            space_link = structure_link.end.relations.filter(
+                lambda x: x.end.parent_space
+                == self.bubble_chamber.conceptual_spaces["space-type"]
+            ).get(key=self.link_key)
         self.bubble_chamber.loggers["activity"].log(
             self,
             f"Found space link: {space_link.start} -> {space_link.end}",
         )
         return {
-            chunk_intra: ChunkSuggester,
-            label_intra: LabelSuggester,
-            relation_intra: RelationSuggester,
-            chunk_inter: ChunkProjectionSuggester,
-            letter_chunk_inter: LetterChunkProjectionSuggester,
-            label_inter: LabelProjectionSuggester,
-            relation_inter: RelationProjectionSuggester,
-        }[space_link]
+            suggest: {
+                chunk_intra: ChunkSuggester,
+                label_intra: LabelSuggester,
+                relation_intra: RelationSuggester,
+                chunk_inter: ChunkProjectionSuggester,
+                letter_chunk_inter: LetterChunkProjectionSuggester,
+                label_inter: LabelProjectionSuggester,
+                relation_inter: RelationProjectionSuggester,
+            },
+            evaluate: {
+                chunk_intra: ChunkEvaluator,
+                label_intra: LabelEvaluator,
+                relation_intra: RelationEvaluator,
+                chunk_inter: ChunkProjectionEvaluator,
+                letter_chunk_inter: LetterChunkProjectionEvaluator,
+                label_inter: LabelProjectionEvaluator,
+                relation_inter: RelationProjectionEvaluator,
+            },
+        }[activity_concept][space_link]
 
 
 class RandomStructureConceptDrivenFactory(StructureConceptDrivenFactory):

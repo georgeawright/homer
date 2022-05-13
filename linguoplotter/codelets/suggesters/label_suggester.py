@@ -57,8 +57,7 @@ class LabelSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        view = bubble_chamber.production_views.get(key=activation)
-        space = view.input_spaces.get(key=activation)
+        space = bubble_chamber.input_spaces.get(key=activation)
         target = space.contents.where(is_labellable=True, is_slot=False).get(
             key=labeling_exigency
         )
