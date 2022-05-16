@@ -14,7 +14,7 @@
   (def-contextual-space :name "ablative-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space location-space time-space)))
 (define pp-ablative-sub-frame
-  (def-sub-frame :name "pp-ablative-sub" :parent_concept pp-concept :parent_frame None
+  (def-sub-frame :name "pp-ablative-sub" :parent_concept pp-ablative-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection early-location-concept late-location-concept
 				   early-time-concept late-time-concept)
@@ -28,7 +28,7 @@
   (def-contextual-space :name "allative-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space location-space time-space)))
 (define pp-allative-sub-frame
-  (def-sub-frame :name "pp-allative-sub" :parent_concept pp-concept :parent_frame None
+  (def-sub-frame :name "pp-allative-sub" :parent_concept pp-allative-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection early-location-concept late-location-concept
 				   early-time-concept late-time-concept)

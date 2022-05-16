@@ -55,8 +55,23 @@
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-allative-concept
+  (def-concept :name "pp-allative" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-ablative-concept
+  (def-concept :name "pp-ablative" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
 (define pp-directional-concept
   (def-concept :name "pp-directional" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-inessive-concept
+  (def-concept :name "pp-inessive" :locations (list pp-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))

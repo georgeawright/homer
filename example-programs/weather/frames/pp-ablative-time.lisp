@@ -10,7 +10,7 @@
   (def-contextual-space :name "pp[from-time].text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define pp-ablative-time
-  (def-frame :name "pp[from-time]" :parent_concept pp-concept :parent_frame None
+  (def-frame :name "pp[from-time]" :parent_concept pp-ablative-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection early-time-concept late-time-concept)
     :input_space pp-ablative-time-input

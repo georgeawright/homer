@@ -8,7 +8,7 @@
   (def-contextual-space :name "pp[in-location].text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space location-space)))
 (define pp-inessive-location
-  (def-frame :name "pp[in-location]" :parent_concept pp-concept :parent_frame None
+  (def-frame :name "pp[in-location]" :parent_concept pp-inessive-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection location-concept)
     :input_space pp-inessive-location-input

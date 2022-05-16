@@ -14,7 +14,7 @@
   (def-contextual-space :name "pp[to-location].text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space location-space time-space)))
 (define pp-allative-location
-  (def-frame :name "pp[to-location]" :parent_concept pp-concept :parent_frame None
+  (def-frame :name "pp[to-location]" :parent_concept pp-allative-concept :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection early-location-concept late-location-concept
 				   early-time-concept late-time-concept)
