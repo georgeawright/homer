@@ -14,7 +14,7 @@ class Builder(Codelet):
         urgency: FloatBetweenOneAndZero,
     ):
         Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.child_structures = None
+        self.child_structures = self.bubble_chamber.new_structure_collection()
 
     @classmethod
     def make(

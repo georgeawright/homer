@@ -83,10 +83,17 @@ class ChunkBuilder(Builder):
                 chunk.rule == self.target_rule
                 and chunk.members.where(is_slot=False) == suggested_members
             ):
-                return False
+                self.child_structures = self.bubble_chamber.new_structure_collection(
+                    chunk
+                )
         return True
 
     def _process_structure(self):
+        if not self.child_structures.is_empty():
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Equivalent chunk already exists"
+            )
+            return
         if self.target_root is None:
             if (
                 self.target_rule.right_concept is None

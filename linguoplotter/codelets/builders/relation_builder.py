@@ -1,5 +1,6 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.builder import Builder
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.location import Location
@@ -61,14 +62,24 @@ class RelationBuilder(Builder):
         }
 
     def _passes_preliminary_checks(self):
-        return not self.target_structure_one.has_relation(
-            self.target_space,
-            self.parent_concept,
-            self.target_structure_one,
-            self.target_structure_two,
-        )
+        try:
+            self.child_structures.add(
+                self.target_structure_one.relations.where(
+                    parent_concept=self.parent_concept,
+                    conceptual_space=self.target_space,
+                    end=self.target_structure_two,
+                ).get()
+            )
+        except MissingStructureError:
+            pass
+        return True
 
     def _process_structure(self):
+        if not self.child_structures.is_empty():
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Equivalent relation already exists"
+            )
+            return
         start_coordinates = self.target_structure_one.location_in_space(
             self.target_space
         ).coordinates

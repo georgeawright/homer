@@ -210,10 +210,7 @@ class ChunkSuggester(Suggester):
         self.bubble_chamber.loggers["activity"].log_collection(
             self, suggested_members, "Suggested members"
         )
-        return self.bubble_chamber.chunks.filter(
-            lambda x: x.rule == self.target_rule
-            and x.members.where(is_slot=False) == suggested_members
-        ).is_empty()
+        return True
 
     def _calculate_confidence(self):
         if self.target_rule.right_concept is None:

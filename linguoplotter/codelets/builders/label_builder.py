@@ -56,9 +56,23 @@ class LabelBuilder(Builder):
         }
 
     def _passes_preliminary_checks(self):
-        return not self.target_node.has_label(self.parent_concept)
+        try:
+            equivalent_label = self.target_node.labels.where(
+                parent_concept=self.parent_concept
+            ).get()
+            while equivalent_label.is_label:
+                self.child_structures.add(equivalent_label)
+                equivalent_label = equivalent_label.start
+        except MissingStructureError:
+            pass
+        return True
 
     def _process_structure(self):
+        if not self.child_structures.is_empty():
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Equivalent label already exists"
+            )
+            return
         try:
             conceptual_location = self.target_node.location_in_space(
                 self.parent_concept.parent_space
