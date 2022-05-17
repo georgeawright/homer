@@ -25,7 +25,7 @@
 (define location-sub-frame-input
   (def-contextual-space :name "location-sub-frame.meaning" :parent_concept input-concept
     :conceptual_spaces (StructureCollection location-space)))
-(define location-sub-frame-1-output
+(define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space location-space)))
 (define location-sub-frame
