@@ -61,6 +61,9 @@ class View(Structure):
             "frames": [frame.structure_id for frame in self.frames],
             "input_spaces": [space.structure_id for space in self.input_spaces],
             "output_space": self.output_space.structure_id,
+            "prioritized_targets": [
+                structure.structure_id for structure in self.prioritized_targets
+            ],
             "members": [correspondence.structure_id for correspondence in self.members],
             "members_repr": [str(correspondence) for correspondence in self.members],
             "node_groups": [
@@ -170,9 +173,9 @@ class View(Structure):
                     lambda x: x not in self.parent_frame.concepts and not x.is_slot
                 ).get()
             )
-            for concept in self.parent_frame.concepts:
-                if start_concept in concept.relatives:
-                    return False
+            # for concept in self.parent_frame.concepts:
+            #    if start_concept in concept.relatives:
+            #        return False
             if end.parent_concept.is_slot:
                 for relative in end.parent_concept.relatives.filter(
                     lambda x: x in self.parent_frame.concepts
