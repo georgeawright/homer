@@ -65,6 +65,10 @@
     :parent_space pp-inessive-location-output
     :left_branch (StructureCollection pp-word-1)
     :right_branch (StructureCollection np-super-chunk)))
+(define pp-super-chunk-label
+  (def-label :start pp-super-chunk :parent_concept pp-concept
+    :locations (list pp-location
+		     (Location (list) pp-inessive-location-output))))
 
 (def-relation :start label-concept :end pp-inessive-location
   :is_bidirectional True :activation 1.0)
