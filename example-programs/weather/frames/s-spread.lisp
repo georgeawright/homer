@@ -30,7 +30,7 @@
     :conceptual_spaces (StructureCollection grammar-space location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-spread-location-sub"
-    :parent_concept pp-directional-concept
+    :parent_concept pp-directional-location-concept
     :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection)
@@ -45,7 +45,7 @@
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-spread-location-sub"
-    :parent_concept pp-directional-concept
+    :parent_concept pp-directional-time-concept
     :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection)

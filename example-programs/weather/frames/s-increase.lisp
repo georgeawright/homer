@@ -12,7 +12,8 @@
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space location-space)))
 (define location-sub-frame
-  (def-sub-frame :name "s-increase-location-sub" :parent_concept pp-inessive-concept
+  (def-sub-frame :name "s-increase-location-sub"
+    :parent_concept pp-inessive-location-concept
     :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection)
@@ -26,7 +27,8 @@
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define time-sub-frame
-  (def-sub-frame :name "s-increase-location-sub" :parent_concept pp-inessive-concept
+  (def-sub-frame :name "s-increase-location-sub"
+    :parent_concept pp-directional-time-concept
     :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection)

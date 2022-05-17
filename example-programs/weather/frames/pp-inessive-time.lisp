@@ -8,7 +8,9 @@
   (def-contextual-space :name "pp[in-time].text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define pp-inessive-time
-  (def-frame :name "pp[in-time]" :parent_concept pp-inessive-concept :parent_frame None
+  (def-frame :name "pp[in-time]"
+    :parent_concept pp-inessive-time-concept
+    :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection time-concept)
     :input_space pp-inessive-time-input

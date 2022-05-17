@@ -10,7 +10,9 @@
   (def-contextual-space :name "ablative-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define pp-ablative-sub-frame
-  (def-sub-frame :name "pp-ablative-sub" :parent_concept pp-ablative-concept :parent_frame None
+  (def-sub-frame :name "pp-ablative-sub"
+    :parent_concept pp-ablative-time-concept
+    :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection early-time-concept late-time-concept)
     :input_space pp-ablative-input
@@ -23,7 +25,9 @@
   (def-contextual-space :name "allative-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define pp-allative-sub-frame
-  (def-sub-frame :name "pp-allative-sub" :parent_concept pp-allative-concept :parent_frame None
+  (def-sub-frame :name "pp-allative-sub"
+    :parent_concept pp-allative-time-concept
+    :parent_frame None
     :sub_frames (StructureCollection)
     :concepts (StructureCollection early-time-concept late-time-concept)
     :input_space pp-allative-input
@@ -36,7 +40,9 @@
   (def-contextual-space :name "pp[from-to-time].text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define pp-directional-time
-  (def-frame :name "pp[from-to-time]" :parent_concept pp-directional-concept :parent_frame None
+  (def-frame :name "pp[from-to-time]"
+    :parent_concept pp-directional-time-concept
+    :parent_frame None
     :sub_frames (StructureCollection pp-ablative-sub-frame pp-allative-sub-frame)
     :concepts (StructureCollection early-time-concept late-time-concept)
     :input_space pp-directional-time-input
