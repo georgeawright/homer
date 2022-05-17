@@ -32,6 +32,8 @@ class ViewDrivenFactory(Factory):
     """Finds a view with unfilled slots
     and spawns a codelet to suggest a structure that could fill a slot"""
 
+    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
+
     def __init__(
         self,
         codelet_id: str,
@@ -74,8 +76,6 @@ class ViewDrivenFactory(Factory):
         return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):
-        from linguoplotter.codelets import FocusSetter
-
         if self.target_view is None:
             self.target_view = (
                 self.bubble_chamber.focus.view
@@ -400,13 +400,19 @@ class ViewDrivenFactory(Factory):
                 for group in self.target_view.node_groups
                 if node in group.values()
             ]
+            + [
+                correspondence.start
+                for correspondence in self.target_view.members
+                if correspondence.start.parent_space == contextual_space
+            ]
         )
         self.bubble_chamber.loggers["activity"].log_collection(
             self, prioritized_targets, "prioritized targets"
         )
         views_with_correct_frame_and_spaces = (
             self.bubble_chamber.production_views.filter(
-                lambda x: (x.parent_frame.parent_concept == sub_frame.parent_concept)
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and (x.parent_frame.parent_concept == sub_frame.parent_concept)
                 and (x.input_spaces == self.target_view.input_spaces)
             )
         )
@@ -433,7 +439,7 @@ class ViewDrivenFactory(Factory):
         self.bubble_chamber.loggers["activity"].log_collection(
             self,
             views_with_compatible_correspondences,
-            "Views with compatible correspondnces",
+            "Views with compatible correspondences",
         )
         if prioritized_targets.is_empty():
             views_with_correct_prioritized_targets = (
@@ -442,14 +448,13 @@ class ViewDrivenFactory(Factory):
         else:
             views_with_correct_prioritized_targets = (
                 views_with_compatible_correspondences.filter(
-                    lambda x: self.bubble_chamber.new_structure_collection(
-                        *[
-                            node
-                            for node in x.grouped_nodes
-                            if node in contextual_space.contents
+                    lambda x: all(
+                        [
+                            correspondence.start in prioritized_targets
+                            for correspondence in x.members
+                            if correspondence.start.parent_space == contextual_space
                         ]
                     )
-                    == prioritized_targets
                 )
             )
         self.bubble_chamber.loggers["activity"].log_collection(
@@ -524,6 +529,11 @@ class ViewDrivenFactory(Factory):
                 for node in sub_frame.input_space.contents
                 for group in self.target_view.node_groups
                 if node in group.values()
+            ]
+            + [
+                correspondence.start
+                for correspondence in self.target_view.members
+                if correspondence.start.parent_space == contextual_space
             ]
         )
         self.bubble_chamber.loggers["activity"].log_collection(
@@ -631,6 +641,11 @@ class ViewDrivenFactory(Factory):
                 for node in sub_frame.input_space.contents
                 for group in self.target_view.node_groups
                 if node in group.values()
+            ]
+            + [
+                correspondence.start
+                for correspondence in self.target_view.members
+                if correspondence.start.parent_space == contextual_space
             ]
         )
         prioritized_conceptual_spaces = sub_frame.input_space.conceptual_spaces
