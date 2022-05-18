@@ -155,7 +155,7 @@
 		     (Location (list) spread-sentence-output))
     :parent_space location-sub-frame-output))
 (define location-chunk-grammar-label
-  (def-label :start sentence-word-6 :parent_concept pp-concept
+  (def-label :start sentence-word-6 :parent_concept pp-directional-location-concept
     :locations (list pp-location
 		     (Location (list) location-sub-frame-output))))
 (define sentence-word-7
@@ -165,7 +165,7 @@
 		     (Location (list) spread-sentence-output))
     :parent_space time-sub-frame-output))
 (define time-chunk-grammar-label
-  (def-label :start sentence-word-7 :parent_concept pp-concept
+  (def-label :start sentence-word-7 :parent_concept pp-directional-time-concept
     :locations (list pp-location
 		     (Location (list) time-sub-frame-output))))
 
