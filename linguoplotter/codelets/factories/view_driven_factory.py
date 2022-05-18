@@ -128,13 +128,22 @@ class ViewDrivenFactory(Factory):
                 and x.correspondences.is_empty()
             )
         )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, sub_frame_input_structures, "sub frame input structures"
+        )
         input_structures = self.target_view.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence and x.correspondences.is_empty()
+        )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, input_structures, "input structures"
         )
         output_structures = self.target_view.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
             and x.parent_space != self.target_view.parent_frame.output_space
             and x.correspondences.is_empty()
+        )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, output_structures, "output structures"
         )
         for structures in [
             sub_frame_input_structures,

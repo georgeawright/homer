@@ -142,6 +142,13 @@ class View(Structure):
                 self.grouped_nodes[node_pair[0]] = True
                 self.grouped_nodes[node_pair[1]] = True
 
+    def remove(self, correspondence: "Correspondence"):
+        self.members.remove(correspondence)
+        self.grouped_nodes = {}
+        self.node_groups = []
+        for member in self.members:
+            self.add(member)
+
     def has_member(
         self,
         parent_concept: Concept,
@@ -173,9 +180,6 @@ class View(Structure):
                     lambda x: x not in self.parent_frame.concepts and not x.is_slot
                 ).get()
             )
-            # for concept in self.parent_frame.concepts:
-            #    if start_concept in concept.relatives:
-            #        return False
             if end.parent_concept.is_slot:
                 for relative in end.parent_concept.relatives.filter(
                     lambda x: x in self.parent_frame.concepts

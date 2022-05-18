@@ -228,12 +228,16 @@ class BubbleChamber:
 
     def remove(self, item):
         if item.is_view:
-            for correspondence in item.members:
+            correspondences = item.members.copy()
+            for correspondence in correspondences:
                 self.remove(correspondence)
             for frame in item.frames:
                 self.remove(frame)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
+        if item.is_correspondence:
+            return
+            item.parent_view.remove(item)
         if item.is_link:
             for argument in item.arguments:
                 argument.links_out.remove(item)
