@@ -84,7 +84,7 @@
 
 (define pp-1
   (def-letter-chunk :name None
-    :locations (list prep-location
+    :locations (list pp-location
 		     (Location (list) pp-ablative-output)
 		     (Location (list) pp-directional-time-output))
     :parent_space pp-ablative-output))
@@ -94,7 +94,7 @@
 		     (Location (list) pp-ablative-output))))
 (define pp-2
   (def-letter-chunk :name None
-    :locations (list prep-location
+    :locations (list pp-location
 		     (Location (list) pp-allative-output)
 		     (Location (list) pp-directional-time-output))
     :parent_space pp-allative-output))
