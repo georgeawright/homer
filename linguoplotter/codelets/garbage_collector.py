@@ -47,7 +47,8 @@ class GarbageCollector(Codelet):
             for codelet in self.coderack._codelets:
                 if target in codelet.target_structures:
                     self.result = CodeletResult.FIZZLE
-            if not self.result != CodeletResult.FIZZLE:
+            if self.result != CodeletResult.FIZZLE:
+                self.bubble_chamber.loggers["activity"].log(self, f"Removing {target}")
                 self.bubble_chamber.remove(target)
                 self.result = CodeletResult.FINISH
         self._engender_follow_up()
