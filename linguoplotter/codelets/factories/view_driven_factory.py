@@ -450,27 +450,6 @@ class ViewDrivenFactory(Factory):
             views_with_compatible_correspondences,
             "Views with compatible correspondences",
         )
-        if prioritized_targets.is_empty():
-            views_with_correct_prioritized_targets = (
-                views_with_compatible_correspondences
-            )
-        else:
-            views_with_correct_prioritized_targets = (
-                views_with_compatible_correspondences.filter(
-                    lambda x: all(
-                        [
-                            correspondence.start in prioritized_targets
-                            for correspondence in x.members
-                            if correspondence.start.parent_space == contextual_space
-                        ]
-                    )
-                )
-            )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self,
-            views_with_correct_prioritized_targets,
-            "Views with correct prioritized_targets",
-        )
         follow_up = PotentialSubFrameToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
@@ -484,7 +463,7 @@ class ViewDrivenFactory(Factory):
         )
         follow_up._get_target_conceptual_space(self, follow_up)
         views_with_correct_conceptual_space = (
-            views_with_correct_prioritized_targets.filter(
+            views_with_compatible_correspondences.filter(
                 lambda x: (
                     follow_up.target_conceptual_space
                     in x.parent_frame.input_space.conceptual_spaces
@@ -568,15 +547,6 @@ class ViewDrivenFactory(Factory):
             (
                 views_with_correct_frame_and_spaces.filter(
                     lambda x: x.prioritized_targets == prioritized_targets
-                    if x.members.is_empty()
-                    else self.bubble_chamber.new_structure_collection(
-                        *[
-                            member.start
-                            for member in x.members
-                            if member.start in contextual_space.contents
-                        ]
-                    )
-                    == prioritized_targets
                 )
             )
             if not prioritized_targets.is_empty()
