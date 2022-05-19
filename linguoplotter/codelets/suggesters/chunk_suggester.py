@@ -91,12 +91,8 @@ class ChunkSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_space = bubble_chamber.input_spaces.get()
-        target_node = bubble_chamber.new_structure_collection(
-            *[
-                node
-                for node in target_space.contents.where(is_node=True)
-                if target_rule.is_compatible_with(node)
-            ]
+        target_node = target_space.contents.filter(
+            lambda x: x.is_node and not x.is_slot and target_rule.is_compatible_with(x)
         ).get(key=chunking_exigency)
         urgency = target_node.chunking_exigency if urgency is None else urgency
         return cls.spawn(
