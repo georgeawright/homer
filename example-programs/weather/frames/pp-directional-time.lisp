@@ -89,7 +89,7 @@
 		     (Location (list) pp-directional-time-output))
     :parent_space pp-ablative-output))
 (define pp-1-grammar-label
-  (def-label :start pp-1 :parent_concept pp-concept
+  (def-label :start pp-1 :parent_concept pp-ablative-time-concept
     :locations (list pp-location
 		     (Location (list) pp-ablative-output))))
 (define pp-2
@@ -99,7 +99,7 @@
 		     (Location (list) pp-directional-time-output))
     :parent_space pp-allative-output))
 (define pp-2-grammar-label
-  (def-label :start pp-2 :parent_concept pp-concept
+  (def-label :start pp-2 :parent_concept pp-allative-time-concept
     :locations (list pp-location
 		     (Location (list) pp-allative-output))))
 
@@ -111,7 +111,7 @@
     :left_branch (StructureCollection pp-1)
     :right_branch (StructureCollection pp-2)))
 (define pp-super-chunk-label
-  (def-label :start pp-super-chunk :parent_concept pp-concept
+  (def-label :start pp-super-chunk :parent_concept pp-directional-time-concept
     :locations (list pp-location
 		     (Location (list) pp-directional-time-output))))
 

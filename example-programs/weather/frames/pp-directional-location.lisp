@@ -109,7 +109,7 @@
 		     (Location (list) pp-directional-location-output))
     :parent_space pp-ablative-output))
 (define pp-1-grammar-label
-  (def-label :start pp-1 :parent_concept pp-concept
+  (def-label :start pp-1 :parent_concept pp-ablative-location-concept
     :locations (list pp-location
 		     (Location (list) pp-ablative-output))))
 (define pp-2
@@ -119,7 +119,7 @@
 		     (Location (list) pp-directional-location-output))
     :parent_space pp-allative-output))
 (define pp-2-grammar-label
-  (def-label :start pp-2 :parent_concept pp-concept
+  (def-label :start pp-2 :parent_concept pp-allative-location-concept
     :locations (list pp-location
 		     (Location (list) pp-allative-output))))
 

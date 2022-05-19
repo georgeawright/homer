@@ -72,7 +72,7 @@
     :left_branch (StructureCollection pp-word-1)
     :right_branch (StructureCollection pp-word-2)))
 (define pp-super-chunk-label
-  (def-label :start pp-super-chunk :parent_concept pp-concept
+  (def-label :start pp-super-chunk :parent_concept pp-ablative-time-concept
     :locations (list pp-location
 		     (Location (list) pp-ablative-time-output))))
 

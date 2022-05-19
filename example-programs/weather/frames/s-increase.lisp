@@ -4,6 +4,8 @@
   (def-conceptual-space :name "" :parent_concept space-parent-concept
     :possible_instances (StructureCollection temperature-space conceptual-space goodness-space)
     :no_of_dimensions 1))
+(define location-concept
+  (def-concept :name "" :is_slot True :parent_space location-space))
  
 (define location-sub-frame-input
   (def-contextual-space :name "location-sub-frame.meaning" :parent_concept input-concept
@@ -16,7 +18,7 @@
     :parent_concept pp-inessive-location-concept
     :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection)
+    :concepts (StructureCollection location-concept)
     :input_space location-sub-frame-input
     :output_space location-sub-frame-output))
 
@@ -27,7 +29,7 @@
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define time-sub-frame
-  (def-sub-frame :name "s-increase-location-sub"
+  (def-sub-frame :name "s-increase-time-sub"
     :parent_concept pp-directional-time-concept
     :parent_frame None
     :sub_frames (StructureCollection)
@@ -46,7 +48,7 @@
   (def-frame :name "s-increase" :parent_concept sentence-concept :parent_frame None
     :depth 6
     :sub_frames (StructureCollection location-sub-frame time-sub-frame)
-    :concepts (StructureCollection)
+    :concepts (StructureCollection location-concept)
     :input_space increase-sentence-input
     :output_space increase-sentence-output))
 
@@ -66,12 +68,19 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) increase-sentence-input))
     :parent_space increase-sentence-input))
+(define late-chunk-location-label
+  (def-label :start late-chunk :parent_concept location-concept
+    :locations (list (Location (list (list Nan Nan)) location-space)
+		     (Location (list) location-sub-frame-input)
+		     (Location (list) increase-sentence-input))
+    :parent_space location-sub-frame-input))
 (define time-relation
-  (def-relation :start late-chunk :end early-chunk :parent_concept more-concept
+  (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
+		     (TwoPointLocation (list) (list) time-sub-frame-input)
 		     (TwoPointLocation (list) (list) increase-sentence-input))
-    :parent_space increase-sentence-input
+    :parent_space time-sub-frame-input
     :conceptual_space time-space))
 (define location-relation
   (def-relation :start late-chunk :end early-chunk :parent_concept same-concept
@@ -193,4 +202,6 @@
 (def-relation :start rp-concept :end increase-sentence
   :is_bidirectional True :activation 1.0)
 (def-relation :start sentence-concept :end increase-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start more-concept :end increase-sentence
   :is_bidirectional True :activation 1.0)
