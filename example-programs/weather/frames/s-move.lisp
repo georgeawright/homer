@@ -8,6 +8,8 @@
   (def-conceptual-space :name "" :parent_concept space-parent-concept
     :possible_instances (StructureCollection temperature-space height-space goodness-space)
     :no_of_dimensions 1))
+(define conceptual-label-concept
+  (def-concept :name "" :is_slot True :parent_space conceptual-space))
 
 (define ap-sub-frame-input
   (def-contextual-space :name "ap-sub-frame.input" :parent_concept input-concept
@@ -18,7 +20,7 @@
 (define ap-sub-frame
   (def-sub-frame :name "s-move-ap-sub" :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection)
+    :concepts (StructureCollection conceptual-label-concept)
     :input_space ap-sub-frame-input
     :output_space ap-sub-frame-output))
 
@@ -76,6 +78,12 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) move-sentence-input))
     :parent_space move-sentence-input))
+(define early-chunk-conceptual-label
+  (def-label :start early-chunk :parent_concept conceptual-label-concept
+    :locations (list (Location (list) conceptual-space)
+		     (Location (list) ap-sub-frame-input)
+		     (Location (list) move-sentence-input))
+    :parent_space ap-sub-frame-input))
 (define late-chunk
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
 			      (Location (list (list Nan)) time-space)
@@ -89,15 +97,17 @@
   (def-relation :start late-chunk :end early-chunk :parent_concept more-concept
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
+		     (TwoPointLocation (list) (list) time-sub-frame-input)
 		     (TwoPointLocation (list) (list) move-sentence-input))
-    :parent_space move-sentence-input
+    :parent_space time-sub-frame-input
     :conceptual_space time-space))
 (define location-relation
   (def-relation :start late-chunk :end early-chunk :parent_concept different-concept
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
+		     (TwoPointLocation (list) (list) location-sub-frame-input)
 		     (TwoPointLocation (list) (list) move-sentence-input))
-    :parent_space move-sentence-input
+    :parent_space location-sub-frame-input
     :conceptual_space location-space))
 (define conceptual-relation
   (def-relation :start late-chunk :end early-chunk :parent_concept same-concept
