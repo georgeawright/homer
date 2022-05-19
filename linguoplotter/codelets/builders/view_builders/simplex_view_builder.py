@@ -94,6 +94,8 @@ class SimplexViewBuilder(ViewBuilder):
             links_in=self.bubble_chamber.new_structure_collection(),
             links_out=self.bubble_chamber.new_structure_collection(),
             parent_spaces=self.bubble_chamber.new_structure_collection(),
+            sub_views=self.bubble_chamber.new_structure_collection(),
+            super_views=self.bubble_chamber.new_structure_collection(),
         )
         self.bubble_chamber.loggers["structure"].log(view_output)
         self.bubble_chamber.contextual_spaces.add(view_output)

@@ -148,6 +148,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         views_with_correct_frame = bubble_chamber.production_views.filter(
             lambda x: x.parent_frame.parent_concept
             == correspondence_suggester.sub_frame.parent_concept
+            and x.super_views.is_empty()
         )
         bubble_chamber.loggers["activity"].log_collection(
             calling_codelet, views_with_correct_frame, "Views with correct frame"

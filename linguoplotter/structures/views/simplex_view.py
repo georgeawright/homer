@@ -25,6 +25,8 @@ class SimplexView(View):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        sub_views: StructureCollection,
+        super_views: StructureCollection,
     ):
         View.__init__(
             self,
@@ -41,6 +43,8 @@ class SimplexView(View):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            sub_views=sub_views,
+            super_views=super_views,
         )
         self.is_simplex_view = True
 

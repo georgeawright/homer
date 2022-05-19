@@ -29,6 +29,8 @@ class View(Structure):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        sub_views: StructureCollection,
+        super_views: StructureCollection,
     ):
         Structure.__init__(
             self,
@@ -46,6 +48,8 @@ class View(Structure):
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members
+        self.sub_views = sub_views
+        self.super_views = super_views
         self.prioritized_targets = prioritized_targets
         self.node_groups = []
         self.grouped_nodes = {}
@@ -143,6 +147,7 @@ class View(Structure):
                 self.grouped_nodes[node_pair[1]] = True
 
     def remove(self, correspondence: "Correspondence"):
+        # TODO also need to remove sub frames if correspondence was only link to other frame
         self.members.remove(correspondence)
         self.grouped_nodes = {}
         self.node_groups = []
