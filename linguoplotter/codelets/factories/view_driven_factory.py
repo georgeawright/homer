@@ -46,6 +46,7 @@ class ViewDrivenFactory(Factory):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
         self.target_view = target_view
         self.target_slot = None
+        self.compatible_sub_views = None
 
     @classmethod
     def spawn(
@@ -391,64 +392,11 @@ class ViewDrivenFactory(Factory):
             lambda x: x.input_space == self.target_slot.parent_space
             or x.output_space == self.target_slot.parent_space
         ).get()
-        if self.bubble_chamber.production_views.filter(
-            lambda x: x.parent_frame.parent_concept == sub_frame.parent_concept
-        ).is_empty():
-            raise MissingStructureError
-        contextual_space = self.target_view.input_spaces.get()
         self.bubble_chamber.loggers["activity"].log_collection(
             self, self.target_view.node_groups, "node groups"
         )
         self.bubble_chamber.loggers["activity"].log_collection(
             self, sub_frame.input_space.contents, "sub frame input contents"
-        )
-        prioritized_targets = self.bubble_chamber.new_structure_collection(
-            *[
-                group[contextual_space]
-                for node in sub_frame.input_space.contents
-                for group in self.target_view.node_groups
-                if node in group.values()
-            ]
-            + [
-                correspondence.start
-                for correspondence in self.target_view.members
-                if correspondence.start.parent_space == contextual_space
-            ]
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, prioritized_targets, "prioritized targets"
-        )
-        views_with_correct_frame_and_spaces = (
-            self.bubble_chamber.production_views.filter(
-                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                and (x.parent_frame.parent_concept == sub_frame.parent_concept)
-                and (x.input_spaces == self.target_view.input_spaces)
-            )
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self,
-            views_with_correct_frame_and_spaces,
-            "Views with correct frame and spaces",
-        )
-        views_with_compatible_correspondences = (
-            views_with_correct_frame_and_spaces.filter(
-                lambda x: all(
-                    [
-                        self.target_view.can_accept_member(
-                            member.parent_concept,
-                            member.conceptual_space,
-                            member.start,
-                            member.end,
-                        )
-                        for member in x.members
-                    ]
-                )
-            )
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self,
-            views_with_compatible_correspondences,
-            "Views with compatible correspondences",
         )
         follow_up = PotentialSubFrameToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,
@@ -462,9 +410,22 @@ class ViewDrivenFactory(Factory):
             self.target_view.unhappiness,
         )
         follow_up._get_target_conceptual_space(self, follow_up)
-        views_with_correct_conceptual_space = (
-            views_with_compatible_correspondences.filter(
-                lambda x: (
+        self.compatible_sub_views = self.bubble_chamber.production_views.filter(
+            lambda x: (x.parent_frame.parent_concept == sub_frame.parent_concept)
+            and (x.input_spaces == self.target_view.input_spaces)
+            and all(
+                [
+                    self.target_view.can_accept_member(
+                        member.parent_concept,
+                        member.conceptual_space,
+                        member.start,
+                        member.end,
+                    )
+                    for member in x.members
+                ]
+            )
+            and (
+                (
                     follow_up.target_conceptual_space
                     in x.parent_frame.input_space.conceptual_spaces
                     if self.target_slot.parent_space == sub_frame.input_space
@@ -475,15 +436,36 @@ class ViewDrivenFactory(Factory):
             )
         )
         self.bubble_chamber.loggers["activity"].log_collection(
-            self, views_with_correct_conceptual_space, "Views with correct space"
+            self, self.compatible_sub_views, "Compatible sub views"
         )
-        views_that_are_complete = views_with_correct_conceptual_space.filter(
-            lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
+        views_with_compatible_nodes = self.compatible_sub_views.filter(
+            lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+            and any(
+                [
+                    self.target_view.can_accept_member(
+                        member.parent_concept,
+                        member.conceptual_space,
+                        member.start,
+                        self.target_slot,
+                    )
+                    and self.target_view.can_accept_member(
+                        member.parent_concept,
+                        member.conceptual_space,
+                        member.end,
+                        self.target_slot,
+                    )
+                    for member in x.members.filter(
+                        lambda c: type(c.start) == type(self.target_slot)
+                        and c.start.parent_space.parent_concept
+                        == self.target_slot.parent_space.parent_concept
+                    )
+                ]
+            )
         )
         self.bubble_chamber.loggers["activity"].log_collection(
-            self, views_that_are_complete, "Views that are complete"
+            self, views_with_compatible_nodes, "Views with compatible nodes"
         )
-        follow_up.target_sub_view = views_that_are_complete.get(key=exigency)
+        follow_up.target_sub_view = views_with_compatible_nodes.get(key=exigency)
         self.bubble_chamber.loggers["activity"].log(
             self,
             f"Found target sub view: {follow_up.target_sub_view}",
@@ -511,6 +493,9 @@ class ViewDrivenFactory(Factory):
             or x.output_space == self.target_slot.parent_space
         ).get()
         contextual_space = self.target_view.input_spaces.get()
+        self.compatible_sub_views = self.compatible_sub_views.filter(
+            lambda x: x.unhappiness > self.FLOATING_POINT_TOLERANCE
+        )
         prioritized_targets = self.bubble_chamber.new_structure_collection(
             *[
                 group[contextual_space]
@@ -527,35 +512,17 @@ class ViewDrivenFactory(Factory):
         self.bubble_chamber.loggers["activity"].log_collection(
             self, prioritized_targets, "prioritized_targets"
         )
-        views_with_correct_frame_and_spaces = (
-            self.bubble_chamber.production_views.filter(
-                lambda x: x != self.target_view
-                and (x.parent_frame.parent_concept == sub_frame.parent_concept)
-                and (
-                    x.parent_frame.progenitor
-                    != self.target_view.parent_frame.progenitor
-                )
-                and (x.input_spaces == self.target_view.input_spaces)
-            )
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self,
-            views_with_correct_frame_and_spaces,
-            "Views with correct frame and spaces",
-        )
         views_with_correct_prioritized_targets = (
             (
-                views_with_correct_frame_and_spaces.filter(
+                self.compatible_sub_views.filter(
                     lambda x: x.prioritized_targets == prioritized_targets
                 )
             )
             if not prioritized_targets.is_empty()
-            else views_with_correct_frame_and_spaces
+            else self.compatible_sub_views
         )
         self.bubble_chamber.loggers["activity"].log_collection(
-            self,
-            views_with_correct_prioritized_targets,
-            "Views with correct priotitized_targets",
+            self, self.compatible_sub_views, "Views with correct priotitized_targets"
         )
         conceptual_space = None
         if self.target_slot.is_link and self.target_slot.is_node:
