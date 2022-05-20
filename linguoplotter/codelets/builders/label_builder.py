@@ -166,12 +166,12 @@ class LabelBuilder(Builder):
         item_to_copy = self.target_node
         while item_to_copy.start.is_link:
             item_to_copy = item_to_copy.start
-        previous_item = item_to_copy.start
+        previous_item = item_to_copy
         while item_to_copy is not None:
             previous_item = item_to_copy.copy(
                 bubble_chamber=self.bubble_chamber,
                 parent_id=self.codelet_id,
-                start=previous_item,
+                start=previous_item.start,
             )
             self.child_structures.add(previous_item)
             try:
