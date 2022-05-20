@@ -94,7 +94,7 @@
 			      (Location (list) move-sentence-input))
     :parent_space move-sentence-input))
 (define time-relation
-  (def-relation :start late-chunk :end early-chunk :parent_concept more-concept
+  (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) time-sub-frame-input)
