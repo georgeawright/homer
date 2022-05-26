@@ -21,7 +21,7 @@ class SamenessClassifier(Classifier):
                 *[
                     item.parent_spaces.where(
                         is_conceptual_space=True, is_basic_level=True
-                    )
+                    ).where_not(name="size")
                     for item in collection
                 ]
             )

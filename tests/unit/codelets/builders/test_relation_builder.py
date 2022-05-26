@@ -58,21 +58,3 @@ def test_successful_creates_relation_and_spawns_follow_up(
     assert CodeletResult.FINISH == result
     assert len(relation_builder.child_codelets) == 1
     assert isinstance(relation_builder.child_codelets[0], RelationEvaluator)
-
-
-def test_fizzles_when_relation_already_exists(
-    bubble_chamber, target_structure_one, target_structure_two, parent_concept
-):
-    target_structure_one.has_relation.return_value = True
-    target_structures = {
-        "target_structure_one": target_structure_one,
-        "target_structure_two": target_structure_two,
-        "target_space": Mock(),
-        "parent_concept": parent_concept,
-    }
-    relation_builder = RelationBuilder(
-        Mock(), Mock(), bubble_chamber, target_structures, 1.0
-    )
-    result = relation_builder.run()
-    assert CodeletResult.FIZZLE == result
-    assert relation_builder.child_structures is None

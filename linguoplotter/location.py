@@ -29,8 +29,8 @@ class Location:
 
     @classmethod
     def merge(cls, location_one: Location, location_two: Location) -> Location:
-        if location_one.coordinates[-1] != [location_two.coordinates[0][0] - 1]:
-            raise Exception("locations are not adjacent")
+        if location_one == location_two:
+            return location_one.copy()
         return Location(
             [location_one.coordinates[0], location_two.coordinates[-1]],
             location_one.space,

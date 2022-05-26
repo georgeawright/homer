@@ -153,7 +153,6 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             self.bubble_chamber.loggers["activity"].log(
                 self, "Correspondee to target projectee is abstract chunk"
             )
-            # TODO: below causes problem
             return self.target_projectee.correspondees.where_not(name=None).get()
         if not self.target_projectee.links_in.where(is_relation=True).is_empty():
             self.bubble_chamber.loggers["activity"].log(

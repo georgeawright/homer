@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
+from linguoplotter.classifiers import SamenessClassifier
 from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collection import StructureCollection
-from linguoplotter.structure_collection_keys import activation, chunking_exigency
-from linguoplotter.structures.nodes import Rule
-
-# TODO: chunking exigency needs to depend on rule - high level grammar rules, sameness, have low exigency
+from linguoplotter.structure_collection_keys import chunking_exigency
 
 
 class ChunkSuggester(Suggester):
@@ -25,13 +22,8 @@ class ChunkSuggester(Suggester):
         Suggester.__init__(
             self, codelet_id, parent_id, bubble_chamber, target_structures, urgency
         )
-        self.target_space = target_structures.get("target_space")
-        self.target_rule = target_structures.get("target_rule")
-        self.target_root = target_structures.get("target_root")
-        self.target_node = target_structures.get("target_node")
-        self.target_slot = target_structures.get("target_slot")
-        self.target_slot_filler = target_structures.get("target_slot_filler")
-        self.target_branch = target_structures.get("target_branch")
+        self.target_structure_one = target_structures.get("target_structure_one")
+        self.target_structure_two = target_structures.get("target_structure_two")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -47,10 +39,7 @@ class ChunkSuggester(Suggester):
         target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
-        qualifier = (
-            "TopDown" if target_structures["target_rule"] is not None else "BottomUp"
-        )
-        codelet_id = ID.new(cls, qualifier)
+        codelet_id = ID.new(cls)
         return cls(
             codelet_id,
             parent_id,
@@ -67,7 +56,7 @@ class ChunkSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_space = bubble_chamber.input_spaces.get()
-        target_node = target_space.contents.where(is_node=True, is_slot=False).get(
+        target_node = target_space.contents.where(is_node=True).get(
             key=chunking_exigency
         )
         urgency = urgency if urgency is not None else target_node.unchunkedness
@@ -75,9 +64,7 @@ class ChunkSuggester(Suggester):
             parent_id,
             bubble_chamber,
             {
-                "target_space": target_space,
-                "target_node": target_node,
-                "target_rule": None,
+                "target_structure_one": target_node,
             },
             urgency,
         )
@@ -87,24 +74,9 @@ class ChunkSuggester(Suggester):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_rule: Rule,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_space = bubble_chamber.input_spaces.get()
-        target_node = target_space.contents.filter(
-            lambda x: x.is_node and not x.is_slot and target_rule.is_compatible_with(x)
-        ).get(key=chunking_exigency)
-        urgency = target_node.chunking_exigency if urgency is None else urgency
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            {
-                "target_space": target_space,
-                "target_node": target_node,
-                "target_rule": target_rule,
-            },
-            urgency,
-        )
+        return cls.make(parent_id, bubble_chamber, urgency)
 
     @property
     def _structure_concept(self):
@@ -113,129 +85,37 @@ class ChunkSuggester(Suggester):
     @property
     def targets_dict(self):
         return {
-            "target_space": self.target_space,
-            "target_rule": self.target_rule,
-            "target_root": self.target_root,
-            "target_node": self.target_node,
-            "target_slot": self.target_slot,
-            "target_slot_filler": self.target_slot_filler,
-            "target_branch": self.target_branch,
+            "target_structure_one": self.target_structure_one,
+            "target_structure_two": self.target_structure_two,
         }
 
-    def _passes_preliminary_checks(self):
-        if self.target_rule is None:
-            try:
-                self.target_root = self.target_node.super_chunks.get()
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found target_root: {self.target_root}"
-                )
-                self.target_rule = self.target_root.rule
-            except MissingStructureError:
-                self.target_root = None
-                self.target_rule = self.bubble_chamber.rules.where(
-                    instance_type=type(self.target_node)
-                ).get()
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target_rule: {self.target_rule}"
-            )
-        else:
-            try:
-                self.target_root = self.target_node.super_chunks.where(
-                    rule=self.target_rule
-                ).get()
-            except MissingStructureError:
-                self.target_root = None
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target_root: {self.target_root}"
-            )
-        if (
-            self.target_root is None
-            and not self.target_node.is_raw
-            and self.target_node.has_free_branch
-        ):
-            self.target_root = self.target_node
-        if self.target_root is not None:
-            try:
-                self.target_slot = self.target_root.members.where(is_slot=True).get()
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found target_slot: {self.target_slot}"
-                )
-                if (
-                    self.target_slot.location_in_space(self.target_space).coordinates
-                    == []
-                ):
-                    self.target_slot_filler = (
-                        self.target_root.nearby()
-                        .where(is_slot=False)
-                        .filter(
-                            lambda x: StructureCollection.intersection(
-                                x.raw_members, self.target_root.raw_members
-                            ).is_empty()
-                        )
-                        .get(key=chunking_exigency)
+    def _passes_preliminary_checks(self) -> bool:
+        try:
+            if self.target_structure_two is None:
+                self.target_structure_two = (
+                    self.target_structure_one.potential_chunk_mates.get(
+                        key=chunking_exigency
                     )
-                else:
-                    # TODO: probably don't need this else branch
-                    self.target_slot_filler = (
-                        self.target_space.contents.filter(
-                            lambda x: x.is_node
-                            and x.is_slot
-                            and StructureCollection.intersection(
-                                x.raw_members, self.target_root.members
-                            ).is_empty()
-                        )
-                        .at(self.target_slot.location)
-                        .get(key=chunking_exigency)
-                    )
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found target_slot_filler: {self.target_slot_filler}"
                 )
-            except MissingStructureError:
-                return False
-        suggested_members = StructureCollection.union(
-            self.target_root.members.where(is_slot=False)
-            if self.target_root is not None
-            else self.bubble_chamber.new_structure_collection(),
-            self.bubble_chamber.new_structure_collection(self.target_node)
-            if self.target_root != self.target_node
-            else self.bubble_chamber.new_structure_collection(),
-            self.bubble_chamber.new_structure_collection(self.target_slot_filler)
-            if self.target_slot_filler is not None
-            else self.bubble_chamber.new_structure_collection(),
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, suggested_members, "Suggested members"
-        )
-        return True
+            return True
+        except MissingStructureError:
+            return False
 
     def _calculate_confidence(self):
-        if self.target_rule.right_concept is None:
-            branch_concept = self.target_rule.left_concept
-            self.target_branch = "left"
-        else:
-            branch_names = {
-                self.target_rule.left_concept: "left",
-                self.target_rule.right_concept: "right",
-            }
-            branch_concept = self.bubble_chamber.random_machine.select(
-                [self.target_rule.left_concept, self.target_rule.right_concept],
-                key=lambda x: self.target_rule.compatibility_with(
-                    collection=self.bubble_chamber.new_structure_collection(
-                        self.target_node
-                    ),
-                    branch=branch_names[x],
-                ),
-            )
-            self.target_branch = branch_names[branch_concept]
-        classifications = [
-            branch_concept.classifier.classify(
-                collection=self.bubble_chamber.new_structure_collection(
-                    self.target_node
-                ),
-                concept=branch_concept,
-            )
-        ]
-        self.confidence = fuzzy.AND(*classifications)
+        collection_one = (
+            self.bubble_chamber.new_structure_collection(self.target_structure_one)
+            if self.target_structure_one.members.is_empty()
+            else self.target_structure_one.members
+        )
+        collection_two = (
+            self.bubble_chamber.new_structure_collection(self.target_structure_two)
+            if self.target_structure_two.members.is_empty()
+            else self.target_structure_two.members
+        )
+        self.confidence = SamenessClassifier().classify(
+            collection=StructureCollection.union(collection_one, collection_two),
+            concept=self.bubble_chamber.concepts["same"],
+        )
 
     def _fizzle(self):
         pass

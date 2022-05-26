@@ -113,20 +113,3 @@ def test_gives_low_confidence_for_bad_example(
     assert relation_suggester.confidence == 0
     assert len(relation_suggester.child_codelets) == 1
     assert isinstance(relation_suggester.child_codelets[0], RelationBuilder)
-
-
-def test_fizzles_when_relation_already_exists(bubble_chamber, target_structure_one):
-    relations_where = Mock()
-    relations_where.is_empty.return_value = False
-    target_structure_one.relations.where.return_value = relations_where
-    target_structures = {
-        "target_space": Mock(),
-        "target_structure_one": target_structure_one,
-        "target_structure_two": None,
-        "parent_concept": None,
-    }
-    relation_suggester = RelationSuggester(
-        Mock(), Mock(), bubble_chamber, target_structures, 1.0
-    )
-    result = relation_suggester.run()
-    assert CodeletResult.FIZZLE == result

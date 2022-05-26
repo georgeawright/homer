@@ -3,14 +3,12 @@ from math import prod
 import statistics
 from typing import List
 
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structures import Node, Space
 
 from .concept import Concept
-from .rule import Rule
 
 
 class Chunk(Node):
@@ -22,9 +20,6 @@ class Chunk(Node):
         members: StructureCollection,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
-        left_branch: StructureCollection,
-        right_branch: StructureCollection,
-        rule: Rule,
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
@@ -45,9 +40,6 @@ class Chunk(Node):
         )
         self.abstract_chunk = abstract_chunk
         self.members = members
-        self.left_branch = left_branch
-        self.right_branch = right_branch
-        self.rule = rule
         self.super_chunks = super_chunks
         self._parent_space = parent_space
         self.is_raw = is_raw
@@ -61,8 +53,6 @@ class Chunk(Node):
             "parent_space": self.parent_space.structure_id
             if self.parent_space is not None
             else None,
-            "left_branch": [member.structure_id for member in self.left_branch],
-            "right_branch": [member.structure_id for member in self.right_branch],
             "super_chunks": [member.structure_id for member in self.super_chunks],
             "links_out": [link.structure_id for link in self.links_out],
             "links_in": [link.structure_id for link in self.links_in],
@@ -127,35 +117,8 @@ class Chunk(Node):
             )
 
     @property
-    def free_branch_concept(self):
-        if self.rule.root_concept == self.rule.left_concept:
-            return self.rule.left_concept
-        if self.left_branch.is_empty():
-            return self.rule.left_concept
-        if self.right_branch.is_empty() and self.rule.right_concept is not None:
-            return self.rule.right_concept
-        raise MissingStructureError
-
-    @property
-    def free_branch(self):
-        if self.rule.root_concept == self.rule.left_concept:
-            return self.left_branch
-        if self.left_branch.is_empty():
-            return self.left_branch
-        if self.right_branch.is_empty() and self.rule.right_concept is not None:
-            return self.right_branch
-        raise MissingStructureError
-
-    @property
-    def has_free_branch(self):
-        try:
-            return self.free_branch is not None
-        except MissingStructureError:
-            return False
-
-    @property
     def potential_chunk_mates(self) -> StructureCollection:
-        return StructureCollection.union(self.adjacent, self.super_chunks, self.members)
+        return self.nearby().filter(lambda x: x not in self.members)
 
     @property
     def adjacent(self) -> StructureCollection:
@@ -178,18 +141,15 @@ class Chunk(Node):
                 .near(self.location_in_space(space))
                 .excluding(self),
             )
-        return (
-            StructureCollection.intersection(
-                *[
-                    location.space.contents.where(is_chunk=True).near(location)
-                    for location in self.locations
-                    if location.space.is_conceptual_space
-                    and location.space.is_basic_level
-                ]
-            )
-            .filter(lambda x: x in self.parent_space.contents)
-            .excluding(self)
-        )
+        return StructureCollection.intersection(
+            *[
+                location.space.contents.where(
+                    is_chunk=True, parent_space=self.parent_space
+                ).near(location)
+                for location in self.locations
+                if location.space.is_conceptual_space and location.space.is_basic_level
+            ]
+        ).excluding(self)
 
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
@@ -226,27 +186,17 @@ class Chunk(Node):
                         member, location, bubble_chamber, parent_id, copies
                     )
                 members.add(copies[member])
-            new_left_branch = bubble_chamber.new_structure_collection(
-                *[copies[member] for member in chunk.left_branch]
-            )
-            new_right_branch = bubble_chamber.new_structure_collection(
-                *[copies[member] for member in chunk.right_branch]
-            )
             return bubble_chamber.new_chunk(
                 parent_id=parent_id,
                 locations=locations,
                 parent_space=location.space,
                 members=members,
-                left_branch=new_left_branch,
-                right_branch=new_right_branch,
-                rule=chunk.rule,
                 is_raw=chunk.is_raw,
                 quality=0.0,
             )
 
         return copy_recursively(self, location, bubble_chamber, parent_id, {})
 
-    # TODO: copy with contents doesn't add item to space
     def copy_with_contents(
         self,
         copies: dict,
@@ -269,20 +219,11 @@ class Chunk(Node):
                     new_location=new_location,
                 )
             new_members.add(copies[member])
-        new_left_branch = bubble_chamber.new_structure_collection(
-            *[copies[member] for member in self.left_branch]
-        )
-        new_right_branch = bubble_chamber.new_structure_collection(
-            *[copies[member] for member in self.right_branch]
-        )
         chunk_copy = bubble_chamber.new_chunk(
             parent_id=parent_id,
             locations=new_locations,
             parent_space=new_location.space,
             members=new_members,
-            left_branch=new_left_branch,
-            right_branch=new_right_branch,
-            rule=self.rule,
             is_raw=self.is_raw,
             quality=self.quality,
         )
@@ -291,8 +232,6 @@ class Chunk(Node):
     def spread_activation(self):
         if not self.is_fully_active():
             return
-        if self.rule is not None:
-            self.rule.boost_activation(self.activation)
         if self.parent_space is not None and self.parent_space.is_contextual_space:
             for link in self.links:
                 link.boost_activation(self.quality)

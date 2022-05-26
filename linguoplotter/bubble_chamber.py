@@ -17,7 +17,7 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Frame, LinkOrNode, Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Concept, Rule
+from .structures.nodes import Chunk, Concept
 from .structures.nodes.chunks import LetterChunk
 from .structures.spaces import ConceptualSpace, ContextualSpace
 from .structures.views import SimplexView, MonitoringView
@@ -42,7 +42,6 @@ class BubbleChamber:
         self.concepts = None
         self.chunks = None
         self.letter_chunks = None
-        self.rules = None
 
         self.concept_links = None
         self.correspondences = None
@@ -76,7 +75,6 @@ class BubbleChamber:
         self.concepts = self.new_structure_collection()
         self.chunks = self.new_structure_collection()
         self.letter_chunks = self.new_structure_collection()
-        self.rules = self.new_structure_collection()
         self.concept_links = self.new_structure_collection()
         self.correspondences = self.new_structure_collection()
         self.labels = self.new_structure_collection()
@@ -161,7 +159,6 @@ class BubbleChamber:
             self.relations,
             self.views,
             self.concept_links,
-            self.rules,
         )
 
     @property
@@ -178,7 +175,6 @@ class BubbleChamber:
             Chunk: "chunks",
             Concept: "concepts",
             LetterChunk: "letter_chunks",
-            Rule: "rules",
             # links
             Correspondence: "correspondences",
             Label: "labels",
@@ -381,18 +377,12 @@ class BubbleChamber:
         members: StructureCollection = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
-        left_branch: StructureCollection = None,
-        right_branch: StructureCollection = None,
-        rule: Rule = None,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ) -> Chunk:
         if members is None:
             members = self.new_structure_collection()
-        if left_branch is None:
-            left_branch = self.new_structure_collection()
-        if right_branch is None:
-            right_branch = self.new_structure_collection()
+        locations.append(Location([[len(members)]], self.conceptual_spaces["size"]))
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )
@@ -403,9 +393,6 @@ class BubbleChamber:
             members=members,
             parent_space=parent_space,
             quality=quality,
-            left_branch=left_branch,
-            right_branch=right_branch,
-            rule=rule,
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
@@ -430,7 +417,6 @@ class BubbleChamber:
         quality: FloatBetweenOneAndZero = 0.0,
         left_branch: StructureCollection = None,
         right_branch: StructureCollection = None,
-        rule: Rule = None,
         meaning_concept: Concept = None,
         grammar_concept: Concept = None,
         abstract_chunk: LetterChunk = None,
@@ -454,7 +440,6 @@ class BubbleChamber:
             quality=quality,
             left_branch=left_branch,
             right_branch=right_branch,
-            rule=rule,
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
@@ -514,57 +499,6 @@ class BubbleChamber:
             concept._activation = activation
         self.add(concept)
         return concept
-
-    def new_rule(
-        self,
-        name: str,
-        location: Location,
-        root_concept: Concept,
-        left_concept: Concept,
-        right_concept: Concept,
-        parent_id: str = "",
-        stable_activation: FloatBetweenOneAndZero = None,
-    ) -> Rule:
-        rule = Rule(
-            structure_id=ID.new(Rule),
-            parent_id=parent_id,
-            name=name,
-            location=location,
-            root_concept=root_concept,
-            left_concept=left_concept,
-            right_concept=right_concept,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
-            parent_spaces=self.new_structure_collection(location.space),
-            stable_activation=stable_activation,
-        )
-        self.new_relation(
-            parent_id=parent_id,
-            start=root_concept,
-            end=rule,
-            parent_concept=None,
-            locations=[],
-            quality=1.0,
-        )
-        self.new_relation(
-            parent_id=parent_id,
-            start=rule,
-            end=left_concept,
-            parent_concept=None,
-            locations=[],
-            quality=1.0,
-        )
-        if right_concept is not None:
-            self.new_relation(
-                parent_id=parent_id,
-                start=rule,
-                end=right_concept,
-                parent_concept=None,
-                locations=[],
-                quality=1.0,
-            )
-        self.add(rule)
-        return rule
 
     def new_link_or_node(
         self,

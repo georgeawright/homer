@@ -1,6 +1,7 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+from linguoplotter.classifiers import SamenessClassifier
 from linguoplotter.codelets.evaluators import ChunkEvaluator
 from linguoplotter.codelets.selectors import ChunkSelector
 from linguoplotter.structure_collection import StructureCollection
@@ -10,19 +11,17 @@ from linguoplotter.structure_collection import StructureCollection
 def test_changes_target_structure_quality(
     bubble_chamber, current_quality, classification
 ):
-    chunk = Mock()
-    chunk.is_slot = False
-    chunk.rule.right_concept = None
-    chunk.rule.left_concept.classifier.classify.return_value = classification
-    chunk.quality = current_quality
-    evaluator = ChunkEvaluator(
-        Mock(),
-        Mock(),
-        bubble_chamber,
-        bubble_chamber.new_structure_collection(chunk),
-        Mock(),
-    )
-    evaluator.run()
-    assert classification == chunk.quality
-    assert 1 == len(evaluator.child_codelets)
-    assert isinstance(evaluator.child_codelets[0], ChunkSelector)
+    with patch.object(SamenessClassifier, "classify", return_value=classification):
+        chunk = Mock()
+        chunk.quality = current_quality
+        evaluator = ChunkEvaluator(
+            Mock(),
+            Mock(),
+            bubble_chamber,
+            bubble_chamber.new_structure_collection(chunk),
+            Mock(),
+        )
+        evaluator.run()
+        assert classification == chunk.quality
+        assert 1 == len(evaluator.child_codelets)
+        assert isinstance(evaluator.child_codelets[0], ChunkSelector)

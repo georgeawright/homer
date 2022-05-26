@@ -80,15 +80,3 @@ def test_gives_low_confidence_bad_example(bubble_chamber, target_chunk):
     assert label_suggester.confidence == 0
     assert len(label_suggester.child_codelets) == 1
     assert isinstance(label_suggester.child_codelets[0], LabelBuilder)
-
-
-def test_fizzles_when_label_exists(bubble_chamber, target_chunk):
-    labels_where = Mock()
-    labels_where.is_empty.return_value = False
-    target_chunk.labels.where.return_value = labels_where
-    target_structures = {"target_node": target_chunk, "parent_concept": None}
-    label_suggester = LabelSuggester(
-        Mock(), Mock(), bubble_chamber, target_structures, 1.0
-    )
-    result = label_suggester.run()
-    assert CodeletResult.FIZZLE == result

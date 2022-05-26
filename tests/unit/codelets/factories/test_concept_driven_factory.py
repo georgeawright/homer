@@ -27,9 +27,6 @@ def test_gets_appropriate_follow_up_class(bubble_chamber):
     example_relation_concept.structure_type = Relation
     bubble_chamber.concepts.add(example_relation_concept)
 
-    example_rule = Mock()
-    bubble_chamber.rules.add(example_rule)
-
     coderack = Mock()
 
     factory_codelet = ConceptDrivenFactory(
@@ -41,4 +38,3 @@ def test_gets_appropriate_follow_up_class(bubble_chamber):
         factory_codelet._get_follow_up_class(example_relation_concept)
         == RelationSuggester
     )
-    assert factory_codelet._get_follow_up_class(example_rule) == ChunkSuggester

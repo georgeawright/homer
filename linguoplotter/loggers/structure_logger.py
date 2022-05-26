@@ -142,7 +142,7 @@ class StructureLogger(Logger):
                     f'{item.structure_id} [label="{item_name}" fontsize={item_size}];\n'
                 )
             for item in space.contents.where(is_correspondence=False):
-                if item.is_node:
+                if item.is_letter_chunk:
                     for left_node in item.left_branch:
                         f.write(
                             f"{item.structure_id} -> {left_node.structure_id} "
@@ -152,6 +152,12 @@ class StructureLogger(Logger):
                         f.write(
                             f"{item.structure_id} -> {right_node.structure_id} "
                             + '[label="left"];\n'
+                        )
+                elif item.is_chunk:
+                    for member in item.members:
+                        f.write(
+                            f"{item.structure_id} -> {member.structure_id} "
+                            + '[label="member"];\n'
                         )
                 else:
                     f.write(

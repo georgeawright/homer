@@ -16,10 +16,6 @@
     :classifier (DifferentnessClassifier) :instance_type Chunk :structure_type Correspondence
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 
-(define sameness-rule
-  (def-rule :name "same->same" :location (Location (list) same-different-space)
-    :root_concept same-concept :left_concept same-concept :right_concept None))
-
 (define same-word (def-letter-chunk :name "same" :locations (list)))
 (def-relation :start same-concept :end same-word :parent_concept jj-concept)
 (define different-word (def-letter-chunk :name "different" :locations (list)))
