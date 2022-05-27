@@ -145,3 +145,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   :parent_concept location-concept :quality 1.0)
 (def-relation :start southwest-concept :end northeast-concept
   :parent_concept location-concept :quality 1.0)
+(def-relation :start northwest-concept :end north-concept :is_excitatory False :quality 1.0)
+(def-relation :start northwest-concept :end west-concept :is_excitatory False :quality 1.0)
+(def-relation :start northeast-concept :end north-concept :is_excitatory False :quality 1.0)
+(def-relation :start northeast-concept :end east-concept :is_excitatory False :quality 1.0)
+(def-relation :start southwest-concept :end south-concept :is_excitatory False :quality 1.0)
+(def-relation :start southwest-concept :end west-concept :is_excitatory False :quality 1.0)
+(def-relation :start southeast-concept :end south-concept :is_excitatory False :quality 1.0)
+(def-relation :start southeast-concept :end east-concept :is_excitatory False :quality 1.0)
