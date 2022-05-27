@@ -94,6 +94,10 @@ class Chunk(Node):
             *[chunk.raw_members for chunk in self.members.where(is_slot=False)]
         )
 
+    @property
+    def is_abstract(self):
+        return self.parent_space is None
+
     def recalculate_unhappiness(self) -> FloatBetweenOneAndZero:
         self.recalculate_unchunkedness()
         self.recalculate_unlabeledness()
@@ -228,26 +232,6 @@ class Chunk(Node):
             quality=self.quality,
         )
         return (chunk_copy, copies)
-
-    def spread_activation(self):
-        if not self.is_fully_active():
-            return
-        if self.parent_space is not None and self.parent_space.is_contextual_space:
-            for link in self.links:
-                link.boost_activation(self.quality)
-        else:
-            for link in self.links_out.where(is_label=False):
-                link.end.boost_activation(
-                    link.parent_concept.activation
-                    if link.parent_concept is not None
-                    else None
-                )
-            for link in self.links_in.where(is_bidirectional=True):
-                link.start.boost_activation(
-                    link.parent_concept.activation
-                    if link.parent_concept is not None
-                    else None
-                )
 
     def __repr__(self) -> str:
         members = "{" + ",".join([member.structure_id for member in self.members]) + "}"

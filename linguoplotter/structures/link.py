@@ -37,6 +37,7 @@ class Link(Structure):
         self.arguments = arguments
         self._parent_concept = parent_concept
         self.value = parent_concept.name if hasattr(parent_concept, "name") else None
+        self.is_excitatory = True
         self.is_link = True
 
     @property
@@ -68,6 +69,13 @@ class Link(Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a
 
     def spread_activation(self):
+        if not self.is_fully_active:
+            return
+        if (
+            self.start.parent_space is None
+            or self.start.parent_space.is_conceptual_space
+        ):
+            return
         if self.parent_concept is not None:
             self.parent_concept.boost_activation(self.quality)
         for argument in self.arguments.filter(

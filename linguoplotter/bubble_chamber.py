@@ -535,6 +535,7 @@ class BubbleChamber:
         parent_view: View = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
+        is_excitatory: bool = True,
         is_privileged: bool = False,
     ) -> Correspondence:
         if locations is None:
@@ -562,6 +563,7 @@ class BubbleChamber:
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
+            is_excitatory=is_excitatory,
             is_privileged=is_privileged,
         )
         if parent_view is not None:
@@ -623,6 +625,7 @@ class BubbleChamber:
         parent_space: ContextualSpace = None,
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
+        is_excitatory: bool = True,
         activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
         parent_space = start.parent_space if parent_space is None else parent_space
@@ -645,6 +648,7 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             is_bidirectional=is_bidirectional,
+            is_excitatory=is_excitatory,
         )
         if activation is not None:
             relation._activation = activation

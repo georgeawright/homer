@@ -264,9 +264,15 @@ class Frame(Structure):
         if not self.is_fully_active():
             return
         for link in self.links_out.where(is_label=False):
-            link.end.boost_activation(link.activation)
+            if link.is_excitatory:
+                link.end.boost_activation(link.activation)
+            else:
+                link.decay.boost_activation(link.activation)
         for link in self.links_in.where(is_bidirectional=True):
-            link.start.boost_activation(link.activation)
+            if link.is_excitatory:
+                link.start.boost_activation(link.activation)
+            else:
+                link.start.decay_activation(link.activation)
         for instance in self.instances:
             instance.boost_activation()
         if self.parent_frame is not None:

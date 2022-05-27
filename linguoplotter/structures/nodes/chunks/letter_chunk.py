@@ -85,10 +85,6 @@ class LetterChunk(Chunk):
         return self.name is None
 
     @property
-    def is_abstract(self):
-        return self.parent_space is None
-
-    @property
     def concepts(self):
         return self.relatives.where(is_concept=True)
 
