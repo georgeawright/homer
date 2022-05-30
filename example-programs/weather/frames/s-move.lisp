@@ -102,7 +102,7 @@
     :parent_space time-sub-frame-input
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start late-chunk :end early-chunk :parent_concept different-concept
+  (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
 		     (TwoPointLocation (list) (list) location-sub-frame-input)
@@ -158,7 +158,7 @@
 		     (Location (list) move-sentence-output))
     :parent_space location-sub-frame-output))
 (define location-chunk-grammar-label
-  (def-label :start sentence-word-6 :parent_concept pp-inessive-location-concept
+  (def-label :start sentence-word-6 :parent_concept pp-directional-location-concept
     :locations (list pp-location
 		     (Location (list) location-sub-frame-output))))
 (define sentence-word-7

@@ -101,6 +101,14 @@
 		     (TwoPointLocation (list) (list) pp-allative-input)
 		     (TwoPointLocation (list) (list) pp-directional-location-input))
     :conceptual_space time-space))
+(define location-relation
+  (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
+    :locations (list (Location (list (list Nan)) same-different-space)
+		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
+		     (TwoPointLocation (list) (list) pp-ablative-input)
+		     (TwoPointLocation (list) (list) pp-allative-input)
+		     (TwoPointLocation (list) (list) pp-directional-location-input))
+    :conceptual_space location-space))
 
 (define pp-1
   (def-letter-chunk :name None
@@ -131,7 +139,7 @@
     :left_branch (StructureCollection pp-1)
     :right_branch (StructureCollection pp-2)))
 (define pp-super-chunk-label
-  (def-label :start pp-super-chunk :parent_concept pp-concept
+  (def-label :start pp-super-chunk :parent_concept pp-directional-location-concept
     :locations (list pp-location
 		     (Location (list) pp-directional-location-output))))
 
