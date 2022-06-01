@@ -33,5 +33,10 @@ class ChunkEvaluator(Evaluator):
         self.confidence = SamenessClassifier().classify(
             collection=target_chunk.members,
             concept=self.bubble_chamber.concepts["same"],
+            spaces=target_chunk.parent_spaces.filter(
+                lambda x: x.is_conceptual_space
+                and x.is_basic_level
+                and x.name != "size"
+            ),
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

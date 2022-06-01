@@ -115,6 +115,11 @@ class ChunkSuggester(Suggester):
         self.confidence = SamenessClassifier().classify(
             collection=StructureCollection.union(collection_one, collection_two),
             concept=self.bubble_chamber.concepts["same"],
+            spaces=self.target_structure_one.parent_spaces.filter(
+                lambda x: x.is_conceptual_space
+                and x.is_basic_level
+                and x.name != "size"
+            ),
         )
 
     def _fizzle(self):
