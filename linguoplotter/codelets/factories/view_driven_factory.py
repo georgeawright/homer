@@ -153,6 +153,11 @@ class ViewDrivenFactory(Factory):
         ]:
             if not structures.where(is_relation=True).is_empty():
                 return structures.where(is_relation=True).get()
+        for structures in [
+            sub_frame_input_structures,
+            input_structures,
+            output_structures,
+        ]:
             if not structures.where(is_label=True).is_empty():
                 return structures.where(is_label=True).get()
             if not structures.where(is_chunk=True).is_empty():

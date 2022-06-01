@@ -82,7 +82,7 @@
   (def-label :start early-chunk :parent_concept conceptual-label-concept
     :locations (list (Location (list) conceptual-space)
 		     (Location (list) ap-sub-frame-input)
-		     (Location (list) move-sentence-input))
+		     (Location (list) spread-sentence-input))
     :parent_space ap-sub-frame-input))
 (define late-chunk
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
@@ -102,7 +102,7 @@
     :parent_space time-sub-frame-input
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start late-chunk :end early-chunk :parent_concept same-concept
+  (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
 		     (TwoPointLocation (list) (list) location-sub-frame-input)
@@ -115,7 +115,7 @@
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) size-space)
 		     (TwoPointLocation (list) (list) spread-sentence-input))
     :parent_space spread-sentence-input
-    :conceptual_space conceptual-space))
+    :conceptual_space size-space))
 (define conceptual-relation
   (def-relation :start late-chunk :end early-chunk :parent_concept same-concept
     :locations (list (Location (list (list Nan)) same-different-space)
