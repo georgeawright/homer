@@ -169,14 +169,8 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             views_with_correct_conceptual_space,
             "Views with correct space",
         )
-        views_that_are_complete = views_with_correct_conceptual_space.filter(
-            lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
-        )
-        bubble_chamber.loggers["activity"].log_collection(
-            calling_codelet, views_that_are_complete, "Views that are complete"
-        )
-        correspondence_suggester.target_sub_view = views_that_are_complete.get(
-            key=activation
+        correspondence_suggester.target_sub_view = (
+            views_with_correct_conceptual_space.get(key=activation)
         )
         bubble_chamber.loggers["activity"].log(
             calling_codelet,

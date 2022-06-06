@@ -55,6 +55,7 @@ class Concept(Node):
         self.distance_to_proximity_weight = distance_to_proximity_weight
         self.is_concept = True
         self._is_slot = is_slot
+        self._non_slot_value = None
 
     def __dict__(self) -> dict:
         return {
@@ -86,7 +87,15 @@ class Concept(Node):
 
     @property
     def is_filled_in(self) -> bool:
-        return not self.relatives.where(is_slot=False).is_empty()
+        return not self.non_slot_value is None
+
+    @property
+    def non_slot_value(self) -> Concept:
+        if self._non_slot_value is None:
+            return None
+        if not self._non_slot_value.is_slot:
+            return self._non_slot_value
+        return self._non_slot_value.non_slot_value
 
     def recalculate_unhappiness(self):
         self.unhappiness = 0.5 ** sum(

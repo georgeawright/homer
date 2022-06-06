@@ -8,15 +8,9 @@ class SpaceToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             self.target_structure_two.is_link
             and not self.target_structure_two.parent_concept.is_filled_in
         ):
-            concept_link = self.bubble_chamber.new_relation(
-                parent_id=self.codelet_id,
-                start=self.target_structure_two.parent_concept,
-                end=self.target_structure_one.parent_concept,
-                parent_concept=None,
-                locations=[],
-                quality=1.0,
+            self.target_structure_two.parent_concept._non_slot_value = (
+                self.target_structure_one.parent_concept
             )
-            self.child_structures.add(concept_link)
         correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
             start=self.target_structure_one,

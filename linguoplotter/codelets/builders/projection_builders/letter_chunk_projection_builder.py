@@ -185,7 +185,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         grammar_concept = (
             grammar_label.parent_concept
             if not grammar_label.parent_concept.is_slot
-            else grammar_label.parent_concept.relatives.where(is_slot=False).get()
+            else grammar_label.parent_concept.non_slot_value
         )
         meaning_label = self.target_projectee.labels.filter(
             lambda x: x.parent_concept.parent_space
@@ -197,7 +197,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         meaning_concept = (
             meaning_label.parent_concept
             if not meaning_label.parent_concept.is_slot
-            else meaning_label.parent_concept.relatives.where(is_slot=False).get()
+            else meaning_label.parent_concept.non_slot_value
         )
         self.bubble_chamber.loggers["activity"].log(
             self, f"Meaning concept: {meaning_concept}"

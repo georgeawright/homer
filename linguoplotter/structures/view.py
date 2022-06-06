@@ -1,3 +1,4 @@
+import statistics
 from typing import List
 
 from linguoplotter import fuzzy
@@ -51,8 +52,8 @@ class View(Structure):
         self.sub_views = sub_views
         self.super_views = super_views
         self.prioritized_targets = prioritized_targets
-        self.node_groups = []
-        self.grouped_nodes = {}
+        self._node_groups = []
+        self._grouped_nodes = {}
         self.matched_sub_frames = {}
         self.slot_values = {}
         self.is_view = True
@@ -106,11 +107,25 @@ class View(Structure):
     def is_recyclable(self) -> bool:
         return self.activation == 0.0
 
+    @property
+    def grouped_nodes(self):
+        if self.super_views.is_empty():
+            return self._grouped_nodes
+        return self.super_views.get().grouped_nodes
+
+    @property
+    def node_groups(self):
+        if self.super_views.is_empty():
+            return self._node_groups
+        return self.super_views.get().node_groups
+
     def recalculate_unhappiness(self):
         items_to_process = sum(
             [
                 len(self.parent_frame.uncorresponded_items),
                 len(self.parent_frame.unprojected_items),
+                len(self.parent_frame.sub_frames)
+                - len(self.sub_views.filter(lambda x: x.unhappiness == 0.0)),
             ]
         )
         self.unhappiness = 1 - 0.5 ** items_to_process
@@ -145,6 +160,8 @@ class View(Structure):
                 )
                 self.grouped_nodes[node_pair[0]] = True
                 self.grouped_nodes[node_pair[1]] = True
+        if not self.super_views.is_empty():
+            self.super_views.get().add(correspondence)
 
     def remove(self, correspondence: "Correspondence"):
         # TODO also need to remove sub frames if correspondence was only link to other frame
@@ -153,6 +170,8 @@ class View(Structure):
         self.node_groups = []
         for member in self.members:
             self.add(member)
+        if not self.super_views.is_empty():
+            self.super_views.get().remove(correspondence)
 
     def has_member(
         self,
@@ -177,33 +196,38 @@ class View(Structure):
     ) -> bool:
         if self.has_member(parent_concept, conceptual_space, start, end):
             return False
-        if start.is_link and end.is_link:
+        if (
+            start.is_link
+            and end.is_link
+            and (not start.parent_concept.is_slot or start.parent_concept.is_filled_in)
+        ):
             start_concept = (
                 start.parent_concept
                 if not start.parent_concept.is_slot
-                else start.parent_concept.relatives.filter(
-                    lambda x: x not in self.parent_frame.concepts and not x.is_slot
-                ).get()
+                else start.parent_concept.non_slot_value
             )
-            if end.parent_concept.is_slot:
-                for relative in end.parent_concept.relatives.filter(
+            end_concept = end.parent_concept
+            if end_concept.is_slot:
+                for relative in end_concept.relatives.filter(
                     lambda x: x in self.parent_frame.concepts
                 ):
                     relation_concept = (
-                        end.parent_concept.relations_with(relative).get().parent_concept
+                        end_concept.relations_with(relative).get().parent_concept
                     )
                     if relative.is_slot and relative.is_filled_in:
-                        relative_concept = relative.relatives.where(is_slot=False).get()
+                        relative_concept = relative.non_slot_value
                         if not start_concept.has_relation_with(
                             relative_concept, relation_concept
                         ):
                             return False
                     if not relative.is_slot:
                         if not start_concept.has_relation_with(
-                            end.parent_concept, relation_concept
+                            end_concept, relation_concept
                         ):
                             return False
-        if not end.correspondences.filter(lambda x: x in self.members).is_empty():
+        if not end.correspondences.filter(
+            lambda x: x.end == end and x in self.members
+        ).is_empty():
             return False
         potential_node_groups = (
             [{start.parent_space: start, end.parent_space: end}]
@@ -240,7 +264,14 @@ class View(Structure):
                     )
                 ):
                     return False
-        return True
+        if self.super_views.is_empty():
+            return True
+        return self.super_views.get().can_accept_member(
+            parent_concept,
+            conceptual_space,
+            start,
+            end,
+        )
 
     def spread_activation(self):
         if not self.is_fully_active():

@@ -92,10 +92,12 @@ class Frame(Structure):
     @property
     def uncorresponded_items(self) -> StructureCollection:
         return StructureCollection.union(
-            self.input_space.contents.filter(lambda x: x.correspondences.is_empty()),
+            self.input_space.contents.filter(
+                lambda x: x.correspondences.where(end=x).is_empty()
+            ),
             self.output_space.contents.filter(
                 lambda x: x.parent_space != self.output_space
-                and x.correspondences.is_empty()
+                and x.correspondences.where(start=x).is_empty()
             ),
         ).where(is_correspondence=False, is_link_or_node=False)
 

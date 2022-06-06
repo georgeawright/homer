@@ -18,9 +18,7 @@ class RelationProjectionBuilder(ProjectionBuilder):
         parent_concept = (
             self.target_projectee.parent_concept
             if not self.target_projectee.is_slot
-            else self.target_projectee.parent_concept.relatives.where(
-                is_slot=False
-            ).get()
+            else self.target_projectee.parent_concept.non_slot_value
         )
         start_correspondence = self.target_projectee.start.correspondences_to_space(
             self.target_view.output_space

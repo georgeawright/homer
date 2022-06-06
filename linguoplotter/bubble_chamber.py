@@ -566,10 +566,14 @@ class BubbleChamber:
             is_excitatory=is_excitatory,
             is_privileged=is_privileged,
         )
-        if parent_view is not None:
-            parent_view.recalculate_exigency()
+        while parent_view is not None:
             parent_view.add(correspondence)
+            parent_view.recalculate_exigency()
             self.loggers["structure"].log(parent_view)
+            try:
+                parent_view = parent_view.super_views.get()
+            except MissingStructureError:
+                parent_view = None
         start.links_out.add(correspondence)
         start.links_in.add(correspondence)
         start.recalculate_exigency()
