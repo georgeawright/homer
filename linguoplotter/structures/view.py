@@ -63,6 +63,7 @@ class View(Structure):
             "structure_id": self.structure_id,
             "parent_id": self.parent_id,
             "parent_frame": self.parent_frame.structure_id,
+            "parent_frame_name": self.parent_frame.name,
             "frames": [frame.structure_id for frame in self.frames],
             "input_spaces": [space.structure_id for space in self.input_spaces],
             "output_space": self.output_space.structure_id,
