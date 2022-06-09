@@ -23,9 +23,6 @@ class SimplexViewSuggester(ViewSuggester):
         self.prioritized_conceptual_spaces = target_structures.get(
             "prioritized_conceptual_spaces", bubble_chamber.new_structure_collection()
         )
-        self.prioritized_targets = target_structures.get(
-            "prioritized_targets", bubble_chamber.new_structure_collection()
-        )
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -73,7 +70,6 @@ class SimplexViewSuggester(ViewSuggester):
             "frame": self.frame,
             "contextual_space": self.contextual_space,
             "conceptual_spaces_map": self.conceptual_spaces_map,
-            "prioritized_targets": self.prioritized_targets,
             "prioritized_conceptual_spaces": self.prioritized_conceptual_spaces,
         }
 
@@ -136,47 +132,22 @@ class SimplexViewSuggester(ViewSuggester):
         return True
 
     def _calculate_confidence(self):
-        # if prioritized targets not empty, no view with same targets, 1
-        # otherwise confidence divided by number of views with equivalent frame and space
-        if not self.prioritized_targets.is_empty():
-            equivalent_views = self.bubble_chamber.views.filter(
-                lambda x: all(
-                    [
-                        x.input_spaces
-                        == self.bubble_chamber.new_structure_collection(
-                            self.contextual_space
-                        ),
-                        x.parent_frame.progenitor == self.frame.progenitor,
-                        x.parent_frame.input_space.conceptual_spaces
-                        == self.frame.input_space.conceptual_spaces,
-                        x.prioritized_targets == self.prioritized_targets,
-                        x.members.is_empty(),
-                    ]
-                )
+        equivalent_views = self.bubble_chamber.views.filter(
+            lambda x: all(
+                [
+                    x.input_spaces
+                    == self.bubble_chamber.new_structure_collection(
+                        self.contextual_space
+                    ),
+                    x.parent_frame.progenitor == self.frame.progenitor,
+                ]
             )
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, equivalent_views, "Equivalent views"
-            )
-            self.confidence = 1 if equivalent_views.is_empty() else 0
-        else:
-            equivalent_views = self.bubble_chamber.views.filter(
-                lambda x: all(
-                    [
-                        x.input_spaces
-                        == self.bubble_chamber.new_structure_collection(
-                            self.contextual_space
-                        ),
-                        x.parent_frame.progenitor == self.frame.progenitor,
-                    ]
-                )
-            )
-            equivalent_view_activation = sum(
-                [view.activation for view in equivalent_views]
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Frame activation: {self.frame.activation}"
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Total equivalent view activation: {equivalent_view_activation}"
-            )
-            self.confidence = self.frame.activation * 0.5 ** equivalent_view_activation
+        )
+        equivalent_view_activation = sum([view.activation for view in equivalent_views])
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Frame activation: {self.frame.activation}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Total equivalent view activation: {equivalent_view_activation}"
+        )
+        self.confidence = self.frame.activation * 0.5 ** equivalent_view_activation

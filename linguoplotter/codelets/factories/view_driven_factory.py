@@ -88,7 +88,11 @@ class ViewDrivenFactory(Factory):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Slot parent space: {self.target_slot.parent_space}"
         )
-        if self.target_slot.parent_space == self.target_view.parent_frame.input_space:
+        if (
+            len(self.target_slot.parent_spaces.where(is_contextual_space=True)) == 1
+            and self.target_slot.parent_space
+            == self.target_view.parent_frame.input_space
+        ):
             try:
                 follow_up = self._spawn_space_to_frame_correspondence_suggester()
             except MissingStructureError:
@@ -129,43 +133,18 @@ class ViewDrivenFactory(Factory):
             pass
 
     def _set_target_slot(self):
-        sub_frame_input_structures = (
-            self.target_view.parent_frame.input_space.contents.filter(
-                lambda x: not x.is_correspondence
-                and x.parent_space != self.target_view.parent_frame.input_space
-                and x.correspondences.where(end=x).is_empty()
-            )
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, sub_frame_input_structures, "sub frame input structures"
-        )
-        input_structures = self.target_view.parent_frame.input_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and x.correspondences.where(end=x).is_empty()
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, input_structures, "input structures"
-        )
-        output_structures = self.target_view.parent_frame.output_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and x.parent_space != self.target_view.parent_frame.output_space
-            and x.correspondences.where(end=x).is_empty()
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, output_structures, "output structures"
-        )
         for structures in [
-            sub_frame_input_structures,
-            input_structures,
-            output_structures,
+            self.target_view.unfilled_sub_frame_input_structures,
+            self.target_view.unfilled_input_structures,
+            self.target_view.unfilled_output_structures,
         ]:
             if not structures.where(is_relation=True).is_empty():
                 self.target_slot = structures.where(is_relation=True).get()
                 return
         for structures in [
-            sub_frame_input_structures,
-            input_structures,
-            output_structures,
+            self.target_view.unfilled_sub_frame_input_structures,
+            self.target_view.unfilled_input_structures,
+            self.target_view.unfilled_output_structures,
         ]:
             if not structures.where(is_label=True).is_empty():
                 self.target_slot = structures.where(is_label=True).get()
@@ -174,15 +153,7 @@ class ViewDrivenFactory(Factory):
                 self.target_slot = structures.where(is_chunk=True).get()
                 return
 
-        projectable_structures = (
-            self.target_view.parent_frame.output_space.contents.filter(
-                lambda x: not x.is_correspondence
-                and x.correspondences_to_space(self.target_view.output_space).is_empty()
-            )
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, projectable_structures, "projectable structures"
-        )
+        projectable_structures = self.target_view.unfilled_projectable_structures
         if not projectable_structures.where(is_chunk=True).is_empty():
             self.target_slot = projectable_structures.where(is_chunk=True).get()
             return
@@ -227,14 +198,9 @@ class ViewDrivenFactory(Factory):
                             is_labellable=True, is_slot=False
                         ).get(key=labeling_exigency)
                     else:
-                        try:
-                            node = self.target_view.prioritized_targets.filter(
-                                lambda x: x.is_node and not x.is_slot
-                            ).get()
-                        except MissingStructureError:
-                            node = input_space.contents.where(
-                                is_node=True, is_slot=False
-                            ).get(key=labeling_exigency)
+                        node = input_space.contents.where(
+                            is_node=True, is_slot=False
+                        ).get(key=labeling_exigency)
             parent_concept = (
                 self.target_slot.parent_spaces.where(is_conceptual_space=True)
                 .get()
@@ -380,24 +346,49 @@ class ViewDrivenFactory(Factory):
             else self.target_view.parent_frame.output_space
         )
         sub_frame = self.target_view.parent_frame.sub_frames.filter(
-            lambda x: x.input_space == self.target_slot.parent_space
-            or x.output_space == self.target_slot.parent_space
+            lambda x: (
+                x.input_space in self.target_slot.parent_spaces
+                or x.output_space in self.target_slot.parent_spaces
+            )
+            and not self.target_slot.has_correspondence_to_space(
+                self.target_view.matched_sub_frames[x].input_space
+            )
+            if x in self.target_view.matched_sub_frames
+            else False
+            and not self.target_slot.has_correspondence_to_space(
+                self.target_view.matched_sub_frames[x].output_space
+            )
+            if x in self.target_view.matched_sub_frames
+            else False
         ).get()
         self.bubble_chamber.loggers["activity"].log_dict(
             self, self.target_view.matched_sub_frames, "view matched sub frames"
         )
         if sub_frame not in self.target_view.matched_sub_frames:
             raise MissingStructureError
-        return SubFrameToFrameCorrespondenceSuggester.spawn(
+        matching_frame = self.target_view.matched_sub_frames[sub_frame]
+        target_space_one = (
+            matching_frame.input_space
+            if target_space_two == self.target_view.parent_frame.input_space
+            else matching_frame.output_space
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Found target space one: {target_space_one}"
+        )
+        follow_up = SubFrameToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
             {
                 "target_view": self.target_view,
                 "target_space_two": target_space_two,
                 "target_structure_two": self.target_slot,
+                "target_space_one": target_space_one,
             },
             self.target_view.unhappiness,
         )
+        follow_up._get_target_conceptual_space(self, follow_up)
+        follow_up._get_target_structure_one(self, follow_up)
+        return follow_up
 
     def _spawn_potential_sub_frame_to_frame_correspondence_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
@@ -410,8 +401,8 @@ class ViewDrivenFactory(Factory):
             else self.target_view.parent_frame.output_space
         )
         sub_frame = self.target_view.parent_frame.sub_frames.filter(
-            lambda x: x.input_space == self.target_slot.parent_space
-            or x.output_space == self.target_slot.parent_space
+            lambda x: x.input_space in self.target_slot.parent_spaces
+            or x.output_space in self.target_slot.parent_spaces
         ).get()
         self.bubble_chamber.loggers["activity"].log_collection(
             self, self.target_view.node_groups, "node groups"
@@ -461,7 +452,8 @@ class ViewDrivenFactory(Factory):
             self, self.compatible_sub_views, "Compatible sub views"
         )
         views_with_compatible_nodes = self.compatible_sub_views.filter(
-            lambda x: any(
+            lambda x: x.members.is_empty()
+            or any(
                 [
                     self.target_view.can_accept_member(
                         member.parent_concept,
@@ -510,8 +502,8 @@ class ViewDrivenFactory(Factory):
             "Trying to spawn simplex view suggester",
         )
         sub_frame = self.target_view.parent_frame.sub_frames.filter(
-            lambda x: x.input_space == self.target_slot.parent_space
-            or x.output_space == self.target_slot.parent_space
+            lambda x: x.input_space in self.target_slot.parent_spaces
+            or x.output_space in self.target_slot.parent_spaces
         ).get()
         self.bubble_chamber.loggers["activity"].log(
             self, f"Found sub frame: {sub_frame}"
@@ -523,19 +515,6 @@ class ViewDrivenFactory(Factory):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Found target frame: {frame}"
         )
-        prioritized_targets = self.bubble_chamber.new_structure_collection(
-            *[
-                group[contextual_space]
-                for node in sub_frame.input_space.contents
-                for group in self.target_view.node_groups
-                if node in group.values()
-            ]
-            + [
-                correspondence.start
-                for correspondence in self.target_view.members
-                if correspondence.start.parent_space == contextual_space
-            ]
-        )
         prioritized_conceptual_spaces = sub_frame.input_space.conceptual_spaces
         return SimplexViewSuggester.spawn(
             self.codelet_id,
@@ -543,7 +522,6 @@ class ViewDrivenFactory(Factory):
             {
                 "frame": frame,
                 "contextual_space": contextual_space,
-                "prioritized_targets": prioritized_targets,
                 "prioritized_conceptual_spaces": prioritized_conceptual_spaces,
             },
             self.target_view.unhappiness,

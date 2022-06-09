@@ -87,7 +87,8 @@ class FocusUnsetter(Codelet):
             self.result = CodeletResult.FIZZLE
             self._fizzle()
         else:
-            if change_in_satisfaction_score < 0:
+            if transposed_change_in_satisfaction_score <= 0.5:
+                self.bubble_chamber.loggers["activity"].log(self, "Decaying focus")
                 self.bubble_chamber.focus.view.decay_activation(
                     1 - transposed_change_in_satisfaction_score
                 )

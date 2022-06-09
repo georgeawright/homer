@@ -26,7 +26,6 @@ class View(Structure):
         input_spaces: StructureCollection,
         output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
-        prioritized_targets: StructureCollection,
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
@@ -51,7 +50,6 @@ class View(Structure):
         self.members = members
         self.sub_views = sub_views
         self.super_views = super_views
-        self.prioritized_targets = prioritized_targets
         self._node_groups = []
         self._grouped_nodes = {}
         self.matched_sub_frames = {}
@@ -65,18 +63,16 @@ class View(Structure):
             "parent_frame": self.parent_frame.structure_id,
             "parent_frame_name": self.parent_frame.name,
             "frames": [frame.structure_id for frame in self.frames],
+            "super_views": [view.structure_id for view in self.super_views],
             "input_spaces": [space.structure_id for space in self.input_spaces],
             "output_space": self.output_space.structure_id,
-            "prioritized_targets": [
-                structure.structure_id for structure in self.prioritized_targets
-            ],
             "members": [correspondence.structure_id for correspondence in self.members],
             "members_repr": [str(correspondence) for correspondence in self.members],
             "node_groups": [
                 {space.structure_id: node.structure_id for space, node in group.items()}
-                for group in self.node_groups
+                for group in self._node_groups
             ],
-            "grouped_nodes": [node.structure_id for node in self.grouped_nodes],
+            "grouped_nodes": [node.structure_id for node in self._grouped_nodes],
             "matched_sub_frames": {
                 frame_1.structure_id: frame_2.structure_id
                 for frame_1, frame_2 in self.matched_sub_frames.items()
@@ -109,6 +105,40 @@ class View(Structure):
         return self.activation == 0.0
 
     @property
+    def unfilled_sub_frame_input_structures(self):
+        return self.parent_frame.input_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and not x.is_chunk
+            and (
+                len(x.correspondences.where(end=x))
+                < len(x.parent_spaces.where(is_contextual_space=True)) - 1
+            )
+        )
+
+    @property
+    def unfilled_input_structures(self):
+        return self.parent_frame.input_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and not x.is_chunk
+            and x.correspondences.where(end=x).is_empty()
+        )
+
+    @property
+    def unfilled_output_structures(self):
+        return self.parent_frame.output_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and x.parent_space != self.parent_frame.output_space
+            and x.correspondences.where(end=x).is_empty()
+        )
+
+    @property
+    def unfilled_projectable_structures(self):
+        return self.parent_frame.output_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and x.correspondences_to_space(self.output_space).is_empty()
+        )
+
+    @property
     def grouped_nodes(self):
         if self.super_views.is_empty():
             return self._grouped_nodes
@@ -123,10 +153,10 @@ class View(Structure):
     def recalculate_unhappiness(self):
         items_to_process = sum(
             [
-                len(self.parent_frame.uncorresponded_items),
-                len(self.parent_frame.unprojected_items),
-                len(self.parent_frame.sub_frames)
-                - len(self.sub_views.filter(lambda x: x.unhappiness == 0.0)),
+                len(self.unfilled_sub_frame_input_structures),
+                len(self.unfilled_input_structures),
+                len(self.unfilled_output_structures),
+                len(self.unfilled_projectable_structures),
             ]
         )
         self.unhappiness = 1 - 0.5 ** items_to_process
@@ -141,26 +171,29 @@ class View(Structure):
     def add(self, correspondence: "Correspondence"):
         self.members.add(correspondence)
         for node_pair in correspondence.node_pairs:
-            if all(node in self.grouped_nodes for node in node_pair):
+            if all(node in self._grouped_nodes for node in node_pair):
                 continue
-            for node_group in self.node_groups:
+            for node_group in self._node_groups:
                 if (
                     node_group.get(node_pair[0].parent_space) == node_pair[0]
                     or node_group.get(node_pair[1].parent_space) == node_pair[1]
                 ):
                     node_group[node_pair[0].parent_space] = node_pair[0]
                     node_group[node_pair[1].parent_space] = node_pair[1]
-                    self.grouped_nodes[node_pair[0]] = True
-                    self.grouped_nodes[node_pair[1]] = True
-            if node_pair[0] not in self.grouped_nodes:
-                self.node_groups.append(
+                    self._grouped_nodes[node_pair[0]] = True
+                    self._grouped_nodes[node_pair[1]] = True
+            if (
+                node_pair[0] not in self._grouped_nodes
+                or node_pair[1] not in self._grouped_nodes
+            ):
+                self._node_groups.append(
                     {
                         node_pair[0].parent_space: node_pair[0],
                         node_pair[1].parent_space: node_pair[1],
                     }
                 )
-                self.grouped_nodes[node_pair[0]] = True
-                self.grouped_nodes[node_pair[1]] = True
+                self._grouped_nodes[node_pair[0]] = True
+                self._grouped_nodes[node_pair[1]] = True
         if not self.super_views.is_empty():
             self.super_views.get().add(correspondence)
 
@@ -227,7 +260,9 @@ class View(Structure):
                         ):
                             return False
         if not end.correspondences.filter(
-            lambda x: x.end == end and x in self.members
+            lambda x: x.end == end
+            and x in self.members
+            and x.start in start.parent_space.contents
         ).is_empty():
             return False
         potential_node_groups = (

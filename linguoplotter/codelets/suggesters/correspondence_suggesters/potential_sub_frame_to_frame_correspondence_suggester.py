@@ -95,29 +95,6 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     self, f"Target view cannot accept {correspondence}"
                 )
                 return False
-        try:
-            target_structure_zero = (
-                self.target_structure_one.correspondences.filter(
-                    lambda x: x.start.parent_space in self.target_view.input_spaces
-                )
-                .get()
-                .start
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target zero: {target_structure_zero}"
-            )
-            if not self.target_view.can_accept_member(
-                self.parent_concept,
-                self.target_conceptual_space,
-                target_structure_zero,
-                self.target_structure_two,
-            ):
-                self.bubble_chamber.loggers["activity"].log(
-                    self, "View cannot accept correspondence from target zero"
-                )
-                return False
-        except MissingStructureError:
-            pass
         if not self.target_view.can_accept_member(
             self.parent_concept,
             self.target_conceptual_space,

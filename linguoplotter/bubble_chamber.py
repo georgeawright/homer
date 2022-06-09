@@ -165,8 +165,7 @@ class BubbleChamber:
     def collections(self) -> dict:
         return {
             # views
-            MonitoringView: "monitoring_views",
-            SimplexView: "simplex_views",
+            SimplexView: "views",
             # spaces
             ConceptualSpace: "conceptual_spaces",
             ContextualSpace: "contextual_spaces",

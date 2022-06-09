@@ -153,7 +153,12 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             self.bubble_chamber.loggers["activity"].log(
                 self, "Correspondee to target projectee is abstract chunk"
             )
-            return self.target_projectee.correspondees.where_not(name=None).get()
+            node_group = [
+                group
+                for group in self.target_view.node_groups
+                if self.target_projectee in group.values()
+            ][0]
+            return [node for node in node_group.values() if node.name is not None][0]
         if not self.target_projectee.links_in.where(is_relation=True).is_empty():
             self.bubble_chamber.loggers["activity"].log(
                 self, "Abstract chunk is based on relations"

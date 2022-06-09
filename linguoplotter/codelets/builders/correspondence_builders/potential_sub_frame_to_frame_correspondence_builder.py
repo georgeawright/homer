@@ -26,28 +26,6 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                     self, f"{self.target_view} cannot accept {correspondence}"
                 )
                 return False
-        try:
-            target_structure_zero = (
-                self.target_structure_one.correspondences.filter(
-                    lambda x: x.start.parent_space in self.target_view.input_spaces
-                )
-                .get()
-                .start
-            )
-            if not self.target_view.can_accept_member(
-                self.parent_concept,
-                self.target_conceptual_space,
-                target_structure_zero,
-                self.target_structure_two,
-            ):
-                self.bubble_chamber.loggers["activity"].log(
-                    self,
-                    f"{self.target_view} cannot accept correspondence to "
-                    + f"{target_structure_zero}",
-                )
-                return False
-        except MissingStructureError:
-            pass
         return self.target_view.can_accept_member(
             self.parent_concept,
             self.target_conceptual_space,
@@ -102,5 +80,4 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
         )
         self.child_structures.add(sub_frame_correspondence)
         self._structure_concept.instances.add(sub_frame_correspondence)
-        self._add_contextual_space_correspondence()
         self.bubble_chamber.loggers["structure"].log_view(self.target_view)
