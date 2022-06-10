@@ -52,7 +52,7 @@ class ChunkSelector(Selector):
                 {
                     "target_structure_one": winning_chunk,
                 },
-                winning_chunk.activation,
+                winning_chunk.chunking_exigency,
             ),
             ChunkEvaluator.spawn(
                 self.codelet_id,
