@@ -90,6 +90,7 @@ class FocusUnsetter(Codelet):
             if transposed_change_in_satisfaction_score <= 0.5:
                 self.bubble_chamber.loggers["activity"].log(self, "Decaying focus")
                 self.bubble_chamber.focus.view._activation == 0
+                self._update_recycler_urgency()
             self.bubble_chamber.focus.view = None
             self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
             self._engender_follow_up()
@@ -102,6 +103,13 @@ class FocusUnsetter(Codelet):
         for codelet in self.coderack._codelets:
             if "WorldviewSetter" in codelet.codelet_id:
                 codelet.urgency = self.bubble_chamber.focus.satisfaction
+                return
+        raise Exception
+
+    def _update_recycler_urgency(self):
+        for codelet in self.coderack._codelets:
+            if "Recycler" in codelet.codelet_id:
+                codelet.urgency = 1.0
                 return
         raise Exception
 
