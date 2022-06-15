@@ -95,4 +95,4 @@ class ActivityLogger(Logger):
         self.log_collection(codelet, codelet.winners, "Winners")
 
     def log_losers(self, codelet: "Codelet"):
-        self.log_collection(codelet, codelet.challengers, "Losers")
+        self.log_collection(codelet, codelet.losers, "Losers")

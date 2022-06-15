@@ -2,7 +2,7 @@
 (define location-concept
   (def-concept :name "location" :locations (list) :classifier None
     :instance_type Chunk :structure_type Label :parent_space None
-    :distance_function centroid_euclidean_distance :activation 1.0
+    :distance_function shortest_distance :activation 1.0
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define north-south-space
   (def-conceptual-space :name "north-south" :parent_concept location-concept

@@ -102,7 +102,7 @@ class View(Structure):
 
     @property
     def is_recyclable(self) -> bool:
-        return self.activation == 0.0
+        return self.activation == 0.0 and self.super_views.is_empty()
 
     @property
     def unfilled_sub_frame_input_structures(self):
@@ -198,10 +198,22 @@ class View(Structure):
             self.super_views.get().add(correspondence)
 
     def remove(self, correspondence: "Correspondence"):
-        # TODO also need to remove sub frames if correspondence was only link to other frame
         self.members.remove(correspondence)
-        self.grouped_nodes = {}
-        self.node_groups = []
+        for sub_frame, matched_frame in self.matched_sub_frames.items():
+            if (
+                correspondence in matched_frame.input_space.contents
+                or correspondence in matched_frame.output_space.contents
+            ):
+                if self.members.filter(
+                    lambda x: x in matched_frame.input_space.contents
+                    or x in matched_frame.output_space.contents
+                ).is_empty():
+                    sub_view = self.sub_views.where(parent_frame=matched_frame).get()
+                    sub_view.super_views.remove(self)
+                    self.sub_views.remove(sub_view)
+                    self.matched_sub_frames.pop(sub_frame)
+        self._grouped_nodes = {}
+        self._node_groups = []
         for member in self.members:
             self.add(member)
         if not self.super_views.is_empty():

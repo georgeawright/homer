@@ -19,23 +19,32 @@ class ChunkSelector(Selector):
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Champion chunk: {champion_chunk}"
             )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Nearby champion chunk: {champion_chunk.nearby()}"
+            challenger_chunk = (
+                champion_chunk.nearby()
+                .filter(
+                    lambda x: len(
+                        StructureCollection.intersection(
+                            champion_chunk.members, x.members
+                        )
+                    )
+                    > 0.5 * len(champion_chunk.members)
+                    and len(
+                        StructureCollection.intersection(
+                            champion_chunk.members, x.members
+                        )
+                    )
+                    > 0.5 * len(x.members)
+                )
+                .get(key=activation)
             )
-            challenger_chunk = champion_chunk.nearby().get(key=activation)
             self.challengers = self.bubble_chamber.new_structure_collection(
                 challenger_chunk
             )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found challenger: {challenger_chunk}"
+            )
         except MissingStructureError:
-            return True
-        members_intersection = StructureCollection.intersection(
-            champion_chunk.members, challenger_chunk.members
-        )
-        if not (
-            len(members_intersection) > 0.5 * len(champion_chunk.members)
-            and len(members_intersection) > 0.5 * len(challenger_chunk.members)
-        ):
-            self.challengers = None
+            pass
         return True
 
     def _fizzle(self):

@@ -44,6 +44,8 @@ class GarbageCollector(Codelet):
         else:
             target = self.bubble_chamber.recycle_bin.remove_oldest()
             self.bubble_chamber.loggers["activity"].log(self, f"Found target: {target}")
+            if not target.is_recyclable:
+                self.result = CodeletResult.FIZZLE
             for codelet in self.coderack._codelets:
                 if target in codelet.target_structures:
                     self.result = CodeletResult.FIZZLE

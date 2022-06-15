@@ -131,7 +131,8 @@ class Chunk(Node):
     @property
     def is_recyclable(self) -> bool:
         return (
-            self.parent_space is not None
+            not self.is_raw
+            and self.parent_space is not None
             and self.parent_space.is_main_input
             and self.activation == 0.0
             and self.links.is_empty()
@@ -151,7 +152,9 @@ class Chunk(Node):
                     is_chunk=True, parent_space=self.parent_space
                 ).near(location)
                 for location in self.locations
-                if location.space.is_conceptual_space and location.space.is_basic_level
+                if location.space.is_conceptual_space
+                and location.space.is_basic_level
+                and location.space.name != "size"
             ]
         ).excluding(self)
 

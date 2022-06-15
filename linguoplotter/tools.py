@@ -3,6 +3,11 @@ import statistics
 from typing import Iterable, List, Union
 
 
+def shortest_distance(a, b) -> float:
+    distance = min([math.dist(a_point, b_point) for a_point in a for b_point in b])
+    return distance if not math.isnan(distance) else 0
+
+
 def centroid_euclidean_distance(a, b) -> float:
     if len(a) == len(b) == 0:
         # TODO: possibly get rid of this if statment

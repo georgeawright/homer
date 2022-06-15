@@ -95,7 +95,7 @@ class BubbleChamber:
     def input_spaces(self) -> StructureCollection:
         return StructureCollection.union(
             *[view.input_spaces for view in self.production_views],
-            self.contextual_spaces.where(is_main_input=True)
+            self.contextual_spaces.where(is_main_input=True),
         )
 
     @property
@@ -230,10 +230,11 @@ class BubbleChamber:
                 self.remove(frame)
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
+            for super_view in item.super_views:
+                super_view.sub_views.remove(item)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
         if item.is_correspondence:
-            return
             item.parent_view.remove(item)
         if item.is_link:
             for argument in item.arguments:
