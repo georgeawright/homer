@@ -63,9 +63,6 @@
 (define letter-chunk-concept
   (def-concept :name "letter-chunk" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
-(define view-monitoring-concept
-  (def-concept :name "view-monitoring" :locations (list (Location (list) structure-space))
-    :parent_space structure-space))
 (define view-simplex-concept
   (def-concept :name "view-simplex" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
@@ -76,7 +73,6 @@
 (def-relation :start suggest-concept :end letter-chunk-concept)
 (def-relation :start suggest-concept :end relation-concept)
 (def-relation :start suggest-concept :end view-simplex-concept)
-(def-relation :start suggest-concept :end view-monitoring-concept)
 
 (def-relation :start build-concept :end chunk-concept)
 (def-relation :start build-concept :end correspondence-concept)
@@ -84,7 +80,6 @@
 (def-relation :start build-concept :end letter-chunk-concept)
 (def-relation :start build-concept :end relation-concept)
 (def-relation :start build-concept :end view-simplex-concept)
-(def-relation :start build-concept :end view-monitoring-concept)
 
 (def-relation :start evaluate-concept :end chunk-concept)
 (def-relation :start evaluate-concept :end correspondence-concept)
@@ -92,7 +87,6 @@
 (def-relation :start evaluate-concept :end letter-chunk-concept)
 (def-relation :start evaluate-concept :end relation-concept)
 (def-relation :start evaluate-concept :end view-simplex-concept)
-(def-relation :start evaluate-concept :end view-monitoring-concept)
 
 (def-relation :start select-concept :end chunk-concept)
 (def-relation :start select-concept :end correspondence-concept)
@@ -100,7 +94,6 @@
 (def-relation :start select-concept :end letter-chunk-concept)
 (def-relation :start select-concept :end relation-concept)
 (def-relation :start select-concept :end view-simplex-concept)
-(def-relation :start select-concept :end view-monitoring-concept)
 
 (def-relation :start inner-concept :end outer-concept)
 
@@ -144,6 +137,3 @@
   :is_bidirectional False :activation 0.2)
 (def-relation :start correspondence-concept :end relation-concept
   :is_bidirectional False :activation 0.2)
-(def-relation :start correspondence-concept :end view-monitoring-concept
-  :activation 0.2)
-

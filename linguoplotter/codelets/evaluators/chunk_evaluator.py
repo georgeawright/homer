@@ -1,5 +1,5 @@
-from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
+from linguoplotter.classifiers import SamenessClassifier
 from linguoplotter.codelets.evaluator import Evaluator
 
 
@@ -29,19 +29,14 @@ class ChunkEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_chunk = self.target_structures.where(is_slot=False).get()
-        classifications = [
-            target_chunk.rule.left_concept.classifier.classify(
-                collection=target_chunk.left_branch.where(is_slot=False),
-                concept=target_chunk.rule.left_concept,
+        target_chunk = self.target_structures.get()
+        self.confidence = SamenessClassifier().classify(
+            collection=target_chunk.members,
+            concept=self.bubble_chamber.concepts["same"],
+            spaces=target_chunk.parent_spaces.filter(
+                lambda x: x.is_conceptual_space
+                and x.is_basic_level
+                and x.name != "size"
             ),
-        ]
-        if target_chunk.rule.right_concept is not None:
-            classifications.append(
-                target_chunk.rule.right_concept.classifier.classify(
-                    collection=target_chunk.right_branch.where(is_slot=False),
-                    concept=target_chunk.rule.right_concept,
-                ),
-            )
-        self.confidence = fuzzy.AND(*classifications)
+        )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

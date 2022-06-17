@@ -20,6 +20,7 @@ class ProjectionBuilder(Builder):
         self.target_correspondence = target_structures.get("target_correspondence")
         self.frame_correspondee = target_structures.get("frame_correspondee")
         self.non_frame_correspondee = target_structures.get("non_frame_correspondee")
+        self._target_structures = target_structures
 
     @classmethod
     def get_follow_up_class(cls) -> type:

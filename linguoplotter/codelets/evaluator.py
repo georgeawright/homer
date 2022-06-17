@@ -20,9 +20,8 @@ class Evaluator(Codelet):
         target_structures: StructureCollection,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
-        self.target_structures = target_structures
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        self._target_structures = target_structures
         self.original_confidence = target_structures.get().quality
         self.confidence = 0
         self.change_in_confidence = 0
@@ -79,6 +78,10 @@ class Evaluator(Codelet):
     @property
     def _parent_link(self):
         raise NotImplementedError
+
+    @property
+    def target_structures(self) -> StructureCollection:
+        return self._target_structures
 
     def _boost_activations(self):
         self._evaluate_concept.boost_activation(1)

@@ -10,7 +10,7 @@
 (load "conceptual-spaces/location.lisp")
 
 (load "frames/ap-jj.lisp")
-(load "frames/np-nn.lisp")
+(load "frames/np-nn-loc.lisp")
 (load "frames/rp-jjr.lisp")
 (load "frames/s-ap-in-np.lisp")
 (load "frames/s-comparative.lisp")

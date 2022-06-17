@@ -29,6 +29,7 @@ class Correspondence(Link):
         parent_spaces: StructureCollection,
         is_privileged: bool = False,
         is_bidirectional: bool = True,
+        is_excitatory: bool = True,
     ):
         Link.__init__(
             self,
@@ -48,6 +49,7 @@ class Correspondence(Link):
         self.parent_view = parent_view
         self.is_privileged = is_privileged
         self.is_bidirectional = is_bidirectional
+        self.is_excitatory = is_excitatory
         self.is_correspondence = True
 
     def __dict__(self) -> dict:
@@ -129,6 +131,13 @@ class Correspondence(Link):
 
     def common_arguments_with(self, other: Correspondence) -> StructureCollection:
         return StructureCollection.intersection(self.arguments, other.arguments)
+
+    def spread_activation(self):
+        if not self.is_fully_active:
+            return
+        Link.spread_activation(self)
+        if self.parent_view is not None:
+            self.parent_view.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         return (

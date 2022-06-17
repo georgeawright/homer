@@ -18,8 +18,7 @@ class Selector(Codelet):
         urgency: FloatBetweenOneAndZero,
         challengers: StructureCollection = None,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.champions = champions
         self.challengers = challengers
         self.winners = None
@@ -126,6 +125,16 @@ class Selector(Codelet):
     @property
     def _structure_concept(self):
         raise NotImplementedError
+
+    @property
+    def target_structures(self):
+        structures = self.bubble_chamber.new_structure_collection()
+        for champion in self.champions:
+            structures.add(champion)
+        if self.challengers is not None:
+            for challenger in self.challengers:
+                structures.add(challenger)
+        return structures
 
     @property
     def _champions_size(self):

@@ -55,6 +55,66 @@
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-allative-concept
+  (def-concept :name "pp-allative" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-allative-time-concept
+  (def-concept :name "pp-allative-time" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-allative-location-concept
+  (def-concept :name "pp-allative-location" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-ablative-concept
+  (def-concept :name "pp-ablative" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-ablative-time-concept
+  (def-concept :name "pp-ablative-time" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-ablative-location-concept
+  (def-concept :name "pp-ablative-location" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-directional-concept
+  (def-concept :name "pp-directional" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-directional-time-concept
+  (def-concept :name "pp-directional-time" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-directional-location-concept
+  (def-concept :name "pp-directional-location" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-inessive-concept
+  (def-concept :name "pp-inessive" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-inessive-time-concept
+  (def-concept :name "pp-inessive-time" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-inessive-location-concept
+  (def-concept :name "pp-inessive-location" :locations (list pp-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
 (define nn-concept
   (def-concept :name "nn" :locations (list nn-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
@@ -129,6 +189,15 @@
 (define in
   (def-letter-chunk :name "in" :parent_space grammar-space
     :locations (list prep-location)))
+(define on
+  (def-letter-chunk :name "on" :parent_space grammar-space
+    :locations (list prep-location)))
+(define from
+  (def-letter-chunk :name "from" :parent_space grammar-space
+    :locations (list prep-location)))
+(define to
+  (def-letter-chunk :name "to" :parent_space grammar-space
+    :locations (list prep-location)))
 (define than
   (def-letter-chunk :name "than" :parent_space grammar-space
     :locations (list prep-location)))
@@ -137,6 +206,9 @@
     :locations (list conj-location)))
 (define but
   (def-letter-chunk :name "but" :parent_space grammar-space
+    :locations (list conj-location)))
+(define then
+  (def-letter-chunk :name "then" :parent_space grammar-space
     :locations (list conj-location)))
 (define comma
   (def-letter-chunk :name "comma" :parent_space grammar-space

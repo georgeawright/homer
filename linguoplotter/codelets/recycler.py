@@ -19,8 +19,7 @@ class Recycler(Codelet):
         coderack: "Coderack",
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.coderack = coderack
 
     @classmethod
@@ -42,6 +41,23 @@ class Recycler(Codelet):
 
     def run(self) -> CodeletResult:
         try:
+            target = self.bubble_chamber.structures.filter(
+                lambda x: x.is_recyclable and x not in self.bubble_chamber.recycle_bin
+            ).get()
+            self.bubble_chamber.loggers["activity"].log(self, f"Found target: {target}")
+            self.bubble_chamber.recycle_bin.add(target)
+            self.result = CodeletResult.FINISH
+        except MissingStructureError:
+            self.bubble_chamber.loggers["activity"].log(self, "Couldn't find target")
+            self.result = CodeletResult.FIZZLE
+        self._engender_follow_up()
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
+        self.bubble_chamber.loggers["activity"].log_result(self)
+        return self.result
+
+        """
+    def run(self) -> CodeletResult:
+        try:
             target_view = self.bubble_chamber.views.filter(
                 lambda x: x.activation == 0.0
                 and x not in self.bubble_chamber.recycle_bin
@@ -55,8 +71,10 @@ class Recycler(Codelet):
             self.bubble_chamber.loggers["activity"].log(self, f"No target view")
             self.result = CodeletResult.FIZZLE
         self._engender_follow_up()
+        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
+        """
 
     def _engender_follow_up(self):
         urgency = max(

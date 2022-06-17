@@ -34,6 +34,7 @@ class Space(Structure):
         self._parent_concept = parent_concept
         self.contents = contents
         self.is_space = True
+        self.is_main_input = False
 
     def is_compatible_with(self, other: Space) -> bool:
         return self.parent_concept.is_compatible_with(other.parent_concept)

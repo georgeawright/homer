@@ -80,13 +80,24 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 frame_two = [
                     frame
                     for frame in self.target_view.matched_sub_frames
-                    if self.target_space_two == frame.input_space
-                    or self.target_space_two == frame.output_space
+                    if (
+                        frame.input_space in self.target_structure_two.parent_spaces
+                        and not self.target_structure_two.has_correspondence_to_space(
+                            frame.input_space
+                        )
+                    )
+                    or (
+                        frame.output_space in self.target_structure_two.parent_spaces
+                        and not self.target_structure_two.has_correspondence_to_space(
+                            frame.output_space
+                        )
+                    )
                 ][0]
                 frame_one = self.target_view.matched_sub_frames[frame_two]
                 self.target_space_one = (
                     frame_one.input_space
-                    if self.target_space_two == frame_two.input_space
+                    if frame_one.input_space.parent_concept
+                    == self.target_space_two.parent_concept
                     else frame_one.output_space
                 )
                 self.bubble_chamber.loggers["activity"].log(
@@ -97,23 +108,6 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         except MissingStructureError:
             return False
         self.parent_concept = self.bubble_chamber.concepts["same"]
-        try:
-            target_structure_zero = (
-                self.target_structure_one.correspondences.filter(
-                    lambda x: x.start.parent_space in self.target_view.input_spaces
-                )
-                .get()
-                .start
-            )
-            if not self.target_view.can_accept_member(
-                self.parent_concept,
-                self.target_conceptual_space,
-                target_structure_zero,
-                self.target_structure_two,
-            ):
-                return False
-        except MissingStructureError:
-            pass
         can_accept = self.target_view.can_accept_member(
             self.parent_concept,
             self.target_conceptual_space,

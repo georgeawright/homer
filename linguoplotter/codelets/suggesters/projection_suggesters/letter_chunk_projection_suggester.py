@@ -49,15 +49,29 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
 
     def _passes_preliminary_checks(self) -> bool:
         if self.target_projectee.is_slot:
-            no_of_parent_spaces = len(
-                self.target_projectee.parent_spaces.where(is_contextual_space=True)
-            )
-            no_of_correspondences = len(self.target_projectee.correspondences)
-            if no_of_parent_spaces > 1 and no_of_correspondences < 1:
+            if (
+                len(self.target_projectee.parent_spaces.where(is_contextual_space=True))
+                > 1
+                and self.target_projectee.correspondences.is_empty()
+            ):
                 self.bubble_chamber.loggers["activity"].log(
-                    self, "Not enough correspondences to target projectee"
+                    self, "mismatch between parent spaces and correspondences"
                 )
                 return False
+            try:
+                node_group = [
+                    group
+                    for group in self.target_view.node_groups
+                    if self.target_projectee in group.values()
+                ][0]
+                nodes_with_name = [node for node in node_group if node.name is not None]
+                if len(nodes_with_name) == 0:
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, "No correspondees with name"
+                    )
+                    return False
+            except IndexError:
+                pass
             for label in self.target_projectee.labels:
                 parent_concept = label.parent_concept
                 if parent_concept.is_slot and not parent_concept.is_filled_in:

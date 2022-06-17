@@ -21,10 +21,10 @@ loggers = {
     "structure": StructureLogger(f"{structure_logs_dir_path}"),
     "errors": ErrorLogger(error_stream),
 }
-narrator = Linguoplotter.setup(loggers, random_seed=1)
+narrator = Linguoplotter.setup(loggers, random_seed=3)
 narrator.interpreter.interpret_file("builtin.lisp")
 
 os.chdir("example-programs/weather")
-narrator.interpreter.interpret_file("description.lisp")
+narrator.interpreter.interpret_file("narration-5-change-in-size.lisp")
 os.chdir("../..")
 narrator.run()

@@ -62,7 +62,9 @@ class CorrespondenceSuggester(Suggester):
         if target_view is None:
             raise MissingStructureError
         input_structures = target_view.parent_frame.input_space.contents.filter(
-            lambda x: not x.is_correspondence and x.correspondences.is_empty()
+            lambda x: not x.is_correspondence
+            and len(x.correspondences.where(end=x))
+            < len(x.parent_spaces.where(is_contextual_space=True)) - 1
         )
         output_structures = target_view.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
@@ -189,41 +191,7 @@ class CorrespondenceSuggester(Suggester):
 
     @staticmethod
     def _get_target_structure_one(calling_codelet, correspondence_suggester):
-        bubble_chamber = calling_codelet.bubble_chamber
-        bubble_chamber.loggers["activity"].log_collection(
-            calling_codelet,
-            correspondence_suggester.target_view.prioritized_targets,
-            "prioritized targets",
-        )
-        if not correspondence_suggester.target_view.prioritized_targets.where(
-            parent_space=correspondence_suggester.target_space_one
-        ).is_empty():
-            bubble_chamber.loggers["activity"].log(
-                calling_codelet,
-                f"Attempting to find target structure one from priortitized targets",
-            )
-            CorrespondenceSuggester._get_target_structure_one_from_collection(
-                calling_codelet,
-                correspondence_suggester,
-                correspondence_suggester.target_view.prioritized_targets,
-            )
-        else:
-            bubble_chamber.loggers["activity"].log(
-                calling_codelet,
-                f"Attempting to find target structure one from target space one",
-            )
-            CorrespondenceSuggester._get_target_structure_one_from_collection(
-                calling_codelet,
-                correspondence_suggester,
-                correspondence_suggester.target_space_one.contents,
-            )
-
-    @staticmethod
-    def _get_target_structure_one_from_collection(
-        calling_codelet, correspondence_suggester, source_collection
-    ):
-        if source_collection.is_empty():
-            raise MissingStructureError
+        source_collection = correspondence_suggester.target_space_one.contents
         if (
             correspondence_suggester.target_structure_two.is_label
             and correspondence_suggester.target_structure_two.start.is_label
@@ -253,6 +221,11 @@ class CorrespondenceSuggester(Suggester):
                 correspondence_suggester.target_structure_two.start
                 in correspondence_suggester.target_view.grouped_nodes
             ):
+                calling_codelet.bubble_chamber.loggers["activity"].log_collection(
+                    calling_codelet,
+                    correspondence_suggester.target_view.node_groups,
+                    "node groups",
+                )
                 start_node_group = [
                     group
                     for group in correspondence_suggester.target_view.node_groups
@@ -283,6 +256,10 @@ class CorrespondenceSuggester(Suggester):
                 parent_view=correspondence_suggester.target_view,
                 end=correspondence_suggester.target_structure_two.start,
             ).is_empty():
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet,
+                    "Searching for target structure one via correspondences",
+                )
                 correspondence_suggester.target_structure_one = (
                     correspondence_suggester.target_structure_two.start.correspondences.where(
                         parent_view=correspondence_suggester.target_view,
@@ -296,10 +273,11 @@ class CorrespondenceSuggester(Suggester):
                     .get()
                 )
             else:
-                source_collection_labels = StructureCollection.union(
-                    *[item.labels for item in source_collection]
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet,
+                    "Searching for target structure one via source collection",
                 )
-                correspondence_suggester.target_structure_one = source_collection_labels.filter(
+                correspondence_suggester.target_structure_one = source_collection.filter(
                     lambda x: x.is_label
                     and (
                         (x.start == structure_one_start)
@@ -356,28 +334,25 @@ class CorrespondenceSuggester(Suggester):
             calling_codelet.bubble_chamber.loggers["activity"].log(
                 calling_codelet, correspondence_suggester.target_conceptual_space
             )
+            matching_relations = source_collection.filter(
+                lambda x: x.is_relation
+                and (x.start == structure_one_start or structure_one_start is None)
+                and (x.end == structure_one_end or structure_one_end is None)
+                and (
+                    x.parent_concept
+                    == correspondence_suggester.target_structure_two.parent_concept
+                    or correspondence_suggester.target_structure_two.parent_concept.is_slot
+                )
+                and x.conceptual_space
+                == correspondence_suggester.target_conceptual_space
+            )
             calling_codelet.bubble_chamber.loggers["activity"].log_collection(
                 calling_codelet,
-                source_collection.filter(
-                    lambda x: x.is_relation
-                    and (x.start == structure_one_start or structure_one_start is None)
-                    and (x.end == structure_one_end or structure_one_end is None)
-                    and x.conceptual_space
-                    == correspondence_suggester.target_conceptual_space
-                ),
+                matching_relations,
                 "matching input relations",
             )
-            source_collection_relations = StructureCollection.union(
-                *[item.relations for item in source_collection]
-            )
-            correspondence_suggester.target_structure_one = (
-                source_collection_relations.filter(
-                    lambda x: x.is_relation
-                    and (x.start == structure_one_start or structure_one_start is None)
-                    and (x.end == structure_one_end or structure_one_end is None)
-                    and x.conceptual_space
-                    == correspondence_suggester.target_conceptual_space
-                ).get(key=corresponding_exigency)
+            correspondence_suggester.target_structure_one = matching_relations.get(
+                key=corresponding_exigency
             )
         if (
             correspondence_suggester.target_structure_two.is_node

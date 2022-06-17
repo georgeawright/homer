@@ -153,8 +153,12 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             self.bubble_chamber.loggers["activity"].log(
                 self, "Correspondee to target projectee is abstract chunk"
             )
-            # TODO: below causes problem
-            return self.target_projectee.correspondees.where_not(name=None).get()
+            node_group = [
+                group
+                for group in self.target_view.node_groups
+                if self.target_projectee in group.values()
+            ][0]
+            return [node for node in node_group.values() if node.name is not None][0]
         if not self.target_projectee.links_in.where(is_relation=True).is_empty():
             self.bubble_chamber.loggers["activity"].log(
                 self, "Abstract chunk is based on relations"
@@ -186,7 +190,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         grammar_concept = (
             grammar_label.parent_concept
             if not grammar_label.parent_concept.is_slot
-            else grammar_label.parent_concept.relatives.where(is_slot=False).get()
+            else grammar_label.parent_concept.non_slot_value
         )
         meaning_label = self.target_projectee.labels.filter(
             lambda x: x.parent_concept.parent_space
@@ -198,7 +202,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         meaning_concept = (
             meaning_label.parent_concept
             if not meaning_label.parent_concept.is_slot
-            else meaning_label.parent_concept.relatives.where(is_slot=False).get()
+            else meaning_label.parent_concept.non_slot_value
         )
         self.bubble_chamber.loggers["activity"].log(
             self, f"Meaning concept: {meaning_concept}"

@@ -4,7 +4,7 @@ from . import classifiers
 from . import structures
 from .location import Location
 from .locations import TwoPointLocation
-from .tools import boolean_distance, centroid_euclidean_distance
+from .tools import boolean_distance, centroid_euclidean_distance, shortest_distance
 
 # strings can't contain spaces. '~' is used to represent a space
 
@@ -28,6 +28,7 @@ class Interpreter:
             # Distance Functions
             "boolean_distance": boolean_distance,
             "centroid_euclidean_distance": centroid_euclidean_distance,
+            "shortest_distance": shortest_distance,
             # Structure Factory Methods
             "def-conceptual-space": bubble_chamber.new_conceptual_space,
             "def-contextual-space": bubble_chamber.new_contextual_space,
@@ -37,7 +38,6 @@ class Interpreter:
             "def-concept": bubble_chamber.new_concept,
             "def-letter-chunk": bubble_chamber.new_letter_chunk,
             "def-link-or-node": bubble_chamber.new_link_or_node,
-            "def-rule": bubble_chamber.new_rule,
             "def-correspondence": bubble_chamber.new_correspondence,
             "def-label": bubble_chamber.new_label,
             "def-relation": bubble_chamber.new_relation,

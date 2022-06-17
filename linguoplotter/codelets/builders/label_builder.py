@@ -19,6 +19,7 @@ class LabelBuilder(Builder):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_node = target_structures.get("target_node")
         self.parent_concept = target_structures.get("parent_concept")
+        self._target_structures = target_structures
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -55,9 +56,23 @@ class LabelBuilder(Builder):
         }
 
     def _passes_preliminary_checks(self):
-        return not self.target_node.has_label(self.parent_concept)
+        try:
+            equivalent_label = self.target_node.labels.where(
+                parent_concept=self.parent_concept
+            ).get()
+            while equivalent_label.is_label:
+                self.child_structures.add(equivalent_label)
+                equivalent_label = equivalent_label.start
+        except MissingStructureError:
+            pass
+        return True
 
     def _process_structure(self):
+        if not self.child_structures.is_empty():
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Equivalent label already exists"
+            )
+            return
         try:
             conceptual_location = self.target_node.location_in_space(
                 self.parent_concept.parent_space
@@ -151,12 +166,12 @@ class LabelBuilder(Builder):
         item_to_copy = self.target_node
         while item_to_copy.start.is_link:
             item_to_copy = item_to_copy.start
-        previous_item = item_to_copy.start
+        previous_item = item_to_copy
         while item_to_copy is not None:
             previous_item = item_to_copy.copy(
                 bubble_chamber=self.bubble_chamber,
                 parent_id=self.codelet_id,
-                start=previous_item,
+                start=previous_item.start,
             )
             self.child_structures.add(previous_item)
             try:

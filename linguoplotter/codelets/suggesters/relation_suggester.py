@@ -154,12 +154,7 @@ class RelationSuggester(Suggester):
                 )
             except MissingStructureError:
                 return False
-        return self.target_structure_one.relations.where(
-            conceptual_space=self.target_space,
-            parent_concept=self.parent_concept,
-            start=self.target_structure_one,
-            end=self.target_structure_two,
-        ).is_empty()
+        return True
 
     def _calculate_confidence(self):
         self.confidence = (

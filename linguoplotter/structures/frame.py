@@ -92,10 +92,12 @@ class Frame(Structure):
     @property
     def uncorresponded_items(self) -> StructureCollection:
         return StructureCollection.union(
-            self.input_space.contents.filter(lambda x: x.correspondences.is_empty()),
+            self.input_space.contents.filter(
+                lambda x: x.correspondences.where(end=x).is_empty()
+            ),
             self.output_space.contents.filter(
                 lambda x: x.parent_space != self.output_space
-                and x.correspondences.is_empty()
+                and x.correspondences.where(start=x).is_empty()
             ),
         ).where(is_correspondence=False, is_link_or_node=False)
 
@@ -264,9 +266,15 @@ class Frame(Structure):
         if not self.is_fully_active():
             return
         for link in self.links_out.where(is_label=False):
-            link.end.boost_activation(link.activation)
+            if link.is_excitatory:
+                link.end.boost_activation(link.activation)
+            else:
+                link.decay.boost_activation(link.activation)
         for link in self.links_in.where(is_bidirectional=True):
-            link.start.boost_activation(link.activation)
+            if link.is_excitatory:
+                link.start.boost_activation(link.activation)
+            else:
+                link.start.decay_activation(link.activation)
         for instance in self.instances:
             instance.boost_activation()
         if self.parent_frame is not None:

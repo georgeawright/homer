@@ -63,7 +63,6 @@ class Structure(ABC):
         self.is_concept = False
         self.is_chunk = False
         self.is_letter_chunk = False
-        self.is_rule = False
         self.is_link = False
         self.is_correspondence = False
         self.is_label = False
@@ -125,6 +124,10 @@ class Structure(ABC):
 
     @property
     def is_slot(self) -> bool:
+        return False
+
+    @property
+    def is_recyclable(self) -> bool:
         return False
 
     def recalculate_exigency(self):

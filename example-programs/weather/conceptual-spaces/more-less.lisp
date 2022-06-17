@@ -22,3 +22,11 @@
 (define less-word (def-letter-chunk :name "less" :locations (list)))
 (def-relation :start less-concept :end less-word :parent_concept jj-concept)
 
+(define increase-word
+  (def-letter-chunk :name "increase" :parent_space grammar-space
+    :locations (list vb-location)))
+(def-relation :start more-concept :end increase-word :parent_concept vb-concept)
+(define decrease-word
+  (def-letter-chunk :name "decrease" :parent_space grammar-space
+    :locations (list vb-location)))
+(def-relation :start less-concept :end decrease-word :parent_concept vb-concept)

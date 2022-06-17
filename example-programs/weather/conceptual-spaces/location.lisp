@@ -1,7 +1,9 @@
+(define location-dist-to-prox-weight 2)
 (define location-concept
   (def-concept :name "location" :locations (list) :classifier None
     :instance_type Chunk :structure_type Label :parent_space None
-    :distance_function centroid_euclidean_distance :activation 1.0))
+    :distance_function shortest_distance :activation 1.0
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define north-south-space
   (def-conceptual-space :name "north-south" :parent_concept location-concept
     :no_of_dimensions 1
@@ -39,41 +41,50 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define north-concept
   (def-concept :name "north" :locations (list (Location (list (list 0 4)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space location-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define south-concept
   (def-concept :name "south" :locations (list (Location (list (list 10 4)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space location-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define west-concept
   (def-concept :name "west" :locations (list (Location (list (list 5 0)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space location-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define east-concept
   (def-concept :name "east" :locations (list (Location (list (list 5 8)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space location-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define northwest-concept
   (def-concept :name "northwest" :locations (list (Location (list (list 0 0)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space location-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define northeast-concept
   (def-concept :name "northeast" :locations (list (Location (list (list 0 8)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space location-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define southwest-concept
   (def-concept :name "southwest" :locations (list (Location (list (list 10 0)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space location-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define southeast-concept
   (def-concept :name "southeast" :locations (list (Location (list (list 10 8)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function centroid_euclidean_distance))
+    :parent_space location-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 (define central-concept
   (def-concept :name "central"
     :locations (list (Location (list (list 5 4)) location-space)
 		     (Location (list (list 0)) peripheralness-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space peripheralness-space :distance_function centroid_euclidean_distance))
+    :parent_space peripheralness-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 
 (define north-word
   (def-letter-chunk :name "north" :parent_space location-space
@@ -134,3 +145,11 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   :parent_concept location-concept :quality 1.0)
 (def-relation :start southwest-concept :end northeast-concept
   :parent_concept location-concept :quality 1.0)
+(def-relation :start northwest-concept :end north-concept :is_excitatory False :quality 1.0)
+(def-relation :start northwest-concept :end west-concept :is_excitatory False :quality 1.0)
+(def-relation :start northeast-concept :end north-concept :is_excitatory False :quality 1.0)
+(def-relation :start northeast-concept :end east-concept :is_excitatory False :quality 1.0)
+(def-relation :start southwest-concept :end south-concept :is_excitatory False :quality 1.0)
+(def-relation :start southwest-concept :end west-concept :is_excitatory False :quality 1.0)
+(def-relation :start southeast-concept :end south-concept :is_excitatory False :quality 1.0)
+(def-relation :start southeast-concept :end east-concept :is_excitatory False :quality 1.0)

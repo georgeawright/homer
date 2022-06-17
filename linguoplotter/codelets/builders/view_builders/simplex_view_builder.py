@@ -22,7 +22,6 @@ class SimplexViewBuilder(ViewBuilder):
         self.frame = target_structures.get("frame")
         self.contextual_space = target_structures.get("contextual_space")
         self.conceptual_spaces_map = target_structures.get("conceptual_spaces_map")
-        self.prioritized_targets = target_structures.get("prioritized_targets")
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -41,7 +40,6 @@ class SimplexViewBuilder(ViewBuilder):
         return {
             "frame": self.frame,
             "contextual_space": self.contextual_space,
-            "prioritized_targets": self.prioritized_targets,
         }
 
     def _process_structure(self):
@@ -90,10 +88,11 @@ class SimplexViewBuilder(ViewBuilder):
             ),
             output_space=view_output,
             quality=0,
-            prioritized_targets=self.prioritized_targets,
             links_in=self.bubble_chamber.new_structure_collection(),
             links_out=self.bubble_chamber.new_structure_collection(),
             parent_spaces=self.bubble_chamber.new_structure_collection(),
+            sub_views=self.bubble_chamber.new_structure_collection(),
+            super_views=self.bubble_chamber.new_structure_collection(),
         )
         self.bubble_chamber.loggers["structure"].log(view_output)
         self.bubble_chamber.contextual_spaces.add(view_output)

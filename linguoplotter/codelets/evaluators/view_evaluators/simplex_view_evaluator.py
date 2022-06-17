@@ -40,7 +40,10 @@ class SimplexViewEvaluator(ViewEvaluator):
                     if member.start.parent_space.is_main_input
                 ]
             )
-            if len(target_view.members) > 0
+            if len(
+                target_view.members.filter(lambda x: x.start.parent_space.is_main_input)
+            )
+            > 0
             else 0
         )
         self.bubble_chamber.loggers["activity"].log(

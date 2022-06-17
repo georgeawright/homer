@@ -19,9 +19,6 @@ def test_size_no_members(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
     )
     assert chunk.size == 1
 
@@ -42,9 +39,6 @@ def test_size_recursive(bubble_chamber):
                 Mock(),
                 Mock(),
                 Mock(),
-                Mock(),
-                Mock(),
-                Mock(),
             )
         )
     chunk = Chunk(
@@ -52,9 +46,6 @@ def test_size_recursive(bubble_chamber):
         Mock(),
         Mock(),
         members,
-        Mock(),
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -83,9 +74,6 @@ def test_location_in_space():
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
     )
     assert chunk.location_in_space(space_1) == space_1_location
     assert chunk.location_in_space(space_2) == space_2_location
@@ -97,9 +85,6 @@ def test_raw_members(bubble_chamber):
         "",
         [],
         bubble_chamber.new_structure_collection(),
-        Mock(),
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -119,9 +104,6 @@ def test_raw_members(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
         is_raw=True,
     )
     raw_chunk_3 = Chunk(
@@ -129,9 +111,6 @@ def test_raw_members(bubble_chamber):
         "",
         [],
         bubble_chamber.new_structure_collection(),
-        Mock(),
-        Mock(),
-        Mock(),
         Mock(),
         Mock(),
         Mock(),
@@ -151,13 +130,10 @@ def test_raw_members(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
         is_raw=True,
     )
 
-    left_chunk = Chunk(
+    super_chunk_1 = Chunk(
         "",
         "",
         [],
@@ -169,10 +145,8 @@ def test_raw_members(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
     )
-    right_chunk = Chunk(
+    super_chunk_2 = Chunk(
         "",
         "",
         [],
@@ -184,36 +158,13 @@ def test_raw_members(bubble_chamber):
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
-    )
-    root_chunk = Chunk(
-        "",
-        "",
-        [],
-        bubble_chamber.new_structure_collection(left_chunk, right_chunk),
-        Mock(),
-        Mock(),
-        bubble_chamber.new_structure_collection(left_chunk),
-        bubble_chamber.new_structure_collection(right_chunk),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
     )
 
     assert (
         bubble_chamber.new_structure_collection(raw_chunk_1, raw_chunk_2)
-        == left_chunk.raw_members
+        == super_chunk_1.raw_members
     )
     assert (
         bubble_chamber.new_structure_collection(raw_chunk_3, raw_chunk_4)
-        == right_chunk.raw_members
-    )
-    assert (
-        bubble_chamber.new_structure_collection(
-            raw_chunk_1, raw_chunk_2, raw_chunk_3, raw_chunk_4
-        )
-        == root_chunk.raw_members
+        == super_chunk_2.raw_members
     )

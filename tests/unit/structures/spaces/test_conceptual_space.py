@@ -117,9 +117,6 @@ def test_add(
         Mock(),
         Mock(),
         Mock(),
-        Mock(),
-        Mock(),
-        Mock(),
     )
     location_space.add(chunk)
 

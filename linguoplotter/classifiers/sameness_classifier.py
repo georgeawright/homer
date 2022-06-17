@@ -8,26 +8,28 @@ class SamenessClassifier(Classifier):
     def classify(self, **kwargs: dict) -> FloatBetweenOneAndZero:
         """
         Required: ('start' AND 'end') OR 'collection'
-        Optional: 'space'
+        Optional: 'space', 'spaces'
         """
         start = kwargs.get("start")
         end = kwargs.get("end")
         collection = kwargs.get("collection")
+        spaces = kwargs.get("spaces")
         space = kwargs.get("space")
 
         collection = list(collection) if collection is not None else [start, end]
-        spaces = (
-            StructureCollection.union(
-                *[
-                    item.parent_spaces.where(
-                        is_conceptual_space=True, is_basic_level=True
-                    )
-                    for item in collection
-                ]
+        if spaces is None:
+            spaces = (
+                StructureCollection.union(
+                    *[
+                        item.parent_spaces.where(
+                            is_conceptual_space=True, is_basic_level=True
+                        )
+                        for item in collection
+                    ]
+                )
+                if space is None
+                else [space]
             )
-            if space is None
-            else [space]
-        )
         distinct_pairs = [
             (collection[i], collection[j])
             for i in range(len(collection))

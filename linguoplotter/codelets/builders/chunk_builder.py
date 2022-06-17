@@ -16,17 +16,14 @@ class ChunkBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: StructureCollection,
+        target_structures: dict,
         urgency: FloatBetweenOneAndZero,
     ):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_space = target_structures.get("target_space")
-        self.target_rule = target_structures.get("target_rule")
-        self.target_root = target_structures.get("target_root")
-        self.target_node = target_structures.get("target_node")
-        self.target_slot = target_structures.get("target_slot")
-        self.target_slot_filler = target_structures.get("target_slot_filler")
-        self.target_branch = target_structures.get("target_branch")
+        self.target_structure_one = target_structures.get("target_structure_one")
+        self.target_structure_two = target_structures.get("target_structure_two")
+        self._target_structures = target_structures
+        self.suggested_members = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -58,145 +55,58 @@ class ChunkBuilder(Builder):
     @property
     def targets_dict(self):
         return {
-            "target_space": self.target_space,
-            "target_rule": self.target_rule,
-            "target_root": self.target_root,
-            "target_node": self.target_node,
-            "target_slot": self.target_slot,
-            "target_slot_filler": self.target_slot_filler,
-            "target_branch": self.target_branch,
+            "target_structure_one": self.target_structure_one,
+            "target_structure_two": self.target_structure_two,
         }
 
     def _passes_preliminary_checks(self):
-        suggested_members = StructureCollection.union(
-            self.target_root.members.where(is_slot=False)
-            if self.target_root is not None
-            else self.bubble_chamber.new_structure_collection(),
-            self.bubble_chamber.new_structure_collection(self.target_node),
-            self.bubble_chamber.new_structure_collection(self.target_slot_filler)
-            if self.target_slot_filler is not None
-            else self.bubble_chamber.new_structure_collection(),
+        collection_one = (
+            self.bubble_chamber.new_structure_collection(self.target_structure_one)
+            if self.target_structure_one.members.is_empty()
+            else self.target_structure_one.members
         )
-        for chunk in self.bubble_chamber.chunks:
-            if (
-                chunk.rule == self.target_rule
-                and chunk.members.where(is_slot=False) == suggested_members
-            ):
-                return False
+        collection_two = (
+            self.bubble_chamber.new_structure_collection(self.target_structure_two)
+            if self.target_structure_two.members.is_empty()
+            else self.target_structure_two.members
+        )
+        self.suggested_members = StructureCollection.union(
+            collection_one, collection_two
+        )
+        equivalent_chunks = self.bubble_chamber.chunks.where(
+            members=self.suggested_members
+        )
+        if not equivalent_chunks.is_empty():
+            self.child_structures = self.bubble_chamber.new_structure_collection(
+                equivalent_chunks.get()
+            )
         return True
 
     def _process_structure(self):
-        if self.target_root is None:
-            if (
-                self.target_rule.right_concept is None
-                and self.target_rule.root_concept == self.target_rule.left_concept
-            ):
-                slot_locations = [Location([], self.target_space)] + [
-                    Location([[math.nan for _ in range(space.no_of_dimensions)]], space)
-                    for space in self.target_space.conceptual_spaces
-                ]
-                chunk_locations = [
-                    location.copy() for location in self.target_node.locations
-                ]
-            elif self.target_rule.right_concept is None:
-                root_location = self.target_node.location_in_space(self.target_space)
-                root_conceptual_location = (
-                    self.target_rule.root_concept.location_in_space(
-                        self.target_rule.parent_space
-                    )
-                )
-                slot_locations = []
-                chunk_locations = [root_location, root_conceptual_location]
-            else:
-                target_node_location = self.target_node.location_in_space(
-                    self.target_space
-                )
-                adjacent_location = (
-                    target_node_location.get_adjacent_location_right()
-                    if self.target_branch == "left"
-                    else target_node_location.get_adjacent_location_left()
-                )
-                slot_conceptual_locations = [
-                    Location([[math.nan]], space)
-                    for space in self.target_space.conceptual_spaces
-                ]
-                root_location = (
-                    Location.merge(
-                        self.target_node.location_in_space(self.target_space),
-                        adjacent_location,
-                    )
-                    if self.target_branch == "left"
-                    else Location.merge(
-                        adjacent_location,
-                        self.target_node.location_in_space(self.target_space),
-                    )
-                )
-                root_conceptual_location = (
-                    self.target_rule.root_concept.location_in_space(
-                        self.target_rule.parent_space
-                    )
-                )
-                slot_locations = [adjacent_location] + slot_conceptual_locations
-                chunk_locations = [root_location, root_conceptual_location]
-            slot = self.bubble_chamber.new_chunk(
-                parent_id=self.codelet_id,
-                locations=slot_locations,
-                members=self.bubble_chamber.new_structure_collection(),
-                parent_space=self.target_space,
-                quality=0.0,
-                left_branch=self.bubble_chamber.new_structure_collection(),
-                right_branch=self.bubble_chamber.new_structure_collection(),
-                rule=None,
+        if not self.child_structures.is_empty():
+            self.bubble_chamber.loggers["activity"].log(
+                self, "Equivalent chunk already exists"
             )
-            if self.target_branch == "left":
-                left_branch = self.bubble_chamber.new_structure_collection(
-                    self.target_node
-                )
-                right_branch = self.bubble_chamber.new_structure_collection()
-            else:
-                left_branch = self.bubble_chamber.new_structure_collection()
-                right_branch = self.bubble_chamber.new_structure_collection(
-                    self.target_node
-                )
-            chunk = self.bubble_chamber.new_chunk(
-                parent_id=self.codelet_id,
-                locations=chunk_locations,
-                members=self.bubble_chamber.new_structure_collection(self.target_node),
-                parent_space=self.target_space,
-                quality=0.0,
-                left_branch=left_branch,
-                right_branch=right_branch,
-                rule=self.target_rule,
+            return
+        chunk_locations = [
+            Location.merge(
+                self.target_structure_one.location_in_space(space),
+                self.target_structure_two.location_in_space(space),
             )
-            self._structure_concept.instances.add(chunk)
-            self._structure_concept.recalculate_exigency()
-            self.child_structures = self.bubble_chamber.new_structure_collection(chunk)
-            if chunk.has_free_branch:
-                chunk.free_branch.add(slot)
-                chunk.members.add(slot)
-                slot.super_chunks.add(chunk)
-                self.child_structures.add(slot)
-        if self.target_slot is not None and self.target_slot_filler is not None:
-            self.target_root.members.add(self.target_slot_filler)
-            self.target_slot_filler.super_chunks.add(self.target_root)
-            self.child_structures = self.bubble_chamber.new_structure_collection(
-                self.target_root, self.target_slot
-            )
-            for location in self.target_root.locations:
-                location.coordinates += self.target_slot_filler.location_in_space(
-                    location.space
-                ).coordinates
-            if self.target_branch == "left":
-                self.target_root.left_branch.add(self.target_slot_filler)
-            if self.target_branch == "right":
-                self.target_root.right_branch.add(self.target_slot_filler)
-            if not self.target_root.has_free_branch:
-                self.target_root.members.remove(self.target_slot)
-                self.target_space.contents.remove(self.target_slot)
-                self.child_structures.remove(self.target_slot)
+            for space in self.target_structure_one.parent_spaces
+        ]
+        chunk = self.bubble_chamber.new_chunk(
+            parent_id=self.codelet_id,
+            locations=chunk_locations,
+            members=self.suggested_members,
+            parent_space=self.target_structure_one.parent_space,
+            quality=0.0,
+        )
+        size_space = self.bubble_chamber.spaces["size"]
+        chunk.location_in_space(size_space).coordinates = [[chunk.size]]
+        self._structure_concept.instances.add(chunk)
+        self._structure_concept.recalculate_exigency()
+        self.child_structures = self.bubble_chamber.new_structure_collection(chunk)
 
     def _fizzle(self):
-        pass
-
-    def _fail(self):
         pass

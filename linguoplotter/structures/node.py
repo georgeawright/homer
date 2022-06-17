@@ -72,18 +72,36 @@ class Node(Structure):
     def spread_activation(self):
         if not self.is_fully_active():
             return
-        for link in self.links_out.where(is_label=False):
-            link.end.boost_activation(
-                link.parent_concept.activation
-                if link.parent_concept is not None
-                else None
-            )
-        for link in self.links_in.where(is_bidirectional=True):
-            link.start.boost_activation(
-                link.parent_concept.activation
-                if link.parent_concept is not None
-                else None
-            )
+        if self.parent_space is None or self.parent_space.is_conceptual_space:
+            for link in self.links_out.where(is_label=False):
+                if link.is_excitatory:
+                    link.end.boost_activation(
+                        link.parent_concept.activation
+                        if link.parent_concept is not None
+                        else None
+                    )
+                else:
+                    link.end.decay_activation(
+                        link.parent_concept.activation
+                        if link.parent_concept is not None
+                        else None
+                    )
+            for link in self.links_in.where(is_bidirectional=True):
+                if link.is_excitatory:
+                    link.start.boost_activation(
+                        link.parent_concept.activation
+                        if link.parent_concept is not None
+                        else None
+                    )
+                else:
+                    link.start.decay_activation(
+                        link.parent_concept.activation
+                        if link.parent_concept is not None
+                        else None
+                    )
+        else:
+            for link in self.links:
+                link.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         if self.parent_space is None:

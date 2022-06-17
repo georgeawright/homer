@@ -52,6 +52,12 @@ class ViewBuilder(Builder):
             "contextual_space": self.contextual_space,
         }
 
+    @property
+    def target_structures(self) -> StructureCollection:
+        return self.bubble_chamber.new_structure_collection(
+            self.frame, self.contextual_space
+        )
+
     def _passes_preliminary_checks(self):
         return True
 

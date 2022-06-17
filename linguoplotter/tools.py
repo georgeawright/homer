@@ -3,6 +3,11 @@ import statistics
 from typing import Iterable, List, Union
 
 
+def shortest_distance(a, b) -> float:
+    distance = min([math.dist(a_point, b_point) for a_point in a for b_point in b])
+    return distance if not math.isnan(distance) else 0
+
+
 def centroid_euclidean_distance(a, b) -> float:
     if len(a) == len(b) == 0:
         # TODO: possibly get rid of this if statment
@@ -17,7 +22,11 @@ def centroid_difference(a, b) -> float:
 
 
 def boolean_distance(a, b) -> float:
-    return 0.0 if a == b else math.inf
+    for coordinates_a, coordinates_b in zip(a, b):
+        for c_a, c_b in zip(coordinates_a, coordinates_b):
+            if c_a != c_b and not math.isnan(c_a) and not math.isnan(c_b):
+                return math.inf
+    return 0.0
 
 
 def average_vector(vectors: List[List[Union[float, int]]]):

@@ -57,11 +57,8 @@ class LabelSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        view = bubble_chamber.production_views.get(key=activation)
-        space = view.input_spaces.get(key=activation)
-        target = space.contents.where(is_labellable=True, is_slot=False).get(
-            key=labeling_exigency
-        )
+        space = bubble_chamber.input_spaces.get(key=activation)
+        target = space.contents.where(is_chunk=True).get(key=labeling_exigency)
         urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(
             parent_id,
@@ -78,7 +75,7 @@ class LabelSuggester(Suggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        potential_targets = bubble_chamber.labellable_items.where(is_slot=False).filter(
+        potential_targets = bubble_chamber.input_nodes.where(is_slot=False).filter(
             lambda x: isinstance(x, parent_concept.instance_type)
         )
         target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
@@ -139,9 +136,7 @@ class LabelSuggester(Suggester):
                     return False
         if self.parent_concept is None:
             return False
-        return self.target_node.labels.where(
-            parent_concept=self.parent_concept
-        ).is_empty()
+        return True
 
     def _calculate_confidence(self):
         try:

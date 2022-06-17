@@ -17,8 +17,7 @@ class FocusUnsetter(Codelet):
         last_satisfaction_score: FloatBetweenOneAndZero,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, urgency)
-        self.bubble_chamber = bubble_chamber
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.coderack = coderack
         self.last_satisfaction_score = last_satisfaction_score
         self.target_view = self.bubble_chamber.focus.view
@@ -88,10 +87,10 @@ class FocusUnsetter(Codelet):
             self.result = CodeletResult.FIZZLE
             self._fizzle()
         else:
-            if change_in_satisfaction_score < 0:
-                self.bubble_chamber.focus.view.decay_activation(
-                    1 - transposed_change_in_satisfaction_score
-                )
+            if transposed_change_in_satisfaction_score <= 0.5:
+                self.bubble_chamber.loggers["activity"].log(self, "Decaying focus")
+                self.bubble_chamber.focus.view._activation == 0
+                self._update_recycler_urgency()
             self.bubble_chamber.focus.view = None
             self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
             self._engender_follow_up()
@@ -104,6 +103,13 @@ class FocusUnsetter(Codelet):
         for codelet in self.coderack._codelets:
             if "WorldviewSetter" in codelet.codelet_id:
                 codelet.urgency = self.bubble_chamber.focus.satisfaction
+                return
+        raise Exception
+
+    def _update_recycler_urgency(self):
+        for codelet in self.coderack._codelets:
+            if "Recycler" in codelet.codelet_id:
+                codelet.urgency = 1.0
                 return
         raise Exception
 

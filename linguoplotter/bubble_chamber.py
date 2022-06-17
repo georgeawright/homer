@@ -17,7 +17,7 @@ from .structure import Structure
 from .structure_collection import StructureCollection
 from .structures import Frame, LinkOrNode, Space, View
 from .structures.links import Correspondence, Label, Relation
-from .structures.nodes import Chunk, Concept, Rule
+from .structures.nodes import Chunk, Concept
 from .structures.nodes.chunks import LetterChunk
 from .structures.spaces import ConceptualSpace, ContextualSpace
 from .structures.views import SimplexView, MonitoringView
@@ -42,7 +42,6 @@ class BubbleChamber:
         self.concepts = None
         self.chunks = None
         self.letter_chunks = None
-        self.rules = None
 
         self.concept_links = None
         self.correspondences = None
@@ -76,7 +75,6 @@ class BubbleChamber:
         self.concepts = self.new_structure_collection()
         self.chunks = self.new_structure_collection()
         self.letter_chunks = self.new_structure_collection()
-        self.rules = self.new_structure_collection()
         self.concept_links = self.new_structure_collection()
         self.correspondences = self.new_structure_collection()
         self.labels = self.new_structure_collection()
@@ -97,7 +95,7 @@ class BubbleChamber:
     def input_spaces(self) -> StructureCollection:
         return StructureCollection.union(
             *[view.input_spaces for view in self.production_views],
-            self.contextual_spaces.where(is_main_input=True)
+            self.contextual_spaces.where(is_main_input=True),
         )
 
     @property
@@ -161,8 +159,26 @@ class BubbleChamber:
             self.relations,
             self.views,
             self.concept_links,
-            self.rules,
         )
+
+    @property
+    def collections(self) -> dict:
+        return {
+            # views
+            SimplexView: "views",
+            # spaces
+            ConceptualSpace: "conceptual_spaces",
+            ContextualSpace: "contextual_spaces",
+            Frame: "frames",
+            # nodes
+            Chunk: "chunks",
+            Concept: "concepts",
+            LetterChunk: "letter_chunks",
+            # links
+            Correspondence: "correspondences",
+            Label: "labels",
+            Relation: "relations",
+        }
 
     def recalculate_satisfaction(self):
         self.focus.recalculate_satisfaction()
@@ -202,26 +218,35 @@ class BubbleChamber:
         for space in item.parent_spaces:
             space.add(item)
             self.loggers["structure"].log(space)
-        collections = {
-            # views
-            MonitoringView: "monitoring_views",
-            SimplexView: "simplex_views",
-            # spaces
-            ConceptualSpace: "conceptual_spaces",
-            ContextualSpace: "contextual_spaces",
-            Frame: "frames",
-            # nodes
-            Chunk: "chunks",
-            Concept: "concepts",
-            LetterChunk: "letter_chunks",
-            Rule: "rules",
-            # links
-            Correspondence: "correspondences",
-            Label: "labels",
-            Relation: "relations",
-        }
-        collection_name = collections[type(item)]
+        collection_name = self.collections[type(item)]
         getattr(self, collection_name).add(item)
+
+    def remove(self, item):
+        if item.is_view:
+            correspondences = item.members.where(parent_view=item)
+            for correspondence in correspondences:
+                self.remove(correspondence)
+            for frame in item.frames:
+                self.remove(frame)
+            for sub_view in item.sub_views:
+                sub_view.super_views.remove(item)
+            for super_view in item.super_views:
+                super_view.sub_views.remove(item)
+        if item.is_frame:
+            item.parent_frame.instances.remove(item)
+        if item.is_correspondence:
+            item.parent_view.remove(item)
+        if item.is_link:
+            for argument in item.arguments:
+                argument.links_out.remove(item)
+                argument.links_in.remove(item)
+        if item.is_chunk:
+            for member in item.members:
+                member.super_chunks.remove(item)
+        for space in item.parent_spaces:
+            space.contents.remove(item)
+        collection_name = self.collections[type(item)]
+        getattr(self, collection_name).remove(item)
 
     def new_conceptual_space(
         self,
@@ -352,18 +377,12 @@ class BubbleChamber:
         members: StructureCollection = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
-        left_branch: StructureCollection = None,
-        right_branch: StructureCollection = None,
-        rule: Rule = None,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ) -> Chunk:
         if members is None:
             members = self.new_structure_collection()
-        if left_branch is None:
-            left_branch = self.new_structure_collection()
-        if right_branch is None:
-            right_branch = self.new_structure_collection()
+        locations.append(Location([[len(members)]], self.conceptual_spaces["size"]))
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
         )
@@ -374,9 +393,6 @@ class BubbleChamber:
             members=members,
             parent_space=parent_space,
             quality=quality,
-            left_branch=left_branch,
-            right_branch=right_branch,
-            rule=rule,
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
@@ -401,7 +417,6 @@ class BubbleChamber:
         quality: FloatBetweenOneAndZero = 0.0,
         left_branch: StructureCollection = None,
         right_branch: StructureCollection = None,
-        rule: Rule = None,
         meaning_concept: Concept = None,
         grammar_concept: Concept = None,
         abstract_chunk: LetterChunk = None,
@@ -425,7 +440,6 @@ class BubbleChamber:
             quality=quality,
             left_branch=left_branch,
             right_branch=right_branch,
-            rule=rule,
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
@@ -486,57 +500,6 @@ class BubbleChamber:
         self.add(concept)
         return concept
 
-    def new_rule(
-        self,
-        name: str,
-        location: Location,
-        root_concept: Concept,
-        left_concept: Concept,
-        right_concept: Concept,
-        parent_id: str = "",
-        stable_activation: FloatBetweenOneAndZero = None,
-    ) -> Rule:
-        rule = Rule(
-            structure_id=ID.new(Rule),
-            parent_id=parent_id,
-            name=name,
-            location=location,
-            root_concept=root_concept,
-            left_concept=left_concept,
-            right_concept=right_concept,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
-            parent_spaces=self.new_structure_collection(location.space),
-            stable_activation=stable_activation,
-        )
-        self.new_relation(
-            parent_id=parent_id,
-            start=root_concept,
-            end=rule,
-            parent_concept=None,
-            locations=[],
-            quality=1.0,
-        )
-        self.new_relation(
-            parent_id=parent_id,
-            start=rule,
-            end=left_concept,
-            parent_concept=None,
-            locations=[],
-            quality=1.0,
-        )
-        if right_concept is not None:
-            self.new_relation(
-                parent_id=parent_id,
-                start=rule,
-                end=right_concept,
-                parent_concept=None,
-                locations=[],
-                quality=1.0,
-            )
-        self.add(rule)
-        return rule
-
     def new_link_or_node(
         self,
         parent_space: Space = None,
@@ -572,6 +535,7 @@ class BubbleChamber:
         parent_view: View = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
+        is_excitatory: bool = True,
         is_privileged: bool = False,
     ) -> Correspondence:
         if locations is None:
@@ -599,12 +563,17 @@ class BubbleChamber:
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
+            is_excitatory=is_excitatory,
             is_privileged=is_privileged,
         )
-        if parent_view is not None:
-            parent_view.recalculate_exigency()
+        while parent_view is not None:
             parent_view.add(correspondence)
+            parent_view.recalculate_exigency()
             self.loggers["structure"].log(parent_view)
+            try:
+                parent_view = parent_view.super_views.get()
+            except MissingStructureError:
+                parent_view = None
         start.links_out.add(correspondence)
         start.links_in.add(correspondence)
         start.recalculate_exigency()
@@ -660,6 +629,7 @@ class BubbleChamber:
         parent_space: ContextualSpace = None,
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
+        is_excitatory: bool = True,
         activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
         parent_space = start.parent_space if parent_space is None else parent_space
@@ -682,6 +652,7 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             is_bidirectional=is_bidirectional,
+            is_excitatory=is_excitatory,
         )
         if activation is not None:
             relation._activation = activation

@@ -4,6 +4,7 @@ import math
 from typing import Callable, Dict, List
 
 from linguoplotter.location import Location
+from linguoplotter.locations import TwoPointLocation
 from linguoplotter.structure import Structure
 from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structures import Space
@@ -110,16 +111,41 @@ class ConceptualSpace(Space):
         )
 
     def location_from_super_space_location(self, location: Location) -> Location:
-        if location.coordinates[0][0] is None:
-            coordinates = [[None for _ in range(self.no_of_dimensions)]]
-        if math.isnan(location.coordinates[0][0]):
-            coordinates = [[math.nan for _ in range(self.no_of_dimensions)]]
-        else:
-            coordinates_function = self.super_space_to_coordinate_function_map[
-                location.space.name
-            ]
-            coordinates = coordinates_function(location)
-        return Location(coordinates, self)
+        try:
+            if location.coordinates[0][0] is None:
+                coordinates = [[None for _ in range(self.no_of_dimensions)]]
+            if math.isnan(location.coordinates[0][0]):
+                coordinates = [[math.nan for _ in range(self.no_of_dimensions)]]
+            else:
+                coordinates_function = self.super_space_to_coordinate_function_map[
+                    location.space.name
+                ]
+                coordinates = coordinates_function(location)
+            return Location(coordinates, self)
+        except NotImplementedError:
+            if location.start_coordinates[0][0] is None:
+                start_coordinates = [[None for _ in range(self.no_of_dimensions)]]
+            if math.isnan(location.start_coordinates[0][0]):
+                start_coordinates = [[math.nan for _ in range(self.no_of_dimensions)]]
+            else:
+                coordinates_function = self.super_space_to_coordinate_function_map[
+                    location.space.name
+                ]
+                start_coordinates = coordinates_function(
+                    Location(location.start_coordinates, location.space)
+                )
+            if location.end_coordinates[0][0] is None:
+                end_coordinates = [[None for _ in range(self.no_of_dimensions)]]
+            if math.isnan(location.end_coordinates[0][0]):
+                end_coordinates = [[math.nan for _ in range(self.no_of_dimensions)]]
+            else:
+                coordinates_function = self.super_space_to_coordinate_function_map[
+                    location.space.name
+                ]
+                end_coordinates = coordinates_function(
+                    Location(location.end_coordinates, location.space)
+                )
+            return TwoPointLocation(start_coordinates, end_coordinates, self)
 
     def make_projection(
         self,

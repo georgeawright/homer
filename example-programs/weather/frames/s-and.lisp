@@ -175,7 +175,3 @@
   :is_bidirectional True :activation 1.0)
 (def-relation :start sentence-concept :end and-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start descriptive-sentence :end and-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start comparative-sentence :end and-sentence
-  :is_bidirectional True :activation 1.0)

@@ -28,6 +28,7 @@ class Relation(Link):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         is_bidirectional: bool = True,
+        is_excitatory: bool = True,
     ):
         Link.__init__(
             self,
@@ -47,6 +48,7 @@ class Relation(Link):
         self.conceptual_space = conceptual_space
         self.is_relation = True
         self.is_bidirectional = is_bidirectional
+        self.is_excitatory = is_excitatory
 
     def __dict__(self) -> dict:
         return {

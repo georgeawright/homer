@@ -3,12 +3,11 @@ from math import prod
 import re
 from typing import List, Union
 
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structures import Space
-from linguoplotter.structures.nodes import Chunk, Rule
+from linguoplotter.structures.nodes import Chunk
 
 
 class LetterChunk(Chunk):
@@ -23,7 +22,6 @@ class LetterChunk(Chunk):
         quality: FloatBetweenOneAndZero,
         left_branch: StructureCollection,
         right_branch: StructureCollection,
-        rule: Rule,
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
@@ -38,15 +36,14 @@ class LetterChunk(Chunk):
             members=members,
             parent_space=parent_space,
             quality=quality,
-            left_branch=left_branch,
-            right_branch=right_branch,
-            rule=rule,
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
             super_chunks=super_chunks,
             abstract_chunk=abstract_chunk,
         )
+        self.left_branch = left_branch
+        self.right_branch = right_branch
         self._name = name
         self.is_letter_chunk = True
 
@@ -88,10 +85,6 @@ class LetterChunk(Chunk):
         return self.name is None
 
     @property
-    def is_abstract(self):
-        return self.parent_space is None
-
-    @property
     def concepts(self):
         return self.relatives.where(is_concept=True)
 
@@ -104,33 +97,6 @@ class LetterChunk(Chunk):
             self.unchunkedness = 0.5 * prod(
                 [chunk.unchunkedness for chunk in self.super_chunks]
             )
-
-    @property
-    def free_branch_concept(self):
-        if self.rule.root_concept == self.rule.left_concept:
-            return self.rule.left_concept
-        if self.left_branch.is_empty():
-            return self.rule.left_concept
-        if self.right_branch.is_empty() and self.rule.right_concept is not None:
-            return self.rule.right_concept
-        raise MissingStructureError
-
-    @property
-    def free_branch(self):
-        if self.rule.root_concept == self.rule.left_concept:
-            return self.left_branch
-        if self.left_branch.is_empty():
-            return self.left_branch
-        if self.right_branch.is_empty() and self.rule.right_concept is not None:
-            return self.right_branch
-        raise MissingStructureError
-
-    @property
-    def has_free_branch(self):
-        try:
-            return self.free_branch is not None
-        except MissingStructureError:
-            return False
 
     def nearby(self, space: Space = None) -> StructureCollection:
         if space is not None:
@@ -181,7 +147,6 @@ class LetterChunk(Chunk):
                 parent_space=location.space,
                 left_branch=new_left_branch,
                 right_branch=new_right_branch,
-                rule=chunk.rule,
                 abstract_chunk=self
                 if self.abstract_chunk is None
                 else self.abstract_chunk,
@@ -226,7 +191,6 @@ class LetterChunk(Chunk):
             parent_space=new_location.space,
             left_branch=new_left_branch,
             right_branch=new_right_branch,
-            rule=self.rule,
             abstract_chunk=self if self.abstract_chunk is None else self.abstract_chunk,
             quality=self.quality,
         )
