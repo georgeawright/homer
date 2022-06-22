@@ -46,7 +46,7 @@ class FocusUnsetter(Codelet):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
         )
-        current_satisfaction_score = self.bubble_chamber.satisfaction
+        current_satisfaction_score = self.bubble_chamber.focus.satisfaction
         change_in_satisfaction_score = (
             current_satisfaction_score - self.last_satisfaction_score
         )
@@ -55,7 +55,7 @@ class FocusUnsetter(Codelet):
         ) + 0.5
         self.bubble_chamber.loggers["activity"].log(
             self,
-            f"Current bubble chamber satisfaction: {self.bubble_chamber.satisfaction}",
+            f"Current focus satisfaction: {self.bubble_chamber.focus.satisfaction}",
         )
         self.bubble_chamber.loggers["activity"].log(
             self,
@@ -89,7 +89,9 @@ class FocusUnsetter(Codelet):
         else:
             if transposed_change_in_satisfaction_score <= 0.5:
                 self.bubble_chamber.loggers["activity"].log(self, "Decaying focus")
-                self.bubble_chamber.focus.view._activation == 0
+                self.bubble_chamber.focus.view.decay_activation(
+                    transposed_change_in_satisfaction_score
+                )
                 self._update_recycler_urgency()
             self.bubble_chamber.focus.view = None
             self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
@@ -119,7 +121,7 @@ class FocusUnsetter(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                self.bubble_chamber.satisfaction,
+                self.bubble_chamber.focus.satisfaction,
                 0.5,
             )
         )
