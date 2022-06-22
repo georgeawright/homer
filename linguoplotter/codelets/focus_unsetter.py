@@ -67,7 +67,7 @@ class FocusUnsetter(Codelet):
         )
         if self.bubble_chamber.focus.view.unhappiness == 0.0:
             probability_of_unsetting_focus = 1
-            self._update_worldview_setter_urgency()
+            self._update_worldview_porter_urgency()
         else:
             probability_of_unsetting_focus = statistics.fmean(
                 [
@@ -99,9 +99,9 @@ class FocusUnsetter(Codelet):
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
-    def _update_worldview_setter_urgency(self):
+    def _update_worldview_porter_urgency(self):
         for codelet in self.coderack._codelets:
-            if "WorldviewSetter" in codelet.codelet_id:
+            if "WorldviewPorter" in codelet.codelet_id:
                 codelet.urgency = self.bubble_chamber.focus.satisfaction
                 return
         raise Exception

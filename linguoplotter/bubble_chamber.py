@@ -27,12 +27,12 @@ from .worldview import Worldview
 
 
 class BubbleChamber:
-    def __init__(self):
+    def __init__(self, focus, recycle_bin):
         self.loggers = {}
         self.random_machine = None
-        self.focus = Focus()
-        self.worldview = Worldview()
-        self.recycle_bin = RecycleBin()
+        self.worldview = None
+        self.focus = focus
+        self.recycle_bin = recycle_bin
 
         self.conceptual_spaces = None
         self.contextual_spaces = None
@@ -59,7 +59,7 @@ class BubbleChamber:
 
     @classmethod
     def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
-        bubble_chamber = cls()
+        bubble_chamber = cls(Focus(), RecycleBin())
         bubble_chamber.random_machine = RandomMachine(bubble_chamber, random_seed)
         bubble_chamber.reset(loggers)
         return bubble_chamber
@@ -67,7 +67,7 @@ class BubbleChamber:
     def reset(self, loggers: Dict[str, Logger]):
         self.loggers = loggers
         self.focus = Focus()
-        self.worldview = Worldview()
+        self.worldview = Worldview(self.new_structure_collection())
         self.conceptual_spaces = self.new_structure_collection()
         self.contextual_spaces = self.new_structure_collection()
         self.frames = self.new_structure_collection()
