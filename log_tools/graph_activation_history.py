@@ -1,7 +1,7 @@
 import json
 import os
 
-log_directory = "logs/1655909355.8252764/structures/structures/SimplexView4/"
+log_directory = "logs/1655991633.2821648/structures/structures/SimplexView57/"
 field = "activation"
 log_files = os.listdir(log_directory)
 log_files.sort(key=lambda x: int(x.split(".")[0]))

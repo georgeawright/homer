@@ -234,6 +234,7 @@ class BubbleChamber:
                 super_view.sub_views.remove(item)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
+            item.parent_frame.recalculate_exigency()
         if item.is_correspondence:
             item.parent_view.remove(item)
         if item.is_link:

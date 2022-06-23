@@ -199,7 +199,7 @@ class View(Structure):
 
     def remove(self, correspondence: "Correspondence"):
         self.members.remove(correspondence)
-        for sub_frame, matched_frame in self.matched_sub_frames.items():
+        for sub_frame, matched_frame in self.matched_sub_frames.copy().items():
             if (
                 correspondence in matched_frame.input_space.contents
                 or correspondence in matched_frame.output_space.contents

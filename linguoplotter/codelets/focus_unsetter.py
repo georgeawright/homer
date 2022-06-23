@@ -89,13 +89,12 @@ class FocusUnsetter(Codelet):
         else:
             if transposed_change_in_satisfaction_score <= 0.5:
                 self.bubble_chamber.loggers["activity"].log(self, "Decaying focus")
-                self.bubble_chamber.focus.view.decay_activation(
-                    transposed_change_in_satisfaction_score
-                )
+                self.bubble_chamber.focus.view._activation = 0.0
                 for correspondence in self.bubble_chamber.focus.view.members:
                     correspondence.decay_activation(
                         transposed_change_in_satisfaction_score
                     )
+                    correspondence.update_activation()
                 self._update_recycler_urgency()
             self.bubble_chamber.focus.view = None
             self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
