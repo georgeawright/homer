@@ -198,6 +198,9 @@
 (define to
   (def-letter-chunk :name "to" :parent_space grammar-space
     :locations (list prep-location)))
+(define between
+  (def-letter-chunk :name "between" :parent_space grammar-space
+    :locations (list prep-location)))
 (define than
   (def-letter-chunk :name "than" :parent_space grammar-space
     :locations (list prep-location)))

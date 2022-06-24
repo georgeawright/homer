@@ -20,8 +20,11 @@
 (load "frames/pp-allative-time.lisp")
 (load "frames/pp-directional-location.lisp")
 (load "frames/pp-directional-time.lisp")
+(load "frames/pp-directional-time-between.lisp")
 (load "frames/pp-inessive-location.lisp")
+(load "frames/pp-inessive-location-phrase.lisp")
 (load "frames/pp-inessive-time.lisp")
+(load "frames/pp-inessive-time-phrase.lisp")
 (load "frames/rp-jjr.lisp")
 (load "frames/s-increase.lisp")
 

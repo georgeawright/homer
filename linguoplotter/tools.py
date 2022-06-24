@@ -16,6 +16,14 @@ def centroid_euclidean_distance(a, b) -> float:
     return distance if not math.isnan(distance) else 0
 
 
+def area_euclidean_distance(a, b) -> float:
+    distance = statistics.fmean(
+        [shortest_distance(a, [b_point]) for b_point in b]
+        + [shortest_distance(b, [a_point]) for a_point in a]
+    )
+    return distance if not math.isnan(distance) else 0
+
+
 def centroid_difference(a, b) -> float:
     difference = average_vector(a)[0] - average_vector(b)[0]
     return difference if not math.isnan(difference) else 0

@@ -17,6 +17,12 @@
   (def-concept :name "sunday" :locations (list (Location (list (list 48)) time-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space time-space :distance_function boolean_distance))
+(define always-concept
+  (def-concept :name "always"
+    :locations (list (Location (list (list 0) (list 24) (list 48)) time-space))
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
+    :parent_space peripheralness-space :distance_function area_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 
 (def-correspondence :start friday-concept :end early-concept :parent_concept same-concept)
 (def-correspondence :start sunday-concept :end late-concept :parent_concept same-concept)
@@ -33,3 +39,8 @@
   (def-letter-chunk :name "sunday" :parent_space time-space
     :locations (list (Location (list (list 48)) time-space))))
 (def-relation :start sunday-concept :end sunday-word :parent_concept nn-concept)
+(define throughout-the-weekend-phrase
+  (def-letter-chunk :name "throughout~the~weekend" :parent_space time-space
+    :locations (list (Location (list (list 0) (list 24) (list 48)) time-space))))
+(def-relation
+  :start always-concept :end throughout-the-weekend-phrase :parent_concept pp-concept)
