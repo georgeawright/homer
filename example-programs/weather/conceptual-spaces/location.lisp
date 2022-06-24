@@ -88,7 +88,8 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
 (define everywhere-concept
   (def-concept :name "everywhere"
     :locations (list (Location
-		      (list (list 0 0) (list 0 8) (list 10 0) (list 10 8)) location-space)
+		      (list (list 0 0) (list 0 8) (list 10 0) (list 10 8) (list 5 4))
+		      location-space)
 		     (Location (list (list 0)) peripheralness-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space peripheralness-space :distance_function area_euclidean_distance
@@ -148,7 +149,8 @@ lambda location: [[(c[0]+4-c[1])/2] for c in location.coordinates]
   (def-letter-chunk :name "across~the~country" :parent_space location-space
     :locations (list (Location (list) grammar-space)
 		     (Location
-		      (list (list 0 0) (list 0 8) (list 10 0) (list 10 8)) location-space)
+		      (list (list 0 0) (list 0 8) (list 10 0) (list 10 8) (list 5 4))
+		      location-space)
 		     (Location (list (list 0)) peripheralness-space))))
 (def-relation
   :start everywhere-concept :end across-the-country-phrase :parent_concept pp-concept)
