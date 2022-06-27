@@ -27,6 +27,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                     output_location,
                     parent_id=self.codelet_id,
                     bubble_chamber=self.bubble_chamber,
+                    parent_id=self.codelet_id,
                 )
             else:
                 locations = [
