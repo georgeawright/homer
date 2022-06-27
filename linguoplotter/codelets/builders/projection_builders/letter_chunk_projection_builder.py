@@ -39,6 +39,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                     locations=locations,
                     parent_space=self.target_view.output_space,
                     abstract_chunk=abstract_chunk,
+                    parent_id=self.codelet_id,
                 )
         else:
             abstract_chunk = self._get_abstract_chunk()

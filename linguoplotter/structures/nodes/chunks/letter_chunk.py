@@ -26,6 +26,7 @@ class LetterChunk(Chunk):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
+        containing_chunks: StructureCollection,
         abstract_chunk: LetterChunk = None,
     ):
         Chunk.__init__(
@@ -40,6 +41,7 @@ class LetterChunk(Chunk):
             links_out=links_out,
             parent_spaces=parent_spaces,
             super_chunks=super_chunks,
+            containing_chunks=containing_chunks,
             abstract_chunk=abstract_chunk,
         )
         self.left_branch = left_branch
@@ -91,11 +93,11 @@ class LetterChunk(Chunk):
     def recalculate_unchunkedness(self):
         if self.is_abstract:
             self.unchunkedness = 0
-        elif len(self.super_chunks) == 0:
+        elif len(self.containing_chunks) == 0:
             self.unchunkedness = 1
         else:
             self.unchunkedness = 0.5 * prod(
-                [chunk.unchunkedness for chunk in self.super_chunks]
+                [chunk.unchunkedness for chunk in self.containing_chunks]
             )
 
     def nearby(self, space: Space = None) -> StructureCollection:

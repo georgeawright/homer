@@ -102,6 +102,14 @@ class ChunkBuilder(Builder):
             parent_space=self.target_structure_one.parent_space,
             quality=0.0,
         )
+        for member in StructureCollection.union(
+            self.bubble_chamber.new_structure_collection(
+                self.target_structure_one, self.target_structure_two
+            ),
+            self.target_structure_one.members,
+            self.target_structure_two.members,
+        ):
+            member.containing_chunks.add(chunk)
         size_space = self.bubble_chamber.spaces["size"]
         chunk.location_in_space(size_space).coordinates = [[chunk.size]]
         self._structure_concept.instances.add(chunk)

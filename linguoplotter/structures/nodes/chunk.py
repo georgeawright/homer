@@ -24,6 +24,7 @@ class Chunk(Node):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
+        containing_chunks: StructureCollection,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ):
@@ -41,6 +42,7 @@ class Chunk(Node):
         self.abstract_chunk = abstract_chunk
         self.members = members
         self.super_chunks = super_chunks
+        self.containing_chunks = containing_chunks
         self._parent_space = parent_space
         self.is_raw = is_raw
         self.is_chunk = True
@@ -113,11 +115,11 @@ class Chunk(Node):
         )
 
     def recalculate_unchunkedness(self):
-        if len(self.super_chunks) == 0:
+        if len(self.containing_chunks) == 0:
             self.unchunkedness = 1
         else:
             self.unchunkedness = 0.5 * prod(
-                [chunk.unchunkedness for chunk in self.super_chunks]
+                [chunk.unchunkedness for chunk in self.containing_chunks]
             )
 
     @property

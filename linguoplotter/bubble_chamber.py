@@ -398,6 +398,7 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
+            containing_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
             is_raw=is_raw,
         )
@@ -445,6 +446,7 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
+            containing_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
         )
         for member in members:
