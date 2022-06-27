@@ -27,7 +27,6 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                     output_location,
                     parent_id=self.codelet_id,
                     bubble_chamber=self.bubble_chamber,
-                    parent_id=self.codelet_id,
                 )
             else:
                 locations = [
@@ -78,6 +77,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 locations=locations,
                 parent_space=self.target_view.output_space,
                 abstract_chunk=abstract_chunk,
+                parent_id=self.codelet_id,
             )
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Built Letter Chunk {word}"
