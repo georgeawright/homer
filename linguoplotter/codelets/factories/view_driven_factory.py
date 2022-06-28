@@ -201,12 +201,19 @@ class ViewDrivenFactory(Factory):
                         node = input_space.contents.where(
                             is_node=True, is_slot=False
                         ).get(key=labeling_exigency)
-            parent_concept = (
-                self.target_slot.parent_spaces.where(is_conceptual_space=True)
-                .get()
-                .contents.where(is_concept=True, is_slot=False)
-                .get(key=lambda x: x.proximity_to(node))
-            )
+            if not self.target_slot.parent_concept.is_slot:
+                parent_concept = self.target_slot.parent_concept
+            elif self.target_slot.parent_concept.is_filled_in:
+                parent_concept = self.target_slot.parent_concept.relatives.where(
+                    is_concept=True, is_slot=False
+                ).get()
+            else:
+                parent_concept = (
+                    self.target_slot.parent_spaces.where(is_conceptual_space=True)
+                    .get()
+                    .contents.where(is_concept=True, is_slot=False)
+                    .get(key=lambda x: x.proximity_to(node))
+                )
             return LabelSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
