@@ -1,3 +1,4 @@
+from __future__ import annotations
 import statistics
 from typing import List
 
@@ -239,6 +240,7 @@ class View(Structure):
         conceptual_space: Space,
         start: Structure,
         end: Structure,
+        sub_view: View = None,
     ) -> bool:
         if self.has_member(parent_concept, conceptual_space, start, end):
             return False
@@ -298,6 +300,17 @@ class View(Structure):
                 },
             ]
         )
+        if sub_view is not None:
+            for potential_node_group in potential_node_groups:
+                for sub_view_node_group in sub_view.node_groups:
+                    if any(
+                        [
+                            node in sub_view_node_group.values()
+                            for node in potential_node_group.values()
+                        ]
+                    ):
+                        for space in sub_view_node_group:
+                            potential_node_group[space] = sub_view_node_group[space]
         for existing_node_group in self.node_groups:
             for potential_group in potential_node_groups:
                 if (

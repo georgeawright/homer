@@ -433,6 +433,7 @@ class ViewDrivenFactory(Factory):
                         member.conceptual_space,
                         member.start,
                         member.end,
+                        sub_view=x,
                     )
                     for member in x.members
                 ]
@@ -460,12 +461,14 @@ class ViewDrivenFactory(Factory):
                         member.conceptual_space,
                         member.start,
                         self.target_slot,
+                        sub_view=x,
                     )
                     and self.target_view.can_accept_member(
                         member.parent_concept,
                         member.conceptual_space,
                         member.end,
                         self.target_slot,
+                        sub_view=x,
                     )
                     for member in x.members.filter(
                         lambda c: type(c.start) == type(self.target_slot)

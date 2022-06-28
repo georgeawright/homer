@@ -90,6 +90,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 correspondence.conceptual_space,
                 correspondence.start,
                 correspondence.end,
+                sub_view=self.target_sub_view,
             ):
                 self.bubble_chamber.loggers["activity"].log(
                     self, f"Target view cannot accept {correspondence}"
@@ -100,6 +101,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             self.target_conceptual_space,
             self.target_structure_one,
             self.target_structure_two,
+            sub_view=self.target_sub_view,
         ):
             self.bubble_chamber.loggers["activity"].log(
                 self, "View cannot accept correspondence from target one"

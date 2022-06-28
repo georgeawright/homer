@@ -63,6 +63,7 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         return cls.make(parent_id, bubble_chamber, urgency)
 
     def _passes_preliminary_checks(self):
+        self.parent_concept = self.bubble_chamber.concepts["same"]
         self.target_space_two = self.target_structure_two.parent_space
         self._get_target_conceptual_space(self, self)
         try:
