@@ -152,18 +152,11 @@ class Coderack:
             + f"Focus: {self.bubble_chamber.focus.view}\n"
             + f"Worldview: {self.bubble_chamber.worldview.views}\n",
         )
+        self.loggers["activity"]._log_coderack_population(self.population_size)
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)
 
     def _select_a_codelet(self) -> Codelet:
-        if len(self._codelets) >= self.MAXIMUM_POPULATION:
-            codelet_choice = [
-                codelet
-                for codelet in self._codelets
-                if isinstance(codelet, CoderackCleaner)
-            ][0]
-            self._codelets.remove(codelet_choice)
-            return codelet_choice
         try:
             codelet_choice = self.bubble_chamber.random_machine.select(
                 self._codelets, key=lambda x: x.urgency
