@@ -58,7 +58,9 @@ class LabelSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         space = bubble_chamber.input_spaces.get(key=activation)
-        target = space.contents.where(is_chunk=True).get(key=labeling_exigency)
+        target = space.contents.filter(lambda x: x.is_chunk and x.quality > 0).get(
+            key=labeling_exigency
+        )
         urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(
             parent_id,
@@ -76,7 +78,7 @@ class LabelSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         potential_targets = bubble_chamber.input_nodes.where(is_slot=False).filter(
-            lambda x: isinstance(x, parent_concept.instance_type)
+            lambda x: isinstance(x, parent_concept.instance_type) and x.quality > 0
         )
         target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
         urgency = urgency if urgency is not None else target.unlabeledness
