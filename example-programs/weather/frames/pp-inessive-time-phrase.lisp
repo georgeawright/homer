@@ -38,11 +38,11 @@
     :locations (list (Location (list (list Nan Nan)) time-space)
 		     (Location (list) pp-inessive-time-output))))
 
-(def-relation :start label-concept :end pp-inessive-location
+(def-relation :start label-concept :end pp-inessive-time
   :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end pp-inessive-location
+(def-relation :start chunk-concept :end pp-inessive-time
   :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end pp-inessive-location
+(def-relation :start letter-chunk-concept :end pp-inessive-time
   :is_bidirectional True :activation 1.0)
-(def-relation :start pp-concept :end pp-inessive-location
+(def-relation :start pp-concept :end pp-inessive-time
   :is_bidirectional True :activation 1.0)
