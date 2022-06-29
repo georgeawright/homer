@@ -430,7 +430,8 @@ class ViewDrivenFactory(Factory):
         )
         follow_up._get_target_conceptual_space(self, follow_up)
         self.compatible_sub_views = self.bubble_chamber.production_views.filter(
-            lambda x: x.super_views.is_empty()
+            lambda x: x != self.target_view
+            and x.super_views.is_empty()
             and (x.parent_frame.parent_concept == sub_frame.parent_concept)
             and (x.input_spaces == self.target_view.input_spaces)
             and all(

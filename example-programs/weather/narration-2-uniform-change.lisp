@@ -27,6 +27,9 @@
 (load "frames/pp-inessive-time-phrase.lisp")
 (load "frames/rp-jjr.lisp")
 (load "frames/s-increase.lisp")
+(load "frames/s-move.lisp")
+(load "frames/s-spread.lisp")
+(load "frames/s-and.lisp")
 
 (define input-space
   (def-contextual-space
