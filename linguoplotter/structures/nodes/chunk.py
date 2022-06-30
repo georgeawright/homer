@@ -142,23 +142,30 @@ class Chunk(Node):
         )
 
     def nearby(self, space: Space = None) -> StructureCollection:
-        if space is not None:
-            return (
-                space.contents.where(is_chunk=True)
-                .near(self.location_in_space(space))
-                .excluding(self),
-            )
-        return StructureCollection.intersection(
-            *[
-                location.space.contents.where(
-                    is_chunk=True, parent_space=self.parent_space
-                ).near(location)
-                for location in self.locations
-                if location.space.is_conceptual_space
-                and location.space.is_basic_level
-                and location.space.name != "size"
-            ]
-        ).excluding(self)
+        if self.is_raw:
+            if space is not None:
+                return (
+                    space.contents.where(is_chunk=True)
+                    .near(self.location_in_space(space))
+                    .excluding(self),
+                )
+            return StructureCollection.intersection(
+                *[
+                    location.space.contents.where(
+                        is_chunk=True, parent_space=self.parent_space
+                    ).near(location)
+                    for location in self.locations
+                    if location.space.is_conceptual_space
+                    and location.space.is_basic_level
+                    and location.space.name != "size"
+                ]
+            ).excluding(self)
+        return StructureCollection.difference(
+            StructureCollection.union(
+                *[member.nearby(space=space) for member in self.members]
+            ),
+            self.members,
+        )
 
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
