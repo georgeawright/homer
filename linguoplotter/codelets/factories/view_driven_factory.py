@@ -194,12 +194,12 @@ class ViewDrivenFactory(Factory):
                         self.target_slot.start.is_link
                         and self.target_slot.start.is_node
                     ):
-                        node = input_space.contents.where(
-                            is_labellable=True, is_slot=False
+                        node = input_space.contents.filter(
+                            lambda x: x.is_labellable and x.quality > 0
                         ).get(key=labeling_exigency)
                     else:
-                        node = input_space.contents.where(
-                            is_node=True, is_slot=False
+                        node = input_space.contents.filter(
+                            lambda x: x.is_node and x.quality > 0
                         ).get(key=labeling_exigency)
             if not self.target_slot.parent_concept.is_slot:
                 parent_concept = self.target_slot.parent_concept
@@ -255,8 +255,8 @@ class ViewDrivenFactory(Factory):
                 ):
                     target_structure_two = node_group[input_space]
             if target_structure_one is None or target_structure_two is None:
-                potential_targets = input_space.contents.where(
-                    is_node=True, is_slot=False
+                potential_targets = input_space.contents.filter(
+                    lambda x: x.is_node and x.quality > 0
                 )
                 try:
                     (
