@@ -94,6 +94,7 @@ class ChunkBuilder(Builder):
                 self.target_structure_two.location_in_space(space),
             )
             for space in self.target_structure_one.parent_spaces
+            if space.name != "size"
         ]
         chunk = self.bubble_chamber.new_chunk(
             parent_id=self.codelet_id,
@@ -110,8 +111,6 @@ class ChunkBuilder(Builder):
             self.target_structure_two.members,
         ):
             member.containing_chunks.add(chunk)
-        size_space = self.bubble_chamber.spaces["size"]
-        chunk.location_in_space(size_space).coordinates = [[chunk.size]]
         self._structure_concept.instances.add(chunk)
         self._structure_concept.recalculate_exigency()
         self.child_structures = self.bubble_chamber.new_structure_collection(chunk)
