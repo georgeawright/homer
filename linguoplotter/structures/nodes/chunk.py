@@ -160,12 +160,10 @@ class Chunk(Node):
                     and location.space.name != "size"
                 ]
             ).excluding(self)
-        return StructureCollection.difference(
-            StructureCollection.union(
-                *[member.nearby(space=space) for member in self.members]
-            ),
-            self.members,
-        )
+        return StructureCollection.union(
+            *[member.nearby(space=space) for member in self.members]
+        ).filter(lambda x: self not in x.containing_chunks)
+        # ).filter(lambda x: not all([m in self.members for m in x.members]))
 
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
