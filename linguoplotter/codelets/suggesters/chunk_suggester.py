@@ -6,6 +6,7 @@ from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
+from linguoplotter.location import Location
 from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import chunking_exigency
 
@@ -24,6 +25,7 @@ class ChunkSuggester(Suggester):
         )
         self.target_structure_one = target_structures.get("target_structure_one")
         self.target_structure_two = target_structures.get("target_structure_two")
+        self.target_members = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -87,33 +89,29 @@ class ChunkSuggester(Suggester):
         return {
             "target_structure_one": self.target_structure_one,
             "target_structure_two": self.target_structure_two,
+            "target_members": self.target_members,
         }
 
     def _passes_preliminary_checks(self) -> bool:
-        try:
+        if self.target_members is None:
             if self.target_structure_two is None:
-                self.target_structure_two = (
-                    self.target_structure_one.potential_chunk_mates.get(
-                        key=chunking_exigency
+                try:
+                    self.target_structure_two = (
+                        self.target_structure_one.potential_chunk_mates.get(
+                            key=chunking_exigency
+                        )
                     )
-                )
-            return True
-        except MissingStructureError:
-            return False
+                except MissingStructureError:
+                    return False
+            self.target_members = StructureCollection.union(
+                self.target_structure_one.raw_members,
+                self.target_structure_two.raw_members,
+            )
+        return True
 
     def _calculate_confidence(self):
-        collection_one = (
-            self.bubble_chamber.new_structure_collection(self.target_structure_one)
-            if self.target_structure_one.members.is_empty()
-            else self.target_structure_one.members
-        )
-        collection_two = (
-            self.bubble_chamber.new_structure_collection(self.target_structure_two)
-            if self.target_structure_two.members.is_empty()
-            else self.target_structure_two.members
-        )
         self.confidence = SamenessClassifier().classify(
-            collection=StructureCollection.union(collection_one, collection_two),
+            collection=self.target_members,
             concept=self.bubble_chamber.concepts["same"],
             spaces=self.target_structure_one.parent_spaces.filter(
                 lambda x: x.is_conceptual_space

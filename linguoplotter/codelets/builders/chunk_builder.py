@@ -1,5 +1,4 @@
 from __future__ import annotations
-import math
 
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.builder import Builder
@@ -22,8 +21,8 @@ class ChunkBuilder(Builder):
         Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
         self.target_structure_one = target_structures.get("target_structure_one")
         self.target_structure_two = target_structures.get("target_structure_two")
+        self.target_members = target_structures.get("target_members")
         self._target_structures = target_structures
-        self.suggested_members = None
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -57,24 +56,12 @@ class ChunkBuilder(Builder):
         return {
             "target_structure_one": self.target_structure_one,
             "target_structure_two": self.target_structure_two,
+            "target_members": self.target_members,
         }
 
     def _passes_preliminary_checks(self):
-        collection_one = (
-            self.bubble_chamber.new_structure_collection(self.target_structure_one)
-            if self.target_structure_one.members.is_empty()
-            else self.target_structure_one.members
-        )
-        collection_two = (
-            self.bubble_chamber.new_structure_collection(self.target_structure_two)
-            if self.target_structure_two.members.is_empty()
-            else self.target_structure_two.members
-        )
-        self.suggested_members = StructureCollection.union(
-            collection_one, collection_two
-        )
         equivalent_chunks = self.bubble_chamber.chunks.where(
-            members=self.suggested_members
+            members=self.target_members
         )
         if not equivalent_chunks.is_empty():
             self.child_structures = self.bubble_chamber.new_structure_collection(
@@ -90,7 +77,7 @@ class ChunkBuilder(Builder):
             return
         chunk_locations = [
             Location.merge(
-                *[member.location_in_space(space) for member in self.suggested_members]
+                *[member.location_in_space(space) for member in self.target_members]
             )
             for space in self.target_structure_one.parent_spaces
             if space.name != "size"
@@ -98,7 +85,7 @@ class ChunkBuilder(Builder):
         chunk = self.bubble_chamber.new_chunk(
             parent_id=self.codelet_id,
             locations=chunk_locations,
-            members=self.suggested_members,
+            members=self.target_members,
             parent_space=self.target_structure_one.parent_space,
             quality=0.0,
         )
@@ -106,8 +93,7 @@ class ChunkBuilder(Builder):
             self.bubble_chamber.new_structure_collection(
                 self.target_structure_one, self.target_structure_two
             ),
-            self.target_structure_one.members,
-            self.target_structure_two.members,
+            self.target_members,
         ):
             member.containing_chunks.add(chunk)
         self._structure_concept.instances.add(chunk)
