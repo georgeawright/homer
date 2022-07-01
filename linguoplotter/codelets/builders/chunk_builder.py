@@ -90,8 +90,7 @@ class ChunkBuilder(Builder):
             return
         chunk_locations = [
             Location.merge(
-                self.target_structure_one.location_in_space(space),
-                self.target_structure_two.location_in_space(space),
+                *[member.location_in_space(space) for member in self.suggested_members]
             )
             for space in self.target_structure_one.parent_spaces
             if space.name != "size"
