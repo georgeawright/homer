@@ -67,14 +67,14 @@ class ViewDrivenFactory(Factory):
         return self.bubble_chamber.new_structure_collection(self.target_view)
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        urgency = (
-            self.bubble_chamber.focus.view.unhappiness
+        return (
+            max(
+                self.bubble_chamber.focus.view.unhappiness,
+                self.coderack.MINIMUM_CODELET_URGENCY,
+            )
             if self.bubble_chamber.focus.view is not None
-            else 1 - self.bubble_chamber.satisfaction
+            else self.coderack.MINIMUM_CODELET_URGENCY
         )
-        if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
-            return urgency
-        return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):
         self._set_target_view()
@@ -118,12 +118,10 @@ class ViewDrivenFactory(Factory):
         self.child_codelets.append(follow_up)
 
     def _set_target_view(self):
+        if self.bubble_chamber.focus.view is None:
+            raise MissingStructureError
         if self.target_view is None:
-            self.target_view = (
-                self.bubble_chamber.focus.view
-                if self.bubble_chamber.focus.view is not None
-                else self.bubble_chamber.production_views.get(key=exigency)
-            )
+            self.target_view = self.bubble_chamber.focus.view
         try:
             self.target_view = self.target_view.sub_views.filter(
                 lambda x: x.unhappiness > 0
