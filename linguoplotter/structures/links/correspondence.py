@@ -133,7 +133,7 @@ class Correspondence(Link):
         return StructureCollection.intersection(self.arguments, other.arguments)
 
     def spread_activation(self):
-        if not self.is_fully_active:
+        if not self.is_fully_active():
             return
         Link.spread_activation(self)
         if self.parent_view is not None:
