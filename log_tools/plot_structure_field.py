@@ -72,7 +72,12 @@ concept_file_map = {
     "central": None,
     "everywhere": None,
 }
-log_directory = "logs/1656934328.7748954"
+
+log_directories = os.listdir("logs/")
+log_directories.sort()
+print(log_directories)
+log_directory = "logs/" + log_directories[-1]
+
 structures_directory = f"{log_directory}/structures/structures/"
 log_files = os.listdir(structures_directory)
 for log_file in log_files:
