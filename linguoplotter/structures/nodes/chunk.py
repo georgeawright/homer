@@ -177,7 +177,7 @@ class Chunk(Node):
             is_slot=False,
             parent_space=self.parent_space,
         )
-        key = lambda x: 1 - space.proximity_between(x, self)
+        key = lambda x: concept.classifier.classify(start=self, end=x, space=space)
         return chunks.get(key=key, exclude=[self])
 
     def copy_to_location(
