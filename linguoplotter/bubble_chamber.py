@@ -208,6 +208,26 @@ class BubbleChamber:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
 
+    def refresh_concept_activations(self) -> None:
+        builtin_spaces = [
+            self.spaces["activity"],
+            self.spaces["structure"],
+            self.spaces["direction"],
+            self.spaces["space-type"],
+        ]
+        for structure in StructureCollection.union(
+            self.concepts.filter(lambda x: x.parent_space not in builtin_spaces),
+            self.letter_chunks.filter(
+                lambda x: x.parent_space is None or x.parent_space.is_conceptual_space
+            ),
+            self.frames,
+        ):
+            structure._activation = 0.0
+            structure._activation_buffer = 0.0
+            for link in structure.links:
+                link._activation = 0.0
+                link._activation_buffer = 0.0
+
     def new_structure_collection(
         self, *structures: List[Structure]
     ) -> StructureCollection:
