@@ -90,6 +90,10 @@ class FocusUnsetter(Codelet):
             if transposed_change_in_satisfaction_score <= 0.5:
                 self.bubble_chamber.loggers["activity"].log(self, "Decaying focus")
                 self.bubble_chamber.focus.view._activation = 0.0
+                for view in self.bubble_chamber.focus.view.sub_views:
+                    view._activation = 0.0
+                for view in self.bubble_chamber.focus.view.super_views:
+                    view._activation = 0.0
                 for correspondence in self.bubble_chamber.focus.view.members:
                     correspondence.decay_activation(
                         transposed_change_in_satisfaction_score
