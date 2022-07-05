@@ -24,6 +24,7 @@ class Chunk(Node):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
+        containing_chunks: StructureCollection,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ):
@@ -41,6 +42,7 @@ class Chunk(Node):
         self.abstract_chunk = abstract_chunk
         self.members = members
         self.super_chunks = super_chunks
+        self.containing_chunks = containing_chunks
         self._parent_space = parent_space
         self.is_raw = is_raw
         self.is_chunk = True
@@ -113,11 +115,11 @@ class Chunk(Node):
         )
 
     def recalculate_unchunkedness(self):
-        if len(self.super_chunks) == 0:
+        if len(self.containing_chunks) == 0:
             self.unchunkedness = 1
         else:
             self.unchunkedness = 0.5 * prod(
-                [chunk.unchunkedness for chunk in self.super_chunks]
+                [chunk.unchunkedness for chunk in self.containing_chunks]
             )
 
     @property
@@ -140,23 +142,30 @@ class Chunk(Node):
         )
 
     def nearby(self, space: Space = None) -> StructureCollection:
-        if space is not None:
-            return (
-                space.contents.where(is_chunk=True)
-                .near(self.location_in_space(space))
-                .excluding(self),
-            )
-        return StructureCollection.intersection(
-            *[
-                location.space.contents.where(
-                    is_chunk=True, parent_space=self.parent_space
-                ).near(location)
-                for location in self.locations
-                if location.space.is_conceptual_space
-                and location.space.is_basic_level
-                and location.space.name != "size"
-            ]
-        ).excluding(self)
+        if self.is_raw:
+            if space is not None:
+                return (
+                    space.contents.where(is_chunk=True)
+                    .near(self.location_in_space(space))
+                    .excluding(self),
+                )
+            return StructureCollection.intersection(
+                *[
+                    location.space.contents.where(
+                        is_chunk=True, parent_space=self.parent_space
+                    ).near(location)
+                    for location in self.locations
+                    if location.space.is_conceptual_space
+                    and location.space.is_basic_level
+                    and location.space.name != "size"
+                ]
+            ).excluding(self)
+        return StructureCollection.union(
+            *[member.nearby(space=space) for member in self.members]
+        ).filter(
+            lambda x: self not in x.containing_chunks
+            and x not in self.containing_chunks
+        )
 
     def get_potential_relative(
         self, space: Space = None, concept: Concept = None
@@ -168,7 +177,7 @@ class Chunk(Node):
             is_slot=False,
             parent_space=self.parent_space,
         )
-        key = lambda x: 1 - space.proximity_between(x, self)
+        key = lambda x: concept.classifier.classify(start=self, end=x, space=space)
         return chunks.get(key=key, exclude=[self])
 
     def copy_to_location(

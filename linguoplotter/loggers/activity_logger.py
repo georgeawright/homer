@@ -3,9 +3,15 @@ from linguoplotter.logger import Logger
 
 
 class ActivityLogger(Logger):
-    def __init__(self, log_file_name: str, satisfaction_stream=None):
+    def __init__(
+        self,
+        log_file_name: str,
+        satisfaction_stream=None,
+        coderack_population_stream=None,
+    ):
         self.log_file_name = log_file_name
         self.satisfaction_stream = satisfaction_stream
+        self.coderack_population_stream = coderack_population_stream
         self._stream = None
         self.previous_codelet_id = None
         self.codelets_run = 0
@@ -46,6 +52,12 @@ class ActivityLogger(Logger):
         if self.satisfaction_stream is not None:
             self.satisfaction_stream.write(
                 f"{self.codelets_run},{codelet.bubble_chamber.satisfaction}\n"
+            )
+
+    def _log_coderack_population(self, coderack_population: int):
+        if self.coderack_population_stream is not None:
+            self.coderack_population_stream.write(
+                f"{self.codelets_run},{coderack_population}\n"
             )
 
     def log_dict(self, codelet: "Codelet", dictionary, name: str):

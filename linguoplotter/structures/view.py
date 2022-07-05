@@ -1,3 +1,4 @@
+from __future__ import annotations
 import statistics
 from typing import List
 
@@ -150,6 +151,16 @@ class View(Structure):
             return self._node_groups
         return self.super_views.get().node_groups
 
+    @property
+    def output(self):
+        return (
+            self.output_space.contents.filter(
+                lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+            )
+            .get()
+            .name
+        )
+
     def recalculate_unhappiness(self):
         items_to_process = sum(
             [
@@ -199,7 +210,7 @@ class View(Structure):
 
     def remove(self, correspondence: "Correspondence"):
         self.members.remove(correspondence)
-        for sub_frame, matched_frame in self.matched_sub_frames.items():
+        for sub_frame, matched_frame in self.matched_sub_frames.copy().items():
             if (
                 correspondence in matched_frame.input_space.contents
                 or correspondence in matched_frame.output_space.contents
@@ -239,6 +250,7 @@ class View(Structure):
         conceptual_space: Space,
         start: Structure,
         end: Structure,
+        sub_view: View = None,
     ) -> bool:
         if self.has_member(parent_concept, conceptual_space, start, end):
             return False
@@ -298,6 +310,17 @@ class View(Structure):
                 },
             ]
         )
+        if sub_view is not None:
+            for potential_node_group in potential_node_groups:
+                for sub_view_node_group in sub_view.node_groups:
+                    if any(
+                        [
+                            node in sub_view_node_group.values()
+                            for node in potential_node_group.values()
+                        ]
+                    ):
+                        for space in sub_view_node_group:
+                            potential_node_group[space] = sub_view_node_group[space]
         for existing_node_group in self.node_groups:
             for potential_group in potential_node_groups:
                 if (

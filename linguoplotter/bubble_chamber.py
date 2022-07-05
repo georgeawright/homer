@@ -27,12 +27,12 @@ from .worldview import Worldview
 
 
 class BubbleChamber:
-    def __init__(self):
+    def __init__(self, focus, recycle_bin):
         self.loggers = {}
         self.random_machine = None
-        self.focus = Focus()
-        self.worldview = Worldview()
-        self.recycle_bin = RecycleBin()
+        self.worldview = None
+        self.focus = focus
+        self.recycle_bin = recycle_bin
 
         self.conceptual_spaces = None
         self.contextual_spaces = None
@@ -59,7 +59,7 @@ class BubbleChamber:
 
     @classmethod
     def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
-        bubble_chamber = cls()
+        bubble_chamber = cls(Focus(), RecycleBin())
         bubble_chamber.random_machine = RandomMachine(bubble_chamber, random_seed)
         bubble_chamber.reset(loggers)
         return bubble_chamber
@@ -67,7 +67,7 @@ class BubbleChamber:
     def reset(self, loggers: Dict[str, Logger]):
         self.loggers = loggers
         self.focus = Focus()
-        self.worldview = Worldview()
+        self.worldview = Worldview(self.new_structure_collection())
         self.conceptual_spaces = self.new_structure_collection()
         self.contextual_spaces = self.new_structure_collection()
         self.frames = self.new_structure_collection()
@@ -208,6 +208,26 @@ class BubbleChamber:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
 
+    def refresh_concept_activations(self) -> None:
+        builtin_spaces = [
+            self.spaces["activity"],
+            self.spaces["structure"],
+            self.spaces["direction"],
+            self.spaces["space-type"],
+        ]
+        for structure in StructureCollection.union(
+            self.concepts.filter(lambda x: x.parent_space not in builtin_spaces),
+            self.letter_chunks.filter(
+                lambda x: x.parent_space is None or x.parent_space.is_conceptual_space
+            ),
+            self.frames,
+        ):
+            structure._activation = 0.0
+            structure._activation_buffer = 0.0
+            for link in structure.links:
+                link._activation = 0.0
+                link._activation_buffer = 0.0
+
     def new_structure_collection(
         self, *structures: List[Structure]
     ) -> StructureCollection:
@@ -234,6 +254,7 @@ class BubbleChamber:
                 super_view.sub_views.remove(item)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
+            item.parent_frame.recalculate_exigency()
         if item.is_correspondence:
             item.parent_view.remove(item)
         if item.is_link:
@@ -397,6 +418,7 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
+            containing_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
             is_raw=is_raw,
         )
@@ -444,6 +466,7 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
+            containing_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
         )
         for member in members:

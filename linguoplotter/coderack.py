@@ -15,7 +15,7 @@ from .codelets import (
     Selector,
     Suggester,
     Recycler,
-    WorldviewSetter,
+    WorldviewPorter,
 )
 from .codelets.factories import (
     ConceptDrivenFactory,
@@ -40,7 +40,7 @@ class Coderack:
         GarbageCollector,
         Publisher,
         Recycler,
-        WorldviewSetter,
+        WorldviewPorter,
     )
 
     def __init__(self, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
@@ -62,7 +62,7 @@ class Coderack:
             FocusSetter.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
-            WorldviewSetter.spawn(
+            WorldviewPorter.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
             CoderackCleaner.spawn(
@@ -150,20 +150,13 @@ class Coderack:
             + f"Coderack Population Size: {self.population_size} | "
             + f"View Count: {view_count}\n"
             + f"Focus: {self.bubble_chamber.focus.view}\n"
-            + f"Worldview: {self.bubble_chamber.worldview.view}\n",
+            + f"Worldview: {self.bubble_chamber.worldview.views}\n",
         )
+        self.loggers["activity"]._log_coderack_population(self.population_size)
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)
 
     def _select_a_codelet(self) -> Codelet:
-        if len(self._codelets) >= self.MAXIMUM_POPULATION:
-            codelet_choice = [
-                codelet
-                for codelet in self._codelets
-                if isinstance(codelet, CoderackCleaner)
-            ][0]
-            self._codelets.remove(codelet_choice)
-            return codelet_choice
         try:
             codelet_choice = self.bubble_chamber.random_machine.select(
                 self._codelets, key=lambda x: x.urgency

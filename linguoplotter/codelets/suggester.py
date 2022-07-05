@@ -2,6 +2,7 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structures.nodes import Concept
 
 
@@ -78,8 +79,19 @@ class Suggester(Codelet):
 
     @property
     def target_structures(self):
-        return self.bubble_chamber.new_structure_collection(
-            *self._target_structures.values()
+        return StructureCollection.union(
+            self.bubble_chamber.new_structure_collection(
+                *[
+                    structure
+                    for structure in self._target_structures.values()
+                    if not isinstance(structure, StructureCollection)
+                ]
+            ),
+            *[
+                structure_collection
+                for structure_collection in self._target_structures.values()
+                if isinstance(structure_collection, StructureCollection)
+            ],
         )
 
     def _boost_activations(self):

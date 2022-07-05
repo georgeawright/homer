@@ -2,7 +2,7 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection temperature-space conceptual-space goodness-space)
+    :possible_instances (StructureCollection temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))

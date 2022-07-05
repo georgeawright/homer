@@ -21,6 +21,7 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                 correspondence.conceptual_space,
                 correspondence.start,
                 correspondence.end,
+                sub_view=self.target_sub_view,
             ):
                 self.bubble_chamber.loggers["activity"].log(
                     self, f"{self.target_view} cannot accept {correspondence}"
@@ -31,6 +32,7 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             self.target_conceptual_space,
             self.target_structure_one,
             self.target_structure_two,
+            sub_view=self.target_sub_view,
         )
 
     def _process_structure(self):

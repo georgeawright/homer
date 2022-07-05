@@ -85,7 +85,15 @@ class CorrespondenceSuggester(Suggester):
             target_structure_two = output_structures.where(is_chunk=True).get()
         else:
             raise MissingStructureError
-        target_space_two = target_structure_two.parent_space
+        possible_target_spaces = target_structure_two.parent_spaces.filter(
+            lambda s: s.is_contextual_space
+        )
+        if len(possible_target_spaces) == 1:
+            target_space_two = possible_target_spaces.get()
+        else:
+            target_space_two = possible_target_spaces.filter(
+                lambda x: target_structure_two.parent_space != x
+            ).get()
         if target_space_two == target_view.parent_frame.input_space:
             follow_up_class = SpaceToFrameCorrespondenceSuggester
             sub_frame = None

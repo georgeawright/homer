@@ -1,4 +1,5 @@
 from __future__ import annotations
+import functools
 from typing import List
 
 from .tools import average_vector
@@ -28,9 +29,12 @@ class Location:
         )
 
     @classmethod
-    def merge(cls, location_one: Location, location_two: Location) -> Location:
+    def merge(cls, *locations: List[Location]) -> Location:
         return Location(
-            location_one.coordinates + location_two.coordinates, location_one.space
+            functools.reduce(
+                lambda a, b: a + b, [location.coordinates for location in locations]
+            ),
+            locations[0].space,
         )
 
     def __eq__(self, other: Location) -> bool:

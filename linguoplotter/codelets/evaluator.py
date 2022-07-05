@@ -2,15 +2,12 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collection import StructureCollection
 
 
 class Evaluator(Codelet):
     """Evaluates the quality of target_structure and adjusts its quality accordingly."""
-
-    CONFIDENCE_THRESHOLD = HyperParameters.CONFIDENCE_THRESHOLD
 
     def __init__(
         self,
@@ -56,8 +53,7 @@ class Evaluator(Codelet):
             structure.quality = self.confidence
         self._engender_follow_up()
         self.result = CodeletResult.FINISH
-        # TODO: probably just boost/decay activations proportionally to change in confidence
-        if self.change_in_confidence > self.CONFIDENCE_THRESHOLD:
+        if self.change_in_confidence > 0:
             self._boost_activations()
         else:
             self._decay_activations()
@@ -84,7 +80,7 @@ class Evaluator(Codelet):
         return self._target_structures
 
     def _boost_activations(self):
-        self._evaluate_concept.boost_activation(1)
+        self._evaluate_concept.boost_activation(self.change_in_confidence)
         self._parent_link.boost_activation(self.change_in_confidence)
         self._evaluate_concept.update_activation()
         self._parent_link.update_activation()

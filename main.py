@@ -14,17 +14,20 @@ os.mkdir(structure_logs_dir_path)
 
 log_file_name = f"{logs_dir_path}/activity"
 satisfaction_stream = open(f"{logs_dir_path}/satisfaction.csv", "w")
+coderack_population_stream = open(f"{logs_dir_path}/coderack_population.csv", "w")
 error_file_name = f"{logs_dir_path}/errors.log"
 error_stream = open(error_file_name, "w")
 loggers = {
-    "activity": ActivityLogger(log_file_name, satisfaction_stream),
+    "activity": ActivityLogger(
+        log_file_name, satisfaction_stream, coderack_population_stream
+    ),
     "structure": StructureLogger(f"{structure_logs_dir_path}"),
     "errors": ErrorLogger(error_stream),
 }
-narrator = Linguoplotter.setup(loggers, random_seed=3)
+narrator = Linguoplotter.setup(loggers, random_seed=1)
 narrator.interpreter.interpret_file("builtin.lisp")
 
 os.chdir("example-programs/weather")
-narrator.interpreter.interpret_file("narration-5-change-in-size.lisp")
+narrator.interpreter.interpret_file("narration-2-uniform-change.lisp")
 os.chdir("../..")
 narrator.run()

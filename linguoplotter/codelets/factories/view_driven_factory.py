@@ -67,14 +67,14 @@ class ViewDrivenFactory(Factory):
         return self.bubble_chamber.new_structure_collection(self.target_view)
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        urgency = (
-            self.bubble_chamber.focus.view.unhappiness
+        return (
+            max(
+                self.bubble_chamber.focus.view.unhappiness,
+                self.coderack.MINIMUM_CODELET_URGENCY,
+            )
             if self.bubble_chamber.focus.view is not None
-            else 1 - self.bubble_chamber.satisfaction
+            else self.coderack.MINIMUM_CODELET_URGENCY
         )
-        if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
-            return urgency
-        return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):
         self._set_target_view()
@@ -118,12 +118,10 @@ class ViewDrivenFactory(Factory):
         self.child_codelets.append(follow_up)
 
     def _set_target_view(self):
+        if self.bubble_chamber.focus.view is None:
+            raise MissingStructureError
         if self.target_view is None:
-            self.target_view = (
-                self.bubble_chamber.focus.view
-                if self.bubble_chamber.focus.view is not None
-                else self.bubble_chamber.production_views.get(key=exigency)
-            )
+            self.target_view = self.bubble_chamber.focus.view
         try:
             self.target_view = self.target_view.sub_views.filter(
                 lambda x: x.unhappiness > 0
@@ -194,19 +192,26 @@ class ViewDrivenFactory(Factory):
                         self.target_slot.start.is_link
                         and self.target_slot.start.is_node
                     ):
-                        node = input_space.contents.where(
-                            is_labellable=True, is_slot=False
+                        node = input_space.contents.filter(
+                            lambda x: x.is_labellable and x.quality > 0
                         ).get(key=labeling_exigency)
                     else:
-                        node = input_space.contents.where(
-                            is_node=True, is_slot=False
+                        node = input_space.contents.filter(
+                            lambda x: x.is_node and x.quality > 0
                         ).get(key=labeling_exigency)
-            parent_concept = (
-                self.target_slot.parent_spaces.where(is_conceptual_space=True)
-                .get()
-                .contents.where(is_concept=True, is_slot=False)
-                .get(key=lambda x: x.proximity_to(node))
-            )
+            if not self.target_slot.parent_concept.is_slot:
+                parent_concept = self.target_slot.parent_concept
+            elif self.target_slot.parent_concept.is_filled_in:
+                parent_concept = self.target_slot.parent_concept.relatives.where(
+                    is_concept=True, is_slot=False
+                ).get()
+            else:
+                parent_concept = (
+                    self.target_slot.parent_spaces.where(is_conceptual_space=True)
+                    .get()
+                    .contents.where(is_concept=True, is_slot=False)
+                    .get(key=lambda x: x.proximity_to(node))
+                )
             return LabelSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
@@ -248,8 +253,8 @@ class ViewDrivenFactory(Factory):
                 ):
                     target_structure_two = node_group[input_space]
             if target_structure_one is None or target_structure_two is None:
-                potential_targets = input_space.contents.where(
-                    is_node=True, is_slot=False
+                potential_targets = input_space.contents.filter(
+                    lambda x: x.is_node and x.quality > 0
                 )
                 try:
                     (
@@ -423,7 +428,8 @@ class ViewDrivenFactory(Factory):
         )
         follow_up._get_target_conceptual_space(self, follow_up)
         self.compatible_sub_views = self.bubble_chamber.production_views.filter(
-            lambda x: x.super_views.is_empty()
+            lambda x: x != self.target_view
+            and x.super_views.is_empty()
             and (x.parent_frame.parent_concept == sub_frame.parent_concept)
             and (x.input_spaces == self.target_view.input_spaces)
             and all(
@@ -433,6 +439,7 @@ class ViewDrivenFactory(Factory):
                         member.conceptual_space,
                         member.start,
                         member.end,
+                        sub_view=x,
                     )
                     for member in x.members
                 ]
@@ -460,12 +467,14 @@ class ViewDrivenFactory(Factory):
                         member.conceptual_space,
                         member.start,
                         self.target_slot,
+                        sub_view=x,
                     )
                     and self.target_view.can_accept_member(
                         member.parent_concept,
                         member.conceptual_space,
                         member.end,
                         self.target_slot,
+                        sub_view=x,
                     )
                     for member in x.members.filter(
                         lambda c: type(c.start) == type(self.target_slot)

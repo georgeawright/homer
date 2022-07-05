@@ -1,6 +1,6 @@
 class HyperParameters:
     FLOATING_POINT_TOLERANCE = 1e-5
-    CODELET_RUN_LIMIT = 50000
+    CODELET_RUN_LIMIT = 100000
 
     ACTIVATION_UPDATE_FREQUENCY = 10
     ACTIVATION_UPDATE_COEFFICIENT = 0.1
@@ -13,9 +13,6 @@ class HyperParameters:
 
     DETERMINISM_SMOOTHING_FUNCTION = lambda x: (x + 0.5) / 2
     PUBLICATION_PROBABILITY_EXPONENT = 5
-
-    # TODO: these ought to be removed when suggesters are implemented
-    CONFIDENCE_THRESHOLD = 0.5
 
     # TODO: these ought to be specific to each conceptual space
     DISTANCE_TO_PROXIMITY_WEIGHT = 1.5

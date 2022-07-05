@@ -46,7 +46,7 @@ class FocusUnsetter(Codelet):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
         )
-        current_satisfaction_score = self.bubble_chamber.satisfaction
+        current_satisfaction_score = self.bubble_chamber.focus.satisfaction
         change_in_satisfaction_score = (
             current_satisfaction_score - self.last_satisfaction_score
         )
@@ -55,7 +55,7 @@ class FocusUnsetter(Codelet):
         ) + 0.5
         self.bubble_chamber.loggers["activity"].log(
             self,
-            f"Current bubble chamber satisfaction: {self.bubble_chamber.satisfaction}",
+            f"Current focus satisfaction: {self.bubble_chamber.focus.satisfaction}",
         )
         self.bubble_chamber.loggers["activity"].log(
             self,
@@ -67,7 +67,7 @@ class FocusUnsetter(Codelet):
         )
         if self.bubble_chamber.focus.view.unhappiness == 0.0:
             probability_of_unsetting_focus = 1
-            self._update_worldview_setter_urgency()
+            self._update_worldview_porter_urgency()
         else:
             probability_of_unsetting_focus = statistics.fmean(
                 [
@@ -89,7 +89,16 @@ class FocusUnsetter(Codelet):
         else:
             if transposed_change_in_satisfaction_score <= 0.5:
                 self.bubble_chamber.loggers["activity"].log(self, "Decaying focus")
-                self.bubble_chamber.focus.view._activation == 0
+                self.bubble_chamber.focus.view._activation = 0.0
+                for view in self.bubble_chamber.focus.view.sub_views:
+                    view._activation = 0.0
+                for view in self.bubble_chamber.focus.view.super_views:
+                    view._activation = 0.0
+                for correspondence in self.bubble_chamber.focus.view.members:
+                    correspondence.decay_activation(
+                        transposed_change_in_satisfaction_score
+                    )
+                    correspondence.update_activation()
                 self._update_recycler_urgency()
             self.bubble_chamber.focus.view = None
             self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
@@ -99,9 +108,9 @@ class FocusUnsetter(Codelet):
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
-    def _update_worldview_setter_urgency(self):
+    def _update_worldview_porter_urgency(self):
         for codelet in self.coderack._codelets:
-            if "WorldviewSetter" in codelet.codelet_id:
+            if "WorldviewPorter" in codelet.codelet_id:
                 codelet.urgency = self.bubble_chamber.focus.satisfaction
                 return
         raise Exception
@@ -119,7 +128,7 @@ class FocusUnsetter(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                self.bubble_chamber.satisfaction,
+                self.bubble_chamber.focus.satisfaction,
                 0.5,
             )
         )

@@ -1,6 +1,5 @@
 from __future__ import annotations
 import math
-import statistics
 from typing import List
 
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero

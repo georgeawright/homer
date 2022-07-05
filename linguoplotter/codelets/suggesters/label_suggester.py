@@ -58,7 +58,9 @@ class LabelSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         space = bubble_chamber.input_spaces.get(key=activation)
-        target = space.contents.where(is_chunk=True).get(key=labeling_exigency)
+        target = space.contents.filter(lambda x: x.is_chunk and x.quality > 0).get(
+            key=labeling_exigency
+        )
         urgency = urgency if urgency is not None else target.unlabeledness
         return cls.spawn(
             parent_id,
@@ -76,7 +78,7 @@ class LabelSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         potential_targets = bubble_chamber.input_nodes.where(is_slot=False).filter(
-            lambda x: isinstance(x, parent_concept.instance_type)
+            lambda x: isinstance(x, parent_concept.instance_type) and x.quality > 0
         )
         target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
         urgency = urgency if urgency is not None else target.unlabeledness
@@ -139,66 +141,12 @@ class LabelSuggester(Suggester):
         return True
 
     def _calculate_confidence(self):
-        try:
-            self.confidence = (
-                self.parent_concept.classifier.classify(
-                    concept=self.parent_concept, start=self.target_node
-                )
-                * self.target_node.quality
-            )
-        except NoLocationError:
-            for space in self.target_node.parent_spaces:
-                if (
-                    not space.contents.where(is_concept=True)
-                    .filter(
-                        lambda x: x.has_correspondence_to_space(
-                            self.parent_concept.parent_space
-                        )
-                    )
-                    .is_empty()
-                ):
-                    source_space = self.parent_concept.parent_space
-                    target_space = space
-                    break
-            source_concepts = [
-                concept for concept in source_space.contents.where(is_concept=True)
-            ]
-            source_concepts.sort(
-                key=lambda x: x.location_in_space(source_space).coordinates[0][0]
-            )
-            source_min_concept = source_concepts[0]
-            source_max_concept = source_concepts[-1]
-            target_min_concept = source_min_concept.correspondees.filter(
-                lambda x: x.has_correspondence_to_space(source_space)
-            ).get()
-            target_max_concept = source_max_concept.correspondees.filter(
-                lambda x: x.has_correspondence_to_space(source_space)
-            ).get()
-            source_min = source_min_concept.location_in_space(source_space).coordinates[
-                0
-            ][0]
-            source_max = source_max_concept.location_in_space(source_space).coordinates[
-                0
-            ][0]
-            target_min = target_min_concept.location_in_space(target_space).coordinates[
-                0
-            ][0]
-            target_max = target_max_concept.location_in_space(target_space).coordinates[
-                0
-            ][0]
-            conversion_ratio = (source_max - source_min) / (target_max - target_min)
-            new_location_coordinates = [
-                [(coordinates[0] - target_min) * conversion_ratio]
-                for coordinates in self.target_node.location_in_space(
-                    target_space
-                ).coordinates
-            ]
-            projected_location = Location(new_location_coordinates, source_space)
-            self.target_node.locations.append(projected_location)
-            self.confidence = self.parent_concept.classifier.classify(
+        self.confidence = (
+            self.parent_concept.classifier.classify(
                 concept=self.parent_concept, start=self.target_node
             )
-            self.target_node.locations.remove(projected_location)
+            * self.target_node.quality
+        )
 
     def _fizzle(self):
         pass

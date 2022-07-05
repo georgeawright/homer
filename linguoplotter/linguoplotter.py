@@ -113,13 +113,9 @@ class Linguoplotter:
             + f"SELECT: {select_activation}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
-        if self.bubble_chamber.worldview.view is not None:
-            view_output = self.bubble_chamber.worldview.view.output_space
-            main_chunk = view_output.contents.filter(
-                lambda x: x.is_chunk and x.super_chunks.is_empty()
-            ).get()
-            text = main_chunk.name
-            print(text)
+        if not self.bubble_chamber.worldview.views.is_empty():
+            view_output = self.bubble_chamber.worldview.output
+            print(view_output)
         print("=" * 200)
 
     def print_results(self):

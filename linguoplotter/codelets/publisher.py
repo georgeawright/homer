@@ -44,38 +44,25 @@ class Publisher(Codelet):
         )
 
     def run(self) -> CodeletResult:
-        target_view = self.bubble_chamber.worldview.view
-        if target_view is None:
+        if self.bubble_chamber.worldview.views.is_empty():
             self.bubble_chamber.loggers["activity"].log(self, "There is no worldview.")
             self._fizzle()
             self.result = CodeletResult.FIZZLE
-        elif (
-            target_view.parent_frame.parent_concept
-            != self.bubble_chamber.concepts["sentence"]
-        ):
-            self.bubble_chamber.loggers["activity"].log(
-                self, "Worldview has no sentence."
-            )
-            self._fizzle()
-            self.result = CodeletResult.FIZZLE
         else:
-            self.bubble_chamber.loggers["activity"].log(self, "Worldview has sentence")
+            self.bubble_chamber.loggers["activity"].log(self, "Worldview is not empty")
             publish_concept = self.bubble_chamber.concepts["publish"]
             if publish_concept.is_fully_active():
                 self.bubble_chamber.loggers["activity"].log(
                     self, "Publish concept is fully active"
                 )
-                main_chunk = target_view.output_space.contents.filter(
-                    lambda x: x.is_chunk and x.super_chunks.is_empty()
-                ).get()
-                self.bubble_chamber.result = main_chunk.name
+                self.bubble_chamber.result = self.bubble_chamber.worldview.output
                 self.result = CodeletResult.FINISH
             else:
                 self.bubble_chamber.loggers["activity"].log(
                     self, "Boosting publish concept"
                 )
                 publish_concept.boost_activation(
-                    self.bubble_chamber.general_satisfaction
+                    self.bubble_chamber.worldview.satisfaction
                 )
                 self._fizzle()
                 self.result = CodeletResult.FIZZLE

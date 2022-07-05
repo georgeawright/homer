@@ -61,9 +61,9 @@ class RelationSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         input_space = bubble_chamber.input_spaces.get()
-        target = input_space.contents.where(is_chunk=True, is_slot=False).get(
-            key=relating_exigency
-        )
+        target = input_space.contents.filter(
+            lambda x: x.is_chunk and not x.is_slot and x.quality > 0
+        ).get(key=relating_exigency)
         target_space = target.parent_spaces.where(
             is_conceptual_space=True, no_of_dimensions=1
         ).get()
@@ -90,7 +90,9 @@ class RelationSuggester(Suggester):
     ):
         input_space = bubble_chamber.input_spaces.get()
         conceptual_space = input_space.conceptual_spaces.where(no_of_dimensions=1).get()
-        potential_targets = input_space.contents.where(is_node=True, is_slot=False)
+        potential_targets = input_space.contents.filter(
+            lambda x: x.is_node and x.is_slot and x.quality > 0
+        )
         try:
             target_structure_one, target_structure_two = potential_targets.pairs.get(
                 key=lambda x: parent_concept.classifier.classify(
