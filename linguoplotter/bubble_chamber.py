@@ -27,6 +27,8 @@ from .worldview import Worldview
 
 
 class BubbleChamber:
+    JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
+
     def __init__(self, focus, recycle_bin):
         self.loggers = {}
         self.random_machine = None
@@ -203,7 +205,14 @@ class BubbleChamber:
 
     def update_activations(self) -> None:
         for structure in self.structures:
+            structure_old_activation = structure.activation
             structure.update_activation()
+            if (
+                # structure.activation > structure_old_activation
+                structure.activation > self.JUMP_THRESHOLD
+                and self.random_machine.coin_flip()
+            ):
+                structure._activation = 1.0
             if self.log_count % self.ACTIVATION_LOGGING_FREQUENCY == 0:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
