@@ -46,7 +46,9 @@ class LabelProjectionEvaluator(ProjectionEvaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
+        label = self.target_structures.where(is_label=True).get()
         try:
+            # TODO: out of date
             non_frame_item = (
                 self.target_structures.where(is_correspondence=True)
                 .filter(lambda x: not x.start.is_slot)
@@ -68,3 +70,4 @@ class LabelProjectionEvaluator(ProjectionEvaluator):
         except MissingStructureError:
             self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
+        self.activation_difference = label.quality - label.activation
