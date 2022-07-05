@@ -64,7 +64,14 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
 
     def _passes_preliminary_checks(self):
         self.parent_concept = self.bubble_chamber.concepts["same"]
-        self.target_space_two = self.target_structure_two.parent_space
+        if self.target_space_two is None:
+            self.target_space_two = (
+                self.sub_frame.input_space
+                if self.target_space_two.has_location_in_space(
+                    self.sub_frame.input_space
+                )
+                else self.sub_frame.output_space
+            )
         self._get_target_conceptual_space(self, self)
         try:
             if self.target_space_one is None:
