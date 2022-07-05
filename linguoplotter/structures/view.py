@@ -151,6 +151,16 @@ class View(Structure):
             return self._node_groups
         return self.super_views.get().node_groups
 
+    @property
+    def output(self):
+        return (
+            self.output_space.contents.filter(
+                lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+            )
+            .get()
+            .name
+        )
+
     def recalculate_unhappiness(self):
         items_to_process = sum(
             [

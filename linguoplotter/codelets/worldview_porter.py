@@ -121,6 +121,9 @@ class WorldviewPorter(Codelet):
         return compatible_views
 
     def _is_compatible(self, view: View, views: StructureCollection) -> bool:
+        for collected_view in views:
+            if collected_view.output == view.output:
+                return False
         return True
 
     def _calculate_satisfaction(
