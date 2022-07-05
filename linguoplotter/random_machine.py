@@ -28,6 +28,9 @@ class RandomMachine:
     def generate_number(self) -> FloatBetweenOneAndZero:
         return random.random()
 
+    def coin_flip(self) -> bool:
+        return self.generate_number() > 0.5
+
     def randomize_number(self, number: FloatBetweenOneAndZero):
         return number * self.determinism + random.random() * self.randomness
 
