@@ -55,27 +55,6 @@ class Recycler(Codelet):
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
-        """
-    def run(self) -> CodeletResult:
-        try:
-            target_view = self.bubble_chamber.views.filter(
-                lambda x: x.activation == 0.0
-                and x not in self.bubble_chamber.recycle_bin
-            ).get()
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target view: {target_view}"
-            )
-            self.bubble_chamber.recycle_bin.add(target_view)
-            self.result = CodeletResult.FINISH
-        except MissingStructureError:
-            self.bubble_chamber.loggers["activity"].log(self, f"No target view")
-            self.result = CodeletResult.FIZZLE
-        self._engender_follow_up()
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
-        return self.result
-        """
-
     def _engender_follow_up(self):
         urgency = max(
             min(1, self.MINIMUM_URGENCY * len(self.bubble_chamber.views)),
