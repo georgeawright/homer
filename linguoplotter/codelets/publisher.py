@@ -51,10 +51,10 @@ class Publisher(Codelet):
         else:
             self.bubble_chamber.loggers["activity"].log(self, "Worldview is not empty")
             publish_concept = self.bubble_chamber.concepts["publish"]
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Publish concept activation: {publish_concept.activation}"
+            )
             if publish_concept.is_fully_active():
-                self.bubble_chamber.loggers["activity"].log(
-                    self, "Publish concept is fully active"
-                )
                 self.bubble_chamber.result = self.bubble_chamber.worldview.output
                 self.result = CodeletResult.FINISH
             else:
