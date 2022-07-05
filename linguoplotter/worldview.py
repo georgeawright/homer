@@ -8,13 +8,4 @@ class Worldview:
 
     @property
     def output(self):
-        return ". ".join(
-            [
-                view.output_space.contents.filter(
-                    lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
-                )
-                .get()
-                .name
-                for view in self.views
-            ]
-        )
+        return ". ".join([view.output for view in self.views])
