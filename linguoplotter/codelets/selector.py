@@ -160,11 +160,19 @@ class Selector(Codelet):
         for winner in self.winners:
             winner.boost_activation(self.confidence)
             winner.update_activation()
+            if winner.is_link:
+                winner.parent_concept.boost_activation(self.confidence)
+            if winner.is_view:
+                winner.parent_frame.boost_activation(self.confidence)
 
     def _decay_losers(self):
         for loser in self.losers:
             loser.decay_activation(self.confidence)
             loser.update_activation()
+            if loser.is_link:
+                loser.parent_concept.decay_activation(self.confidence)
+            if loser.is_view:
+                loser.parent_frame.decay_activation(self.confidence)
 
     def _get_representative(self, collection: StructureCollection):
         return collection.get()

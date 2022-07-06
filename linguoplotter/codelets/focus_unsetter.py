@@ -94,6 +94,8 @@ class FocusUnsetter(Codelet):
                     view._activation = 0.0
                 for view in self.bubble_chamber.focus.view.super_views:
                     view._activation = 0.0
+                for frame in self.bubble_chamber.focus.view.frames:
+                    frame._activation = 0.0
                 for correspondence in self.bubble_chamber.focus.view.members:
                     correspondence.decay_activation(
                         transposed_change_in_satisfaction_score
