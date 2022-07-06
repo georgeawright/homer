@@ -50,6 +50,9 @@ class Evaluator(Codelet):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Change in confidence: {self.change_in_confidence}"
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Activation difference: {self.activation_difference}"
+        )
         for structure in self.target_structures:
             structure.quality = self.confidence
         self._engender_follow_up()
