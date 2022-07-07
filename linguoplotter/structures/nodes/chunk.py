@@ -138,7 +138,7 @@ class Chunk(Node):
             and self.parent_space is not None
             and self.parent_space.is_main_input
             and self.activation == 0.0
-            and self.links.is_empty()
+            and self.links.filter(lambda x: not x.correspondences.is_empty()).is_empty()
             and self.super_chunks.is_empty()
         )
 

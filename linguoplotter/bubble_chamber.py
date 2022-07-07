@@ -280,6 +280,8 @@ class BubbleChamber:
         if item.is_chunk:
             for member in item.members:
                 member.super_chunks.remove(item)
+            for link in item.links:
+                self.remove(link)
         for space in item.parent_spaces:
             space.contents.remove(item)
         collection_name = self.collections[type(item)]
