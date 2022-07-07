@@ -99,6 +99,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 )
                 word.left_branch.add(correspondee)
                 word.members.add(correspondee)
+                word.sub_chunks.add(correspondee)
                 correspondee.super_chunks.add(word)
         for member in self.target_projectee.right_branch:
             if member.has_correspondence_to_space(self.target_view.output_space):
@@ -111,6 +112,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 )
                 word.right_branch.add(correspondee)
                 word.members.add(correspondee)
+                word.sub_chunks.add(correspondee)
                 correspondee.super_chunks.add(word)
         for super_chunk in self.target_projectee.super_chunks:
             if super_chunk.has_correspondence_to_space(self.target_view.output_space):
@@ -129,6 +131,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                     )
                     correspondee.right_branch.add(word)
                 correspondee.members.add(word)
+                correspondee.sub_chunks.add(word)
                 word.super_chunks.add(correspondee)
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,

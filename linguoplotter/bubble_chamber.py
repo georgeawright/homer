@@ -427,13 +427,14 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
-            containing_chunks=self.new_structure_collection(),
+            sub_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
             is_raw=is_raw,
         )
         for member in members:
             member.super_chunks.add(chunk)
             member.recalculate_exigency()
+            chunk.sub_chunks.add(member)
             self.loggers["structure"].log(member)
         self.add(chunk)
         return chunk
@@ -475,12 +476,13 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
-            containing_chunks=self.new_structure_collection(),
+            sub_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
             member.recalculate_exigency()
+            letter_chunk.sub_chunks.add(member)
             self.loggers["structure"].log(member)
         self.add(letter_chunk)
         if meaning_concept is not None:
