@@ -63,6 +63,9 @@ class WorldviewPorter(Codelet):
 
     def run_competition(self):
         competing_view_collection = self._get_competing_view_collection()
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, competing_view_collection, "Assembled competing views"
+        )
         current_worldview_satisfaction = self._calculate_satisfaction(
             self.bubble_chamber.worldview.views
         )
