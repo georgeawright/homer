@@ -166,3 +166,12 @@ generate_plot(
     "activation",
     "Location Concepts Activation Over Time",
 )
+
+generate_plot(
+    log_directory,
+    [
+        "SimplexView1",
+    ],
+    "activation",
+    "Selected Structures Activation Over Time",
+)
