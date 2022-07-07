@@ -259,7 +259,14 @@ class BubbleChamber:
                 self.remove(frame)
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
-            for super_view in item.super_views:
+            for super_view in item.super_views.copy():
+                for correspondence in super_view.members.copy():
+                    if (
+                        correspondence.start in item.parent_frame.input_space.contents
+                        or correspondence.start
+                        in item.parent_frame.output_space.contents
+                    ):
+                        self.remove(correspondence)
                 super_view.sub_views.remove(item)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
