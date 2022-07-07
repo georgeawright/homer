@@ -133,12 +133,10 @@ class WorldviewPorter(Codelet):
         self, views: StructureCollection
     ) -> FloatBetweenOneAndZero:
         return fuzzy.AND(
+            self._proportion_of_input_in_views(views),
             fuzzy.OR(
                 self._view_quality_score(views),
                 self._frame_depth_score(views),
-            ),
-            fuzzy.OR(
-                self._proportion_of_input_in_views(views),
                 self._frame_types_score(views),
             ),
         )
