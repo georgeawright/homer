@@ -280,6 +280,8 @@ class View(Structure):
                     relation_concept = (
                         end_concept.relations_with(relative).get().parent_concept
                     )
+                    if relation_concept.name == "different":
+                        continue
                     if relative.is_slot and relative.is_filled_in:
                         relative_concept = relative.non_slot_value
                         if not start_concept.has_relation_with(
@@ -291,6 +293,13 @@ class View(Structure):
                             end_concept, relation_concept
                         ):
                             return False
+            different_concepts = end_concept.relatives.filter(
+                lambda x: not x.relations_with(end_concept)
+                .where(name="different")
+                .is_empty()
+            )
+            if start_concept in different_concepts:
+                return False
         if not end.correspondences.filter(
             lambda x: x.end == end
             and x in self.members

@@ -1,7 +1,11 @@
 (define early-time-concept
-  (def-concept :name "" :is_slot True :parent_space time-space))
+  (def-concept :name "" :is_slot True :parent_space time-space
+    :locations (list (Location (list (list Nan)) time-space))))
 (define late-time-concept
-  (def-concept :name "" :is_slot True :parent_space time-space))
+  (def-concept :name "" :is_slot True :parent_space time-space
+    :locations (list (Location (list (list Nan)) time-space))))
+(def-relation :start early-time-concept :end late-time-concept
+  :parent_concept different-concept)
 
 (define pp-ablative-input
   (def-contextual-space :name "ablative-sub-frame.meaning" :parent_concept input-concept

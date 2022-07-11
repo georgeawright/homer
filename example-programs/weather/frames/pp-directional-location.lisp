@@ -1,11 +1,19 @@
 (define early-location-concept
-  (def-concept :name "" :is_slot True :parent_space location-space))
+  (def-concept :name "" :is_slot True :parent_space location-space
+    :locations (list (Location (list (list Nan Nan)) location-space))))
 (define late-location-concept
-  (def-concept :name "" :is_slot True :parent_space location-space))
+  (def-concept :name "" :is_slot True :parent_space location-space
+    :locations (list (Location (list (list Nan Nan)) location-space))))
+(def-relation :start early-location-concept :end late-location-concept
+  :parent_concept different-concept)
 (define early-time-concept
-  (def-concept :name "" :is_slot True :parent_space time-space))
+  (def-concept :name "" :is_slot True :parent_space time-space
+    :locations (list (Location (list (list Nan)) time-space))))
 (define late-time-concept
-  (def-concept :name "" :is_slot True :parent_space time-space))
+  (def-concept :name "" :is_slot True :parent_space time-space
+    :locations (list (Location (list (list Nan)) time-space))))
+(def-relation :start early-time-concept :end late-time-concept
+  :parent_concept different-concept)
 
 (define pp-ablative-input
   (def-contextual-space :name "ablative-sub-frame.meaning" :parent_concept input-concept
