@@ -431,6 +431,7 @@ class ViewDrivenFactory(Factory):
             lambda x: x != self.target_view
             and x.super_views.is_empty()
             and (x.parent_frame.parent_concept == sub_frame.parent_concept)
+            and (x.parent_frame.progenitor != self.target_view.parent_frame.progenitor)
             and (x.input_spaces == self.target_view.input_spaces)
             and all(
                 [
