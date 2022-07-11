@@ -1,9 +1,10 @@
 from __future__ import annotations
-import statistics
 from typing import List
 
 from linguoplotter import fuzzy
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
 from linguoplotter.structure_collection import StructureCollection
@@ -15,6 +16,8 @@ from linguoplotter.structures.spaces import ContextualSpace
 
 class View(Structure):
     """A collection of spaces and self-consistent correspondences between them."""
+
+    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
 
     def __init__(
         self,
@@ -103,7 +106,7 @@ class View(Structure):
 
     @property
     def is_recyclable(self) -> bool:
-        return self.activation == 0.0 and self.super_views.is_empty()
+        return self.activation < self.FLOATING_POINT_TOLERANCE
 
     @property
     def unfilled_sub_frame_input_structures(self):
@@ -219,9 +222,14 @@ class View(Structure):
                     lambda x: x in matched_frame.input_space.contents
                     or x in matched_frame.output_space.contents
                 ).is_empty():
-                    sub_view = self.sub_views.where(parent_frame=matched_frame).get()
-                    sub_view.super_views.remove(self)
-                    self.sub_views.remove(sub_view)
+                    try:
+                        sub_view = self.sub_views.where(
+                            parent_frame=matched_frame
+                        ).get()
+                        sub_view.super_views.remove(self)
+                        self.sub_views.remove(sub_view)
+                    except MissingStructureError:
+                        pass
                     self.matched_sub_frames.pop(sub_frame)
         self._grouped_nodes = {}
         self._node_groups = []

@@ -36,5 +36,7 @@ class ChunkProjectionEvaluator(ProjectionEvaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
+        chunk = self.target_structures.where(is_chunk=True).get()
         self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
+        self.activation_difference = chunk.quality - chunk.activation

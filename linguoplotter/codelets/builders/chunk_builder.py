@@ -89,13 +89,12 @@ class ChunkBuilder(Builder):
             parent_space=self.target_structure_one.parent_space,
             quality=0.0,
         )
-        for member in StructureCollection.union(
-            self.bubble_chamber.new_structure_collection(
-                self.target_structure_one, self.target_structure_two
-            ),
-            self.target_members,
-        ):
-            member.containing_chunks.add(chunk)
+        for member in self.target_members:
+            for member_super_chunk in member.super_chunks.excluding(self):
+                if all([c in self.target_members for c in member_super_chunk.members]):
+                    chunk.sub_chunks.add(member_super_chunk)
+                    member_super_chunk.super_chunks.add(chunk)
+            member.super_chunks.add(chunk)
         self._structure_concept.instances.add(chunk)
         self._structure_concept.recalculate_exigency()
         self.child_structures = self.bubble_chamber.new_structure_collection(chunk)

@@ -40,3 +40,4 @@ class ChunkEvaluator(Evaluator):
             ),
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
+        self.activation_difference = target_chunk.quality - target_chunk.activation

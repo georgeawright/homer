@@ -63,6 +63,9 @@ class WorldviewPorter(Codelet):
 
     def run_competition(self):
         competing_view_collection = self._get_competing_view_collection()
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, competing_view_collection, "Assembled competing views"
+        )
         current_worldview_satisfaction = self._calculate_satisfaction(
             self.bubble_chamber.worldview.views
         )
@@ -130,12 +133,10 @@ class WorldviewPorter(Codelet):
         self, views: StructureCollection
     ) -> FloatBetweenOneAndZero:
         return fuzzy.AND(
+            self._proportion_of_input_in_views(views),
             fuzzy.OR(
                 self._view_quality_score(views),
                 self._frame_depth_score(views),
-            ),
-            fuzzy.OR(
-                self._proportion_of_input_in_views(views),
                 self._frame_types_score(views),
             ),
         )

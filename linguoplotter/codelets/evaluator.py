@@ -21,7 +21,8 @@ class Evaluator(Codelet):
         self._target_structures = target_structures
         self.original_confidence = target_structures.get().quality
         self.confidence = 0
-        self.change_in_confidence = 0
+        self.change_in_confidence = None
+        self.activation_difference = None
 
     @classmethod
     def spawn(
@@ -48,6 +49,9 @@ class Evaluator(Codelet):
         )
         self.bubble_chamber.loggers["activity"].log(
             self, f"Change in confidence: {self.change_in_confidence}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Activation difference: {self.activation_difference}"
         )
         for structure in self.target_structures:
             structure.quality = self.confidence
@@ -100,6 +104,6 @@ class Evaluator(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structures,
-                self.change_in_confidence,
+                FloatBetweenOneAndZero(self.activation_difference),
             )
         )

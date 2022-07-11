@@ -94,6 +94,8 @@ class FocusUnsetter(Codelet):
                     view._activation = 0.0
                 for view in self.bubble_chamber.focus.view.super_views:
                     view._activation = 0.0
+                for frame in self.bubble_chamber.focus.view.frames:
+                    frame._activation = 0.0
                 for correspondence in self.bubble_chamber.focus.view.members:
                     correspondence.decay_activation(
                         transposed_change_in_satisfaction_score
@@ -135,9 +137,6 @@ class FocusUnsetter(Codelet):
 
     def _engender_follow_up(self):
         from linguoplotter.codelets import FocusSetter
-        from linguoplotter.codelets.evaluators.view_evaluators import (
-            SimplexViewEvaluator,
-        )
 
         self.child_codelets.append(
             FocusSetter.spawn(
@@ -145,13 +144,5 @@ class FocusUnsetter(Codelet):
                 self.bubble_chamber,
                 self.coderack,
                 0.5,
-            )
-        )
-        self.child_codelets.append(
-            SimplexViewEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.bubble_chamber.new_structure_collection(self.target_view),
-                1.0,
             )
         )

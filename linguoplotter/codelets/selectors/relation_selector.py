@@ -18,6 +18,9 @@ class RelationSelector(Selector):
         space = champion_relation.conceptual_space
         candidates = champion_relation.start.relations_in_space_with(
             space, champion_relation.end
+        ).filter(
+            lambda x: x.parent_concept.parent_space
+            == champion_relation.parent_concept.parent_space
         )
         if len(candidates) > 1:
             challenger_relation = candidates.get(

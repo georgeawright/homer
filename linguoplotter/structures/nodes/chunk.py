@@ -24,7 +24,7 @@ class Chunk(Node):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
-        containing_chunks: StructureCollection,
+        sub_chunks: StructureCollection,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ):
@@ -42,7 +42,7 @@ class Chunk(Node):
         self.abstract_chunk = abstract_chunk
         self.members = members
         self.super_chunks = super_chunks
-        self.containing_chunks = containing_chunks
+        self.sub_chunks = sub_chunks
         self._parent_space = parent_space
         self.is_raw = is_raw
         self.is_chunk = True
@@ -56,6 +56,7 @@ class Chunk(Node):
             if self.parent_space is not None
             else None,
             "super_chunks": [member.structure_id for member in self.super_chunks],
+            "sub_chunks": [member.structure_id for member in self.sub_chunks],
             "links_out": [link.structure_id for link in self.links_out],
             "links_in": [link.structure_id for link in self.links_in],
             "quality": self.quality,
@@ -115,11 +116,11 @@ class Chunk(Node):
         )
 
     def recalculate_unchunkedness(self):
-        if len(self.containing_chunks) == 0:
+        if len(self.super_chunks) == 0:
             self.unchunkedness = 1
         else:
             self.unchunkedness = 0.5 * prod(
-                [chunk.unchunkedness for chunk in self.containing_chunks]
+                [chunk.unchunkedness for chunk in self.super_chunks]
             )
 
     @property
@@ -137,7 +138,7 @@ class Chunk(Node):
             and self.parent_space is not None
             and self.parent_space.is_main_input
             and self.activation == 0.0
-            and self.links.is_empty()
+            and self.links.filter(lambda x: not x.correspondences.is_empty()).is_empty()
             and self.super_chunks.is_empty()
         )
 
@@ -160,11 +161,12 @@ class Chunk(Node):
                     and location.space.name != "size"
                 ]
             ).excluding(self)
-        return StructureCollection.union(
-            *[member.nearby(space=space) for member in self.members]
-        ).filter(
-            lambda x: self not in x.containing_chunks
-            and x not in self.containing_chunks
+        return (
+            StructureCollection.union(
+                *[member.nearby(space=space) for member in self.members]
+            )
+            .filter(lambda x: self not in x.super_chunks and x not in self.super_chunks)
+            .excluding(self)
         )
 
     def get_potential_relative(

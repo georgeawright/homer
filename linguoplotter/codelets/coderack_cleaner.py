@@ -91,9 +91,9 @@ class CoderackCleaner(Codelet):
         self.bubble_chamber.loggers["activity"].log_result(self)
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        urgency = (1 - self.bubble_chamber.satisfaction) * (
-            1 - (1 / self.coderack.population_size)
+        return FloatBetweenOneAndZero(
+            max(
+                self.coderack.population_size / self.coderack.MAXIMUM_POPULATION,
+                self.coderack.MINIMUM_CODELET_URGENCY,
+            )
         )
-        if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
-            return urgency
-        return self.coderack.MINIMUM_CODELET_URGENCY

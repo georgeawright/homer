@@ -86,3 +86,4 @@ class SimplexViewEvaluator(ViewEvaluator):
             ]
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
+        self.activation_difference = target_view.quality - target_view.activation

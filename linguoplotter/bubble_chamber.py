@@ -27,6 +27,8 @@ from .worldview import Worldview
 
 
 class BubbleChamber:
+    JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
+
     def __init__(self, focus, recycle_bin):
         self.loggers = {}
         self.random_machine = None
@@ -203,7 +205,14 @@ class BubbleChamber:
 
     def update_activations(self) -> None:
         for structure in self.structures:
+            structure_old_activation = structure.activation
             structure.update_activation()
+            if (
+                # structure.activation > structure_old_activation
+                structure.activation > self.JUMP_THRESHOLD
+                and self.random_machine.coin_flip()
+            ):
+                structure._activation = 1.0
             if self.log_count % self.ACTIVATION_LOGGING_FREQUENCY == 0:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
@@ -250,7 +259,14 @@ class BubbleChamber:
                 self.remove(frame)
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
-            for super_view in item.super_views:
+            for super_view in item.super_views.copy():
+                for correspondence in super_view.members.copy():
+                    if (
+                        correspondence.start in item.parent_frame.input_space.contents
+                        or correspondence.start
+                        in item.parent_frame.output_space.contents
+                    ):
+                        self.remove(correspondence)
                 super_view.sub_views.remove(item)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
@@ -264,6 +280,8 @@ class BubbleChamber:
         if item.is_chunk:
             for member in item.members:
                 member.super_chunks.remove(item)
+            for link in item.links:
+                self.remove(link)
         for space in item.parent_spaces:
             space.contents.remove(item)
         collection_name = self.collections[type(item)]
@@ -418,13 +436,14 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
-            containing_chunks=self.new_structure_collection(),
+            sub_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
             is_raw=is_raw,
         )
         for member in members:
             member.super_chunks.add(chunk)
             member.recalculate_exigency()
+            chunk.sub_chunks.add(member)
             self.loggers["structure"].log(member)
         self.add(chunk)
         return chunk
@@ -466,12 +485,13 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
             super_chunks=self.new_structure_collection(),
-            containing_chunks=self.new_structure_collection(),
+            sub_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
             member.recalculate_exigency()
+            letter_chunk.sub_chunks.add(member)
             self.loggers["structure"].log(member)
         self.add(letter_chunk)
         if meaning_concept is not None:

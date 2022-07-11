@@ -71,6 +71,10 @@ concept_file_map = {
     "southeast": None,
     "central": None,
     "everywhere": None,
+    "more": None,
+    "less": None,
+    "same": None,
+    "different": None,
 }
 
 log_directories = os.listdir("logs/")
@@ -128,6 +132,26 @@ generate_plot(
         concept_file_map["mild"],
         concept_file_map["cool"],
         concept_file_map["cold"],
+    ],
+    "activation",
+    "Temperature Concepts Activation Over Time",
+)
+
+generate_plot(
+    log_directory,
+    [
+        concept_file_map["more"],
+        concept_file_map["less"],
+        concept_file_map["same"],
+        concept_file_map["different"],
+    ],
+    "activation",
+    "Other Semantic Concepts Activation Over Time",
+)
+
+generate_plot(
+    log_directory,
+    [
         concept_file_map["north"],
         concept_file_map["south"],
         concept_file_map["east"],
@@ -140,5 +164,14 @@ generate_plot(
         concept_file_map["everywhere"],
     ],
     "activation",
-    "Semantic Concepts Activation Over Time",
+    "Location Concepts Activation Over Time",
+)
+
+generate_plot(
+    log_directory,
+    [
+        "SimplexView1",
+    ],
+    "activation",
+    "Selected Structures Activation Over Time",
 )
