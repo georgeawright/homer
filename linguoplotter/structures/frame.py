@@ -59,6 +59,7 @@ class Frame(Structure):
             "structure_id": self.structure_id,
             "input_space": self.input_space.structure_id,
             "output_space": self.output_space.structure_id,
+            "activation": self.activation,
         }
 
     @property

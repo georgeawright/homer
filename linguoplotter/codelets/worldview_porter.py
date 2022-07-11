@@ -124,8 +124,16 @@ class WorldviewPorter(Codelet):
         return compatible_views
 
     def _is_compatible(self, view: View, views: StructureCollection) -> bool:
+        collected_raw_input = StructureCollection.union(
+            *[view.raw_input_nodes() for collected_view in views]
+        )
         for collected_view in views:
             if collected_view.output == view.output:
+                return False
+            overlapping_raw_input = StructureCollection.intersection(
+                view.raw_input_nodes(), collected_raw_input
+            )
+            if len(overlapping_raw_input) / len(view.raw_input_nodes()) > 0.5:
                 return False
         return True
 

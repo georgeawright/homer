@@ -1,3 +1,4 @@
+from __future__ import annotations
 import statistics
 from typing import List
 
@@ -66,31 +67,28 @@ class SimplexView(View):
 
         return SimplexViewSelector
 
+    def raw_input_nodes(self):
+        return StructureCollection.union(
+            *[
+                node.raw_members
+                for node in self.grouped_nodes
+                if node.parent_space in self.input_spaces
+            ]
+        )
+
+    def input_overlap_with(self, other: SimplexView):
+        shared_raw_nodes = StructureCollection.intersection(
+            self.raw_input_nodes, other.raw_input_nodes
+        )
+        proportion_in_self = len(shared_raw_nodes) / len(self.raw_input_nodes)
+        proportion_in_other = len(shared_raw_nodes) / len(other.raw_input_nodes)
+        return statistics.fmean([proportion_in_self, proportion_in_other])
+
     def nearby(self, space: Space = None) -> StructureCollection:
-        def input_coords(view):
-            return [
-                coord
-                for member in view.members
-                for coord in member.start.location_in_space(
-                    member.start_space
-                ).coordinates
-                if member.start_space.parent_concept.name == "input"
-            ]
-
-        def input_overlap(view_1, view_2):
-            view_1_coords = input_coords(view_1)
-            view_2_coords = input_coords(view_2)
-            coords_in_both = [
-                coord for coord in view_1_coords if coord in view_2_coords
-            ]
-            proportion_in_view_1 = len(coords_in_both) / len(view_1_coords)
-            proportion_in_view_2 = len(coords_in_both) / len(view_2_coords)
-            return statistics.fmean([proportion_in_view_1, proportion_in_view_2])
-
         space = space if space is not None else self.location.space
         return (
             space.contents.where(is_view=True)
-            .filter(lambda x: input_overlap(x, self) > 0.5)
+            .filter(lambda x: self.input_overlap_with(x) > 0.5)
             .excluding(self)
         )
 
