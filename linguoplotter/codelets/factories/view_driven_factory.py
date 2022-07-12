@@ -1,4 +1,3 @@
-from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Factory
 from linguoplotter.codelets.suggesters import LabelSuggester, RelationSuggester
