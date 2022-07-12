@@ -254,7 +254,7 @@ class ViewDrivenFactory(Factory):
                     target_structure_two = node_group[input_space]
             if target_structure_one is None or target_structure_two is None:
                 potential_targets = input_space.contents.filter(
-                    lambda x: x.is_node and x.quality > 0
+                    lambda x: x.is_node and not x.is_raw and x.quality > 0
                 )
                 try:
                     (
@@ -273,15 +273,11 @@ class ViewDrivenFactory(Factory):
                             else True
                         )
                     ).get(
-                        key=lambda x: fuzzy.AND(
-                            parent_concept.classifier.classify(
-                                start=x[0],
-                                end=x[1],
-                                concept=parent_concept,
-                                space=self.target_slot.conceptual_space,
-                            ),
-                            x[0].exigency,
-                            x[1].exigency,
+                        key=lambda x: parent_concept.classifier.classify(
+                            start=x[0],
+                            end=x[1],
+                            concept=parent_concept,
+                            space=self.target_slot.conceptual_space,
                         )
                     )
                 except NoLocationError:
