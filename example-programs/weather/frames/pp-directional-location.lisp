@@ -103,6 +103,7 @@
     :parent_space pp-allative-input))
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) pp-ablative-input)
@@ -111,6 +112,7 @@
     :conceptual_space time-space))
 (define location-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
 		     (TwoPointLocation (list) (list) pp-ablative-input)

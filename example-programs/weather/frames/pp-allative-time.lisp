@@ -38,6 +38,7 @@
     :parent_space pp-allative-time-input))
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) pp-allative-time-input))

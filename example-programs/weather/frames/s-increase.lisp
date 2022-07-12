@@ -76,6 +76,7 @@
     :parent_space location-sub-frame-input))
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) time-sub-frame-input)
@@ -84,6 +85,7 @@
     :conceptual_space time-space))
 (define location-relation
   (def-relation :start late-chunk :end early-chunk :parent_concept same-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
 		     (TwoPointLocation (list) (list) increase-sentence-input))
@@ -91,6 +93,7 @@
     :conceptual_space location-space))
 (define conceptual-relation
   (def-relation :start late-chunk :end early-chunk :parent_concept more-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
 		     (TwoPointLocation (list) (list) increase-sentence-input))
