@@ -20,7 +20,6 @@ from linguoplotter.id import ID
 from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import (
     activation,
-    exigency,
     labeling_exigency,
 )
 from linguoplotter.structures import View
@@ -422,82 +421,7 @@ class ViewDrivenFactory(Factory):
             self.target_view.unhappiness,
         )
         follow_up._get_target_conceptual_space(self, follow_up)
-        self.compatible_sub_views = self.bubble_chamber.production_views.filter(
-            lambda x: x != self.target_view
-            and x.super_views.is_empty()
-            and (x.parent_frame.parent_concept == sub_frame.parent_concept)
-            and (x.parent_frame.progenitor != self.target_view.parent_frame.progenitor)
-            and (x.input_spaces == self.target_view.input_spaces)
-            and all(
-                [
-                    self.target_view.can_accept_member(
-                        member.parent_concept,
-                        member.conceptual_space,
-                        member.start,
-                        member.end,
-                        sub_view=x,
-                    )
-                    for member in x.members
-                ]
-            )
-            and (
-                (
-                    follow_up.target_conceptual_space
-                    in x.parent_frame.input_space.conceptual_spaces
-                    if self.target_slot.parent_space == sub_frame.input_space
-                    else follow_up.target_conceptual_space
-                    in x.parent_frame.output_space.conceptual_spaces
-                )
-                or follow_up.target_conceptual_space is None
-            )
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, self.compatible_sub_views, "Compatible sub views"
-        )
-        views_with_compatible_nodes = self.compatible_sub_views.filter(
-            lambda x: x.members.is_empty()
-            or any(
-                [
-                    self.target_view.can_accept_member(
-                        member.parent_concept,
-                        member.conceptual_space,
-                        member.start,
-                        self.target_slot,
-                        sub_view=x,
-                    )
-                    and self.target_view.can_accept_member(
-                        member.parent_concept,
-                        member.conceptual_space,
-                        member.end,
-                        self.target_slot,
-                        sub_view=x,
-                    )
-                    for member in x.members.filter(
-                        lambda c: type(c.start) == type(self.target_slot)
-                        and c.start.parent_space.parent_concept
-                        == self.target_slot.parent_space.parent_concept
-                    )
-                ]
-            )
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, views_with_compatible_nodes, "Views with compatible nodes"
-        )
-        follow_up.target_sub_view = views_with_compatible_nodes.get(key=exigency)
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Found target sub view: {follow_up.target_sub_view}",
-        )
-        follow_up.target_space_one = (
-            follow_up.target_sub_view.parent_frame.input_space
-            if follow_up.target_sub_view.parent_frame.input_space.parent_concept
-            == target_space_two.parent_concept
-            else follow_up.target_sub_view.parent_frame.output_space
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Found target space one: {follow_up.target_space_one}",
-        )
+        follow_up._get_target_space_one(self, follow_up)
         follow_up._get_target_structure_one(self, follow_up)
         return follow_up
 

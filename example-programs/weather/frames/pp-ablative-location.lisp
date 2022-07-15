@@ -1,3 +1,13 @@
+(define unidimensional-location-space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define unidimensional-location-space
+  (def-conceptual-space :name "" :parent_concept unidimensional-location-space-parent-concept
+    :possible_instances
+    (StructureCollection north-south-space west-east-space nw-se-space ne-sw-space)
+    :no_of_dimensions 1))
+(define location-relation-concept
+  (def-concept :name "" :is_slot True :parent_space more-less-space
+    :locations (list (Location (list) more-less-space))))
 (define early-location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
 (define late-location-concept
@@ -9,16 +19,19 @@
 
 (define pp-ablative-location-input
   (def-contextual-space :name "pp[from-location].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space time-space)))
+    :conceptual_spaces (StructureCollection unidimensional-location-space
+					    location-space time-space)))
 (define pp-ablative-location-output
   (def-contextual-space :name "pp[from-location].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space location-space time-space)))
+    :conceptual_spaces (StructureCollection unidimensional-location-space
+					    grammar-space location-space time-space)))
 (define pp-ablative-location
   (def-frame :name "pp[from-location]"
     :parent_concept pp-ablative-location-concept
     :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection early-location-concept late-location-concept
+    :concepts (StructureCollection location-relation-concept
+				   early-location-concept late-location-concept
 				   early-time-concept late-time-concept)
     :input_space pp-ablative-location-input
     :output_space pp-ablative-location-output))
@@ -61,12 +74,12 @@
 		     (TwoPointLocation (list) (list) pp-ablative-location-input))
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
-    :quality 1.0
-    :locations (list (Location (list (list Nan)) same-different-space)
-		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
+  (def-relation :start early-chunk :end late-chunk :parent_concept location-relation-concept
+    :locations (list (Location (list (list Nan)) more-less-space)
+		     (TwoPointLocation
+		      (list (list Nan Nan)) (list (list Nan Nan)) unidimensional-location-space)
 		     (TwoPointLocation (list) (list) pp-ablative-location-input))
-    :conceptual_space location-space))
+    :conceptual_space unidimensional-location-space))
 
 (define pp-word-1
   (def-letter-chunk :name "from"

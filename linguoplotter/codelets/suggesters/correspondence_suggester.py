@@ -92,7 +92,11 @@ class CorrespondenceSuggester(Suggester):
             target_space_two = possible_target_spaces.get()
         else:
             target_space_two = possible_target_spaces.filter(
-                lambda x: target_structure_two.parent_space != x
+                lambda x: x
+                not in [
+                    target_view.parent_frame.input_space,
+                    target_view.parent_frame.output_space,
+                ]
             ).get()
         if target_space_two == target_view.parent_frame.input_space:
             follow_up_class = SpaceToFrameCorrespondenceSuggester
@@ -220,20 +224,10 @@ class CorrespondenceSuggester(Suggester):
             correspondence_suggester.target_structure_two.is_link
             and not correspondence_suggester.target_structure_two.is_node
         ):
-            calling_codelet.bubble_chamber.loggers["activity"].log_collection(
-                calling_codelet,
-                correspondence_suggester.target_view.grouped_nodes,
-                "grouped nodes",
-            )
             if (
                 correspondence_suggester.target_structure_two.start
                 in correspondence_suggester.target_view.grouped_nodes
             ):
-                calling_codelet.bubble_chamber.loggers["activity"].log_collection(
-                    calling_codelet,
-                    correspondence_suggester.target_view.node_groups,
-                    "node groups",
-                )
                 start_node_group = [
                     group
                     for group in correspondence_suggester.target_view.node_groups

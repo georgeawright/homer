@@ -10,6 +10,16 @@
     :no_of_dimensions 1))
 (define conceptual-label-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
+(define unidimensional-location-space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define unidimensional-location-space
+  (def-conceptual-space :name "" :parent_concept unidimensional-location-space-parent-concept
+    :possible_instances
+    (StructureCollection north-south-space west-east-space nw-se-space ne-sw-space)
+    :no_of_dimensions 1))
+(define location-relation-concept
+  (def-concept :name "" :is_slot True :parent_space more-less-space
+    :locations (list (Location (list) more-less-space))))
 
 (define ap-sub-frame-input
   (def-contextual-space :name "ap-sub-frame.input" :parent_concept input-concept
@@ -26,16 +36,16 @@
 
 (define location-sub-frame-input
   (def-contextual-space :name "location-sub-frame.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space)))
+    :conceptual_spaces (StructureCollection unidimensional-location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space location-space)))
+    :conceptual_spaces (StructureCollection grammar-space unidimensional-location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-spread-location-sub"
     :parent_concept pp-directional-location-concept
     :parent_frame None
     :sub_frames (StructureCollection)
-    :concepts (StructureCollection)
+    :concepts (StructureCollection location-relation-concept)
     :input_space location-sub-frame-input
     :output_space location-sub-frame-output))
 
@@ -56,10 +66,11 @@
 
 (define spread-sentence-input
   (def-contextual-space :name "s-spread.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space time-space conceptual-space)))
+    :conceptual_spaces (StructureCollection unidimensional-location-space location-space
+					    time-space conceptual-space)))
 (define spread-sentence-output
   (def-contextual-space :name "s-spread.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureCollection unidimensional-location-space
 			grammar-space location-space time-space conceptual-space)))
 (define spread-sentence
   (def-frame :name "s-spread" :parent_concept sentence-concept :parent_frame None
@@ -99,18 +110,19 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) time-sub-frame-input)
+		     (TwoPointLocation (list) (list) location-sub-frame-input)
 		     (TwoPointLocation (list) (list) spread-sentence-input))
     :parent_space time-sub-frame-input
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
-    :quality 1.0
-    :locations (list (Location (list (list Nan)) same-different-space)
-		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
+  (def-relation :start early-chunk :end late-chunk :parent_concept location-relation-concept
+    :locations (list (Location (list (list Nan)) more-less-space)
+		     (TwoPointLocation
+		      (list (list Nan)) (list (list Nan)) unidimensional-location-space)
 		     (TwoPointLocation (list) (list) location-sub-frame-input)
 		     (TwoPointLocation (list) (list) spread-sentence-input))
     :parent_space location-sub-frame-input
-    :conceptual_space location-space))
+    :conceptual_space unidimensional-location-space))
 (define size-relation
   (def-relation :start late-chunk :end early-chunk :parent_concept more-concept
     :quality 1.0
