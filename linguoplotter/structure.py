@@ -405,6 +405,16 @@ class Structure(ABC):
             self._activation_update_coefficient * (1 / self.depth) * amount
         )
 
+    def activate(self):
+        if self.stable:
+            return
+        self._activation = 1.0
+
+    def deactivate(self):
+        if self.stable:
+            return
+        self._activation = 0.0
+
     def spread_activation(self):
         raise NotImplementedError
 

@@ -158,8 +158,9 @@ class Selector(Codelet):
 
     def _boost_winners(self):
         for winner in self.winners:
-            winner.boost_activation(self.confidence)
-            winner.update_activation()
+            # winner.boost_activation(self.confidence)
+            # winner.update_activation()
+            winner.activate()
             if winner.is_link:
                 winner.parent_concept.boost_activation(self.confidence)
             if winner.is_view:
@@ -167,8 +168,9 @@ class Selector(Codelet):
 
     def _decay_losers(self):
         for loser in self.losers:
-            loser.decay_activation(self.confidence)
-            loser.update_activation()
+            # loser.decay_activation(self.confidence)
+            # loser.update_activation()
+            loser.deactivate()
             if loser.is_link:
                 loser.parent_concept.decay_activation(self.confidence)
             if loser.is_view:
