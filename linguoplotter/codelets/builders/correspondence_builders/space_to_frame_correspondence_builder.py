@@ -28,7 +28,7 @@ class SpaceToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                         lambda x: x in relative.parent_space.contents
                         and x.has_relation_with(
                             self.target_structure_two.parent_concept.non_slot_value,
-                            relation_with_relative.parent_concept,
+                            relation_with_relative.parent_concept.non_slot_value,
                         )
                     ).get()
         correspondence = self.bubble_chamber.new_correspondence(

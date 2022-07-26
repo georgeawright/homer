@@ -416,6 +416,7 @@ class BubbleChamber:
         members: StructureCollection = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
+        activation: FloatBetweenOneAndZero = 0.0,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ) -> Chunk:
@@ -440,6 +441,7 @@ class BubbleChamber:
             abstract_chunk=abstract_chunk,
             is_raw=is_raw,
         )
+        chunk._activation = activation
         for member in members:
             member.super_chunks.add(chunk)
             member.recalculate_exigency()

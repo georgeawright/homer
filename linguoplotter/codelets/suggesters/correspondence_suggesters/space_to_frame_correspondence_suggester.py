@@ -103,6 +103,32 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 self, "Target view cannot accept suggested member."
             )
             return False
+        if (
+            self.target_structure_two.is_link
+            and self.target_structure_two.parent_concept.is_slot
+            and not self.target_structure_two.parent_concept.is_filled_in
+        ):
+            structure_two_non_slot_value = self.target_structure_one.parent_concept
+            for relative in self.target_structure_two.parent_concept.relatives:
+                if self.target_view.parent_frame.input_space.contents.where(
+                    is_link=True, parent_concept=relative
+                ).is_empty():
+                    relation_with_relative = (
+                        self.target_structure_two.parent_concept.relations_with(
+                            relative
+                        ).get()
+                    )
+                    structure_two_parent_relatives = (
+                        structure_two_non_slot_value.relatives
+                    )
+                    if structure_two_parent_relatives.filter(
+                        lambda x: x in relative.parent_space.contents
+                        and x.has_relation_with(
+                            structure_two_non_slot_value,
+                            relation_with_relative.parent_concept.non_slot_value,
+                        )
+                    ).is_empty():
+                        return False
         return True
 
     def _calculate_confidence(self):

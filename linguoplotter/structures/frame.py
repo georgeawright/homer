@@ -182,13 +182,24 @@ class Frame(Structure):
                 bubble_chamber=bubble_chamber, parent_id=parent_id
             )
             for relation in concept.relations:
-                if relation.start in concept_copies and relation.end in concept_copies:
+                if (
+                    relation.start in concept_copies
+                    and relation.end in concept_copies
+                    and (
+                        relation.parent_concept in concept_copies
+                        or not relation.parent_concept.is_slot
+                    )
+                ):
                     new_relation = relation.copy(
                         bubble_chamber=bubble_chamber,
                         parent_id=parent_id,
                         start=concept_copies[relation.start],
                         end=concept_copies[relation.end],
                     )
+                    if relation.parent_concept.is_slot:
+                        new_relation._parent_concept = concept_copies[
+                            relation.parent_concept
+                        ]
                     concept_copies[relation.start].links_out.add(new_relation)
                     concept_copies[relation.end].links_in.add(new_relation)
         concepts = bubble_chamber.new_structure_collection(
