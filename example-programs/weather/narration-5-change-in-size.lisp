@@ -13,16 +13,10 @@
 (load "conceptual-spaces/time.lisp")
 
 (load "frames/ap-jj.lisp")
-(load "frames/np-nn.lisp")
-(load "frames/pp-ablative-location.lisp")
-(load "frames/pp-ablative-time.lisp")
-(load "frames/pp-allative-location.lisp")
-(load "frames/pp-allative-time.lisp")
-(load "frames/pp-directional-location.lisp")
-(load "frames/pp-directional-time.lisp")
-(load "frames/pp-inessive-location.lisp")
-(load "frames/pp-inessive-time.lisp")
-(load "frames/rp-jjr.lisp")
+
+(load "frames/pp-from-to-locations.lisp")
+(load "frames/pp-between-times.lisp")
+
 (load "frames/s-spread.lisp")
 
 (define input-space

@@ -2,6 +2,7 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import activation, exigency
 from linguoplotter.structures import Frame
 
@@ -92,7 +93,11 @@ class SimplexViewSuggester(ViewSuggester):
         for conceptual_space in frame_input_space.conceptual_spaces:
             if (
                 not conceptual_space.is_slot
-                and conceptual_space not in self.contextual_space.conceptual_spaces
+                and not conceptual_space in self.contextual_space.conceptual_spaces
+                and not any(
+                    conceptual_space in space.sub_spaces
+                    for space in self.contextual_space.conceptual_spaces
+                )
             ):
                 self.bubble_chamber.loggers["activity"].log(
                     self,
@@ -112,13 +117,19 @@ class SimplexViewSuggester(ViewSuggester):
                     )
                 except MissingStructureError:
                     try:
-                        self.conceptual_spaces_map[
-                            conceptual_space
-                        ] = self.contextual_space.conceptual_spaces.filter(
-                            lambda x: x not in self.conceptual_spaces_map.values()
-                            and conceptual_space.subsumes(x)
-                        ).get(
-                            key=activation
+                        self.conceptual_spaces_map[conceptual_space] = (
+                            StructureCollection.union(
+                                self.contextual_space.conceptual_spaces,
+                                *[
+                                    space.sub_spaces
+                                    for space in self.contextual_space.conceptual_spaces
+                                ],
+                            )
+                            .filter(
+                                lambda x: x not in self.conceptual_spaces_map.values()
+                                and conceptual_space.subsumes(x)
+                            )
+                            .get(key=activation)
                         )
                     except MissingStructureError:
                         self.bubble_chamber.loggers["activity"].log_dict(

@@ -230,6 +230,7 @@ class View(Structure):
                         self.sub_views.remove(sub_view)
                     except MissingStructureError:
                         pass
+                    self.frames.remove(sub_frame)
                     self.matched_sub_frames.pop(sub_frame)
         self._grouped_nodes = {}
         self._node_groups = []
@@ -280,6 +281,8 @@ class View(Structure):
                     relation_concept = (
                         end_concept.relations_with(relative).get().parent_concept
                     )
+                    if relation_concept.name == "different":
+                        continue
                     if relative.is_slot and relative.is_filled_in:
                         relative_concept = relative.non_slot_value
                         if not start_concept.has_relation_with(
@@ -291,6 +294,13 @@ class View(Structure):
                             end_concept, relation_concept
                         ):
                             return False
+            different_concepts = end_concept.relatives.filter(
+                lambda x: not x.relations_with(end_concept)
+                .where(name="different")
+                .is_empty()
+            )
+            if start_concept in different_concepts:
+                return False
         if not end.correspondences.filter(
             lambda x: x.end == end
             and x in self.members
@@ -331,15 +341,18 @@ class View(Structure):
                             potential_node_group[space] = sub_view_node_group[space]
         for existing_node_group in self.node_groups:
             for potential_group in potential_node_groups:
+                shared_spaces = [
+                    space for space in existing_node_group if space in potential_group
+                ]
                 if (
-                    all(space in existing_node_group for space in potential_group)
-                    and not all(
-                        node in existing_node_group.values()
-                        for node in potential_group.values()
-                    )
+                    len(shared_spaces) > 1
                     and any(
-                        node in existing_node_group.values()
-                        for node in potential_group.values()
+                        existing_node_group[space] == potential_group[space]
+                        for space in shared_spaces
+                    )
+                    and not all(
+                        existing_node_group[space] == potential_group[space]
+                        for space in shared_spaces
                     )
                 ):
                     return False

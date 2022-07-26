@@ -1,7 +1,11 @@
 (define early-time-concept
-  (def-concept :name "" :is_slot True :parent_space time-space))
+  (def-concept :name "" :is_slot True :parent_space time-space
+    :locations (list (Location (list (list Nan)) time-space))))
 (define late-time-concept
-  (def-concept :name "" :is_slot True :parent_space time-space))
+  (def-concept :name "" :is_slot True :parent_space time-space
+    :locations (list (Location (list (list Nan)) time-space))))
+(def-relation :start early-time-concept :end late-time-concept
+  :parent_concept different-concept)
 
 (define pp-directional-time-input
   (def-contextual-space :name "pp[between-times].meaning" :parent_concept input-concept
@@ -38,6 +42,7 @@
     :parent_space pp-directional-time-input))
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) pp-directional-time-input))

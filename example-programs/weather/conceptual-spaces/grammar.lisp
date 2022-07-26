@@ -222,6 +222,9 @@
 (define -er
   (def-letter-chunk :name "[b]er" :parent_space grammar-space
     :locations (list (Location (list) grammar-space))))
+(define -wards
+  (def-letter-chunk :name "[b]wards" :parent_space grammar-space
+    :locations (list (Location (list) grammar-space))))
 (define null
   (def-letter-chunk :name "" :parent_space grammar-space
     :locations (list null-location)))

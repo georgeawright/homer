@@ -97,6 +97,10 @@ class Concept(Node):
             return self._non_slot_value
         return self._non_slot_value.non_slot_value
 
+    @property
+    def parent_basic_space(self) -> "ConceptualSpace":
+        return self.parent_spaces.where(is_basic_level=True).get()
+
     def recalculate_unhappiness(self):
         self.unhappiness = 0.5 ** sum(
             instance.activation for instance in self.instances

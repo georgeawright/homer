@@ -77,9 +77,18 @@ concept_file_map = {
     "different": None,
 }
 
+conceptual_space_file_map = {
+    "location": None,
+    "north-south": None,
+    "west-east": None,
+    "northwest-southeast": None,
+    "northeast-southwest": None,
+    "peripheralness": None,
+}
+
+
 log_directories = os.listdir("logs/")
 log_directories.sort()
-print(log_directories)
 log_directory = "logs/" + log_directories[-1]
 
 structures_directory = f"{log_directory}/structures/structures/"
@@ -94,8 +103,16 @@ for log_file in log_files:
                     concept_file_map[file_data["name"]] = log_file
         except FileNotFoundError:
             pass
-
-print(concept_file_map)
+for log_file in log_files:
+    if re.match(r"ConceptualSpace[1-9]", log_file):
+        file_name = f"{structures_directory}/{log_file}/0.json"
+        try:
+            with open(file_name, "r") as f:
+                file_data = json.load(f)
+                if file_data["name"] in conceptual_space_file_map:
+                    conceptual_space_file_map[file_data["name"]] = log_file
+        except FileNotFoundError:
+            pass
 
 generate_plot(
     log_directory,
@@ -161,7 +178,6 @@ generate_plot(
         concept_file_map["southwest"],
         concept_file_map["southeast"],
         concept_file_map["central"],
-        concept_file_map["everywhere"],
     ],
     "activation",
     "Location Concepts Activation Over Time",
@@ -170,7 +186,24 @@ generate_plot(
 generate_plot(
     log_directory,
     [
-        "SimplexView1",
+        conceptual_space_file_map["location"],
+        conceptual_space_file_map["north-south"],
+        conceptual_space_file_map["west-east"],
+        conceptual_space_file_map["northwest-southeast"],
+        conceptual_space_file_map["northeast-southwest"],
+        conceptual_space_file_map["peripheralness"],
+    ],
+    "activation",
+    "Location Spaces Activation Over Time",
+)
+
+generate_plot(
+    log_directory,
+    [
+        "Frame21",
+        "Frame25",
+        "Frame29",
+        "Frame32",
     ],
     "activation",
     "Selected Structures Activation Over Time",

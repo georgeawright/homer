@@ -137,6 +137,13 @@ class Relation(Link):
             .excluding(self)
         )
 
+    def spread_activation(self):
+        if not self.is_fully_active():
+            return
+        Link.spread_activation(self)
+        if self.conceptual_space is not None:
+            self.conceptual_space.boost_activation(self.quality)
+
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name
         conceptual_space = (

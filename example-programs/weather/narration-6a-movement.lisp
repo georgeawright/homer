@@ -83,20 +83,22 @@
 		   (Location (list (list 4 8)) location-space))
   :parent_space input-space)
 
+(define chunk-a
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 21)) temperature-space)
 		   (Location (list (list 0)) time-space)
 		   (Location (list (list 6 2)) location-space))
-  :parent_space input-space)
+  :parent_space input-space))
+(define chunk-b
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
 		   (Location (list (list 0)) time-space)
 		   (Location (list (list 6 4)) location-space))
-  :parent_space input-space)
+  :parent_space input-space))
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
@@ -112,20 +114,22 @@
 		   (Location (list (list 6 8)) location-space))
   :parent_space input-space)
 
-(def-chunk
+(define chunk-c
+  (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 23)) temperature-space)
 		   (Location (list (list 0)) time-space)
 		   (Location (list (list 8 2)) location-space))
-  :parent_space input-space)
-(def-chunk
+  :parent_space input-space))
+(define chunk-d
+  (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 22)) temperature-space)
 		   (Location (list (list 0)) time-space)
 		   (Location (list (list 8 4)) location-space))
-  :parent_space input-space)
+  :parent_space input-space))
 (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
@@ -271,20 +275,22 @@
 		   (Location (list (list 48)) time-space)
 		   (Location (list (list 2 4)) location-space))
   :parent_space input-space)
-(def-chunk
+(define chunk-e
+  (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 20)) temperature-space)
 		   (Location (list (list 48)) time-space)
 		   (Location (list (list 2 6)) location-space))
-  :parent_space input-space)
-(def-chunk
+  :parent_space input-space))
+(define chunk-f
+  (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 20)) temperature-space)
 		   (Location (list (list 48)) time-space)
 		   (Location (list (list 2 8)) location-space))
-  :parent_space input-space)
+  :parent_space input-space))
 
 (def-chunk
   :is_raw True
@@ -300,20 +306,22 @@
 		   (Location (list (list 48)) time-space)
 		   (Location (list (list 4 4)) location-space))
   :parent_space input-space)
-(def-chunk
+(define chunk-g
+  (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 21)) temperature-space)
 		   (Location (list (list 48)) time-space)
 		   (Location (list (list 4 6)) location-space))
-  :parent_space input-space)
-(def-chunk
+  :parent_space input-space))
+(define chunk-h
+  (def-chunk
   :is_raw True
   :locations (list (Location (list) input-space)
 		   (Location (list (list 20)) temperature-space)
 		   (Location (list (list 48)) time-space)
 		   (Location (list (list 4 8)) location-space))
-  :parent_space input-space)
+  :parent_space input-space))
 
 (def-chunk
   :is_raw True
@@ -373,3 +381,23 @@
 		   (Location (list (list 8 8)) location-space))
   :parent_space input-space)
 
+(def-chunk
+  :is_raw False
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 21) (list 22) (list 22) (list 23)) temperature-space)
+		   (Location (list (list 0) (list 0) (list 0) (list 0)) time-space)
+		   (Location (list (list 6 2) (list 6 4) (list 8 2) (list 8 4)) location-space))
+  :members (StructureCollection chunk-a chunk-b chunk-c chunk-d)
+  :quality 1.0
+  :activation 1.0
+  :parent_space input-space)
+(def-chunk
+  :is_raw False
+  :locations (list (Location (list) input-space)
+		   (Location (list (list 20) (list 20) (list 20) (list 21)) temperature-space)
+		   (Location (list (list 48) (list 48) (list 48) (list 48)) time-space)
+		   (Location (list (list 2 6) (list 2 8) (list 4 6) (list 4 8)) location-space))
+  :members (StructureCollection chunk-e chunk-f chunk-g chunk-h)
+  :quality 1.0
+  :activation 1.0
+  :parent_space input-space)

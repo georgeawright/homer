@@ -56,7 +56,12 @@ class ConceptualSpace(Space):
         self.is_conceptual_space = True
 
     def __dict__(self) -> dict:
-        return {}
+        return {
+            "structure_id": self.structure_id,
+            "parent_id": self.parent_id,
+            "name": self.name,
+            "activation": self.activation,
+        }
 
     @property
     def is_slot(self) -> bool:
@@ -89,6 +94,12 @@ class ConceptualSpace(Space):
         if structure not in self.contents:
             self.contents.add(structure)
             for sub_space in self.sub_spaces:
+                if (
+                    structure.parent_space.is_conceptual_space
+                    and structure.parent_space != self
+                    and structure.parent_space != sub_space
+                ):
+                    continue
                 if not structure.has_location_in_space(sub_space):
                     location_in_sub_space = (
                         sub_space.location_from_super_space_location(
