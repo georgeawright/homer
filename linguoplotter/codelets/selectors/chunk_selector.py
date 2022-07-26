@@ -28,7 +28,7 @@ class ChunkSelector(Selector):
                         )
                     )
                     > 0.5 * len(champion_chunk.members)
-                    and len(
+                    and len(  # TODO: possibly this should be or
                         StructureCollection.intersection(
                             champion_chunk.members, x.members
                         )
