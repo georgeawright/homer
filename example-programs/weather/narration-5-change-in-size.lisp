@@ -14,7 +14,7 @@
 
 (load "frames/ap-jj.lisp")
 
-(load "frames/pp-from-to-locations.lisp")
+(load "frames/pp-from-wards-locations.lisp")
 (load "frames/pp-between-times.lisp")
 
 (load "frames/s-spread.lisp")
