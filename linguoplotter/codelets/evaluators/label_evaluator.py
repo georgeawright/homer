@@ -50,4 +50,4 @@ class LabelEvaluator(Evaluator):
             ]
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = labels[0].quality - labels[0].activation
+        self.activation_difference = self.confidence - labels[0].activation

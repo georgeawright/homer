@@ -6,7 +6,6 @@ from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.location import Location
 from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import chunking_exigency
 
@@ -106,6 +105,9 @@ class ChunkSuggester(Suggester):
             self.target_members = StructureCollection.union(
                 self.target_structure_one.raw_members,
                 self.target_structure_two.raw_members,
+            )
+            self.bubble_chamber.loggers["activity"].log_collection(
+                self, self.target_members, "Target members"
             )
         return True
 

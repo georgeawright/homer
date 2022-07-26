@@ -35,6 +35,4 @@ class RelationEvaluator(Evaluator):
             end=target_relation.end,
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = (
-            target_relation.quality - target_relation.activation
-        )
+        self.activation_difference = self.confidence - target_relation.activation

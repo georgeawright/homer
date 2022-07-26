@@ -63,4 +63,4 @@ class LetterChunkProjectionEvaluator(ProjectionEvaluator):
         except MissingStructureError:
             self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = letter_chunk.quality - letter_chunk.activation
+        self.activation_difference = self.confidence - letter_chunk.activation

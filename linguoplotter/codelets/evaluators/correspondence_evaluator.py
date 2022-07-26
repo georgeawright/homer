@@ -56,6 +56,4 @@ class CorrespondenceEvaluator(Evaluator):
         )
         self.confidence = argument_compatibility * average_argument_quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = (
-            target_correspondence.quality - target_correspondence.activation
-        )
+        self.activation_difference = self.confidence - target_correspondence.activation

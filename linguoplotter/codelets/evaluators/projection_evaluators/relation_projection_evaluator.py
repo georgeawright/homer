@@ -70,4 +70,4 @@ class RelationProjectionEvaluator(ProjectionEvaluator):
         except MissingStructureError:
             self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = relation.quality - relation.activation
+        self.activation_difference = self.confidence - relation.activation
