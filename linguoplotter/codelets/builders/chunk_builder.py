@@ -5,7 +5,6 @@ from linguoplotter.codelets.builder import Builder
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.id import ID
-from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structures.nodes import Chunk
 
 
@@ -98,7 +97,7 @@ class ChunkBuilder(Builder):
             quality=0.0,
         )
         for member in self.target_members:
-            for member_super_chunk in member.super_chunks.excluding(self):
+            for member_super_chunk in member.super_chunks.excluding(chunk):
                 if all([c in self.target_members for c in member_super_chunk.members]):
                     chunk.sub_chunks.add(member_super_chunk)
                     member_super_chunk.super_chunks.add(chunk)
