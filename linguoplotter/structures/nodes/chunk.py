@@ -61,6 +61,7 @@ class Chunk(Node):
             "links_in": [link.structure_id for link in self.links_in],
             "quality": self.quality,
             "activation": self.activation,
+            "unchunkedness": self.unchunkedness,
         }
 
     @classmethod
@@ -122,6 +123,16 @@ class Chunk(Node):
             self.unchunkedness = 0.5 * prod(
                 [chunk.unchunkedness for chunk in self.super_chunks]
             )
+
+    def recalculate_labeling_exigency(self):
+        self.labeling_exigency = statistics.fmean(
+            [self.activation, self.unlabeledness, self.unchunkedness]
+        )
+
+    def recalculate_relating_exigency(self):
+        self.relating_exigency = statistics.fmean(
+            [self.activation, self.unrelatedness, self.unchunkedness]
+        )
 
     @property
     def potential_chunk_mates(self) -> StructureCollection:
