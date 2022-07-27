@@ -185,8 +185,6 @@ class View(Structure):
     def add(self, correspondence: "Correspondence"):
         self.members.add(correspondence)
         for node_pair in correspondence.node_pairs:
-            if all(node in self._grouped_nodes for node in node_pair):
-                continue
             for node_group in self._node_groups:
                 if (
                     node_group.get(node_pair[0].parent_space) == node_pair[0]
