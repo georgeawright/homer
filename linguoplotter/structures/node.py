@@ -99,8 +99,23 @@ class Node(Structure):
                         else None
                     )
         else:
-            for link in self.links:
-                link.boost_activation(self.quality)
+            for space in self.parent_space.conceptual_spaces:
+                best_label = None
+                for label in self.labels_in_space(space):
+                    if best_label is None or label.activation > best_label.activation:
+                        best_label = label
+                if best_label is not None:
+                    best_label.boost_activation(self.quality)
+                best_relations = {}
+                for relation in self.relations.where(conceptual_space=space):
+                    if (
+                        relation.parent_space not in best_relations
+                        or relation.activation
+                        > best_relations[relation.parent_space].activation
+                    ):
+                        best_relations[relation.parent_space] = relation
+                for relation in best_relations.values():
+                    relation.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         if self.parent_space is None:
