@@ -81,9 +81,9 @@ class LabelBuilder(Builder):
             conceptual_space = self.parent_concept.parent_space
             self.target_node.parent_space.conceptual_spaces.add(conceptual_space)
             for node in self.target_node.parent_space.contents.where(is_node=True):
+                if node.has_location_in_space(conceptual_space):
+                    continue
                 for location in node.locations:
-                    if node.has_location_in_space(conceptual_space):
-                        continue
                     if location.space.is_conceptual_space:
                         try:
                             node.locations.append(

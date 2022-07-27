@@ -77,10 +77,18 @@ class ChunkBuilder(Builder):
             return
         chunk_locations = [
             Location.merge(
+                *[
+                    member.location_in_space(self.target_structure_one.parent_space)
+                    for member in self.target_members
+                ]
+            )
+        ] + [
+            Location.merge(
                 *[member.location_in_space(space) for member in self.target_members]
             )
-            for space in self.target_structure_one.parent_spaces
+            for space in self.target_structure_one.parent_space.conceptual_spaces
             if space.name != "size"
+            and self.target_structure_one.has_location_in_space(space)
         ]
         chunk = self.bubble_chamber.new_chunk(
             parent_id=self.codelet_id,
