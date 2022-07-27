@@ -28,11 +28,14 @@ class RelationEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_relation = self.target_structures.get()
-        self.confidence = target_relation.parent_concept.classifier.classify(
-            space=target_relation.conceptual_space,
-            concept=target_relation.parent_concept,
-            start=target_relation.start,
-            end=target_relation.end,
+        self.confidence = (
+            target_relation.parent_concept.classifier.classify(
+                space=target_relation.conceptual_space,
+                concept=target_relation.parent_concept,
+                start=target_relation.start,
+                end=target_relation.end,
+            )
+            * min(target_relation.start.quality, target_relation.end.quality)
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_relation.activation

@@ -34,6 +34,7 @@ class LabelEvaluator(Evaluator):
         target_label = self.target_structures.filter(
             lambda x: x.is_label and not x.start.is_label
         ).get()
+        original_start = target_label.start
         labels = []
         while target_label is not None:
             labels.append(target_label)
@@ -41,13 +42,16 @@ class LabelEvaluator(Evaluator):
                 target_label = target_label.labels.get()
             except MissingStructureError:
                 target_label = None
-        self.confidence = fuzzy.OR(
-            *[
-                label.parent_concept.classifier.classify(
-                    start=label.start, concept=label.parent_concept
-                )
-                for label in labels
-            ]
+        self.confidence = (
+            fuzzy.OR(
+                *[
+                    label.parent_concept.classifier.classify(
+                        start=label.start, concept=label.parent_concept
+                    )
+                    for label in labels
+                ]
+            )
+            * original_start.quality
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - labels[0].activation

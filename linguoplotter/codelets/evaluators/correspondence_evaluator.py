@@ -48,12 +48,10 @@ class CorrespondenceEvaluator(Evaluator):
                 view=target_correspondence.parent_view,
             )
         )
-        average_argument_quality = statistics.fmean(
-            [
-                start.quality if not start.is_slot else 1.0,
-                end.quality if not end.is_slot else 1.0,
-            ]
+        min_argument_quality = min(
+            start.quality if not start.is_slot else 1.0,
+            end.quality if not end.is_slot else 1.0,
         )
-        self.confidence = argument_compatibility * average_argument_quality
+        self.confidence = argument_compatibility * min_argument_quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_correspondence.activation
