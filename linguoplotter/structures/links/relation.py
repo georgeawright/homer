@@ -27,6 +27,8 @@ class Relation(Link):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
     ):
@@ -43,6 +45,8 @@ class Relation(Link):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self._parent_space = parent_space
         self.conceptual_space = conceptual_space

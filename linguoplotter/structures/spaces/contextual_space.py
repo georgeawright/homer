@@ -23,6 +23,8 @@ class ContextualSpace(Space):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         is_main_input: bool = False,
     ):
         Space.__init__(
@@ -36,6 +38,8 @@ class ContextualSpace(Space):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.conceptual_spaces = conceptual_spaces
         self.is_main_input = is_main_input

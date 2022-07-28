@@ -35,6 +35,8 @@ class View(Structure):
         parent_spaces: StructureCollection,
         sub_views: StructureCollection,
         super_views: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
     ):
         Structure.__init__(
             self,
@@ -45,6 +47,8 @@ class View(Structure):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.parent_frame = parent_frame
         self.value = None

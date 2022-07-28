@@ -25,6 +25,8 @@ class Chunk(Node):
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
         sub_chunks: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ):
@@ -38,6 +40,8 @@ class Chunk(Node):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.abstract_chunk = abstract_chunk
         self.members = members

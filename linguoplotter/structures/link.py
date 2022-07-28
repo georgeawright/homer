@@ -21,6 +21,8 @@ class Link(Structure):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
     ):
         Structure.__init__(
             self,
@@ -31,6 +33,8 @@ class Link(Structure):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.start = start
         self.end = end

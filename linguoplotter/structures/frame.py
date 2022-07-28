@@ -27,6 +27,8 @@ class Frame(Structure):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         instances: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         is_sub_frame: bool = False,
         depth: int = None,
     ):
@@ -40,6 +42,8 @@ class Frame(Structure):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.name = name
         self._parent_concept = parent_concept

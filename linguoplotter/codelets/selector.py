@@ -71,6 +71,7 @@ class Selector(Codelet):
             for structure in self.winners:
                 self.bubble_chamber.loggers["structure"].log(structure)
         self._boost_activations()
+        self._rearrange_champions()
         self.follow_up_urgency = FloatBetweenOneAndZero(
             self.winners.get().quality - self.winners.get().activation
         )
@@ -175,6 +176,9 @@ class Selector(Codelet):
                 loser.parent_concept.decay_activation(self.confidence)
             if loser.is_view:
                 loser.parent_frame.decay_activation(self.confidence)
+
+    def _rearrange_champions(self):
+        pass
 
     def _get_representative(self, collection: StructureCollection):
         return collection.get()

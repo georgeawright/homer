@@ -26,6 +26,8 @@ class ConceptualSpace(Space):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         possible_instances: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
@@ -41,6 +43,8 @@ class ConceptualSpace(Space):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.possible_instances = possible_instances
         self.no_of_dimensions = no_of_dimensions

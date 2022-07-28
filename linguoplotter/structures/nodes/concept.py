@@ -28,6 +28,8 @@ class Concept(Node):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         instances: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         is_slot: bool = False,
@@ -43,6 +45,8 @@ class Concept(Node):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.name = name
         self.classifier = classifier
@@ -175,7 +179,9 @@ class Concept(Node):
                         break
                     except KeyError:
                         pass
-            mock_node = Node("", "", [new_location], None, None, None, None, None)
+            mock_node = Node(
+                "", "", [new_location], None, None, None, None, None, None, None
+            )
             if new_location is None:
                 raise NoLocationError
             return self.distance_from(mock_node)

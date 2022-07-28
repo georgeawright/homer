@@ -323,6 +323,8 @@ class BubbleChamber:
             is_basic_level=is_basic_level,
             is_symbolic=is_symbolic,
             super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         self.add(space)
         return space
@@ -346,6 +348,8 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=self.new_structure_collection(),
             is_main_input=is_main_input,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         self.add(space)
         return space
@@ -380,6 +384,8 @@ class BubbleChamber:
             instances=self.new_structure_collection(),
             is_sub_frame=is_sub_frame,
             depth=depth,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         if parent_frame is not None:
             parent_frame.instances.add(frame)
@@ -440,6 +446,8 @@ class BubbleChamber:
             sub_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
             is_raw=is_raw,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         chunk._activation = activation
         for member in members:
@@ -489,6 +497,8 @@ class BubbleChamber:
             super_chunks=self.new_structure_collection(),
             sub_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
@@ -539,6 +549,8 @@ class BubbleChamber:
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
             is_slot=is_slot,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         if activation is not None:
             concept._activation = activation
@@ -610,6 +622,8 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_excitatory=is_excitatory,
             is_privileged=is_privileged,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         while parent_view is not None:
             parent_view.add(correspondence)
@@ -655,6 +669,8 @@ class BubbleChamber:
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         if start is not None:
             start.links_out.add(label)
@@ -698,6 +714,8 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_bidirectional=is_bidirectional,
             is_excitatory=is_excitatory,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         if activation is not None:
             relation._activation = activation

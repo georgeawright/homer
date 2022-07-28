@@ -25,6 +25,8 @@ class Structure(ABC):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         stable_activation: float = None,
     ):
         self.structure_id = structure_id
@@ -34,10 +36,8 @@ class Structure(ABC):
         self.links_in = links_in
         self.links_out = links_out
         self.parent_spaces = parent_spaces
-        # TODO: get rid of randomness
-        # self._activation = FloatBetweenOneAndZero(
-        #    random.random() if stable_activation is None else stable_activation
-        # )
+        self.champion_labels = champion_labels
+        self.champion_relations = champion_relations
         self._activation = 0.0 if stable_activation is None else stable_activation
         self.stable = stable_activation is not None
         self._depth = 1

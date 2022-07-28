@@ -16,20 +16,33 @@ class LabelSelector(Selector):
         if self.challengers is not None:
             return True
         champion_label = self._get_representative(self.champions)
-        candidates = champion_label.start.labels_in_space(
-            champion_label.parent_concept.parent_space
-        )
         try:
-            challenger_label = candidates.get(key=activation, exclude=[champion_label])
-            self.challengers = self.bubble_chamber.new_structure_collection(
-                challenger_label
+            challenger_label = (
+                champion_label.start.champion_labels.filter(
+                    lambda x: x.parent_concept.parent_space
+                    == champion_label.parent_concept.parent_space
+                )
+                .excluding(champion_label)
+                .get()
             )
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, self.challengers, "Found challengers"
-            )
-            return True
         except MissingStructureError:
-            return True
+            try:
+                challenger_label = (
+                    champion_label.start.labels_in_space(
+                        champion_label.parent_concept.parent_space
+                    )
+                    .excluding(champion_label)
+                    .get(key=activation)
+                )
+            except MissingStructureError:
+                return True
+        self.challengers = self.bubble_chamber.new_structure_collection(
+            challenger_label
+        )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, self.challengers, "Found challengers"
+        )
+        return True
 
     def _get_representative(self, collection: StructureCollection):
         try:
@@ -42,6 +55,14 @@ class LabelSelector(Selector):
 
     def _fizzle(self):
         pass
+
+    def _rearrange_champions(self):
+        winning_label = self.winners.get()
+        start_node = winning_label.start
+        start_node.champion_labels.add(winning_label)
+        if self.losers is not None:
+            losing_label = self.losers.get()
+            start_node.champion_labels.remove(losing_label)
 
     def _engender_follow_up(self):
         try:

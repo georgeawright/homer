@@ -15,24 +15,51 @@ class RelationSelector(Selector):
         if self.challengers is not None:
             return True
         champion_relation = self.champions.get()
-        space = champion_relation.conceptual_space
-        candidates = champion_relation.start.relations_in_space_with(
-            space, champion_relation.end
-        ).filter(
-            lambda x: x.parent_concept.parent_space
-            == champion_relation.parent_concept.parent_space
+        try:
+            challenger_relation = (
+                champion_relation.start.champion_relations.filter(
+                    lambda x: x.end == champion_relation.end
+                    and x.conceptual_space == champion_relation.conceptual_space
+                    and x.parent_concept.parent_space == champion_relation.parent_space
+                )
+                .excluding(champion_relation)
+                .get()
+            )
+        except MissingStructureError:
+            try:
+                challenger_relation = (
+                    champion_relation.start.relations.filter(
+                        lambda x: x.end == champion_relation.end
+                        and x.conceptual_space == champion_relation.conceptual_space
+                        and x.parent_concept.parent_space
+                        == champion_relation.parent_space
+                    )
+                    .excluding(champion_relation)
+                    .get(key=activation)
+                )
+            except MissingStructureError:
+                return True
+        self.challengers = self.bubble_chamber.new_structure_collection(
+            challenger_relation
         )
-        if len(candidates) > 1:
-            challenger_relation = candidates.get(
-                key=activation, exclude=[champion_relation]
-            )
-            self.challengers = self.bubble_chamber.new_structure_collection(
-                challenger_relation
-            )
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, self.challengers, "Found challengers"
+        )
         return True
 
     def _fizzle(self):
         pass
+
+    def _rearrange_champions(self):
+        winning_relation = self.winners.get()
+        start_node = winning_relation.start
+        end_node = winning_relation.end
+        start_node.champion_relations.add(winning_relation)
+        end_node.champion_relations.add(winning_relation)
+        if self.losers is not None:
+            losing_relation = self.losers.get()
+            start_node.champion_relations.remove(losing_relation)
+            end_node.champion_relations.remove(losing_relation)
 
     def _engender_follow_up(self):
         winner_relation = self.winners.get()

@@ -27,6 +27,8 @@ class LetterChunk(Chunk):
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
         sub_chunks: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         abstract_chunk: LetterChunk = None,
     ):
         Chunk.__init__(
@@ -43,6 +45,8 @@ class LetterChunk(Chunk):
             super_chunks=super_chunks,
             sub_chunks=sub_chunks,
             abstract_chunk=abstract_chunk,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.left_branch = left_branch
         self.right_branch = right_branch

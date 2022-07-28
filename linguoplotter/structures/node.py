@@ -21,6 +21,8 @@ class Node(Structure):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         stable_activation: FloatBetweenOneAndZero = None,
     ):
         Structure.__init__(
@@ -32,6 +34,8 @@ class Node(Structure):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
             stable_activation=stable_activation,
         )
         self._parent_space = parent_space
@@ -99,23 +103,10 @@ class Node(Structure):
                         else None
                     )
         else:
-            for space in self.parent_space.conceptual_spaces:
-                best_label = None
-                for label in self.labels_in_space(space):
-                    if best_label is None or label.activation > best_label.activation:
-                        best_label = label
-                if best_label is not None:
-                    best_label.boost_activation(self.quality)
-                best_relations = {}
-                for relation in self.relations.where(conceptual_space=space):
-                    if (
-                        relation.parent_space not in best_relations
-                        or relation.activation
-                        > best_relations[relation.parent_space].activation
-                    ):
-                        best_relations[relation.parent_space] = relation
-                for relation in best_relations.values():
-                    relation.boost_activation(self.quality)
+            for champion in self.champion_labels:
+                champion.boost_activation(self.quality)
+            for champion in self.champion_relations:
+                champion.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         if self.parent_space is None:
