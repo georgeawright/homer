@@ -1,6 +1,5 @@
 import math
 import random
-from typing import Union
 
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero

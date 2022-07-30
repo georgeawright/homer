@@ -171,6 +171,17 @@ class StructureCollection:
             {structure: True for structure in self.structures}, key, exclude
         )
 
+    def sample(self, size: int, key: callable = lambda x: 0, exclude: list = None):
+        if len(self) < size:
+            raise MissingStructureError
+        exclude = [] if exclude is None else exclude
+        collection = StructureCollection(self.bubble_chamber, [])
+        for _ in range(size):
+            item = self.get(key, exclude)
+            exclude.append(item)
+            collection.add(item)
+        return collection
+
     def _arrange_structures_by_name(self):
         self.structures_by_name = {}
         for item in self.structures:

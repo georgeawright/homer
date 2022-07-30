@@ -72,7 +72,7 @@ class LabelSelector(Selector):
             )
             target_node = (
                 winning_label.start.nearby()
-                .where(is_slot=False)
+                .filter(lambda x: x.quality > 0)
                 .get(key=labeling_exigency)
             )
             self.child_codelets.append(

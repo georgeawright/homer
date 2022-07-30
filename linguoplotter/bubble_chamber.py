@@ -268,6 +268,8 @@ class BubbleChamber:
                     ):
                         self.remove(correspondence)
                 super_view.sub_views.remove(item)
+                for frame in item.frames:
+                    super_view.frames.remove(frame)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
             item.parent_frame.recalculate_exigency()
@@ -278,8 +280,10 @@ class BubbleChamber:
                 argument.links_out.remove(item)
                 argument.links_in.remove(item)
         if item.is_chunk:
-            for member in item.members:
-                member.super_chunks.remove(item)
+            for sub_chunk in item.sub_chunks:
+                sub_chunk.super_chunks.remove(item)
+            for super_chunk in item.super_chunks:
+                super_chunk.super_chunks.remove(item)
             for link in item.links:
                 self.remove(link)
         for space in item.parent_spaces:
