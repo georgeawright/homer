@@ -374,6 +374,8 @@ class View(Structure):
             member.boost_activation(self.quality)
         for frame in self.frames:
             frame.boost_activation(self.quality)
+        for view in self.sub_views:
+            view.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])

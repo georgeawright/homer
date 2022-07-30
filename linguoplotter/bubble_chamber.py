@@ -204,6 +204,7 @@ class BubbleChamber:
             structure.spread_activation()
 
     def update_activations(self) -> None:
+        self.worldview.activate()
         for structure in self.structures:
             structure_old_activation = structure.activation
             structure.update_activation()
