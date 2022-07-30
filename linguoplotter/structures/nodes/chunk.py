@@ -140,7 +140,9 @@ class Chunk(Node):
 
     @property
     def potential_chunk_mates(self) -> StructureCollection:
-        return self.nearby().filter(lambda x: x not in self.members)
+        return self.nearby().filter(
+            lambda x: x not in self.sub_chunks and x not in self.super_chunks
+        )
 
     @property
     def adjacent(self) -> StructureCollection:
@@ -187,11 +189,12 @@ class Chunk(Node):
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:
         space = self.parent_space if space is None else space
-        chunks = space.contents.where(
-            is_chunk=True,
-            is_letter_chunk=False,
-            is_slot=False,
-            parent_space=self.parent_space,
+        chunks = space.contents.filter(
+            lambda x: x.is_chunk
+            and not x.is_letter_chunk
+            and not x.is_slot
+            and x.parent_space == self.parent_space
+            and x.quality > 0
         )
         key = lambda x: concept.classifier.classify(start=self, end=x, space=space)
         return chunks.get(key=key, exclude=[self])
