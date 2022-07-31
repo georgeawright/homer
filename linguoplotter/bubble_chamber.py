@@ -280,9 +280,11 @@ class BubbleChamber:
             for argument in item.arguments:
                 argument.links_out.remove(item)
                 argument.links_in.remove(item)
+                argument.recalculate_exigency()
         if item.is_chunk:
             for sub_chunk in item.sub_chunks:
                 sub_chunk.super_chunks.remove(item)
+                sub_chunk.recalculate_exigency()
             for super_chunk in item.super_chunks:
                 super_chunk.super_chunks.remove(item)
             for link in item.links:
