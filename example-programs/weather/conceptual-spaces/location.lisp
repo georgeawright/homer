@@ -85,6 +85,14 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space peripheralness-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
+(define everywhere-concept
+  (def-concept :name "everywhere"
+    :locations (list (Location
+		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
+		      location-space))
+    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function area_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
 
 (def-relation :start north-concept :end more-concept
   :parent_concept more-concept :activation 1.0)
@@ -170,6 +178,13 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 		     (Location (list (list 5 4)) location-space)
 		     (Location (list (list 0)) peripheralness-space))))
 (def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
+(define country-word
+  (def-letter-chunk :name "country" :parent_space location-space
+    :locations (list (Location (list) grammar-space)
+		     (Location
+		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
+		      location-space))))
+(def-relation :start everywhere-concept :end country-word :parent_concept nn-concept)
 
 (def-relation :start north-concept :end south-concept
   :parent_concept more-concept :quality 1.0)
