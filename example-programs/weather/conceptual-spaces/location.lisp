@@ -36,7 +36,8 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
   (def-conceptual-space :name "location" :parent_concept location-concept
     :no_of_dimensions 2
     :dimensions (list north-south-space west-east-space)
-    :sub_spaces (list north-south-space west-east-space nw-se-space ne-sw-space)
+    :sub_spaces
+    (list north-south-space west-east-space nw-se-space ne-sw-space peripheralness-space)
     :is_basic_level True))
 (define north-concept
   (def-concept :name "north" :locations (list (Location (list (list 0 4)) location-space))

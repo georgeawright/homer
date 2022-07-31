@@ -74,9 +74,14 @@ class LabelBuilder(Builder):
             )
             return
         try:
-            conceptual_location = self.target_node.location_in_space(
-                self.parent_concept.parent_basic_space
-            )
+            try:
+                conceptual_location = self.target_node.location_in_space(
+                    self.parent_concept.parent_basic_space
+                )
+            except MissingStructureError:
+                conceptual_location = self.target_node.location_in_space(
+                    self.parent_concept.parent_space
+                )
         except NoLocationError:
             conceptual_space = self.parent_concept.parent_space
             self.target_node.parent_space.conceptual_spaces.add(conceptual_space)

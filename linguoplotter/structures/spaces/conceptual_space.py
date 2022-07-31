@@ -98,7 +98,7 @@ class ConceptualSpace(Space):
         if structure not in self.contents:
             self.contents.add(structure)
             for sub_space in self.sub_spaces:
-                if (
+                if structure.parent_space is None or (
                     structure.parent_space.is_conceptual_space
                     and structure.parent_space != self
                     and structure.parent_space != sub_space
