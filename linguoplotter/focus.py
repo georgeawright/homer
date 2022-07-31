@@ -53,12 +53,14 @@ class Focus:
                     self.view.parent_frame.corresponded_items
                 )
                 no_of_items = len(self.view.parent_frame.items)
-                self.satisfaction = statistics.fmean(
+                self.view.quality = statistics.fmean(
                     [
                         statistics.fmean([item.quality for item in view_items]),
                         no_of_corresponded_items / no_of_items,
+                        self.view.output_space.quality,
                     ]
                 )
+                self.satisfaction = self.view.quality
 
     def change_view(self, view: View):
         self.view = view
