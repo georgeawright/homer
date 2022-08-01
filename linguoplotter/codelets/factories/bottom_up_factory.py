@@ -4,9 +4,18 @@ from linguoplotter.errors import MissingStructureError
 
 class BottomUpFactory(Factory):
     def follow_up_urgency(self):
-        return max(
-            1 - self.bubble_chamber.satisfaction, self.coderack.MINIMUM_CODELET_URGENCY
-        )
+        if self.bubble_chamber.focus.view is None:
+            try:
+                return max(
+                    self.child_codelets[0].urgency,
+                    self.coderack.MINIMUM_CODELET_URGENCY,
+                )
+            except IndexError:
+                return max(
+                    1 - self.bubble_chamber.satisfaction,
+                    self.coderack.MINIMUM_CODELET_URGENCY,
+                )
+        return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _proportion_of_unchunked_raw_chunks(self):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()

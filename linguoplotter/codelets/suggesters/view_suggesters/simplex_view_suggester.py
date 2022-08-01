@@ -151,14 +151,24 @@ class SimplexViewSuggester(ViewSuggester):
                         self.contextual_space
                     ),
                     x.parent_frame.progenitor == self.frame.progenitor,
+                    x not in self.bubble_chamber.recycle_bin,
                 ]
             )
         )
         equivalent_view_activation = sum([view.activation for view in equivalent_views])
+        try:
+            proportion_of_views_equivalent = len(equivalent_views) / len(
+                self.bubble_chamber.views.filter(
+                    lambda x: x not in self.bubble_chamber.recycle_bin
+                )
+            )
+        except ZeroDivisionError:
+            proportion_of_views_equivalent = 0
         self.bubble_chamber.loggers["activity"].log(
             self, f"Frame activation: {self.frame.activation}"
         )
         self.bubble_chamber.loggers["activity"].log(
             self, f"Total equivalent view activation: {equivalent_view_activation}"
         )
-        self.confidence = self.frame.activation * 0.5 ** equivalent_view_activation
+        # self.confidence = self.frame.activation * 0.5 ** equivalent_view_activation
+        self.confidence = self.frame.activation * (1 - proportion_of_views_equivalent)

@@ -65,13 +65,10 @@ class ViewDrivenFactory(Factory):
         return self.bubble_chamber.new_structure_collection(self.target_view)
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        return (
-            max(
-                self.bubble_chamber.focus.view.unhappiness,
-                self.coderack.MINIMUM_CODELET_URGENCY,
-            )
-            if self.bubble_chamber.focus.view is not None
-            else self.coderack.MINIMUM_CODELET_URGENCY
+        if self.bubble_chamber.focus.view is None:
+            return self.coderack.MINIMUM_CODELET_URGENCY
+        return max(
+            1 - self.bubble_chamber.satisfaction, self.coderack.MINIMUM_CODELET_URGENCY
         )
 
     def _engender_follow_up(self):
@@ -200,9 +197,7 @@ class ViewDrivenFactory(Factory):
             if not self.target_slot.parent_concept.is_slot:
                 parent_concept = self.target_slot.parent_concept
             elif self.target_slot.parent_concept.is_filled_in:
-                parent_concept = self.target_slot.parent_concept.relatives.where(
-                    is_concept=True, is_slot=False
-                ).get()
+                parent_concept = self.target_slot.parent_concept.non_slot_value
             else:
                 parent_concept = (
                     self.target_slot.parent_spaces.where(is_conceptual_space=True)
@@ -220,9 +215,7 @@ class ViewDrivenFactory(Factory):
             if not self.target_slot.parent_concept.is_slot:
                 parent_concept = self.target_slot.parent_concept
             elif self.target_slot.parent_concept.is_filled_in:
-                parent_concept = self.target_slot.parent_concept.relatives.where(
-                    is_concept=True, is_slot=False
-                ).get()
+                parent_concept = self.target_slot.parent_concept.non_slot_value
             else:
                 parent_concept = (
                     self.target_slot.parent_spaces.filter(

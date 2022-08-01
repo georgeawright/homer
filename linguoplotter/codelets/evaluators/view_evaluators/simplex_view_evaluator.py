@@ -7,13 +7,12 @@ from linguoplotter.codelets.evaluators import ViewEvaluator
 class SimplexViewEvaluator(ViewEvaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        structure_type = bubble_chamber.concepts["view-simplex"]
         target = bubble_chamber.simplex_views.get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
             bubble_chamber.new_structure_collection(target),
-            structure_type.activation,
+            abs(target.activation - target.quality),
         )
 
     @classmethod

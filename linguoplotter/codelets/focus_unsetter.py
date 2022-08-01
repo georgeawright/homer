@@ -68,6 +68,7 @@ class FocusUnsetter(Codelet):
         if self.bubble_chamber.focus.view.unhappiness == 0.0:
             probability_of_unsetting_focus = 1
             self._update_worldview_porter_urgency()
+            self._update_bottom_up_factories_urgencies()
         else:
             probability_of_unsetting_focus = statistics.fmean(
                 [
@@ -83,6 +84,7 @@ class FocusUnsetter(Codelet):
             self, f"Random number: {random_number}"
         )
         if random_number > probability_of_unsetting_focus:
+            self._update_view_driven_factory_urgency()
             self.bubble_chamber.loggers["activity"].log(self, "Focus left set.")
             self.result = CodeletResult.FIZZLE
             self._fizzle()
@@ -102,6 +104,7 @@ class FocusUnsetter(Codelet):
                     )
                     correspondence.update_activation()
                 self._update_recycler_urgency()
+                self._update_bottom_up_factories_urgencies()
             self.bubble_chamber.focus.view = None
             self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
             self._engender_follow_up()
@@ -123,6 +126,21 @@ class FocusUnsetter(Codelet):
                 codelet.urgency = 1.0
                 return
         raise Exception
+
+    def _update_view_driven_factory_urgency(self):
+        for codelet in self.coderack._codelets:
+            if "ViewDrivenFactory" in codelet.codelet_id:
+                codelet.urgency = 1.0
+                return
+        raise Exception
+
+    def _update_bottom_up_factories_urgencies(self):
+        for codelet in self.coderack._codelets:
+            if (
+                "BottomUpSuggesterFactory" in codelet.codelet_id
+                or "BottomUpEvaluatorFactory" in codelet.codelet_id
+            ):
+                codelet.urgency = 1.0
 
     def _fizzle(self):
         self.child_codelets.append(

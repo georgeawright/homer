@@ -104,6 +104,6 @@ class Evaluator(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.target_structures,
-                FloatBetweenOneAndZero(self.activation_difference),
+                FloatBetweenOneAndZero(abs(self.activation_difference)),
             )
         )

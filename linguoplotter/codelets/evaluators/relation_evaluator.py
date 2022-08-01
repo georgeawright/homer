@@ -11,14 +11,13 @@ class RelationEvaluator(Evaluator):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        structure_type = bubble_chamber.concepts["relation"]
         input_space = bubble_chamber.input_spaces.get()
         target = input_space.contents.where(is_relation=True).get()
         return cls.spawn(
             parent_id,
             bubble_chamber,
             bubble_chamber.new_structure_collection(target),
-            structure_type.activation,
+            abs(target.activation - target.quality),
         )
 
     @property

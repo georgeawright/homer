@@ -74,7 +74,7 @@ class GarbageCollector(Codelet):
 
     def _engender_follow_up(self):
         urgency = max(
-            min(1, self.MINIMUM_URGENCY * len(self.bubble_chamber.views)),
+            min(1, self.MINIMUM_URGENCY * len(self.bubble_chamber.recycle_bin)),
             self.MINIMUM_URGENCY,
         )
         self.child_codelets.append(

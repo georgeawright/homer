@@ -55,6 +55,16 @@ class Recycler(Codelet):
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
+    def _update_garbage_collector_urgency(self):
+        for codelet in self.coderack._codelets:
+            if "GarbageCollector" in codelet.codelet_id:
+                codelet.urgency = (
+                    len(self.bubble_chamber.recycle_bin)
+                    * self.coderack.MINIMUM_CODELET_URGENCY
+                )
+                return
+        raise Exception
+
     def _engender_follow_up(self):
         urgency = max(
             min(1, self.MINIMUM_URGENCY * len(self.bubble_chamber.views)),
