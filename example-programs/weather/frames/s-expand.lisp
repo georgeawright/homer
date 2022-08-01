@@ -71,7 +71,8 @@
   (def-frame :name "s-expand" :parent_concept sentence-concept :parent_frame None
     :depth 6
     :sub_frames (StructureCollection ap-sub-frame location-sub-frame time-sub-frame)
-    :concepts (StructureCollection size-label-concept size-comparison-concept)
+    :concepts (StructureCollection size-label-concept size-comparison-concept
+				   conceptual-label-concept)
     :input_space expand-sentence-input
     :output_space expand-sentence-output))
 
@@ -187,7 +188,7 @@
     :locations (list vb-location
 		     (Location (list) expand-sentence-output))))
 (define size-word-meaning-label
-  (def-label :start sentence-word-6 :parent_concept size-concept
+  (def-label :start sentence-word-6 :parent_concept size-label-concept
     :locations (list (Location (list (list Nan)) size-space)
 		     (Location (list) expand-sentence-output))))
 (define sentence-word-7
@@ -276,7 +277,7 @@
     :locations (list sentence-location
 		     (Location (list) expand-sentence-output))
     :parent_space expand-sentence-output
-    :left_branch (StructureCollection np-super-super-chunk)
+    :left_branch (StructureCollection np-super-super-super-chunk)
     :right_branch (StructureCollection vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
