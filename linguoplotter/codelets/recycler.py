@@ -5,6 +5,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.hyper_parameters import HyperParameters
+from linguoplotter.structure_collection import StructureCollection
 
 
 class Recycler(Codelet):
@@ -66,8 +67,15 @@ class Recycler(Codelet):
         raise Exception
 
     def _engender_follow_up(self):
+        structures_sample = StructureCollection.union(
+            self.bubble_chamber.spaces.where(is_main_input=True).get().contents,
+            self.bubble_chamber.views,
+        ).sample(10)
+        recyclable_structures = structures_sample.filter(
+            lambda x: x.is_recyclable and not x in self.bubble_chamber.recycle_bin
+        )
         urgency = max(
-            min(1, self.MINIMUM_URGENCY * len(self.bubble_chamber.views)),
+            len(recyclable_structures) / len(structures_sample),
             self.MINIMUM_URGENCY,
         )
         self.child_codelets.append(
