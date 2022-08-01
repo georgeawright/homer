@@ -50,7 +50,7 @@
   (def-frame :name "s-[in/de]crease" :parent_concept sentence-concept :parent_frame None
     :depth 6
     :sub_frames (StructureCollection location-sub-frame time-sub-frame)
-    :concepts (StructureCollection location-concept)
+    :concepts (StructureCollection location-concept comparison-concept)
     :input_space increase-sentence-input
     :output_space increase-sentence-output))
 
