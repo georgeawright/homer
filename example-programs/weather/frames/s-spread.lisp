@@ -221,16 +221,16 @@
   (def-label :start np-super-super-chunk :parent_concept nsubj-concept
     :locations (list np-location
 		     (Location (list) spread-sentence-output))))
-(define vb-super-chunk
+(define v-super-chunk
   (def-letter-chunk :name None
-    :locations (list vb-location
+    :locations (list v-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
     :left_branch (StructureCollection sentence-word-4)
     :right_branch (StructureCollection sentence-word-5)))
-(define vb-super-chunk-label
-  (def-label :start vb-super-chunk :parent_concept vb-concept
-    :locations (list vb-location
+(define v-super-chunk-label
+  (def-label :start v-super-chunk :parent_concept v-concept
+    :locations (list v-location
 		     (Location (list) spread-sentence-output))))
 (define pred-super-chunk
   (def-letter-chunk :name None
@@ -248,7 +248,7 @@
     :locations (list vp-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
-    :left_branch (StructureCollection vb-super-chunk)
+    :left_branch (StructureCollection v-super-chunk)
     :right_branch (StructureCollection pred-super-chunk)))
 (define vp-super-chunk-label
   (def-label :start vp-super-chunk :parent_concept vp-concept
