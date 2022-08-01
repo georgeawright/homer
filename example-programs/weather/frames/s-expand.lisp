@@ -201,6 +201,12 @@
   (def-label :start sentence-word-7 :parent_concept pp-directional-time-concept
     :locations (list pp-location
 		     (Location (list) time-sub-frame-output))))
+(define sentence-word-8
+  (def-letter-chunk :name ""
+    :locations (list null-location
+		     (Location (list) expand-sentence-output))
+    :parent_space expand-sentence-output
+    :abstract_chunk null))
 
 (define np-super-chunk
   (def-letter-chunk :name None
@@ -256,7 +262,7 @@
 		     (Location (list) expand-sentence-output))
     :parent_space expand-sentence-output
     :left_branch (StructureCollection sentence-word-7)
-    :right_branch (StructureCollection)))
+    :right_branch (StructureCollection sentence-word-8)))
 (define pred-label
   (def-label :start pred-super-chunk :parent_concept predicate-concept
     :locations (list predicate-location
@@ -267,7 +273,7 @@
 		     (Location (list) expand-sentence-output))
     :parent_space expand-sentence-output
     :left_branch (StructureCollection vb-super-chunk)
-    :right_branch (StructureCollection sentence-word-7)))
+    :right_branch (StructureCollection pred-super-chunk)))
 (define vp-super-chunk-label
   (def-label :start vp-super-chunk :parent_concept vp-concept
     :locations (list vp-location
