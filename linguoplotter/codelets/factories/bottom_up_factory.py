@@ -7,7 +7,12 @@ class BottomUpFactory(Factory):
         if self.bubble_chamber.focus.view is None:
             try:
                 return max(
-                    self.child_codelets[0].urgency,
+                    min(
+                        [
+                            1 - self.bubble_chamber.satisfaction,
+                            self.child_codelets[0].urgency,
+                        ]
+                    ),
                     self.coderack.MINIMUM_CODELET_URGENCY,
                 )
             except IndexError:
@@ -15,6 +20,7 @@ class BottomUpFactory(Factory):
                     1 - self.bubble_chamber.satisfaction,
                     self.coderack.MINIMUM_CODELET_URGENCY,
                 )
+
         return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _proportion_of_unchunked_raw_chunks(self):
