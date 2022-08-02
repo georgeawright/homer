@@ -1,3 +1,5 @@
+import statistics
+
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
@@ -171,4 +173,6 @@ class SimplexViewSuggester(ViewSuggester):
             self, f"Total equivalent view activation: {equivalent_view_activation}"
         )
         # self.confidence = self.frame.activation * 0.5 ** equivalent_view_activation
-        self.confidence = self.frame.activation * (1 - proportion_of_views_equivalent)
+        self.confidence = statistics.fmean(
+            [self.frame.exigency * (1 - proportion_of_views_equivalent)]
+        )
