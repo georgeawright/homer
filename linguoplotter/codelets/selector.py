@@ -161,7 +161,10 @@ class Selector(Codelet):
         for winner in self.winners:
             # winner.boost_activation(self.confidence)
             # winner.update_activation()
-            winner.activate()
+            if winner.quality > 0.0:
+                winner.activate()
+            else:
+                winner.deactivate()
             if winner.is_link:
                 winner.parent_concept.boost_activation(self.confidence)
             if winner.is_view:
