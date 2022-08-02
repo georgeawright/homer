@@ -124,11 +124,5 @@
     :locations (list pp-location
 		     (Location (list) pp-directional-time-output))))
 
-(def-relation :start label-concept :end pp-directional-time
-  :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end pp-directional-time
-  :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end pp-directional-time
-  :is_bidirectional True :activation 1.0)
-(def-relation :start pp-concept :end pp-directional-time
+(def-relation :start time-concept :end pp-directional-time
   :is_bidirectional True :activation 1.0)

@@ -177,11 +177,5 @@
 		     (Location (list) pp-from-to-locations-output))))
 
 
-(def-relation :start label-concept :end pp-from-to-locations
-  :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end pp-from-to-locations
-  :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end pp-from-to-locations
-  :is_bidirectional True :activation 1.0)
-(def-relation :start pp-concept :end pp-from-to-locations
+(def-relation :start location-concept :end pp-from-to-locations
   :is_bidirectional True :activation 1.0)

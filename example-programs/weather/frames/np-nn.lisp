@@ -57,13 +57,7 @@
     :locations (list np-location
 		     (Location (list) nn-output))))
    
-(def-relation :start label-concept :end nn-frame
+(def-relation :start location-concept :end nn-frame
   :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end nn-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end nn-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start nn-concept :end nn-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start np-concept :end nn-frame
+(def-relation :start time-concept :end nn-frame
   :is_bidirectional True :activation 1.0)

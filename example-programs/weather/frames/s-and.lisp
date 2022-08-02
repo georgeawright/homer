@@ -169,9 +169,5 @@
 
 (def-relation :start same-concept :end and-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start conj-concept :end and-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start and :end and-sentence
-  :is_bidirectional True :activation 1.0)
 (def-relation :start sentence-concept :end and-sentence
   :is_bidirectional True :activation 1.0)

@@ -197,23 +197,7 @@
     :locations (list sentence-location
 		     (Location (list) increase-sentence-output))))
 
-(def-relation :start label-concept :end increase-sentence
+(def-relation :start pp-inessive-location-concept :end increase-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start relation-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start nn-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jj-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jjr-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start rp-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start sentence-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start more-concept :end increase-sentence
+(def-relation :start pp-directional-time-concept :end increase-sentence
   :is_bidirectional True :activation 1.0)

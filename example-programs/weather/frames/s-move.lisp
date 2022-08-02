@@ -246,21 +246,10 @@
     :locations (list sentence-location
 		     (Location (list) move-sentence-output))))
 
-(def-relation :start label-concept :end move-sentence
+(def-relation :start pp-directional-location-concept :end move-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start relation-concept :end move-sentence
+(def-relation :start pp-directional-time-concept :end move-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end move-sentence
+(def-relation :start ap-concept :end move-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end move-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start nn-concept :end move-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jj-concept :end move-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jjr-concept :end move-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start rp-concept :end move-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start sentence-concept :end move-sentence
-  :is_bidirectional True :activation 1.0)
+

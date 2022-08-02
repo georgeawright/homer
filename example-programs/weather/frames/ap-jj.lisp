@@ -57,13 +57,9 @@
     :locations (list ap-location
 		     (Location (list) jj-output))))
 
-(def-relation :start label-concept :end jj-frame
+(def-relation :start temperature-concept :end jj-frame
   :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end jj-frame
+(def-relation :start height-concept :end jj-frame
   :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end jj-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jj-concept :end jj-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start ap-concept :end jj-frame
+(def-relation :start goodness-concept :end jj-frame
   :is_bidirectional True :activation 1.0)

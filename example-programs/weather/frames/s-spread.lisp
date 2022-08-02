@@ -266,21 +266,13 @@
     :locations (list sentence-location
 		     (Location (list) spread-sentence-output))))
 
-(def-relation :start label-concept :end spread-sentence
+(def-relation :start pp-directional-location-concept :end spread-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start relation-concept :end spread-sentence
+(def-relation :start pp-directional-time-concept :end spread-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end spread-sentence
+(def-relation :start ap-concept :end spread-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end spread-sentence
+(def-relation :start large-concept :end spread-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start nn-concept :end spread-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jj-concept :end spread-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jjr-concept :end spread-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start rp-concept :end spread-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start sentence-concept :end spread-sentence
+(def-relation :start small-concept :end spread-sentence
   :is_bidirectional True :activation 1.0)
