@@ -68,7 +68,6 @@ class Linguoplotter:
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
                 self.loggers["errors"].log_message("No more codelets.")
-                self.print_results()
                 break
             except Exception as e:
                 raise e
