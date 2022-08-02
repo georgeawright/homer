@@ -1,6 +1,7 @@
 from linguoplotter.codelets.selectors import ViewSelector
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.structures.views import SimplexView
+from linguoplotter.structure_collection_keys import activation
 
 
 class SimplexViewSelector(ViewSelector):
@@ -32,21 +33,22 @@ class SimplexViewSelector(ViewSelector):
         if self.challengers is not None:
             return True
         try:
-            champion_view = self.champions.get()
-            challenger_view = champion_view.nearby().get()
-            self.challengers = self.bubble_chamber.new_structure_collection(
-                challenger_view
-            )
+            self._get_challenger()
         except MissingStructureError:
             return True
-        champion_members_starts = self.bubble_chamber.new_structure_collection(
-            member.start
-            for member in champion_view.members
-            if member.start.parent_space.parent_concept.name == "input"
-        )
-        return not self.bubble_chamber.new_structure_collection(
-            member.start
-            for member in challenger_view.members
-            if member.start.parent_space.parent_concept.name == "input"
-            and member.start in champion_members_starts
-        ).is_empty()
+        return True
+
+    def _get_challenger(self):
+        champion_view = self.champions.get()
+        challenger_view = self.bubble_chamber.views.filter(
+            lambda x: x.parent_frame.parent_concept
+            == champion_view.parent_frame.parent_concept
+            and not champion_view.members.filter(
+                lambda c: c.start.parent_space in x.input_spaces
+            ).is_empty()
+            and not x.members.filter(
+                lambda c: c.start.parent_space in x.input_spaces
+            ).is_empty()
+            and x.raw_input_nodes() == champion_view.raw_input_nodes()
+        ).get(key=activation)
+        self.challengers = self.bubble_chamber.new_structure_collection(challenger_view)
