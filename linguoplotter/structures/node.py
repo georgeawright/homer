@@ -102,6 +102,8 @@ class Node(Structure):
                         if link.parent_concept is not None
                         else None
                     )
+            if self.parent_space is not None:
+                self.parent_space.parent_concept.activate()
         else:
             for champion in self.champion_labels:
                 champion.boost_activation(self.quality)
