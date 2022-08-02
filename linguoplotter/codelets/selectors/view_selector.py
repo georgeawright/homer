@@ -1,6 +1,7 @@
 from linguoplotter.codelets.selector import Selector
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.hyper_parameters import HyperParameters
+from linguoplotter.structure_collection_keys import exigency
 
 
 class ViewSelector(Selector):
@@ -29,11 +30,17 @@ class ViewSelector(Selector):
         # spawn a top-down view suggester with copy of winning view's frame
         winning_view = self.winners.get()
         if winning_view.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE:
+            try:
+                target_frame = winning_view.parent_frame.parent_concept.relatives.where(
+                    is_frame=True
+                ).get(key=exigency)
+            except MissingStructureError:
+                target_frame = winning_view.parent_frame
             self.child_codelets.append(
                 self.get_follow_up_class().make(
                     self.codelet_id,
                     self.bubble_chamber,
-                    frame=winning_view.parent_frame,
+                    frame=target_frame,
                 )
             )
         self.child_codelets.append(
