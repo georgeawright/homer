@@ -126,6 +126,15 @@ class Coderack:
                             [codelet.urgency, existing_codelet.urgency]
                         )
                         return
+        try:
+            coderack_cleaner = [
+                c for c in self._codelets if isinstance(c, CoderackCleaner)
+            ][0]
+            coderack_cleaner.urgency = FloatBetweenOneAndZero(
+                self.population_size / self.MAXIMUM_POPULATION
+            )
+        except IndexError:
+            pass
         self._codelets.append(codelet)
 
     def remove_codelet(self, codelet: Codelet):
