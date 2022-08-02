@@ -39,7 +39,10 @@ class ChunkEvaluator(Evaluator):
             ),
         )
         for sub_chunk in target_chunk.sub_chunks:
-            if self.confidence >= sub_chunk.quality:
+            if (
+                target_chunk.size - sub_chunk.size
+                >= sub_chunk.quality - self.confidence
+            ):
                 sub_chunk.quality = 0
         for super_chunk in target_chunk.super_chunks:
             if super_chunk.quality >= self.confidence:
