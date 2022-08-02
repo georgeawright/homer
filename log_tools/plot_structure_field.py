@@ -55,6 +55,11 @@ concept_file_map = {
     "letter-chunk": None,
     "relation": None,
     "view-simplex": None,
+    # grammar
+    "np": None,
+    "ap": None,
+    "pp-inessive-location": None,
+    "pp-inessive-time": None,
     # semantic
     "hot": None,
     "warm": None,
@@ -181,6 +186,18 @@ generate_plot(
     ],
     "activation",
     "Location Concepts Activation Over Time",
+)
+
+generate_plot(
+    log_directory,
+    [
+        concept_file_map["np"],
+        concept_file_map["ap"],
+        concept_file_map["pp-inessive-location"],
+        concept_file_map["pp-inessive-time"],
+    ],
+    "activation",
+    "Grammar Concepts Activation Over Time",
 )
 
 generate_plot(
