@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 import statistics
 
+from linguoplotter import fuzzy
 from linguoplotter.errors import NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
@@ -127,7 +128,7 @@ class Frame(Structure):
 
     def recalculate_exigency(self):
         self.recalculate_unhappiness()
-        self.exigency = statistics.fmean([self.unhappiness, self.activation])
+        self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
     def instantiate(
         self,
@@ -281,6 +282,7 @@ class Frame(Structure):
     def spread_activation(self):
         if not self.is_fully_active():
             return
+        self.parent_concept.boost_activation()
         for link in self.links_out.where(is_label=False):
             if link.is_excitatory:
                 link.end.boost_activation(link.activation)
