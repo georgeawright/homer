@@ -12,7 +12,9 @@ class RelationEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         input_space = bubble_chamber.input_spaces.get()
-        target = input_space.contents.where(is_relation=True).get()
+        target = input_space.contents.where(is_relation=True).get(
+            key=lambda x: abs(x.activation - x.quality)
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,

@@ -7,7 +7,9 @@ from linguoplotter.codelets.evaluators import ViewEvaluator
 class SimplexViewEvaluator(ViewEvaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        target = bubble_chamber.simplex_views.get()
+        target = bubble_chamber.simplex_views.get(
+            key=lambda x: abs(x.activation - x.quality)
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,

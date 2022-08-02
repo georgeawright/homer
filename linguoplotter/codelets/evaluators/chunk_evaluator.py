@@ -14,7 +14,7 @@ class ChunkEvaluator(Evaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         target = bubble_chamber.input_nodes.where(
             is_chunk=True, is_letter_chunk=False, is_raw=False, is_slot=False
-        ).get()
+        ).get(key=lambda x: abs(x.activation - x.quality))
         return cls.spawn(
             parent_id,
             bubble_chamber,

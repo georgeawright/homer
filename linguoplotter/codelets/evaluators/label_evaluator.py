@@ -16,7 +16,7 @@ class LabelEvaluator(Evaluator):
         input_space = bubble_chamber.input_spaces.get()
         target = input_space.contents.filter(
             lambda x: x.is_label and not x.start.is_label
-        ).get()
+        ).get(key=lambda x: abs(x.activation - x.quality))
         return cls.spawn(
             parent_id,
             bubble_chamber,
