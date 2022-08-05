@@ -54,9 +54,10 @@ class WorldviewPorter(Codelet):
                 self, f"Target view activation: {self.target_view.activation}"
             )
             self.run_competition()
+            self._engender_follow_up()
         except MissingStructureError:
             self.result = CodeletResult.FIZZLE
-        self._engender_follow_up()
+            self._fizzle()
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
@@ -91,6 +92,16 @@ class WorldviewPorter(Codelet):
             )
             self._update_publisher_urgency()
             self.result = CodeletResult.FIZZLE
+
+    def _fizzle(self):
+        self.child_codelets.append(
+            self.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.coderack,
+                self.MINIMUM_CODELET_URGENCY,
+            )
+        )
 
     def _engender_follow_up(self):
         self.child_codelets.append(
