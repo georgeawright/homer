@@ -73,7 +73,7 @@ class Recycler(Codelet):
                 .get()
                 .contents.where(is_raw=False),
                 self.bubble_chamber.views,
-            ).sample(10)
+            ).sample(len(self.bubble_chamber.structures) * 0.1)
             recyclable_structures = structures_sample.filter(
                 lambda x: x.is_recyclable and not x in self.bubble_chamber.recycle_bin
             )
