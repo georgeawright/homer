@@ -67,15 +67,21 @@ class Recycler(Codelet):
         raise Exception
 
     def _engender_follow_up(self):
-        structures_sample = StructureCollection.union(
-            self.bubble_chamber.spaces.where(is_main_input=True).get().contents,
-            self.bubble_chamber.views,
-        ).sample(10)
-        recyclable_structures = structures_sample.filter(
-            lambda x: x.is_recyclable and not x in self.bubble_chamber.recycle_bin
-        )
+        try:
+            structures_sample = StructureCollection.union(
+                self.bubble_chamber.spaces.where(is_main_input=True)
+                .get()
+                .contents.where(is_raw=False),
+                self.bubble_chamber.views,
+            ).sample(10)
+            recyclable_structures = structures_sample.filter(
+                lambda x: x.is_recyclable and not x in self.bubble_chamber.recycle_bin
+            )
+            proportion_recyclable = len(recyclable_structures) / len(structures_sample)
+        except MissingStructureError:
+            proportion_recyclable = 0
         urgency = max(
-            len(recyclable_structures) / len(structures_sample),
+            proportion_recyclable,
             self.MINIMUM_URGENCY,
         )
         self.child_codelets.append(
