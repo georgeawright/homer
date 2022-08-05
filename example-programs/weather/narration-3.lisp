@@ -13,7 +13,6 @@
 (load "conceptual-spaces/time.lisp")
 
 (load "frames/ap-jj.lisp")
-(load "frames/np-nn.lisp")
 
 (load "frames/pp-inessive-time.lisp")
 (load "frames/pp-between-times.lisp")
