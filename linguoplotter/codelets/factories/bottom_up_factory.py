@@ -20,7 +20,6 @@ class BottomUpFactory(Factory):
                     1 - self.bubble_chamber.satisfaction,
                     self.coderack.MINIMUM_CODELET_URGENCY,
                 )
-
         return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _proportion_of_unchunked_raw_chunks(self):
