@@ -90,9 +90,7 @@ class FocusSetter(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                self.coderack.MINIMUM_CODELET_URGENCY
-                if self.bubble_chamber.views.is_empty()
-                else 0.5,
+                self.coderack.MINIMUM_CODELET_URGENCY,
             )
         )
 
