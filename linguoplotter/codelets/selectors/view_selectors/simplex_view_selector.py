@@ -40,15 +40,19 @@ class SimplexViewSelector(ViewSelector):
 
     def _get_challenger(self):
         champion_view = self.champions.get()
-        challenger_view = self.bubble_chamber.views.filter(
-            lambda x: x.parent_frame.parent_concept
-            == champion_view.parent_frame.parent_concept
-            and not champion_view.members.filter(
-                lambda c: c.start.parent_space in x.input_spaces
-            ).is_empty()
-            and not x.members.filter(
-                lambda c: c.start.parent_space in x.input_spaces
-            ).is_empty()
-            and x.raw_input_nodes() == champion_view.raw_input_nodes()
-        ).get(key=activation)
+        challenger_view = (
+            self.bubble_chamber.views.filter(
+                lambda x: x.parent_frame.parent_concept
+                == champion_view.parent_frame.parent_concept
+                and not champion_view.members.filter(
+                    lambda c: c.start.parent_space in x.input_spaces
+                ).is_empty()
+                and not x.members.filter(
+                    lambda c: c.start.parent_space in x.input_spaces
+                ).is_empty()
+                and x.raw_input_nodes() == champion_view.raw_input_nodes()
+            )
+            .excluding(champion_view)
+            .get(key=activation)
+        )
         self.challengers = self.bubble_chamber.new_structure_collection(challenger_view)
