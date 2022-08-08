@@ -456,12 +456,27 @@ class BubbleChamber:
             champion_labels=self.new_structure_collection(),
             champion_relations=self.new_structure_collection(),
         )
+        for existing_chunk in self.chunks:
+            if not chunk.members.is_empty() and all(
+                member in existing_chunk.members for member in chunk.members
+            ):
+                chunk.super_chunks.add(existing_chunk)
+                existing_chunk.sub_chunks.add(chunk)
+                existing_chunk.recalculate_exigency()
+                self.loggers["structure"].log(existing_chunk)
+            if not existing_chunk.members.is_empty() and all(
+                member in chunk.members for member in existing_chunk.members
+            ):
+                chunk.sub_chunks.add(existing_chunk)
+                existing_chunk.super_chunks.add(chunk)
+                existing_chunk.recalculate_exigency()
+                self.loggers["structure"].log(existing_chunk)
+            if existing_chunk.is_raw and existing_chunk in chunk.members:
+                existing_chunk.super_chunks.add(chunk)
+                chunk.sub_chunks.add(existing_chunk)
+                existing_chunk.recalculate_exigency()
+                self.loggers["structure"].log(existing_chunk)
         chunk._activation = activation
-        for member in members:
-            member.super_chunks.add(chunk)
-            member.recalculate_exigency()
-            chunk.sub_chunks.add(member)
-            self.loggers["structure"].log(member)
         self.add(chunk)
         return chunk
 
