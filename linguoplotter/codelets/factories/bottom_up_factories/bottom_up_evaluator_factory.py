@@ -46,11 +46,8 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
                 lambda x: x.is_chunk and not x.is_raw
             ).sample(10)
         except MissingStructureError:
-            try:
-                chunks = input_space.contents.filter(
-                    lambda x: x.is_chunk and not x.is_raw
-                )
-            except MissingStructureError:
+            chunks = input_space.contents.filter(lambda x: x.is_chunk and not x.is_raw)
+            if chunks.is_empty():
                 return 0
         return statistics.fmean(
             [
@@ -67,11 +64,8 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
                 lambda x: x.is_chunk and not x.is_raw
             ).sample(10)
         except MissingStructureError:
-            try:
-                chunks = input_space.contents.filter(
-                    lambda x: x.is_chunk and not x.is_raw
-                )
-            except MissingStructureError:
+            chunks = input_space.contents.filter(lambda x: x.is_chunk and not x.is_raw)
+            if chunks.is_empty():
                 return 0
         return statistics.fmean(
             [
