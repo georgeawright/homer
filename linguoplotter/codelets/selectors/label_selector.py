@@ -19,7 +19,7 @@ class LabelSelector(Selector):
         try:
             challenger_label = (
                 champion_label.start.champion_labels.filter(
-                    lambda x: x.parent_concept.parent_space
+                    lambda x: x.parent_concept.parent_basic_space
                     == champion_label.parent_concept.parent_space
                 )
                 .excluding(champion_label)
@@ -29,7 +29,7 @@ class LabelSelector(Selector):
             try:
                 challenger_label = (
                     champion_label.start.labels_in_space(
-                        champion_label.parent_concept.parent_space
+                        champion_label.parent_concept.parent_basic_space
                     )
                     .excluding(champion_label)
                     .get(key=activation)
