@@ -8,10 +8,12 @@ class ActivityLogger(Logger):
         log_file_name: str,
         satisfaction_stream=None,
         coderack_population_stream=None,
+        view_count_stream=None,
     ):
         self.log_file_name = log_file_name
         self.satisfaction_stream = satisfaction_stream
         self.coderack_population_stream = coderack_population_stream
+        self.view_count_stream = view_count_stream
         self._stream = None
         self.previous_codelet_id = None
         self.codelets_run = 0
@@ -59,6 +61,10 @@ class ActivityLogger(Logger):
             self.coderack_population_stream.write(
                 f"{self.codelets_run},{coderack_population}\n"
             )
+
+    def _log_view_count(self, view_count: int):
+        if self.view_count_stream is not None:
+            self.view_count_stream.write(f"{self.codelets_run},{view_count}\n")
 
     def log_dict(self, codelet: "Codelet", dictionary, name: str):
         if dictionary is None or len(dictionary) == 0:

@@ -168,6 +168,7 @@ class Coderack:
             + f"Worldview: {self.bubble_chamber.worldview.views}\n",
         )
         self.loggers["activity"]._log_coderack_population(self.population_size)
+        self.loggers["activity"]._log_view_count(len(self.bubble_chamber.views))
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)
 
