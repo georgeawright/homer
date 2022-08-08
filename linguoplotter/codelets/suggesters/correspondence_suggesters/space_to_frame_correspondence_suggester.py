@@ -132,6 +132,19 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         return True
 
     def _calculate_confidence(self):
+        input_links = self.bubble_chamber.new_structure_collection(
+            self.target_structure_one
+        )
+        input_chunks = self.bubble_chamber.new_structure_collection()
+        while not input_links.is_empty():
+            link = input_links.get()
+            for arg in link.arguments:
+                if arg.is_chunk:
+                    input_chunks.add(arg)
+                elif arg.is_link:
+                    input_links.add(arg)
+            input_links.remove(link)
+        input_quality = min([chunk.quality for chunk in input_chunks])
         self.confidence = (
             self.parent_concept.classifier.classify(
                 concept=self.parent_concept,
@@ -140,7 +153,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 end=self.target_structure_two,
                 view=self.target_view,
             )
-            * self.target_structure_one.quality
+            * input_quality
         )
 
     def _fizzle(self):
