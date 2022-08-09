@@ -18,10 +18,12 @@
 (load "frames/pp-between-times.lisp")
 (load "frames/pp-inessive-location.lisp")
 (load "frames/pp-from-to-different-locations.lisp")
+(load "frames/pp-from-wards-locations.lisp")
 (load "frames/pp-from-to-locations.lisp")
 
 (load "frames/s-increase.lisp")
 (load "frames/s-move.lisp")
+(load "frames/s-spread.lisp")
 (load "frames/s-and.lisp")
 
 (define input-space
