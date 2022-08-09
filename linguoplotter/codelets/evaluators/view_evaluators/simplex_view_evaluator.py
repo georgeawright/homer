@@ -78,13 +78,26 @@ class SimplexViewEvaluator(ViewEvaluator):
             "Proportion of frame output items projected: "
             + f"{proportion_of_frame_output_items_projected}",
         )
-        self.confidence = statistics.fmean(
-            [
-                average_correspondence_quality,
-                proportion_of_frame_input_items_matched,
-                proportion_of_frame_output_items_projected,
-                target_view.output_space.quality,
-            ]
+        try:
+            input_chunks_quality = min(
+                [
+                    chunk.quality
+                    for chunk in target_view.grouped_nodes
+                    if chunk.parent_space in target_view.input_spaces
+                ]
+            )
+        except ValueError:
+            input_chunks_quality = 1
+        self.confidence = (
+            statistics.fmean(
+                [
+                    average_correspondence_quality,
+                    proportion_of_frame_input_items_matched,
+                    proportion_of_frame_output_items_projected,
+                    target_view.output_space.quality,
+                ]
+            )
+            * input_chunks_quality
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_view.activation

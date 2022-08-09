@@ -49,16 +49,29 @@ class Focus:
             if view_items.is_empty():
                 self.satisfaction = 0
             else:
+                try:
+                    input_chunks_quality = min(
+                        [
+                            chunk.quality
+                            for chunk in self.view.grouped_nodes
+                            if chunk.parent_space in self.view.input_spaces
+                        ]
+                    )
+                except ValueError:
+                    input_chunks_quality = 1
                 no_of_corresponded_items = len(
                     self.view.parent_frame.corresponded_items
                 )
                 no_of_items = len(self.view.parent_frame.items)
-                self.view.quality = statistics.fmean(
-                    [
-                        statistics.fmean([item.quality for item in view_items]),
-                        no_of_corresponded_items / no_of_items,
-                        self.view.output_space.quality,
-                    ]
+                self.view.quality = (
+                    statistics.fmean(
+                        [
+                            statistics.fmean([item.quality for item in view_items]),
+                            no_of_corresponded_items / no_of_items,
+                            self.view.output_space.quality,
+                        ]
+                    )
+                    * input_chunks_quality
                 )
                 self.satisfaction = self.view.quality
 

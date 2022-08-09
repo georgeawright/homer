@@ -47,6 +47,7 @@ class FocusUnsetter(Codelet):
             self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
         )
         current_satisfaction_score = self.bubble_chamber.focus.satisfaction
+        self.bubble_chamber.focus.view.quality = current_satisfaction_score
         change_in_satisfaction_score = (
             current_satisfaction_score - self.last_satisfaction_score
         )
