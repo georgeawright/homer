@@ -82,10 +82,8 @@ class Linguoplotter:
     def print_status_update(self):
         codelets_run = self.coderack.codelets_run
         bubble_chamber_satisfaction = self.bubble_chamber.satisfaction
-        suggest_activation = self.bubble_chamber.concepts["suggest"].activation
-        build_activation = self.bubble_chamber.concepts["build"].activation
-        evaluate_activation = self.bubble_chamber.concepts["evaluate"].activation
-        select_activation = self.bubble_chamber.concepts["select"].activation
+        coderack_population = len(self.coderack._codelets)
+        view_count = len(self.bubble_chamber.views)
         focus = (
             self.bubble_chamber.focus.view.structure_id
             + self.bubble_chamber.focus.view.parent_frame.name
@@ -106,10 +104,8 @@ class Linguoplotter:
         print(
             f"codelets run: {codelets_run}; "
             + f"satisf.: {bubble_chamber_satisfaction}; "
-            + f"SUGGEST: {suggest_activation}; "
-            + f"BUILD: {build_activation}; "
-            + f"EVALUATE: {evaluate_activation}; "
-            + f"SELECT: {select_activation}; "
+            + f"coderack pop.: {coderack_population}; "
+            + f"view count.: {view_count}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
         if not self.bubble_chamber.worldview.views.is_empty():
