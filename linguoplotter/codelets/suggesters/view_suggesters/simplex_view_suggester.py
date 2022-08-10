@@ -152,6 +152,12 @@ class SimplexViewSuggester(ViewSuggester):
                     == self.bubble_chamber.new_structure_collection(
                         self.contextual_space
                     ),
+                    all(
+                        [
+                            space in x.input_spaces.get().conceptual_spaces
+                            for space in self.conceptual_spaces_map.values()
+                        ]
+                    ),
                     x.parent_frame.progenitor == self.frame.progenitor,
                     x not in self.bubble_chamber.recycle_bin,
                 ]
