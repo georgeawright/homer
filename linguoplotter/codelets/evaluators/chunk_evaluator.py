@@ -45,7 +45,10 @@ class ChunkEvaluator(Evaluator):
             ):
                 sub_chunk.quality = 0
         for super_chunk in target_chunk.super_chunks:
-            if super_chunk.quality >= self.confidence:
+            if (
+                super_chunk.size - target_chunk.size
+                >= self.confidence - super_chunk.quality
+            ):
                 self.confidence = 0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_chunk.activation
