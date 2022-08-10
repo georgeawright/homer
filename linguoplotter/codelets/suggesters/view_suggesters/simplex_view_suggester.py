@@ -157,6 +157,9 @@ class SimplexViewSuggester(ViewSuggester):
                 ]
             )
         )
+        if not equivalent_views.filter(lambda x: x.members.is_empty()).is_empty():
+            self.confidence = 0.0
+            return
         equivalent_view_activation = sum([view.activation for view in equivalent_views])
         try:
             proportion_of_views_equivalent = len(equivalent_views) / len(
