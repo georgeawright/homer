@@ -282,6 +282,9 @@ class BubbleChamber:
                 argument.links_in.remove(item)
                 argument.recalculate_exigency()
         if item.is_chunk:
+            for view in self.views.copy():
+                if item in view.grouped_nodes:
+                    self.remove(view)
             for sub_chunk in item.sub_chunks:
                 sub_chunk.super_chunks.remove(item)
                 sub_chunk.recalculate_exigency()

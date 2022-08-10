@@ -155,7 +155,6 @@ class Chunk(Node):
             and self.parent_space is not None
             and self.parent_space.is_main_input
             and self.activation == 0.0
-            and self.links.filter(lambda x: not x.correspondences.is_empty()).is_empty()
         )
 
     def nearby(self, space: Space = None) -> StructureCollection:
