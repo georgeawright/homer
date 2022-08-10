@@ -1,3 +1,5 @@
+import math
+
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -41,15 +43,26 @@ class Recycler(Codelet):
         )
 
     def run(self) -> CodeletResult:
+        recyclable_structures = self.bubble_chamber.structures.where(is_recyclable=True)
+        sample_size = math.ceil(len(recyclable_structures) * self.urgency)
         try:
-            target = self.bubble_chamber.structures.filter(
-                lambda x: x.is_recyclable and x not in self.bubble_chamber.recycle_bin
-            ).get()
-            self.bubble_chamber.loggers["activity"].log(self, f"Found target: {target}")
-            self.bubble_chamber.recycle_bin.add(target)
+            structures = recyclable_structures.sample(sample_size)
+            for item in structures:
+                if item.is_recyclable and not item in self.bubble_chamber.recycle_bin:
+                    probability_of_recycling = (
+                        self.bubble_chamber.random_machine.generate_number()
+                    )
+                    self.bubble_chamber.loggers["activity"].log(
+                        self,
+                        f"{item.structure_id}, quality: {item.quality}; prob: {probability_of_recycling}",
+                    )
+                    if probability_of_recycling > item.quality:
+                        self.bubble_chamber.loggers["activity"].log(
+                            self, f"Adding to recycle bin: {item}"
+                        )
+                        self.bubble_chamber.recycle_bin.add(item)
             self.result = CodeletResult.FINISH
         except MissingStructureError:
-            self.bubble_chamber.loggers["activity"].log(self, "Couldn't find target")
             self.result = CodeletResult.FIZZLE
         self._engender_follow_up()
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
