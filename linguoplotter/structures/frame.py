@@ -62,6 +62,7 @@ class Frame(Structure):
     def __dict__(self) -> dict:
         return {
             "structure_id": self.structure_id,
+            "name": self.name,
             "input_space": self.input_space.structure_id,
             "output_space": self.output_space.structure_id,
             "activation": self.activation,
