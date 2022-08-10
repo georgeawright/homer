@@ -1,11 +1,10 @@
-import statistics
-
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection import StructureCollection
-from linguoplotter.structure_collection_keys import activation, exigency
+from linguoplotter.structure_collection_keys import activation
 from linguoplotter.structures import Frame
 
 
@@ -45,7 +44,7 @@ class SimplexViewSuggester(ViewSuggester):
         if frame is None:
             frame = bubble_chamber.frames.where(
                 parent_frame=None, is_sub_frame=False
-            ).get(key=exigency)
+            ).get()
         views_with_frame = bubble_chamber.views.filter(
             lambda x: x.parent_frame in frame.instances or x.parent_frame == frame
         )
@@ -53,7 +52,6 @@ class SimplexViewSuggester(ViewSuggester):
             urgency
             if urgency is not None
             else (1 - bubble_chamber.focus.focussedness)
-            * frame.activation
             * 0.5 ** sum([1 - view.activation for view in views_with_frame])
         )
         return cls.spawn(
@@ -181,7 +179,6 @@ class SimplexViewSuggester(ViewSuggester):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Total equivalent view activation: {equivalent_view_activation}"
         )
-        # self.confidence = self.frame.activation * 0.5 ** equivalent_view_activation
-        self.confidence = statistics.fmean(
-            [self.frame.exigency * (1 - proportion_of_views_equivalent)]
+        self.confidence = fuzzy.OR(
+            self.frame.exigency, (1 - proportion_of_views_equivalent)
         )
