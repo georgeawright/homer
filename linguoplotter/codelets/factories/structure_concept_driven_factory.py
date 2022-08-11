@@ -77,6 +77,22 @@ class StructureConceptDrivenFactory(Factory):
         correspondence = self.bubble_chamber.concepts["correspondence"]
         view_simplex = self.bubble_chamber.concepts["view-simplex"]
 
+        self.bubble_chamber.loggers["activity"].log(self, "Structure Activations")
+        self.bubble_chamber.loggers["activity"].log(self, f"Chunk: {chunk.activation}")
+        self.bubble_chamber.loggers["activity"].log(self, f"Label: {label.activation}")
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Relations: {relation.activation}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Correspondence: {correspondence.activation}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Letter Chunk: {letter_chunk.activation}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Simplex View: {view_simplex.activation}"
+        )
+
         suggest_correspondence = suggest.relations.where(end=correspondence).get()
         suggest_view_simplex = suggest.relations.where(end=view_simplex).get()
 
@@ -97,6 +113,18 @@ class StructureConceptDrivenFactory(Factory):
         )
 
         activity_concept = activity_concepts.get(key=self.node_key)
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Found activity concept: {activity_concept}"
+        )
+        for link in activity_concept.relations.filter(
+            lambda x: x.end.parent_space
+            == self.bubble_chamber.conceptual_spaces["structure"]
+            and (not x.end.instances.is_empty() or activity_concept == suggest)
+        ):
+            self.bubble_chamber.loggers["activity"].log(
+                self,
+                f"link end: {link.end}; exigency: {link.end.exigency}; activation {link.end.activation}",
+            )
         structure_link = activity_concept.relations.filter(
             lambda x: x.end.parent_space
             == self.bubble_chamber.conceptual_spaces["structure"]

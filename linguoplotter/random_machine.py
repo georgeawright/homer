@@ -1,6 +1,5 @@
 import math
 import random
-from typing import Union
 
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -25,8 +24,12 @@ class RandomMachine:
     def randomness(self) -> FloatBetweenOneAndZero:
         return 1 - self.determinism
 
-    def generate_number(self) -> FloatBetweenOneAndZero:
-        return random.random()
+    def generate_number(self, minimum: float = 0.0) -> FloatBetweenOneAndZero:
+        if minimum > 1:
+            raise Exception("Minimum should be lower than 1")
+        if minimum == 0.0:
+            return random.random()
+        return (minimum / 1) * random.random() + minimum
 
     def coin_flip(self) -> bool:
         return self.generate_number() > 0.5
@@ -49,20 +52,14 @@ class RandomMachine:
         sample_size = max(math.ceil(len(collection) * self.determinism), 1)
         sample = random.sample(list(collection), sample_size)
         key_weights = [key(item) for item in sample]
-        random_weights = [random.random() for item in sample]
-        total_key_weights = sum(key_weights)
-        total_random_weight = sum(random_weights)
-        if total_key_weights > 0:
-            key_weights = [w / total_key_weights for w in key_weights]
-        if total_random_weight > 0:
-            random_weights = [w / total_random_weight for w in random_weights]
+        random_weights = [
+            self.generate_number(minimum=self.determinism) for item in sample
+        ]
 
         highest_weight = 0
         index_of_highest_weight = 0
         for i in range(len(sample)):
-            weight = (
-                key_weights[i] * self.determinism + random_weights[i] * self.randomness
-            )
+            weight = key_weights[i] * random_weights[i]
             if weight > highest_weight:
                 highest_weight = weight
                 index_of_highest_weight = i

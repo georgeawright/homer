@@ -35,7 +35,7 @@ class FocusSetter(Codelet):
     def run(self) -> CodeletResult:
         try:
             target_view = self.bubble_chamber.production_views.filter(
-                lambda x: x.unhappiness > 0 and x not in self.bubble_chamber.recycle_bin
+                lambda x: x.unhappiness > 0
             ).get(key=exigency)
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Found target view: {target_view}"
@@ -90,7 +90,7 @@ class FocusSetter(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.coderack,
-                0.5,
+                self.coderack.MINIMUM_CODELET_URGENCY,
             )
         )
 

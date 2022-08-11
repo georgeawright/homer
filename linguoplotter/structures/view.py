@@ -35,6 +35,8 @@ class View(Structure):
         parent_spaces: StructureCollection,
         sub_views: StructureCollection,
         super_views: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
     ):
         Structure.__init__(
             self,
@@ -45,6 +47,8 @@ class View(Structure):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.parent_frame = parent_frame
         self.value = None
@@ -68,6 +72,7 @@ class View(Structure):
             "parent_frame_name": self.parent_frame.name,
             "frames": [frame.structure_id for frame in self.frames],
             "super_views": [view.structure_id for view in self.super_views],
+            "sub_views": [view.structure_id for view in self.sub_views],
             "input_spaces": [space.structure_id for space in self.input_spaces],
             "output_space": self.output_space.structure_id,
             "members": [correspondence.structure_id for correspondence in self.members],
@@ -185,8 +190,6 @@ class View(Structure):
     def add(self, correspondence: "Correspondence"):
         self.members.add(correspondence)
         for node_pair in correspondence.node_pairs:
-            if all(node in self._grouped_nodes for node in node_pair):
-                continue
             for node_group in self._node_groups:
                 if (
                     node_group.get(node_pair[0].parent_space) == node_pair[0]
@@ -372,6 +375,8 @@ class View(Structure):
             member.boost_activation(self.quality)
         for frame in self.frames:
             frame.boost_activation(self.quality)
+        for view in self.sub_views:
+            view.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])

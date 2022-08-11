@@ -25,6 +25,8 @@ class Chunk(Node):
         parent_spaces: StructureCollection,
         super_chunks: StructureCollection,
         sub_chunks: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ):
@@ -38,6 +40,8 @@ class Chunk(Node):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.abstract_chunk = abstract_chunk
         self.members = members
@@ -61,6 +65,7 @@ class Chunk(Node):
             "links_in": [link.structure_id for link in self.links_in],
             "quality": self.quality,
             "activation": self.activation,
+            "unchunkedness": self.unchunkedness,
         }
 
     @classmethod
@@ -123,9 +128,21 @@ class Chunk(Node):
                 [chunk.unchunkedness for chunk in self.super_chunks]
             )
 
+    def recalculate_labeling_exigency(self):
+        self.labeling_exigency = statistics.fmean(
+            [self.activation, self.unlabeledness, self.unchunkedness]
+        )
+
+    def recalculate_relating_exigency(self):
+        self.relating_exigency = statistics.fmean(
+            [self.activation, self.unrelatedness, self.unchunkedness]
+        )
+
     @property
     def potential_chunk_mates(self) -> StructureCollection:
-        return self.nearby().filter(lambda x: x not in self.members)
+        return self.nearby().filter(
+            lambda x: x not in self.sub_chunks and x not in self.super_chunks
+        )
 
     @property
     def adjacent(self) -> StructureCollection:
@@ -138,8 +155,6 @@ class Chunk(Node):
             and self.parent_space is not None
             and self.parent_space.is_main_input
             and self.activation == 0.0
-            and self.links.filter(lambda x: not x.correspondences.is_empty()).is_empty()
-            and self.super_chunks.is_empty()
         )
 
     def nearby(self, space: Space = None) -> StructureCollection:
@@ -173,11 +188,12 @@ class Chunk(Node):
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:
         space = self.parent_space if space is None else space
-        chunks = space.contents.where(
-            is_chunk=True,
-            is_letter_chunk=False,
-            is_slot=False,
-            parent_space=self.parent_space,
+        chunks = space.contents.filter(
+            lambda x: x.is_chunk
+            and not x.is_letter_chunk
+            and not x.is_slot
+            and x.parent_space == self.parent_space
+            and x.quality > 0
         )
         key = lambda x: concept.classifier.classify(start=self, end=x, space=space)
         return chunks.get(key=key, exclude=[self])

@@ -204,6 +204,7 @@ class BubbleChamber:
             structure.spread_activation()
 
     def update_activations(self) -> None:
+        self.worldview.activate()
         for structure in self.structures:
             structure_old_activation = structure.activation
             structure.update_activation()
@@ -268,6 +269,8 @@ class BubbleChamber:
                     ):
                         self.remove(correspondence)
                 super_view.sub_views.remove(item)
+                for frame in item.frames:
+                    super_view.frames.remove(frame)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
             item.parent_frame.recalculate_exigency()
@@ -277,9 +280,16 @@ class BubbleChamber:
             for argument in item.arguments:
                 argument.links_out.remove(item)
                 argument.links_in.remove(item)
+                argument.recalculate_exigency()
         if item.is_chunk:
-            for member in item.members:
-                member.super_chunks.remove(item)
+            for view in self.views.copy():
+                if item in view.grouped_nodes:
+                    self.remove(view)
+            for sub_chunk in item.sub_chunks:
+                sub_chunk.super_chunks.remove(item)
+                sub_chunk.recalculate_exigency()
+            for super_chunk in item.super_chunks:
+                super_chunk.super_chunks.remove(item)
             for link in item.links:
                 self.remove(link)
         for space in item.parent_spaces:
@@ -323,6 +333,8 @@ class BubbleChamber:
             is_basic_level=is_basic_level,
             is_symbolic=is_symbolic,
             super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         self.add(space)
         return space
@@ -346,6 +358,8 @@ class BubbleChamber:
             links_out=self.new_structure_collection(),
             parent_spaces=self.new_structure_collection(),
             is_main_input=is_main_input,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         self.add(space)
         return space
@@ -380,6 +394,8 @@ class BubbleChamber:
             instances=self.new_structure_collection(),
             is_sub_frame=is_sub_frame,
             depth=depth,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         if parent_frame is not None:
             parent_frame.instances.add(frame)
@@ -440,13 +456,30 @@ class BubbleChamber:
             sub_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
             is_raw=is_raw,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
+        for existing_chunk in self.chunks:
+            if not chunk.members.is_empty() and all(
+                member in existing_chunk.members for member in chunk.members
+            ):
+                chunk.super_chunks.add(existing_chunk)
+                existing_chunk.sub_chunks.add(chunk)
+                existing_chunk.recalculate_exigency()
+                self.loggers["structure"].log(existing_chunk)
+            if not existing_chunk.members.is_empty() and all(
+                member in chunk.members for member in existing_chunk.members
+            ):
+                chunk.sub_chunks.add(existing_chunk)
+                existing_chunk.super_chunks.add(chunk)
+                existing_chunk.recalculate_exigency()
+                self.loggers["structure"].log(existing_chunk)
+            if existing_chunk.is_raw and existing_chunk in chunk.members:
+                existing_chunk.super_chunks.add(chunk)
+                chunk.sub_chunks.add(existing_chunk)
+                existing_chunk.recalculate_exigency()
+                self.loggers["structure"].log(existing_chunk)
         chunk._activation = activation
-        for member in members:
-            member.super_chunks.add(chunk)
-            member.recalculate_exigency()
-            chunk.sub_chunks.add(member)
-            self.loggers["structure"].log(member)
         self.add(chunk)
         return chunk
 
@@ -489,6 +522,8 @@ class BubbleChamber:
             super_chunks=self.new_structure_collection(),
             sub_chunks=self.new_structure_collection(),
             abstract_chunk=abstract_chunk,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
@@ -539,6 +574,8 @@ class BubbleChamber:
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
             is_slot=is_slot,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         if activation is not None:
             concept._activation = activation
@@ -610,6 +647,8 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_excitatory=is_excitatory,
             is_privileged=is_privileged,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         while parent_view is not None:
             parent_view.add(correspondence)
@@ -655,6 +694,8 @@ class BubbleChamber:
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         if start is not None:
             start.links_out.add(label)
@@ -698,6 +739,8 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_bidirectional=is_bidirectional,
             is_excitatory=is_excitatory,
+            champion_labels=self.new_structure_collection(),
+            champion_relations=self.new_structure_collection(),
         )
         if activation is not None:
             relation._activation = activation

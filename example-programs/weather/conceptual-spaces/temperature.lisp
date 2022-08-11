@@ -4,7 +4,7 @@
     :distance_function centroid_euclidean_distance))
 (define temperature-space
   (def-conceptual-space :name "temperature" :parent_concept temperature-concept
-    :no_of_dimensions 1 :is_basic_level True))
+    :no_of_dimensions 1 :is_basic_level True :dimensions (list) :sub_spaces (list extremeness-space)))
 (define hot-concept
   (def-concept :name "hot" :locations (list (Location (list (list 22)) temperature-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label

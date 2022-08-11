@@ -1,5 +1,6 @@
 import statistics
 
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluators import ViewEvaluator
 
@@ -7,13 +8,14 @@ from linguoplotter.codelets.evaluators import ViewEvaluator
 class SimplexViewEvaluator(ViewEvaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        structure_type = bubble_chamber.concepts["view-simplex"]
-        target = bubble_chamber.simplex_views.get()
+        target = bubble_chamber.simplex_views.get(
+            key=lambda x: abs(x.activation - x.quality)
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,
             bubble_chamber.new_structure_collection(target),
-            structure_type.activation,
+            abs(target.activation - target.quality),
         )
 
     @classmethod
@@ -50,21 +52,6 @@ class SimplexViewEvaluator(ViewEvaluator):
             self, f"Average correspondence quality: {average_correspondence_quality}"
         )
         frame = target_view.parent_frame
-        if frame.input_space.contents.is_empty():
-            proportion_of_frame_input_items_matched = 1
-        else:
-            proportion_of_frame_input_items_matched = sum(
-                1
-                for item in frame.input_space.contents.where(is_correspondence=False)
-                if not item.correspondences.is_empty()
-            ) / sum(
-                1 for item in frame.input_space.contents.where(is_correspondence=False)
-            )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            "Proportion of frame input items matched: "
-            + f"{proportion_of_frame_input_items_matched}",
-        )
         proportion_of_frame_output_items_projected = sum(
             1
             for item in frame.output_space.contents.where(is_correspondence=False)
@@ -77,13 +64,22 @@ class SimplexViewEvaluator(ViewEvaluator):
             "Proportion of frame output items projected: "
             + f"{proportion_of_frame_output_items_projected}",
         )
-        self.confidence = statistics.fmean(
-            [
+        try:
+            input_chunks_quality = min(
+                [
+                    chunk.quality
+                    for chunk in target_view.grouped_nodes
+                    if chunk.parent_space in target_view.input_spaces
+                ]
+            )
+        except ValueError:
+            input_chunks_quality = 1
+        self.confidence = (
+            fuzzy.AND(
                 average_correspondence_quality,
-                proportion_of_frame_input_items_matched,
                 proportion_of_frame_output_items_projected,
-                target_view.output_space.quality,
-            ]
+            )
+            * input_chunks_quality
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = target_view.quality - target_view.activation
+        self.activation_difference = self.confidence - target_view.activation

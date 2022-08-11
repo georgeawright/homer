@@ -68,7 +68,6 @@ class Linguoplotter:
                 self.coderack.select_and_run_codelet()
             except NoMoreCodelets:
                 self.loggers["errors"].log_message("No more codelets.")
-                self.print_results()
                 break
             except Exception as e:
                 raise e
@@ -83,10 +82,8 @@ class Linguoplotter:
     def print_status_update(self):
         codelets_run = self.coderack.codelets_run
         bubble_chamber_satisfaction = self.bubble_chamber.satisfaction
-        suggest_activation = self.bubble_chamber.concepts["suggest"].activation
-        build_activation = self.bubble_chamber.concepts["build"].activation
-        evaluate_activation = self.bubble_chamber.concepts["evaluate"].activation
-        select_activation = self.bubble_chamber.concepts["select"].activation
+        coderack_population = len(self.coderack._codelets)
+        view_count = len(self.bubble_chamber.views)
         focus = (
             self.bubble_chamber.focus.view.structure_id
             + self.bubble_chamber.focus.view.parent_frame.name
@@ -107,10 +104,9 @@ class Linguoplotter:
         print(
             f"codelets run: {codelets_run}; "
             + f"satisf.: {bubble_chamber_satisfaction}; "
-            + f"SUGGEST: {suggest_activation}; "
-            + f"BUILD: {build_activation}; "
-            + f"EVALUATE: {evaluate_activation}; "
-            + f"SELECT: {select_activation}; "
+            + f"coderack pop.: {coderack_population}; "
+            + f"view count.: {view_count}; "
+            + f"recycle bin: {len(self.bubble_chamber.recycle_bin)}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
         if not self.bubble_chamber.worldview.views.is_empty():
@@ -122,3 +118,30 @@ class Linguoplotter:
         print(f"codelets run: {self.coderack.codelets_run}")
         print(f"satisfaction: {self.bubble_chamber.worldview.satisfaction}")
         print(f"result: {self.bubble_chamber.result}")
+        main_input = self.bubble_chamber.spaces.where(is_main_input=True).get()
+        for chunk in main_input.contents.where(is_chunk=True, quality=1, activation=1):
+            print(chunk, chunk.quality, chunk.activation)
+            for label in chunk.labels:
+                print(label, label.quality, label.activation)
+            for relation in chunk.relations:
+                print(relation, relation.quality, relation.activation)
+        for chunk in main_input.contents.where(is_chunk=True):
+            print(
+                chunk.structure_id,
+                chunk.quality,
+                chunk.activation,
+                [chunk.structure_id for chunk in chunk.members],
+            )
+        for view in self.bubble_chamber.views:
+            print(
+                view.structure_id,
+                view.unhappiness,
+                view.quality,
+                view.activation,
+                view.parent_frame.name,
+                [
+                    node.structure_id
+                    for node in view.grouped_nodes
+                    if node.parent_space.is_main_input
+                ],
+            )

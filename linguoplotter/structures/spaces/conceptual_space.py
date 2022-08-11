@@ -26,6 +26,8 @@ class ConceptualSpace(Space):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         possible_instances: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
@@ -41,6 +43,8 @@ class ConceptualSpace(Space):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.possible_instances = possible_instances
         self.no_of_dimensions = no_of_dimensions
@@ -94,7 +98,7 @@ class ConceptualSpace(Space):
         if structure not in self.contents:
             self.contents.add(structure)
             for sub_space in self.sub_spaces:
-                if (
+                if structure.parent_space is None or (
                     structure.parent_space.is_conceptual_space
                     and structure.parent_space != self
                     and structure.parent_space != sub_space

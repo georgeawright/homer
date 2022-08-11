@@ -70,4 +70,4 @@ class LabelProjectionEvaluator(ProjectionEvaluator):
         except MissingStructureError:
             self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = label.quality - label.activation
+        self.activation_difference = self.confidence - label.activation

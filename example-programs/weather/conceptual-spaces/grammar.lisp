@@ -13,17 +13,18 @@
 (define rp-location (Location (list (list 5)) grammar-space))
 (define pp-location (Location (list (list 6)) grammar-space))
 (define nn-location (Location (list (list 7)) grammar-space))
-(define vb-location (Location (list (list 8)) grammar-space))
-(define jj-location (Location (list (list 9)) grammar-space))
-(define jjr-location (Location (list (list 10)) grammar-space))
-(define rb-location (Location (list (list 11)) grammar-space))
-(define cop-location (Location (list (list 12)) grammar-space))
-(define prep-location (Location (list (list 13)) grammar-space))
-(define det-location (Location (list (list 14)) grammar-space))
-(define nsubj-location (Location (list (list 15)) grammar-space))
-(define predicate-location (Location (list (list 16)) grammar-space))
-(define conj-location (Location (list (list 17)) grammar-space))
-(define null-location (Location (list (list 18)) grammar-space))
+(define v-location (Location (list (list 8)) grammar-space))
+(define vb-location (Location (list (list 9)) grammar-space))
+(define jj-location (Location (list (list 10)) grammar-space))
+(define jjr-location (Location (list (list 11)) grammar-space))
+(define rb-location (Location (list (list 12)) grammar-space))
+(define cop-location (Location (list (list 13)) grammar-space))
+(define prep-location (Location (list (list 14)) grammar-space))
+(define det-location (Location (list (list 15)) grammar-space))
+(define nsubj-location (Location (list (list 16)) grammar-space))
+(define predicate-location (Location (list (list 17)) grammar-space))
+(define conj-location (Location (list (list 18)) grammar-space))
+(define null-location (Location (list (list 19)) grammar-space))
 
 (define sentence-concept
   (def-concept :name "sentence" :locations (list sentence-location)
@@ -117,6 +118,11 @@
     :distance_to_proximity_weight grammar-distance-to-proximity))
 (define nn-concept
   (def-concept :name "nn" :locations (list nn-location)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 1 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define v-concept
+  (def-concept :name "v" :locations (list v-location)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 1 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))

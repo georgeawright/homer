@@ -49,13 +49,13 @@
 		     (Location (list) and-sub-frame-1-output))))
 (define s-and-verb-1
   (def-letter-chunk :name None
-    :locations (list vb-location
+    :locations (list v-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-1-output))
     :parent_space and-sub-frame-1-output))
 (define s-and-verb-1-grammar-label
-  (def-label :start s-and-verb-1 :parent_concept vb-concept
-    :locations (list vb-location
+  (def-label :start s-and-verb-1 :parent_concept v-concept
+    :locations (list v-location
 		     (Location (list) and-sub-frame-1-output))))
 (define s-and-predicate-1
   (def-letter-chunk :name None
@@ -111,13 +111,13 @@
 		     (Location (list) and-sub-frame-2-output))))
 (define s-and-verb-2
   (def-letter-chunk :name None
-    :locations (list vb-location
+    :locations (list v-location
 		     (Location (list) and-sentence-output)
 		     (Location (list) and-sub-frame-2-output))
     :parent_space and-sub-frame-2-output))
 (define s-and-verb-2-grammar-label
-  (def-label :start s-and-verb-2 :parent_concept vb-concept
-    :locations (list vb-location
+  (def-label :start s-and-verb-2 :parent_concept v-concept
+    :locations (list v-location
 		     (Location (list) and-sub-frame-2-output))))
 (define s-and-predicate-2
   (def-letter-chunk :name None
@@ -168,10 +168,6 @@
     :right_branch (StructureCollection conjunction-super-chunk)))
 
 (def-relation :start same-concept :end and-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start conj-concept :end and-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start and :end and-sentence
   :is_bidirectional True :activation 1.0)
 (def-relation :start sentence-concept :end and-sentence
   :is_bidirectional True :activation 1.0)

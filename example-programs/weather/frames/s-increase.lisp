@@ -6,6 +6,8 @@
     :no_of_dimensions 1))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
+(define comparison-concept
+  (def-concept :name "" :is_slot True :parent_space more-less-space))
  
 (define location-sub-frame-input
   (def-contextual-space :name "location-sub-frame.meaning" :parent_concept input-concept
@@ -14,7 +16,7 @@
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space location-space)))
 (define location-sub-frame
-  (def-sub-frame :name "s-increase-location-sub"
+  (def-sub-frame :name "s-[in/de]crease-location-sub"
     :parent_concept pp-inessive-location-concept
     :parent_frame None
     :sub_frames (StructureCollection)
@@ -29,7 +31,7 @@
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define time-sub-frame
-  (def-sub-frame :name "s-increase-time-sub"
+  (def-sub-frame :name "s-[in/de]crease-time-sub"
     :parent_concept pp-directional-time-concept
     :parent_frame None
     :sub_frames (StructureCollection)
@@ -38,17 +40,17 @@
     :output_space time-sub-frame-output))
 
 (define increase-sentence-input
-  (def-contextual-space :name "s-increase.meaning" :parent_concept input-concept
+  (def-contextual-space :name "s-[in/de]crease.meaning" :parent_concept input-concept
     :conceptual_spaces (StructureCollection location-space time-space conceptual-space)))
 (define increase-sentence-output
-  (def-contextual-space :name "s-increase.text" :parent_concept text-concept
+  (def-contextual-space :name "s-[in/de]crease.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection
 			grammar-space location-space time-space conceptual-space)))
 (define increase-sentence
-  (def-frame :name "s-increase" :parent_concept sentence-concept :parent_frame None
+  (def-frame :name "s-[in/de]crease" :parent_concept sentence-concept :parent_frame None
     :depth 6
     :sub_frames (StructureCollection location-sub-frame time-sub-frame)
-    :concepts (StructureCollection location-concept)
+    :concepts (StructureCollection location-concept comparison-concept)
     :input_space increase-sentence-input
     :output_space increase-sentence-output))
 
@@ -92,8 +94,7 @@
     :parent_space increase-sentence-input
     :conceptual_space location-space))
 (define conceptual-relation
-  (def-relation :start late-chunk :end early-chunk :parent_concept more-concept
-    :quality 1.0
+  (def-relation :start late-chunk :end early-chunk :parent_concept comparison-concept
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
 		     (TwoPointLocation (list) (list) increase-sentence-input))
@@ -117,11 +118,19 @@
     :parent_space increase-sentence-output
     :abstract_chunk will))
 (define sentence-word-3
-  (def-letter-chunk :name "increase"
+  (def-letter-chunk :name None
     :locations (list vb-location
+		     (Location (list (list Nan)) more-less-space)
 		     (Location (list) increase-sentence-output))
-    :parent_space increase-sentence-output
-    :abstract_chunk increase-word))
+    :parent_space increase-sentence-output))
+(define comparison-word-grammar-label
+  (def-label :start sentence-word-3 :parent_concept vb-concept
+    :locations (list vb-location
+		     (Location (list) increase-sentence-output))))
+(define comparison-word-meaning-label
+  (def-label :start sentence-word-3 :parent_concept comparison-concept
+    :locations (list (Location (list (list Nan)) more-less-space)
+		     (Location (list) increase-sentence-output))))
 (define sentence-word-4
   (def-letter-chunk :name None
     :locations (list pp-location
@@ -143,16 +152,16 @@
     :locations (list pp-location
 		     (Location (list) time-sub-frame-output))))
 
-(define vb-super-chunk
+(define v-super-chunk
   (def-letter-chunk :name None
-    :locations (list vb-location
+    :locations (list v-location
 		     (Location (list) increase-sentence-output))
     :parent_space increase-sentence-output
     :left_branch (StructureCollection sentence-word-2)
     :right_branch (StructureCollection sentence-word-3)))
-(define vb-super-chunk-label
-  (def-label :start vb-super-chunk :parent_concept vb-concept
-    :locations (list vb-location
+(define v-super-chunk-label
+  (def-label :start v-super-chunk :parent_concept v-concept
+    :locations (list v-location
 		     (Location (list) increase-sentence-output))))
 (define pred-super-chunk
   (def-letter-chunk :name None
@@ -170,7 +179,7 @@
     :locations (list vp-location
 		     (Location (list) increase-sentence-output))
     :parent_space increase-sentence-output
-    :left_branch (StructureCollection vb-super-chunk)
+    :left_branch (StructureCollection v-super-chunk)
     :right_branch (StructureCollection pred-super-chunk)))
 (define vp-super-chunk-label
   (def-label :start vp-super-chunk :parent_concept vp-concept
@@ -188,23 +197,7 @@
     :locations (list sentence-location
 		     (Location (list) increase-sentence-output))))
 
-(def-relation :start label-concept :end increase-sentence
+(def-relation :start pp-inessive-location-concept :end increase-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start relation-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start nn-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jj-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jjr-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start rp-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start sentence-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
-(def-relation :start more-concept :end increase-sentence
+(def-relation :start pp-directional-time-concept :end increase-sentence
   :is_bidirectional True :activation 1.0)

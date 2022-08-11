@@ -1,3 +1,4 @@
+from .bottom_up_factory import BottomUpFactory
 from .concept_driven_factory import ConceptDrivenFactory
 from .structure_driven_factory import StructureDrivenFactory
 from .structure_concept_driven_factory import (

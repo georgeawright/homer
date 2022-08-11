@@ -12,15 +12,14 @@ class ChunkEvaluator(Evaluator):
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        structure_type = bubble_chamber.concepts["chunk"]
         target = bubble_chamber.input_nodes.where(
             is_chunk=True, is_letter_chunk=False, is_raw=False, is_slot=False
-        ).get()
+        ).get(key=lambda x: abs(x.activation - x.quality))
         return cls.spawn(
             parent_id,
             bubble_chamber,
             bubble_chamber.new_structure_collection(target),
-            structure_type.activation,
+            abs(target.activation - target.quality),
         )
 
     @property
@@ -39,5 +38,17 @@ class ChunkEvaluator(Evaluator):
                 and x.name != "size"
             ),
         )
+        for sub_chunk in target_chunk.sub_chunks:
+            if (
+                target_chunk.size - sub_chunk.size
+                >= sub_chunk.quality - self.confidence
+            ):
+                sub_chunk.quality = 0
+        for super_chunk in target_chunk.super_chunks:
+            if (
+                super_chunk.size - target_chunk.size
+                >= self.confidence - super_chunk.quality
+            ):
+                self.confidence = 0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = target_chunk.quality - target_chunk.activation
+        self.activation_difference = self.confidence - target_chunk.activation

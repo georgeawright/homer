@@ -16,7 +16,9 @@ class CorrespondenceEvaluator(Evaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["correspondence"]
         view = bubble_chamber.production_views.get(key=activation)
-        target = view.members.where(start_space=view.raw_input_space).get()
+        target = view.members.where(start_space=view.raw_input_space).get(
+            key=lambda x: abs(x.activation - x.quality)
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -48,14 +50,10 @@ class CorrespondenceEvaluator(Evaluator):
                 view=target_correspondence.parent_view,
             )
         )
-        average_argument_quality = statistics.fmean(
-            [
-                start.quality if not start.is_slot else 1.0,
-                end.quality if not end.is_slot else 1.0,
-            ]
+        min_argument_quality = min(
+            start.quality if not start.is_slot else 1.0,
+            end.quality if not end.is_slot else 1.0,
         )
-        self.confidence = argument_compatibility * average_argument_quality
+        self.confidence = argument_compatibility * min_argument_quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = (
-            target_correspondence.quality - target_correspondence.activation
-        )
+        self.activation_difference = self.confidence - target_correspondence.activation

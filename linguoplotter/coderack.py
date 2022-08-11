@@ -20,7 +20,10 @@ from .codelets import (
 from .codelets.factories import (
     ConceptDrivenFactory,
     ViewDrivenFactory,
-    ExigentStructureConceptDrivenFactory,
+)
+from .codelets.factories.bottom_up_factories import (
+    BottomUpEvaluatorFactory,
+    BottomUpSuggesterFactory,
 )
 from .errors import MissingStructureError, NoMoreCodelets
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -74,7 +77,10 @@ class Coderack:
             ViewDrivenFactory.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
-            ExigentStructureConceptDrivenFactory.spawn(
+            BottomUpEvaluatorFactory.spawn(
+                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+            ),
+            BottomUpSuggesterFactory.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
         ]
@@ -120,6 +126,15 @@ class Coderack:
                             [codelet.urgency, existing_codelet.urgency]
                         )
                         return
+        try:
+            coderack_cleaner = [
+                c for c in self._codelets if isinstance(c, CoderackCleaner)
+            ][0]
+            coderack_cleaner.urgency = FloatBetweenOneAndZero(
+                self.population_size / self.MAXIMUM_POPULATION
+            )
+        except IndexError:
+            pass
         self._codelets.append(codelet)
 
     def remove_codelet(self, codelet: Codelet):
@@ -153,6 +168,7 @@ class Coderack:
             + f"Worldview: {self.bubble_chamber.worldview.views}\n",
         )
         self.loggers["activity"]._log_coderack_population(self.population_size)
+        self.loggers["activity"]._log_view_count(len(self.bubble_chamber.views))
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)
 

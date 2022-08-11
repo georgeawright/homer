@@ -71,6 +71,7 @@ class Selector(Codelet):
             for structure in self.winners:
                 self.bubble_chamber.loggers["structure"].log(structure)
         self._boost_activations()
+        self._rearrange_champions()
         self.follow_up_urgency = FloatBetweenOneAndZero(
             self.winners.get().quality - self.winners.get().activation
         )
@@ -158,8 +159,12 @@ class Selector(Codelet):
 
     def _boost_winners(self):
         for winner in self.winners:
-            winner.boost_activation(self.confidence)
-            winner.update_activation()
+            # winner.boost_activation(self.confidence)
+            # winner.update_activation()
+            if winner.quality > 0.0:
+                winner.activate()
+            else:
+                winner.deactivate()
             if winner.is_link:
                 winner.parent_concept.boost_activation(self.confidence)
             if winner.is_view:
@@ -167,12 +172,16 @@ class Selector(Codelet):
 
     def _decay_losers(self):
         for loser in self.losers:
-            loser.decay_activation(self.confidence)
-            loser.update_activation()
+            # loser.decay_activation(self.confidence)
+            # loser.update_activation()
+            loser.deactivate()
             if loser.is_link:
                 loser.parent_concept.decay_activation(self.confidence)
             if loser.is_view:
                 loser.parent_frame.decay_activation(self.confidence)
+
+    def _rearrange_champions(self):
+        pass
 
     def _get_representative(self, collection: StructureCollection):
         return collection.get()

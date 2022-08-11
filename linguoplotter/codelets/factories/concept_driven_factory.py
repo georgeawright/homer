@@ -20,10 +20,23 @@ class ConceptDrivenFactory(Factory):
     ):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
-    def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        urgency = self.bubble_chamber.satisfaction
-        if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
-            return urgency
+    def follow_up_urgency(self):
+        if self.bubble_chamber.focus.view is None:
+            try:
+                return max(
+                    min(
+                        [
+                            self.bubble_chamber.satisfaction,
+                            self.child_codelets[0].urgency,
+                        ]
+                    ),
+                    self.coderack.MINIMUM_CODELET_URGENCY,
+                )
+            except IndexError:
+                return max(
+                    self.bubble_chamber.satisfaction,
+                    self.coderack.MINIMUM_CODELET_URGENCY,
+                )
         return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):

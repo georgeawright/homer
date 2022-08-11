@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 import statistics
 
+from linguoplotter import fuzzy
 from linguoplotter.errors import NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
@@ -27,6 +28,8 @@ class Frame(Structure):
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
         instances: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         is_sub_frame: bool = False,
         depth: int = None,
     ):
@@ -40,6 +43,8 @@ class Frame(Structure):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.name = name
         self._parent_concept = parent_concept
@@ -57,6 +62,7 @@ class Frame(Structure):
     def __dict__(self) -> dict:
         return {
             "structure_id": self.structure_id,
+            "name": self.name,
             "input_space": self.input_space.structure_id,
             "output_space": self.output_space.structure_id,
             "activation": self.activation,
@@ -123,7 +129,7 @@ class Frame(Structure):
 
     def recalculate_exigency(self):
         self.recalculate_unhappiness()
-        self.exigency = statistics.fmean([self.unhappiness, self.activation])
+        self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
     def instantiate(
         self,
@@ -277,6 +283,7 @@ class Frame(Structure):
     def spread_activation(self):
         if not self.is_fully_active():
             return
+        self.parent_concept.boost_activation()
         for link in self.links_out.where(is_label=False):
             if link.is_excitatory:
                 link.end.boost_activation(link.activation)

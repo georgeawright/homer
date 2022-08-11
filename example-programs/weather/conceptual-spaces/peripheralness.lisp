@@ -4,7 +4,11 @@
     :distance_function centroid_euclidean_distance))
 (define peripheralness-space
   (def-conceptual-space :name "peripheralness" :parent_concept peripheralness-concept
-    :no_of_dimensions 1))
+    :no_of_dimensions 1
+    :super_space_to_coordinate_function_map
+    (dict (list (tuple "location" (python """
+lambda location: [[((c[0]-4)**2 + (c[1]-4)**2)/2] for c in location.coordinates]
+"""))))))
 (define peripheral-concept
   (def-concept :name "peripheral"
     :locations (list (Location (list (list 10)) peripheralness-space))

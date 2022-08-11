@@ -26,9 +26,18 @@
     :locations (list (Location (list (list 10)) size-space))))
 (def-relation :start large-concept :end larg-word :parent_concept jjr-concept)
 (def-relation :start larg-word :end -er :parent_concept jjr-concept)
+(define expand-word
+  (def-letter-chunk :name "expand" :parent_space size-space
+    :locations (list (Location (list (list 10)) size-space))))
+(def-relation :start large-concept :end expand-word :parent_concept vb-concept)
+
 (define small-word
   (def-letter-chunk :name "small" :parent_space size-space
     :locations (list (Location (list (list 1)) size-space))))
 (def-relation :start small-concept :end small-word :parent_concept jj-concept)
 (def-relation :start small-concept :end small-word :parent_concept jjr-concept)
 (def-relation :start small-word :end -er :parent_concept jjr-concept)
+(define shrink-word
+  (def-letter-chunk :name "shrink" :parent_space size-space
+    :locations (list (Location (list (list 1)) size-space))))
+(def-relation :start small-concept :end shrink-word :parent_concept vb-concept)

@@ -113,27 +113,31 @@
 
 (def-relation :start chunk-concept :end label-concept
   :is_bidirectional False :activation 0.33)
-(def-relation :start chunk-concept :end relation-concept
+(def-relation :start label-concept :end chunk-concept
+  :is_bidirectional False :is_excitatory False :activation 1.0)
+
+(def-relation :start label-concept :end relation-concept
   :is_bidirectional False :activation 0.33)
-(def-relation :start chunk-concept :end view-simplex-concept
-  :is_bidirectional False :activation 0.33)
-(def-relation :start letter-chunk-concept :end label-concept
-  :is_bidirectional False :activation 0.33)
-(def-relation :start letter-chunk-concept :end relation-concept
-  :is_bidirectional False :activation 0.33)
-(def-relation :start letter-chunk-concept :end view-simplex-concept
-  :is_bidirectional False :activation 0.33)
-(def-relation :start label-concept :end view-simplex-concept
-  :is_bidirectional False :activation 1.0)
+(def-relation :start relation-concept :end label-concept
+  :is_bidirectional False :is_excitatory False :activation 1.0)
+
 (def-relation :start relation-concept :end view-simplex-concept
-  :is_bidirectional False :activation 1.0)
+  :is_bidirectional False :activation 0.33)
+(def-relation :start view-simplex-concept :end relation-concept
+  :is_bidirectional False :is_excitatory False :activation 1.0)
+
 (def-relation :start view-simplex-concept :end correspondence-concept
-  :is_bidirectional False :activation 1.0)
-(def-relation :start correspondence-concept :end chunk-concept
-  :is_bidirectional False :activation 0.2)
+  :is_bidirectional False :activation 0.33)
+(def-relation :start correspondence-concept :end view-simplex-concept
+  :is_bidirectional False :is_excitatory False :activation 1.0)
+
 (def-relation :start correspondence-concept :end letter-chunk-concept
-  :is_bidirectional False :activation 0.2)
-(def-relation :start correspondence-concept :end label-concept
-  :is_bidirectional False :activation 0.2)
-(def-relation :start correspondence-concept :end relation-concept
-  :is_bidirectional False :activation 0.2)
+  :is_bidirectional False :activation 0.33)
+(def-relation :start letter-chunk-concept :end correspondence-concept
+  :is_bidirectional False :is_excitatory False :activation 1.0)
+
+(def-relation :start letter-chunk-concept :end chunk-concept
+  :is_bidirectional False :activation 0.33)
+(def-relation :start chunk-concept :end letter-chunk-concept
+  :is_bidirectional False :is_excitatory False :activation 1.0)
+

@@ -345,6 +345,10 @@ class CorrespondenceSuggester(Suggester):
                     == correspondence_suggester.target_structure_two.parent_concept
                     or correspondence_suggester.target_structure_two.parent_concept.is_slot
                 )
+                and (
+                    x.parent_concept.parent_space
+                    == correspondence_suggester.target_structure_two.parent_concept.parent_space
+                )
                 and x.conceptual_space
                 == correspondence_suggester.target_conceptual_space
             )

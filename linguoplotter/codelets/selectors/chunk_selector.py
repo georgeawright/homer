@@ -19,29 +19,15 @@ class ChunkSelector(Selector):
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Champion chunk: {champion_chunk}"
             )
-            challenger_chunk = (
-                champion_chunk.nearby()
-                .filter(
-                    lambda x: len(
-                        StructureCollection.intersection(
-                            champion_chunk.members, x.members
-                        )
-                    )
-                    > 0.5 * len(champion_chunk.members)
-                    and len(
-                        StructureCollection.intersection(
-                            champion_chunk.members, x.members
-                        )
-                    )
-                    > 0.5 * len(x.members)
+            self.challengers = self.bubble_chamber.new_structure_collection(
+                StructureCollection.union(
+                    champion_chunk.sub_chunks, champion_chunk.super_chunks
                 )
+                .where(is_raw=False)
                 .get(key=activation)
             )
-            self.challengers = self.bubble_chamber.new_structure_collection(
-                challenger_chunk
-            )
             self.bubble_chamber.loggers["activity"].log(
-                self, f"Found challenger: {challenger_chunk}"
+                self, f"Found challengers: {self.challengers}"
             )
         except MissingStructureError:
             pass

@@ -21,6 +21,8 @@ class Node(Structure):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         stable_activation: FloatBetweenOneAndZero = None,
     ):
         Structure.__init__(
@@ -32,6 +34,8 @@ class Node(Structure):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
             stable_activation=stable_activation,
         )
         self._parent_space = parent_space
@@ -98,9 +102,13 @@ class Node(Structure):
                         if link.parent_concept is not None
                         else None
                     )
+            if self.parent_space is not None:
+                self.parent_space.parent_concept.activate()
         else:
-            for link in self.links:
-                link.boost_activation(self.quality)
+            for champion in self.champion_labels:
+                champion.boost_activation(self.quality)
+            for champion in self.champion_relations:
+                champion.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         if self.parent_space is None:

@@ -27,6 +27,8 @@ class Correspondence(Link):
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
+        champion_labels: StructureCollection,
+        champion_relations: StructureCollection,
         is_privileged: bool = False,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
@@ -44,6 +46,8 @@ class Correspondence(Link):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            champion_labels=champion_labels,
+            champion_relations=champion_relations,
         )
         self.conceptual_space = conceptual_space
         self.parent_view = parent_view
@@ -134,6 +138,8 @@ class Correspondence(Link):
 
     def spread_activation(self):
         if not self.is_fully_active():
+            return
+        if self.start.is_slot and self.end.is_slot:
             return
         Link.spread_activation(self)
         if self.parent_view is not None:

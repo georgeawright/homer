@@ -15,5 +15,5 @@ class RecycleBin:
     def add(self, item):
         self._items.append(item)
 
-    def remove_oldest(self):
-        return self._items.pop(0)
+    def remove(self, item):
+        self._items.remove(item)
