@@ -60,7 +60,7 @@ class RandomMachine:
         index_of_highest_weight = 0
         for i in range(len(sample)):
             weight = (
-                key_weights[i] * self.determinism + random_weights[i] * self.randomness
+                key_weights[i] * self.determinism * random_weights[i] * self.randomness
             )
             if weight > highest_weight:
                 highest_weight = weight
