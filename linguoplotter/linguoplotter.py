@@ -106,6 +106,7 @@ class Linguoplotter:
             + f"satisf.: {bubble_chamber_satisfaction}; "
             + f"coderack pop.: {coderack_population}; "
             + f"view count.: {view_count}; "
+            + f"recycle bin: {len(self.bubble_chamber.recycle_bin)}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
         if not self.bubble_chamber.worldview.views.is_empty():
@@ -117,3 +118,30 @@ class Linguoplotter:
         print(f"codelets run: {self.coderack.codelets_run}")
         print(f"satisfaction: {self.bubble_chamber.worldview.satisfaction}")
         print(f"result: {self.bubble_chamber.result}")
+        main_input = self.bubble_chamber.spaces.where(is_main_input=True).get()
+        for chunk in main_input.contents.where(is_chunk=True, quality=1, activation=1):
+            print(chunk, chunk.quality, chunk.activation)
+            for label in chunk.labels:
+                print(label, label.quality, label.activation)
+            for relation in chunk.relations:
+                print(relation, relation.quality, relation.activation)
+        for chunk in main_input.contents.where(is_chunk=True):
+            print(
+                chunk.structure_id,
+                chunk.quality,
+                chunk.activation,
+                [chunk.structure_id for chunk in chunk.members],
+            )
+        for view in self.bubble_chamber.views:
+            print(
+                view.structure_id,
+                view.unhappiness,
+                view.quality,
+                view.activation,
+                view.parent_frame.name,
+                [
+                    node.structure_id
+                    for node in view.grouped_nodes
+                    if node.parent_space.is_main_input
+                ],
+            )
