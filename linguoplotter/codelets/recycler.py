@@ -64,6 +64,10 @@ class Recycler(Codelet):
             self.result = CodeletResult.FINISH
         except MissingStructureError:
             self.result = CodeletResult.FIZZLE
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Recycle Bin Population: {len(self.bubble_chamber.recycle_bin)}"
+        )
+        self._update_garbage_collector_urgency()
         self._engender_follow_up()
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.bubble_chamber.loggers["activity"].log_result(self)
