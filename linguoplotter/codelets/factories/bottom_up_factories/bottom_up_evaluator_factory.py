@@ -12,14 +12,14 @@ from linguoplotter.errors import MissingStructureError
 
 class BottomUpEvaluatorFactory(BottomUpFactory):
     def _engender_follow_up(self):
-        correspondences_per_link = self._correspondences_per_link()
+        views_per_frame_type_per_chunk = self._views_per_frame_type_per_chunk()
         relations_per_space_per_end_per_chunk = (
             self._relations_per_space_per_end_per_chunk()
         )
         labels_per_space_per_chunk = self._labels_per_space_per_chunk()
         super_chunks_per_raw_chunk = self._super_chunks_per_raw_chunk()
 
-        if correspondences_per_link > relations_per_space_per_end_per_chunk:
+        if views_per_frame_type_per_chunk > relations_per_space_per_end_per_chunk:
             follow_up_class = SimplexViewEvaluator
         elif relations_per_space_per_end_per_chunk > labels_per_space_per_chunk:
             follow_up_class = RelationEvaluator
@@ -80,12 +80,16 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             ]
         )
 
-    def _correspondences_per_link(self):
+    def _views_per_frame_type_per_chunk(self):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()
+        non_raw_chunks = input_space.contents.where(is_chunk=True, is_raw=False)
+        views = self.bubble_chamber.views
         try:
-            links = input_space.contents.filter(
-                lambda x: x.is_label or x.is_relation
-            ).sample(10)
+            view_sample = views.sample(10)
+            view_types = self.bubble_chamber.new_structure_collection(
+                *[view.parent_frame.parent_concept for view in view_sample]
+            )
+            return len(views) / len(non_raw_chunks)
         except MissingStructureError:
             return 0
-        return statistics.fmean([len(link.correspondences) for link in links])
+        return len(views) / len(view_types) / len(non_raw_chunks)
