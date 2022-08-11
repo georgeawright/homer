@@ -1,5 +1,6 @@
 import statistics
 
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluators import ViewEvaluator
 
@@ -51,21 +52,6 @@ class SimplexViewEvaluator(ViewEvaluator):
             self, f"Average correspondence quality: {average_correspondence_quality}"
         )
         frame = target_view.parent_frame
-        if frame.input_space.contents.is_empty():
-            proportion_of_frame_input_items_matched = 1
-        else:
-            proportion_of_frame_input_items_matched = sum(
-                1
-                for item in frame.input_space.contents.where(is_correspondence=False)
-                if not item.correspondences.is_empty()
-            ) / sum(
-                1 for item in frame.input_space.contents.where(is_correspondence=False)
-            )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            "Proportion of frame input items matched: "
-            + f"{proportion_of_frame_input_items_matched}",
-        )
         proportion_of_frame_output_items_projected = sum(
             1
             for item in frame.output_space.contents.where(is_correspondence=False)
@@ -89,13 +75,9 @@ class SimplexViewEvaluator(ViewEvaluator):
         except ValueError:
             input_chunks_quality = 1
         self.confidence = (
-            statistics.fmean(
-                [
-                    average_correspondence_quality,
-                    proportion_of_frame_input_items_matched,
-                    proportion_of_frame_output_items_projected,
-                    target_view.output_space.quality,
-                ]
+            fuzzy.AND(
+                average_correspondence_quality,
+                proportion_of_frame_output_items_projected,
             )
             * input_chunks_quality
         )
