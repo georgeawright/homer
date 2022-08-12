@@ -184,10 +184,22 @@ class Structure(ABC):
         raise NotImplementedError
 
     def recalculate_unlabeledness(self):
-        self.unlabeledness = 0.5 ** sum(link.activation for link in self.labels)
+        try:
+            self.unlabeledness = 1 - FloatBetweenOneAndZero(
+                sum(label.quality for label in self.labels)
+                / len(self.parent_spaces.where(is_conceptual_space=True))
+            )
+        except ZeroDivisionError:
+            self.unlabeledness = 1
 
     def recalculate_unrelatedness(self):
-        self.unrelatedness = 0.5 ** sum(link.activation for link in self.relations)
+        try:
+            self.unrelatedness = 1 - FloatBetweenOneAndZero(
+                sum(relation.quality for relation in self.relations)
+                / len(self.parent_spaces.where(is_conceptual_space=True))
+            )
+        except ZeroDivisionError:
+            self.unrelatedness = 1
 
     def recalculate_uncorrespondedness(self) -> FloatBetweenOneAndZero:
         self.uncorrespondedness = 0.5 ** sum(

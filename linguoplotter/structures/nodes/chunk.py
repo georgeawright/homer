@@ -124,8 +124,8 @@ class Chunk(Node):
         if len(self.super_chunks) == 0:
             self.unchunkedness = 1
         else:
-            self.unchunkedness = 0.5 * prod(
-                [chunk.unchunkedness for chunk in self.super_chunks]
+            self.unchunkedness = FloatBetweenOneAndZero(
+                sum([chunk.quality for chunk in self.super_chunks])
             )
 
     def recalculate_labeling_exigency(self):
