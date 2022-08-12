@@ -144,7 +144,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 elif arg.is_link:
                     input_links.add(arg)
             input_links.remove(link)
-        input_quality = min([chunk.quality for chunk in input_chunks])
+        input_quality = (
+            min([chunk.quality for chunk in input_chunks])
+            * self.target_structure_one.quality
+        )
         self.confidence = (
             self.parent_concept.classifier.classify(
                 concept=self.parent_concept,
