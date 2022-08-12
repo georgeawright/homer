@@ -105,5 +105,6 @@ class Evaluator(Codelet):
                 self.bubble_chamber,
                 self.target_structures,
                 FloatBetweenOneAndZero(abs(self.activation_difference)),
+                # TODO possibly use sigmoid here too
             )
         )
