@@ -91,7 +91,7 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
     :locations (list (Location
 		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
 		      location-space))
-    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
+    :classifier (EverywhereClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function area_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 
