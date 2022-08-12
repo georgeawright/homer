@@ -14,6 +14,21 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         proportion_of_unrelated_chunks = self._proportion_of_unrelated_chunks()
         proportion_of_uncorresponded_links = self._proportion_of_uncorresponded_links()
 
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            f"Proportion of unchunked raw chunks: {proportion_of_unchunked_raw_chunks}",
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Proportion of unlabeled chunks: {proportion_of_unlabeled_chunks}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Proportion of unrelated chunks: {proportion_of_unrelated_chunks}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            f"Proportion of uncorresponded links: {proportion_of_uncorresponded_links}",
+        )
+
         if proportion_of_unchunked_raw_chunks > proportion_of_unlabeled_chunks:
             follow_up_class = ChunkSuggester
         elif proportion_of_unlabeled_chunks > proportion_of_unrelated_chunks:
