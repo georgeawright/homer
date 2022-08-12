@@ -184,6 +184,41 @@ class View(Structure):
         self.recalculate_unhappiness()
         self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
+    def calculate_quality(self):
+        average_correspondence_quality = sum(
+            [member.quality for member in self.members if member.end.is_slot]
+        ) / len(self.slots)
+        proportion_of_frame_output_items_projected = sum(
+            1
+            for item in self.parent_frame.output_space.contents.where(
+                is_correspondence=False
+            )
+            if item.has_correspondence_to_space(self.output_space)
+        ) / sum(
+            1
+            for item in self.parent_frame.output_space.contents.where(
+                is_correspondence=False
+            )
+        )
+        try:
+            input_chunks_quality = min(
+                [
+                    chunk.quality
+                    for chunk in self.grouped_nodes
+                    if chunk.parent_space in self.input_spaces
+                ]
+            )
+        except ValueError:
+            input_chunks_quality = 1
+        quality = (
+            fuzzy.AND(
+                average_correspondence_quality,
+                proportion_of_frame_output_items_projected,
+            )
+            * input_chunks_quality
+        )
+        return quality
+
     def copy(self, **kwargs: dict):
         raise NotImplementedError
 
