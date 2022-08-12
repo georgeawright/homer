@@ -58,9 +58,14 @@ class ChunkSuggester(Suggester):
     ):
         target_space = bubble_chamber.input_spaces.get()
         target_node = target_space.contents.where(is_node=True).get(
-            key=chunking_exigency
+            key=lambda x: x.unchunkedness * (len(x.potential_chunk_mates) > 0)
         )
-        urgency = urgency if urgency is not None else target_node.unchunkedness
+        urgency = (
+            urgency
+            if urgency is not None
+            else target_node.unchunkedness
+            * (len(target_node.potential_chunk_mates) > 0)
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,
