@@ -289,7 +289,7 @@ class BubbleChamber:
                 sub_chunk.super_chunks.remove(item)
                 sub_chunk.recalculate_exigency()
             for super_chunk in item.super_chunks:
-                super_chunk.super_chunks.remove(item)
+                super_chunk.sub_chunks.remove(item)
             for link in item.links:
                 self.remove(link)
         for space in item.parent_spaces:
