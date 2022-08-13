@@ -186,20 +186,34 @@ class Structure(ABC):
     def recalculate_unlabeledness(self):
         try:
             self.unlabeledness = 1 - FloatBetweenOneAndZero(
-                sum(label.quality for label in self.labels)
-                / len(self.parent_spaces.where(is_conceptual_space=True))
+                len(self.labels) / len(self.locations)
             )
         except ZeroDivisionError:
             self.unlabeledness = 1
 
+    #        try:
+    #            self.unlabeledness = 1 - FloatBetweenOneAndZero(
+    #                sum(label.quality for label in self.labels)
+    #                / len(self.parent_spaces.where(is_conceptual_space=True))
+    #            )
+    #        except ZeroDivisionError:
+    #            self.unlabeledness = 1
+
     def recalculate_unrelatedness(self):
         try:
             self.unrelatedness = 1 - FloatBetweenOneAndZero(
-                sum(relation.quality for relation in self.relations)
-                / len(self.parent_spaces.where(is_conceptual_space=True))
+                len(self.relations) / len(self.locations)
             )
         except ZeroDivisionError:
             self.unrelatedness = 1
+
+    #        try:
+    #            self.unrelatedness = 1 - FloatBetweenOneAndZero(
+    #                sum(relation.quality for relation in self.relations)
+    #                / len(self.parent_spaces.where(is_conceptual_space=True))
+    #            )
+    #        except ZeroDivisionError:
+    #            self.unrelatedness = 1
 
     def recalculate_uncorrespondedness(self) -> FloatBetweenOneAndZero:
         self.uncorrespondedness = 0.5 ** sum(
