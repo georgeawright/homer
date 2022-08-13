@@ -203,7 +203,6 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 (def-relation :start nearly-everywhere-concept :end majority-of-the-country-word
   :parent_concept nn-concept)
 
-
 (def-relation :start north-concept :end south-concept
   :parent_concept more-concept :quality 1.0)
 (def-relation :start west-concept :end east-concept
@@ -230,3 +229,16 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 (def-relation :start southwest-concept :end west-concept :is_excitatory False :quality 1.0)
 (def-relation :start southeast-concept :end south-concept :is_excitatory False :quality 1.0)
 (def-relation :start southeast-concept :end east-concept :is_excitatory False :quality 1.0)
+
+(define same-location-concept (def-concept :name "same-location"))
+(def-relation :start same-concept :end same-location-concept
+  :parent_concept location-concept)
+(define different-location-concept (def-concept :name "different-location"))
+(def-relation :start different-concept :end different-location-concept
+  :parent_concept location-concept)
+(define more-location-concept (def-concept :name "more-location"))
+(def-relation :start more-concept :end more-location-concept
+  :parent_concept location-concept)
+(define less-location-concept (def-concept :name "less-location"))
+(def-relation :start less-concept :end less-location-concept
+  :parent_concept location-concept)

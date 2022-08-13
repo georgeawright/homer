@@ -126,3 +126,7 @@
 
 (def-relation :start time-concept :end pp-directional-time
   :is_bidirectional True :activation 1.0)
+(def-relation :start less-time-concept :end pp-directional-time
+  :is_bidirectional True :activation 1.0)
+(def-relation :start more-time-concept :end pp-directional-time
+  :is_bidirectional True :activation 1.0)

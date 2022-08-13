@@ -147,6 +147,14 @@ class Relation(Link):
         Link.spread_activation(self)
         if self.conceptual_space is not None:
             self.conceptual_space.boost_activation(self.quality)
+        if (
+            self.parent_space is not None
+            and self.parent_space.is_main_input
+            and self.conceptual_space is not None
+        ):
+            self.parent_concept.relations.where(
+                parent_concept=self.conceptual_space.parent_concept
+            ).get().end.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name

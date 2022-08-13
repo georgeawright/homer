@@ -41,3 +41,16 @@
   (def-letter-chunk :name "shrink" :parent_space size-space
     :locations (list (Location (list (list 1)) size-space))))
 (def-relation :start small-concept :end shrink-word :parent_concept vb-concept)
+
+(define same-size-concept (def-concept :name "same-size"))
+(def-relation :start same-concept :end same-size-concept
+  :parent_concept size-concept)
+(define different-size-concept (def-concept :name "different-size"))
+(def-relation :start different-concept :end different-size-concept
+  :parent_concept size-concept)
+(define more-size-concept (def-concept :name "more-size"))
+(def-relation :start more-concept :end more-size-concept
+  :parent_concept size-concept)
+(define less-size-concept (def-concept :name "less-size"))
+(def-relation :start less-concept :end less-size-concept
+  :parent_concept size-concept)

@@ -174,11 +174,13 @@
     :locations (list pp-location
 		     (Location (list) pp-from-wards-locations-output))))
 
-(def-relation :start label-concept :end pp-from-wards-locations
+(def-relation :start location-concept :end pp-from-wards-locations
   :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end pp-from-wards-locations
+(def-relation :start more-location-concept :end pp-from-wards-locations
   :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end pp-from-wards-locations
+(def-relation :start less-location-concept :end pp-from-wards-locations
   :is_bidirectional True :activation 1.0)
-(def-relation :start pp-concept :end pp-from-wards-locations
+(def-relation :start more-time-concept :end pp-from-wards-locations
+  :is_bidirectional True :activation 1.0)
+(def-relation :start less-time-concept :end pp-from-wards-locations
   :is_bidirectional True :activation 1.0)

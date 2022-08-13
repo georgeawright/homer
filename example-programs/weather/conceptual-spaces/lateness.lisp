@@ -35,3 +35,16 @@
     :locations (list (Location (list (list 10)) lateness-space))))
 (def-relation :start late-concept :end lat-word :parent_concept jjr-concept)
 (def-relation :start lat-word :end -er :parent_concept jjr-concept)
+
+(define same-lateness-concept (def-concept :name "same-lateness"))
+(def-relation :start same-concept :end same-lateness-concept
+  :parent_concept lateness-concept)
+(define different-lateness-concept (def-concept :name "different-lateness"))
+(def-relation :start different-concept :end different-lateness-concept
+  :parent_concept lateness-concept)
+(define more-lateness-concept (def-concept :name "more-lateness"))
+(def-relation :start more-concept :end more-lateness-concept
+  :parent_concept lateness-concept)
+(define less-lateness-concept (def-concept :name "less-lateness"))
+(def-relation :start less-concept :end less-lateness-concept
+  :parent_concept lateness-concept)

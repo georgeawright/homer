@@ -4,7 +4,7 @@ from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection import StructureCollection
-from linguoplotter.structure_collection_keys import activation
+from linguoplotter.structure_collection_keys import activation, exigency
 from linguoplotter.structures import Frame
 
 
@@ -44,16 +44,8 @@ class SimplexViewSuggester(ViewSuggester):
         if frame is None:
             frame = bubble_chamber.frames.where(
                 parent_frame=None, is_sub_frame=False
-            ).get()
-        views_with_frame = bubble_chamber.views.filter(
-            lambda x: x.parent_frame in frame.instances or x.parent_frame == frame
-        )
-        urgency = (
-            urgency
-            if urgency is not None
-            else (1 - bubble_chamber.focus.focussedness)
-            * 0.5 ** sum([1 - view.activation for view in views_with_frame])
-        )
+            ).get(key=exigency)
+        urgency = urgency if urgency is not None else frame.exigency
         return cls.spawn(
             parent_id,
             bubble_chamber,

@@ -33,3 +33,16 @@ lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
 (def-relation :start low-concept :end low-word :parent_concept jj-concept)
 (def-relation :start low-concept :end low-word :parent_concept jjr-concept)
 (def-relation :start low-word :end -er :parent_concept jjr-concept)
+
+(define same-height-concept (def-concept :name "same-height"))
+(def-relation :start same-concept :end same-height-concept
+  :parent_concept height-concept)
+(define different-height-concept (def-concept :name "different-height"))
+(def-relation :start different-concept :end different-height-concept
+  :parent_concept height-concept)
+(define more-height-concept (def-concept :name "more-height"))
+(def-relation :start more-concept :end more-height-concept
+  :parent_concept height-concept)
+(define less-height-concept (def-concept :name "less-height"))
+(def-relation :start less-concept :end less-height-concept
+  :parent_concept height-concept)

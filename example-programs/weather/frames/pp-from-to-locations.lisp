@@ -179,3 +179,11 @@
 
 (def-relation :start location-concept :end pp-from-to-locations
   :is_bidirectional True :activation 1.0)
+(def-relation :start more-location-concept :end pp-from-to-locations
+  :is_bidirectional True :activation 1.0)
+(def-relation :start less-location-concept :end pp-from-to-locations
+  :is_bidirectional True :activation 1.0)
+(def-relation :start more-time-concept :end pp-from-to-locations
+  :is_bidirectional True :activation 1.0)
+(def-relation :start less-time-concept :end pp-from-to-locations
+  :is_bidirectional True :activation 1.0)
