@@ -252,4 +252,5 @@
   :is_bidirectional True :activation 1.0)
 (def-relation :start ap-concept :end move-sentence
   :is_bidirectional True :activation 1.0)
-
+(def-relation :start same-temperature-concept :end move-sentence
+  :is_bidirectional True :activation 1.0)

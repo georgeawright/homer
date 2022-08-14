@@ -236,3 +236,7 @@
   :is_bidirectional True :activation 1.0)
 (def-relation :start pp-directional-time-concept :end be-sentence
   :is_bidirectional True :activation 1.0)
+(def-relation :start same-location-concept :end be-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start same-temperature-concept :end be-sentence
+  :is_bidirectional True :activation 1.0)

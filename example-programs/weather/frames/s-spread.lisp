@@ -272,7 +272,9 @@
   :is_bidirectional True :activation 1.0)
 (def-relation :start ap-concept :end spread-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start large-concept :end spread-sentence
+(def-relation :start more-size-concept :end spread-sentence
   :is_bidirectional True :activation 1.0)
-(def-relation :start small-concept :end spread-sentence
+(def-relation :start same-location-concept :end spread-sentence
+  :is_bidirectional True :activation 1.0)
+(def-relation :start same-temperature-concept :end spread-sentence
   :is_bidirectional True :activation 1.0)
