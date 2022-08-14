@@ -285,6 +285,8 @@ class CorrespondenceSuggester(Suggester):
                         (x.start == structure_one_start)
                         or (structure_one_start is None)
                     )
+                    and x.start.quality > 0
+                    and x.quality > 0
                     and x.has_location_in_space(
                         correspondence_suggester.target_conceptual_space
                     )
@@ -338,8 +340,11 @@ class CorrespondenceSuggester(Suggester):
             )
             matching_relations = source_collection.filter(
                 lambda x: x.is_relation
+                and x.quality > 0
                 and (x.start == structure_one_start or structure_one_start is None)
+                and (x.start.quality > 0)
                 and (x.end == structure_one_end or structure_one_end is None)
+                and (x.end.quality > 0)
                 and (
                     x.parent_concept
                     == correspondence_suggester.target_structure_two.parent_concept
