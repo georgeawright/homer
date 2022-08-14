@@ -221,7 +221,7 @@ class View(Structure):
             )
         except ValueError:
             input_chunks_quality = 1
-        quality = (
+        quality = FloatBetweenOneAndZero(
             fuzzy.AND(
                 average_correspondence_quality,
                 proportion_of_frame_output_items_projected,
