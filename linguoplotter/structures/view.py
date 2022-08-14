@@ -102,6 +102,17 @@ class View(Structure):
         return self.input_spaces.where(is_contextual_space=True)
 
     @property
+    def input_slots(self):
+        return self.parent_frame.input_space.contents.where(is_slot=True)
+
+    @property
+    def output_sub_frame_slots(self):
+        return self.parent_frame.output_space.contents.filter(
+            lambda x: x.is_slot
+            and len(x.parent_spaces.where(is_contextual_space=True)) > 1
+        )
+
+    @property
     def size(self):
         return len(self.members)
 
@@ -187,7 +198,7 @@ class View(Structure):
     def calculate_quality(self):
         average_correspondence_quality = sum(
             [member.quality for member in self.members if member.end.is_slot]
-        ) / len(self.slots)
+        ) / (len(self.input_slots) + len(self.output_sub_frame_slots))
         proportion_of_frame_output_items_projected = sum(
             1
             for item in self.parent_frame.output_space.contents.where(
