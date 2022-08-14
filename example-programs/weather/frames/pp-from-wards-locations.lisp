@@ -174,8 +174,6 @@
     :locations (list pp-location
 		     (Location (list) pp-from-wards-locations-output))))
 
-(def-relation :start location-concept :end pp-from-wards-locations
-  :is_bidirectional True :activation 1.0)
 (def-relation :start more-location-concept :end pp-from-wards-locations
   :is_bidirectional True :activation 1.0)
 (def-relation :start less-location-concept :end pp-from-wards-locations
