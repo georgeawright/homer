@@ -24,6 +24,10 @@ def area_euclidean_distance(a, b) -> float:
     return distance if not math.isnan(distance) else 0
 
 
+def size_euclidean_distance(a, b) -> float:
+    return abs(len(a) - len(b))
+
+
 def centroid_difference(a, b) -> float:
     difference = average_vector(a)[0] - average_vector(b)[0]
     return difference if not math.isnan(difference) else 0
