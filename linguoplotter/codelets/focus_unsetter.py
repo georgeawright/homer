@@ -43,6 +43,7 @@ class FocusUnsetter(Codelet):
         )
 
     def run(self) -> CodeletResult:
+        self.bubble_chamber.focus.recalculate_satisfaction()
         self.bubble_chamber.loggers["activity"].log(
             self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
         )

@@ -73,4 +73,4 @@
 		     (Location (list) pp-inessive-location-output))))
 
 (def-relation :start location-concept :end pp-inessive-location
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)

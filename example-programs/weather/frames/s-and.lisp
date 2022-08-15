@@ -168,6 +168,6 @@
     :right_branch (StructureCollection conjunction-super-chunk)))
 
 (def-relation :start same-concept :end and-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start sentence-concept :end and-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)

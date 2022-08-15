@@ -135,42 +135,18 @@ class SimplexViewSuggester(ViewSuggester):
         return True
 
     def _calculate_confidence(self):
-        equivalent_views = self.bubble_chamber.views.filter(
-            lambda x: all(
-                [
-                    x.input_spaces
-                    == self.bubble_chamber.new_structure_collection(
-                        self.contextual_space
-                    ),
-                    all(
-                        [
-                            space in x.input_spaces.get().conceptual_spaces
-                            for space in self.conceptual_spaces_map.values()
-                        ]
-                    ),
-                    x.parent_frame.progenitor == self.frame.progenitor,
-                    x not in self.bubble_chamber.recycle_bin,
-                ]
+        number_of_equivalent_views = len(
+            self.bubble_chamber.views.filter(
+                lambda x: x.parent_frame.parent_concept == self.frame.parent_concept
             )
         )
-        if not equivalent_views.filter(lambda x: x.members.is_empty()).is_empty():
-            self.confidence = 0.0
-            return
-        equivalent_view_activation = sum([view.activation for view in equivalent_views])
-        try:
-            proportion_of_views_equivalent = len(equivalent_views) / len(
-                self.bubble_chamber.views.filter(
-                    lambda x: x not in self.bubble_chamber.recycle_bin
-                )
-            )
-        except ZeroDivisionError:
-            proportion_of_views_equivalent = 0
         self.bubble_chamber.loggers["activity"].log(
             self, f"Frame activation: {self.frame.activation}"
         )
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Total equivalent view activation: {equivalent_view_activation}"
+            self, f"Number of equivalent views: {number_of_equivalent_views}"
         )
-        self.confidence = fuzzy.OR(
-            self.frame.exigency, (1 - proportion_of_views_equivalent)
-        )
+        try:
+            self.confidence = self.frame.activation / number_of_equivalent_views
+        except ZeroDivisionError:
+            self.confidence = self.frame.activation

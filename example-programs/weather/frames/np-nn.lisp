@@ -58,6 +58,6 @@
 		     (Location (list) nn-output))))
    
 (def-relation :start location-concept :end nn-frame
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start time-concept :end nn-frame
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)

@@ -31,6 +31,7 @@ class Relation(Link):
         champion_relations: StructureCollection,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
+        is_stable: bool = False,
     ):
         Link.__init__(
             self,
@@ -53,6 +54,7 @@ class Relation(Link):
         self.is_relation = True
         self.is_bidirectional = is_bidirectional
         self.is_excitatory = is_excitatory
+        self.is_stable = is_stable
 
     def __dict__(self) -> dict:
         return {
@@ -142,19 +144,17 @@ class Relation(Link):
         )
 
     def spread_activation(self):
-        if not self.is_fully_active():
-            return
-        Link.spread_activation(self)
-        if self.conceptual_space is not None:
-            self.conceptual_space.boost_activation(self.quality)
         if (
-            self.parent_space is not None
-            and self.parent_space.is_main_input
-            and self.conceptual_space is not None
+            not self.is_fully_active()
+            or self.parent_space is None
+            or self.parent_space.is_conceptual_space
+            or not self.parent_space.is_main_input
         ):
-            self.parent_concept.relations.where(
-                parent_concept=self.conceptual_space.parent_concept
-            ).get().end.boost_activation(self.quality)
+            return
+        self.parent_concept.boost_activation(self.quality)
+        self.parent_concept.relations.where(
+            parent_concept=self.conceptual_space.parent_concept
+        ).get().end.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name

@@ -717,6 +717,7 @@ class BubbleChamber:
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         activation: FloatBetweenOneAndZero = None,
+        stable_activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
         parent_space = start.parent_space if parent_space is None else parent_space
         locations = [] if locations is None else locations
@@ -739,11 +740,14 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_bidirectional=is_bidirectional,
             is_excitatory=is_excitatory,
+            is_stable=stable_activation is not None,
             champion_labels=self.new_structure_collection(),
             champion_relations=self.new_structure_collection(),
         )
         if activation is not None:
             relation._activation = activation
+        if stable_activation is not None:
+            relation._activation = stable_activation
         start.links_out.add(relation)
         end.links_in.add(relation)
         start.recalculate_exigency()

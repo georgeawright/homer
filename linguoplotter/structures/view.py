@@ -1,4 +1,5 @@
 from __future__ import annotations
+import statistics
 from typing import List
 
 from linguoplotter import fuzzy
@@ -117,6 +118,18 @@ class View(Structure):
         return len(self.members)
 
     @property
+    def structures(self):
+        return [
+            correspondence.start
+            for correspondence in self.members
+            if correspondence.start.parent_space in self.input_spaces
+        ] + [
+            node
+            for node in self.grouped_nodes
+            if node.parent_space in self.input_spaces
+        ]
+
+    @property
     def slots(self):
         return self.parent_frame.slots
 
@@ -180,8 +193,9 @@ class View(Structure):
             .name
         )
 
-    def recalculate_unhappiness(self):
-        items_to_process = sum(
+    @property
+    def number_of_items_left_to_process(self):
+        return sum(
             [
                 len(self.unfilled_sub_frame_input_structures),
                 len(self.unfilled_input_structures),
@@ -189,28 +203,20 @@ class View(Structure):
                 len(self.unfilled_projectable_structures),
             ]
         )
-        self.unhappiness = 1 - 0.5 ** items_to_process
+
+    def recalculate_unhappiness(self):
+        self.unhappiness = 1 - 0.5 ** self.number_of_items_left_to_process
 
     def recalculate_exigency(self):
         self.recalculate_unhappiness()
         self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
     def calculate_quality(self):
-        average_correspondence_quality = sum(
-            [member.quality for member in self.members if member.end.is_slot]
-        ) / (len(self.input_slots) + len(self.output_sub_frame_slots))
-        proportion_of_frame_output_items_projected = sum(
-            1
-            for item in self.parent_frame.output_space.contents.where(
-                is_correspondence=False
-            )
-            if item.has_correspondence_to_space(self.output_space)
-        ) / sum(
-            1
-            for item in self.parent_frame.output_space.contents.where(
-                is_correspondence=False
-            )
+        total_correspondence_quality = sum(
+            correspondence.quality for correspondence in self.members
         )
+        total_slots = len(self.members) + self.number_of_items_left_to_process
+        average_correspondence_quality = total_correspondence_quality / total_slots
         try:
             input_chunks_quality = min(
                 [
@@ -221,13 +227,7 @@ class View(Structure):
             )
         except ValueError:
             input_chunks_quality = 1
-        quality = FloatBetweenOneAndZero(
-            fuzzy.AND(
-                average_correspondence_quality,
-                proportion_of_frame_output_items_projected,
-            )
-            * input_chunks_quality
-        )
+        quality = fuzzy.AND(average_correspondence_quality, input_chunks_quality)
         return quality
 
     def copy(self, **kwargs: dict):
@@ -415,14 +415,9 @@ class View(Structure):
         )
 
     def spread_activation(self):
-        if not self.is_fully_active():
-            return
-        for member in self.members:
-            member.boost_activation(self.quality)
-        for frame in self.frames:
-            frame.boost_activation(self.quality)
-        for view in self.sub_views:
-            view.boost_activation(self.quality)
+        if self.is_fully_active():
+            self.parent_frame.parent_concept.boost_activation(self.quality)
+            self.parent_frame.progenitor.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])

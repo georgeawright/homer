@@ -60,4 +60,4 @@
 		     (Location (list) pp-inessive-time-output))))
 
 (def-relation :start time-concept :end pp-inessive-time
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)

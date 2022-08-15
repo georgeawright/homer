@@ -291,13 +291,13 @@
 		     (Location (list) expand-sentence-output))))
 
 (def-relation :start pp-inessive-location-concept :end expand-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start pp-directional-time-concept :end expand-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start ap-concept :end expand-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start large-concept :end expand-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start small-concept :end expand-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 0.3)
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 import math
 from typing import List
 
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
@@ -23,7 +24,6 @@ class Node(Structure):
         parent_spaces: StructureCollection,
         champion_labels: StructureCollection,
         champion_relations: StructureCollection,
-        stable_activation: FloatBetweenOneAndZero = None,
     ):
         Structure.__init__(
             self,
@@ -36,7 +36,6 @@ class Node(Structure):
             parent_spaces=parent_spaces,
             champion_labels=champion_labels,
             champion_relations=champion_relations,
-            stable_activation=stable_activation,
         )
         self._parent_space = parent_space
         self.is_node = True
@@ -73,42 +72,35 @@ class Node(Structure):
         raise NotImplementedError
 
     def spread_activation(self):
-        if not self.is_fully_active():
-            return
+        pass
+
+    def update_activation(self):
         if self.parent_space is None or self.parent_space.is_conceptual_space:
-            for link in self.links_out.where(is_label=False):
-                if link.is_excitatory:
-                    link.end.boost_activation(
-                        link.parent_concept.activation
-                        if link.parent_concept is not None
-                        else None
-                    )
-                else:
-                    link.end.decay_activation(
-                        link.parent_concept.activation
-                        if link.parent_concept is not None
-                        else None
-                    )
-            for link in self.links_in.where(is_bidirectional=True):
-                if link.is_excitatory:
-                    link.start.boost_activation(
-                        link.parent_concept.activation
-                        if link.parent_concept is not None
-                        else None
-                    )
-                else:
-                    link.start.decay_activation(
-                        link.parent_concept.activation
-                        if link.parent_concept is not None
-                        else None
-                    )
-            if self.parent_space is not None:
+            relatives_total = 0
+            for relation in self.relations:
+                try:
+                    if not relation.arguments.excluding(self).get().is_fully_active():
+                        continue
+                except MissingStructureError:
+                    pass
+                relatives_total += relation.activation
+            if relatives_total >= 1:
+                self._activation_buffer += (
+                    self.ACTIVATION_UPDATE_COEFFICIENT * relatives_total
+                )
+            if self._activation_buffer == 0.0:
+                self.decay_activation(self.DECAY_RATE)
+            self._activation = FloatBetweenOneAndZero(
+                self._activation + self._activation_buffer
+            )
+            self._activation_buffer = 0.0
+            self.recalculate_exigency()
+            if (
+                self.is_fully_active()
+                and self.parent_space is not None
+                and self.parent_space.is_conceptual_space
+            ):
                 self.parent_space.parent_concept.activate()
-        else:
-            for champion in self.champion_labels:
-                champion.boost_activation(self.quality)
-            for champion in self.champion_relations:
-                champion.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         if self.parent_space is None:

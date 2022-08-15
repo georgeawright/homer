@@ -57,6 +57,11 @@ class GarbageCollector(Codelet):
             if any(
                 [
                     structure in codelet.target_structures
+                    or (
+                        hasattr(codelet, "target_view")
+                        and codelet.target_view is not None
+                        and structure in codelet.target_view.structures
+                    )
                     for codelet in self.coderack._codelets
                 ]
             ):
