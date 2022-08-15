@@ -92,7 +92,7 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
 		      location-space))
     :classifier (EverywhereClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function area_euclidean_distance
+    :parent_space location-space :distance_function size_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define nearly-everywhere-concept
   (def-concept :name "nearly-everywhere"
@@ -100,7 +100,7 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
 		      location-space))
     :classifier (MostOfTheCountryClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function area_euclidean_distance
+    :parent_space location-space :distance_function size_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 
 (def-relation :start north-concept :end more-concept
