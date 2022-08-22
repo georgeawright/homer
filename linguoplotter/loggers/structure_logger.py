@@ -27,8 +27,6 @@ class StructureLogger(Logger):
         with open(output_file_path, "w") as f:
             json.dump(structure.__dict__(), f, sort_keys=False, indent=4)
 
-        pass
-
     def log_concepts_and_frames(self, bubble_chamber, coderack):
         """output dot file of concepts, frames, connections, and activations"""
         codelets_run = coderack.codelets_run
