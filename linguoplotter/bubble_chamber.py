@@ -191,13 +191,32 @@ class BubbleChamber:
             self.satisfaction = self.general_satisfaction
 
     def recalculate_general_satisfaction(self):
-        spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
-        self.general_satisfaction = statistics.fmean(
+        # small number of top-level chunks
+        # links in a large proportion of conceptual spaces with high quality and activation
+        # empty space has zero quality
+        # av(link.q*link.a) / sum(unchunked.q*unchunked.a)
+
+        main_input_space = self.contextual_spaces.where(is_main_input=True).get()
+        average_view_quality = (
+            statistics.fmean([view.quality for view in self.views])
+            if not self.views.is_empty()
+            else 0
+        )
+        self.general_satisfaction = sum(
             [
-                statistics.fmean([space.quality for space in spaces]),
-                self.worldview.satisfaction,
+                0.25 * main_input_space.quality,
+                0.25 * average_view_quality,
+                0.5 * self.worldview.satisfaction,
             ]
         )
+
+        # spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
+        # self.general_satisfaction = statistics.fmean(
+        #    [
+        #        statistics.fmean([space.quality for space in spaces]),
+        #        self.worldview.satisfaction,
+        #    ]
+        # )
 
     def spread_activations(self):
         for structure in self.structures:

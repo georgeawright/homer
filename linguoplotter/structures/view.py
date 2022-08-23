@@ -212,23 +212,36 @@ class View(Structure):
         self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
     def calculate_quality(self):
-        total_correspondence_quality = sum(
-            correspondence.quality for correspondence in self.members
-        )
+        #        total_correspondence_quality = sum(
+        #            correspondence.quality for correspondence in self.members
+        #        )
+        #        total_slots = len(self.members) + self.number_of_items_left_to_process
+        #        average_correspondence_quality = total_correspondence_quality / total_slots
+        #        try:
+        #            input_chunks_quality = min(
+        #                [
+        #                    chunk.quality
+        #                    for chunk in self.grouped_nodes
+        #                    if chunk.parent_space in self.input_spaces
+        #                ]
+        #            )
+        #        except ValueError:
+        #            input_chunks_quality = 1
+        #        quality = fuzzy.AND(average_correspondence_quality, input_chunks_quality)
+        #        return quality
         total_slots = len(self.members) + self.number_of_items_left_to_process
-        average_correspondence_quality = total_correspondence_quality / total_slots
+        correspondence_quality = (
+            sum(correspondence.quality for correspondence in self.members) / total_slots
+        )
         try:
-            input_chunks_quality = min(
-                [
-                    chunk.quality
-                    for chunk in self.grouped_nodes
-                    if chunk.parent_space in self.input_spaces
-                ]
+            input_quality = min(
+                correspondence.start.quality
+                for correspondence in self.members
+                if correspondence.start.parent_space.is_main_input
             )
         except ValueError:
-            input_chunks_quality = 1
-        quality = fuzzy.AND(average_correspondence_quality, input_chunks_quality)
-        return quality
+            input_quality = 0
+        return statistics.fmean([correspondence_quality, input_quality])
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

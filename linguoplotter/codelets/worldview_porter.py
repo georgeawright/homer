@@ -151,14 +151,23 @@ class WorldviewPorter(Codelet):
     def _calculate_satisfaction(
         self, views: StructureCollection
     ) -> FloatBetweenOneAndZero:
-        return fuzzy.AND(
-            self._proportion_of_input_in_views(views),
-            fuzzy.OR(
-                self._view_quality_score(views),
-                self._frame_depth_score(views),
-                self._frame_types_score(views),
-            ),
+        if views.is_empty():
+            return 0
+        proportion_of_input = self._proportion_of_input_in_views(views)
+        number_of_frames = sum(len(view.frames) for view in views)
+        view_quality = statistics.fmean([view.quality for view in views])
+        return (
+            0.33 * proportion_of_input + 0.33 * view_quality + 0.33 / number_of_frames
         )
+
+    #        return fuzzy.AND(
+    #            self._proportion_of_input_in_views(views),
+    #            fuzzy.OR(
+    #                self._view_quality_score(views),
+    #                self._frame_depth_score(views),
+    #                self._frame_types_score(views),
+    #            ),
+    #        )
 
     def _view_quality_score(self, views: StructureCollection) -> FloatBetweenOneAndZero:
         if views.is_empty():

@@ -1,6 +1,6 @@
 class HyperParameters:
     FLOATING_POINT_TOLERANCE = 1e-5
-    CODELET_RUN_LIMIT = 20000
+    CODELET_RUN_LIMIT = 50000
 
     ACTIVATION_UPDATE_FREQUENCY = 10
     ACTIVATION_UPDATE_COEFFICIENT = 0.5
@@ -12,7 +12,7 @@ class HyperParameters:
     MINIMUM_CODELET_URGENCY = 0.01
     NUMBER_OF_START_CHUNK_SUGGESTERS = 7
 
-    DETERMINISM_SMOOTHING_FUNCTION = lambda x: (x + 0.8) / 2
+    DETERMINISM_SMOOTHING_FUNCTION = lambda x: 0.5 * x + 0.25
     PUBLICATION_PROBABILITY_EXPONENT = 5
 
     # TODO: these ought to be specific to each conceptual space
