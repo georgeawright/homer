@@ -16,6 +16,10 @@ class WorldviewPorter(Codelet):
 
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
+    INPUT_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_PROPORTION_OF_INPUT_WEIGHT
+    VIEW_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_VIEW_QUALITY_WEIGHT
+    FRAMES_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_NUMBER_OF_FRAMES_WEIGHT
+
     def __init__(
         self,
         codelet_id: str,
@@ -158,9 +162,9 @@ class WorldviewPorter(Codelet):
         view_quality = statistics.fmean([view.quality for view in views])
         return sum(
             [
-                0.25 * proportion_of_input,
-                0.5 * view_quality,
-                0.25 * 1 / number_of_frames,
+                self.INPUT_WEIGHT * proportion_of_input,
+                self.VIEW_WEIGHT * view_quality,
+                self.FRAMES_WEIGHT * 1 / number_of_frames,
             ]
         )
 

@@ -29,6 +29,10 @@ from .worldview import Worldview
 class BubbleChamber:
     JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
 
+    MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
+    VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_VIEW_QUALITIES_WEIGHT
+    WORLDVIEW_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WORLDVIEW_WEIGHT
+
     def __init__(self, focus, recycle_bin):
         self.loggers = {}
         self.random_machine = None
@@ -204,9 +208,9 @@ class BubbleChamber:
         )
         self.general_satisfaction = sum(
             [
-                0.25 * main_input_space.quality,
-                0.25 * average_view_quality,
-                0.5 * self.worldview.satisfaction,
+                self.MAIN_INPUT_WEIGHT * main_input_space.quality,
+                self.VIEWS_WEIGHT * average_view_quality,
+                self.WORLDVIEW_WEIGHT * self.worldview.satisfaction,
             ]
         )
 

@@ -20,6 +20,9 @@ class View(Structure):
 
     FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
 
+    CORRESPONDENCE_WEIGHT = HyperParameters.VIEW_QUALITY_CORRESPONDENCE_WEIGHT
+    INPUT_WEIGHT = HyperParameters.VIEW_QUALITY_INPUT_WEIGHT
+
     def __init__(
         self,
         structure_id: str,
@@ -241,7 +244,12 @@ class View(Structure):
             )
         except ValueError:
             input_quality = 0
-        return statistics.fmean([correspondence_quality, input_quality])
+        return sum(
+            [
+                self.CORRESPONDENCE_WEIGHT * correspondence_quality,
+                self.INPUT_WEIGHT * input_quality,
+            ]
+        )
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError
