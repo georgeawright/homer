@@ -67,6 +67,18 @@ class GarbageCollector(Codelet):
             ):
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
+            if not self.bubble_chamber.worldview.views.is_empty() and (
+                any(
+                    structure in view.grouped_nodes
+                    for view in self.bubble_chamber.worldview.views
+                )
+                or any(
+                    structure in view.members
+                    for view in self.bubble_chamber.worldview.views
+                )
+            ):
+                self.bubble_chamber.recycle_bin.remove(structure)
+                continue
             probability_of_removal = (
                 self.bubble_chamber.random_machine.generate_number()
             )
