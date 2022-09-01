@@ -19,6 +19,8 @@ for i in range(5):
     satisfaction_stream = open(f"{logs_dir_path}/satisfaction.csv", "w")
     coderack_population_stream = open(f"{logs_dir_path}/coderack_population.csv", "w")
     view_count_stream = open(f"{logs_dir_path}/view_count.csv", "w")
+    codelet_spawned_stream = open(f"{logs_dir_path}/codelets_spawned", "w")
+    codelet_run_stream = open(f"{logs_dir_path}/codelets_run", "w")
     error_file_name = f"{logs_dir_path}/errors.log"
     error_stream = open(error_file_name, "w")
     loggers = {
@@ -27,6 +29,8 @@ for i in range(5):
             satisfaction_stream,
             coderack_population_stream,
             view_count_stream,
+            codelet_spawned_stream,
+            codelet_run_stream,
         ),
         "structure": StructureLogger(f"{structure_logs_dir_path}"),
         "errors": ErrorLogger(error_stream),
