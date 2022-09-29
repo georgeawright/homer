@@ -19,6 +19,22 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         labels_per_space_per_chunk = self._labels_per_space_per_chunk()
         super_chunks_per_raw_chunk = self._super_chunks_per_raw_chunk()
 
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            f"Views per frame type per chunk: {views_per_frame_type_per_chunk}",
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            f"Relations per space per end per chunk: {relations_per_space_per_end_per_chunk}",
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Labels per space per chunk: {labels_per_space_per_chunk}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            self,
+            f"Super chunks per raw chunk: {super_chunks_per_raw_chunk}",
+        )
+
         if views_per_frame_type_per_chunk > relations_per_space_per_end_per_chunk:
             follow_up_class = SimplexViewEvaluator
         elif relations_per_space_per_end_per_chunk > labels_per_space_per_chunk:

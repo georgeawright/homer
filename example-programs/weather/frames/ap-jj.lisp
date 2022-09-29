@@ -58,8 +58,8 @@
 		     (Location (list) jj-output))))
 
 (def-relation :start temperature-concept :end jj-frame
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start height-concept :end jj-frame
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start goodness-concept :end jj-frame
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)

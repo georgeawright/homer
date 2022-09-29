@@ -121,12 +121,7 @@ class Chunk(Node):
         )
 
     def recalculate_unchunkedness(self):
-        if len(self.super_chunks) == 0:
-            self.unchunkedness = 1
-        else:
-            self.unchunkedness = 0.5 * prod(
-                [chunk.unchunkedness for chunk in self.super_chunks]
-            )
+        self.unchunkedness = 0.1 ** len(self.super_chunks)
 
     def recalculate_labeling_exigency(self):
         self.labeling_exigency = statistics.fmean(

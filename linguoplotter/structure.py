@@ -27,7 +27,6 @@ class Structure(ABC):
         parent_spaces: StructureCollection,
         champion_labels: StructureCollection,
         champion_relations: StructureCollection,
-        stable_activation: float = None,
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
@@ -38,8 +37,8 @@ class Structure(ABC):
         self.parent_spaces = parent_spaces
         self.champion_labels = champion_labels
         self.champion_relations = champion_relations
-        self._activation = 0.0 if stable_activation is None else stable_activation
-        self.stable = stable_activation is not None
+        self._activation = 0.0
+        self.is_stable = False
         self._depth = 1
         self._activation_buffer = 0.0
         self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
@@ -184,10 +183,20 @@ class Structure(ABC):
         raise NotImplementedError
 
     def recalculate_unlabeledness(self):
-        self.unlabeledness = 0.5 ** sum(link.activation for link in self.labels)
+        try:
+            self.unlabeledness = 1 - FloatBetweenOneAndZero(
+                len(self.labels) / len(self.locations)
+            )
+        except ZeroDivisionError:
+            self.unlabeledness = 1
 
     def recalculate_unrelatedness(self):
-        self.unrelatedness = 0.5 ** sum(link.activation for link in self.relations)
+        try:
+            self.unrelatedness = 1 - FloatBetweenOneAndZero(
+                len(self.relations) / len(self.locations)
+            )
+        except ZeroDivisionError:
+            self.unrelatedness = 1
 
     def recalculate_uncorrespondedness(self) -> FloatBetweenOneAndZero:
         self.uncorrespondedness = 0.5 ** sum(
@@ -388,7 +397,7 @@ class Structure(ABC):
         return self.activation == 1.0
 
     def boost_activation(self, amount: float = None):
-        if self.stable:
+        if self.is_stable:
             return
         if amount is None:
             amount = self.MINIMUM_ACTIVATION_UPDATE
@@ -397,7 +406,7 @@ class Structure(ABC):
         )
 
     def decay_activation(self, amount: float = None):
-        if self.stable:
+        if self.is_stable:
             return
         if amount is None:
             amount = self.MINIMUM_ACTIVATION_UPDATE
@@ -406,12 +415,12 @@ class Structure(ABC):
         )
 
     def activate(self):
-        if self.stable:
+        if self.is_stable:
             return
         self._activation = 1.0
 
     def deactivate(self):
-        if self.stable:
+        if self.is_stable:
             return
         self._activation = 0.0
 
@@ -419,13 +428,26 @@ class Structure(ABC):
         raise NotImplementedError
 
     def update_activation(self):
-        if self._activation_buffer == 0.0:
-            self.decay_activation(self.DECAY_RATE)
-        self._activation = FloatBetweenOneAndZero(
-            self._activation + self._activation_buffer
-        )
-        self._activation_buffer = 0.0
-        self.recalculate_exigency()
+        if self.parent_space is None or self.parent_space.is_conceptual_space:
+            relatives_total = 0
+            for relation in self.relations:
+                try:
+                    if not relation.arguments.excluding(self).get().is_fully_active():
+                        continue
+                except MissingStructureError:
+                    pass
+                relatives_total += relation.activation
+            if relatives_total >= 1:
+                self._activation_buffer += (
+                    self.ACTIVATION_UPDATE_COEFFICIENT * relatives_total
+                )
+            if self._activation_buffer == 0.0:
+                self.decay_activation(self.DECAY_RATE)
+            self._activation = FloatBetweenOneAndZero(
+                self._activation + self._activation_buffer
+            )
+            self._activation_buffer = 0.0
+            self.recalculate_exigency()
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

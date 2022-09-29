@@ -57,8 +57,25 @@ class GarbageCollector(Codelet):
             if any(
                 [
                     structure in codelet.target_structures
+                    or (
+                        hasattr(codelet, "target_view")
+                        and codelet.target_view is not None
+                        and structure in codelet.target_view.structures
+                    )
                     for codelet in self.coderack._codelets
                 ]
+            ):
+                self.bubble_chamber.recycle_bin.remove(structure)
+                continue
+            if not self.bubble_chamber.worldview.views.is_empty() and (
+                any(
+                    structure in view.grouped_nodes
+                    for view in self.bubble_chamber.worldview.views
+                )
+                or any(
+                    structure in view.members
+                    for view in self.bubble_chamber.worldview.views
+                )
             ):
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue

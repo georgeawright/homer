@@ -16,6 +16,10 @@ class WorldviewPorter(Codelet):
 
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
+    INPUT_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_PROPORTION_OF_INPUT_WEIGHT
+    VIEW_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_VIEW_QUALITY_WEIGHT
+    FRAMES_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_NUMBER_OF_FRAMES_WEIGHT
+
     def __init__(
         self,
         codelet_id: str,
@@ -151,14 +155,27 @@ class WorldviewPorter(Codelet):
     def _calculate_satisfaction(
         self, views: StructureCollection
     ) -> FloatBetweenOneAndZero:
-        return fuzzy.AND(
-            self._proportion_of_input_in_views(views),
-            fuzzy.OR(
-                self._view_quality_score(views),
-                self._frame_depth_score(views),
-                self._frame_types_score(views),
-            ),
+        if views.is_empty():
+            return 0
+        proportion_of_input = self._proportion_of_input_in_views(views)
+        number_of_frames = sum(len(view.frames) for view in views)
+        view_quality = statistics.fmean([view.quality for view in views])
+        return sum(
+            [
+                self.INPUT_WEIGHT * proportion_of_input,
+                self.VIEW_WEIGHT * view_quality,
+                self.FRAMES_WEIGHT * 1 / number_of_frames,
+            ]
         )
+
+    #        return fuzzy.AND(
+    #            self._proportion_of_input_in_views(views),
+    #            fuzzy.OR(
+    #                self._view_quality_score(views),
+    #                self._frame_depth_score(views),
+    #                self._frame_types_score(views),
+    #            ),
+    #        )
 
     def _view_quality_score(self, views: StructureCollection) -> FloatBetweenOneAndZero:
         if views.is_empty():

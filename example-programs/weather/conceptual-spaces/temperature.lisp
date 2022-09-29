@@ -86,3 +86,16 @@
   (def-letter-chunk :name "extreme" :parent_space extremeness-space
     :locations (list (Location (list (list 10)) extremeness-space))))
 (def-relation :start extreme-concept :end extreme-word :parent_concept jj-concept)
+
+(define same-temperature-concept (def-concept :name "same-temperature"))
+(def-relation :start same-concept :end same-temperature-concept
+  :parent_concept temperature-concept)
+(define different-temperature-concept (def-concept :name "different-temperature"))
+(def-relation :start different-concept :end different-temperature-concept
+  :parent_concept temperature-concept)
+(define more-temperature-concept (def-concept :name "more-temperature"))
+(def-relation :start more-concept :end more-temperature-concept
+  :parent_concept temperature-concept)
+(define less-temperature-concept (def-concept :name "less-temperature"))
+(def-relation :start less-concept :end less-temperature-concept
+  :parent_concept temperature-concept)

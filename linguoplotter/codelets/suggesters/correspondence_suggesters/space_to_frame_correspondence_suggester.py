@@ -4,6 +4,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection_keys import (
     activation,
+    corresponding_exigency,
     exigency,
     uncorrespondedness,
 )
@@ -144,7 +145,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 elif arg.is_link:
                     input_links.add(arg)
             input_links.remove(link)
-        input_quality = min([chunk.quality for chunk in input_chunks])
+        input_quality = (
+            min([chunk.quality for chunk in input_chunks])
+            * self.target_structure_one.quality
+        )
         self.confidence = (
             self.parent_concept.classifier.classify(
                 concept=self.parent_concept,
@@ -167,3 +171,229 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
         except MissingStructureError:
             pass
+
+    @staticmethod
+    def _get_target_structure_one(calling_codelet, correspondence_suggester):
+        source_collection = correspondence_suggester.target_space_one.contents
+        if (
+            correspondence_suggester.target_structure_two.is_label
+            and correspondence_suggester.target_structure_two.start.is_label
+        ):
+            return CorrespondenceSuggester._get_target_structure_one_labeled_label(
+                calling_codelet, correspondence_suggester, source_collection
+            )
+        if (
+            correspondence_suggester.target_structure_two.is_link
+            and correspondence_suggester.target_structure_two.is_node
+        ):
+            correspondence_suggester.target_structure_one = source_collection.filter(
+                lambda x: x.has_location_in_space(
+                    correspondence_suggester.target_conceptual_space
+                )
+            ).get(key=corresponding_exigency)
+        if (
+            correspondence_suggester.target_structure_two.is_link
+            and not correspondence_suggester.target_structure_two.is_node
+        ):
+            if (
+                correspondence_suggester.target_structure_two.start
+                in correspondence_suggester.target_view.grouped_nodes
+            ):
+                start_node_group = [
+                    group
+                    for group in correspondence_suggester.target_view.node_groups
+                    if correspondence_suggester.target_structure_two.start
+                    in group.values()
+                ][0]
+                try:
+                    structure_one_start = start_node_group[
+                        correspondence_suggester.target_space_one
+                    ]
+                    calling_codelet.bubble_chamber.loggers["activity"].log(
+                        calling_codelet,
+                        f"Found structure one start: {structure_one_start}",
+                    )
+                except KeyError:
+                    calling_codelet.bubble_chamber.loggers["activity"].log(
+                        calling_codelet,
+                        f"Start node group has no member in target space one",
+                    )
+                    structure_one_start = None
+            else:
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet, f"Structure two start not in grouped nodes"
+                )
+                structure_one_start = None
+        if correspondence_suggester.target_structure_two.is_label:
+            if not correspondence_suggester.target_structure_two.start.correspondences.where(
+                parent_view=correspondence_suggester.target_view,
+                end=correspondence_suggester.target_structure_two.start,
+            ).is_empty():
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet,
+                    "Searching for target structure one via correspondences",
+                )
+                correspondence_suggester.target_structure_one = (
+                    correspondence_suggester.target_structure_two.start.correspondences.where(
+                        parent_view=correspondence_suggester.target_view,
+                        end=correspondence_suggester.target_structure_two.start,
+                    )
+                    .get()
+                    .start.labels.filter(
+                        lambda x: x.parent_concept
+                        in correspondence_suggester.target_conceptual_space.contents
+                    )
+                    .get()
+                )
+            else:
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet,
+                    "Searching for target structure one via source collection",
+                )
+                correspondence_suggester.target_structure_one = source_collection.filter(
+                    lambda x: x.is_label
+                    and (
+                        (x.start == structure_one_start)
+                        or (structure_one_start is None)
+                    )
+                    and x.start.quality > 0
+                    and x.quality > 0
+                    and x.has_location_in_space(
+                        correspondence_suggester.target_conceptual_space
+                    )
+                    and any(
+                        [
+                            x.parent_concept
+                            == correspondence_suggester.target_structure_two.parent_concept,
+                            x.parent_concept.is_slot,
+                            correspondence_suggester.target_structure_two.parent_concept.is_slot,
+                        ]
+                    )
+                ).get(
+                    key=corresponding_exigency
+                )
+        if correspondence_suggester.target_structure_two.is_relation:
+            if (
+                correspondence_suggester.target_structure_two.end
+                in correspondence_suggester.target_view.grouped_nodes
+            ):
+                end_node_group = [
+                    group
+                    for group in correspondence_suggester.target_view.node_groups
+                    if correspondence_suggester.target_structure_two.end
+                    in group.values()
+                ][0]
+                try:
+                    structure_one_end = end_node_group[
+                        correspondence_suggester.target_space_one
+                    ]
+                    calling_codelet.bubble_chamber.loggers["activity"].log(
+                        calling_codelet, f"Found structure one end: {structure_one_end}"
+                    )
+                except KeyError:
+                    calling_codelet.bubble_chamber.loggers["activity"].log(
+                        calling_codelet,
+                        f"End node group has no member in target space one",
+                    )
+                    structure_one_end = None
+            else:
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet, f"Structure two end not in grouped nodes"
+                )
+                structure_one_end = None
+            calling_codelet.bubble_chamber.loggers["activity"].log_collection(
+                calling_codelet,
+                source_collection.filter(lambda x: x.is_relation),
+                "input relations",
+            )
+            calling_codelet.bubble_chamber.loggers["activity"].log(
+                calling_codelet, correspondence_suggester.target_conceptual_space
+            )
+            matching_relations = source_collection.filter(
+                lambda x: x.is_relation
+                and x.quality > 0
+                and (x.start == structure_one_start or structure_one_start is None)
+                and (x.start.quality > 0)
+                and (x.end == structure_one_end or structure_one_end is None)
+                and (x.end.quality > 0)
+                and (
+                    x.parent_concept
+                    == correspondence_suggester.target_structure_two.parent_concept
+                    or correspondence_suggester.target_structure_two.parent_concept.is_slot
+                )
+                and (
+                    x.parent_concept.parent_space
+                    == correspondence_suggester.target_structure_two.parent_concept.parent_space
+                )
+                and x.conceptual_space
+                == correspondence_suggester.target_conceptual_space
+            )
+            calling_codelet.bubble_chamber.loggers["activity"].log_collection(
+                calling_codelet,
+                matching_relations,
+                "matching input relations",
+            )
+            correspondence_suggester.target_structure_one = matching_relations.get(
+                key=corresponding_exigency
+            )
+        if (
+            correspondence_suggester.target_structure_two.is_node
+            and not correspondence_suggester.target_structure_two.is_link
+        ):
+            if (
+                correspondence_suggester.target_structure_two
+                in correspondence_suggester.target_view.grouped_nodes
+            ):
+                node_group = [
+                    group
+                    for group in correspondence_suggester.target_view.node_groups
+                    if correspondence_suggester.target_structure_two in group.values()
+                ][0]
+                calling_codelet.bubble_chamber.loggers["activity"].log_dict(
+                    calling_codelet,
+                    node_group,
+                    "Target structure two node group",
+                )
+                if correspondence_suggester.target_space_one in node_group:
+                    correspondence_suggester.target_structure_one = node_group[
+                        correspondence_suggester.target_space_one
+                    ]
+                else:
+                    for (
+                        input_space
+                    ) in correspondence_suggester.target_view.input_spaces:
+                        if input_space in node_group:
+                            target_structure_zero = node_group[input_space]
+                            correspondence_suggester.target_structure_one = (
+                                target_structure_zero.correspondences_to_space(
+                                    correspondence_suggester.target_space_one
+                                )
+                                .get()
+                                .end
+                            )
+                            break
+                    if correspondence_suggester.target_structure_one is None:
+                        raise MissingStructureError
+            else:
+                calling_codelet.bubble_chamber.loggers["activity"].log(
+                    calling_codelet, "Target structure two not in node group"
+                )
+                correspondence_suggester.target_structure_one = (
+                    source_collection.filter(
+                        lambda x: type(x)
+                        == type(correspondence_suggester.target_structure_two)
+                        and (not x.is_slot or not x.correspondences.is_empty())
+                        and (
+                            x.has_location_in_space(
+                                correspondence_suggester.target_conceptual_space
+                            )
+                            if correspondence_suggester.target_conceptual_space
+                            is not None
+                            else True
+                        )
+                    ).get(key=corresponding_exigency)
+                )
+        calling_codelet.bubble_chamber.loggers["activity"].log(
+            calling_codelet,
+            f"Found target structure one: {correspondence_suggester.target_structure_one}",
+        )

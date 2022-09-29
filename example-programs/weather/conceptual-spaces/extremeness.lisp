@@ -16,3 +16,16 @@ lambda location: [[abs(c[0]-13)] for c in location.coordinates]
 
 (define extreme-word (def-letter-chunk :name "extreme" :locations (list)))
 (def-relation :start extreme-concept :end extreme-word :parent_concept jj-concept)
+
+(define same-extremeness-concept (def-concept :name "same-extremeness"))
+(def-relation :start same-concept :end same-extremeness-concept
+  :parent_concept extremeness-concept)
+(define different-extremeness-concept (def-concept :name "different-extremeness"))
+(def-relation :start different-concept :end different-extremeness-concept
+  :parent_concept extremeness-concept)
+(define more-extremeness-concept (def-concept :name "more-extremeness"))
+(def-relation :start more-concept :end more-extremeness-concept
+  :parent_concept extremeness-concept)
+(define less-extremeness-concept (def-concept :name "less-extremeness"))
+(def-relation :start less-concept :end less-extremeness-concept
+  :parent_concept extremeness-concept)

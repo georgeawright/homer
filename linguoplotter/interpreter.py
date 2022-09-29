@@ -9,6 +9,7 @@ from .tools import (
     centroid_euclidean_distance,
     shortest_distance,
     area_euclidean_distance,
+    size_euclidean_distance,
 )
 
 # strings can't contain spaces. '~' is used to represent a space
@@ -28,6 +29,8 @@ class Interpreter:
             # Classifier Types
             "DifferenceClassifier": classifiers.DifferenceClassifier,
             "DifferentnessClassifier": classifiers.DifferentnessClassifier,
+            "EverywhereClassifier": classifiers.EverywhereClassifier,
+            "MostOfTheCountryClassifier": classifiers.MostOfTheCountryClassifier,
             "ProximityClassifier": classifiers.ProximityClassifier,
             "SamenessClassifier": classifiers.SamenessClassifier,
             # Distance Functions
@@ -35,6 +38,7 @@ class Interpreter:
             "centroid_euclidean_distance": centroid_euclidean_distance,
             "shortest_distance": shortest_distance,
             "area_euclidean_distance": area_euclidean_distance,
+            "size_euclidean_distance": size_euclidean_distance,
             # Structure Factory Methods
             "def-conceptual-space": bubble_chamber.new_conceptual_space,
             "def-contextual-space": bubble_chamber.new_contextual_space,

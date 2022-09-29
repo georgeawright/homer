@@ -198,6 +198,10 @@
 		     (Location (list) increase-sentence-output))))
 
 (def-relation :start pp-inessive-location-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 0.4)
 (def-relation :start pp-directional-time-concept :end increase-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 0.4)
+(def-relation :start more-temperature-concept :end increase-sentence
+  :is_bidirectional True :stable_activation 0.4)
+(def-relation :start less-temperature-concept :end increase-sentence
+  :is_bidirectional True :stable_activation 0.4)

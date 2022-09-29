@@ -1,3 +1,5 @@
+import math
+
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -120,7 +122,8 @@ class Suggester(Codelet):
                 self.codelet_id,
                 self.bubble_chamber,
                 self.targets_dict,
-                self.confidence,
+                1 / (1 + math.e ** -(10 * self.confidence - 5)),
+                # TODO: this should be a hyper-parameter
             )
         )
 

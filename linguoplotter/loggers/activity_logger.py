@@ -9,11 +9,15 @@ class ActivityLogger(Logger):
         satisfaction_stream=None,
         coderack_population_stream=None,
         view_count_stream=None,
+        codelet_spawned_stream=None,
+        codelet_run_stream=None,
     ):
         self.log_file_name = log_file_name
         self.satisfaction_stream = satisfaction_stream
         self.coderack_population_stream = coderack_population_stream
         self.view_count_stream = view_count_stream
+        self.codelet_spawned_stream = codelet_spawned_stream
+        self.codelet_run_stream = codelet_run_stream
         self._stream = None
         self.previous_codelet_id = None
         self.codelets_run = 0
@@ -90,6 +94,18 @@ class ActivityLogger(Logger):
         if CodeletResult.FIZZLE == codelet.result:
             self.log(codelet, "Result: FIZZLE")
         self.log(codelet, "-" * self.LINE_WIDTH)
+
+    def log_codelet_spawned(self, codelet: "Codelet"):
+        if self.codelet_spawned_stream is not None:
+            self.codelet_spawned_stream.write(
+                f"{self.codelets_run},{codelet.codelet_id},{codelet.urgency}\n"
+            )
+
+    def log_codelet_run(self, codelet: "Codelet"):
+        if self.codelet_run_stream is not None:
+            self.codelet_run_stream.write(
+                f"{self.codelets_run},{codelet.codelet_id},{codelet.urgency}\n"
+            )
 
     def log_targets_dict(self, codelet: "Codelet"):
         self.log_dict(codelet, codelet.targets_dict, "Target structures")

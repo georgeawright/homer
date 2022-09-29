@@ -91,8 +91,16 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
     :locations (list (Location
 		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
 		      location-space))
-    :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space location-space :distance_function area_euclidean_distance
+    :classifier (EverywhereClassifier) :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function size_euclidean_distance
+    :distance_to_proximity_weight location-dist-to-prox-weight))
+(define nearly-everywhere-concept
+  (def-concept :name "nearly-everywhere"
+    :locations (list (Location
+		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
+		      location-space))
+    :classifier (MostOfTheCountryClassifier) :instance_type Chunk :structure_type Label
+    :parent_space location-space :distance_function size_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 
 (def-relation :start north-concept :end more-concept
@@ -186,6 +194,14 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
 		      location-space))))
 (def-relation :start everywhere-concept :end country-word :parent_concept nn-concept)
+(define majority-of-the-country-word
+  (def-letter-chunk :name """majority of the country""" :parent_space location-space
+    :locations (list (Location (list) grammar-space)
+		     (Location
+		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
+		      location-space))))
+(def-relation :start nearly-everywhere-concept :end majority-of-the-country-word
+  :parent_concept nn-concept)
 
 (def-relation :start north-concept :end south-concept
   :parent_concept more-concept :quality 1.0)
@@ -213,3 +229,16 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 (def-relation :start southwest-concept :end west-concept :is_excitatory False :quality 1.0)
 (def-relation :start southeast-concept :end south-concept :is_excitatory False :quality 1.0)
 (def-relation :start southeast-concept :end east-concept :is_excitatory False :quality 1.0)
+
+(define same-location-concept (def-concept :name "same-location"))
+(def-relation :start same-concept :end same-location-concept
+  :parent_concept location-concept)
+(define different-location-concept (def-concept :name "different-location"))
+(def-relation :start different-concept :end different-location-concept
+  :parent_concept location-concept)
+(define more-location-concept (def-concept :name "more-location"))
+(def-relation :start more-concept :end more-location-concept
+  :parent_concept location-concept)
+(define less-location-concept (def-concept :name "less-location"))
+(def-relation :start less-concept :end less-location-concept
+  :parent_concept location-concept)

@@ -52,13 +52,6 @@ class Linguoplotter:
         while self.bubble_chamber.result is None:
             try:
                 if self.coderack.codelets_run % self.activation_update_frequency == 0:
-                    self.bubble_chamber.loggers["structure"].log_concepts_and_frames(
-                        self.bubble_chamber, self.coderack
-                    )
-                    for input_space in self.bubble_chamber.input_spaces:
-                        self.bubble_chamber.loggers["structure"].log_contextual_space(
-                            input_space, self.coderack
-                        )
                     if not HyperParameters.TESTING:
                         self.print_status_update()
                     self.bubble_chamber.spread_activations()
@@ -75,7 +68,7 @@ class Linguoplotter:
         return {
             "random_seed": self.bubble_chamber.random_machine.seed,
             "result": self.bubble_chamber.result,
-            "satisfaction": self.bubble_chamber.satisfaction,
+            "satisfaction": self.bubble_chamber.worldview.satisfaction,
             "codelets_run": self.coderack.codelets_run,
         }
 
@@ -121,6 +114,8 @@ class Linguoplotter:
         main_input = self.bubble_chamber.spaces.where(is_main_input=True).get()
         for chunk in main_input.contents.where(is_chunk=True, quality=1, activation=1):
             print(chunk, chunk.quality, chunk.activation)
+            print(chunk.champion_labels)
+            print(chunk.champion_relations)
             for label in chunk.labels:
                 print(label, label.quality, label.activation)
             for relation in chunk.relations:

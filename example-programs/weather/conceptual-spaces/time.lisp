@@ -44,3 +44,16 @@
     :locations (list (Location (list (list 0) (list 24) (list 48)) time-space))))
 (def-relation
   :start always-concept :end throughout-the-weekend-phrase :parent_concept pp-concept)
+
+(define same-time-concept (def-concept :name "same-time"))
+(def-relation :start same-concept :end same-time-concept
+  :parent_concept time-concept)
+(define different-time-concept (def-concept :name "different-time"))
+(def-relation :start different-concept :end different-time-concept
+  :parent_concept time-concept)
+(define more-time-concept (def-concept :name "more-time"))
+(def-relation :start more-concept :end more-time-concept
+  :parent_concept time-concept)
+(define less-time-concept (def-concept :name "less-time"))
+(def-relation :start less-concept :end less-time-concept
+  :parent_concept time-concept)

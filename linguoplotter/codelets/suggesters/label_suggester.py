@@ -112,12 +112,15 @@ class LabelSuggester(Suggester):
             except MissingStructureError:
                 return False
             try:
-                self.parent_concept = (
-                    conceptual_space.contents.where(
-                        is_concept=True, structure_type=Label, is_slot=False
+                self.parent_concept = conceptual_space.contents.where(
+                    is_concept=True, structure_type=Label, is_slot=False
+                ).get(
+                    key=lambda x: x.distance_function(
+                        x.location_in_space(conceptual_space).coordinates,
+                        self.target_node.location_in_space(
+                            conceptual_space
+                        ).coordinates,
                     )
-                    .near(location)
-                    .get()
                 )
                 self.bubble_chamber.loggers["activity"].log(
                     self, f"Found parent concept: {self.parent_concept}"
@@ -129,7 +132,14 @@ class LabelSuggester(Suggester):
                             is_concept=True, structure_type=Label
                         )
                         .where_not(classifier=None)
-                        .get()
+                        .get(
+                            key=lambda x: x.distance_function(
+                                x.location_in_space(conceptual_space).coordinates,
+                                self.target_node.location_in_space(
+                                    conceptual_space
+                                ).coordinates,
+                            )
+                        )
                     )
                     self.bubble_chamber.loggers["activity"].log(
                         self, f"Found parent concept: {self.parent_concept}"

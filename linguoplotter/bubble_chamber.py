@@ -29,6 +29,10 @@ from .worldview import Worldview
 class BubbleChamber:
     JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
 
+    MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
+    VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_VIEW_QUALITIES_WEIGHT
+    WORLDVIEW_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WORLDVIEW_WEIGHT
+
     def __init__(self, focus, recycle_bin):
         self.loggers = {}
         self.random_machine = None
@@ -191,13 +195,32 @@ class BubbleChamber:
             self.satisfaction = self.general_satisfaction
 
     def recalculate_general_satisfaction(self):
-        spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
-        self.general_satisfaction = statistics.fmean(
+        # small number of top-level chunks
+        # links in a large proportion of conceptual spaces with high quality and activation
+        # empty space has zero quality
+        # av(link.q*link.a) / sum(unchunked.q*unchunked.a)
+
+        main_input_space = self.contextual_spaces.where(is_main_input=True).get()
+        average_view_quality = (
+            statistics.fmean([view.quality for view in self.views])
+            if not self.views.is_empty()
+            else 0
+        )
+        self.general_satisfaction = sum(
             [
-                statistics.fmean([space.quality for space in spaces]),
-                self.worldview.satisfaction,
+                self.MAIN_INPUT_WEIGHT * main_input_space.quality,
+                self.VIEWS_WEIGHT * average_view_quality,
+                self.WORLDVIEW_WEIGHT * self.worldview.satisfaction,
             ]
         )
+
+        # spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
+        # self.general_satisfaction = statistics.fmean(
+        #    [
+        #        statistics.fmean([space.quality for space in spaces]),
+        #        self.worldview.satisfaction,
+        #    ]
+        # )
 
     def spread_activations(self):
         for structure in self.structures:
@@ -289,7 +312,7 @@ class BubbleChamber:
                 sub_chunk.super_chunks.remove(item)
                 sub_chunk.recalculate_exigency()
             for super_chunk in item.super_chunks:
-                super_chunk.super_chunks.remove(item)
+                super_chunk.sub_chunks.remove(item)
             for link in item.links:
                 self.remove(link)
         for space in item.parent_spaces:
@@ -717,6 +740,7 @@ class BubbleChamber:
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         activation: FloatBetweenOneAndZero = None,
+        stable_activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
         parent_space = start.parent_space if parent_space is None else parent_space
         locations = [] if locations is None else locations
@@ -739,11 +763,14 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_bidirectional=is_bidirectional,
             is_excitatory=is_excitatory,
+            is_stable=stable_activation is not None,
             champion_labels=self.new_structure_collection(),
             champion_relations=self.new_structure_collection(),
         )
         if activation is not None:
             relation._activation = activation
+        if stable_activation is not None:
+            relation._activation = stable_activation
         start.links_out.add(relation)
         end.links_in.add(relation)
         start.recalculate_exigency()

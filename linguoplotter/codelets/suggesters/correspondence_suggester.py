@@ -60,7 +60,7 @@ class CorrespondenceSuggester(Suggester):
 
         target_view = bubble_chamber.focus.view if target_view is None else target_view
         if target_view is None:
-            raise MissingStructureError
+            target_view = bubble_chamber.views.filter(lambda x: x.unhappiness > 0).get()
         input_structures = target_view.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
             and len(x.correspondences.where(end=x))

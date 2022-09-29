@@ -1,4 +1,6 @@
 from .difference_classifier import DifferenceClassifier
 from .differentness_classifier import DifferentnessClassifier
+from .everywhere_classifier import EverywhereClassifier
+from .most_of_the_country_classifier import MostOfTheCountryClassifier
 from .proximity_classifier import ProximityClassifier
 from .sameness_classifier import SamenessClassifier

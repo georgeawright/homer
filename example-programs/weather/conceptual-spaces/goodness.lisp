@@ -39,3 +39,16 @@ lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
     :locations (list (Location (list (list 0)) goodness-space))))
 (def-relation :start bad-concept :end worse-word :parent_concept jjr-concept)
 (def-relation :start worse-word :end null :parent_concept jjr-concept)
+
+(define same-goodness-concept (def-concept :name "same-goodness"))
+(def-relation :start same-concept :end same-goodness-concept
+  :parent_concept goodness-concept)
+(define different-goodness-concept (def-concept :name "different-goodness"))
+(def-relation :start different-concept :end different-goodness-concept
+  :parent_concept goodness-concept)
+(define more-goodness-concept (def-concept :name "more-goodness"))
+(def-relation :start more-concept :end more-goodness-concept
+  :parent_concept goodness-concept)
+(define less-goodness-concept (def-concept :name "less-goodness"))
+(def-relation :start less-concept :end less-goodness-concept
+  :parent_concept goodness-concept)

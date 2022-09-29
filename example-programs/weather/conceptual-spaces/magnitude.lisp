@@ -43,3 +43,15 @@
     :locations (list (Location (list (list -2)) magnitude-space))))
 (def-relation :start bit-concept :end bit-word :parent_concept rb-concept)
 
+(define same-magnitude-concept (def-concept :name "same-magnitude"))
+(def-relation :start same-concept :end same-magnitude-concept
+  :parent_concept magnitude-concept)
+(define different-magnitude-concept (def-concept :name "different-magnitude"))
+(def-relation :start different-concept :end different-magnitude-concept
+  :parent_concept magnitude-concept)
+(define more-magnitude-concept (def-concept :name "more-magnitude"))
+(def-relation :start more-concept :end more-magnitude-concept
+  :parent_concept magnitude-concept)
+(define less-magnitude-concept (def-concept :name "less-magnitude"))
+(def-relation :start less-concept :end less-magnitude-concept
+  :parent_concept magnitude-concept)

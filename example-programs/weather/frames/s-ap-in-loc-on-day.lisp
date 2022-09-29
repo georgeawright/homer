@@ -204,14 +204,14 @@
 		     (Location (list) descriptive-sentence-output))))
 
 (def-relation :start label-concept :end descriptive-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start chunk-concept :end descriptive-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start letter-chunk-concept :end descriptive-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start nn-concept :end descriptive-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start jj-concept :end descriptive-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)
 (def-relation :start sentence-concept :end descriptive-sentence
-  :is_bidirectional True :activation 1.0)
+  :is_bidirectional True :stable_activation 1.0)

@@ -73,19 +73,13 @@ class Link(Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a
 
     def spread_activation(self):
-        if not self.is_fully_active():
-            return
         if (
-            self.start.parent_space is None
-            or self.start.parent_space.is_conceptual_space
+            not self.is_fully_active()
+            or self.parent_space is None
+            or self.parent_space.is_conceptual_space
         ):
             return
-        if self.parent_concept is not None:
-            self.parent_concept.boost_activation(self.quality)
-        for argument in self.arguments.filter(
-            lambda x: x.parent_space is not None and x.parent_space.is_contextual_space
-        ):
-            argument.boost_activation(self.quality)
+        self.parent_concept.boost_activation(self.quality)
 
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name

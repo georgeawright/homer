@@ -4,7 +4,6 @@ from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import exigency
 
 
@@ -51,22 +50,6 @@ class FocusSetter(Codelet):
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
             )
-            self.bubble_chamber.refresh_concept_activations()
-            target_view._activation = 1.0
-            for frame in target_view.frames:
-                frame._activation = 1.0
-                frame.progenitor._activation = 1.0
-                for concept in frame.concepts:
-                    if concept.is_filled_in:
-                        concept.non_slot_value._activation = 1.0
-            for member in target_view.members:
-                member._activation = 1.0
-                for arg in member.arguments:
-                    arg._activation = 1.0
-            for view in StructureCollection.union(
-                target_view.sub_views, target_view.super_views
-            ):
-                view._activation = 1.0
             self._update_codelet_urgencies()
             self._engender_follow_up()
             self.result = CodeletResult.FINISH

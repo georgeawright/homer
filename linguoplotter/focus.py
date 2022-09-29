@@ -44,47 +44,7 @@ class Focus:
         if self.view is None:
             self.satisfaction = 0
         else:
-            average_correspondence_quality = (
-                statistics.fmean(
-                    [
-                        member.quality
-                        for member in self.view.members
-                        if member.start.parent_space.is_main_input
-                    ]
-                )
-                if len(
-                    self.view.members.filter(
-                        lambda x: x.start.parent_space.is_main_input
-                    )
-                )
-                > 0
-                else 0
-            )
-            frame = self.view.parent_frame
-            proportion_of_frame_output_items_projected = sum(
-                1
-                for item in frame.output_space.contents.where(is_correspondence=False)
-                if item.has_correspondence_to_space(self.view.output_space)
-            ) / sum(
-                1 for item in frame.output_space.contents.where(is_correspondence=False)
-            )
-            try:
-                input_chunks_quality = min(
-                    [
-                        chunk.quality
-                        for chunk in self.view.grouped_nodes
-                        if chunk.parent_space in self.view.input_spaces
-                    ]
-                )
-            except ValueError:
-                input_chunks_quality = 1
-            self.satisfaction = (
-                fuzzy.AND(
-                    average_correspondence_quality,
-                    proportion_of_frame_output_items_projected,
-                )
-                * input_chunks_quality
-            )
+            self.satisfaction = self.view.calculate_quality()
             self.view.quality = self.satisfaction
 
     def change_view(self, view: View):

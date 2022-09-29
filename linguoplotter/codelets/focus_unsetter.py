@@ -43,6 +43,7 @@ class FocusUnsetter(Codelet):
         )
 
     def run(self) -> CodeletResult:
+        self.bubble_chamber.focus.recalculate_satisfaction()
         self.bubble_chamber.loggers["activity"].log(
             self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
         )
@@ -71,12 +72,7 @@ class FocusUnsetter(Codelet):
             self._update_worldview_porter_urgency()
             self._update_bottom_up_factories_urgencies()
         else:
-            probability_of_unsetting_focus = statistics.fmean(
-                [
-                    current_satisfaction_score,
-                    transposed_change_in_satisfaction_score,
-                ]
-            )
+            probability_of_unsetting_focus = transposed_change_in_satisfaction_score
         self.bubble_chamber.loggers["activity"].log(
             self, f"Probability of unsetting focus: {probability_of_unsetting_focus}"
         )
