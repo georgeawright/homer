@@ -8,7 +8,7 @@ pwd = os.getcwd()
 
 results = []
 
-for i in range(5):
+for i in range(1):
     time_string = str(time.time())
     logs_dir_path = f"{pwd}/logs/{time_string}"
     os.mkdir(logs_dir_path)
