@@ -46,7 +46,7 @@ class WorldviewPorter(Codelet):
 
     def run(self) -> CodeletResult:
         try:
-            self.target_view = self.bubble_chamber.production_views.filter(
+            self.target_view = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
                 and x.parent_frame.parent_concept.name == "sentence"
                 and x not in self.bubble_chamber.worldview.views

@@ -23,7 +23,7 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=exigency)
         target_space_two_candidates = bubble_chamber.new_structure_collection()
         for frame in target_view.matched_sub_frames.keys():
             target_space_two_candidates.add(frame.input_space)

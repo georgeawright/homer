@@ -5,7 +5,7 @@ from linguoplotter.codelets.suggesters import (
     LabelSuggester,
     RelationSuggester,
 )
-from linguoplotter.codelets.suggesters.view_suggesters import SimplexViewSuggester
+from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
 
 
@@ -41,7 +41,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             (LabelSuggester, proportion_of_unlabeled_chunks),
             (RelationSuggester, proportion_of_unrelated_chunks),
             (CorrespondenceSuggester, proportion_of_unfilled_slots),
-            (SimplexViewSuggester, proportion_of_uncorresponded_links),
+            (ViewSuggester, proportion_of_uncorresponded_links),
         ]
         follow_up_classes.sort(key=lambda x: x[1], reverse=True)
         follow_up_class = follow_up_classes[0][0]

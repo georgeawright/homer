@@ -71,6 +71,7 @@ class Factory(Codelet):
             ChunkSuggester,
             LabelSuggester,
             RelationSuggester,
+            ViewSuggester,
         )
         from linguoplotter.codelets.suggesters.correspondence_suggesters import (
             SpaceToFrameCorrespondenceSuggester,
@@ -83,25 +84,18 @@ class Factory(Codelet):
             RelationProjectionSuggester,
             LetterChunkProjectionSuggester,
         )
-        from linguoplotter.codelets.suggesters.view_suggesters import (
-            MonitoringViewSuggester,
-            SimplexViewSuggester,
-        )
         from linguoplotter.codelets.evaluators import (
             ChunkEvaluator,
             CorrespondenceEvaluator,
             LabelEvaluator,
             RelationEvaluator,
+            ViewEvaluator,
         )
         from linguoplotter.codelets.evaluators.projection_evaluators import (
             ChunkProjectionEvaluator,
             LabelProjectionEvaluator,
             RelationProjectionEvaluator,
             LetterChunkProjectionEvaluator,
-        )
-        from linguoplotter.codelets.evaluators.view_evaluators import (
-            MonitoringViewEvaluator,
-            SimplexViewEvaluator,
         )
 
         return {
@@ -112,8 +106,7 @@ class Factory(Codelet):
                         "correspondence": SpaceToFrameCorrespondenceSuggester,
                         "label": LabelSuggester,
                         "relation": RelationSuggester,
-                        "view-monitoring": MonitoringViewSuggester,
-                        "view-simplex": SimplexViewSuggester,
+                        "view": ViewSuggester,
                     },
                 },
                 "outer": {
@@ -133,8 +126,7 @@ class Factory(Codelet):
                         "correspondence": CorrespondenceEvaluator,
                         "label": LabelEvaluator,
                         "relation": RelationEvaluator,
-                        "view-monitoring": MonitoringViewEvaluator,
-                        "view-simplex": SimplexViewEvaluator,
+                        "view": ViewEvaluator,
                     },
                 },
                 "outer": {
@@ -167,8 +159,7 @@ class Factory(Codelet):
         chunk = self.bubble_chamber.concepts["chunk"]
         label = self.bubble_chamber.concepts["label"]
         relation = self.bubble_chamber.concepts["relation"]
-        view_monitoring = self.bubble_chamber.concepts["view-monitoring"]
-        view_simplex = self.bubble_chamber.concepts["view-simplex"]
+        view = self.bubble_chamber.concepts["view"]
         letter_chunk = self.bubble_chamber.concepts["letter-chunk"]
 
         nsc = lambda *x: self.bubble_chamber.new_structure_collection(*x)
@@ -184,7 +175,7 @@ class Factory(Codelet):
                 "actions": nsc(suggest),
                 "spaces": nsc(inner),
                 "directions": nsc(forward),
-                "structures": nsc(view_monitoring, view_simplex),
+                "structures": nsc(view),
             },
             "outer": {
                 "actions": nsc(suggest),

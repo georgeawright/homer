@@ -15,7 +15,7 @@ class CorrespondenceEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["correspondence"]
-        view = bubble_chamber.production_views.get(key=activation)
+        view = bubble_chamber.views.get(key=activation)
         target = view.members.where(start_space=view.raw_input_space).get(
             key=lambda x: abs(x.activation - x.quality)
         )

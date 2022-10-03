@@ -20,7 +20,6 @@ from .structures.links import Correspondence, Label, Relation
 from .structures.nodes import Chunk, Concept
 from .structures.nodes.chunks import LetterChunk
 from .structures.spaces import ConceptualSpace, ContextualSpace
-from .structures.views import SimplexView, MonitoringView
 from .worldview import Worldview
 
 # TODO: new_structure methods should accept activation as arg with rand as default
@@ -100,14 +99,14 @@ class BubbleChamber:
     @property
     def input_spaces(self) -> StructureCollection:
         return StructureCollection.union(
-            *[view.input_spaces for view in self.production_views],
+            *[view.input_spaces for view in self.views],
             self.contextual_spaces.where(is_main_input=True),
         )
 
     @property
     def output_spaces(self) -> StructureCollection:
         return self.new_structure_collection(
-            *[view.output_space for view in self.production_views]
+            *[view.output_space for view in self.views]
         )
 
     @property
@@ -121,26 +120,6 @@ class BubbleChamber:
         return StructureCollection.union(
             *[space.contents.where(is_labellable=True) for space in self.input_spaces]
         )
-
-    @property
-    def comprehension_views(self) -> StructureCollection:
-        return self.monitoring_views
-
-    @property
-    def production_views(self) -> StructureCollection:
-        return StructureCollection.union(self.simplex_views)
-
-    @property
-    def monitoring_views(self) -> StructureCollection:
-        return self.views.where(is_monitoring_view=True)
-
-    @property
-    def discourse_views(self) -> StructureCollection:
-        return self.views.where(is_discourse_view=True)
-
-    @property
-    def simplex_views(self) -> StructureCollection:
-        return self.views.where(is_simplex_view=True)
 
     @property
     def size_of_raw_input(self) -> int:
@@ -171,7 +150,7 @@ class BubbleChamber:
     def collections(self) -> dict:
         return {
             # views
-            SimplexView: "views",
+            View: "views",
             # spaces
             ConceptualSpace: "conceptual_spaces",
             ContextualSpace: "contextual_spaces",
@@ -780,8 +759,5 @@ class BubbleChamber:
         self.loggers["structure"].log(end)
         return relation
 
-    def new_simplex_view(self) -> SimplexView:
-        raise NotImplementedError
-
-    def new_monitoring_view(self) -> MonitoringView:
+    def new_view(self) -> View:
         raise NotImplementedError

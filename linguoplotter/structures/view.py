@@ -95,11 +95,39 @@ class View(Structure):
             "unhappiness": self.unhappiness,
         }
 
+    @classmethod
+    def get_builder_class(cls):
+        from linguoplotter.codelets.builders import ViewBuilder
+
+        return ViewBuilder
+
+    @classmethod
+    def get_evaluator_class(cls):
+        from linguoplotter.codelets.evaluators import ViewEvaluator
+
+        return ViewEvaluator
+
+    @classmethod
+    def get_selector_class(cls):
+        from linguoplotter.codelets.selectors import ViewSelector
+
+        return ViewSelector
+
     @property
     def raw_input_space(self) -> Space:
         return self.input_spaces.filter(
             lambda x: x.parent_concept.name == "input"
         ).get()
+
+    # TODO: this should be a property
+    def raw_input_nodes(self):
+        return StructureCollection.union(
+            *[
+                node.raw_members
+                for node in self.grouped_nodes
+                if node.parent_space in self.input_spaces
+            ]
+        )
 
     @property
     def input_contextual_spaces(self):
@@ -233,6 +261,30 @@ class View(Structure):
                 self.INPUT_WEIGHT * input_quality,
             ]
         )
+
+    def input_overlap_with(self, other: View):
+        shared_raw_nodes = StructureCollection.intersection(
+            self.raw_input_nodes, other.raw_input_nodes
+        )
+        proportion_in_self = len(shared_raw_nodes) / len(self.raw_input_nodes)
+        proportion_in_other = len(shared_raw_nodes) / len(other.raw_input_nodes)
+        return statistics.fmean([proportion_in_self, proportion_in_other])
+
+    def nearby(self, space: Space = None) -> StructureCollection:
+        space = space if space is not None else self.location.space
+        return (
+            space.contents.where(is_view=True)
+            .filter(lambda x: self.input_overlap_with(x) > 0.5)
+            .excluding(self)
+        )
+
+    def decay_activation(self, amount: float = None):
+        if amount is None:
+            amount = self.MINIMUM_ACTIVATION_UPDATE
+        self._activation_buffer -= self._activation_update_coefficient * amount
+        for member in self.members:
+            member.decay_activation(amount)
+        self.output_space.decay_activation(amount)
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

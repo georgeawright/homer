@@ -2,10 +2,8 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import CorrespondenceSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import (
-    activation,
     exigency,
     uncorrespondedness,
 )
@@ -28,7 +26,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=exigency)
         non_matched_sub_frame = target_view.parent_frame.sub_frames.filter(
             lambda x: x not in target_view.matched_sub_frames
         ).get(key=uncorrespondedness)
@@ -124,7 +122,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     @staticmethod
     def _get_target_space_one(calling_codelet, correspondence_suggester):
         bubble_chamber = correspondence_suggester.bubble_chamber
-        compatible_sub_views = bubble_chamber.production_views.filter(
+        compatible_sub_views = bubble_chamber.views.filter(
             lambda x: x != correspondence_suggester.target_view
             and x.super_views.is_empty()
             and (
