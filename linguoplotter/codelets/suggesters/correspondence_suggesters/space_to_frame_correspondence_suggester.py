@@ -27,7 +27,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=exigency)
         target_space_two = target_view.parent_frame.input_space
         target_structure_two = target_space_two.contents.where(
             is_correspondence=False
@@ -54,7 +54,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         parent_concept: Concept,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.production_views.get(key=activation)
+        target_view = bubble_chamber.views.get(key=activation)
         target_space_two = target_view.parent_frame.input_space
         target_structure_two = target_space_two.contents.where(
             is_correspondence=False

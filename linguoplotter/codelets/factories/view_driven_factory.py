@@ -12,7 +12,7 @@ from linguoplotter.codelets.suggesters.projection_suggesters import (
     LetterChunkProjectionSuggester,
     RelationProjectionSuggester,
 )
-from linguoplotter.codelets.suggesters.view_suggesters import SimplexViewSuggester
+from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError, NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
@@ -109,7 +109,7 @@ class ViewDrivenFactory(Factory):
                         self._spawn_potential_sub_frame_to_frame_correspondence_suggester()
                     )
                 except MissingStructureError:
-                    follow_up = self._spawn_simplex_view_suggester()
+                    follow_up = self._spawn_view_suggester()
         self.child_codelets.append(follow_up)
 
     def _set_target_view(self):
@@ -418,10 +418,10 @@ class ViewDrivenFactory(Factory):
         follow_up._get_target_structure_one(self, follow_up)
         return follow_up
 
-    def _spawn_simplex_view_suggester(self):
+    def _spawn_view_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
             self,
-            "Trying to spawn simplex view suggester",
+            "Trying to spawn view suggester",
         )
         sub_frame = self.target_view.parent_frame.sub_frames.filter(
             lambda x: x.input_space in self.target_slot.parent_spaces
@@ -438,7 +438,7 @@ class ViewDrivenFactory(Factory):
             self, f"Found target frame: {frame}"
         )
         prioritized_conceptual_spaces = sub_frame.input_space.conceptual_spaces
-        return SimplexViewSuggester.spawn(
+        return ViewSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
             {

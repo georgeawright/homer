@@ -19,7 +19,7 @@ class StructureDrivenFactory(Factory):
         Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
 
     def _engender_follow_up(self):
-        input_space = self.bubble_chamber.production_views.get().input_spaces.get()
+        input_space = self.bubble_chamber.views.get().input_spaces.get()
         structure = input_space.contents.get(key=unhappiness)
         follow_up_class = self._get_follow_up_class(structure)
         rand = self.bubble_chamber.random_machine.generate_random_number()

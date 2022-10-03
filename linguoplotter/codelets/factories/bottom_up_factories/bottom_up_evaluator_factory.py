@@ -5,7 +5,7 @@ from linguoplotter.codelets.evaluators import (
     LabelEvaluator,
     RelationEvaluator,
 )
-from linguoplotter.codelets.evaluators.view_evaluators import SimplexViewEvaluator
+from linguoplotter.codelets.evaluators import ViewEvaluator
 from linguoplotter.codelets.factories import BottomUpFactory
 from linguoplotter.errors import MissingStructureError
 
@@ -36,7 +36,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         )
 
         if views_per_frame_type_per_chunk > relations_per_space_per_end_per_chunk:
-            follow_up_class = SimplexViewEvaluator
+            follow_up_class = ViewEvaluator
         elif relations_per_space_per_end_per_chunk > labels_per_space_per_chunk:
             follow_up_class = RelationEvaluator
         elif labels_per_space_per_chunk > super_chunks_per_raw_chunk:
