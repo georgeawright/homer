@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List
 
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
@@ -152,9 +153,15 @@ class Relation(Link):
         ):
             return
         self.parent_concept.boost_activation(self.quality)
-        self.parent_concept.relations.where(
-            parent_concept=self.conceptual_space.parent_concept
-        ).get().end.boost_activation(self.quality)
+        try:
+            self.parent_concept.relations.where(
+                parent_concept=self.conceptual_space.parent_concept
+            ).get().end.boost_activation(self.quality)
+        except MissingStructureError:
+            # TODO: this is for spreading activation to MORE-TEMPERATURE concept etc
+            # that might be irrelevant if that becomes a compound concept
+            # possibly replace with more generic more-less-temperature concept?
+            pass
 
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name

@@ -1,5 +1,6 @@
 from linguoplotter.location import Location
 from linguoplotter.codelets.builders import ProjectionBuilder
+from linguoplotter.errors import MissingStructureError
 
 
 class LetterChunkProjectionBuilder(ProjectionBuilder):
@@ -158,33 +159,82 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             self.bubble_chamber.loggers["activity"].log(
                 self, "Correspondee to target projectee is abstract chunk"
             )
-            node_group = [
-                group
-                for group in self.target_view.node_groups
-                if self.target_projectee in group.values()
-            ][0]
-            return [node for node in node_group.values() if node.name is not None][0]
+            return self._get_abstract_chunk_from_correspondence()
         if not self.target_projectee.links_in.where(is_relation=True).is_empty():
             self.bubble_chamber.loggers["activity"].log(
                 self, "Abstract chunk is based on relations"
             )
-            relation = self.target_projectee.relations.get()
-            relative = self.target_projectee.relatives.get()
-            relative_correspondee = (
-                relative.correspondences_to_space(self.target_view.output_space)
-                .get()
-                .end
-            )
-            abstract_relation = relative_correspondee.abstract_chunk.relations.where(
-                parent_concept=relation.parent_concept,
-                start=relative_correspondee.abstract_chunk,
-            ).get()
-            return abstract_relation.arguments.get(
-                exclude=[relative_correspondee.abstract_chunk]
-            )
+            return self._get_abstract_chunk_from_relations()
         self.bubble_chamber.loggers["activity"].log(
             self, "Abstract chunk is based on labels"
         )
+        return self._get_abstract_chunk_from_labels()
+
+    def _get_abstract_chunk_from_correspondence(self):
+        node_group = [
+            group
+            for group in self.target_view.node_groups
+            if self.target_projectee in group.values()
+        ][0]
+        return [node for node in node_group.values() if node.name is not None][0]
+
+    def _get_abstract_chunk_from_relations(self):
+        # TODO: further divide according to combination types of meaning concept
+        relation = self.target_projectee.relations.get()
+        relative = self.target_projectee.relatives.get()
+        relative_correspondee = (
+            relative.correspondences_to_space(self.target_view.output_space).get().end
+        )
+        abstract_relation = relative_correspondee.abstract_chunk.relations.where(
+            parent_concept=relation.parent_concept,
+            start=relative_correspondee.abstract_chunk,
+        ).get()
+        return abstract_relation.arguments.get(
+            exclude=[relative_correspondee.abstract_chunk]
+        )
+
+    def _get_abstract_chunk_from_labels(self):
+        def _abstract_chunk_from_concepts(meaning_concept, grammar_concept):
+            try:
+                return (
+                    meaning_concept.relations.where(parent_concept=grammar_concept)
+                    .get(key=lambda x: x.end.activation)
+                    .end
+                )
+            except MissingStructureError:
+                root_letter_chunk = (
+                    meaning_concept.root.relations.where(parent_concept=grammar_concept)
+                    .get(key=lambda x: x.end.activation)
+                    .end
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Root letter chunk: {root_letter_chunk}"
+                )
+                arg_letter_chunk = _abstract_chunk_from_concepts(
+                    meaning_concept.args[0], grammar_concept
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Arg letter chunk: {arg_letter_chunk}"
+                )
+                return self.bubble_chamber.new_letter_chunk(
+                    name=f"{root_letter_chunk.name} {arg_letter_chunk.name}",
+                    locations=[
+                        location.copy()
+                        for location in meaning_concept.locations
+                        + grammar_concept.locations
+                    ],
+                    parent_space=meaning_concept.parent_space,
+                    parent_id=self.codelet_id,
+                    left_branch=self.bubble_chamber.new_structure_collection(
+                        root_letter_chunk
+                    ),
+                    right_branch=self.bubble_chamber.new_structure_collection(
+                        arg_letter_chunk
+                    ),
+                    meaning_concept=meaning_concept,
+                    grammar_concept=grammar_concept,
+                )
+
         grammar_label = self.target_projectee.labels.filter(
             lambda x: x.parent_concept.parent_space
             == self.bubble_chamber.conceptual_spaces["grammar"]
@@ -212,8 +262,4 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Meaning concept: {meaning_concept}"
         )
-        return (
-            meaning_concept.relations.where(parent_concept=grammar_concept)
-            .get(key=lambda x: x.end.activation)
-            .end
-        )
+        return _abstract_chunk_from_concepts(meaning_concept, grammar_concept)

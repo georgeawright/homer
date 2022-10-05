@@ -19,6 +19,7 @@ from .structures import Frame, LinkOrNode, Space, View
 from .structures.links import Correspondence, Label, Relation
 from .structures.nodes import Chunk, Concept
 from .structures.nodes.chunks import LetterChunk
+from .structures.nodes.concepts import CompoundConcept
 from .structures.spaces import ConceptualSpace, ContextualSpace
 from .worldview import Worldview
 
@@ -27,7 +28,6 @@ from .worldview import Worldview
 
 class BubbleChamber:
     JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
-
     MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
     VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_VIEW_QUALITIES_WEIGHT
     WORLDVIEW_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WORLDVIEW_WEIGHT
@@ -158,6 +158,7 @@ class BubbleChamber:
             # nodes
             Chunk: "chunks",
             Concept: "concepts",
+            CompoundConcept: "concepts",
             LetterChunk: "letter_chunks",
             # links
             Correspondence: "correspondences",
@@ -535,7 +536,11 @@ class BubbleChamber:
         self.add(letter_chunk)
         if meaning_concept is not None:
             self.new_relation(
-                parent_id, meaning_concept, letter_chunk, grammar_concept, [], 1.0
+                meaning_concept,
+                letter_chunk,
+                grammar_concept,
+                quality=1.0,
+                parent_id=parent_id,
             )
         return letter_chunk
 
@@ -583,6 +588,67 @@ class BubbleChamber:
             concept._activation = activation
         self.add(concept)
         return concept
+
+    def new_compound_concept(
+        self,
+        root: Concept,
+        args: List[Concept],
+        parent_id: str = "",
+        is_slot: bool = False,
+    ):
+        try:
+            return self.concepts.where(
+                is_compound_concept=True, root=root, args=args
+            ).get()
+        except MissingStructureError:
+            parent_spaces = self.new_structure_collection(
+                *[location.space for location in args[0].locations]
+            )
+            concept = CompoundConcept(
+                structure_id=ID.new(Concept),
+                parent_id=parent_id,
+                root=root,
+                args=args,
+                child_spaces=self.new_structure_collection(),
+                links_in=self.new_structure_collection(),
+                links_out=self.new_structure_collection(),
+                parent_spaces=parent_spaces,
+                instances=self.new_structure_collection(),
+                champion_labels=self.new_structure_collection(),
+                champion_relations=self.new_structure_collection(),
+                is_slot=is_slot,
+            )
+            self.add(concept)
+            self.new_relation(root, concept, quality=1.0, parent_id=parent_id)
+            for arg in args:
+                self.new_relation(arg, concept, quality=1.0, parent_id=parent_id)
+            if all(
+                arg.has_relation_with(
+                    self.concepts["more"], parent_concept=self.concepts["more"]
+                )
+                for arg in args
+            ):
+                self.new_relation(
+                    concept,
+                    self.concepts["more"],
+                    self.concepts["more"],
+                    quality=1.0,
+                    parent_id=parent_id,
+                )
+            elif all(
+                arg.has_relation_with(
+                    self.concepts["less"], parent_concept=self.concepts["more"]
+                )
+                for arg in args
+            ):
+                self.new_relation(
+                    concept,
+                    self.concepts["less"],
+                    self.concepts["more"],
+                    quality=1.0,
+                    parent_id=parent_id,
+                )
+            return concept
 
     def new_link_or_node(
         self,

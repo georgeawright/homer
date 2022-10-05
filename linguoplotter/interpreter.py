@@ -30,7 +30,9 @@ class Interpreter:
             "DifferenceClassifier": classifiers.DifferenceClassifier,
             "DifferentnessClassifier": classifiers.DifferentnessClassifier,
             "EverywhereClassifier": classifiers.EverywhereClassifier,
+            "MagnitudeProximityClassifier": classifiers.MagnitudeProximityClassifier,
             "MostOfTheCountryClassifier": classifiers.MostOfTheCountryClassifier,
+            "NotClassifier": classifiers.NotClassifier,
             "ProximityClassifier": classifiers.ProximityClassifier,
             "SamenessClassifier": classifiers.SamenessClassifier,
             # Distance Functions

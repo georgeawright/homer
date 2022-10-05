@@ -151,11 +151,22 @@ class LabelSuggester(Suggester):
         return True
 
     def _calculate_confidence(self):
-        self.confidence = (
-            self.parent_concept.classifier.classify(
+        classification = self.parent_concept.classifier.classify(
+            concept=self.parent_concept, start=self.target_node
+        )
+
+        if classification < 0.5:
+            self.parent_concept = self.bubble_chamber.new_compound_concept(
+                self.bubble_chamber.concepts["not"], [self.parent_concept]
+            )
+            classification = self.parent_concept.classifier.classify(
                 concept=self.parent_concept, start=self.target_node
             )
+
+        self.confidence = (
+            classification
             * self.target_node.quality
+            # / self.parent_concept.number_of_components
         )
 
     def _fizzle(self):

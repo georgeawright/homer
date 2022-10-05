@@ -60,6 +60,7 @@ class Structure(ABC):
         self.is_link_or_node = False
         self.is_node = False
         self.is_concept = False
+        self.is_compound_concept = False
         self.is_chunk = False
         self.is_letter_chunk = False
         self.is_link = False

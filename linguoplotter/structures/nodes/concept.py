@@ -102,6 +102,10 @@ class Concept(Node):
         return self._non_slot_value.non_slot_value
 
     @property
+    def number_of_components(self):
+        return 1
+
+    @property
     def parent_basic_space(self) -> "ConceptualSpace":
         return self.parent_spaces.where(is_basic_level=True).get()
 
