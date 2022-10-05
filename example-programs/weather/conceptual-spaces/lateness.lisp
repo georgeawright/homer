@@ -4,7 +4,11 @@
     :distance_function centroid_euclidean_distance))
 (define lateness-space
   (def-conceptual-space :name "lateness" :parent_concept lateness-concept
-    :no_of_dimensions 1 :is_basic_level True))
+    :no_of_dimensions 1 :is_basic_level True
+    :super_space_to_coordinate_function_map
+    (dict (list (tuple "time" (python """
+lambda location: [[(c[0]*10)/48] for c in location.coordinates]
+"""))))))
 (define early-concept
   (def-concept :name "early" :locations (list (Location (list (list 0)) lateness-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label

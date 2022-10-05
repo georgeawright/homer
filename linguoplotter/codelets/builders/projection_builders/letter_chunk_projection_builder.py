@@ -202,6 +202,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                     .end
                 )
             except MissingStructureError:
+                print(meaning_concept.name, grammar_concept.name)
                 root_letter_chunk = (
                     meaning_concept.root.relations.where(parent_concept=grammar_concept)
                     .get(key=lambda x: x.end.activation)

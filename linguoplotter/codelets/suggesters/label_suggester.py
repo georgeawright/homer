@@ -166,7 +166,7 @@ class LabelSuggester(Suggester):
         self.confidence = (
             classification
             * self.target_node.quality
-            # / self.parent_concept.number_of_components
+            / self.parent_concept.number_of_components
         )
 
     def _fizzle(self):

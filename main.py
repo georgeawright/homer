@@ -35,7 +35,7 @@ for i in range(1):
         "structure": StructureLogger(f"{structure_logs_dir_path}"),
         "errors": ErrorLogger(error_stream),
     }
-    narrator = Linguoplotter.setup(loggers, random_seed=i)
+    narrator = Linguoplotter.setup(loggers, random_seed=1)
     narrator.interpreter.interpret_file("builtin.lisp")
 
     os.chdir("example-programs/weather")

@@ -30,6 +30,7 @@ class LabelEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
+        # TODO: no need for recursive label evaluation
         target_label = self.target_structures.filter(
             lambda x: x.is_label and not x.start.is_label
         ).get()

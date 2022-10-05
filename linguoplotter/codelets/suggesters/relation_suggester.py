@@ -159,14 +159,26 @@ class RelationSuggester(Suggester):
         return True
 
     def _calculate_confidence(self):
-        self.confidence = (
-            self.parent_concept.classifier.classify(
+        classification = self.parent_concept.classifier.classify(
+            concept=self.parent_concept,
+            space=self.target_space,
+            start=self.target_structure_one,
+            end=self.target_structure_two,
+        )
+        if classification < 0.5:
+            self.parent_concept = self.bubble_chamber.new_compound_concept(
+                self.bubble_chamber.concepts["not"], [self.parent_concept]
+            )
+            classification = self.parent_concept.classifier.classify(
                 concept=self.parent_concept,
                 space=self.target_space,
                 start=self.target_structure_one,
                 end=self.target_structure_two,
             )
+        self.confidence = (
+            classification
             * min(self.target_structure_one.quality, self.target_structure_two.quality)
+            / self.parent_concept.number_of_components
         )
 
     def _fizzle(self):
