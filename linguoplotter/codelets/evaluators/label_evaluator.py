@@ -30,28 +30,14 @@ class LabelEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        # TODO: no need for recursive label evaluation
-        target_label = self.target_structures.filter(
-            lambda x: x.is_label and not x.start.is_label
-        ).get()
-        original_start = target_label.start
-        labels = []
-        while target_label is not None:
-            labels.append(target_label)
-            try:
-                target_label = target_label.labels.get()
-            except MissingStructureError:
-                target_label = None
+        target_label = self.target_structures.filter(lambda x: x.is_label).get()
+        target_node = target_label.start
+        parent_concept = target_label.parent_concept
+        classification = parent_concept.classifier.classify(
+            concept=parent_concept, start=target_node
+        )
         self.confidence = (
-            fuzzy.OR(
-                *[
-                    label.parent_concept.classifier.classify(
-                        start=label.start, concept=label.parent_concept
-                    )
-                    for label in labels
-                ]
-            )
-            * original_start.quality
+            classification * target_node.quality / parent_concept.number_of_components
         )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
-        self.activation_difference = self.confidence - labels[0].activation
+        self.activation_difference = self.confidence - target_label.activation
