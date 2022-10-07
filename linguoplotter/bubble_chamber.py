@@ -622,32 +622,35 @@ class BubbleChamber:
             self.new_relation(root, concept, quality=1.0, parent_id=parent_id)
             for arg in args:
                 self.new_relation(arg, concept, quality=1.0, parent_id=parent_id)
-            if all(
-                arg.has_relation_with(
-                    self.concepts["more"], parent_concept=self.concepts["more"]
-                )
-                for arg in args
-            ):
-                self.new_relation(
-                    concept,
-                    self.concepts["more"],
-                    self.concepts["more"],
-                    quality=1.0,
-                    parent_id=parent_id,
-                )
-            elif all(
-                arg.has_relation_with(
-                    self.concepts["less"], parent_concept=self.concepts["more"]
-                )
-                for arg in args
-            ):
-                self.new_relation(
-                    concept,
-                    self.concepts["less"],
-                    self.concepts["more"],
-                    quality=1.0,
-                    parent_id=parent_id,
-                )
+            try:
+                if all(
+                    arg.has_relation_with(
+                        self.concepts["more"], parent_concept=self.concepts["more"]
+                    )
+                    for arg in args
+                ):
+                    self.new_relation(
+                        concept,
+                        self.concepts["more"],
+                        self.concepts["more"],
+                        quality=1.0,
+                        parent_id=parent_id,
+                    )
+                elif all(
+                    arg.has_relation_with(
+                        self.concepts["less"], parent_concept=self.concepts["more"]
+                    )
+                    for arg in args
+                ):
+                    self.new_relation(
+                        concept,
+                        self.concepts["less"],
+                        self.concepts["more"],
+                        quality=1.0,
+                        parent_id=parent_id,
+                    )
+            except KeyError:
+                pass
             return concept
 
     def new_link_or_node(

@@ -35,7 +35,7 @@ class DifferentnessClassifier(Classifier):
         ]
         if distinct_pairs == []:
             distinct_pairs = [(collection[0], collection[0])]
-        return fuzzy.OR(
+        return fuzzy.AND(
             *[
                 fuzzy.AND(
                     *[
