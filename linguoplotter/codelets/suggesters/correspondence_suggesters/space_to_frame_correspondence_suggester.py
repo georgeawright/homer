@@ -92,8 +92,14 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 self.parent_concept = self.bubble_chamber.new_compound_concept(
                     self.bubble_chamber.concepts["not"], [self.parent_concept]
                 )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found parent concept: {self.parent_concept}"
+                )
         else:
             self.parent_concept = self.bubble_chamber.concepts["same"]
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found parent concept: {self.parent_concept}"
+            )
         try:
             if self.target_space_one is None:
                 self.target_space_one = self.target_view.input_spaces.get()
@@ -108,9 +114,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 "MissingStructureError when searching for input target space and structure",
             )
             return False
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found parent concept: {self.parent_concept}"
-        )
         if not self.target_view.can_accept_member(
             self.parent_concept,
             self.target_conceptual_space,
@@ -127,14 +130,23 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             and not self.target_structure_two.parent_concept.is_filled_in
         ):
             structure_two_non_slot_value = self.target_structure_one.parent_concept
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Concept: {structure_two_non_slot_value}"
+            )
             for relative in self.target_structure_two.parent_concept.relatives:
                 if self.target_view.parent_frame.input_space.contents.where(
                     is_link=True, parent_concept=relative
                 ).is_empty():
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, f"Relative: {relative}"
+                    )
                     relation_with_relative = (
                         self.target_structure_two.parent_concept.relations_with(
                             relative
                         ).get()
+                    )
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, f"Relation with relative: {relation_with_relative}"
                     )
                     structure_two_parent_relatives = (
                         structure_two_non_slot_value.relatives
@@ -146,6 +158,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                             relation_with_relative.parent_concept.non_slot_value,
                         )
                     ).is_empty():
+                        self.bubble_chamber.loggers["activity"].log(
+                            self,
+                            f"None of structure two parent relatives have relation with concept",
+                        )
                         return False
         return True
 
