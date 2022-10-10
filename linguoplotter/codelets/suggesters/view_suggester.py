@@ -157,7 +157,8 @@ class ViewSuggester(Suggester):
     def _calculate_confidence(self):
         number_of_equivalent_views = len(
             self.bubble_chamber.views.filter(
-                lambda x: x.parent_frame.parent_concept == self.frame.parent_concept
+                lambda x: x.unhappiness > 0
+                and x.parent_frame.parent_concept == self.frame.parent_concept
             )
         )
         self.bubble_chamber.loggers["activity"].log(

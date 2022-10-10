@@ -209,7 +209,7 @@ class ViewDrivenFactory(Factory):
                 self.codelet_id,
                 self.bubble_chamber,
                 {"target_node": node, "parent_concept": parent_concept},
-                self.target_slot.uncorrespondedness,
+                parent_concept.proximity_to(node),
             )
         if self.target_slot.is_relation:
             if not self.target_slot.parent_concept.is_slot:
@@ -282,7 +282,12 @@ class ViewDrivenFactory(Factory):
                     "target_structure_two": target_structure_two,
                     "parent_concept": parent_concept,
                 },
-                self.target_view.unhappiness,
+                parent_concept.classifier.classify(
+                    start=target_structure_one,
+                    end=target_structure_two,
+                    concept=parent_concept,
+                    space=self.target_slot.conceptual_space,
+                ),
             )
         raise Exception("Slot is not a label or a relation.")
 

@@ -102,8 +102,8 @@ class Coderack:
                         type(codelet) == type(existing_codelet)
                         and codelet.targets_dict == existing_codelet.targets_dict
                     ):
-                        existing_codelet.urgency = statistics.fmean(
-                            [codelet.urgency, existing_codelet.urgency]
+                        existing_codelet.urgency = (
+                            existing_codelet.urgency + codelet.urgency
                         )
                         return
                 if isinstance(codelet, Evaluator):
@@ -112,8 +112,8 @@ class Coderack:
                         and codelet.target_structures
                         == existing_codelet.target_structures
                     ):
-                        existing_codelet.urgency = statistics.fmean(
-                            [codelet.urgency, existing_codelet.urgency]
+                        existing_codelet.urgency = (
+                            existing_codelet.urgency + codelet.urgency
                         )
                         return
                 if isinstance(codelet, Selector):
@@ -122,8 +122,8 @@ class Coderack:
                         and codelet.champions == existing_codelet.champions
                         and codelet.challengers == existing_codelet.challengers
                     ):
-                        existing_codelet.urgency = statistics.fmean(
-                            [codelet.urgency, existing_codelet.urgency]
+                        existing_codelet.urgency = (
+                            existing_codelet.urgency + codelet.urgency
                         )
                         return
         try:

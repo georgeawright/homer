@@ -1,9 +1,8 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Suggester
-from linguoplotter.errors import MissingStructureError, NoLocationError
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.location import Location
 from linguoplotter.structure_collection_keys import activation, labeling_exigency
 from linguoplotter.structures.links import Label
 from linguoplotter.structures.nodes import Concept
@@ -81,7 +80,11 @@ class LabelSuggester(Suggester):
             lambda x: isinstance(x, parent_concept.instance_type) and x.quality > 0
         )
         target = potential_targets.get(key=lambda x: parent_concept.proximity_to(x))
-        urgency = urgency if urgency is not None else target.unlabeledness
+        urgency = (
+            urgency
+            if urgency is not None
+            else target.unlabeledness * parent_concept.proximity_to(target)
+        )
         return cls.spawn(
             parent_id,
             bubble_chamber,
@@ -105,9 +108,15 @@ class LabelSuggester(Suggester):
             classification = self.parent_concept.classifier.classify(
                 concept=self.parent_concept, start=self.target_node
             )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Preliminary classification: {classification}"
+            )
             if classification < 0.5:
                 self.parent_concept = self.bubble_chamber.new_compound_concept(
                     self.bubble_chamber.concepts["not"], [self.parent_concept]
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Concept replaced with: {self.parent_concept}"
                 )
         else:
             try:
