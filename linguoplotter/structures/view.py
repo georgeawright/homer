@@ -243,6 +243,12 @@ class View(Structure):
         self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
     def calculate_quality(self):
+        for member in self.members:
+            if (
+                member.parent_concept.is_compound_concept
+                and member.parent_concept.root.name == "not"
+            ):
+                return 0.0
         total_slots = len(self.members) + self.number_of_items_left_to_process
         correspondence_quality = (
             sum(correspondence.quality for correspondence in self.members) / total_slots

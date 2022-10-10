@@ -134,7 +134,18 @@ class RelationSuggester(Suggester):
         }
 
     def _passes_preliminary_checks(self):
-        if self.parent_concept is None:
+        if self.parent_concept is not None:
+            classification = self.parent_concept.classifier.classify(
+                concept=self.parent_concept,
+                space=self.target_space,
+                start=self.target_structure_one,
+                end=self.target_structure_two,
+            )
+            if classification < 0.5:
+                self.parent_concept = self.bubble_chamber.new_compound_concept(
+                    self.bubble_chamber.concepts["not"], [self.parent_concept]
+                )
+        else:
             self.parent_concept = (
                 self.bubble_chamber.conceptual_spaces.where(structure_type=Relation)
                 .get()
@@ -165,16 +176,6 @@ class RelationSuggester(Suggester):
             start=self.target_structure_one,
             end=self.target_structure_two,
         )
-        if classification < 0.5:
-            self.parent_concept = self.bubble_chamber.new_compound_concept(
-                self.bubble_chamber.concepts["not"], [self.parent_concept]
-            )
-            classification = self.parent_concept.classifier.classify(
-                concept=self.parent_concept,
-                space=self.target_space,
-                start=self.target_structure_one,
-                end=self.target_structure_two,
-            )
         self.confidence = (
             classification
             * min(self.target_structure_one.quality, self.target_structure_two.quality)

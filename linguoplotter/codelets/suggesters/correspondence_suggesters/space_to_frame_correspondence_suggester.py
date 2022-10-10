@@ -76,6 +76,22 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
 
     def _passes_preliminary_checks(self):
         self._get_target_conceptual_space(self, self)
+        if (
+            self.target_structure_one is not None
+            and self.parent_concept is not None
+            and not self.target_view.members.is_empty()
+        ):
+            classification = self.parent_concept.classifier.classify(
+                concept=self.parent_concept,
+                space=self.target_conceptual_space,
+                start=self.target_structure_one,
+                end=self.target_structure_two,
+                view=self.target_view,
+            )
+            if classification < 0.5:
+                self.parent_concept = self.bubble_chamber.new_compound_concept(
+                    self.bubble_chamber.concepts["not"], [self.parent_concept]
+                )
         try:
             if self.target_space_one is None:
                 self.target_space_one = self.target_view.input_spaces.get()
@@ -267,6 +283,11 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                             == correspondence_suggester.target_structure_two.parent_concept,
                             x.parent_concept.is_slot,
                             correspondence_suggester.target_structure_two.parent_concept.is_slot,
+                            (
+                                x.parent_concept.is_compound_concept
+                                and x.parent_concept.args[0]
+                                == correspondence_suggester.target_structure_two.parent_concept
+                            ),
                         ]
                     )
                 ).get(
@@ -316,10 +337,17 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 and (x.start.quality > 0)
                 and (x.end == structure_one_end or structure_one_end is None)
                 and (x.end.quality > 0)
-                and (
-                    x.parent_concept
-                    == correspondence_suggester.target_structure_two.parent_concept
-                    or correspondence_suggester.target_structure_two.parent_concept.is_slot
+                and any(
+                    [
+                        x.parent_concept
+                        == correspondence_suggester.target_structure_two.parent_concept,
+                        correspondence_suggester.target_structure_two.parent_concept.is_slot,
+                        (
+                            x.parent_concept.is_compound_concept
+                            and x.parent_concept.args[0]
+                            == correspondence_suggester.target_structure_two.parent_concept
+                        ),
+                    ]
                 )
                 and (
                     x.parent_concept.parent_space

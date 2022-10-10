@@ -294,6 +294,11 @@ class CorrespondenceSuggester(Suggester):
                             == correspondence_suggester.target_structure_two.parent_concept,
                             x.parent_concept.is_slot,
                             correspondence_suggester.target_structure_two.parent_concept.is_slot,
+                            (
+                                x.parent_concept.is_compound_concept
+                                and x.parent_concept.args[0]
+                                == correspondence_suggester.target_structure_two.parent_concept
+                            ),
                         ]
                     )
                 ).get(
@@ -340,10 +345,17 @@ class CorrespondenceSuggester(Suggester):
                 lambda x: x.is_relation
                 and (x.start == structure_one_start or structure_one_start is None)
                 and (x.end == structure_one_end or structure_one_end is None)
-                and (
-                    x.parent_concept
-                    == correspondence_suggester.target_structure_two.parent_concept
-                    or correspondence_suggester.target_structure_two.parent_concept.is_slot
+                and any(
+                    [
+                        x.parent_concept
+                        == correspondence_suggester.target_structure_two.parent_concept,
+                        correspondence_suggester.target_structure_two.parent_concept.is_slot,
+                        (
+                            x.parent_concept.is_compound_concept
+                            and x.parent_concept.args[0]
+                            == correspondence_suggester.target_structure_two.parent_concept
+                        ),
+                    ]
                 )
                 and (
                     x.parent_concept.parent_space

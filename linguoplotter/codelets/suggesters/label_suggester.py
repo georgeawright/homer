@@ -101,7 +101,15 @@ class LabelSuggester(Suggester):
         }
 
     def _passes_preliminary_checks(self):
-        if self.parent_concept is None:
+        if self.parent_concept is not None:
+            classification = self.parent_concept.classifier.classify(
+                concept=self.parent_concept, start=self.target_node
+            )
+            if classification < 0.5:
+                self.parent_concept = self.bubble_chamber.new_compound_concept(
+                    self.bubble_chamber.concepts["not"], [self.parent_concept]
+                )
+        else:
             try:
                 conceptual_space = self.bubble_chamber.conceptual_spaces.filter(
                     lambda x: x.is_basic_level
@@ -154,15 +162,6 @@ class LabelSuggester(Suggester):
         classification = self.parent_concept.classifier.classify(
             concept=self.parent_concept, start=self.target_node
         )
-
-        if classification < 0.5:
-            self.parent_concept = self.bubble_chamber.new_compound_concept(
-                self.bubble_chamber.concepts["not"], [self.parent_concept]
-            )
-            classification = self.parent_concept.classifier.classify(
-                concept=self.parent_concept, start=self.target_node
-            )
-
         self.confidence = (
             classification
             * self.target_node.quality
