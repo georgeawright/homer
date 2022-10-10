@@ -92,6 +92,8 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 self.parent_concept = self.bubble_chamber.new_compound_concept(
                     self.bubble_chamber.concepts["not"], [self.parent_concept]
                 )
+        else:
+            self.parent_concept = self.bubble_chamber.concepts["same"]
         try:
             if self.target_space_one is None:
                 self.target_space_one = self.target_view.input_spaces.get()
@@ -106,7 +108,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 "MissingStructureError when searching for input target space and structure",
             )
             return False
-        self.parent_concept = self.bubble_chamber.concepts["same"]
         self.bubble_chamber.loggers["activity"].log(
             self, f"Found parent concept: {self.parent_concept}"
         )

@@ -63,7 +63,6 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         return cls.make(parent_id, bubble_chamber, urgency)
 
     def _passes_preliminary_checks(self):
-        self.parent_concept = self.bubble_chamber.concepts["same"]
         if self.target_space_two is None:
             self.target_space_two = (
                 self.sub_frame.input_space
@@ -73,6 +72,20 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 else self.sub_frame.output_space
             )
         self._get_target_conceptual_space(self, self)
+        if self.target_structure_one is not None and self.parent_concept is not None:
+            classification = self.parent_concept.classifier.classify(
+                concept=self.parent_concept,
+                space=self.target_conceptual_space,
+                start=self.target_structure_one,
+                end=self.target_structure_two,
+                view=self.target_view,
+            )
+            if classification < 0.5:
+                self.parent_concept = self.bubble_chamber.new_compound_concept(
+                    self.bubble_chamber.concepts["not"], [self.parent_concept]
+                )
+        else:
+            self.parent_concept = self.bubble_chamber.concepts["same"]
         try:
             if self.target_space_one is None:
                 self.bubble_chamber.loggers["activity"].log(
