@@ -62,9 +62,9 @@ class RelationSelector(Selector):
             end_node.champion_relations.remove(losing_relation)
 
     def _engender_follow_up(self):
-        winner_relation = self.winners.get()
-        parent_concept = winner_relation.parent_concept.friends().get()
         try:
+            winner_relation = self.winners.get()
+            parent_concept = winner_relation.parent_concept.friends().get()
             target_space = StructureCollection.intersection(
                 winner_relation.start.parent_spaces.where(no_of_dimensions=1),
                 winner_relation.end.parent_spaces.where(no_of_dimensions=1),
@@ -84,11 +84,3 @@ class RelationSelector(Selector):
             )
         except MissingStructureError:
             pass
-        self.child_codelets.append(
-            RelationEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winners,
-                self.follow_up_urgency,
-            )
-        )

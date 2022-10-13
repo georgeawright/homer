@@ -32,35 +32,35 @@ class ViewSelector(Selector):
             return True
         try:
             self._get_challenger()
+            self.bubble_chamber.loggers["activity"].log_collection(
+                self, self.challengers, "Found challengers"
+            )
         except MissingStructureError:
             return True
         return True
 
     def _engender_follow_up(self):
         # spawn a top-down view suggester with copy of winning view's frame
-        winning_view = self.winners.get()
-        if winning_view.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE:
-            try:
-                target_frame = winning_view.parent_frame.parent_concept.relatives.where(
-                    is_frame=True
-                ).get(key=exigency)
-            except MissingStructureError:
-                target_frame = winning_view.parent_frame
-            self.child_codelets.append(
-                self.get_follow_up_class().make(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    frame=target_frame,
+        try:
+            winning_view = self.winners.get()
+            if winning_view.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE:
+                try:
+                    target_frame = (
+                        winning_view.parent_frame.parent_concept.relatives.where(
+                            is_frame=True
+                        ).get(key=exigency)
+                    )
+                except MissingStructureError:
+                    target_frame = winning_view.parent_frame
+                self.child_codelets.append(
+                    self.get_follow_up_class().make(
+                        self.codelet_id,
+                        self.bubble_chamber,
+                        frame=target_frame,
+                    )
                 )
-            )
-        self.child_codelets.append(
-            self.get_follow_up_evaluator().spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winners,
-                self.follow_up_urgency,
-            )
-        )
+        except MissingStructureError:
+            pass
 
     def _get_challenger(self):
         champion_view = self.champions.get()

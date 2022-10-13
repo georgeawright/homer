@@ -85,11 +85,3 @@ class LabelSelector(Selector):
             )
         except MissingStructureError:
             pass
-        self.child_codelets.append(
-            LabelEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winners,
-                self.follow_up_urgency,
-            )
-        )

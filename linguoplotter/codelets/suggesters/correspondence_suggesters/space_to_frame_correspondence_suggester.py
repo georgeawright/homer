@@ -79,7 +79,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         if (
             self.target_structure_one is not None
             and self.parent_concept is not None
-            and not self.target_view.members.is_empty()
+            and not (
+                self.target_view.members.is_empty()
+                and self.target_view.super_views.is_empty()
+            )
         ):
             classification = self.parent_concept.classifier.classify(
                 concept=self.parent_concept,
@@ -87,6 +90,9 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 start=self.target_structure_one,
                 end=self.target_structure_two,
                 view=self.target_view,
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Preliminary classification: {classification}"
             )
             if classification < 0.5:
                 self.parent_concept = self.bubble_chamber.new_compound_concept(

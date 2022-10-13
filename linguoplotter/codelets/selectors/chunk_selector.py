@@ -39,20 +39,17 @@ class ChunkSelector(Selector):
         )
 
     def _engender_follow_up(self):
-        winning_chunk = self.winners.get()
-        self.child_codelets = [
-            ChunkSuggester.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                {
-                    "target_structure_one": winning_chunk,
-                },
-                winning_chunk.chunking_exigency,
-            ),
-            ChunkEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winners,
-                self.follow_up_urgency,
-            ),
-        ]
+        try:
+            winning_chunk = self.winners.get()
+            self.child_codelets.append(
+                ChunkSuggester.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    {
+                        "target_structure_one": winning_chunk,
+                    },
+                    winning_chunk.chunking_exigency,
+                ),
+            )
+        except MissingStructureError:
+            pass

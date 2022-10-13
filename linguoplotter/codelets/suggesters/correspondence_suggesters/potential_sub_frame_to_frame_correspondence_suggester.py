@@ -71,6 +71,33 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     def _passes_preliminary_checks(self):
         if self.target_conceptual_space is None:
             self._get_target_conceptual_space(self, self)
+        if (
+            self.target_structure_one is not None
+            and self.parent_concept is not None
+            and not self.target_view.members.is_empty()
+        ):
+            classification = self.parent_concept.classifier.classify(
+                concept=self.parent_concept,
+                space=self.target_conceptual_space,
+                start=self.target_structure_one,
+                end=self.target_structure_two,
+                view=self.target_view,
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Preliminary classification: {classification}"
+            )
+            if classification < 0.5:
+                self.parent_concept = self.bubble_chamber.new_compound_concept(
+                    self.bubble_chamber.concepts["not"], [self.parent_concept]
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found parent concept: {self.parent_concept}"
+                )
+        else:
+            self.parent_concept = self.bubble_chamber.concepts["same"]
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found parent concept: {self.parent_concept}"
+            )
         if self.target_space_one is None:
             try:
                 PotentialSubFrameToFrameCorrespondenceSuggester._get_target_space_one(
@@ -81,7 +108,6 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 )
             except MissingStructureError:
                 return False
-        self.parent_concept = self.bubble_chamber.concepts["same"]
         for correspondence in self.target_sub_view.members:
             if not self.target_view.can_accept_member(
                 correspondence.parent_concept,

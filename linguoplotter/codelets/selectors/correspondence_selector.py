@@ -1,5 +1,4 @@
 from linguoplotter.codelets.selector import Selector
-from linguoplotter.codelets.evaluators import CorrespondenceEvaluator
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.structure_collection_keys import activation
 
@@ -31,17 +30,9 @@ class CorrespondenceSelector(Selector):
     def _engender_follow_up(self):
         from linguoplotter.codelets.suggesters import CorrespondenceSuggester
 
-        self.child_codelets.append(
-            CorrespondenceEvaluator.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winners,
-                self.follow_up_urgency,
-            )
-        )
-        winner_correspondence = self.winners.where(is_correspondence=True).get()
-        target_view = winner_correspondence.parent_view
         try:
+            winner_correspondence = self.winners.where(is_correspondence=True).get()
+            target_view = winner_correspondence.parent_view
             self.child_codelets.append(
                 CorrespondenceSuggester.make(
                     self.codelet_id,
