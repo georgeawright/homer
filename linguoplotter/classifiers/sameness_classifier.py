@@ -36,7 +36,48 @@ class SamenessClassifier(Classifier):
             for j in range(len(collection[:i]))
         ]
         if distinct_pairs == []:
-            distinct_pairs = [(collection[0], collection[0])]
+            distinct_pairs = [(collection[0], collection[1])]
+        if distinct_pairs[0][0].is_link:
+            start_concept = (
+                start.parent_concept
+                if not start.parent_concept.is_slot
+                else start.parent_concept.non_slot_value
+            )
+            end_concept = (
+                end.parent_concept
+                if not end.parent_concept.is_slot
+                else end.parent_concept.non_slot_value
+            )
+            if start_concept == end_concept:
+                return 1.0
+        if distinct_pairs[0][0].is_label:
+            return fuzzy.AND(
+                start_concept.classifier.classify(concept=start_concept, start=end)
+                if start_concept is not None
+                else 1.0,
+                end_concept.classifier.classify(concept=end_concept, start=start)
+                if end_concept is not None
+                else 1.0,
+            )
+        if distinct_pairs[0][0].is_relation:
+            return fuzzy.AND(
+                start_concept.classifier.classify(
+                    concept=start_concept,
+                    space=space,
+                    start=end.start,
+                    end=end.end,
+                )
+                if start_concept is not None
+                else 1.0,
+                end_concept.classifier.classify(
+                    concept=end_concept,
+                    space=space,
+                    start=start.start,
+                    end=start.end,
+                )
+                if end_concept is not None
+                else 1.0,
+            )
         return fuzzy.OR(
             *[
                 fuzzy.AND(

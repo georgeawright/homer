@@ -1,3 +1,5 @@
+import math
+
 from linguoplotter.classifier import Classifier
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.tools import average_vector
@@ -21,6 +23,8 @@ class DifferenceClassifier(Classifier):
             average_vector(start.location_in_space(space).coordinates)[0]
             - average_vector(end.location_in_space(space).coordinates)[0]
         )
+        if math.isnan(difference):
+            return 1.0
         try:
             return FloatBetweenOneAndZero(difference / self.prototype_difference)
         except ZeroDivisionError:

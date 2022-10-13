@@ -10,4 +10,12 @@ class NotClassifier(Classifier):
         )
 
     def classify(self, **kwargs: dict):
+        try:
+            if kwargs["start"].is_slot:
+                return 1.0
+            if kwargs["end"].is_slot:
+                return 1.0
+        except KeyError:
+            pass
+
         return 1 - self.negated_concept.classifier.classify(**kwargs)
