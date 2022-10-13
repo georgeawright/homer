@@ -7,6 +7,7 @@ from linguoplotter.codelets.suggesters import (
 )
 from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
+from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 
 
 class BottomUpSuggesterFactory(BottomUpFactory):
@@ -63,10 +64,10 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             non_raw_chunks = input_space.contents.filter(
                 lambda x: x.is_chunk and not x.is_raw
             ).sample(10)
-            unlabeled_non_raw_chunks = non_raw_chunks.filter(
-                lambda x: x.labels.is_empty()
+            total_label_quality = sum(
+                label.quality for chunk in non_raw_chunks for label in chunk.labels
             )
-            return len(unlabeled_non_raw_chunks) / len(non_raw_chunks)
+            return 1 - FloatBetweenOneAndZero(total_label_quality / len(non_raw_chunks))
         except MissingStructureError:
             return float("-inf")
 
