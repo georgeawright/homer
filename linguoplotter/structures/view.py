@@ -268,6 +268,12 @@ class View(Structure):
             ]
         )
 
+    def is_equivalent_to(self, other: View):
+        try:
+            return self.structures == other.structures and self.output == other.output
+        except MissingStructureError:
+            return False
+
     def input_overlap_with(self, other: View):
         shared_raw_nodes = StructureCollection.intersection(
             self.raw_input_nodes, other.raw_input_nodes

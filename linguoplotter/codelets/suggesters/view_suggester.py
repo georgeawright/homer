@@ -157,8 +157,7 @@ class ViewSuggester(Suggester):
     def _calculate_confidence(self):
         number_of_equivalent_views = len(
             self.bubble_chamber.views.filter(
-                lambda x: x.unhappiness > 0
-                and x.parent_frame.parent_concept == self.frame.parent_concept
+                lambda x: x.parent_frame.parent_concept == self.frame.parent_concept
             )
         )
         self.bubble_chamber.loggers["activity"].log(
@@ -167,10 +166,7 @@ class ViewSuggester(Suggester):
         self.bubble_chamber.loggers["activity"].log(
             self, f"Number of equivalent views: {number_of_equivalent_views}"
         )
-        try:
-            self.confidence = self.frame.activation / number_of_equivalent_views
-        except ZeroDivisionError:
-            self.confidence = self.frame.activation
+        self.confidence = self.frame.activation / (number_of_equivalent_views + 1)
 
     def _fizzle(self):
         pass

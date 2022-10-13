@@ -1,5 +1,3 @@
-import statistics
-
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -69,6 +67,7 @@ class FocusUnsetter(Codelet):
         )
         if self.bubble_chamber.focus.view.unhappiness == 0.0:
             probability_of_unsetting_focus = 1
+            self._check_for_and_merge_with_equivalent_views()
             self._update_worldview_porter_urgency()
             self._update_bottom_up_factories_urgencies()
         else:
@@ -138,6 +137,19 @@ class FocusUnsetter(Codelet):
                 or "BottomUpEvaluatorFactory" in codelet.codelet_id
             ):
                 codelet.urgency = 1.0
+
+    def _check_for_and_merge_with_equivalent_views(self):
+        # if not self.target_view.super_views.is_empty(): return ?
+        for view in self.bubble_chamber.views.excluding(self.target_view).filter(
+            lambda x: x.super_views.is_empty()
+        ):
+            if self.target_view.is_equivalent_to(view):
+                view.quality = 0.0
+                view.deactivate()
+                self.bubble_chamber.recycle_bin.add(view)
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Found and recycled equivalent view: {view}"
+                )
 
     def _fizzle(self):
         self.child_codelets.append(
