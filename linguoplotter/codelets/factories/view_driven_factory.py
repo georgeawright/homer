@@ -421,6 +421,7 @@ class ViewDrivenFactory(Factory):
                 "target_space_two": target_space_two,
                 "target_structure_two": self.target_slot,
                 "sub_frame": sub_frame,
+                "parent_concept": self.bubble_chamber.concepts["same"],
             },
             self.target_view.unhappiness,
         )
