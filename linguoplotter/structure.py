@@ -186,7 +186,7 @@ class Structure(ABC):
     def recalculate_unlabeledness(self):
         try:
             self.unlabeledness = 1 - FloatBetweenOneAndZero(
-                len(self.labels) / len(self.locations)
+                len(self.positive_labels) / len(self.locations)
             )
         except ZeroDivisionError:
             self.unlabeledness = 1
@@ -211,6 +211,16 @@ class Structure(ABC):
     @property
     def labels(self) -> StructureCollection:
         return self.links_out.where(is_label=True)
+
+    @property
+    def positive_labels(self) -> StructureCollection:
+        return self.links_out.filter(
+            lambda x: x.is_label
+            and (
+                not x.parent_concept.is_compound_concept
+                or x.parent_concept.root.name != "not"
+            )
+        )
 
     @property
     def relations(self) -> StructureCollection:

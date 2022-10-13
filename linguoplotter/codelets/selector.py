@@ -3,6 +3,7 @@ import random
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collection import StructureCollection
@@ -62,19 +63,30 @@ class Selector(Codelet):
             for structure in StructureCollection.union(self.winners, self.losers):
                 self.bubble_chamber.loggers["structure"].log(structure)
         else:
-            self.winners = self.champions
-            self.bubble_chamber.loggers["activity"].log_winners(self)
-            self.confidence = self.winners.get().quality
-            random_number = self.bubble_chamber.random_machine.generate_number()
-            if self.confidence > random_number:
-                self._boost_winners()
-            for structure in self.winners:
-                self.bubble_chamber.loggers["structure"].log(structure)
+            self.confidence = self.champions.get().quality
+            if self.confidence == 0.0:
+                self.losers = self.champions
+                self.winners = self.bubble_chamber.new_structure_collection()
+                self.bubble_chamber.loggers["activity"].log_losers(self)
+                self._decay_losers()
+                for structure in self.losers:
+                    self.bubble_chamber.loggers["structure"].log(structure)
+            else:
+                self.winners = self.champions
+                self.bubble_chamber.loggers["activity"].log_winners(self)
+                random_number = self.bubble_chamber.random_machine.generate_number()
+                if self.confidence > random_number:
+                    self._boost_winners()
+                for structure in self.winners:
+                    self.bubble_chamber.loggers["structure"].log(structure)
+                self._rearrange_champions()
         self._boost_activations()
-        self._rearrange_champions()
-        self.follow_up_urgency = FloatBetweenOneAndZero(
-            self.winners.get().quality - self.winners.get().activation
-        )
+        try:
+            self.follow_up_urgency = FloatBetweenOneAndZero(
+                self.winners.get().quality - self.winners.get().activation
+            )
+        except MissingStructureError:
+            self.follow_up_urgency = 0.0
         self._engender_follow_up()
         self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.result = CodeletResult.FINISH

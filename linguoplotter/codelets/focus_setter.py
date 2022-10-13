@@ -35,6 +35,9 @@ class FocusSetter(Codelet):
         try:
             target_view = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness > 0
+                and x.members.filter(
+                    lambda x: x.parent_concept.name == "not(same)"
+                ).is_empty()
             ).get(key=exigency)
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Found target view: {target_view}"
