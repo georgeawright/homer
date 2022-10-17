@@ -1,8 +1,13 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluator import Evaluator
+from linguoplotter.hyper_parameters import HyperParameters
+from linguoplotter.structure_collection import StructureCollection
 
 
 class RelationEvaluator(Evaluator):
+    CLASSIFICATION_WEIGHT = HyperParameters.RELATION_QUALITY_CLASSIFICATION_WEIGHT
+    SAMENESS_WEIGHT = HyperParameters.RELATION_QUALITY_SAMENESS_WEIGHT
+
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.selectors import RelationSelector
@@ -29,18 +34,36 @@ class RelationEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_relation = self.target_structures.get()
-        parent_concept = target_relation.parent_concept
-        classification = parent_concept.classifier.classify(
-            space=target_relation.conceptual_space,
-            concept=parent_concept,
-            start=target_relation.start,
-            end=target_relation.end,
-        )
-        min_argument_quality = min(
+        minimum_argument_quality = min(
             target_relation.start.quality, target_relation.end.quality
         )
-        self.confidence = (
-            classification * min_argument_quality / parent_concept.number_of_components
+        parallel_relations = StructureCollection.intersection(
+            target_relation.start.relations, target_relation.end.relations
         )
+        classifications = {
+            relation: relation.parent_concept.classifier.classify(
+                space=relation.conceptual_space,
+                concept=relation.parent_concept,
+                start=relation.start,
+                end=relation.end,
+            )
+            * minimum_argument_quality
+            / relation.parent_concept.number_of_components
+            for relation in parallel_relations
+        }
+        sameness_confidence = max(
+            classification
+            if relation.parent_concept == self.bubble_chamber.concepts["same"]
+            else 0
+            for relation, classification in classifications.items()
+        )
+        for relation in classifications:
+            relation.quality = sum(
+                [
+                    classifications[relation] * self.CLASSIFICATION_WEIGHT,
+                    sameness_confidence * self.SAMENESS_WEIGHT,
+                ]
+            )
+        self.confidence = target_relation.quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_relation.activation

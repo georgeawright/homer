@@ -145,28 +145,52 @@ class RelationSuggester(Suggester):
                 self.parent_concept = self.bubble_chamber.new_compound_concept(
                     self.bubble_chamber.concepts["not"], [self.parent_concept]
                 )
-        else:
-            self.parent_concept = (
-                self.bubble_chamber.conceptual_spaces.where(structure_type=Relation)
-                .get()
-                .contents.where(is_concept=True, is_slot=False)
-                .get()
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found parent concept: {self.parent_concept}"
-            )
-        if self.target_structure_two is None:
-            try:
-                self.target_structure_two = (
-                    self.target_structure_one.get_potential_relative(
-                        space=self.target_space, concept=self.parent_concept
+            if self.target_structure_two is None:
+                try:
+                    self.target_structure_two = (
+                        self.target_structure_one.get_potential_relative(
+                            space=self.target_space, concept=self.parent_concept
+                        )
                     )
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, f"Found target structure two: {self.target_structure_two}"
+                    )
+                except MissingStructureError:
+                    return False
+        else:
+            if self.target_structure_two is None:
+                self.target_structure_two = (
+                    self.target_structure_one.parent_space.contents.filter(
+                        lambda x: x != self.target_structure_one
+                        and x.is_chunk
+                        and x.quality > 0
+                    ).get(key=relating_exigency)
                 )
                 self.bubble_chamber.loggers["activity"].log(
                     self, f"Found target structure two: {self.target_structure_two}"
                 )
-            except MissingStructureError:
-                return False
+            self.parent_concept = (
+                self.bubble_chamber.concepts.where(
+                    structure_type=Relation, is_slot=False
+                )
+                .where_not(classifier=None)
+                .filter(
+                    lambda x: self.target_structure_one.relations.where(
+                        parent_concept=x, end=self.target_structure_two
+                    ).is_empty()
+                )
+                .get(
+                    key=lambda x: x.classifier.classify(
+                        concept=x,
+                        space=self.target_space,
+                        start=self.target_structure_one,
+                        end=self.target_structure_two,
+                    )
+                )  # key is classification
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found parent concept: {self.parent_concept}"
+            )
         return True
 
     def _calculate_confidence(self):

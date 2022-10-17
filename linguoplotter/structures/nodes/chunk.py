@@ -1,11 +1,12 @@
 from __future__ import annotations
-from math import prod
 import statistics
 from typing import List
 
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collection_keys import relating_exigency
 from linguoplotter.structures import Node, Space
 
 from .concept import Concept
@@ -183,6 +184,12 @@ class Chunk(Node):
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:
         space = self.parent_space if space is None else space
+        try:
+            return self.relatives.filter(
+                lambda x: self.relations.where(end=x, conceptual_space=space).is_empty()
+            ).get(key=relating_exigency)
+        except MissingStructureError:
+            pass
         chunks = space.contents.filter(
             lambda x: x.is_chunk
             and not x.is_letter_chunk
