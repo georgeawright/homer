@@ -62,9 +62,11 @@ class ViewSuggester(Suggester):
     ):
         contextual_space = bubble_chamber.input_spaces.get(key=activation)
         if frame is None:
-            frame = bubble_chamber.frames.where(
-                parent_frame=None, is_sub_frame=False
-            ).get(key=exigency)
+            frame = (
+                bubble_chamber.frames.filter(lambda x: x.exigency > 0)
+                .where(parent_frame=None, is_sub_frame=False)
+                .get(key=exigency)
+            )
         urgency = urgency if urgency is not None else frame.exigency
         return cls.spawn(
             parent_id,
