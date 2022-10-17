@@ -120,6 +120,7 @@ class Linguoplotter:
                 print(label, label.quality, label.activation)
             for relation in chunk.relations:
                 print(relation, relation.quality, relation.activation)
+            print()
         for chunk in main_input.contents.where(is_chunk=True):
             print(
                 chunk.structure_id,
