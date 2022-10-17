@@ -1,6 +1,6 @@
 (define same-different-concept
   (def-concept :name "same-different" :locations (list) :classifier None :instance_type None
-    :structure_type Correspondence :parent_space None
+    :structure_type Relation :parent_space None
     :distance_function centroid_euclidean_distance))
 (define same-different-space
   (def-conceptual-space :name "same-different" :parent_concept same-different-concept
