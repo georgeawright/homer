@@ -57,6 +57,9 @@ class GarbageCollector(Codelet):
             if any(
                 [
                     structure in codelet.target_structures
+                    or any(
+                        [link in codelet.target_structures for link in structure.links]
+                    )
                     or (
                         hasattr(codelet, "target_view")
                         and codelet.target_view is not None
