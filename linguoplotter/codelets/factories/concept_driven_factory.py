@@ -50,10 +50,14 @@ class ConceptDrivenFactory(Factory):
             self.child_codelets.append(follow_up)
 
     def _get_parent_concept(self) -> Concept:
-        return StructureCollection.union(
-            self._get_label_concepts(),
-            self._get_relational_concepts(),
-        ).get(key=activation)
+        return (
+            StructureCollection.union(
+                self._get_label_concepts(),
+                self._get_relational_concepts(),
+            )
+            .filter(lambda x: x.is_fully_active())
+            .get()
+        )
 
     def _get_follow_up_class(self, parent_concept: Concept):
         action_concept = self.bubble_chamber.concepts["suggest"]
