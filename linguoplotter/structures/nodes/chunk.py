@@ -269,4 +269,8 @@ class Chunk(Node):
         members = "{" + ",".join([member.structure_id for member in self.members]) + "}"
         if self.parent_space is None:
             return f"<{self.structure_id} {members}>"
-        return f"<{self.structure_id} {members} in {self.parent_space.structure_id} {self.locations}>"
+        return (
+            f"<{self.structure_id} {members} in {self.parent_space.structure_id}\n"
+            + "\n".join([f"    {location}" for location in self.locations])
+            + ">"
+        )
