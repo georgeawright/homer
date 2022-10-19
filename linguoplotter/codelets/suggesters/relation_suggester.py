@@ -141,9 +141,15 @@ class RelationSuggester(Suggester):
                 start=self.target_structure_one,
                 end=self.target_structure_two,
             )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Preliminary classification: {classification}"
+            )
             if classification < 0.5:
                 self.parent_concept = self.bubble_chamber.new_compound_concept(
                     self.bubble_chamber.concepts["not"], [self.parent_concept]
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    self, f"Concept replaced with: {self.parent_concept}"
                 )
             if self.target_structure_two is None:
                 try:

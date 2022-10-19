@@ -21,7 +21,7 @@
   (def-concept :name "always"
     :locations (list (Location (list (list 0) (list 24) (list 48)) time-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space time-space :distance_function area_euclidean_distance
+    :parent_space time-space :distance_function boolean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 
 (def-correspondence :start friday-concept :end early-concept :parent_concept same-concept)

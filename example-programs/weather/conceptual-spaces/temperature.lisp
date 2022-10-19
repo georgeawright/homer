@@ -1,18 +1,22 @@
+(define temperature-dist-to-prox-weight 2)
 (define temperature-concept
   (def-concept :name "temperature" :locations (list) :classifier None
     :instance_type Chunk :structure_type Label :parent_space None
-    :distance_function centroid_euclidean_distance))
+    :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight temperature-dist-to-prox-weight))
 (define temperature-space
   (def-conceptual-space :name "temperature" :parent_concept temperature-concept
     :no_of_dimensions 1 :is_basic_level True :dimensions (list) :sub_spaces (list extremeness-space)))
 (define hot-concept
   (def-concept :name "hot" :locations (list (Location (list (list 22)) temperature-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space temperature-space :distance_function centroid_euclidean_distance))
+    :parent_space temperature-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight temperature-dist-to-prox-weight))
 (define warm-concept
   (def-concept :name "warm" :locations (list (Location (list (list 18)) temperature-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space temperature-space :distance_function centroid_euclidean_distance))
+    :parent_space temperature-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight temperature-dist-to-prox-weight))
 (define mild-concept
   (def-concept :name "mild"
     :locations (list (Location (list (list 0)) extremeness-space)
@@ -22,11 +26,13 @@
 (define cool-concept
   (def-concept :name "cool" :locations (list (Location (list (list 8)) temperature-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space temperature-space :distance_function centroid_euclidean_distance))
+    :parent_space temperature-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight temperature-dist-to-prox-weight))
 (define cold-concept
   (def-concept :name "cold" :locations (list (Location (list (list 4)) temperature-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
-    :parent_space temperature-space :distance_function centroid_euclidean_distance))
+    :parent_space temperature-space :distance_function centroid_euclidean_distance
+    :distance_to_proximity_weight temperature-dist-to-prox-weight))
 
 (def-relation :start hot-concept :end more-concept :parent_concept more-concept :activation 1.0)
 (def-relation :start warm-concept :end more-concept :parent_concept more-concept :activation 1.0)

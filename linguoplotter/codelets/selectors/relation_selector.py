@@ -25,6 +25,12 @@ class RelationSelector(Selector):
                 .excluding(champion_relation)
                 .get()
             )
+            self.challengers = self.bubble_chamber.new_structure_collection(
+                challenger_relation
+            )
+            self.bubble_chamber.loggers["activity"].log_collection(
+                self, self.challengers, "Found challengers"
+            )
         except MissingStructureError:
             try:
                 challenger_relation = (
@@ -37,14 +43,55 @@ class RelationSelector(Selector):
                     .excluding(champion_relation)
                     .get(key=activation)
                 )
+                self.challengers = self.bubble_chamber.new_structure_collection(
+                    challenger_relation
+                )
+                self.bubble_chamber.loggers["activity"].log_collection(
+                    self, self.challengers, "Found challengers"
+                )
             except MissingStructureError:
-                return True
-        self.challengers = self.bubble_chamber.new_structure_collection(
-            challenger_relation
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, self.challengers, "Found challengers"
-        )
+                try:
+                    challenger_relation = (
+                        StructureCollection.union(
+                            champion_relation.start.relations.filter(
+                                lambda x: x.conceptual_space
+                                == champion_relation.conceptual_space
+                                and x.parent_concept.parent_space
+                                == champion_relation.parent_space
+                            ),
+                            champion_relation.end.relations.filter(
+                                lambda x: x.conceptual_space
+                                == champion_relation.conceptual_space
+                                and x.parent_concept.parent_space
+                                == champion_relation.parent_space
+                            ),
+                        )
+                        .excluding(champion_relation)
+                        .get(key=activation)
+                    )
+                    self.challengers = self.bubble_chamber.new_structure_collection(
+                        challenger_relation
+                    )
+                    for relation in challenger_relation.start.relations.filter(
+                        lambda x: x.end == challenger_relation.end
+                        and x.conceptual_space
+                        and x.activation > 0
+                    ):
+                        self.challengers.add(relation)
+                    for relation in champion_relation.start.relations.filter(
+                        lambda x: x.end == challenger_relation.end
+                        and x.conceptual_space
+                        and x.activation > 0
+                    ):
+                        self.champions.add(relation)
+                    self.bubble_chamber.loggers["activity"].log_collection(
+                        self, self.challengers, "Found challengers"
+                    )
+                    self.bubble_chamber.loggers["activity"].log_collection(
+                        self, self.champions, "Set champions"
+                    )
+                except MissingStructureError:
+                    return True
         return True
 
     def _fizzle(self):
@@ -84,3 +131,11 @@ class RelationSelector(Selector):
             )
         except MissingStructureError:
             pass
+
+    @property
+    def _champions_size(self):
+        return len(self.champions)
+
+    @property
+    def _challengers_size(self):
+        return len(self.challengers)

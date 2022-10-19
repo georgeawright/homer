@@ -142,15 +142,34 @@ class Structure(ABC):
         self.chunking_exigency = statistics.fmean([self.activation, self.unchunkedness])
 
     def recalculate_labeling_exigency(self):
-        self.labeling_exigency = statistics.fmean([self.activation, self.unlabeledness])
+        if self.quality is None:
+            self.labeling_exigency = statistics.fmean(
+                [self.activation, self.unlabeledness]
+            )
+        else:
+            self.labeling_exigency = statistics.fmean(
+                [self.activation * self.quality, self.unlabeledness]
+            )
 
     def recalculate_relating_exigency(self):
-        self.relating_exigency = statistics.fmean([self.activation, self.unrelatedness])
+        if self.quality is None:
+            self.relating_exigency = statistics.fmean(
+                [self.activation, self.unrelatedness]
+            )
+        else:
+            self.relating_exigency = statistics.fmean(
+                [self.activation * self.quality, self.unrelatedness]
+            )
 
     def recalculate_corresponding_exigency(self):
-        self.corresponding_exigency = statistics.fmean(
-            [self.activation, self.uncorrespondedness]
-        )
+        if self.quality is None:
+            self.corresponding_exigency = statistics.fmean(
+                [self.activation, self.uncorrespondedness]
+            )
+        else:
+            self.corresponding_exigency = statistics.fmean(
+                [self.activation * self.quality, self.uncorrespondedness]
+            )
 
     @property
     def quality(self) -> FloatBetweenOneAndZero:
@@ -186,7 +205,7 @@ class Structure(ABC):
     def recalculate_unlabeledness(self):
         try:
             self.unlabeledness = 1 - FloatBetweenOneAndZero(
-                len(self.positive_labels) / len(self.locations)
+                sum([label.quality for label in self.labels]) / len(self.locations)
             )
         except ZeroDivisionError:
             self.unlabeledness = 1
@@ -194,7 +213,8 @@ class Structure(ABC):
     def recalculate_unrelatedness(self):
         try:
             self.unrelatedness = 1 - FloatBetweenOneAndZero(
-                len(self.relations) / len(self.locations)
+                sum([relation.quality for relation in self.relations])
+                / len(self.locations)
             )
         except ZeroDivisionError:
             self.unrelatedness = 1

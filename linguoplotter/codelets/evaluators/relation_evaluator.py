@@ -40,6 +40,13 @@ class RelationEvaluator(Evaluator):
         parallel_relations = StructureCollection.intersection(
             target_relation.start.relations, target_relation.end.relations
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, target_relation.start.relations
+        )
+        self.bubble_chamber.loggers["activity"].log(self, target_relation.end.relations)
+        self.bubble_chamber.loggers["activity"].log_collection(
+            self, parallel_relations, "Parallel relations"
+        )
         classifications = {
             relation: relation.parent_concept.classifier.classify(
                 space=relation.conceptual_space,

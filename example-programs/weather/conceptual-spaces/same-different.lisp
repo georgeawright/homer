@@ -8,14 +8,14 @@
 (define same-concept
   (def-concept :name "same"
     :locations (list (Location (list (list 10)) same-different-space))
-    :classifier (SamenessClassifier) :instance_type Chunk :structure_type Correspondence
+    :classifier (SamenessClassifier) :instance_type Chunk :structure_type Relation
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 (define not-same-concept
   (def-compound-concept :root not-concept :args (list same-concept)))
 (define different-concept
   (def-concept :name "different"
     :locations (list (Location (list (list 10)) same-different-space))
-    :classifier (DifferentnessClassifier) :instance_type Chunk :structure_type Correspondence
+    :classifier (DifferentnessClassifier) :instance_type Chunk :structure_type Relation
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 (define not-different-concept
   (def-compound-concept :root not-concept :args (list different-concept)))
