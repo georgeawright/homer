@@ -7,7 +7,6 @@ from linguoplotter.codelets.suggesters import (
     LabelSuggester,
     RelationSuggester,
 )
-from linguoplotter.codelets.suggesters.view_suggesters import SimplexViewSuggester
 from linguoplotter.structure_collection import StructureCollection
 
 
