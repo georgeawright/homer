@@ -63,7 +63,10 @@ class GarbageCollector(Codelet):
                     or (
                         hasattr(codelet, "target_view")
                         and codelet.target_view is not None
-                        and structure in codelet.target_view.structures
+                        and (
+                            structure in codelet.target_view.structures
+                            or structure in codelet.target_view.sub_views
+                        )
                     )
                     for codelet in self.coderack._codelets
                 ]
