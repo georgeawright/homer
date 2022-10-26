@@ -20,7 +20,6 @@ class RelationSelector(Selector):
                 champion_relation.start.champion_relations.filter(
                     lambda x: x.end == champion_relation.end
                     and x.conceptual_space == champion_relation.conceptual_space
-                    and x.parent_concept.parent_space == champion_relation.parent_space
                 )
                 .excluding(champion_relation)
                 .get()
@@ -37,8 +36,6 @@ class RelationSelector(Selector):
                     champion_relation.start.relations.filter(
                         lambda x: x.end == champion_relation.end
                         and x.conceptual_space == champion_relation.conceptual_space
-                        and x.parent_concept.parent_space
-                        == champion_relation.parent_space
                     )
                     .excluding(champion_relation)
                     .get(key=activation)
@@ -56,14 +53,10 @@ class RelationSelector(Selector):
                             champion_relation.start.relations.filter(
                                 lambda x: x.conceptual_space
                                 == champion_relation.conceptual_space
-                                and x.parent_concept.parent_space
-                                == champion_relation.parent_space
                             ),
                             champion_relation.end.relations.filter(
                                 lambda x: x.conceptual_space
                                 == champion_relation.conceptual_space
-                                and x.parent_concept.parent_space
-                                == champion_relation.parent_space
                             ),
                         )
                         .excluding(champion_relation)
@@ -113,6 +106,7 @@ class RelationSelector(Selector):
             winner_relation = self.winners.get()
             parent_concept = winner_relation.parent_concept.friends().get()
             target_space = StructureCollection.intersection(
+                # parent spaces doesn't contain the unidimensional location spaces
                 winner_relation.start.parent_spaces.where(no_of_dimensions=1),
                 winner_relation.end.parent_spaces.where(no_of_dimensions=1),
             ).get(exclude=[winner_relation.conceptual_space])
