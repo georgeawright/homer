@@ -206,6 +206,9 @@ class RelationSuggester(Suggester):
             start=self.target_structure_one,
             end=self.target_structure_two,
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Classification: {classification}"
+        )
         self.confidence = (
             classification
             * min(self.target_structure_one.quality, self.target_structure_two.quality)

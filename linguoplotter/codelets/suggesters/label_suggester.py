@@ -171,6 +171,9 @@ class LabelSuggester(Suggester):
         classification = self.parent_concept.classifier.classify(
             concept=self.parent_concept, start=self.target_node
         )
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Classification: {classification}"
+        )
         self.confidence = (
             classification
             * self.target_node.quality
