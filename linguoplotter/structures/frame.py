@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-import statistics
 
 from linguoplotter import fuzzy
 from linguoplotter.errors import NoLocationError
@@ -131,6 +130,44 @@ class Frame(Structure):
         self.recalculate_unhappiness()
         self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
+    def specify_space(self, parent_space, abstract_space, conceptual_space):
+        parent_space.conceptual_spaces.remove(abstract_space)
+        parent_space.conceptual_spaces.add(conceptual_space)
+        if abstract_space.parent_concept in self.concepts:
+            self.concepts.remove(abstract_space.parent_concept)
+        self.concepts.add(conceptual_space.parent_concept)
+        for item in parent_space.contents:
+            if item.parent_space == abstract_space:
+                item.parent_space = conceptual_space
+            if item.is_relation and item.conceptual_space == abstract_space:
+                item.conceptual_space = conceptual_space
+            try:
+                item.location_in_space(abstract_space).coordinates = [
+                    [math.nan for _ in range(conceptual_space.no_of_dimensions)]
+                ]
+                item.location_in_space(abstract_space).space = conceptual_space
+                conceptual_space.add(item)
+                item.parent_spaces.remove(abstract_space)
+                item.parent_spaces.add(conceptual_space)
+            except NotImplementedError:
+                item.location_in_space(abstract_space).start_coordinates = [
+                    [math.nan for _ in range(conceptual_space.no_of_dimensions)]
+                ]
+                item.location_in_space(abstract_space).end_coordinates = [
+                    [math.nan for _ in range(conceptual_space.no_of_dimensions)]
+                ]
+                item.location_in_space(abstract_space).space = conceptual_space
+                conceptual_space.add(item)
+                item.parent_spaces.remove(abstract_space)
+                item.parent_spaces.add(conceptual_space)
+            except NoLocationError:
+                pass
+        for concept in self.concepts:
+            if concept.parent_space == abstract_space:
+                concept.parent_space = conceptual_space
+            if concept.has_location_in_space(abstract_space):
+                concept.location_in_space(abstract_space).space = conceptual_space
+
     def instantiate(
         self,
         input_space: "ContextualSpace",
@@ -140,44 +177,6 @@ class Frame(Structure):
         input_copies: dict = None,
         output_copies: dict = None,
     ):
-        def specify_space(parent_space, abstract_space, specified_space, concepts):
-            parent_space.conceptual_spaces.remove(abstract_space)
-            parent_space.conceptual_spaces.add(specified_space)
-            for item in parent_space.contents:
-                if abstract_space.parent_concept in concepts:
-                    concepts.remove(abstract_space.parent_concept)
-                self.concepts.add(specified_space.parent_concept)
-                if item.parent_space == abstract_space:
-                    item.parent_space = specified_space
-                if item.is_relation and item.conceptual_space == abstract_space:
-                    item.conceptual_space = specified_space
-                try:
-                    item.location_in_space(abstract_space).coordinates = [
-                        [math.nan for _ in range(specified_space.no_of_dimensions)]
-                    ]
-                    item.location_in_space(abstract_space).space = specified_space
-                    specified_space.add(item)
-                    item.parent_spaces.remove(abstract_space)
-                    item.parent_spaces.add(specified_space)
-                except NotImplementedError:
-                    item.location_in_space(abstract_space).start_coordinates = [
-                        [math.nan for _ in range(specified_space.no_of_dimensions)]
-                    ]
-                    item.location_in_space(abstract_space).end_coordinates = [
-                        [math.nan for _ in range(specified_space.no_of_dimensions)]
-                    ]
-                    item.location_in_space(abstract_space).space = specified_space
-                    specified_space.add(item)
-                    item.parent_spaces.remove(abstract_space)
-                    item.parent_spaces.add(specified_space)
-                except NoLocationError:
-                    pass
-            for concept in concepts:
-                if concept.parent_space == abstract_space:
-                    concept.parent_space = specified_space
-                if concept.has_location_in_space(abstract_space):
-                    concept.location_in_space(abstract_space).space = specified_space
-
         input_copies = {} if input_copies is None else input_copies
         output_copies = {} if output_copies is None else output_copies
         # need to copy the concepts to prevent interference between frame instances
@@ -220,20 +219,12 @@ class Frame(Structure):
         for structure in input_space_copy.contents.where(is_link=True):
             if structure.parent_concept in concept_copies:
                 structure._parent_concept = concept_copies[structure.parent_concept]
-        for conceptual_space in input_space_copy.conceptual_spaces.where(is_slot=True):
-            specified_space = conceptual_spaces_map[conceptual_space]
-            specify_space(input_space_copy, conceptual_space, specified_space, concepts)
         output_space_copy, output_copies = output_space.copy(
             bubble_chamber=bubble_chamber, parent_id=parent_id, copies=output_copies
         )
         for structure in output_space_copy.contents.where(is_link=True):
             if structure.parent_concept in concept_copies:
                 structure._parent_concept = concept_copies[structure.parent_concept]
-        for conceptual_space in output_space_copy.conceptual_spaces.where(is_slot=True):
-            specified_space = conceptual_spaces_map[conceptual_space]
-            specify_space(
-                output_space_copy, conceptual_space, specified_space, concepts
-            )
         sub_frames = bubble_chamber.new_structure_collection()
         space_copies = {input_space: input_space_copy, output_space: output_space_copy}
         for sub_frame in self.sub_frames:
@@ -267,7 +258,7 @@ class Frame(Structure):
                     copy.parent_space = space_copies[original.parent_space]
                 elif original.is_label or original.is_relation:
                     copy._parent_space = space_copies[original.parent_space]
-        return bubble_chamber.new_frame(
+        new_frame = bubble_chamber.new_frame(
             parent_id=parent_id,
             name=ID.new_frame_instance(self.name),
             parent_concept=self.parent_concept,
@@ -279,6 +270,21 @@ class Frame(Structure):
             is_sub_frame=self.is_sub_frame,
             depth=self.depth,
         )
+        for conceptual_space in new_frame.input_space.conceptual_spaces.where(
+            is_slot=True
+        ):
+            specified_space = conceptual_spaces_map[conceptual_space]
+            new_frame.specify_space(
+                new_frame.input_space, conceptual_space, specified_space
+            )
+        for conceptual_space in new_frame.output_space.conceptual_spaces.where(
+            is_slot=True
+        ):
+            specified_space = conceptual_spaces_map[conceptual_space]
+            new_frame.specify_space(
+                new_frame.output_space, conceptual_space, specified_space
+            )
+        return new_frame
 
     def spread_activation(self):
         pass
