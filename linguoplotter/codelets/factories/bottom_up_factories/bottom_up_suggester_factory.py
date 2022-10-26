@@ -37,15 +37,27 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             f"Proportion of unfilled_slots: {proportion_of_unfilled_slots}",
         )
 
-        follow_up_classes = [
-            (ChunkSuggester, proportion_of_unchunked_raw_chunks),
-            (LabelSuggester, proportion_of_unlabeled_chunks),
-            (RelationSuggester, proportion_of_unrelated_chunks),
-            (CorrespondenceSuggester, proportion_of_unfilled_slots),
-            (ViewSuggester, proportion_of_uncorresponded_links),
-        ]
-        follow_up_classes.sort(key=lambda x: x[1], reverse=True)
-        follow_up_class = follow_up_classes[0][0]
+        # TODO: use random machine select
+        follow_up_class = self.bubble_chamber.random_machine.select(
+            [
+                (ChunkSuggester, proportion_of_unchunked_raw_chunks),
+                (LabelSuggester, proportion_of_unlabeled_chunks),
+                (RelationSuggester, proportion_of_unrelated_chunks),
+                (CorrespondenceSuggester, proportion_of_unfilled_slots),
+                (ViewSuggester, proportion_of_uncorresponded_links),
+            ],
+            key=lambda x: x[1],
+        )[0]
+
+        #        follow_up_classes = [
+        #            (ChunkSuggester, proportion_of_unchunked_raw_chunks),
+        #            (LabelSuggester, proportion_of_unlabeled_chunks),
+        #            (RelationSuggester, proportion_of_unrelated_chunks),
+        #            (CorrespondenceSuggester, proportion_of_unfilled_slots),
+        #            (ViewSuggester, proportion_of_uncorresponded_links),
+        #        ]
+        #        follow_up_classes.sort(key=lambda x: x[1], reverse=True)
+        #        follow_up_class = follow_up_classes[0][0]
 
         self.child_codelets.append(
             follow_up_class.make(self.codelet_id, self.bubble_chamber)
