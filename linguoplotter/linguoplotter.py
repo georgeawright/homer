@@ -112,7 +112,9 @@ class Linguoplotter:
         print(f"satisfaction: {self.bubble_chamber.worldview.satisfaction}")
         print(f"result: {self.bubble_chamber.result}")
         main_input = self.bubble_chamber.spaces.where(is_main_input=True).get()
-        for chunk in main_input.contents.where(is_chunk=True, quality=1, activation=1):
+        for chunk in main_input.contents.filter(
+            lambda x: x.is_chunk and x.quality > 0.5 and x.is_fully_active()
+        ):
             print(chunk, chunk.quality, chunk.activation)
             print(chunk.champion_labels)
             print(chunk.champion_relations)
