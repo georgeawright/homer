@@ -1,5 +1,4 @@
 from linguoplotter.codelets.builders import CorrespondenceBuilder
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.structure_collection import StructureCollection
 
 
