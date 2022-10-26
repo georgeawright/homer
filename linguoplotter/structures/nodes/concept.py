@@ -24,6 +24,7 @@ class Concept(Node):
         parent_space: Space,
         child_spaces: StructureCollection,
         distance_function: Callable,
+        possible_instances: StructureCollection,
         links_in: StructureCollection,
         links_out: StructureCollection,
         parent_spaces: StructureCollection,
@@ -54,6 +55,7 @@ class Concept(Node):
         self.structure_type = structure_type
         self.child_spaces = child_spaces
         self.distance_function = distance_function
+        self.possible_instances = possible_instances
         self.instances = instances
         self._depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
@@ -243,6 +245,7 @@ class Concept(Node):
             structure_type=self.structure_type,
             parent_space=self.parent_space,
             distance_function=self.distance_function,
+            possible_instances=self.possible_instances.copy(),
             depth=self.depth,
             distance_to_proximity_weight=self.distance_to_proximity_weight,
             is_slot=self.is_slot,

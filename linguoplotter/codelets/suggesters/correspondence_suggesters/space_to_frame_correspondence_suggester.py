@@ -281,6 +281,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     .start.labels.filter(
                         lambda x: x.parent_concept
                         in correspondence_suggester.target_conceptual_space.contents
+                        and x.parent_concept
+                        in correspondence_suggester.target_structure_two.parent_concept.possible_instances
+                        if not correspondence_suggester.target_structure_two.parent_concept.possible_instances.is_empty()
+                        else True
                     )
                     .get()
                 )
@@ -312,6 +316,12 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                                 == correspondence_suggester.target_structure_two.parent_concept
                             ),
                         ]
+                    )
+                    and (
+                        x.parent_concept
+                        in correspondence_suggester.target_structure_two.parent_concept.possible_instances
+                        if not correspondence_suggester.target_structure_two.parent_concept.possible_instances.is_empty()
+                        else True
                     )
                 ).get(
                     key=corresponding_exigency
@@ -376,6 +386,12 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     x.parent_concept.parent_space
                     == correspondence_suggester.target_structure_two.parent_concept.parent_space
                 )
+                and (
+                    x.parent_concept
+                    in correspondence_suggester.target_structure_two.parent_concept.possible_instances
+                    if not correspondence_suggester.target_structure_two.parent_concept.possible_instances.is_empty()
+                    else True
+                )
                 and x.conceptual_space
                 == correspondence_suggester.target_conceptual_space
             )
@@ -429,20 +445,25 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 calling_codelet.bubble_chamber.loggers["activity"].log(
                     calling_codelet, "Target structure two not in node group"
                 )
-                correspondence_suggester.target_structure_one = (
-                    source_collection.filter(
-                        lambda x: type(x)
-                        == type(correspondence_suggester.target_structure_two)
-                        and (not x.is_slot or not x.correspondences.is_empty())
-                        and (
-                            x.has_location_in_space(
-                                correspondence_suggester.target_conceptual_space
-                            )
-                            if correspondence_suggester.target_conceptual_space
-                            is not None
-                            else True
+                correspondence_suggester.target_structure_one = source_collection.filter(
+                    lambda x: type(x)
+                    == type(correspondence_suggester.target_structure_two)
+                    and (not x.is_slot or not x.correspondences.is_empty())
+                    and (
+                        x.has_location_in_space(
+                            correspondence_suggester.target_conceptual_space
                         )
-                    ).get(key=corresponding_exigency)
+                        if correspondence_suggester.target_conceptual_space is not None
+                        else True
+                    )
+                    and (
+                        x.parent_concept
+                        in correspondence_suggester.target_structure_two.parent_concept.possible_instances
+                        if not correspondence_suggester.target_structure_two.parent_concept.possible_instances.is_empty()
+                        else True
+                    )
+                ).get(
+                    key=corresponding_exigency
                 )
         calling_codelet.bubble_chamber.loggers["activity"].log(
             calling_codelet,

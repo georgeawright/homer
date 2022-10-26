@@ -283,6 +283,8 @@ class BubbleChamber:
             for argument in item.arguments:
                 argument.links_out.remove(item)
                 argument.links_in.remove(item)
+                argument.champion_labels.remove(item)
+                argument.champion_relations.remove(item)
                 argument.recalculate_exigency()
         if item.is_chunk:
             for view in self.views.copy():
@@ -554,6 +556,7 @@ class BubbleChamber:
         structure_type: type = None,
         parent_space: Space = None,
         distance_function: Callable = None,
+        possible_instances: StructureCollection = None,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         activation: FloatBetweenOneAndZero = None,
@@ -562,6 +565,11 @@ class BubbleChamber:
         locations = [] if locations is None else locations
         parent_spaces = self.new_structure_collection(
             *[location.space for location in locations]
+        )
+        possible_instances = (
+            self.new_structure_collection()
+            if possible_instances is None
+            else possible_instances
         )
         concept = Concept(
             structure_id=ID.new(Concept),
@@ -574,6 +582,7 @@ class BubbleChamber:
             parent_space=parent_space,
             child_spaces=self.new_structure_collection(),
             distance_function=distance_function,
+            possible_instances=possible_instances,
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),
             parent_spaces=parent_spaces,
@@ -610,6 +619,7 @@ class BubbleChamber:
                 root=root,
                 args=args,
                 child_spaces=self.new_structure_collection(),
+                possible_instances=self.new_structure_collection(),
                 links_in=self.new_structure_collection(),
                 links_out=self.new_structure_collection(),
                 parent_spaces=parent_spaces,

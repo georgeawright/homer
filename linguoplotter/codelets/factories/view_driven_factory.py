@@ -198,6 +198,10 @@ class ViewDrivenFactory(Factory):
                 parent_concept = self.target_slot.parent_concept
             elif self.target_slot.parent_concept.is_filled_in:
                 parent_concept = self.target_slot.parent_concept.non_slot_value
+            elif not self.target_slot.parent_concept.possible_instances.is_empty():
+                parent_concept = self.target_slot.parent_concept.possible_instances.get(
+                    key=lambda x: x.proximity_to(node)
+                )
             else:
                 parent_concept = (
                     self.target_slot.parent_spaces.where(is_conceptual_space=True)
@@ -215,10 +219,15 @@ class ViewDrivenFactory(Factory):
                 else self.target_view.unhappiness,
             )
         if self.target_slot.is_relation:
+            # TODO: probably get targets before concept
             if not self.target_slot.parent_concept.is_slot:
                 parent_concept = self.target_slot.parent_concept
             elif self.target_slot.parent_concept.is_filled_in:
                 parent_concept = self.target_slot.parent_concept.non_slot_value
+            elif not self.target_slot.parent_concept.possible_instances.is_empty():
+                parent_concept = (
+                    self.target_slot.parent_concept.possible_instances.get()
+                )
             else:
                 parent_concept = (
                     self.target_slot.parent_spaces.filter(
@@ -404,9 +413,15 @@ class ViewDrivenFactory(Factory):
             else self.target_view.parent_frame.output_space
         )
         sub_frame = self.target_view.parent_frame.sub_frames.filter(
-            lambda x: x.input_space in self.target_slot.parent_spaces
-            or x.output_space in self.target_slot.parent_spaces
+            lambda x: x not in self.target_view.matched_sub_frames
+            and (
+                x.input_space in self.target_slot.parent_spaces
+                or x.output_space in self.target_slot.parent_spaces
+            )
         ).get()
+        self.bubble_chamber.loggers["activity"].log(
+            self, f"Found sub frame: {sub_frame}"
+        )
         self.bubble_chamber.loggers["activity"].log_collection(
             self, self.target_view.node_groups, "node groups"
         )
