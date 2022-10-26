@@ -7,6 +7,7 @@
     :no_of_dimensions 1))
 (define location-relation-concept
   (def-concept :name "" :is_slot True :parent_space more-less-space
+    :possible_instances (StructureCollection more-concept less-concept)
     :locations (list (Location (list) more-less-space))))
 (define early-location-concept
   (def-concept :name "" :is_slot True :parent_space location-space
