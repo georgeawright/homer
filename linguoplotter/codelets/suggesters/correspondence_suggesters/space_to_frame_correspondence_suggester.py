@@ -214,26 +214,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     @staticmethod
     def _get_target_structure_one(calling_codelet, correspondence_suggester):
         source_collection = correspondence_suggester.target_space_one.contents
-        if (
-            correspondence_suggester.target_structure_two.is_label
-            and correspondence_suggester.target_structure_two.start.is_label
-        ):
-            return CorrespondenceSuggester._get_target_structure_one_labeled_label(
-                calling_codelet, correspondence_suggester, source_collection
-            )
-        if (
-            correspondence_suggester.target_structure_two.is_link
-            and correspondence_suggester.target_structure_two.is_node
-        ):
-            correspondence_suggester.target_structure_one = source_collection.filter(
-                lambda x: x.has_location_in_space(
-                    correspondence_suggester.target_conceptual_space
-                )
-            ).get(key=corresponding_exigency)
-        if (
-            correspondence_suggester.target_structure_two.is_link
-            and not correspondence_suggester.target_structure_two.is_node
-        ):
+        if correspondence_suggester.target_structure_two.is_link:
             if (
                 correspondence_suggester.target_structure_two.start
                 in correspondence_suggester.target_view.grouped_nodes
@@ -403,10 +384,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             correspondence_suggester.target_structure_one = matching_relations.get(
                 key=corresponding_exigency
             )
-        if (
-            correspondence_suggester.target_structure_two.is_node
-            and not correspondence_suggester.target_structure_two.is_link
-        ):
+        if correspondence_suggester.target_structure_two.is_node:
             if (
                 correspondence_suggester.target_structure_two
                 in correspondence_suggester.target_view.grouped_nodes

@@ -50,7 +50,6 @@ class Interpreter:
             "def-concept": bubble_chamber.new_concept,
             "def-compound-concept": bubble_chamber.new_compound_concept,
             "def-letter-chunk": bubble_chamber.new_letter_chunk,
-            "def-link-or-node": bubble_chamber.new_link_or_node,
             "def-correspondence": bubble_chamber.new_correspondence,
             "def-label": bubble_chamber.new_label,
             "def-relation": bubble_chamber.new_relation,

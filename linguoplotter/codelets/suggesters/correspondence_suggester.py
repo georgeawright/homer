@@ -5,13 +5,10 @@ from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import (
     corresponding_exigency,
 )
 from linguoplotter.structures import View
-
-# TODO: possibly need restriction on space to frame correspondence suggester to prevent corresponding to sub-space items
 
 
 class CorrespondenceSuggester(Suggester):
@@ -204,26 +201,7 @@ class CorrespondenceSuggester(Suggester):
     @staticmethod
     def _get_target_structure_one(calling_codelet, correspondence_suggester):
         source_collection = correspondence_suggester.target_space_one.contents
-        if (
-            correspondence_suggester.target_structure_two.is_label
-            and correspondence_suggester.target_structure_two.start.is_label
-        ):
-            return CorrespondenceSuggester._get_target_structure_one_labeled_label(
-                calling_codelet, correspondence_suggester, source_collection
-            )
-        if (
-            correspondence_suggester.target_structure_two.is_link
-            and correspondence_suggester.target_structure_two.is_node
-        ):
-            correspondence_suggester.target_structure_one = source_collection.filter(
-                lambda x: x.has_location_in_space(
-                    correspondence_suggester.target_conceptual_space
-                )
-            ).get(key=corresponding_exigency)
-        if (
-            correspondence_suggester.target_structure_two.is_link
-            and not correspondence_suggester.target_structure_two.is_node
-        ):
+        if correspondence_suggester.target_structure_two.is_link:
             if (
                 correspondence_suggester.target_structure_two.start
                 in correspondence_suggester.target_view.grouped_nodes
@@ -372,10 +350,7 @@ class CorrespondenceSuggester(Suggester):
             correspondence_suggester.target_structure_one = matching_relations.get(
                 key=corresponding_exigency
             )
-        if (
-            correspondence_suggester.target_structure_two.is_node
-            and not correspondence_suggester.target_structure_two.is_link
-        ):
+        if correspondence_suggester.target_structure_two.is_node:
             if (
                 correspondence_suggester.target_structure_two
                 in correspondence_suggester.target_view.grouped_nodes
