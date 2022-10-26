@@ -260,8 +260,9 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     )
                     .get()
                     .start.labels.filter(
-                        lambda x: x.parent_concept
-                        in correspondence_suggester.target_conceptual_space.contents
+                        lambda x: correspondence_suggester.target_conceptual_space.subsumes(
+                            x.parent_concept.parent_space
+                        )
                         and x.parent_concept
                         in correspondence_suggester.target_structure_two.parent_concept.possible_instances
                         if not correspondence_suggester.target_structure_two.parent_concept.possible_instances.is_empty()
@@ -274,6 +275,11 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     calling_codelet,
                     "Searching for target structure one via source collection",
                 )
+                calling_codelet.bubble_chamber.loggers["activity"].log_collection(
+                    calling_codelet,
+                    correspondence_suggester.target_conceptual_space.possible_instances,
+                    "target conceptual space possible instances",
+                )
                 correspondence_suggester.target_structure_one = source_collection.filter(
                     lambda x: x.is_label
                     and (
@@ -282,8 +288,8 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     )
                     and x.start.quality > 0
                     and x.quality > 0
-                    and x.has_location_in_space(
-                        correspondence_suggester.target_conceptual_space
+                    and correspondence_suggester.target_conceptual_space.subsumes(
+                        x.parent_concept.parent_space
                     )
                     and any(
                         [
@@ -346,11 +352,9 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
             matching_relations = source_collection.filter(
                 lambda x: x.is_relation
-                and x.quality > 0
+                and all([x.quality > 0, x.start.quality > 0, x.end.quality > 0])
                 and (x.start == structure_one_start or structure_one_start is None)
-                and (x.start.quality > 0)
                 and (x.end == structure_one_end or structure_one_end is None)
-                and (x.end.quality > 0)
                 and any(
                     [
                         x.parent_concept
@@ -363,9 +367,11 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         ),
                     ]
                 )
-                and (
+                and correspondence_suggester.target_structure_two.parent_concept.parent_space.subsumes(
                     x.parent_concept.parent_space
-                    == correspondence_suggester.target_structure_two.parent_concept.parent_space
+                )
+                and correspondence_suggester.target_conceptual_space.subsumes(
+                    x.conceptual_space
                 )
                 and (
                     x.parent_concept
@@ -373,8 +379,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     if not correspondence_suggester.target_structure_two.parent_concept.possible_instances.is_empty()
                     else True
                 )
-                and x.conceptual_space
-                == correspondence_suggester.target_conceptual_space
             )
             calling_codelet.bubble_chamber.loggers["activity"].log_collection(
                 calling_codelet,
@@ -420,6 +424,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     if correspondence_suggester.target_structure_one is None:
                         raise MissingStructureError
             else:
+                # TODO: possible defunct branch?
                 calling_codelet.bubble_chamber.loggers["activity"].log(
                     calling_codelet, "Target structure two not in node group"
                 )
@@ -432,12 +437,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                             correspondence_suggester.target_conceptual_space
                         )
                         if correspondence_suggester.target_conceptual_space is not None
-                        else True
-                    )
-                    and (
-                        x.parent_concept
-                        in correspondence_suggester.target_structure_two.parent_concept.possible_instances
-                        if not correspondence_suggester.target_structure_two.parent_concept.possible_instances.is_empty()
+                        and not correspondence_suggester.target_conceptual_space.is_slot
                         else True
                     )
                 ).get(

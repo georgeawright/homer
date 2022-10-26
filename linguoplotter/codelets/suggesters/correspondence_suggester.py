@@ -247,8 +247,9 @@ class CorrespondenceSuggester(Suggester):
                     )
                     .get()
                     .start.labels.filter(
-                        lambda x: x.parent_concept
-                        in correspondence_suggester.target_conceptual_space.contents
+                        lambda x: correspondence_suggester.target_conceptual_space.subsumes(
+                            x.parent_concept.parent_space
+                        )
                     )
                     .get()
                 )
@@ -263,8 +264,8 @@ class CorrespondenceSuggester(Suggester):
                         (x.start == structure_one_start)
                         or (structure_one_start is None)
                     )
-                    and x.has_location_in_space(
-                        correspondence_suggester.target_conceptual_space
+                    and correspondence_suggester.target_conceptual_space.subsumes(
+                        x.parent_concept.parent_space
                     )
                     and any(
                         [
@@ -335,12 +336,12 @@ class CorrespondenceSuggester(Suggester):
                         ),
                     ]
                 )
-                and (
+                and correspondence_suggester.target_structure_two.parent_concept.parent_space.subsumes(
                     x.parent_concept.parent_space
-                    == correspondence_suggester.target_structure_two.parent_concept.parent_space
                 )
-                and x.conceptual_space
-                == correspondence_suggester.target_conceptual_space
+                and correspondence_suggester.target_conceptual_space.subsumes(
+                    x.conceptual_space
+                )
             )
             calling_codelet.bubble_chamber.loggers["activity"].log_collection(
                 calling_codelet,
@@ -386,57 +387,26 @@ class CorrespondenceSuggester(Suggester):
                     if correspondence_suggester.target_structure_one is None:
                         raise MissingStructureError
             else:
+                # TODO: possible defunct branch?
                 calling_codelet.bubble_chamber.loggers["activity"].log(
                     calling_codelet, "Target structure two not in node group"
                 )
-                correspondence_suggester.target_structure_one = (
-                    source_collection.filter(
-                        lambda x: type(x)
-                        == type(correspondence_suggester.target_structure_two)
-                        and (not x.is_slot or not x.correspondences.is_empty())
-                        and (
-                            x.has_location_in_space(
-                                correspondence_suggester.target_conceptual_space
-                            )
-                            if correspondence_suggester.target_conceptual_space
-                            is not None
-                            else True
+                correspondence_suggester.target_structure_one = source_collection.filter(
+                    lambda x: type(x)
+                    == type(correspondence_suggester.target_structure_two)
+                    and (not x.is_slot or not x.correspondences.is_empty())
+                    and (
+                        x.has_location_in_space(
+                            correspondence_suggester.target_conceptual_space
                         )
-                    ).get(key=corresponding_exigency)
+                        if correspondence_suggester.target_conceptual_space is not None
+                        and not correspondence_suggester.target_conceptual_space.is_slot
+                        else True
+                    )
+                ).get(
+                    key=corresponding_exigency
                 )
         calling_codelet.bubble_chamber.loggers["activity"].log(
-            calling_codelet,
-            f"Found target structure one: {correspondence_suggester.target_structure_one}",
-        )
-
-    @staticmethod
-    def _get_target_structure_one_labeled_label(
-        calling_codelet, correspondence_suggester, source_collection
-    ):
-        bubble_chamber = calling_codelet.bubble_chamber
-        labelled_slot_label = correspondence_suggester.target_structure_two.start
-        bubble_chamber.loggers["activity"].log(
-            calling_codelet, f"Labelled slot label: {labelled_slot_label}"
-        )
-        labelled_instance_label = (
-            labelled_slot_label.correspondences.filter(
-                lambda x: x.parent_view == correspondence_suggester.target_view
-                and x.start.parent_space.is_main_input
-            )
-            .get()
-            .start
-        )
-        bubble_chamber.loggers["activity"].log(
-            calling_codelet, f"Labelled instance label: {labelled_instance_label}"
-        )
-        correspondence_suggester.target_structure_one = (
-            labelled_instance_label.labels.filter(
-                lambda x: x.parent_concept.has_location_in_space(
-                    correspondence_suggester.target_conceptual_space
-                )
-            ).get()
-        )
-        bubble_chamber.loggers["activity"].log(
             calling_codelet,
             f"Found target structure one: {correspondence_suggester.target_structure_one}",
         )

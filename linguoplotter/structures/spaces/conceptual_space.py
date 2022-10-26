@@ -114,6 +114,8 @@ class ConceptualSpace(Space):
                 sub_space.add(structure)
 
     def subsumes(self, other) -> bool:
+        if self == other:
+            return True
         return all(
             [
                 self.parent_concept.is_slot
