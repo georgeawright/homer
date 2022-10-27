@@ -4,6 +4,11 @@ from linguoplotter.structure_collection import StructureCollection
 
 class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
+        if self.target_structure_two.is_link and self.target_conceptual_space.is_slot:
+            self.target_view.parent_frame.specify_space(
+                self.target_conceptual_space,
+                self.target_structure_one.parent_concept.parent_space,
+            )
         if not self.target_sub_view.super_views.is_empty():
             self.bubble_chamber.loggers["activity"].log_collection(
                 self, self.target_sub_view.super_views, "super views"

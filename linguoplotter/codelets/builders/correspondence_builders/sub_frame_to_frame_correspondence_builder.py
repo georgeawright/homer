@@ -4,6 +4,11 @@ from linguoplotter.codelets.builders import CorrespondenceBuilder
 class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     def _process_structure(self):
         self.child_structures = self.bubble_chamber.new_structure_collection()
+        if self.target_structure_two.is_link and self.target_conceptual_space.is_slot:
+            self.target_view.parent_frame.specify_space(
+                self.target_conceptual_space,
+                self.target_structure_one.parent_concept.parent_space,
+            )
         if (
             self.target_structure_two.is_link
             and not self.target_structure_two.parent_concept.is_filled_in

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.builder import Builder
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 

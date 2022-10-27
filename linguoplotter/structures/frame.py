@@ -130,13 +130,19 @@ class Frame(Structure):
         self.recalculate_unhappiness()
         self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
-    def specify_space(self, parent_space, abstract_space, conceptual_space):
-        parent_space.conceptual_spaces.remove(abstract_space)
-        parent_space.conceptual_spaces.add(conceptual_space)
+    def specify_space(self, abstract_space, conceptual_space):
+        if abstract_space in self.input_space.conceptual_spaces:
+            self.input_space.conceptual_spaces.remove(abstract_space)
+            self.input_space.conceptual_spaces.add(conceptual_space)
+        if abstract_space in self.output_space.conceptual_spaces:
+            self.output_space.conceptual_spaces.remove(abstract_space)
+            self.output_space.conceptual_spaces.add(conceptual_space)
         if abstract_space.parent_concept in self.concepts:
             self.concepts.remove(abstract_space.parent_concept)
         self.concepts.add(conceptual_space.parent_concept)
-        for item in parent_space.contents:
+        for item in StructureCollection.union(
+            self.input_space.contents, self.output_space.contents
+        ):
             if item.parent_space == abstract_space:
                 item.parent_space = conceptual_space
             if item.is_relation and item.conceptual_space == abstract_space:
@@ -270,20 +276,8 @@ class Frame(Structure):
             is_sub_frame=self.is_sub_frame,
             depth=self.depth,
         )
-        for conceptual_space in new_frame.input_space.conceptual_spaces.where(
-            is_slot=True
-        ):
-            specified_space = conceptual_spaces_map[conceptual_space]
-            new_frame.specify_space(
-                new_frame.input_space, conceptual_space, specified_space
-            )
-        for conceptual_space in new_frame.output_space.conceptual_spaces.where(
-            is_slot=True
-        ):
-            specified_space = conceptual_spaces_map[conceptual_space]
-            new_frame.specify_space(
-                new_frame.output_space, conceptual_space, specified_space
-            )
+        for abstract_space, conceptual_space in conceptual_spaces_map:
+            new_frame.specify_space(abstract_space, conceptual_space)
         return new_frame
 
     def spread_activation(self):

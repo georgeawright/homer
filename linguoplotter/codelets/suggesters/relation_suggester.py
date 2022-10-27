@@ -182,7 +182,9 @@ class RelationSuggester(Suggester):
                 .where_not(classifier=None)
                 .filter(
                     lambda x: self.target_structure_one.relations.where(
-                        parent_concept=x, end=self.target_structure_two
+                        parent_concept=x,
+                        conceptual_space=self.target_space,
+                        end=self.target_structure_two,
                     ).is_empty()
                 )
                 .get(

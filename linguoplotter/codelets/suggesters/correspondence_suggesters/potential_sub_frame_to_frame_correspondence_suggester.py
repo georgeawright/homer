@@ -162,14 +162,24 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             and (x.input_spaces == correspondence_suggester.target_view.input_spaces)
             and all(
                 [
-                    space in x.parent_frame.input_space.conceptual_spaces
-                    for space in correspondence_suggester.sub_frame.input_space.conceptual_spaces
+                    any(
+                        [
+                            super_frame_space.subsumes(sub_frame_space)
+                            for sub_frame_space in x.parent_frame.input_space.conceptual_spaces
+                        ]
+                    )
+                    for super_frame_space in correspondence_suggester.sub_frame.input_space.conceptual_spaces
                 ]
             )
             and all(
                 [
-                    space in x.parent_frame.output_space.conceptual_spaces
-                    for space in correspondence_suggester.sub_frame.output_space.conceptual_spaces
+                    any(
+                        [
+                            super_frame_space.subsumes(sub_frame_space)
+                            for sub_frame_space in x.parent_frame.output_space.conceptual_spaces
+                        ]
+                    )
+                    for super_frame_space in correspondence_suggester.sub_frame.output_space.conceptual_spaces
                 ]
             )
             and all(
@@ -183,17 +193,6 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     )
                     for member in x.members
                 ]
-            )
-            and (
-                (
-                    correspondence_suggester.target_conceptual_space
-                    in x.parent_frame.input_space.conceptual_spaces
-                    if correspondence_suggester.target_structure_two.parent_space
-                    == correspondence_suggester.sub_frame.input_space
-                    else correspondence_suggester.target_conceptual_space
-                    in x.parent_frame.output_space.conceptual_spaces
-                )
-                or correspondence_suggester.target_conceptual_space is None
             )
         )
         bubble_chamber.loggers["activity"].log_collection(

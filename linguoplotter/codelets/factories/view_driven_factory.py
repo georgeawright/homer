@@ -285,11 +285,18 @@ class ViewDrivenFactory(Factory):
                     )
                 except NoLocationError:
                     raise MissingStructureError
+            target_space = (
+                self.target_slot.conceptual_space
+                if not self.target_slot.conceptual_space.is_slot
+                else self.target_slot.conceptual_space.possible_instances.filter(
+                    lambda x: x in self.target_view.input_spaces.get().conceptual_spaces
+                ).get(key=activation)
+            )
             return RelationSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 {
-                    "target_space": self.target_slot.conceptual_space,
+                    "target_space": target_space,
                     "target_structure_one": target_structure_one,
                     "target_structure_two": target_structure_two,
                     "parent_concept": parent_concept,
@@ -298,7 +305,7 @@ class ViewDrivenFactory(Factory):
                     start=target_structure_one,
                     end=target_structure_two,
                     concept=parent_concept,
-                    space=self.target_slot.conceptual_space,
+                    space=target_space,
                 )
                 if self.target_slot.parent_concept.is_slot
                 and not self.target_slot.parent_concept.is_filled_in

@@ -95,65 +95,6 @@ class ViewSuggester(Suggester):
         )
 
     def _passes_preliminary_checks(self) -> bool:
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"frame activation: {self.frame.activation}"
-        )
-        input_space_concept = self.contextual_space.parent_concept
-        frame_input_space = (
-            self.frame.input_space
-            if self.frame.input_space.parent_concept == input_space_concept
-            else self.frame.output_space
-        )
-        for conceptual_space in frame_input_space.conceptual_spaces:
-            if (
-                not conceptual_space.is_slot
-                and not conceptual_space in self.contextual_space.conceptual_spaces
-                and not any(
-                    conceptual_space in space.sub_spaces
-                    for space in self.contextual_space.conceptual_spaces
-                )
-            ):
-                self.bubble_chamber.loggers["activity"].log(
-                    self,
-                    f"{conceptual_space} is not a slot and "
-                    + f"is not in {self.contextual_space} conceptual spaces",
-                )
-                return False
-            if conceptual_space.is_slot:
-                try:
-                    self.conceptual_spaces_map[
-                        conceptual_space
-                    ] = self.prioritized_conceptual_spaces.filter(
-                        lambda x: x not in self.conceptual_spaces_map.values()
-                        and conceptual_space.subsumes(x)
-                    ).get(
-                        key=activation
-                    )
-                except MissingStructureError:
-                    try:
-                        self.conceptual_spaces_map[conceptual_space] = (
-                            StructureCollection.union(
-                                self.contextual_space.conceptual_spaces,
-                                *[
-                                    space.sub_spaces
-                                    for space in self.contextual_space.conceptual_spaces
-                                ],
-                            )
-                            .filter(
-                                lambda x: x not in self.conceptual_spaces_map.values()
-                                and conceptual_space.subsumes(x)
-                            )
-                            .get(key=activation)
-                        )
-                    except MissingStructureError:
-                        self.bubble_chamber.loggers["activity"].log_dict(
-                            self, self.conceptual_spaces_map, "Conceptual Space Map"
-                        )
-                        self.bubble_chamber.loggers["activity"].log(
-                            self,
-                            f"Unable to find space subsumed by {conceptual_space.structure_id}",
-                        )
-                        return False
         return True
 
     def _calculate_confidence(self):
