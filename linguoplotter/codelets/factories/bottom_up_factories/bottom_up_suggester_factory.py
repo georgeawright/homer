@@ -20,24 +20,13 @@ class BottomUpSuggesterFactory(BottomUpFactory):
 
         self.bubble_chamber.loggers["activity"].log(
             self,
-            f"Proportion of unchunked raw chunks: {proportion_of_unchunked_raw_chunks}",
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Proportion of unlabeled chunks: {proportion_of_unlabeled_chunks}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Proportion of unrelated chunks: {proportion_of_unrelated_chunks}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Proportion of uncorresponded links: {proportion_of_uncorresponded_links}",
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Proportion of unfilled_slots: {proportion_of_unfilled_slots}",
+            f"Proportion of unchunked raw chunks: {proportion_of_unchunked_raw_chunks}\n"
+            + f"Proportion of unlabeled chunks: {proportion_of_unlabeled_chunks}\n"
+            + f"Proportion of unrelated chunks: {proportion_of_unrelated_chunks}\n"
+            + f"Proportion of uncorresponded links: {proportion_of_uncorresponded_links}\n"
+            + f"Proportion of unfilled_slots: {proportion_of_unfilled_slots}",
         )
 
-        # TODO: use random machine select
         follow_up_class = self.bubble_chamber.random_machine.select(
             [
                 (ChunkSuggester, proportion_of_unchunked_raw_chunks),
@@ -48,16 +37,6 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             ],
             key=lambda x: x[1],
         )[0]
-
-        #        follow_up_classes = [
-        #            (ChunkSuggester, proportion_of_unchunked_raw_chunks),
-        #            (LabelSuggester, proportion_of_unlabeled_chunks),
-        #            (RelationSuggester, proportion_of_unrelated_chunks),
-        #            (CorrespondenceSuggester, proportion_of_unfilled_slots),
-        #            (ViewSuggester, proportion_of_uncorresponded_links),
-        #        ]
-        #        follow_up_classes.sort(key=lambda x: x[1], reverse=True)
-        #        follow_up_class = follow_up_classes[0][0]
 
         self.child_codelets.append(
             follow_up_class.make(self.codelet_id, self.bubble_chamber)

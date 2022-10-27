@@ -21,28 +21,21 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
 
         self.bubble_chamber.loggers["activity"].log(
             self,
-            f"Views per frame type per chunk: {views_per_frame_type_per_chunk}",
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Relations per space per end per chunk: {relations_per_space_per_end_per_chunk}",
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Labels per space per chunk: {labels_per_space_per_chunk}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Super chunks per raw chunk: {super_chunks_per_raw_chunk}",
+            f"Views per frame type per chunk: {views_per_frame_type_per_chunk}\n"
+            + f"Relations per space per end per chunk: {relations_per_space_per_end_per_chunk}\n"
+            + f"Labels per space per chunk: {labels_per_space_per_chunk}\n"
+            + f"Super chunks per raw chunk: {super_chunks_per_raw_chunk}",
         )
 
-        if views_per_frame_type_per_chunk > relations_per_space_per_end_per_chunk:
-            follow_up_class = ViewEvaluator
-        elif relations_per_space_per_end_per_chunk > labels_per_space_per_chunk:
-            follow_up_class = RelationEvaluator
-        elif labels_per_space_per_chunk > super_chunks_per_raw_chunk:
-            follow_up_class = LabelEvaluator
-        else:
-            follow_up_class = ChunkEvaluator
+        follow_up_class = self.bubble_chamber.random_machine.select(
+            [
+                (ChunkEvaluator, super_chunks_per_raw_chunk),
+                (LabelEvaluator, labels_per_space_per_chunk),
+                (RelationEvaluator, relations_per_space_per_end_per_chunk),
+                (ViewEvaluator, views_per_frame_type_per_chunk),
+            ],
+            key=lambda x: x[1],
+        )[0]
 
         self.child_codelets.append(
             follow_up_class.make(self.codelet_id, self.bubble_chamber)
