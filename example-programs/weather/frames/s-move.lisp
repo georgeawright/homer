@@ -46,7 +46,7 @@
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
     :conceptual_spaces (StructureCollection grammar-space time-space)))
 (define time-sub-frame
-  (def-sub-frame :name "s-move-location-sub"
+  (def-sub-frame :name "s-move-time-sub"
     :parent_concept pp-directional-time-concept
     :parent_frame None
     :sub_frames (StructureCollection)
@@ -80,7 +80,7 @@
     :parent_space move-sentence-input))
 (define early-chunk-conceptual-label
   (def-label :start early-chunk :parent_concept conceptual-label-concept
-    :locations (list (Location (list) conceptual-space)
+    :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) ap-sub-frame-input)
 		     (Location (list) move-sentence-input))
     :parent_space ap-sub-frame-input))
