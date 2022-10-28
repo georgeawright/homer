@@ -91,7 +91,7 @@
     :parent_space spread-sentence-input))
 (define early-chunk-conceptual-label
   (def-label :start early-chunk :parent_concept conceptual-label-concept
-    :locations (list (Location (list) conceptual-space)
+    :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) ap-sub-frame-input)
 		     (Location (list) spread-sentence-input))
     :parent_space ap-sub-frame-input))
