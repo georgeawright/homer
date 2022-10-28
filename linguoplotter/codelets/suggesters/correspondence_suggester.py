@@ -312,14 +312,6 @@ class CorrespondenceSuggester(Suggester):
                     calling_codelet, f"Structure two end not in grouped nodes"
                 )
                 structure_one_end = None
-            calling_codelet.bubble_chamber.loggers["activity"].log_collection(
-                calling_codelet,
-                source_collection.filter(lambda x: x.is_relation),
-                "input relations",
-            )
-            calling_codelet.bubble_chamber.loggers["activity"].log(
-                calling_codelet, correspondence_suggester.target_conceptual_space
-            )
             matching_relations = source_collection.filter(
                 lambda x: x.is_relation
                 and (x.start == structure_one_start or structure_one_start is None)

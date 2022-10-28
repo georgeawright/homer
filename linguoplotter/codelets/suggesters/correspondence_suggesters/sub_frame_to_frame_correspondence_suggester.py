@@ -88,16 +88,10 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             self.parent_concept = self.bubble_chamber.concepts["same"]
         try:
             if self.target_space_one is None:
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Matched sub frames: {self.target_view.matched_sub_frames}"
-                )
                 matched_sub_frame_spaces = {}
                 for k, v in self.target_view.matched_sub_frames.items():
                     matched_sub_frame_spaces[k.input_space] = v.input_space
                     matched_sub_frame_spaces[k.output_space] = v.output_space
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Matched sub frame spaces: {matched_sub_frame_spaces}"
-                )
                 frame_two = [
                     frame
                     for frame in self.target_view.matched_sub_frames

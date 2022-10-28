@@ -136,23 +136,14 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             and not self.target_structure_two.parent_concept.is_filled_in
         ):
             structure_two_non_slot_value = self.target_structure_one.parent_concept
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Concept: {structure_two_non_slot_value}"
-            )
             for relative in self.target_structure_two.parent_concept.relatives:
                 if self.target_view.parent_frame.input_space.contents.where(
                     is_link=True, parent_concept=relative
                 ).is_empty():
-                    self.bubble_chamber.loggers["activity"].log(
-                        self, f"Relative: {relative}"
-                    )
                     relation_with_relative = (
                         self.target_structure_two.parent_concept.relations_with(
                             relative
                         ).get()
-                    )
-                    self.bubble_chamber.loggers["activity"].log(
-                        self, f"Relation with relative: {relation_with_relative}"
                     )
                     structure_two_parent_relatives = (
                         structure_two_non_slot_value.relatives
@@ -275,11 +266,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     calling_codelet,
                     "Searching for target structure one via source collection",
                 )
-                calling_codelet.bubble_chamber.loggers["activity"].log_collection(
-                    calling_codelet,
-                    correspondence_suggester.target_conceptual_space.possible_instances,
-                    "target conceptual space possible instances",
-                )
                 correspondence_suggester.target_structure_one = source_collection.filter(
                     lambda x: x.is_label
                     and (
@@ -342,14 +328,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     calling_codelet, f"Structure two end not in grouped nodes"
                 )
                 structure_one_end = None
-            calling_codelet.bubble_chamber.loggers["activity"].log_collection(
-                calling_codelet,
-                source_collection.filter(lambda x: x.is_relation),
-                "input relations",
-            )
-            calling_codelet.bubble_chamber.loggers["activity"].log(
-                calling_codelet, correspondence_suggester.target_conceptual_space
-            )
             matching_relations = source_collection.filter(
                 lambda x: x.is_relation
                 and all([x.quality > 0, x.start.quality > 0, x.end.quality > 0])

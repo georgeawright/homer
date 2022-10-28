@@ -5,6 +5,7 @@ from .codelets.suggesters import ChunkSuggester
 from .coderack import Coderack
 from .errors import NoMoreCodelets
 from .hyper_parameters import HyperParameters
+from .id import ID
 from .interpreter import Interpreter
 from .logger import Logger
 from .structure_collection import StructureCollection
@@ -31,6 +32,7 @@ class Linguoplotter:
 
     @classmethod
     def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
+        ID.reset()
         bubble_chamber = BubbleChamber.setup(loggers, random_seed=random_seed)
         coderack = Coderack.setup(bubble_chamber, loggers)
         loggers["structure"].coderack = coderack

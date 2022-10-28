@@ -73,15 +73,12 @@ class ViewDrivenFactory(Factory):
 
     def _engender_follow_up(self):
         self._set_target_view()
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Targeting view {self.target_view}"
-        )
         self._set_target_slot()
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Targeting slot {self.target_slot}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Slot parent space: {self.target_slot.parent_space}"
+            self,
+            f"Targeting view {self.target_view}\n"
+            + f"Targeting slot {self.target_slot}\n"
+            + f"Slot parent space: {self.target_slot.parent_space}",
         )
         if (
             len(self.target_slot.parent_spaces.where(is_contextual_space=True)) == 1
@@ -428,12 +425,6 @@ class ViewDrivenFactory(Factory):
         ).get()
         self.bubble_chamber.loggers["activity"].log(
             self, f"Found sub frame: {sub_frame}"
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, self.target_view.node_groups, "node groups"
-        )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, sub_frame.input_space.contents, "sub frame input contents"
         )
         follow_up = PotentialSubFrameToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,

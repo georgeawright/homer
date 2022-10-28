@@ -195,9 +195,6 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 ]
             )
         )
-        bubble_chamber.loggers["activity"].log_collection(
-            calling_codelet, compatible_sub_views, "Compatible sub views"
-        )
         views_with_compatible_nodes = compatible_sub_views.filter(
             lambda x: x.members.is_empty()
             or any(
@@ -226,7 +223,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
         )
         bubble_chamber.loggers["activity"].log_collection(
-            calling_codelet, views_with_compatible_nodes, "Views with compatible nodes"
+            calling_codelet, views_with_compatible_nodes, "Compatible sub views"
         )
         correspondence_suggester.target_sub_view = views_with_compatible_nodes.get(
             key=exigency
