@@ -60,6 +60,13 @@ class ContextualSpace(Space):
         }
 
     @property
+    def conceptual_spaces_and_sub_spaces(self) -> StructureCollection:
+        return StructureCollection.union(
+            self.conceptual_spaces,
+            *[space.sub_spaces for space in self.conceptual_spaces],
+        )
+
+    @property
     def quality(self):
 
         active_contents = self.contents.filter(lambda x: x.activation > 0.5)

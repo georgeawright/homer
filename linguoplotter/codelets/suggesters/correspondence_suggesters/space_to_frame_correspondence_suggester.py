@@ -84,9 +84,20 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 and self.target_view.super_views.is_empty()
             )
         ):
+            if (
+                self.target_conceptual_space is not None
+                and self.target_conceptual_space.is_slot
+            ):
+                classification_space = (
+                    self.target_structure_one.parent_concept.parent_space
+                    if self.target_structure_two.is_label
+                    else self.target_structure_one.conceptual_space
+                )
+            else:
+                classification_space = self.target_conceptual_space
             classification = self.parent_concept.classifier.classify(
                 concept=self.parent_concept,
-                space=self.target_conceptual_space,
+                space=classification_space,
                 start=self.target_structure_one,
                 end=self.target_structure_two,
                 view=self.target_view,
@@ -179,10 +190,18 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             min([chunk.quality for chunk in input_chunks])
             * self.target_structure_one.quality
         )
+        if self.target_conceptual_space is not None:
+            classification_space = (
+                self.target_structure_one.parent_concept.parent_space
+                if self.target_structure_two.is_label
+                else self.target_structure_one.conceptual_space
+            )
+        else:
+            classification_space = None
         self.confidence = (
             self.parent_concept.classifier.classify(
                 concept=self.parent_concept,
-                space=self.target_conceptual_space,
+                space=classification_space,
                 start=self.target_structure_one,
                 end=self.target_structure_two,
                 view=self.target_view,

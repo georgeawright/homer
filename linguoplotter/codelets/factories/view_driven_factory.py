@@ -286,7 +286,8 @@ class ViewDrivenFactory(Factory):
                 self.target_slot.conceptual_space
                 if not self.target_slot.conceptual_space.is_slot
                 else self.target_slot.conceptual_space.possible_instances.filter(
-                    lambda x: x in self.target_view.input_spaces.get().conceptual_spaces
+                    lambda x: x
+                    in self.target_view.input_spaces.get().conceptual_spaces_and_sub_spaces
                 ).get(key=activation)
             )
             return RelationSuggester.spawn(
