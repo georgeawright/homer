@@ -25,7 +25,12 @@ class DifferenceClassifier(Classifier):
         )
         if math.isnan(difference):
             return 1.0
+        space_breadth_adjusted_difference = difference / space.breadth
         try:
-            return FloatBetweenOneAndZero(difference / self.prototype_difference)
+            return FloatBetweenOneAndZero(
+                space_breadth_adjusted_difference / self.prototype_difference
+            )
         except ZeroDivisionError:
-            return FloatBetweenOneAndZero(1 / (1 - abs(difference)))
+            return FloatBetweenOneAndZero(
+                1 / (1 - abs(space_breadth_adjusted_difference))
+            )
