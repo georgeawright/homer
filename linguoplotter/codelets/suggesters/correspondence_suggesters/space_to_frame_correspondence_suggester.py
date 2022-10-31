@@ -6,6 +6,7 @@ from linguoplotter.structure_collection_keys import (
     activation,
     corresponding_exigency,
     exigency,
+    quality_and_activation,
     uncorrespondedness,
 )
 from linguoplotter.structures.nodes import Concept
@@ -278,7 +279,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         if not correspondence_suggester.target_structure_two.parent_concept.possible_instances.is_empty()
                         else True
                     )
-                    .get()
+                    .get(key=quality_and_activation)
                 )
             else:
                 calling_codelet.bubble_chamber.loggers["activity"].log(
@@ -316,7 +317,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         else True
                     )
                 ).get(
-                    key=corresponding_exigency
+                    key=quality_and_activation
                 )
         if correspondence_suggester.target_structure_two.is_relation:
             if (
@@ -383,7 +384,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 "matching input relations",
             )
             correspondence_suggester.target_structure_one = matching_relations.get(
-                key=corresponding_exigency
+                key=quality_and_activation
             )
         if correspondence_suggester.target_structure_two.is_node:
             if (
