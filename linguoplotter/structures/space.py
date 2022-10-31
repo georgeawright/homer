@@ -49,6 +49,9 @@ class Space(Structure):
     def proximity_between(self, a: Structure, b: Structure):
         return self.parent_concept.proximity_between(a, b, space=self)
 
+    def adjacency_of(self, a: Structure, b: Structure):
+        return self.parent_concept.adjacency_of(a, b, space=self)
+
     def update_activation(self):
         self._activation = (
             statistics.median([item.activation for item in self.contents])

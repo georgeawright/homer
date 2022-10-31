@@ -556,6 +556,7 @@ class BubbleChamber:
         structure_type: type = None,
         parent_space: Space = None,
         distance_function: Callable = None,
+        chunking_distance_function: Callable = None,
         possible_instances: StructureCollection = None,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
@@ -571,6 +572,11 @@ class BubbleChamber:
             if possible_instances is None
             else possible_instances
         )
+        chunking_distance_function = (
+            chunking_distance_function
+            if chunking_distance_function is not None
+            else distance_function
+        )
         concept = Concept(
             structure_id=ID.new(Concept),
             parent_id=parent_id,
@@ -582,6 +588,7 @@ class BubbleChamber:
             parent_space=parent_space,
             child_spaces=self.new_structure_collection(),
             distance_function=distance_function,
+            chunking_distance_function=chunking_distance_function,
             possible_instances=possible_instances,
             links_in=self.new_structure_collection(),
             links_out=self.new_structure_collection(),

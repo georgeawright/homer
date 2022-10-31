@@ -32,6 +32,7 @@ class CompoundConcept(Concept):
             parent_space=args[0].parent_space,
             child_spaces=child_spaces,
             distance_function=root.distance_function,
+            chunking_distance_function=root.chunking_distance_function,
             possible_instances=possible_instances,
             links_in=links_in,
             links_out=links_out,

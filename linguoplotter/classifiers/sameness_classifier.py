@@ -82,7 +82,7 @@ class SamenessClassifier(Classifier):
             *[
                 fuzzy.AND(
                     *[
-                        space.proximity_between(pair[0], pair[1])
+                        space.adjacency_of(pair[0], pair[1])
                         if pair[0].has_location_in_space(space)
                         and pair[1].has_location_in_space(space)
                         else 0.0

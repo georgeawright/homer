@@ -24,6 +24,7 @@ class Concept(Node):
         parent_space: Space,
         child_spaces: StructureCollection,
         distance_function: Callable,
+        chunking_distance_function: Callable,
         possible_instances: StructureCollection,
         links_in: StructureCollection,
         links_out: StructureCollection,
@@ -55,6 +56,7 @@ class Concept(Node):
         self.structure_type = structure_type
         self.child_spaces = child_spaces
         self.distance_function = distance_function
+        self.chunking_distance_function = chunking_distance_function
         self.possible_instances = possible_instances
         self.instances = instances
         self._depth = depth
@@ -199,10 +201,19 @@ class Concept(Node):
     def proximity_to_end(self, other: Node, start: Location = None):
         return self._distance_to_proximity(self.distance_from_end(other, start=start))
 
-    def distance_between(self, a: Node, b: Node, space: "Space" = None):
+    def distance_between(
+        self,
+        a: Node,
+        b: Node,
+        space: "Space" = None,
+        distance_function: callable = None,
+    ):
         space = self.parent_space if space is None else space
+        distance_function = (
+            self.distance_function if distance_function is None else distance_function
+        )
         try:
-            return self.distance_function(
+            return distance_function(
                 a.location_in_space(space).coordinates,
                 b.location_in_space(space).coordinates,
             )
@@ -210,11 +221,11 @@ class Concept(Node):
             try:
                 return statistics.mean(
                     [
-                        self.distance_function(
+                        distance_function(
                             a.location_in_space(space).start_coordinates,
                             b.location_in_space(space).start_coordinates,
                         ),
-                        self.distance_function(
+                        distance_function(
                             a.location_in_space(space).end_coordinates,
                             b.location_in_space(space).end_coordinates,
                         ),
@@ -225,6 +236,13 @@ class Concept(Node):
 
     def proximity_between(self, a: Node, b: Node, space: "Space" = None):
         return self._distance_to_proximity(self.distance_between(a, b, space=space))
+
+    def adjacency_of(self, a: Node, b: Node, space: "Space" = None):
+        return self._distance_to_proximity(
+            self.distance_between(
+                a, b, space=space, distance_function=self.chunking_distance_function
+            )
+        )
 
     def _distance_to_proximity(self, value: float) -> float:
         # TODO: consider using a distance_to_proximity function instead of weight
