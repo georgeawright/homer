@@ -169,7 +169,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     ).is_empty():
                         self.bubble_chamber.loggers["activity"].log(
                             self,
-                            f"None of structure two parent relatives have relation with concept",
+                            "Suggested concept is incompatible with existing concepts",
                         )
                         return False
         return True

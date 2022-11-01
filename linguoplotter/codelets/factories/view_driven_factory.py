@@ -13,7 +13,7 @@ from linguoplotter.codelets.suggesters.projection_suggesters import (
     RelationProjectionSuggester,
 )
 from linguoplotter.codelets.suggesters import ViewSuggester
-from linguoplotter.errors import MissingStructureError, NoLocationError
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
@@ -161,56 +161,58 @@ class ViewDrivenFactory(Factory):
         )
         input_space = self.target_view.input_spaces.get()
         if self.target_slot.is_label:
-            if self.target_slot.start.is_label:
-                node = (
-                    self.target_slot.start.correspondences.filter(
-                        lambda x: x.parent_view == self.target_view
-                        and x.start.parent_space == input_space
-                    )
-                    .get()
-                    .start
+            possible_nodes = []
+            for node_group in self.target_view.node_groups:
+                if (
+                    input_space in node_group
+                    and self.target_slot.start in node_group.values()
+                ):
+                    possible_nodes.append(node_group[input_space])
+                    break
+            if possible_nodes == []:
+                possible_nodes = list(
+                    input_space.contents.filter(lambda x: x.is_node and x.quality > 0)
                 )
-            else:
-                node = None
-                for node_group in self.target_view.node_groups:
-                    if (
-                        input_space in node_group
-                        and self.target_slot.start in node_group.values()
-                    ):
-                        node = node_group[input_space]
-                        break
-                if node is None:
-                    if (
-                        self.target_slot.start.is_link
-                        and self.target_slot.start.is_node
-                    ):
-                        node = input_space.contents.filter(
-                            lambda x: x.is_labellable and x.quality > 0
-                        ).get(key=labeling_exigency)
-                    else:
-                        node = input_space.contents.filter(
-                            lambda x: x.is_node and x.quality > 0
-                        ).get(key=labeling_exigency)
             if not self.target_slot.parent_concept.is_slot:
-                parent_concept = self.target_slot.parent_concept
+                possible_concepts = [self.target_slot.parent_concept]
             elif self.target_slot.parent_concept.is_filled_in:
-                parent_concept = self.target_slot.parent_concept.non_slot_value
+                possible_concepts = [self.target_slot.parent_concept.non_slot_value]
             elif not self.target_slot.parent_concept.possible_instances.is_empty():
-                parent_concept = self.target_slot.parent_concept.possible_instances.get(
-                    key=lambda x: x.proximity_to(node)
+                possible_concepts = list(
+                    self.target_slot.parent_concept.possible_instances
                 )
+                # TODO: concepts.where(compatible with existing relations)
+                # get the relatives and relations of target slot parent concept
+                # for each of these
+                # get the relatives of the possible concept
+                # possible concept has to be in the same space as relative and be related to the relative with the same type of relation
             else:
-                parent_concept = (
+                possible_concepts = list(
                     self.target_slot.parent_spaces.where(is_conceptual_space=True)
                     .get()
                     .contents.where(is_concept=True, is_slot=False)
-                    .get(key=lambda x: x.proximity_to(node))
-                )
+                )  # TODO: concepts.where(compatible with existing relations)
+            possible_target_combos = [
+                {
+                    "target_node": start,
+                    "parent_concept": concept,
+                }
+                for start in possible_nodes
+                for concept in possible_concepts
+            ]
+            target_structures = self.bubble_chamber.random_machine.select(
+                possible_target_combos,
+                key=lambda x: x["parent_concept"].classifier.classify(
+                    start=x["target_node"], concept=x["parent_concept"]
+                ),
+            )
             return LabelSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                {"target_node": node, "parent_concept": parent_concept},
-                parent_concept.proximity_to(node)
+                target_structures,
+                target_structures["parent_concept"].proximity_to(
+                    target_structures["target_node"]
+                )
                 if self.target_slot.parent_concept.is_slot
                 and not self.target_slot.parent_concept.is_filled_in
                 else self.target_view.unhappiness,
