@@ -174,24 +174,26 @@ class ViewDrivenFactory(Factory):
                     input_space.contents.filter(lambda x: x.is_node and x.quality > 0)
                 )
             if not self.target_slot.parent_concept.is_slot:
-                possible_concepts = [self.target_slot.parent_concept]
-            elif self.target_slot.parent_concept.is_filled_in:
-                possible_concepts = [self.target_slot.parent_concept.non_slot_value]
-            elif not self.target_slot.parent_concept.possible_instances.is_empty():
-                possible_concepts = list(
-                    self.target_slot.parent_concept.possible_instances
+                possible_concepts = self.bubble_chamber.new_structure_collection(
+                    self.target_slot.parent_concept
                 )
-                # TODO: concepts.where(compatible with existing relations)
-                # get the relatives and relations of target slot parent concept
-                # for each of these
-                # get the relatives of the possible concept
-                # possible concept has to be in the same space as relative and be related to the relative with the same type of relation
+            elif self.target_slot.parent_concept.is_filled_in:
+                possible_concepts = self.bubble_chamber.new_structure_collection(
+                    self.target_slot.parent_concept.non_slot_value
+                )
+            elif not self.target_slot.parent_concept.possible_instances.is_empty():
+                possible_concepts = self.target_slot.parent_concept.possible_instances
             else:
-                possible_concepts = list(
+                possible_concepts = (
                     self.target_slot.parent_spaces.where(is_conceptual_space=True)
                     .get()
                     .contents.where(is_concept=True, is_slot=False)
-                )  # TODO: concepts.where(compatible with existing relations)
+                )
+            possible_concepts = possible_concepts.filter(
+                lambda x: self.target_view.can_accept_concept_for_slot(
+                    x, self.target_slot
+                )
+            )
             possible_target_combos = [
                 {
                     "target_node": start,

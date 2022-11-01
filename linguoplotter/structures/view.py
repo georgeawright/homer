@@ -482,6 +482,26 @@ class View(Structure):
             end,
         )
 
+    def can_accept_concept_for_slot(self, concept, slot) -> bool:
+        return not any(
+            [
+                concept.relatives.filter(
+                    lambda x: x in relative.parent_space.contents
+                    and x.has_relation_with(
+                        concept,
+                        slot.parent_concept.relations_with(relative)
+                        .get()
+                        .parent_concept.non_slot_value,
+                    )
+                ).is_empty()
+                for relative in slot.parent_concept.relatives.filter(
+                    lambda x: self.parent_frame.input_space.contents.where(
+                        is_link=True, parent_concept=x
+                    ).is_empty()
+                )
+            ]
+        )
+
     def spread_activation(self):
         if self.is_fully_active():
             self.parent_frame.parent_concept.boost_activation(self.quality)
