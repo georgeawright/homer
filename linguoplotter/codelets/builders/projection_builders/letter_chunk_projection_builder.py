@@ -1,6 +1,7 @@
 from linguoplotter.location import Location
 from linguoplotter.codelets.builders import ProjectionBuilder
 from linguoplotter.errors import MissingStructureError
+from linguoplotter.structure_collection_keys import activation
 
 
 class LetterChunkProjectionBuilder(ProjectionBuilder):
@@ -259,6 +260,28 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             if not meaning_label.parent_concept.is_slot
             else meaning_label.parent_concept.non_slot_value
         )
+        if meaning_concept is None:
+            meaning_concept = meaning_label.parent_concept._non_slot_value = (
+                meaning_label.parent_concept.parent_space.contents.where(
+                    is_concept=True, is_compound_concept=False
+                )
+                .filter(
+                    lambda x: all(
+                        [
+                            x.has_relation_with(
+                                relation.arguments.excluding(
+                                    meaning_label.parent_concept
+                                )
+                                .get()
+                                .non_slot_value,
+                                relation.parent_concept.non_slot_value,
+                            )
+                            for relation in meaning_label.parent_concept.relations
+                        ]
+                    )
+                )
+                .get(key=activation)
+            )
         self.bubble_chamber.loggers["activity"].log(
             self, f"Meaning concept: {meaning_concept}"
         )

@@ -8,7 +8,7 @@
 (define location-relation-concept
   (def-concept :name "" :is_slot True :parent_space more-less-space
     :possible_instances (StructureCollection more-concept less-concept)
-    :locations (list (Location (list) more-less-space))))
+    :locations (list (Location (list (list Nan)) more-less-space))))
 (define early-location-concept
   (def-concept :name "" :is_slot True :parent_space location-space
     :locations (list (Location (list (list Nan Nan)) location-space)
@@ -17,9 +17,8 @@
   (def-concept :name "" :is_slot True :parent_space location-space
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list (list Nan)) unidimensional-location-space))))
-(def-relation :start early-location-concept :end late-location-concept
-  :parent_concept location-relation-concept :conceptual_space unidimensional-location-space
-  :activation 1.0)
+(def-relation :start late-location-concept :end location-relation-concept
+  :parent_concept more-concept :activation 1.0)
 (define early-time-concept
   (def-concept :name "" :is_slot True :parent_space time-space))
 (define late-time-concept

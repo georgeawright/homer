@@ -52,10 +52,12 @@ class SamenessClassifier(Classifier):
                 return 1.0
         if distinct_pairs[0][0].is_label:
             return fuzzy.AND(
-                start_concept.classifier.classify(concept=start_concept, start=end)
+                start_concept.classifier.classify(
+                    concept=start_concept, start=end.start
+                )
                 if start_concept is not None
                 else 1.0,
-                end_concept.classifier.classify(concept=end_concept, start=start)
+                end_concept.classifier.classify(concept=end_concept, start=start.start)
                 if end_concept is not None
                 else 1.0,
             )

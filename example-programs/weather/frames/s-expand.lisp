@@ -9,6 +9,7 @@
     :locations (list (Location (list (list Nan)) size-space))))
 (define size-comparison-concept
   (def-concept :name "" :is_slot True :parent_space more-less-space
+    :possible_instances (StructureCollection more-concept less-concept)
     :locations (list (Location (list) more-less-space))))
 (def-relation :start size-label-concept :end size-comparison-concept
   :parent_concept more-concept :activation 1.0)

@@ -165,16 +165,19 @@ class RelationSuggester(Suggester):
                     return False
         else:
             if self.target_structure_two is None:
-                self.target_structure_two = (
-                    self.target_structure_one.parent_space.contents.filter(
-                        lambda x: x != self.target_structure_one
-                        and x.is_chunk
-                        and x.quality > 0
-                    ).get(key=relating_exigency)
-                )
-                self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found target structure two: {self.target_structure_two}"
-                )
+                try:
+                    self.target_structure_two = (
+                        self.target_structure_one.parent_space.contents.filter(
+                            lambda x: x != self.target_structure_one
+                            and x.is_chunk
+                            and x.quality > 0
+                        ).get(key=relating_exigency)
+                    )
+                    self.bubble_chamber.loggers["activity"].log(
+                        self, f"Found target structure two: {self.target_structure_two}"
+                    )
+                except MissingStructureError:
+                    return False
             self.parent_concept = (
                 self.bubble_chamber.concepts.where(
                     structure_type=Relation, is_slot=False
@@ -194,7 +197,7 @@ class RelationSuggester(Suggester):
                         start=self.target_structure_one,
                         end=self.target_structure_two,
                     )
-                )  # key is classification
+                )
             )
             self.bubble_chamber.loggers["activity"].log(
                 self, f"Found parent concept: {self.parent_concept}"

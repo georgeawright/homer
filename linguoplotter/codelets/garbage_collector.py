@@ -54,6 +54,9 @@ class GarbageCollector(Codelet):
             if not structure.is_recyclable:
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
+            if structure is self.bubble_chamber.focus.view:
+                self.bubble_chamber.recycle_bin.remove(structure)
+                continue
             if any(
                 [
                     structure in codelet.target_structures

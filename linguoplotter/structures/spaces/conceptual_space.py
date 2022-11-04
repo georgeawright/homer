@@ -116,18 +116,23 @@ class ConceptualSpace(Space):
                 sub_space.add(structure)
 
     def subsumes(self, other) -> bool:
-        if self == other:
-            return True
-        return all(
-            [
-                self.parent_concept.is_slot
-                or self.parent_concept == other.parent_concept,
-                math.isnan(self.no_of_dimensions)
-                or self.no_of_dimensions == other.no_of_dimensions,
-                self.is_symbolic == other.is_symbolic,
-                other in self.possible_instances,
-            ]
-        )
+        if isinstance(other, ConceptualSpace):
+            if self == other:
+                return True
+            return all(
+                [
+                    self.parent_concept.is_slot
+                    or self.parent_concept == other.parent_concept,
+                    math.isnan(self.no_of_dimensions)
+                    or self.no_of_dimensions == other.no_of_dimensions,
+                    self.is_symbolic == other.is_symbolic,
+                    other in self.possible_instances,
+                ]
+            )
+        for space in other:
+            if self.subsumes(space):
+                return True
+        return False
 
     def location_from_super_space_location(self, location: Location) -> Location:
         try:

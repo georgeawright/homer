@@ -96,6 +96,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 )
             else:
                 classification_space = self.target_conceptual_space
+            # TODO: create mock object with correct locations?
             classification = self.parent_concept.classifier.classify(
                 concept=self.parent_concept,
                 space=classification_space,
@@ -255,7 +256,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     .get()
                     .start.labels.filter(
                         lambda x: correspondence_suggester.target_conceptual_space.subsumes(
-                            x.parent_concept.parent_space
+                            x.parent_concept.parent_spaces
                         )
                         and x.parent_concept
                         in correspondence_suggester.target_structure_two.parent_concept.possible_instances
@@ -278,7 +279,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     and x.start.quality > 0
                     and x.quality > 0
                     and correspondence_suggester.target_conceptual_space.subsumes(
-                        x.parent_concept.parent_space
+                        x.parent_concept.parent_spaces
                     )
                     and any(
                         [

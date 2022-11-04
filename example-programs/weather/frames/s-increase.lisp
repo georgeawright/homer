@@ -7,7 +7,9 @@
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
 (define comparison-concept
-  (def-concept :name "" :is_slot True :parent_space more-less-space))
+  (def-concept :name "" :is_slot True :parent_space more-less-space
+    :possible_instances (StructureCollection more-concept less-concept)
+    :locations (list (Location (list) more-less-space))))
  
 (define location-sub-frame-input
   (def-contextual-space :name "location-sub-frame.meaning" :parent_concept input-concept

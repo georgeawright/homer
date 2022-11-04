@@ -185,14 +185,20 @@ class ViewDrivenFactory(Factory):
                 possible_concepts = self.target_slot.parent_concept.possible_instances
             else:
                 possible_concepts = (
-                    self.target_slot.parent_spaces.where(is_conceptual_space=True)
-                    .get()
-                    .contents.where(is_concept=True, is_slot=False)
+                    self.target_slot.parent_concept.parent_space.contents.where(
+                        is_concept=True, is_slot=False
+                    )
                 )
+            self.bubble_chamber.loggers["activity"].log_collection(
+                self, possible_concepts, "possible concepts"
+            )
             possible_concepts = possible_concepts.filter(
                 lambda x: self.target_view.can_accept_concept_for_slot(
                     x, self.target_slot
                 )
+            )
+            self.bubble_chamber.loggers["activity"].log_collection(
+                self, possible_concepts, "possible concepts filtered"
             )
             possible_target_combos = [
                 {
@@ -207,6 +213,9 @@ class ViewDrivenFactory(Factory):
                 key=lambda x: x["parent_concept"].classifier.classify(
                     start=x["target_node"], concept=x["parent_concept"]
                 ),
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                self, f"Found target structures: {target_structures}"
             )
             return LabelSuggester.spawn(
                 self.codelet_id,
@@ -265,6 +274,7 @@ class ViewDrivenFactory(Factory):
                         and x.parent_concept.structure_type == Relation
                     )
                     for concept in space.contents.where(is_concept=True, is_slot=False)
+                    # if concept.is_fully_active()
                 ]
             if not self.target_slot.conceptual_space.is_slot:
                 possible_spaces = [self.target_slot.conceptual_space]

@@ -75,10 +75,14 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
             for label in self.target_projectee.labels:
                 parent_concept = label.parent_concept
                 if parent_concept.is_slot and not parent_concept.is_filled_in:
-                    self.bubble_chamber.loggers["activity"].log(
-                        self, "Target projectee has label with unfilled parent concept"
-                    )
-                    return False
+                    if self.target_view.parent_frame.input_space.contents.where(
+                        is_link=True, parent_concept=parent_concept
+                    ):
+                        self.bubble_chamber.loggers["activity"].log(
+                            self,
+                            "Target projectee has label with unfilled parent concept",
+                        )
+                        return False
             for relation in self.target_projectee.relations.where(
                 end=self.target_projectee
             ):

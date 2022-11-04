@@ -300,20 +300,19 @@ class Structure(ABC):
         except NoLocationError:
             return False
 
-    def location_in_space(
-        self, space: Structure, start: Location = None, end: Location = None
-    ) -> Location:
+    def location_in_space(self, space: Structure) -> Location:
         locations = self.locations
         for location in locations:
             if location is not None and location.space == space:
-                if (
-                    start is not None
-                    and location.start_coordinates != start.coordinates
-                ):
-                    continue
-                if end is not None and location.end_coordinates != end.coordinates:
-                    continue
                 return location
+        if space.is_conceptual_space:
+            for location in locations:
+                if (
+                    location is not None
+                    and location.space.is_conceptual_space
+                    and location.space.subsumes(space)
+                ):
+                    return location
         raise NoLocationError(f"{self} has no location in space {space}")
 
     def has_label(self, concept: Structure) -> FloatBetweenOneAndZero:

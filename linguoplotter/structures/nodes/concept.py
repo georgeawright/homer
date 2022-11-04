@@ -177,29 +177,11 @@ class Concept(Node):
                 raise NoLocationError
             return self.distance_from(mock_node)
 
-    def distance_from_start(self, other: Node, end: Location = None):
-        return self.distance_function(
-            self.location_in_space(self.parent_space, end=end).start_coordinates,
-            other.location_in_space(self.parent_space).coordinates,
-        )
-
-    def distance_from_end(self, other: Node, start: Location = None):
-        return self.distance_function(
-            self.location_in_space(self.parent_space, start=start).end_coordinates,
-            other.location_in_space(self.parent_space).coordinates,
-        )
-
     def proximity_to(self, other: Node):
         try:
             return self._distance_to_proximity(self.distance_from(other))
         except NoLocationError:
             return 0.0
-
-    def proximity_to_start(self, other: Node, end: Location = None):
-        return self._distance_to_proximity(self.distance_from_start(other, end=end))
-
-    def proximity_to_end(self, other: Node, start: Location = None):
-        return self._distance_to_proximity(self.distance_from_end(other, start=start))
 
     def distance_between(
         self,

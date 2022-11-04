@@ -2,7 +2,6 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Factory
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection import StructureCollection
-from linguoplotter.structure_collection_keys import activation
 from linguoplotter.structures.links import Label, Relation
 from linguoplotter.structures.nodes import Concept
 
