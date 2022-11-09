@@ -18,7 +18,7 @@
 
 (define input-space
   (def-contextual-space :name "input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection temperature-space location-space)
+    :conceptual_spaces (StructureSet temperature-space location-space)
     :is_main_input True))
 
 (def-chunk

@@ -20,7 +20,6 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         super_chunks_per_raw_chunk = self._super_chunks_per_raw_chunk()
 
         self.bubble_chamber.loggers["activity"].log(
-            self,
             f"Views per frame type per chunk: {views_per_frame_type_per_chunk}\n"
             + f"Relations per space per end per chunk: {relations_per_space_per_end_per_chunk}\n"
             + f"Labels per space per chunk: {labels_per_space_per_chunk}\n"
@@ -56,7 +55,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             ).sample(10)
         except MissingStructureError:
             chunks = input_space.contents.filter(lambda x: x.is_chunk and not x.is_raw)
-            if chunks.is_empty():
+            if chunks.is_empty:
                 return 0
         return statistics.fmean(
             [
@@ -74,7 +73,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             ).sample(10)
         except MissingStructureError:
             chunks = input_space.contents.filter(lambda x: x.is_chunk and not x.is_raw)
-            if chunks.is_empty():
+            if chunks.is_empty:
                 return 0
         return statistics.fmean(
             [
@@ -83,7 +82,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
                     / len([relation.conceptual_space for relation in chunk.relations])
                     / len(chunk.relatives)
                 )
-                if not chunk.relations.is_empty()
+                if chunk.relations.not_empty
                 else 0
                 for chunk in chunks
             ]
@@ -95,7 +94,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         views = self.bubble_chamber.views
         try:
             view_sample = views.sample(10)
-            view_types = self.bubble_chamber.new_structure_collection(
+            view_types = self.bubble_chamber.new_set(
                 *[view.parent_frame.parent_concept for view in view_sample]
             )
             return len(views) / len(non_raw_chunks)

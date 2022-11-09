@@ -2,7 +2,7 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures.nodes import Concept
 
 
@@ -12,10 +12,11 @@ class Builder(Codelet):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.child_structures = self.bubble_chamber.new_structure_collection()
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
+        self.child_structures = self.bubble_chamber.new_set(name="child structures")
 
     @classmethod
     def make(
@@ -41,7 +42,7 @@ class Builder(Codelet):
         raise NotImplementedError
 
     def run(self) -> CodeletResult:
-        self.bubble_chamber.loggers["activity"].log_targets_dict(self)
+        self.bubble_chamber.loggers["activity"].log_dict(self.targets)
         if not self._passes_preliminary_checks():
             self._decay_activations()
             self._fizzle()
@@ -49,11 +50,8 @@ class Builder(Codelet):
         else:
             self._boost_activations()
             self._process_structure()
-            self.bubble_chamber.loggers["activity"].log_child_structures(self)
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     @property
@@ -67,23 +65,6 @@ class Builder(Codelet):
     @property
     def _structure_concept(self):
         raise NotImplementedError
-
-    @property
-    def target_structures(self):
-        return StructureCollection.union(
-            self.bubble_chamber.new_structure_collection(
-                *[
-                    structure
-                    for structure in self._target_structures.values()
-                    if not isinstance(structure, StructureCollection)
-                ]
-            ),
-            *[
-                structure_collection
-                for structure_collection in self._target_structures.values()
-                if isinstance(structure_collection, StructureCollection)
-            ]
-        )
 
     def _boost_activations(self):
         self._build_concept.boost_activation(1)

@@ -19,7 +19,6 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         proportion_of_unfilled_slots = self._proportion_of_unfilled_slots()
 
         self.bubble_chamber.loggers["activity"].log(
-            self,
             f"Proportion of unchunked raw chunks: {proportion_of_unchunked_raw_chunks}\n"
             + f"Proportion of unlabeled chunks: {proportion_of_unlabeled_chunks}\n"
             + f"Proportion of unrelated chunks: {proportion_of_unrelated_chunks}\n"
@@ -69,7 +68,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 lambda x: x.is_chunk and not x.is_raw
             ).sample(10)
             unrelated_non_raw_chunks = non_raw_chunks.filter(
-                lambda x: x.relations.is_empty()
+                lambda x: x.relations.is_empty
             )
             return len(unrelated_non_raw_chunks) / len(non_raw_chunks)
         except MissingStructureError:
@@ -82,7 +81,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 lambda x: x.is_label or x.is_relation
             ).sample(10)
             uncorresponded_links = labels_and_relations.filter(
-                lambda x: x.correspondences.is_empty()
+                lambda x: x.correspondences.is_empty
             )
             return len(uncorresponded_links) / len(labels_and_relations)
         except MissingStructureError:

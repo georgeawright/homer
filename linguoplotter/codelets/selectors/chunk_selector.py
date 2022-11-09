@@ -1,9 +1,8 @@
 from linguoplotter.codelets.selector import Selector
-from linguoplotter.codelets.evaluators import ChunkEvaluator
 from linguoplotter.codelets.suggesters import ChunkSuggester
 from linguoplotter.errors import MissingStructureError
-from linguoplotter.structure_collection import StructureCollection
 from linguoplotter.structure_collection_keys import activation
+from linguoplotter.structure_collections import StructureSet
 
 
 class ChunkSelector(Selector):
@@ -15,19 +14,11 @@ class ChunkSelector(Selector):
         if self.challengers is not None:
             return True
         try:
-            champion_chunk = self.champions.where(is_chunk=True).get()
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Champion chunk: {champion_chunk}"
-            )
-            self.challengers = self.bubble_chamber.new_structure_collection(
-                StructureCollection.union(
-                    champion_chunk.sub_chunks, champion_chunk.super_chunks
-                )
+            champion = self.champions.get()
+            self.challengers.add(
+                StructureSet.union(champion.sub_chunks, champion.super_chunks)
                 .where(is_raw=False)
                 .get(key=activation)
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found challengers: {self.challengers}"
             )
         except MissingStructureError:
             pass
@@ -41,13 +32,14 @@ class ChunkSelector(Selector):
     def _engender_follow_up(self):
         try:
             winning_chunk = self.winners.get()
+            targets = self.bubble_chamber.new_dict(
+                {"node_one": winning_chunk}, name="targets"
+            )
             self.child_codelets.append(
                 ChunkSuggester.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
-                    {
-                        "target_structure_one": winning_chunk,
-                    },
+                    targets,
                     winning_chunk.chunking_exigency,
                 ),
             )

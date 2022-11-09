@@ -22,12 +22,12 @@ class MagnitudeProximityClassifier(Classifier):
             item.location_in_space(self.main_concept.parent_space).coordinates
         )[0]
         proximity_to_main_concept = self.main_concept.proximity_to(item)
-        if not magnitude_concept.relatives.where(name="more").is_empty():
+        if magnitude_concept.relatives.where(name="more").not_empty:
             if item_coordinates > self.main_concept.location.coordinates[0][0]:
                 magnitude_coordinates = [[1 - proximity_to_main_concept]]
             else:
                 magnitude_coordinates = [[proximity_to_main_concept - 1]]
-        elif not magnitude_concept.relatives.where(name="less").is_empty():
+        elif magnitude_concept.relatives.where(name="less").not_empty:
             if item_coordinates > self.main_concept.location.coordinates[0][0]:
                 magnitude_coordinates = [[1 - proximity_to_main_concept]]
             else:

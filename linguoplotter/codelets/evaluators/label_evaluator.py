@@ -1,7 +1,5 @@
-from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluator import Evaluator
-from linguoplotter.errors import MissingStructureError
 
 
 class LabelEvaluator(Evaluator):
@@ -17,10 +15,11 @@ class LabelEvaluator(Evaluator):
         target = input_space.contents.filter(
             lambda x: x.is_label and not x.start.is_label
         ).get(key=lambda x: abs(x.activation - x.quality))
+        targets = bubble_chamber.new_set(target, name="targets")
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            bubble_chamber.new_structure_collection(target),
+            targets,
             abs(target.activation - target.quality),
         )
 
@@ -30,7 +29,7 @@ class LabelEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_label = self.target_structures.filter(lambda x: x.is_label).get()
+        target_label = self.targets.get()
         target_node = target_label.start
         parent_concept = target_label.parent_concept
         classification = parent_concept.classifier.classify(

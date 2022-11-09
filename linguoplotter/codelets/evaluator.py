@@ -3,23 +3,22 @@ from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 
 
 class Evaluator(Codelet):
-    """Evaluates the quality of target_structure and adjusts its quality accordingly."""
+    """Evaluates the quality of targets and adjusts their quality accordingly."""
 
     def __init__(
         self,
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: StructureCollection,
+        targets: StructureSet,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self._target_structures = target_structures
-        self.original_confidence = target_structures.get().quality
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
+        self.original_confidence = targets.get().quality
         self.confidence = 0
         self.change_in_confidence = None
         self.activation_difference = None
@@ -29,31 +28,22 @@ class Evaluator(Codelet):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: StructureCollection,
+        targets: StructureSet,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        return cls(codelet_id, parent_id, bubble_chamber, target_structures, urgency)
+        return cls(codelet_id, parent_id, bubble_chamber, targets, urgency)
 
     def run(self):
-        self.bubble_chamber.loggers["activity"].log_targets_collection(self)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Original confidence: {self.original_confidence}"
-        )
+        self.bubble_chamber.loggers["activity"].log_set(self.targets)
         self._calculate_confidence()
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Original confidence: {self.original_confidence}"
+            f"Original confidence: {self.original_confidence}"
+            + f"Confidence: {self.confidence}"
+            + f"Change in confidence: {self.change_in_confidence}"
+            + f"Activation difference: {self.activation_difference}"
         )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Confidence: {self.confidence}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Change in confidence: {self.change_in_confidence}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Activation difference: {self.activation_difference}"
-        )
-        for structure in self.target_structures:
+        for structure in self.targets:
             structure.quality = self.confidence
         self._engender_follow_up()
         self.result = CodeletResult.FINISH
@@ -61,9 +51,7 @@ class Evaluator(Codelet):
             self._boost_activations()
         else:
             self._decay_activations()
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
-        for structure in self.target_structures:
+        for structure in self.targets:
             self.bubble_chamber.loggers["structure"].log(structure)
         return self.result
 
@@ -78,10 +66,6 @@ class Evaluator(Codelet):
     @property
     def _parent_link(self):
         raise NotImplementedError
-
-    @property
-    def target_structures(self) -> StructureCollection:
-        return self._target_structures
 
     def _boost_activations(self):
         self._evaluate_concept.boost_activation(self.change_in_confidence)
@@ -99,11 +83,12 @@ class Evaluator(Codelet):
         raise NotImplementedError
 
     def _engender_follow_up(self):
+        self.targets.name = "champions"
         self.child_codelets.append(
             self.get_follow_up_class().spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.target_structures,
+                self.targets,
                 FloatBetweenOneAndZero(abs(self.activation_difference)),
                 # TODO possibly use sigmoid here too
             )

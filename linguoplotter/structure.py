@@ -7,7 +7,7 @@ from .errors import MissingStructureError, NoLocationError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .location import Location
-from .structure_collection import StructureCollection
+from .structure_collections import StructureSet
 
 
 class Structure(ABC):
@@ -22,11 +22,11 @@ class Structure(ABC):
         parent_id: str,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
@@ -93,6 +93,10 @@ class Structure(ABC):
     @property
     def parent_space(self) -> Structure:
         return self._parent_space
+
+    @property
+    def parent_space_location(self) -> Location:
+        return self.location_in_space(self.parent_space)
 
     @property
     def parent_concept(self) -> Structure:
@@ -225,15 +229,15 @@ class Structure(ABC):
         )
 
     @property
-    def links(self) -> StructureCollection:
-        return StructureCollection.union(self.links_in, self.links_out)
+    def links(self) -> StructureSet:
+        return StructureSet.union(self.links_in, self.links_out)
 
     @property
-    def labels(self) -> StructureCollection:
+    def labels(self) -> StructureSet:
         return self.links_out.where(is_label=True)
 
     @property
-    def positive_labels(self) -> StructureCollection:
+    def positive_labels(self) -> StructureSet:
         return self.links_out.filter(
             lambda x: x.is_label
             and (
@@ -243,32 +247,32 @@ class Structure(ABC):
         )
 
     @property
-    def relations(self) -> StructureCollection:
-        return StructureCollection.union(
+    def relations(self) -> StructureSet:
+        return StructureSet.union(
             self.links_in.where(is_relation=True),
             self.links_out.where(is_relation=True),
         )
 
     @property
-    def correspondences(self) -> StructureCollection:
-        return StructureCollection.union(
+    def correspondences(self) -> StructureSet:
+        return StructureSet.union(
             self.links_in.where(is_correspondence=True),
             self.links_out.where(is_correspondence=True),
         )
 
     @property
-    def relatives(self) -> StructureCollection:
-        if self.relations.is_empty():
+    def relatives(self) -> StructureSet:
+        if self.relations.is_empty:
             return self.relations.copy()
-        return StructureCollection.union(
+        return StructureSet.union(
             *[relation.arguments for relation in self.relations]
         ).excluding(self)
 
     @property
-    def correspondees(self) -> StructureCollection:
-        if self.correspondences.is_empty():
+    def correspondees(self) -> StructureSet:
+        if self.correspondences.is_empty:
             return self.correspondences.copy()
-        return StructureCollection.union(
+        return StructureSet.union(
             *[correspondence.arguments for correspondence in self.correspondences]
         ).excluding(self)
 
@@ -333,7 +337,7 @@ class Structure(ABC):
                 return label
         raise MissingStructureError
 
-    def labels_in_space(self, space: Structure) -> StructureCollection:
+    def labels_in_space(self, space: Structure) -> StructureSet:
         return self.labels.filter(lambda x: x in space.contents)
 
     def has_relation(
@@ -365,26 +369,26 @@ class Structure(ABC):
                 return relation
         raise MissingStructureError
 
-    def relations_in_space(self, space: Structure) -> StructureCollection:
+    def relations_in_space(self, space: Structure) -> StructureSet:
         return self.relations.filter(lambda x: x in space.contents)
 
     def relations_in_space_with(
         self, space: Structure, other: Structure
-    ) -> StructureCollection:
+    ) -> StructureSet:
         return self.relations.filter(
             lambda x: x in space.contents and other in x.arguments
         )
 
-    def relations_with(self, other: Structure) -> StructureCollection:
+    def relations_with(self, other: Structure) -> StructureSet:
         return self.relations.filter(lambda x: other in x.arguments)
 
     def has_relation_with(
         self, other: Structure, parent_concept: Structure = None
-    ) -> StructureCollection:
+    ) -> StructureSet:
         relations = self.relations_with(other)
         if parent_concept is not None:
             relations = relations.where(parent_concept=parent_concept)
-        return not relations.is_empty()
+        return relations.not_empty
 
     def relation_in_space_of_type_with(
         self, space: Structure, concept: Structure, start: Structure, end: Structure

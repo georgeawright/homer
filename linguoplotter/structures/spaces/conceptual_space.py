@@ -6,7 +6,7 @@ from typing import Callable, Dict, List
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Space
 from linguoplotter.structures.nodes import Concept
 
@@ -18,17 +18,17 @@ class ConceptualSpace(Space):
         parent_id: str,
         name: str,
         parent_concept: Concept,
-        contents: StructureCollection,
+        contents: StructureSet,
         breadth: int,
         no_of_dimensions: int,
         dimensions: List[ConceptualSpace],
         sub_spaces: List[ConceptualSpace],
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        possible_instances: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        possible_instances: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         is_basic_level: bool = False,
         is_symbolic: bool = False,
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
@@ -90,7 +90,7 @@ class ConceptualSpace(Space):
         return self._dimensions
 
     def nearby(self, space: Structure = None):
-        return StructureCollection.union(
+        return StructureSet.union(
             self.correspondees,
             *[correspondee.correspondees for correspondee in self.correspondees],
         )

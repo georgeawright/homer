@@ -6,7 +6,7 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection temperature-space height-space goodness-space)
+    :possible_instances (StructureSet temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define conceptual-label-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
@@ -15,7 +15,7 @@
 (define unidimensional-location-space
   (def-conceptual-space :name "" :parent_concept unidimensional-location-space-parent-concept
     :possible_instances
-    (StructureCollection north-south-space west-east-space nw-se-space ne-sw-space)
+    (StructureSet north-south-space west-east-space nw-se-space ne-sw-space)
     :no_of_dimensions 1))
 (define location-relation-concept
   (def-concept :name "" :is_slot True :parent_space more-less-space
@@ -23,66 +23,67 @@
 
 (define ap-sub-frame-input
   (def-contextual-space :name "ap-sub-frame.input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection conceptual-space)))
+    :conceptual_spaces (StructureSet conceptual-space)))
 (define ap-sub-frame-output
   (def-contextual-space :name "ap-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
 (define ap-sub-frame
   (def-sub-frame :name "s-spread-ap-sub" :parent_concept ap-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection conceptual-label-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet conceptual-label-concept)
     :input_space ap-sub-frame-input
     :output_space ap-sub-frame-output))
 
 (define location-sub-frame-input
   (def-contextual-space :name "location-sub-frame.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection unidimensional-location-space)))
+    :conceptual_spaces (StructureSet unidimensional-location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space unidimensional-location-space)))
+    :conceptual_spaces (StructureSet grammar-space unidimensional-location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-spread-location-sub"
     :parent_concept pp-directional-location-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection location-relation-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet location-relation-concept)
     :input_space location-sub-frame-input
     :output_space location-sub-frame-output))
 
 (define time-sub-frame-input
   (def-contextual-space :name "time-sub-frame.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection time-space)))
+    :conceptual_spaces (StructureSet time-space)))
 (define time-sub-frame-output
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space time-space)))
+    :conceptual_spaces (StructureSet grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-spread-time-sub"
     :parent_concept pp-directional-time-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet)
     :input_space time-sub-frame-input
     :output_space time-sub-frame-output))
 
 (define spread-sentence-input
   (def-contextual-space :name "s-spread.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection unidimensional-location-space location-space
+    :conceptual_spaces (StructureSet unidimensional-location-space location-space
 					    time-space conceptual-space)))
 (define spread-sentence-output
   (def-contextual-space :name "s-spread.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection unidimensional-location-space
+    :conceptual_spaces (StructureSet unidimensional-location-space
 			grammar-space location-space time-space conceptual-space)))
 (define spread-sentence
   (def-frame :name "s-spread" :parent_concept sentence-concept :parent_frame None
     :depth 6
-    :sub_frames (StructureCollection ap-sub-frame location-sub-frame time-sub-frame)
-    :concepts (StructureCollection)
+    :sub_frames (StructureSet ap-sub-frame location-sub-frame time-sub-frame)
+    :concepts (StructureSet)
     :input_space spread-sentence-input
     :output_space spread-sentence-output))
 
 (define early-chunk
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
 			      (Location (list (list Nan)) time-space)
+			      (Location (list (list Nan)) unidimensional-location-space)
 			      (Location (list (list Nan)) conceptual-space)
 			      (Location (list) ap-sub-frame-input)
 			      (Location (list) location-sub-frame-input)
@@ -98,6 +99,7 @@
 (define late-chunk
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
 			      (Location (list (list Nan)) time-space)
+			      (Location (list (list Nan)) unidimensional-location-space)
 			      (Location (list (list Nan)) conceptual-space)
 			      (Location (list) ap-sub-frame-input)
 			      (Location (list) location-sub-frame-input)
@@ -200,8 +202,8 @@
     :locations (list np-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
-    :left_branch (StructureCollection sentence-word-2)
-    :right_branch (StructureCollection sentence-word-3)))
+    :left_branch (StructureSet sentence-word-2)
+    :right_branch (StructureSet sentence-word-3)))
 (define np-super-chunk-label
   (def-label :start np-super-chunk :parent_concept np-concept
     :locations (list np-location
@@ -211,8 +213,8 @@
     :locations (list np-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
-    :left_branch (StructureCollection sentence-word-1)
-    :right_branch (StructureCollection np-super-chunk)))
+    :left_branch (StructureSet sentence-word-1)
+    :right_branch (StructureSet np-super-chunk)))
 (define np-super-super-chunk-label
   (def-label :start np-super-super-chunk :parent_concept np-concept
     :locations (list np-location
@@ -226,8 +228,8 @@
     :locations (list v-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
-    :left_branch (StructureCollection sentence-word-4)
-    :right_branch (StructureCollection sentence-word-5)))
+    :left_branch (StructureSet sentence-word-4)
+    :right_branch (StructureSet sentence-word-5)))
 (define v-super-chunk-label
   (def-label :start v-super-chunk :parent_concept v-concept
     :locations (list v-location
@@ -237,8 +239,8 @@
     :locations (list predicate-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
-    :left_branch (StructureCollection sentence-word-6)
-    :right_branch (StructureCollection sentence-word-7)))
+    :left_branch (StructureSet sentence-word-6)
+    :right_branch (StructureSet sentence-word-7)))
 (define pred-super-chunk-label
   (def-label :start pred-super-chunk :parent_concept predicate-concept
     :locations (list predicate-location
@@ -248,8 +250,8 @@
     :locations (list vp-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
-    :left_branch (StructureCollection v-super-chunk)
-    :right_branch (StructureCollection pred-super-chunk)))
+    :left_branch (StructureSet v-super-chunk)
+    :right_branch (StructureSet pred-super-chunk)))
 (define vp-super-chunk-label
   (def-label :start vp-super-chunk :parent_concept vp-concept
     :locations (list vp-location
@@ -259,8 +261,8 @@
     :locations (list sentence-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
-    :left_branch (StructureCollection np-super-super-chunk)
-    :right_branch (StructureCollection vp-super-chunk)))
+    :left_branch (StructureSet np-super-super-chunk)
+    :right_branch (StructureSet vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
     :locations (list sentence-location

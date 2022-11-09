@@ -16,19 +16,21 @@ class LabelProjectionBuilder(ProjectionBuilder):
 
     def _process_structure(self):
         parent_concept = (
-            self.target_projectee.parent_concept
-            if not self.target_projectee.is_slot
-            else self.target_projectee.parent_concept.non_slot_value
+            self.targets["projectee"].parent_concept
+            if not self.targets["projectee"].is_slot
+            else self.targets["projectee"].parent_concept.non_slot_value
         )
-        start_correspondence = self.target_projectee.start.correspondences_to_space(
-            self.target_view.output_space
-        ).get()
+        start_correspondence = (
+            self.targets["projectee"]
+            .start.correspondences_to_space(self.targets["view"].output_space)
+            .get()
+        )
         corresponding_start = start_correspondence.end
-        conceptual_location = self.target_projectee.location_in_space(
+        conceptual_location = self.targets["projectee"].location_in_space(
             parent_concept.parent_space
         )
         output_location = corresponding_start.location_in_space(
-            self.target_view.output_space
+            self.targets["view"].output_space
         )
         locations = [conceptual_location, output_location]
         label = self.bubble_chamber.new_label(
@@ -40,15 +42,14 @@ class LabelProjectionBuilder(ProjectionBuilder):
         )
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
-            start=self.target_projectee,
+            start=self.targets["projectee"],
             end=label,
-            locations=[self.target_projectee.location, label.location],
+            locations=[self.targets["projectee"].location, label.location],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
-            parent_view=self.target_view,
+            parent_view=self.targets["view"],
             quality=0.0,
         )
-        self.child_structures = self.bubble_chamber.new_structure_collection(
-            label, frame_to_output_correspondence
-        )
-        self.bubble_chamber.loggers["structure"].log_view(self.target_view)
+        self.child_structures.add(label)
+        self.child_structures.add(frame_to_output_correspondence)
+        self.bubble_chamber.loggers["structure"].log_view(self.targets["view"])

@@ -1,8 +1,8 @@
-from .structure_collection import StructureCollection
+from .structure_collections import StructureSet
 
 
 class Worldview:
-    def __init__(self, views: StructureCollection):
+    def __init__(self, views: StructureSet):
         self.views = views
         self.satisfaction = 0
 

@@ -1,7 +1,7 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Factory
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.links import Label, Relation
 from linguoplotter.structures.nodes import Concept
 
@@ -15,9 +15,12 @@ class ConceptDrivenFactory(Factory):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         coderack: "Coderack",
+        targets,
         urgency: FloatBetweenOneAndZero,
     ):
-        Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
+        Factory.__init__(
+            self, codelet_id, parent_id, bubble_chamber, coderack, targets, urgency
+        )
 
     def follow_up_urgency(self):
         if self.bubble_chamber.focus.view is None:
@@ -40,7 +43,7 @@ class ConceptDrivenFactory(Factory):
 
     def _engender_follow_up(self):
         parent_concept = self._get_parent_concept()
-        follow_up_class = self._get_follow_up_class(parent_concept)
+        follow_up_class = self._get_follow_up_class()
         rand = self.bubble_chamber.random_machine.generate_number()
         if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make_top_down(
@@ -49,22 +52,23 @@ class ConceptDrivenFactory(Factory):
             self.child_codelets.append(follow_up)
 
     def _get_parent_concept(self) -> Concept:
-        return (
-            StructureCollection.union(
+        self.targets["concept"] = (
+            StructureSet.union(
                 self._get_label_concepts(),
                 self._get_relational_concepts(),
             )
             .filter(lambda x: x.is_fully_active())
             .get()
         )
+        return self.targets["concept"]
 
-    def _get_follow_up_class(self, parent_concept: Concept):
+    def _get_follow_up_class(self):
         action_concept = self.bubble_chamber.concepts["suggest"]
         space_concept = self.bubble_chamber.concepts["inner"]
         direction_concept = self.bubble_chamber.concepts["forward"]
-        if parent_concept in self._get_label_concepts():
+        if self.targets["concept"] in self._get_label_concepts():
             structure_concept = self.bubble_chamber.concepts["label"]
-        if parent_concept in self._get_relational_concepts():
+        if self.targets["concept"] in self._get_relational_concepts():
             structure_concept = self.bubble_chamber.concepts["relation"]
         return self._get_codelet_type_from_concepts(
             action=action_concept,
@@ -73,12 +77,12 @@ class ConceptDrivenFactory(Factory):
             structure=structure_concept,
         )
 
-    def _get_label_concepts(self) -> StructureCollection:
+    def _get_label_concepts(self) -> StructureSet:
         return self.bubble_chamber.concepts.where(structure_type=Label).where_not(
             classifier=None
         )
 
-    def _get_relational_concepts(self) -> StructureCollection:
+    def _get_relational_concepts(self) -> StructureSet:
         return self.bubble_chamber.concepts.where(structure_type=Relation).where_not(
             classifier=None
         )

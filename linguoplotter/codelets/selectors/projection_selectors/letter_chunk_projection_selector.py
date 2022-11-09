@@ -1,7 +1,4 @@
 from linguoplotter.codelets.selectors import ProjectionSelector
-from linguoplotter.codelets.evaluators.projection_evaluators import (
-    LetterChunkProjectionEvaluator,
-)
 from linguoplotter.codelets.suggesters.projection_suggesters import (
     LetterChunkProjectionSuggester,
 )
@@ -19,25 +16,23 @@ class LetterChunkProjectionSelector(ProjectionSelector):
 
     def _engender_follow_up(self):
         try:
-            correspondence_from_frame = self.bubble_chamber.new_structure_collection(
-                *[
-                    correspondence
-                    for correspondence in self.winners.where(is_correspondence=True)
-                    if correspondence.start.parent_space.parent_concept
-                    == correspondence.end.parent_space.parent_concept
-                ]
-            ).get()
-            frame = correspondence_from_frame.start.parent_space
-            # TODO: exclude winner
-            new_target = frame.contents.where(is_chunk=True).get(key=uncorrespondedness)
+            letter_chunk = self.winners.where(is_letter_chunk=True).get()
+            correspondence = self.winners.where(is_correspondence=True).get()
+            frame_space = correspondence.start.parent_space
+            new_target = (
+                frame_space.contents.where(is_chunk=True)
+                .excluding(letter_chunk)
+                .get(key=uncorrespondedness)
+            )
+            targets = self.bubble_chamber.new_dict(
+                {"view": correspondence.parent_view, "projectee": new_target},
+                name="targets",
+            )
             self.child_codelets.append(
                 LetterChunkProjectionSuggester.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
-                    {
-                        "target_view": correspondence_from_frame.parent_view,
-                        "target_projectee": new_target,
-                    },
+                    targets,
                     new_target.unhappiness,
                 )
             )

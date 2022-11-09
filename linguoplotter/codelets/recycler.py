@@ -7,7 +7,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureDict, StructureSet
 
 
 class Recycler(Codelet):
@@ -20,9 +20,10 @@ class Recycler(Codelet):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         coderack: "Coderack",
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
 
     @classmethod
@@ -34,13 +35,8 @@ class Recycler(Codelet):
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        return cls(
-            codelet_id,
-            parent_id,
-            bubble_chamber,
-            coderack,
-            urgency,
-        )
+        targets = bubble_chamber.new_dict(name="targets")
+        return cls(codelet_id, parent_id, bubble_chamber, coderack, targets, urgency)
 
     def run(self) -> CodeletResult:
         recyclable_structures = self.bubble_chamber.structures.where(is_recyclable=True)
@@ -53,24 +49,22 @@ class Recycler(Codelet):
                         self.bubble_chamber.random_machine.generate_number()
                     )
                     self.bubble_chamber.loggers["activity"].log(
-                        self,
-                        f"{item.structure_id}, quality: {item.quality}; prob: {probability_of_recycling}",
+                        f"{item.structure_id}, quality: {item.quality}; "
+                        + f"prob: {probability_of_recycling}",
                     )
                     if probability_of_recycling > item.quality:
                         self.bubble_chamber.loggers["activity"].log(
-                            self, f"Adding to recycle bin: {item}"
+                            f"Adding to recycle bin: {item}"
                         )
                         self.bubble_chamber.recycle_bin.add(item)
             self.result = CodeletResult.FINISH
         except MissingStructureError:
             self.result = CodeletResult.FIZZLE
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Recycle Bin Population: {len(self.bubble_chamber.recycle_bin)}"
+            f"Recycle Bin Population: {len(self.bubble_chamber.recycle_bin)}"
         )
         self._update_garbage_collector_urgency()
         self._engender_follow_up()
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     def _update_garbage_collector_urgency(self):
@@ -85,12 +79,12 @@ class Recycler(Codelet):
 
     def _engender_follow_up(self):
         try:
-            structures_sample = StructureCollection.union(
+            structures_sample = StructureSet.union(
                 self.bubble_chamber.spaces.where(is_main_input=True)
                 .get()
                 .contents.where(is_raw=False),
                 self.bubble_chamber.views,
-            ).sample(len(self.bubble_chamber.structures) * 0.1)
+            ).sample(int(len(self.bubble_chamber.structures) * 0.1))
             recyclable_structures = structures_sample.filter(
                 lambda x: x.is_recyclable and not x in self.bubble_chamber.recycle_bin
             )

@@ -5,7 +5,7 @@ from typing import List, Union
 
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Space
 from linguoplotter.structures.nodes import Chunk
 
@@ -17,18 +17,18 @@ class LetterChunk(Chunk):
         parent_id: str,
         name: Union[str, None],
         locations: List[Location],
-        members: StructureCollection,
+        members: StructureSet,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
-        left_branch: StructureCollection,
-        right_branch: StructureCollection,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        super_chunks: StructureCollection,
-        sub_chunks: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        left_branch: StructureSet,
+        right_branch: StructureSet,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        super_chunks: StructureSet,
+        sub_chunks: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         abstract_chunk: LetterChunk = None,
     ):
         Chunk.__init__(
@@ -76,7 +76,7 @@ class LetterChunk(Chunk):
     def name(self):
         if self._name is not None:
             return self._name
-        if not self.left_branch.is_empty() and not self.right_branch.is_empty():
+        if self.left_branch.not_empty and self.right_branch.not_empty:
             left_name = self.left_branch.get().name
             right_name = self.right_branch.get().name
             if left_name is None or right_name is None:
@@ -105,7 +105,7 @@ class LetterChunk(Chunk):
                 [chunk.unchunkedness for chunk in self.super_chunks]
             )
 
-    def nearby(self, space: Space = None) -> StructureCollection:
+    def nearby(self, space: Space = None) -> StructureSet:
         if space is not None:
             return (
                 space.contents.where(is_chunk=True)
@@ -133,17 +133,17 @@ class LetterChunk(Chunk):
                 for location in chunk.locations
                 if location.space.is_conceptual_space
             ] + [location]
-            members = bubble_chamber.new_structure_collection()
+            members = bubble_chamber.new_set()
             for member in chunk.members:
                 if member not in copies:
                     copies[member] = copy_recursively(
                         member, location, bubble_chamber, parent_id, copies
                     )
                 members.add(copies[member])
-            new_left_branch = bubble_chamber.new_structure_collection(
+            new_left_branch = bubble_chamber.new_set(
                 *[copies[member] for member in chunk.left_branch]
             )
-            new_right_branch = bubble_chamber.new_structure_collection(
+            new_right_branch = bubble_chamber.new_set(
                 *[copies[member] for member in chunk.right_branch]
             )
             return bubble_chamber.new_letter_chunk(
@@ -174,7 +174,7 @@ class LetterChunk(Chunk):
             for location in self.locations
             if location.space.is_conceptual_space
         ] + [new_location]
-        new_members = bubble_chamber.new_structure_collection()
+        new_members = bubble_chamber.new_set()
         for member in self.members:
             if member not in copies:
                 copies[member] = member.copy(
@@ -184,10 +184,10 @@ class LetterChunk(Chunk):
                     new_location=new_location,
                 )
             new_members.add(copies[member])
-        new_left_branch = bubble_chamber.new_structure_collection(
+        new_left_branch = bubble_chamber.new_set(
             *[copies[member] for member in self.left_branch]
         )
-        new_right_branch = bubble_chamber.new_structure_collection(
+        new_right_branch = bubble_chamber.new_set(
             *[copies[member] for member in self.right_branch]
         )
         chunk_copy = bubble_chamber.new_letter_chunk(
@@ -204,15 +204,9 @@ class LetterChunk(Chunk):
         return (chunk_copy, copies)
 
     def __repr__(self) -> str:
-        left = (
-            self.left_branch.get().structure_id
-            if not self.left_branch.is_empty()
-            else ""
-        )
+        left = self.left_branch.get().structure_id if self.left_branch.not_empty else ""
         right = (
-            self.right_branch.get().structure_id
-            if not self.right_branch.is_empty()
-            else ""
+            self.right_branch.get().structure_id if self.right_branch.not_empty else ""
         )
         members = ",".join([left, right])
         return f'<{self.structure_id} "{self.name}" [{members}] in {self.locations}>'

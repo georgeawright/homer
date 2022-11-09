@@ -1,5 +1,3 @@
-import statistics
-
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluator import Evaluator
 from linguoplotter.structure_collection_keys import activation
@@ -16,15 +14,13 @@ class CorrespondenceEvaluator(Evaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["correspondence"]
         view = bubble_chamber.views.get(key=activation)
-        target = view.members.where(start_space=view.raw_input_space).get(
-            key=lambda x: abs(x.activation - x.quality)
+        targets = bubble_chamber.new_set(
+            view.members.where(start_space=view.raw_input_space).get(
+                key=lambda x: abs(x.activation - x.quality)
+            ),
+            name="targets",
         )
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            bubble_chamber.new_structure_collection(target),
-            structure_type.activation,
-        )
+        return cls.spawn(parent_id, bubble_chamber, targets, structure_type.activation)
 
     @property
     def _parent_link(self):
@@ -32,13 +28,8 @@ class CorrespondenceEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_correspondence = self.target_structures.where(
-            is_correspondence=True
-        ).get()
+        target_correspondence = self.targets.get()
         self.original_confidence = target_correspondence.quality
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Evaluating {target_correspondence}"
-        )
         start = target_correspondence.start
         end = target_correspondence.end
         argument_compatibility = (

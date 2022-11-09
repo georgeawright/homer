@@ -3,16 +3,16 @@
 
 (define pp-inessive-time-input
   (def-contextual-space :name "pp[in-time].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection time-space)))
+    :conceptual_spaces (StructureSet time-space)))
 (define pp-inessive-time-output
   (def-contextual-space :name "pp[in-time].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space time-space)))
+    :conceptual_spaces (StructureSet grammar-space time-space)))
 (define pp-inessive-time
   (def-frame :name "pp[in-time]"
     :parent_concept pp-inessive-time-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection time-label-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet time-label-concept)
     :input_space pp-inessive-time-input
     :output_space pp-inessive-time-output))
 
@@ -52,8 +52,8 @@
     :locations (list pp-location
 		     (Location (list) pp-inessive-time-output))
     :parent_space pp-inessive-time-output
-    :left_branch (StructureCollection pp-word-1)
-    :right_branch (StructureCollection pp-word-2)))
+    :left_branch (StructureSet pp-word-1)
+    :right_branch (StructureSet pp-word-2)))
 (define pp-super-chunk-label
   (def-label :start pp-super-chunk :parent_concept pp-inessive-time-concept
     :locations (list pp-location

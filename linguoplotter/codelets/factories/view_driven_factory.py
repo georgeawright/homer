@@ -17,11 +17,8 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
-from linguoplotter.structure_collection import StructureCollection
-from linguoplotter.structure_collection_keys import (
-    activation,
-    labeling_exigency,
-)
+from linguoplotter.structure_collections import StructureDict
+from linguoplotter.structure_collection_keys import activation
 from linguoplotter.structures import View
 from linguoplotter.structures.links import Relation
 
@@ -38,12 +35,12 @@ class ViewDrivenFactory(Factory):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         coderack: "Coderack",
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
-        target_view: View = None,
     ):
-        Factory.__init__(self, codelet_id, parent_id, bubble_chamber, coderack, urgency)
-        self.target_view = target_view
-        self.target_slot = None
+        Factory.__init__(
+            self, codelet_id, parent_id, bubble_chamber, coderack, targets, urgency
+        )
         self.compatible_sub_views = None
 
     @classmethod
@@ -56,13 +53,8 @@ class ViewDrivenFactory(Factory):
         target_view: View = None,
     ):
         codelet_id = ID.new(cls)
-        return cls(
-            codelet_id, parent_id, bubble_chamber, coderack, urgency, target_view
-        )
-
-    @property
-    def target_structures(self) -> StructureCollection:
-        return self.bubble_chamber.new_structure_collection(self.target_view)
+        targets = bubble_chamber.new_dict({"view": target_view}, name="targets")
+        return cls(codelet_id, parent_id, bubble_chamber, coderack, targets, urgency)
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
         if self.bubble_chamber.focus.view is None:
@@ -74,27 +66,21 @@ class ViewDrivenFactory(Factory):
     def _engender_follow_up(self):
         self._set_target_view()
         self._set_target_slot()
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Targeting view {self.target_view}\n"
-            + f"Targeting slot {self.target_slot}\n"
-            + f"Slot parent space: {self.target_slot.parent_space}",
-        )
         if (
-            len(self.target_slot.parent_spaces.where(is_contextual_space=True)) == 1
-            and self.target_slot.parent_space
-            == self.target_view.parent_frame.input_space
+            len(self.targets["slot"].parent_spaces.where(is_contextual_space=True)) == 1
+            and self.targets["slot"].parent_space
+            == self.targets["view"].parent_frame.input_space
         ):
             try:
                 follow_up = self._spawn_space_to_frame_correspondence_suggester()
             except MissingStructureError:
                 follow_up = self._spawn_non_projection_suggester()
-        elif (
-            self.target_slot.parent_space == self.target_view.parent_frame.output_space
-            or (
-                self.target_slot in self.target_view.parent_frame.output_space.contents
-                and not self.target_slot.correspondences.is_empty()
-            )
+        elif self.targets["slot"].parent_space == self.targets[
+            "view"
+        ].parent_frame.output_space or (
+            self.targets["slot"]
+            in self.targets["view"].parent_frame.output_space.contents
+            and self.targets["slot"].correspondences.not_empty
         ):
             follow_up = self._spawn_projection_suggester()
         else:  # slot is in sub-frame
@@ -112,60 +98,57 @@ class ViewDrivenFactory(Factory):
     def _set_target_view(self):
         if self.bubble_chamber.focus.view is None:
             raise MissingStructureError
-        if self.target_view is None:
-            self.target_view = self.bubble_chamber.focus.view
+        if self.targets["view"] is None:
+            self.targets["view"] = self.bubble_chamber.focus.view
         try:
-            self.target_view = self.target_view.sub_views.filter(
-                lambda x: x.unhappiness > 0
-            ).get()
+            self.targets["view"] = (
+                self.targets["view"].sub_views.filter(lambda x: x.unhappiness > 0).get()
+            )
             self._set_target_view()
         except MissingStructureError:
             pass
 
     def _set_target_slot(self):
         for structures in [
-            self.target_view.unfilled_sub_frame_input_structures,
-            self.target_view.unfilled_input_structures,
-            self.target_view.unfilled_output_structures,
+            self.targets["view"].unfilled_sub_frame_input_structures,
+            self.targets["view"].unfilled_input_structures,
+            self.targets["view"].unfilled_output_structures,
         ]:
-            if not structures.where(is_relation=True).is_empty():
-                self.target_slot = structures.where(is_relation=True).get()
+            if structures.where(is_relation=True).not_empty:
+                self.targets["slot"] = structures.where(is_relation=True).get()
                 return
         for structures in [
-            self.target_view.unfilled_sub_frame_input_structures,
-            self.target_view.unfilled_input_structures,
-            self.target_view.unfilled_output_structures,
+            self.targets["view"].unfilled_sub_frame_input_structures,
+            self.targets["view"].unfilled_input_structures,
+            self.targets["view"].unfilled_output_structures,
         ]:
-            if not structures.where(is_label=True).is_empty():
-                self.target_slot = structures.where(is_label=True).get()
+            if structures.where(is_label=True).not_empty:
+                self.targets["slot"] = structures.where(is_label=True).get()
                 return
-            if not structures.where(is_chunk=True).is_empty():
-                self.target_slot = structures.where(is_chunk=True).get()
+            if structures.where(is_chunk=True).not_empty:
+                self.targets["slot"] = structures.where(is_chunk=True).get()
                 return
-
-        projectable_structures = self.target_view.unfilled_projectable_structures
-        if not projectable_structures.where(is_chunk=True).is_empty():
-            self.target_slot = projectable_structures.where(is_chunk=True).get()
+        projectable_structures = self.targets["view"].unfilled_projectable_structures
+        if projectable_structures.where(is_chunk=True).not_empty:
+            self.targets["slot"] = projectable_structures.where(is_chunk=True).get()
             return
-        if not projectable_structures.where(is_label=True).is_empty():
-            self.target_slot = projectable_structures.where(is_label=True).get()
+        if projectable_structures.where(is_label=True).not_empty:
+            self.targets["slot"] = projectable_structures.where(is_label=True).get()
             return
-        if not projectable_structures.where(is_relation=True).is_empty():
-            self.target_slot = projectable_structures.where(is_relation=True).get()
+        if projectable_structures.where(is_relation=True).not_empty:
+            self.targets["slot"] = projectable_structures.where(is_relation=True).get()
             return
         raise MissingStructureError
 
     def _spawn_non_projection_suggester(self):
-        self.bubble_chamber.loggers["activity"].log(
-            self, "Trying to spawn non-projection suggester"
-        )
-        input_space = self.target_view.input_spaces.get()
-        if self.target_slot.is_label:
+        self.bubble_chamber.loggers["activity"].log("Spawning non-projection suggester")
+        input_space = self.targets["view"].input_spaces.get()
+        if self.targets["slot"].is_label:
             possible_nodes = []
-            for node_group in self.target_view.node_groups:
+            for node_group in self.targets["view"].node_groups:
                 if (
                     input_space in node_group
-                    and self.target_slot.start in node_group.values()
+                    and self.targets["slot"].start in node_group.values()
                 ):
                     possible_nodes.append(node_group[input_space])
                     break
@@ -173,248 +156,227 @@ class ViewDrivenFactory(Factory):
                 possible_nodes = list(
                     input_space.contents.filter(lambda x: x.is_node and x.quality > 0)
                 )
-            if not self.target_slot.parent_concept.is_slot:
-                possible_concepts = self.bubble_chamber.new_structure_collection(
-                    self.target_slot.parent_concept
+            if not self.targets["slot"].parent_concept.is_slot:
+                possible_concepts = self.bubble_chamber.new_set(
+                    self.targets["slot"].parent_concept
                 )
-            elif self.target_slot.parent_concept.is_filled_in:
-                possible_concepts = self.bubble_chamber.new_structure_collection(
-                    self.target_slot.parent_concept.non_slot_value
+            elif self.targets["slot"].parent_concept.is_filled_in:
+                possible_concepts = self.bubble_chamber.new_set(
+                    self.targets["slot"].parent_concept.non_slot_value
                 )
-            elif not self.target_slot.parent_concept.possible_instances.is_empty():
-                possible_concepts = self.target_slot.parent_concept.possible_instances
+            elif self.targets["slot"].parent_concept.possible_instances.not_empty:
+                possible_concepts = self.targets[
+                    "slot"
+                ].parent_concept.possible_instances
             else:
-                possible_concepts = (
-                    self.target_slot.parent_concept.parent_space.contents.where(
-                        is_concept=True, is_slot=False
-                    )
+                possible_concepts = self.targets[
+                    "slot"
+                ].parent_concept.parent_space.contents.where(
+                    is_concept=True, is_slot=False
                 )
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, possible_concepts, "possible concepts"
-            )
             possible_concepts = possible_concepts.filter(
-                lambda x: self.target_view.can_accept_concept_for_slot(
-                    x, self.target_slot
+                lambda x: self.targets["view"].can_accept_concept_for_slot(
+                    x, self.targets["slot"]
                 )
-            )
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, possible_concepts, "possible concepts filtered"
             )
             possible_target_combos = [
-                {
-                    "target_node": start,
-                    "parent_concept": concept,
-                }
+                self.bubble_chamber.new_dict(
+                    {"start": start, "concept": concept}, name="targets"
+                )
                 for start in possible_nodes
                 for concept in possible_concepts
             ]
-            target_structures = self.bubble_chamber.random_machine.select(
+            targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
-                key=lambda x: x["parent_concept"].classifier.classify(
-                    start=x["target_node"], concept=x["parent_concept"]
+                key=lambda x: x["concept"].classifier.classify(
+                    start=x["start"], concept=x["concept"]
                 ),
             )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target structures: {target_structures}"
-            )
+            self.bubble_chamber.loggers["activity"].log_dict(targets)
             return LabelSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                target_structures,
-                target_structures["parent_concept"].proximity_to(
-                    target_structures["target_node"]
-                )
-                if self.target_slot.parent_concept.is_slot
-                and not self.target_slot.parent_concept.is_filled_in
-                else self.target_view.unhappiness,
+                targets,
+                targets["concept"].proximity_to(targets["start"])
+                if self.targets["slot"].parent_concept.is_slot
+                and not self.targets["slot"].parent_concept.is_filled_in
+                else self.targets["view"].unhappiness,
             )
-        if self.target_slot.is_relation:
-            target_structure_one = None
-            target_structure_two = None
-            for node_group in self.target_view.node_groups:
+        if self.targets["slot"].is_relation:
+            target_start = None
+            target_end = None
+            for node_group in self.targets["view"].node_groups:
                 if (
                     input_space in node_group
-                    and self.target_slot.start in node_group.values()
+                    and self.targets["slot"].start in node_group.values()
                 ):
-                    target_structure_one = node_group[input_space]
+                    target_start = node_group[input_space]
                 if (
                     input_space in node_group
-                    and self.target_slot.end in node_group.values()
+                    and self.targets["slot"].end in node_group.values()
                 ):
-                    target_structure_two = node_group[input_space]
+                    target_end = node_group[input_space]
             potential_targets = input_space.contents.filter(
                 lambda x: x.is_node and not x.is_raw and x.quality > 0
             )
-            possible_target_pairs = potential_targets.pairs.filter(
-                lambda x: x[0] != x[1]
-                and (
-                    x[0] == target_structure_one
-                    if target_structure_one is not None
-                    else True
-                )
-                and (
-                    x[1] == target_structure_two
-                    if target_structure_two is not None
-                    else True
-                )
-            )
-            if not self.target_slot.parent_concept.is_slot:
-                possible_concepts = [self.target_slot.parent_concept]
-            elif self.target_slot.parent_concept.is_filled_in:
-                possible_concepts = [self.target_slot.parent_concept.non_slot_value]
-            elif not self.target_slot.parent_concept.possible_instances.is_empty():
+            possible_target_pairs = [
+                (a, b)
+                for a in potential_targets
+                for b in potential_targets
+                if a != b
+                and (a == target_start if target_start is not None else True)
+                and (b == target_end if target_end is not None else True)
+            ]
+            if not self.targets["slot"].parent_concept.is_slot:
+                possible_concepts = [self.targets["slot"].parent_concept]
+            elif self.targets["slot"].parent_concept.is_filled_in:
+                possible_concepts = [self.targets["slot"].parent_concept.non_slot_value]
+            elif self.targets["slot"].parent_concept.possible_instances.not_empty:
                 possible_concepts = list(
-                    self.target_slot.parent_concept.possible_instances
+                    self.targets["slot"].parent_concept.possible_instances
                 )
             else:
                 possible_concepts = [
                     concept
-                    for space in self.target_slot.parent_spaces.filter(
+                    for space in self.targets["slot"].parent_spaces.filter(
                         lambda x: x.is_conceptual_space
                         and x.parent_concept.structure_type == Relation
                     )
                     for concept in space.contents.where(is_concept=True, is_slot=False)
-                    # if concept.is_fully_active()
                 ]
-            if not self.target_slot.conceptual_space.is_slot:
-                possible_spaces = [self.target_slot.conceptual_space]
+            if not self.targets["slot"].conceptual_space.is_slot:
+                possible_spaces = [self.targets["slot"].conceptual_space]
             else:
                 possible_spaces = list(
-                    self.target_slot.conceptual_space.possible_instances.filter(
+                    self.targets["slot"].conceptual_space.possible_instances.filter(
                         lambda x: x
-                        in self.target_view.input_spaces.get().conceptual_spaces_and_sub_spaces
+                        in self.targets["view"]
+                        .input_spaces.get()
+                        .conceptual_spaces_and_sub_spaces
                     )
                 )
             possible_target_combos = [
-                {
-                    "target_structure_one": start,
-                    "target_structure_two": end,
-                    "target_space": space,
-                    "parent_concept": concept,
-                }
+                self.bubble_chamber.new_dict(
+                    {"start": start, "end": end, "space": space, "concept": concept},
+                    name="targets",
+                )
                 for start, end in possible_target_pairs
                 for space in possible_spaces
                 for concept in possible_concepts
             ]
-            target_structures = self.bubble_chamber.random_machine.select(
+            targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
-                key=lambda x: x["parent_concept"].classifier.classify(
-                    start=x["target_structure_one"],
-                    end=x["target_structure_two"],
-                    concept=x["parent_concept"],
-                    space=x["target_space"],
+                key=lambda x: x["concept"].classifier.classify(
+                    start=x["start"],
+                    end=x["end"],
+                    concept=x["concept"],
+                    space=x["space"],
                 ),
             )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target structures: {target_structures}"
-            )
+            self.bubble_chamber.loggers["activity"].log_dict(targets)
             return RelationSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                target_structures,
-                target_structures["parent_concept"].classifier.classify(
-                    start=target_structures["target_structure_one"],
-                    end=target_structures["target_structure_two"],
-                    concept=target_structures["parent_concept"],
-                    space=target_structures["target_space"],
+                targets,
+                targets["concept"].classifier.classify(
+                    start=targets["start"],
+                    end=targets["end"],
+                    concept=targets["concept"],
+                    space=targets["space"],
                 )
-                if self.target_slot.parent_concept.is_slot
-                and not self.target_slot.parent_concept.is_filled_in
-                else self.target_view.unhappiness,
+                if self.targets["slot"].parent_concept.is_slot
+                and not self.targets["slot"].parent_concept.is_filled_in
+                else self.targets["view"].unhappiness,
             )
         raise Exception("Slot is not a label or a relation.")
 
     def _spawn_projection_suggester(self):
-        self.bubble_chamber.loggers["activity"].log(
-            self, "Trying to spawn projection suggester"
-        )
-        if self.target_slot.is_letter_chunk:
+        self.bubble_chamber.loggers["activity"].log("Spawning ProjectionSuggester")
+        if self.targets["slot"].is_letter_chunk:
             follow_up_class = LetterChunkProjectionSuggester
-        elif self.target_slot.is_chunk:
+        elif self.targets["slot"].is_chunk:
             follow_up_class = ChunkProjectionSuggester
-        elif self.target_slot.is_label:
+        elif self.targets["slot"].is_label:
             follow_up_class = LabelProjectionSuggester
-        elif self.target_slot.is_relation:
+        elif self.targets["slot"].is_relation:
             follow_up_class = RelationProjectionSuggester
+        targets = self.bubble_chamber.new_dict(
+            {"view": self.targets["view"], "projectee": self.targets["slot"]},
+            name="targets",
+        )
         return follow_up_class.spawn(
             self.codelet_id,
             self.bubble_chamber,
-            {"target_view": self.target_view, "target_projectee": self.target_slot},
-            self.target_slot.uncorrespondedness
-            if not self.target_slot.is_chunk
+            targets,
+            self.targets["slot"].uncorrespondedness
+            if not self.targets["slot"].is_chunk
             else 1.0,
         )
 
     def _spawn_space_to_frame_correspondence_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
-            self, "Trying to spawn space-to-frame-correspondence suggester"
+            "Spawning SpaceToFrameCorrespondenceSuggester"
+        )
+        targets = self.bubble_chamber.new_dict(
+            {
+                "view": self.targets["view"],
+                "end": self.targets["slot"],
+                "concept": self.bubble_chamber.concepts["same"],
+            },
+            name="targets",
         )
         follow_up = SpaceToFrameCorrespondenceSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
-            {
-                "target_view": self.target_view,
-                "target_space_one": self.target_view.input_spaces.get(),
-                "target_space_two": self.target_view.parent_frame.input_space,
-                "target_structure_two": self.target_slot,
-                "parent_concept": self.bubble_chamber.concepts["same"],
-            },
-            self.target_view.unhappiness,
+            targets,
+            self.targets["view"].unhappiness,
         )
-        self.bubble_chamber.loggers["activity"].log(self, f"follow_up: {follow_up}")
         follow_up._get_target_conceptual_space(self, follow_up)
         follow_up._get_target_structure_one(self, follow_up)
         return follow_up
 
     def _spawn_sub_frame_to_frame_correspondence_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
-            self, "Trying to spawn sub-frame-to-frame-correspondence suggester"
+            "Spawning SubFrameToFrameCorrespondenceSuggester"
         )
-        target_space_two = (
-            self.target_view.parent_frame.input_space
-            if self.target_slot in self.target_view.parent_frame.input_space.contents
-            else self.target_view.parent_frame.output_space
+        targets = self.bubble_chamber.new_dict(
+            {"view": self.targets["view"], "end": self.targets["slot"]}, name="targets"
         )
-        sub_frame = self.target_view.parent_frame.sub_frames.filter(
-            lambda x: (
-                x.input_space in self.target_slot.parent_spaces
-                or x.output_space in self.target_slot.parent_spaces
-            )
-            and not self.target_slot.has_correspondence_to_space(
-                self.target_view.matched_sub_frames[x].input_space
-            )
-            if x in self.target_view.matched_sub_frames
-            else False
-            and not self.target_slot.has_correspondence_to_space(
-                self.target_view.matched_sub_frames[x].output_space
-            )
-            if x in self.target_view.matched_sub_frames
-            else False
-        ).get()
-        self.bubble_chamber.loggers["activity"].log_dict(
-            self, self.target_view.matched_sub_frames, "view matched sub frames"
+        targets["end_space"] = (
+            targets["view"].parent_frame.input_space
+            if targets["end"] in targets["view"].parent_frame.input_space.contents
+            else targets["view"].parent_frame.output_space
         )
-        if sub_frame not in self.target_view.matched_sub_frames:
+        targets["sub_frame"] = (
+            targets["view"]
+            .parent_frame.sub_frames.filter(
+                lambda x: (
+                    x.input_space in targets["end"].parent_spaces
+                    or x.output_space in targets["end"].parent_spaces
+                )
+                and not targets["end"].has_correspondence_to_space(
+                    targets["view"].matched_sub_frames[x].input_space
+                )
+                if x in targets["view"].matched_sub_frames
+                else False
+                and not targets["end"].has_correspondence_to_space(
+                    targets["view"].matched_sub_frames[x].output_space
+                )
+                if x in targets["view"].matched_sub_frames
+                else False
+            )
+            .get()
+        )
+        if targets["sub_frame"] not in targets["view"].matched_sub_frames:
             raise MissingStructureError
-        matching_frame = self.target_view.matched_sub_frames[sub_frame]
-        target_space_one = (
+        matching_frame = targets["view"].matched_sub_frames[targets["sub_frame"]]
+        targets["start_space"] = (
             matching_frame.input_space
-            if target_space_two == self.target_view.parent_frame.input_space
+            if targets["end_space"] == targets["view"].parent_frame.input_space
             else matching_frame.output_space
         )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found target space one: {target_space_one}"
-        )
         follow_up = SubFrameToFrameCorrespondenceSuggester.spawn(
-            self.codelet_id,
-            self.bubble_chamber,
-            {
-                "target_view": self.target_view,
-                "target_space_two": target_space_two,
-                "target_structure_two": self.target_slot,
-                "target_space_one": target_space_one,
-            },
-            self.target_view.unhappiness,
+            self.codelet_id, self.bubble_chamber, targets, targets["view"].unhappiness
         )
         follow_up._get_target_conceptual_space(self, follow_up)
         follow_up._get_target_structure_one(self, follow_up)
@@ -422,35 +384,30 @@ class ViewDrivenFactory(Factory):
 
     def _spawn_potential_sub_frame_to_frame_correspondence_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
-            self,
-            "Trying to spawn potential sub-frame-to-frame-correspondence suggester",
+            "Spawning PotentialSubFrameToFrameCorrespondenceSuggester"
         )
-        target_space_two = (
-            self.target_view.parent_frame.input_space
-            if self.target_slot in self.target_view.parent_frame.input_space.contents
-            else self.target_view.parent_frame.output_space
+        targets = self.bubble_chamber.new_dict(
+            {"view": self.targets["view"], "end": self.targets["slot"]}, name="targets"
         )
-        sub_frame = self.target_view.parent_frame.sub_frames.filter(
-            lambda x: x not in self.target_view.matched_sub_frames
-            and (
-                x.input_space in self.target_slot.parent_spaces
-                or x.output_space in self.target_slot.parent_spaces
+        targets["end_space"] = (
+            targets["view"].parent_frame.input_space
+            if targets["end"] in targets["view"].parent_frame.input_space.contents
+            else targets["view"].parent_frame.output_space
+        )
+        targets["sub_frame"] = (
+            targets["view"]
+            .parent_frame.sub_frames.filter(
+                lambda x: x not in targets["view"].matched_sub_frames
+                and (
+                    x.input_space in targets["end"].parent_spaces
+                    or x.output_space in targets["end"].parent_spaces
+                )
             )
-        ).get()
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found sub frame: {sub_frame}"
+            .get()
         )
+        targets["concept"] = self.bubble_chamber.concepts["same"]
         follow_up = PotentialSubFrameToFrameCorrespondenceSuggester.spawn(
-            self.codelet_id,
-            self.bubble_chamber,
-            {
-                "target_view": self.target_view,
-                "target_space_two": target_space_two,
-                "target_structure_two": self.target_slot,
-                "sub_frame": sub_frame,
-                "parent_concept": self.bubble_chamber.concepts["same"],
-            },
-            self.target_view.unhappiness,
+            self.codelet_id, self.bubble_chamber, targets, targets["view"].unhappiness
         )
         follow_up._get_target_conceptual_space(self, follow_up)
         follow_up._get_target_space_one(self, follow_up)
@@ -458,32 +415,25 @@ class ViewDrivenFactory(Factory):
         return follow_up
 
     def _spawn_view_suggester(self):
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            "Trying to spawn view suggester",
+        self.bubble_chamber.loggers["activity"].log("Spawning ViewSuggester")
+        sub_frame = (
+            self.targets["view"]
+            .parent_frame.sub_frames.filter(
+                lambda x: x.input_space in self.targets["slot"].parent_spaces
+                or x.output_space in self.targets["slot"].parent_spaces
+            )
+            .get()
         )
-        sub_frame = self.target_view.parent_frame.sub_frames.filter(
-            lambda x: x.input_space in self.target_slot.parent_spaces
-            or x.output_space in self.target_slot.parent_spaces
-        ).get()
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found sub frame: {sub_frame}"
-        )
-        contextual_space = self.target_view.input_spaces.get()
+        self.bubble_chamber.loggers["activity"].log(f"Found sub frame: {sub_frame}")
+        contextual_space = self.targets["view"].input_spaces.get()
         frame = self.bubble_chamber.frames.where(
             is_sub_frame=False, parent_concept=sub_frame.parent_concept
         ).get(key=activation)
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Found target frame: {frame}"
+        self.bubble_chamber.loggers["activity"].log(f"Found target frame: {frame}")
+        targets = self.bubble_chamber.new_dict(
+            {"frame": frame, "contextual_space": contextual_space}, name="targets"
         )
-        prioritized_conceptual_spaces = sub_frame.input_space.conceptual_spaces
+        urgency = self.targets["view"].unhappiness
         return ViewSuggester.spawn(
-            self.codelet_id,
-            self.bubble_chamber,
-            {
-                "frame": frame,
-                "contextual_space": contextual_space,
-                "prioritized_conceptual_spaces": prioritized_conceptual_spaces,
-            },
-            self.target_view.unhappiness,
+            self.codelet_id, self.bubble_chamber, targets, urgency
         )

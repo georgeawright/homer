@@ -33,23 +33,21 @@ class RelationProjectionSuggester(ProjectionSuggester):
             key=corresponding_exigency
         )
         urgency = urgency if urgency is not None else target_view.activation
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            {"target_view": target_view, "target_projectee": target_relation},
-            urgency,
+        targets = bubble_chamber.new_dict(
+            {"view": target_view, "projectee": target_relation}, names="targets"
         )
+        return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 
     def _passes_preliminary_checks(self) -> bool:
         return (
-            not self.target_projectee.has_correspondence_to_space(
-                self.target_view.output_space
+            not self.targets["projectee"].has_correspondence_to_space(
+                self.targets["view"].output_space
             )
-            and self.target_projectee.start.has_correspondence_to_space(
-                self.target_view.output_space
+            and self.targets["projectee"].start.has_correspondence_to_space(
+                self.targets["view"].output_space
             )
-            and self.target_projectee.end.has_correspondence_to_space(
-                self.target_view.output_space
+            and self.targets["projectee"].end.has_correspondence_to_space(
+                self.targets["view"].output_space
             )
         )
 

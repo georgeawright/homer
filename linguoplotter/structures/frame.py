@@ -7,7 +7,7 @@ from linguoplotter.errors import NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 
 
 class Frame(Structure):
@@ -18,17 +18,17 @@ class Frame(Structure):
         name: str,
         parent_concept: "Concept",
         parent_frame: Frame,
-        sub_frames: StructureCollection,  # collection of frames (all slots)
+        sub_frames: StructureSet,  # collection of frames (all slots)
         # structures have locations in frame and sub-frame spaces
-        concepts: StructureCollection,
+        concepts: StructureSet,
         input_space: "ContextualSpace",
         output_space: "ContextualSpace",
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        instances: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        instances: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         is_sub_frame: bool = False,
         depth: int = None,
     ):
@@ -72,46 +72,42 @@ class Frame(Structure):
         return self._depth if self._depth is not None else self.parent_concept.depth
 
     @property
-    def slots(self) -> StructureCollection:
-        return StructureCollection.union(
+    def slots(self) -> StructureSet:
+        return StructureSet.union(
             self.input_space.contents.where(is_slot=True),
             self.output_space.contents.where(is_slot=True),
         )
 
     @property
-    def items(self) -> StructureCollection:
-        return StructureCollection.union(
+    def items(self) -> StructureSet:
+        return StructureSet.union(
             self.input_space.contents, self.output_space.contents
         ).where(is_correspondence=False)
 
     @property
-    def corresponded_items(self) -> StructureCollection:
-        return StructureCollection.union(
-            self.input_space.contents.filter(
-                lambda x: not x.correspondences.is_empty()
-            ),
-            self.output_space.contents.filter(
-                lambda x: not x.correspondences.is_empty()
-            ),
+    def corresponded_items(self) -> StructureSet:
+        return StructureSet.union(
+            self.input_space.contents.filter(lambda x: x.correspondences.not_empty),
+            self.output_space.contents.filter(lambda x: x.correspondences.not_empty),
         ).where(is_correspondence=False)
 
     @property
-    def uncorresponded_items(self) -> StructureCollection:
-        return StructureCollection.union(
+    def uncorresponded_items(self) -> StructureSet:
+        return StructureSet.union(
             self.input_space.contents.filter(
-                lambda x: x.correspondences.where(end=x).is_empty()
+                lambda x: x.correspondences.where(end=x).is_empty
             ),
             self.output_space.contents.filter(
                 lambda x: x.parent_space != self.output_space
-                and x.correspondences.where(start=x).is_empty()
+                and x.correspondences.where(start=x).is_empty
             ),
         ).where(is_correspondence=False, is_link_or_node=False)
 
     @property
-    def unprojected_items(self) -> StructureCollection:
+    def unprojected_items(self) -> StructureSet:
         return self.output_space.contents.filter(
             lambda x: not x.is_correspondence
-            and x.correspondences.where(start=x).is_empty()
+            and x.correspondences.where(start=x).is_empty
         )
 
     @property
@@ -140,7 +136,7 @@ class Frame(Structure):
         if abstract_space.parent_concept in self.concepts:
             self.concepts.remove(abstract_space.parent_concept)
         self.concepts.add(conceptual_space.parent_concept)
-        for item in StructureCollection.union(
+        for item in StructureSet.union(
             self.input_space.contents, self.output_space.contents
         ):
             if item.parent_space == abstract_space:
@@ -213,9 +209,7 @@ class Frame(Structure):
                         ]
                     concept_copies[relation.start].links_out.add(new_relation)
                     concept_copies[relation.end].links_in.add(new_relation)
-        concepts = bubble_chamber.new_structure_collection(
-            *[new for old, new in concept_copies.items()]
-        )
+        concepts = bubble_chamber.new_set(*[new for old, new in concept_copies.items()])
         output_space = (
             self.output_space if input_space == self.input_space else self.input_space
         )
@@ -231,7 +225,7 @@ class Frame(Structure):
         for structure in output_space_copy.contents.where(is_link=True):
             if structure.parent_concept in concept_copies:
                 structure._parent_concept = concept_copies[structure.parent_concept]
-        sub_frames = bubble_chamber.new_structure_collection()
+        sub_frames = bubble_chamber.new_set()
         space_copies = {input_space: input_space_copy, output_space: output_space_copy}
         for sub_frame in self.sub_frames:
             (sub_frame_input_space, sub_frame_output_space) = (

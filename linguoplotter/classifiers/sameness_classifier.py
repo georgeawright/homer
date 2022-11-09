@@ -1,7 +1,7 @@
 from linguoplotter import fuzzy
 from linguoplotter.classifier import Classifier
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 
 
 class SamenessClassifier(Classifier):
@@ -19,7 +19,7 @@ class SamenessClassifier(Classifier):
         collection = list(collection) if collection is not None else [start, end]
         if spaces is None:
             spaces = (
-                StructureCollection.union(
+                StructureSet.union(
                     *[
                         item.parent_spaces.where(
                             is_conceptual_space=True, is_basic_level=True

@@ -8,7 +8,7 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Frame
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.space import Space
@@ -29,18 +29,18 @@ class View(Structure):
         parent_id: str,
         parent_frame: Frame,
         locations: List[Location],
-        members: StructureCollection,
-        frames: StructureCollection,
-        input_spaces: StructureCollection,
+        members: StructureSet,
+        frames: StructureSet,
+        input_spaces: StructureSet,
         output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        sub_views: StructureCollection,
-        super_views: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        sub_views: StructureSet,
+        super_views: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
     ):
         Structure.__init__(
             self,
@@ -121,7 +121,7 @@ class View(Structure):
 
     # TODO: this should be a property
     def raw_input_nodes(self):
-        return StructureCollection.union(
+        return StructureSet.union(
             *[
                 node.raw_members
                 for node in self.grouped_nodes
@@ -184,7 +184,7 @@ class View(Structure):
         return self.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
             and not x.is_chunk
-            and x.correspondences.where(end=x).is_empty()
+            and x.correspondences.where(end=x).is_empty
         )
 
     @property
@@ -192,25 +192,25 @@ class View(Structure):
         return self.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
             and x.parent_space != self.parent_frame.output_space
-            and x.correspondences.where(end=x).is_empty()
+            and x.correspondences.where(end=x).is_empty
         )
 
     @property
     def unfilled_projectable_structures(self):
         return self.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
-            and x.correspondences_to_space(self.output_space).is_empty()
+            and x.correspondences_to_space(self.output_space).is_empty
         )
 
     @property
     def grouped_nodes(self):
-        if self.super_views.is_empty():
+        if self.super_views.is_empty:
             return self._grouped_nodes
         return self.super_views.get().grouped_nodes
 
     @property
     def node_groups(self):
-        if self.super_views.is_empty():
+        if self.super_views.is_empty:
             return self._node_groups
         return self.super_views.get().node_groups
 
@@ -218,7 +218,7 @@ class View(Structure):
     def output(self):
         return (
             self.output_space.contents.filter(
-                lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+                lambda x: x.is_letter_chunk and x.super_chunks.is_empty
             )
             .get()
             .name
@@ -275,14 +275,14 @@ class View(Structure):
             return False
 
     def input_overlap_with(self, other: View):
-        shared_raw_nodes = StructureCollection.intersection(
+        shared_raw_nodes = StructureSet.intersection(
             self.raw_input_nodes, other.raw_input_nodes
         )
         proportion_in_self = len(shared_raw_nodes) / len(self.raw_input_nodes)
         proportion_in_other = len(shared_raw_nodes) / len(other.raw_input_nodes)
         return statistics.fmean([proportion_in_self, proportion_in_other])
 
-    def nearby(self, space: Space = None) -> StructureCollection:
+    def nearby(self, space: Space = None) -> StructureSet:
         space = space if space is not None else self.location.space
         return (
             space.contents.where(is_view=True)
@@ -325,7 +325,7 @@ class View(Structure):
                 )
                 self._grouped_nodes[node_pair[0]] = True
                 self._grouped_nodes[node_pair[1]] = True
-        if not self.super_views.is_empty():
+        if self.super_views.not_empty:
             self.super_views.get().add(correspondence)
 
     def remove(self, correspondence: "Correspondence"):
@@ -338,7 +338,7 @@ class View(Structure):
                 if self.members.filter(
                     lambda x: x in matched_frame.input_space.contents
                     or x in matched_frame.output_space.contents
-                ).is_empty():
+                ).is_empty:
                     try:
                         sub_view = self.sub_views.where(
                             parent_frame=matched_frame
@@ -353,7 +353,7 @@ class View(Structure):
         self._node_groups = []
         for member in self.members:
             self.add(member)
-        if not self.super_views.is_empty():
+        if self.super_views.not_empty:
             self.super_views.get().remove(correspondence)
 
     def has_member(
@@ -363,12 +363,12 @@ class View(Structure):
         start: Structure,
         end: Structure,
     ) -> bool:
-        return not self.members.where(
+        return self.members.where(
             parent_concept=parent_concept,
             conceptual_space=conceptual_space,
             start=start,
             end=end,
-        ).is_empty()
+        ).not_empty
 
     def can_accept_member(
         self,
@@ -414,15 +414,15 @@ class View(Structure):
             different_concepts = end_concept.relatives.filter(
                 lambda x: not x.relations_with(end_concept)
                 .where(name="different")
-                .is_empty()
+                .is_empty
             )
             if start_concept in different_concepts:
                 return False
-        if not end.correspondences.filter(
+        if end.correspondences.filter(
             lambda x: x.end == end
             and x in self.members
             and x.start in start.parent_space.contents
-        ).is_empty():
+        ).not_empty:
             return False
         potential_node_groups = (
             [{start.parent_space: start, end.parent_space: end}]
@@ -473,7 +473,7 @@ class View(Structure):
                     )
                 ):
                     return False
-        if self.super_views.is_empty():
+        if self.super_views.is_empty:
             return True
         return self.super_views.get().can_accept_member(
             parent_concept,
@@ -496,11 +496,11 @@ class View(Structure):
     #                        .get()
     #                        .parent_concept.non_slot_value,
     #                    )
-    #                ).is_empty()
+    #                ).is_empty
     #                for relative in slot.parent_concept.relatives.filter(
     #                    lambda x: self.parent_frame.input_space.contents.where(
     #                        is_link=True, parent_concept=x
-    #                    ).is_empty()
+    #                    ).is_empty
     #                )
     #            ]
     #        )
@@ -524,9 +524,9 @@ class View(Structure):
             string += f"{space.structure_id}\n"
             string += "-" * 120 + "\n"
             for structure in space.contents.filter(
-                lambda x: not x.correspondences.filter(
+                lambda x: x.correspondences.filter(
                     lambda y: y in self.members
-                ).is_empty()
+                ).not_empty
             ):
                 string += f"{structure}\n"
             return string

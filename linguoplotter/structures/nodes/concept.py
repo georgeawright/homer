@@ -7,7 +7,7 @@ from linguoplotter.errors import NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Node, Space
 
 
@@ -22,16 +22,16 @@ class Concept(Node):
         instance_type: type,
         structure_type: type,
         parent_space: Space,
-        child_spaces: StructureCollection,
+        child_spaces: StructureSet,
         distance_function: Callable,
         chunking_distance_function: Callable,
-        possible_instances: StructureCollection,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        instances: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        possible_instances: StructureSet,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        instances: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         is_slot: bool = False,
@@ -129,12 +129,12 @@ class Concept(Node):
             return self.proximity_to(other)
         return 0.0
 
-    def friends(self, space: Space = None) -> StructureCollection:
+    def friends(self, space: Space = None) -> StructureSet:
         space = self.parent_space if space is None else space
         friend_concepts = self.relatives.filter(
             lambda x: not x.is_slot and x.is_concept and x in space.contents
         )
-        if friend_concepts.is_empty():
+        if friend_concepts.is_empty:
             friend_concepts.add(self)
         return friend_concepts
 

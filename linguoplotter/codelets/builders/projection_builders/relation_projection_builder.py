@@ -16,23 +16,27 @@ class RelationProjectionBuilder(ProjectionBuilder):
 
     def _process_structure(self):
         parent_concept = (
-            self.target_projectee.parent_concept
-            if not self.target_projectee.is_slot
-            else self.target_projectee.parent_concept.non_slot_value
+            self.targets["projectee"].parent_concept
+            if not self.targets["projectee"].is_slot
+            else self.targets["projectee"].parent_concept.non_slot_value
         )
-        start_correspondence = self.target_projectee.start.correspondences_to_space(
-            self.target_view.output_space
-        ).get()
+        start_correspondence = (
+            self.targets["projectee"]
+            .start.correspondences_to_space(self.targets["view"].output_space)
+            .get()
+        )
         corresponding_start = start_correspondence.end
-        end_correspondence = self.target_projectee.end.correspondences_to_space(
-            self.target_view.output_space
-        ).get()
+        end_correspondence = (
+            self.targets["projectee"]
+            .end.correspondences_to_space(self.targets["view"].output_space)
+            .get()
+        )
         corresponding_end = end_correspondence.end
-        conceptual_location = self.target_projectee.location_in_space(
+        conceptual_location = self.targets["projectee"].location_in_space(
             parent_concept.parent_space
         )
         output_location = corresponding_start.location_in_space(
-            self.target_view.output_space
+            self.targets["view"].output_space
         )
         locations = [conceptual_location, output_location]
         relation = self.bubble_chamber.new_relation(
@@ -45,30 +49,14 @@ class RelationProjectionBuilder(ProjectionBuilder):
         )
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
-            start=self.target_projectee,
+            start=self.targets["projectee"],
             end=relation,
-            locations=[self.target_projectee.location, relation.location],
+            locations=[self.targets["projectee"].location, relation.location],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
-            parent_view=self.target_view,
+            parent_view=self.targets["view"],
             quality=0.0,
         )
-        self.child_structures = self.bubble_chamber.new_structure_collection(
-            relation, frame_to_output_correspondence
-        )
-        if self.target_projectee.is_slot:
-            non_frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
-                parent_id=self.codelet_id,
-                start=self.non_frame_correspondee,
-                end=relation,
-                locations=[
-                    self.non_frame_correspondee.location_in_space(self.non_frame),
-                    relation.location,
-                ],
-                parent_concept=self.bubble_chamber.concepts["same"],
-                conceptual_space=self.target_correspondence.conceptual_space,
-                parent_view=self.target_view,
-                quality=0.0,
-            )
-            self.child_structures.add(non_frame_to_output_correspondence)
-        self.bubble_chamber.loggers["structure"].log_view(self.target_view)
+        self.child_structures.add(relation)
+        self.child_structures.add(frame_to_output_correspondence)
+        self.bubble_chamber.loggers["structure"].log_view(self.targets["view"])

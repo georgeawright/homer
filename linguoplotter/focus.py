@@ -1,8 +1,4 @@
-import statistics
-
-from linguoplotter import fuzzy
 from .float_between_one_and_zero import FloatBetweenOneAndZero
-from .structure_collection import StructureCollection
 from .structures import View
 
 

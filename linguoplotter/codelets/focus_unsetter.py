@@ -3,6 +3,7 @@ from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
+from linguoplotter.structure_collections import StructureDict
 
 
 class FocusUnsetter(Codelet):
@@ -12,10 +13,11 @@ class FocusUnsetter(Codelet):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         coderack: "Coderack",
+        targets: StructureDict,
         last_satisfaction_score: FloatBetweenOneAndZero,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
         self.last_satisfaction_score = last_satisfaction_score
         self.target_view = self.bubble_chamber.focus.view
@@ -31,11 +33,13 @@ class FocusUnsetter(Codelet):
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
+        targets = bubble_chamber.new_dict(name="targets")
         return cls(
             codelet_id,
             parent_id,
             bubble_chamber,
             coderack,
+            targets,
             last_satisfaction_score,
             urgency,
         )
@@ -43,7 +47,7 @@ class FocusUnsetter(Codelet):
     def run(self) -> CodeletResult:
         self.bubble_chamber.focus.recalculate_satisfaction()
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
+            f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
         )
         current_satisfaction_score = self.bubble_chamber.focus.satisfaction
         self.bubble_chamber.focus.view.quality = current_satisfaction_score
@@ -54,15 +58,12 @@ class FocusUnsetter(Codelet):
             change_in_satisfaction_score * 0.5
         ) + 0.5
         self.bubble_chamber.loggers["activity"].log(
-            self,
             f"Current focus satisfaction: {self.bubble_chamber.focus.satisfaction}",
         )
         self.bubble_chamber.loggers["activity"].log(
-            self,
             f"Change in satisfaction: {change_in_satisfaction_score}",
         )
         self.bubble_chamber.loggers["activity"].log(
-            self,
             f"Transposed change in satisfaction: {transposed_change_in_satisfaction_score}",
         )
         if self.bubble_chamber.focus.view.unhappiness == 0.0:
@@ -73,20 +74,18 @@ class FocusUnsetter(Codelet):
         else:
             probability_of_unsetting_focus = transposed_change_in_satisfaction_score
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Probability of unsetting focus: {probability_of_unsetting_focus}"
+            f"Probability of unsetting focus: {probability_of_unsetting_focus}"
         )
         random_number = self.bubble_chamber.random_machine.generate_number()
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Random number: {random_number}"
-        )
+        self.bubble_chamber.loggers["activity"].log(f"Random number: {random_number}")
         if random_number > probability_of_unsetting_focus:
             self._update_view_driven_factory_urgency()
-            self.bubble_chamber.loggers["activity"].log(self, "Focus left set.")
+            self.bubble_chamber.loggers["activity"].log("Focus left set.")
             self.result = CodeletResult.FIZZLE
             self._fizzle()
         else:
             if transposed_change_in_satisfaction_score <= 0.5:
-                self.bubble_chamber.loggers["activity"].log(self, "Decaying focus")
+                self.bubble_chamber.loggers["activity"].log("Decaying focus")
                 self.bubble_chamber.focus.view._activation = 0.0
                 for view in self.bubble_chamber.focus.view.sub_views:
                     view._activation = 0.0
@@ -102,11 +101,9 @@ class FocusUnsetter(Codelet):
                 self._update_recycler_urgency()
                 self._update_bottom_up_factories_urgencies()
             self.bubble_chamber.focus.view = None
-            self.bubble_chamber.loggers["activity"].log(self, "Focus unset.")
+            self.bubble_chamber.loggers["activity"].log("Focus unset.")
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     def _update_worldview_porter_urgency(self):
@@ -139,16 +136,16 @@ class FocusUnsetter(Codelet):
                 codelet.urgency = 1.0
 
     def _check_for_and_merge_with_equivalent_views(self):
-        # if not self.target_view.super_views.is_empty(): return ?
+        # if not self.target_view.super_views.is_empty: return ?
         for view in self.bubble_chamber.views.excluding(self.target_view).filter(
-            lambda x: x.super_views.is_empty()
+            lambda x: x.super_views.is_empty
         ):
             if self.target_view.is_equivalent_to(view):
                 view.quality = 0.0
                 view.deactivate()
                 self.bubble_chamber.recycle_bin.add(view)
                 self.bubble_chamber.loggers["activity"].log(
-                    self, f"Found and recycled equivalent view: {view}"
+                    f"Found and recycled equivalent view: {view}"
                 )
 
     def _fizzle(self):

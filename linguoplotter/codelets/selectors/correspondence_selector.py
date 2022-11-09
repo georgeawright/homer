@@ -11,15 +11,10 @@ class CorrespondenceSelector(Selector):
     def _passes_preliminary_checks(self):
         if self.challengers is not None:
             return True
-        champion_correspondence = self.champions.where(is_correspondence=True).get()
-        candidates = champion_correspondence.nearby()
+        champion = self.champions.get()
+        candidates = champion.nearby()
         try:
-            challenger_correspondence = candidates.get(
-                key=activation, exclude=[champion_correspondence]
-            )
-            self.challengers = self.bubble_chamber.new_structure_collection(
-                challenger_correspondence
-            )
+            self.challengers.add(candidates.get(key=activation, exclude=[champion]))
         except MissingStructureError:
             pass
         return True
@@ -31,7 +26,7 @@ class CorrespondenceSelector(Selector):
         from linguoplotter.codelets.suggesters import CorrespondenceSuggester
 
         try:
-            winner_correspondence = self.winners.where(is_correspondence=True).get()
+            winner_correspondence = self.winners.get()
             target_view = winner_correspondence.parent_view
             self.child_codelets.append(
                 CorrespondenceSuggester.make(

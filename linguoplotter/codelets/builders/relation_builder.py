@@ -1,11 +1,10 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.builder import Builder
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
-from linguoplotter.structure import Structure
+from linguoplotter.structure_collections import StructureDict
 from linguoplotter.tools import centroid_difference
 
 
@@ -15,15 +14,10 @@ class RelationBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: dict,
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_space = target_structures.get("target_space")
-        self.target_structure_one = target_structures.get("target_structure_one")
-        self.target_structure_two = target_structures.get("target_structure_two")
-        self.parent_concept = target_structures.get("parent_concept")
-        self._target_structures = target_structures
+        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -36,74 +30,56 @@ class RelationBuilder(Builder):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: Structure,
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        return cls(
-            codelet_id,
-            parent_id,
-            bubble_chamber,
-            target_structures,
-            urgency,
-        )
+        return cls(codelet_id, parent_id, bubble_chamber, targets, urgency)
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["relation"]
 
-    @property
-    def targets_dict(self):
-        return {
-            "target_space": self.target_space,
-            "target_structure_one": self.target_structure_one,
-            "target_structure_two": self.target_structure_two,
-            "parent_concept": self.parent_concept,
-        }
-
     def _passes_preliminary_checks(self):
-        try:
-            self.child_structures.add(
-                self.target_structure_one.relations.where(
-                    parent_concept=self.parent_concept,
-                    conceptual_space=self.target_space,
-                    end=self.target_structure_two,
-                ).get()
-            )
-        except MissingStructureError:
-            pass
+        equivalent_relations = self.targets["start"].relations.where(
+            end=self.targets["end"],
+            parent_concept=self.targets["concept"],
+            conceptual_space=self.targets["space"],
+        )
+        if equivalent_relations.not_empty:
+            self.child_structures.add(equivalent_relations.get())
         return True
 
     def _process_structure(self):
-        if not self.child_structures.is_empty():
+        if self.child_structures.not_empty:
             self.bubble_chamber.loggers["activity"].log(
-                self, "Equivalent relation already exists"
+                "Equivalent relation already exists"
             )
             return
-        start_coordinates = self.target_structure_one.location_in_space(
-            self.target_space
-        ).coordinates
-        end_coordinates = self.target_structure_two.location_in_space(
-            self.target_space
-        ).coordinates
+        start_coordinates = (
+            self.targets["start"].location_in_space(self.targets["space"]).coordinates
+        )
+        end_coordinates = (
+            self.targets["end"].location_in_space(self.targets["space"]).coordinates
+        )
         location_coordinates = centroid_difference(start_coordinates, end_coordinates)
         locations = [
-            Location([], self.target_structure_one.parent_space),
-            Location([[location_coordinates]], self.parent_concept.parent_space),
-            TwoPointLocation(start_coordinates, end_coordinates, self.target_space),
+            Location([], self.targets["start"].parent_space),
+            Location([[location_coordinates]], self.targets["concept"].parent_space),
+            TwoPointLocation(start_coordinates, end_coordinates, self.targets["space"]),
         ]
         relation = self.bubble_chamber.new_relation(
             parent_id=self.codelet_id,
-            start=self.target_structure_one,
-            end=self.target_structure_two,
+            start=self.targets["start"],
+            end=self.targets["end"],
             locations=locations,
-            parent_concept=self.parent_concept,
-            conceptual_space=self.target_space,
+            parent_concept=self.targets["concept"],
+            conceptual_space=self.targets["space"],
             quality=0,
         )
         self._structure_concept.instances.add(relation)
         self._structure_concept.recalculate_exigency()
-        self.child_structures = self.bubble_chamber.new_structure_collection(relation)
+        self.child_structures.add(relation)
 
     def _fizzle(self):
         pass

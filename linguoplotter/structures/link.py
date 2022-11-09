@@ -2,7 +2,7 @@ from typing import List
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 
 from .space import Space
 
@@ -14,15 +14,15 @@ class Link(Structure):
         parent_id: str,
         start: Structure,
         end: Structure,
-        arguments: StructureCollection,
+        arguments: StructureSet,
         locations: List[Location],
         parent_concept: "Concept",
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
     ):
         Structure.__init__(
             self,
@@ -58,7 +58,7 @@ class Link(Structure):
             self.parent_space is not None
             and self.parent_space.is_main_input
             and self.activation == 0.0
-            and self.links.is_empty()
+            and self.links.is_empty
         )
 
     def recalculate_unlabeledness(self):

@@ -8,8 +8,6 @@ from .hyper_parameters import HyperParameters
 from .id import ID
 from .interpreter import Interpreter
 from .logger import Logger
-from .structure_collection import StructureCollection
-from .structures.spaces import ConceptualSpace
 
 
 class Linguoplotter:
@@ -104,7 +102,7 @@ class Linguoplotter:
             + f"recycle bin: {len(self.bubble_chamber.recycle_bin)}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
-        if not self.bubble_chamber.worldview.views.is_empty():
+        if self.bubble_chamber.worldview.views.not_empty:
             view_output = self.bubble_chamber.worldview.output
             print(view_output)
         print("=" * 200)

@@ -3,11 +3,11 @@
 (define unidimensional-location-space
   (def-conceptual-space :name "" :parent_concept unidimensional-location-space-parent-concept
     :possible_instances
-    (StructureCollection north-south-space west-east-space nw-se-space ne-sw-space)
+    (StructureSet north-south-space west-east-space nw-se-space ne-sw-space)
     :no_of_dimensions 1))
 (define location-relation-concept
   (def-concept :name "" :is_slot True :parent_space more-less-space
-    :possible_instances (StructureCollection more-concept less-concept)
+    :possible_instances (StructureSet more-concept less-concept)
     :locations (list (Location (list (list Nan)) more-less-space))))
 (define early-location-concept
   (def-concept :name "" :is_slot True :parent_space location-space
@@ -26,18 +26,18 @@
 
 (define pp-from-wards-locations-input
   (def-contextual-space :name "pp[from-wards-locations].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection unidimensional-location-space
+    :conceptual_spaces (StructureSet unidimensional-location-space
 					    location-space time-space)))
 (define pp-from-wards-locations-output
   (def-contextual-space :name "pp[from-wards-locations].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection unidimensional-location-space
+    :conceptual_spaces (StructureSet unidimensional-location-space
 					    grammar-space location-space time-space)))
 (define pp-from-wards-locations
   (def-frame :name "pp[from-wards-locations]"
     :parent_concept pp-directional-location-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection location-relation-concept
+    :sub_frames (StructureSet)
+    :concepts (StructureSet location-relation-concept
 				   early-location-concept late-location-concept
 				   early-time-concept late-time-concept)
     :input_space pp-from-wards-locations-input
@@ -140,8 +140,8 @@
 		     pp-location
 		     (Location (list) pp-from-wards-locations-output))
     :parent_space pp-from-wards-locations-output
-    :left_branch (StructureCollection allative-chunk)
-    :right_branch (StructureCollection wards-chunk)))
+    :left_branch (StructureSet allative-chunk)
+    :right_branch (StructureSet wards-chunk)))
 (define pp-word-4-label
   (def-label :start pp-word-4 :parent_concept pp-allative-location-concept
     :locations (list pp-location
@@ -152,23 +152,23 @@
     :locations (list np-location
 		     (Location (list) pp-from-wards-locations-output))
     :parent_space pp-from-wards-locations-output
-    :left_branch (StructureCollection pp-word-2)
-    :right_branch (StructureCollection pp-word-3)))
+    :left_branch (StructureSet pp-word-2)
+    :right_branch (StructureSet pp-word-3)))
 (define pp-super-chunk-1
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) pp-from-wards-locations-output))
     :parent_space pp-from-wards-locations-output
-    :left_branch (StructureCollection pp-word-1)
-    :right_branch (StructureCollection np-super-chunk-1)))
+    :left_branch (StructureSet pp-word-1)
+    :right_branch (StructureSet np-super-chunk-1)))
 
 (define pp-super-super-chunk
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) pp-from-wards-locations-output))
     :parent_space pp-from-wards-locations-output
-    :left_branch (StructureCollection pp-super-chunk-1)
-    :right_branch (StructureCollection pp-word-4)))
+    :left_branch (StructureSet pp-super-chunk-1)
+    :right_branch (StructureSet pp-word-4)))
 (define pp-super-super-chunk-label
   (def-label :start pp-super-super-chunk :parent_concept pp-directional-location-concept
     :locations (list pp-location

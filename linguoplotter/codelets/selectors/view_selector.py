@@ -32,15 +32,11 @@ class ViewSelector(Selector):
             return True
         try:
             self._get_challenger()
-            self.bubble_chamber.loggers["activity"].log_collection(
-                self, self.challengers, "Found challengers"
-            )
         except MissingStructureError:
             return True
         return True
 
     def _engender_follow_up(self):
-        # spawn a top-down view suggester with copy of winning view's frame
         try:
             winning_view = self.winners.get()
             if winning_view.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE:
@@ -63,23 +59,22 @@ class ViewSelector(Selector):
             pass
 
     def _get_challenger(self):
-        champion_view = self.champions.get()
-        challenger_view = (
+        champion = self.champions.get()
+        self.challengers.add(
             self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
-                == champion_view.parent_frame.parent_concept
-                and not champion_view.members.filter(
+                == champion.parent_frame.parent_concept
+                and champion.members.filter(
                     lambda c: c.start.parent_space in x.input_spaces
-                ).is_empty()
-                and not x.members.filter(
+                ).not_empty
+                and x.members.filter(
                     lambda c: c.start.parent_space in x.input_spaces
-                ).is_empty()
-                and x.raw_input_nodes() == champion_view.raw_input_nodes()
+                ).not_empty
+                and x.raw_input_nodes() == champion.raw_input_nodes()
             )
-            .excluding(champion_view)
+            .excluding(champion)
             .get(key=activation)
         )
-        self.challengers = self.bubble_chamber.new_structure_collection(challenger_view)
 
     def _fizzle(self):
         pass

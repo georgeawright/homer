@@ -6,7 +6,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 
 from .space import Space
 
@@ -19,11 +19,11 @@ class Node(Structure):
         locations: List[Location],
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
     ):
         Structure.__init__(
             self,
@@ -63,7 +63,7 @@ class Node(Structure):
             link.activation for link in self.correspondences
         )
 
-    def nearby(self, space: Space = None) -> StructureCollection:
+    def nearby(self, space: Space = None) -> StructureSet:
         raise NotImplementedError
 
     def get_potential_relative(

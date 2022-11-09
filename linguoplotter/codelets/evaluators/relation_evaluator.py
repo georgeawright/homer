@@ -1,7 +1,7 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluator import Evaluator
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 
 
 class RelationEvaluator(Evaluator):
@@ -20,10 +20,11 @@ class RelationEvaluator(Evaluator):
         target = input_space.contents.where(is_relation=True).get(
             key=lambda x: abs(x.activation - x.quality)
         )
+        targets = bubble_chamber.new_set(target, name="targets")
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            bubble_chamber.new_structure_collection(target),
+            targets,
             abs(target.activation - target.quality),
         )
 
@@ -33,19 +34,15 @@ class RelationEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_relation = self.target_structures.get()
+        target_relation = self.targets.get()
         minimum_argument_quality = min(
             target_relation.start.quality, target_relation.end.quality
         )
-        parallel_relations = StructureCollection.intersection(
+        parallel_relations = StructureSet.intersection(
             target_relation.start.relations, target_relation.end.relations
         )
-        self.bubble_chamber.loggers["activity"].log(
-            self, target_relation.start.relations
-        )
-        self.bubble_chamber.loggers["activity"].log(self, target_relation.end.relations)
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, parallel_relations, "Parallel relations"
+        self.bubble_chamber.loggers["activity"].log_set(
+            parallel_relations, "Parallel relations"
         )
         classifications = {
             relation: relation.parent_concept.classifier.classify(

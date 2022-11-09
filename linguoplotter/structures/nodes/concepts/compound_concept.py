@@ -1,5 +1,5 @@
 from typing import List
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.nodes import Concept
 
 
@@ -10,14 +10,14 @@ class CompoundConcept(Concept):
         parent_id: str,
         root: Concept,
         args: List[Concept],
-        child_spaces: StructureCollection,
-        possible_instances: StructureCollection,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        instances: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        child_spaces: StructureSet,
+        possible_instances: StructureSet,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        instances: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         is_slot: bool = False,
     ):
         Concept.__init__(

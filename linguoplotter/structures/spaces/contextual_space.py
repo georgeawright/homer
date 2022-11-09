@@ -6,7 +6,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Space
 from linguoplotter.structures.nodes import Concept
 
@@ -18,13 +18,13 @@ class ContextualSpace(Space):
         parent_id: str,
         name: str,
         parent_concept: Concept,
-        contents: StructureCollection,
-        conceptual_spaces: StructureCollection,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        contents: StructureSet,
+        conceptual_spaces: StructureSet,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         is_main_input: bool = False,
     ):
         Space.__init__(
@@ -60,8 +60,8 @@ class ContextualSpace(Space):
         }
 
     @property
-    def conceptual_spaces_and_sub_spaces(self) -> StructureCollection:
-        return StructureCollection.union(
+    def conceptual_spaces_and_sub_spaces(self) -> StructureSet:
+        return StructureSet.union(
             self.conceptual_spaces,
             *[space.sub_spaces for space in self.conceptual_spaces],
         )
@@ -70,7 +70,7 @@ class ContextualSpace(Space):
     def quality(self):
 
         active_contents = self.contents.filter(lambda x: x.activation > 0.5)
-        if active_contents.is_empty():
+        if active_contents.is_empty:
             return 0.0
         return statistics.fmean(
             [
@@ -85,7 +85,7 @@ class ContextualSpace(Space):
     #        unused_raw_structures = self.contents.filter(
     #            lambda x: x.is_chunk and x.is_raw and x.super_chunks.is_empty
     #        )
-    #        if built_structures.is_empty():
+    #        if built_structures.is_empty:
     #            return 0.0
     #        return statistics.fmean(
     #            [
@@ -97,6 +97,24 @@ class ContextualSpace(Space):
     def add(self, structure: Structure):
         if structure not in self.contents:
             self.contents.add(structure)
+
+    def add_conceptual_space(self, conceptual_space: "ConceptualSpace"):
+        self.conceptual_spaces.add(conceptual_space)
+        for node in self.contents.where(is_node=True):
+            if node.has_location_in_space(conceptual_space):
+                continue
+            for location in node.locations:
+                if location.space.is_conceptual_space:
+                    try:
+                        node.locations.append(
+                            conceptual_space.location_from_super_space_location(
+                                location
+                            )
+                        )
+                        conceptual_space.add(node)
+                        break
+                    except KeyError:
+                        pass
 
     def decay_activation(self, amount: float = None):
         if amount is None:
