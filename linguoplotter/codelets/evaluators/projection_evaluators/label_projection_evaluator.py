@@ -1,3 +1,5 @@
+import statistics
+
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluators import ProjectionEvaluator
 
@@ -35,7 +37,19 @@ class LabelProjectionEvaluator(ProjectionEvaluator):
 
     def _calculate_confidence(self):
         label = self.targets.where(is_label=True).get()
-        # TODO: confidence should be confidence of items with the meaning concept
-        self.confidence = 1.0
+        correspondence = self.targets.where(is_correspondence=True).get()
+        view = correspondence.parent_view
+        try:
+            self.confidence = statistics.fmean(
+                [
+                    c.quality
+                    for c in view.members
+                    if c.start.parent_space in view.input_spaces
+                    and c.start.is_link
+                    and c.start.parent_concept == label.parent_concept
+                ]
+            )
+        except statistics.StatisticsError:
+            self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - label.activation

@@ -26,7 +26,6 @@ class ChunkProjectionEvaluator(ProjectionEvaluator):
 
     def _calculate_confidence(self):
         chunk = self.targets.where(is_chunk=True).get()
-        # TODO: should be the quality of the shared labels and relations
         self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - chunk.activation
