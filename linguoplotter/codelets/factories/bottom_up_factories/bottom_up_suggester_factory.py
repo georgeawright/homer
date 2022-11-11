@@ -67,10 +67,14 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             non_raw_chunks = input_space.contents.filter(
                 lambda x: x.is_chunk and not x.is_raw
             ).sample(10)
-            unrelated_non_raw_chunks = non_raw_chunks.filter(
-                lambda x: x.relations.is_empty
+            total_relation_quality = sum(
+                relation.quality
+                for chunk in non_raw_chunks
+                for relation in chunk.relations
             )
-            return len(unrelated_non_raw_chunks) / len(non_raw_chunks)
+            return 1 - FloatBetweenOneAndZero(
+                total_relation_quality / len(non_raw_chunks)
+            )
         except MissingStructureError:
             return float("-inf")
 
