@@ -83,7 +83,7 @@ class RelationSelector(Selector):
     def _engender_follow_up(self):
         try:
             winner_relation = self.winners.get()
-            parent_concept = winner_relation.parent_concept.friends().get()
+            parent_concept = winner_relation.parent_concept
             target_space = StructureSet.intersection(
                 # parent spaces doesn't contain the unidimensional location spaces
                 winner_relation.start.parent_spaces.where(no_of_dimensions=1),
