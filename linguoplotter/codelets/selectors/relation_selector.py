@@ -86,9 +86,16 @@ class RelationSelector(Selector):
             parent_concept = winner_relation.parent_concept
             target_space = (
                 winner_relation.parent_space.conceptual_spaces_and_sub_spaces.filter(
-                    lambda x: x.no_of_dimensions == 1
-                    if parent_concept.parent_space.name == "more-less"
-                    else True
+                    lambda x: (
+                        x.no_of_dimensions == 1
+                        if parent_concept.parent_space.name == "more-less"
+                        else True
+                    )
+                    and (
+                        x in winner_relation.parent_space.conceptual_spaces
+                        if parent_concept.parent_space.name == "same-different"
+                        else True
+                    )
                 ).get(exclude=[winner_relation.conceptual_space])
             )
             targets = self.bubble_chamber.new_dict(

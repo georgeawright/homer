@@ -29,6 +29,9 @@ class StructureDict(StructureCollection):
     def items(self):
         return self.structures.items()
 
+    def keys(self):
+        return self.structures.keys()
+
     def values(self):
         return self.structures.values()
 

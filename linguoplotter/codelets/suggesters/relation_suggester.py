@@ -53,17 +53,8 @@ class RelationSuggester(Suggester):
         start = input_space.contents.filter(
             lambda x: x.is_chunk and not x.is_slot and x.quality > 0
         ).get(key=relating_exigency)
-        # TODO:
-        # what about same/different location?
-        # get all structures at once as in view driven factory
-        # probably first get start and end here and concept and space in prelim checks
-        target_space = start.parent_spaces.where(
-            is_conceptual_space=True, no_of_dimensions=1
-        ).get()
         urgency = urgency if urgency is not None else start.unrelatedness
-        targets = bubble_chamber.new_dict(
-            {"start": start, "space": target_space}, name="targets"
-        )
+        targets = bubble_chamber.new_dict({"start": start}, name="targets")
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 
     @classmethod
@@ -75,7 +66,18 @@ class RelationSuggester(Suggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         input_space = bubble_chamber.input_spaces.get()
-        target_space = input_space.conceptual_spaces.where(no_of_dimensions=1).get()
+        target_space = input_space.conceptual_spaces.filter(
+            lambda x: (
+                x.no_of_dimensions == 1
+                if parent_concept.parent_space.name == "more-less"
+                else True
+            )
+            and (
+                x in input_space.conceptual_spaces
+                if parent_concept.parent_space.name == "same-different"
+                else True
+            )
+        ).get()
         potential_targets = input_space.contents.filter(
             lambda x: x.is_node and x.is_slot and x.quality > 0
         )
@@ -113,7 +115,11 @@ class RelationSuggester(Suggester):
         return self.bubble_chamber.concepts["relation"]
 
     def _passes_preliminary_checks(self):
-        if self.targets["concept"] is not None:
+        if None not in [
+            self.targets["concept"],
+            self.targets["space"],
+            self.targets["end"],
+        ]:
             classification = self.targets["concept"].classifier.classify(
                 concept=self.targets["concept"],
                 space=self.targets["space"],
@@ -134,43 +140,59 @@ class RelationSuggester(Suggester):
                     )
                 except MissingStructureError:
                     return False
+        if self.targets["concept"] is None:
+            possible_concepts = self.bubble_chamber.concepts.where(
+                structure_type=Relation, is_slot=False
+            ).where_not(classifier=None)
         else:
-            if self.targets["end"] is None:
-                try:
-                    self.targets["end"] = (
-                        self.targets["start"]
-                        .parent_space.contents.filter(
-                            lambda x: x != self.targets["start"]
-                            and x.is_chunk
-                            and x.quality > 0
-                        )
-                        .get(key=relating_exigency)
-                    )
-                except MissingStructureError:
-                    return False
-            self.targets["concept"] = (
-                self.bubble_chamber.concepts.where(
-                    structure_type=Relation, is_slot=False
-                )
-                .where_not(classifier=None)
-                .filter(
-                    lambda x: self.targets["start"]
-                    .relations.where(
-                        parent_concept=x,
-                        conceptual_space=self.targets["space"],
-                        end=self.targets["end"],
-                    )
-                    .is_empty
-                )
-                .get(
-                    key=lambda x: x.classifier.classify(
-                        concept=x,
-                        space=self.targets["space"],
-                        start=self.targets["start"],
-                        end=self.targets["end"],
-                    )
-                )
+            possible_concepts = [self.targets["concept"]]
+        if self.targets["end"] is None:
+            possible_ends = self.targets["start"].parent_space.contents.filter(
+                lambda x: x != self.targets["start"] and x.is_chunk and x.quality > 0
             )
+        else:
+            possible_ends = [self.targets["end"]]
+        if self.targets["space"] is None:
+            possible_spaces = self.targets[
+                "start"
+            ].parent_space.conceptual_spaces_and_sub_spaces
+        else:
+            possible_spaces = [self.targets["space"]]
+        possible_target_combos = [
+            self.bubble_chamber.new_dict(
+                {
+                    "start": self.targets["start"],
+                    "end": end,
+                    "space": space,
+                    "concept": concept,
+                },
+                name="targets",
+            )
+            for end in possible_ends
+            for space in possible_spaces
+            for concept in possible_concepts
+            if (
+                space.no_of_dimensions == 1 and concept.parent_space.name == "more-less"
+            )
+            or (
+                space in self.targets["start"].parent_space.conceptual_spaces
+                and concept.parent_space.name == "same-different"
+            )
+        ]
+        targets = self.bubble_chamber.random_machine.select(
+            possible_target_combos,
+            key=lambda x: x["concept"].classifier.classify(
+                start=x["start"],
+                end=x["end"],
+                concept=x["concept"],
+                space=x["space"],
+            ),
+        )
+        self.targets["concept"], self.targets["end"], self.targets["space"] = (
+            targets["concept"],
+            targets["end"],
+            targets["space"],
+        )
         return True
 
     def _calculate_confidence(self):
