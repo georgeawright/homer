@@ -84,11 +84,13 @@ class RelationSelector(Selector):
         try:
             winner_relation = self.winners.get()
             parent_concept = winner_relation.parent_concept
-            target_space = StructureSet.intersection(
-                # parent spaces doesn't contain the unidimensional location spaces
-                winner_relation.start.parent_spaces.where(no_of_dimensions=1),
-                winner_relation.end.parent_spaces.where(no_of_dimensions=1),
-            ).get(exclude=[winner_relation.conceptual_space])
+            target_space = (
+                winner_relation.parent_space.conceptual_spaces_and_sub_spaces.filter(
+                    lambda x: x.no_of_dimensions == 1
+                    if parent_concept.parent_space.name == "more-less"
+                    else True
+                ).get(exclude=[winner_relation.conceptual_space])
+            )
             targets = self.bubble_chamber.new_dict(
                 {
                     "start": winner_relation.start,
