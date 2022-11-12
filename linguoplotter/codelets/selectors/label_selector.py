@@ -50,9 +50,7 @@ class LabelSelector(Selector):
     def _engender_follow_up(self):
         try:
             winning_label = self.winners.get()
-            parent_concept = (
-                winning_label.parent_concept.friends().where(structure_type=Label).get()
-            )
+            parent_concept = winning_label.parent_concept
             new_start = (
                 winning_label.start.nearby()
                 .filter(lambda x: x.quality > 0)
