@@ -425,15 +425,11 @@ class ViewDrivenFactory(Factory):
             .get()
         )
         self.bubble_chamber.loggers["activity"].log(f"Found sub frame: {sub_frame}")
-        contextual_space = self.targets["view"].input_spaces.get()
         frame = self.bubble_chamber.frames.where(
             is_sub_frame=False, parent_concept=sub_frame.parent_concept
         ).get(key=activation)
         self.bubble_chamber.loggers["activity"].log(f"Found target frame: {frame}")
-        targets = self.bubble_chamber.new_dict(
-            {"frame": frame, "contextual_space": contextual_space}, name="targets"
-        )
         urgency = self.targets["view"].unhappiness
-        return ViewSuggester.spawn(
-            self.codelet_id, self.bubble_chamber, targets, urgency
+        return ViewSuggester.make(
+            self.codelet_id, self.bubble_chamber, frame=frame, urgency=urgency
         )

@@ -39,7 +39,7 @@ for i in range(5):
     narrator.interpreter.interpret_file("builtin.lisp")
 
     os.chdir("example-programs/weather")
-    narrator.interpreter.interpret_file("narration-3.lisp")
+    narrator.interpreter.interpret_file("narration-6.lisp")
     os.chdir("../..")
     result = narrator.run()
     results.append(result)
