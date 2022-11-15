@@ -110,33 +110,50 @@ hypothesis_texts = {
     ],
 }
 
-scores_for_each_hypothesis = {"1": [], "2": [], "3": []}
-for sequence_number, texts in hypothesis_texts.items():
-    for text in texts:
-        metrics = calculate_metrics(text, references[sequence_number])
-        scores_for_each_hypothesis[sequence_number].append(metrics)
+# scores_for_each_hypothesis = {"1": [], "2": [], "3": []}
+# for sequence_number, texts in hypothesis_texts.items():
+#    for text in texts:
+#        metrics = calculate_metrics(text, references[sequence_number])
+#        scores_for_each_hypothesis[sequence_number].append(metrics)
+#
+# print(scores_for_each_hypothesis)
+#
+# score_averages_for_each_sequence = {}
+# for sequence_number, scores in scores_for_each_hypothesis.items():
+#    score_averages_for_each_sequence[sequence_number] = {
+#        metric_name: statistics.fmean([x[metric_name] for x in scores])
+#        for metric_name in scores[0]
+#    }
+#
+# print(score_averages_for_each_sequence)
+#
+# figure = pyplot.figure()
+# ax = figure.add_axes([0.1, 0.1, 0.8, 0.8])
+# for sequence_number, scores in score_averages_for_each_sequence.items():
+#    score_name = "rougeL-f1-med"
+#    score = scores[score_name]
+#    ax.bar(sequence_number, score)
+#
+# ax.set_title(f"Average {score_name} for each sequence")
+# ax.set_xlabel("Sequence")
+# ax.set_ylabel(score_name)
+# ax.set_xticks([])
+#
+# pyplot.savefig(f"{score_name}.png")
 
-print(scores_for_each_hypothesis)
+pairwise_rouges = []
+for text_a in references["1"]:
+    for text_b in references["1"]:
+        if text_a == text_b:
+            continue
+        metrics = calculate_metrics(text_a, [text_b])
+        pairwise_rouges.append(metrics["rougeL-recall-max"])
 
-score_averages_for_each_sequence = {}
-for sequence_number, scores in scores_for_each_hypothesis.items():
-    score_averages_for_each_sequence[sequence_number] = {
-        metric_name: statistics.fmean([x[metric_name] for x in scores])
-        for metric_name in scores[0]
-    }
+        print(text_a)
+        print(text_b)
+        print(metrics["rougeL-recall-max"])
+        print(metrics["rougeL-precision-max"])
 
-print(score_averages_for_each_sequence)
-
-figure = pyplot.figure()
-ax = figure.add_axes([0.1, 0.1, 0.8, 0.8])
-for sequence_number, scores in score_averages_for_each_sequence.items():
-    score_name = "rougeL-f1-med"
-    score = scores[score_name]
-    ax.bar(sequence_number, score)
-
-ax.set_title(f"Average {score_name} for each sequence")
-ax.set_xlabel("Sequence")
-ax.set_ylabel(score_name)
-ax.set_xticks([])
-
-pyplot.savefig(f"{score_name}.png")
+mean_rouge = statistics.fmean(pairwise_rouges)
+sd_rouge = statistics.stdev(pairwise_rouges)
+print(f"mean: {mean_rouge}, sd: {sd_rouge}")
