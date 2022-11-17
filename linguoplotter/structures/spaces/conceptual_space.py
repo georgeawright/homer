@@ -126,13 +126,26 @@ class ConceptualSpace(Space):
                     math.isnan(self.no_of_dimensions)
                     or self.no_of_dimensions == other.no_of_dimensions,
                     self.is_symbolic == other.is_symbolic,
-                    other in self.possible_instances,
+                    other in self.possible_instances
+                    or (
+                        all(
+                            [
+                                other_possible_instance in self.possible_instances
+                                for other_possible_instance in self.possible_instances
+                            ]
+                        )
+                        if other.possible_instances.not_empty
+                        else False
+                    ),
                 ]
             )
         for space in other:
             if self.subsumes(space):
                 return True
         return False
+
+    def unifies_with(self, other) -> bool:
+        return self.subsumes(other) or other.subsumes(self)
 
     def location_from_super_space_location(self, location: Location) -> Location:
         try:

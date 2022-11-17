@@ -196,9 +196,9 @@ class CorrespondenceSuggester(Suggester):
         if child_codelet.targets["end"].is_label:
             if (
                 child_codelet.targets["end"]
-                .start.correspondences.where(
-                    parent_view=child_codelet.targets["view"],
-                    end=child_codelet.targets["end"].start,
+                .start.correspondences.filter(
+                    lambda x: x.end == child_codelet.targets["end"].start
+                    and x.start.parent_space == child_codelet.targets["start_space"]
                 )
                 .not_empty
             ):
@@ -207,13 +207,13 @@ class CorrespondenceSuggester(Suggester):
                 )
                 child_codelet.targets["start"] = (
                     child_codelet.targets["end"]
-                    .start.correspondences.where(
-                        parent_view=child_codelet.targets["view"],
-                        end=child_codelet.targets["end"].start,
+                    .start.correspondences.filter(
+                        lambda x: x.end == child_codelet.targets["end"].start
+                        and x.start.parent_space == child_codelet.targets["start_space"]
                     )
                     .get()
                     .start.labels.filter(
-                        lambda x: child_codelet.targets["space"].subsumes(
+                        lambda x: child_codelet.targets["space"].unifies_with(
                             x.parent_concept.parent_space
                         )
                     )
@@ -229,7 +229,7 @@ class CorrespondenceSuggester(Suggester):
                         (x.start == structure_one_start)
                         or (structure_one_start is None)
                     )
-                    and child_codelet.targets["space"].subsumes(
+                    and child_codelet.targets["space"].unifies_with(
                         x.parent_concept.parent_space
                     )
                     and any(
@@ -285,6 +285,10 @@ class CorrespondenceSuggester(Suggester):
                             x.parent_concept.is_compound_concept
                             and x.parent_concept.args[0]
                             == child_codelet.targets["end"].parent_concept
+                            and (
+                                x.parent_concept.root.name != "not"
+                                or child_codelet.targets["view"].members.not_empty
+                            )
                         ),
                     ]
                 )

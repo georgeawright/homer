@@ -38,9 +38,9 @@ class Evaluator(Codelet):
         self.bubble_chamber.loggers["activity"].log_set(self.targets)
         self._calculate_confidence()
         self.bubble_chamber.loggers["activity"].log(
-            f"Original confidence: {self.original_confidence}"
-            + f"Confidence: {self.confidence}"
-            + f"Change in confidence: {self.change_in_confidence}"
+            f"Original confidence: {self.original_confidence}\n"
+            + f"Confidence: {self.confidence}\n"
+            + f"Change in confidence: {self.change_in_confidence}\n"
             + f"Activation difference: {self.activation_difference}"
         )
         for structure in self.targets:

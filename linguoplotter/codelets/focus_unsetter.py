@@ -71,8 +71,12 @@ class FocusUnsetter(Codelet):
             self._check_for_and_merge_with_equivalent_views()
             self._update_worldview_porter_urgency()
             self._update_bottom_up_factories_urgencies()
+        elif self.bubble_chamber.focus.view.members.filter(
+            lambda x: x.parent_concept.is_compound_concept
+        ).not_empty:
+            probability_of_unsetting_focus = 1
         else:
-            probability_of_unsetting_focus = transposed_change_in_satisfaction_score
+            probability_of_unsetting_focus = 1 - transposed_change_in_satisfaction_score
         self.bubble_chamber.loggers["activity"].log(
             f"Probability of unsetting focus: {probability_of_unsetting_focus}"
         )

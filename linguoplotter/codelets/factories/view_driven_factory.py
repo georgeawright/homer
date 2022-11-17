@@ -17,7 +17,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
-from linguoplotter.structure_collections import StructureDict
+from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structure_collection_keys import activation
 from linguoplotter.structures import View
 from linguoplotter.structures.links import Relation
@@ -168,6 +168,20 @@ class ViewDrivenFactory(Factory):
                 possible_concepts = self.targets[
                     "slot"
                 ].parent_concept.possible_instances
+            elif (
+                self.targets["slot"].parent_concept.parent_space.is_slot
+                and self.targets[
+                    "slot"
+                ].parent_concept.parent_space.possible_instances.not_empty
+            ):
+                possible_concepts = StructureSet.union(
+                    *[
+                        space.contents.where(is_concept=True, is_slot=False)
+                        for space in self.targets[
+                            "slot"
+                        ].parent_concept.parent_space.possible_instances
+                    ]
+                )
             else:
                 possible_concepts = self.targets[
                     "slot"

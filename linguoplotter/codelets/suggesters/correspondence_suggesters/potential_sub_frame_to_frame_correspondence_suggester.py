@@ -164,32 +164,6 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             and (x.input_spaces == child_codelet.targets["view"].input_spaces)
             and all(
                 [
-                    any(
-                        [
-                            super_frame_space.subsumes(sub_frame_space)
-                            for sub_frame_space in x.parent_frame.input_space.conceptual_spaces
-                        ]
-                    )
-                    for super_frame_space in child_codelet.targets[
-                        "sub_frame"
-                    ].input_space.conceptual_spaces
-                ]
-            )
-            and all(
-                [
-                    any(
-                        [
-                            super_frame_space.subsumes(sub_frame_space)
-                            for sub_frame_space in x.parent_frame.output_space.conceptual_spaces
-                        ]
-                    )
-                    for super_frame_space in child_codelet.targets[
-                        "sub_frame"
-                    ].output_space.conceptual_spaces
-                ]
-            )
-            and all(
-                [
                     child_codelet.targets["view"].can_accept_member(
                         member.parent_concept,
                         member.conceptual_space,
