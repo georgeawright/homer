@@ -196,6 +196,18 @@ class RelationSuggester(Suggester):
         return True
 
     def _calculate_confidence(self):
+        if all(
+            [
+                self.targets["space"] == self.bubble_chamber.spaces["time"],
+                self.targets["concept"]
+                not in [
+                    self.bubble_chamber.concepts["less"],
+                    self.bubble_chamber.concepts["same"],
+                ],
+            ]
+        ):
+            self.confidence = 0.0
+            return
         classification = self.targets["concept"].classifier.classify(
             concept=self.targets["concept"],
             space=self.targets["space"],

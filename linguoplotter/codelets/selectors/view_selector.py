@@ -1,9 +1,9 @@
 from linguoplotter.codelets.selector import Selector
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collection_keys import exigency
+from linguoplotter.structure_collection_keys import activation, exigency
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import View
-from linguoplotter.structure_collection_keys import activation
 
 
 class ViewSelector(Selector):
@@ -28,7 +28,7 @@ class ViewSelector(Selector):
         return self.bubble_chamber.concepts["view"]
 
     def _passes_preliminary_checks(self):
-        if self.challengers is not None:
+        if self.challengers.not_empty:
             return True
         try:
             self._get_challenger()
@@ -40,19 +40,27 @@ class ViewSelector(Selector):
         try:
             winning_view = self.winners.get()
             if winning_view.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE:
-                try:
-                    target_frame = (
+                target_frame = (
+                    StructureSet.union(
+                        self.bubble_chamber.new_set(winning_view.parent_frame),
                         winning_view.parent_frame.parent_concept.relatives.where(
                             is_frame=True
-                        ).get(key=exigency)
+                        ),
                     )
-                except MissingStructureError:
-                    target_frame = winning_view.parent_frame
+                    .filter(
+                        lambda f: self.bubble_chamber.views.filter(
+                            lambda v: v.parent_frame.parent_concept == f.parent_concept
+                            and v.members.is_empty
+                        ).is_empty
+                    )
+                    .get(key=exigency)
+                )
                 self.child_codelets.append(
                     self.get_follow_up_class().make(
                         self.codelet_id,
                         self.bubble_chamber,
                         frame=target_frame,
+                        urgency=target_frame.activation,
                     )
                 )
         except MissingStructureError:
@@ -68,7 +76,7 @@ class ViewSelector(Selector):
                     lambda c: c.start.parent_space in x.input_spaces
                 ).not_empty
                 and x.members.filter(
-                    lambda c: c.start.parent_space in x.input_spaces
+                    lambda c: c.start.parent_space in champion.input_spaces
                 ).not_empty
                 and x.raw_input_nodes() == champion.raw_input_nodes()
             )

@@ -4,12 +4,15 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collection_keys import activation, exigency
 from linguoplotter.structures import Frame
 
 
 class ViewSuggester(Suggester):
+    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
+
     def __init__(
         self,
         codelet_id: str,
@@ -94,9 +97,9 @@ class BottomUpViewSuggester(ViewSuggester):
             self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
                 == self.targets["frame"].parent_concept
-                and x.members.is_empty
+                and x.unhappiness > self.FLOATING_POINT_TOLERANCE
             )
-        )
+        )  # these views should be completed or deleted before more are built
         self.bubble_chamber.loggers["activity"].log(
             "Frame activation: " + str(self.targets["frame"].activation)
         )

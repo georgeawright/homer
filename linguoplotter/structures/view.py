@@ -282,6 +282,10 @@ class View(Structure):
         proportion_in_other = len(shared_raw_nodes) / len(other.raw_input_nodes)
         return statistics.fmean([proportion_in_self, proportion_in_other])
 
+    def specify_space(self, abstract_space, conceptual_space):
+        for frame in self.frames:
+            frame.specify_space(abstract_space, conceptual_space)
+
     def nearby(self, space: Space = None) -> StructureSet:
         space = space if space is not None else self.location.space
         return (

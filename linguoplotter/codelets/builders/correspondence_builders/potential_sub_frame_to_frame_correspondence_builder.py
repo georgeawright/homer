@@ -6,12 +6,12 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
         if self.targets["space"] is not None and self.targets["space"].is_slot:
             if self.targets["end"].is_label:
-                self.targets["view"].parent_frame.specify_space(
+                self.targets["view"].specify_space(
                     self.targets["space"],
                     self.targets["start"].parent_concept.parent_space,
                 )
             if self.targets["end"].is_relation:
-                self.targets["view"].parent_frame.specify_space(
+                self.targets["view"].specify_space(
                     self.targets["space"],
                     self.targets["start"].conceptual_space,
                 )
