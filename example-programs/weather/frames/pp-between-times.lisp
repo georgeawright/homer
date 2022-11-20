@@ -97,10 +97,6 @@
     :parent_space pp-directional-time-output
     :left_branch (StructureSet pp-word-3)
     :right_branch (StructureSet pp-word-4)))
-(define conj-super-chunk-label
-  (def-label :start conj-super-chunk :parent_concept pp-directional-time-concept
-    :locations (list conj-location
-		     (Location (list) pp-directional-time-output))))
 (define np-super-chunk
   (def-letter-chunk :name None
     :locations (list np-location
@@ -108,10 +104,6 @@
     :parent_space pp-directional-time-output
     :left_branch (StructureSet pp-word-2)
     :right_branch (StructureSet conj-super-chunk)))
-(define np-super-chunk-label
-  (def-label :start np-super-chunk :parent_concept pp-directional-time-concept
-    :locations (list np-location
-		     (Location (list) pp-directional-time-output))))
 (define pp-super-chunk
   (def-letter-chunk :name None
     :locations (list pp-location

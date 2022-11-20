@@ -43,14 +43,18 @@ class Space(Structure):
     def is_compatible_with(self, other: Space) -> bool:
         return self.parent_concept.is_compatible_with(other.parent_concept)
 
-    def distance_between(self, a: Structure, b: Structure):
-        return self.parent_concept.distance_between(a, b, space=self)
+    def distance_between(self, a: Structure, b: Structure, return_nan: bool = False):
+        return self.parent_concept.distance_between(
+            a, b, space=self, return_nan=return_nan
+        )
 
-    def proximity_between(self, a: Structure, b: Structure):
-        return self.parent_concept.proximity_between(a, b, space=self)
+    def proximity_between(self, a: Structure, b: Structure, return_nan: bool = False):
+        return self.parent_concept.proximity_between(
+            a, b, space=self, return_nan=return_nan
+        )
 
-    def adjacency_of(self, a: Structure, b: Structure):
-        return self.parent_concept.adjacency_of(a, b, space=self)
+    def adjacency_of(self, a: Structure, b: Structure, return_nan: bool = False):
+        return self.parent_concept.adjacency_of(a, b, space=self, return_nan=return_nan)
 
     def update_activation(self):
         self._activation = (

@@ -9,7 +9,6 @@ from linguoplotter.structure_collection_keys import (
     quality_and_activation,
     uncorrespondedness,
 )
-from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.nodes import Concept
 
 
@@ -88,7 +87,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 )
             else:
                 classification_space = self.targets["space"]
-            # TODO: create mock object with correct locations?
             classification = self.targets["concept"].classifier.classify(
                 concept=self.targets["concept"],
                 space=classification_space,
@@ -135,11 +133,29 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 "Suggested concept is incompatible with existing concepts"
             )
             return False
+        if (
+            self.targets["end"].is_label
+            and not self.targets["space"].is_slot
+            and not self.targets["start"].has_location_in_space(self.targets["space"])
+        ):
+            self.bubble_chamber.loggers["activity"].log(
+                "Suggested concept does not have location in conceptual space"
+            )
+            return False
         return True
 
     def _calculate_confidence(self):
-        input_links = self.bubble_chamber.new_set(self.targets["start"])
-        input_chunks = self.bubble_chamber.new_set()
+        input_links, input_chunks = (
+            (
+                self.bubble_chamber.new_set(self.targets["start"]),
+                self.bubble_chamber.new_set(),
+            )
+            if self.targets["start"].is_link
+            else (
+                self.bubble_chamber.new_set(),
+                self.bubble_chamber.new_set(self.targets["start"]),
+            )
+        )
         while input_links.not_empty:
             link = input_links.get()
             for arg in link.arguments:

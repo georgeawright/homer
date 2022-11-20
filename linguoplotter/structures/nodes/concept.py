@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 import statistics
 from typing import Callable, List
 
@@ -138,11 +139,12 @@ class Concept(Node):
             friend_concepts.add(self)
         return friend_concepts
 
-    def distance_from(self, other: Node):
+    def distance_from(self, other: Node, return_nan: bool = False):
         try:
             return self.distance_function(
                 self.location_in_space(self.parent_space).coordinates,
                 other.location_in_space(self.parent_space).coordinates,
+                return_nan=return_nan,
             )
         except NotImplementedError:
             return statistics.mean(
@@ -150,10 +152,12 @@ class Concept(Node):
                     self.distance_function(
                         self.location_in_space(self.parent_space).start_coordinates,
                         other.location_in_space(self.parent_space).start_coordinates,
+                        return_nan=return_nan,
                     ),
                     self.distance_function(
                         self.location_in_space(self.parent_space).end_coordinates,
                         other.location_in_space(self.parent_space).end_coordinates,
+                        return_nan=return_nan,
                     ),
                 ]
             )
@@ -175,11 +179,14 @@ class Concept(Node):
             )
             if new_location is None:
                 raise NoLocationError
-            return self.distance_from(mock_node)
+            return self.distance_from(mock_node, return_nan)
 
-    def proximity_to(self, other: Node):
+    def proximity_to(self, other: Node, return_nan: bool = False):
         try:
-            return self._distance_to_proximity(self.distance_from(other))
+            distance = self.distance_from(other, return_nan)
+            if math.isnan(distance) and return_nan:
+                return math.nan
+            return self._distance_to_proximity(distance)
         except NoLocationError:
             return 0.0
 
@@ -189,6 +196,7 @@ class Concept(Node):
         b: Node,
         space: "Space" = None,
         distance_function: callable = None,
+        return_nan: bool = False,
     ):
         space = self.parent_space if space is None else space
         distance_function = (
@@ -198,6 +206,7 @@ class Concept(Node):
             return distance_function(
                 a.location_in_space(space).coordinates,
                 b.location_in_space(space).coordinates,
+                return_nan,
             )
         except NotImplementedError:
             try:
@@ -206,25 +215,39 @@ class Concept(Node):
                         distance_function(
                             a.location_in_space(space).start_coordinates,
                             b.location_in_space(space).start_coordinates,
+                            return_nan,
                         ),
                         distance_function(
                             a.location_in_space(space).end_coordinates,
                             b.location_in_space(space).end_coordinates,
+                            return_nan,
                         ),
                     ]
                 )
             except AttributeError:
                 return 0.0
 
-    def proximity_between(self, a: Node, b: Node, space: "Space" = None):
-        return self._distance_to_proximity(self.distance_between(a, b, space=space))
+    def proximity_between(
+        self, a: Node, b: Node, space: "Space" = None, return_nan: bool = False
+    ):
+        distance = self.distance_between(a, b, space=space, return_nan=return_nan)
+        if math.isnan(distance) and return_nan:
+            return math.nan
+        return self._distance_to_proximity(distance)
 
-    def adjacency_of(self, a: Node, b: Node, space: "Space" = None):
-        return self._distance_to_proximity(
-            self.distance_between(
-                a, b, space=space, distance_function=self.chunking_distance_function
-            )
+    def adjacency_of(
+        self, a: Node, b: Node, space: "Space" = None, return_nan: bool = False
+    ):
+        distance = self.distance_between(
+            a,
+            b,
+            space=space,
+            distance_function=self.chunking_distance_function,
+            return_nan=return_nan,
         )
+        if math.isnan(distance) and return_nan:
+            return math.nan
+        return self._distance_to_proximity(distance)
 
     def _distance_to_proximity(self, value: float) -> float:
         # TODO: consider using a distance_to_proximity function instead of weight

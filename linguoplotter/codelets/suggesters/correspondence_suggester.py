@@ -51,7 +51,7 @@ class CorrespondenceSuggester(Suggester):
         input_structures = target_view.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
             and len(x.correspondences.where(end=x))
-            < len(x.parent_spaces.where(is_contextual_space=True)) - 1
+            < len(x.parent_spaces.where(is_contextual_space=True))
         )
         output_structures = target_view.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence

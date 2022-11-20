@@ -162,6 +162,9 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 != child_codelet.targets["view"].parent_frame.progenitor
             )
             and (x.input_spaces == child_codelet.targets["view"].input_spaces)
+            and x.members.filter(
+                lambda c: c.parent_concept.is_compound_concept
+            ).is_empty
             and all(
                 [
                     child_codelet.targets["view"].can_accept_member(

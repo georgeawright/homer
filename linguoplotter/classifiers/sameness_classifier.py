@@ -15,6 +15,7 @@ class SamenessClassifier(Classifier):
         collection = kwargs.get("collection")
         spaces = kwargs.get("spaces")
         space = kwargs.get("space")
+        return_nan = kwargs.get("return_nan", False)
 
         collection = list(collection) if collection is not None else [start, end]
         if spaces is None:
@@ -53,11 +54,13 @@ class SamenessClassifier(Classifier):
         if distinct_pairs[0][0].is_label:
             return fuzzy.AND(
                 start_concept.classifier.classify(
-                    concept=start_concept, start=end.start
+                    concept=start_concept, start=end.start, return_nan=return_nan
                 )
                 if start_concept is not None
                 else 1.0,
-                end_concept.classifier.classify(concept=end_concept, start=start.start)
+                end_concept.classifier.classify(
+                    concept=end_concept, start=start.start, return_nan=return_nan
+                )
                 if end_concept is not None
                 else 1.0,
             )
@@ -68,6 +71,7 @@ class SamenessClassifier(Classifier):
                     space=space,
                     start=end.start,
                     end=end.end,
+                    return_nan=return_nan,
                 )
                 if start_concept is not None
                 else 1.0,
@@ -76,6 +80,7 @@ class SamenessClassifier(Classifier):
                     space=space,
                     start=start.start,
                     end=start.end,
+                    return_nan=return_nan,
                 )
                 if end_concept is not None
                 else 1.0,
@@ -84,7 +89,7 @@ class SamenessClassifier(Classifier):
             *[
                 fuzzy.AND(
                     *[
-                        space.adjacency_of(pair[0], pair[1])
+                        space.adjacency_of(pair[0], pair[1], return_nan=return_nan)
                         if pair[0].has_location_in_space(space)
                         and pair[1].has_location_in_space(space)
                         else 0.0

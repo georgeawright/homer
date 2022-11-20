@@ -1,3 +1,5 @@
+import math
+
 from linguoplotter import fuzzy
 from linguoplotter.classifier import Classifier
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -14,6 +16,7 @@ class DifferentnessClassifier(Classifier):
         end = kwargs.get("end")
         collection = kwargs.get("collection")
         space = kwargs.get("space")
+        return_nan = kwargs.get("return_nan", False)
 
         collection = list(collection) if collection is not None else [start, end]
         spaces = (
@@ -39,7 +42,10 @@ class DifferentnessClassifier(Classifier):
             *[
                 fuzzy.AND(
                     *[
-                        1 - space.proximity_between(pair[0], pair[1])
+                        1
+                        - space.proximity_between(
+                            pair[0], pair[1], return_nan=return_nan
+                        )
                         if pair[0].has_location_in_space(space)
                         and pair[1].has_location_in_space(space)
                         else 0.0

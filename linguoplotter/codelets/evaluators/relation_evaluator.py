@@ -61,6 +61,7 @@ class RelationEvaluator(Evaluator):
             else 0
             for relation, classification in classifications.items()
         )
+        # TODO: maybe also have different time relation confidence?
         for relation in classifications:
             relation.quality = sum(
                 [

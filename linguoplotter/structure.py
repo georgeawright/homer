@@ -471,10 +471,9 @@ class Structure(ABC):
                 except MissingStructureError:
                     pass
                 relatives_total += relation.activation
-            if relatives_total >= 1:
-                self._activation_buffer += (
-                    self.ACTIVATION_UPDATE_COEFFICIENT * relatives_total
-                )
+            self._activation_buffer += (
+                self.ACTIVATION_UPDATE_COEFFICIENT * relatives_total
+            )
             if self._activation_buffer == 0.0:
                 self.decay_activation(self.DECAY_RATE)
             self._activation = FloatBetweenOneAndZero(

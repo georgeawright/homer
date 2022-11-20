@@ -18,13 +18,14 @@ class DifferenceClassifier(Classifier):
         start = kwargs["start"]
         end = kwargs["end"]
         space = kwargs["space"]
+        return_nan = kwargs.get("return_nan", False)
 
         difference = (
             average_vector(start.location_in_space(space).coordinates)[0]
             - average_vector(end.location_in_space(space).coordinates)[0]
         )
         if math.isnan(difference):
-            return 1.0
+            return math.nan if return_nan else 1.0
         space_breadth_adjusted_difference = difference / space.breadth
         try:
             return FloatBetweenOneAndZero(

@@ -143,27 +143,28 @@ class Frame(Structure):
                 item.parent_space = conceptual_space
             if item.is_relation and item.conceptual_space == abstract_space:
                 item.conceptual_space = conceptual_space
-            try:
-                item.location_in_space(abstract_space).coordinates = [
-                    [math.nan for _ in range(conceptual_space.no_of_dimensions)]
-                ]
-                item.location_in_space(abstract_space).space = conceptual_space
-                conceptual_space.add(item)
-                item.parent_spaces.remove(abstract_space)
-                item.parent_spaces.add(conceptual_space)
-            except NotImplementedError:
-                item.location_in_space(abstract_space).start_coordinates = [
-                    [math.nan for _ in range(conceptual_space.no_of_dimensions)]
-                ]
-                item.location_in_space(abstract_space).end_coordinates = [
-                    [math.nan for _ in range(conceptual_space.no_of_dimensions)]
-                ]
-                item.location_in_space(abstract_space).space = conceptual_space
-                conceptual_space.add(item)
-                item.parent_spaces.remove(abstract_space)
-                item.parent_spaces.add(conceptual_space)
-            except NoLocationError:
-                pass
+            for location in item.locations:
+                if location.space != abstract_space:
+                    continue
+                try:
+                    item.location_in_space(abstract_space).coordinates = [
+                        [math.nan for _ in range(conceptual_space.no_of_dimensions)]
+                    ]
+                    item.location_in_space(abstract_space).space = conceptual_space
+                    conceptual_space.add(item)
+                    item.parent_spaces.remove(abstract_space)
+                    item.parent_spaces.add(conceptual_space)
+                except NotImplementedError:
+                    item.location_in_space(abstract_space).start_coordinates = [
+                        [math.nan for _ in range(conceptual_space.no_of_dimensions)]
+                    ]
+                    item.location_in_space(abstract_space).end_coordinates = [
+                        [math.nan for _ in range(conceptual_space.no_of_dimensions)]
+                    ]
+                    item.location_in_space(abstract_space).space = conceptual_space
+                    conceptual_space.add(item)
+                    item.parent_spaces.remove(abstract_space)
+                    item.parent_spaces.add(conceptual_space)
         for concept in self.concepts:
             if concept.parent_space == abstract_space:
                 concept.parent_space = conceptual_space
