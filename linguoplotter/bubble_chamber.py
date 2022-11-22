@@ -557,6 +557,7 @@ class BubbleChamber:
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         activation: FloatBetweenOneAndZero = None,
         is_slot: bool = False,
+        reverse: Concept = None,
     ) -> Concept:
         locations = [] if locations is None else locations
         parent_spaces = self.new_set(*[location.space for location in locations])
@@ -588,6 +589,7 @@ class BubbleChamber:
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
             is_slot=is_slot,
+            reverse=reverse,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
         )
@@ -602,6 +604,7 @@ class BubbleChamber:
         args: List[Concept],
         parent_id: str = "",
         is_slot: bool = False,
+        reverse: Concept = None,
     ):
         try:
             return self.concepts.where(
@@ -625,6 +628,7 @@ class BubbleChamber:
                 champion_labels=self.new_set(),
                 champion_relations=self.new_set(),
                 is_slot=is_slot,
+                reverse=reverse,
             )
             self.add(concept)
             self.new_relation(root, concept, quality=1.0, parent_id=parent_id)

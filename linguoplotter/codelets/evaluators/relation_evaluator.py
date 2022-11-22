@@ -7,6 +7,7 @@ from linguoplotter.structure_collections import StructureSet
 class RelationEvaluator(Evaluator):
     CLASSIFICATION_WEIGHT = HyperParameters.RELATION_QUALITY_CLASSIFICATION_WEIGHT
     SAMENESS_WEIGHT = HyperParameters.RELATION_QUALITY_SAMENESS_WEIGHT
+    TIME_WEIGHT = HyperParameters.RELATION_QUALITY_TIME_WEIGHT
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -55,18 +56,29 @@ class RelationEvaluator(Evaluator):
             / relation.parent_concept.number_of_components
             for relation in parallel_relations
         }
-        sameness_confidence = max(
-            classification
-            if relation.parent_concept == self.bubble_chamber.concepts["same"]
-            else 0
+        sameness_classifications = {
+            relation.conceptual_space: classification
             for relation, classification in classifications.items()
-        )
-        # TODO: maybe also have different time relation confidence?
+            if relation.parent_concept == self.bubble_chamber.concepts["same"]
+        }
+        sameness_confidence = 0
+        sameness_relation_weight = 1
+        for _, classification in sameness_classifications.items():
+            sameness_relation_weight /= 2
+            sameness_confidence += classification * sameness_relation_weight
+        time_difference_confidence = 0
+        for relation, classification in classifications.items():
+            if (
+                relation.conceptual_space == self.bubble_chamber.spaces["time"]
+                and relation.parent_concept == self.bubble_chamber.concepts["less"]
+            ):
+                time_difference_confidence = classification
         for relation in classifications:
             relation.quality = sum(
                 [
                     classifications[relation] * self.CLASSIFICATION_WEIGHT,
                     sameness_confidence * self.SAMENESS_WEIGHT,
+                    time_difference_confidence * self.TIME_WEIGHT,
                 ]
             )
         self.confidence = target_relation.quality

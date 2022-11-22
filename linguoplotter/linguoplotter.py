@@ -47,6 +47,18 @@ class Linguoplotter:
         loggers["structure"].coderack = self.coderack
 
     def run(self):
+        self.bubble_chamber.concepts["same"].reverse = self.bubble_chamber.concepts[
+            "same"
+        ]
+        self.bubble_chamber.concepts[
+            "different"
+        ].reverse = self.bubble_chamber.concepts["different"]
+        self.bubble_chamber.concepts["less"].reverse = self.bubble_chamber.concepts[
+            "more"
+        ]
+        self.bubble_chamber.concepts["more"].reverse = self.bubble_chamber.concepts[
+            "less"
+        ]
         for _ in range(self.NUMBER_OF_START_CHUNK_SUGGESTERS):
             self.coderack.add_codelet(ChunkSuggester.make("", self.bubble_chamber, 1.0))
         while self.bubble_chamber.result is None:

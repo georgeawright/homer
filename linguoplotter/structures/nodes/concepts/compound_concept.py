@@ -19,6 +19,7 @@ class CompoundConcept(Concept):
         champion_labels: StructureSet,
         champion_relations: StructureSet,
         is_slot: bool = False,
+        reverse: Concept = None,
     ):
         Concept.__init__(
             self,
@@ -43,6 +44,7 @@ class CompoundConcept(Concept):
             depth=root.depth * sum(arg.depth for arg in args),
             distance_to_proximity_weight=root.distance_to_proximity_weight,
             is_slot=is_slot,
+            reverse=reverse,
         )
         self.root = root
         self.args = args

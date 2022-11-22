@@ -130,9 +130,19 @@ class RelationSuggester(Suggester):
                 f"Preliminary classification: {classification}"
             )
             if classification < 0.5:
+                original_concept = self.targets["concept"]
                 self.targets["concept"] = self.bubble_chamber.new_compound_concept(
                     self.bubble_chamber.concepts["not"], [self.targets["concept"]]
                 )
+                if (
+                    self.targets["concept"].reverse is None
+                    and original_concept.reverse is not None
+                ):
+                    reverse = self.bubble_chamber.new_compound_concept(
+                        self.bubble_chamber.concepts["not"], [original_concept.reverse]
+                    )
+                    self.targets["concept"].reverse = reverse
+                    reverse.reverse = self.targets["concept"]
             if self.targets["end"] is None:
                 try:
                     self.targets["end"] = self.targets["start"].get_potential_relative(

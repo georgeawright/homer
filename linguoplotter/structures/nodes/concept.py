@@ -36,6 +36,7 @@ class Concept(Node):
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         is_slot: bool = False,
+        reverse: Concept = None,
     ):
         quality = None
         Node.__init__(
@@ -65,6 +66,7 @@ class Concept(Node):
         self.is_concept = True
         self._is_slot = is_slot
         self._non_slot_value = None
+        self.reverse = reverse
 
     def __dict__(self) -> dict:
         return {
@@ -113,6 +115,10 @@ class Concept(Node):
     @property
     def parent_basic_space(self) -> "ConceptualSpace":
         return self.parent_spaces.where(is_basic_level=True).get()
+
+    @property
+    def is_reversible(self) -> bool:
+        return self.reverse is not None
 
     def recalculate_unhappiness(self):
         self.unhappiness = 0.5 ** sum(
