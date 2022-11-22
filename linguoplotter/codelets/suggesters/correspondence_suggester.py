@@ -129,6 +129,12 @@ class CorrespondenceSuggester(Suggester):
                 if self.targets["end"].is_label
                 else self.targets["end"].conceptual_space
             )
+            if classification_space.is_slot:
+                classification_space = (
+                    self.targets["start"].parent_concept.parent_space
+                    if self.targets["end"].is_label
+                    else self.targets["start"].conceptual_space
+                )
         else:
             classification_space = None
         self.confidence = self.targets["concept"].classifier.classify(

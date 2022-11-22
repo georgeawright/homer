@@ -82,6 +82,12 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     if self.targets["end"].is_label
                     else self.targets["start"].conceptual_space
                 )
+                if classification_space.is_slot:
+                    classification_space = (
+                        self.targets["start"].parent_concept.parent_space
+                        if self.targets["end"].is_label
+                        else self.targets["start"].conceptual_space
+                    )
             else:
                 classification_space = self.targets["space"]
             classification = self.targets["concept"].classifier.classify(

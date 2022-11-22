@@ -334,6 +334,15 @@ class View(Structure):
 
     def remove(self, correspondence: "Correspondence"):
         self.members.remove(correspondence)
+        if correspondence.end.is_link and correspondence.end.parent_concept.is_slot:
+            for item in correspondence.end.parent_space.contents.where(is_link=True):
+                if (
+                    item.is_link
+                    and item.parent_concept == correspondence.end.parent_concept
+                    and item != correspondence.end
+                ):
+                    break
+                correspondence.end.parent_concept._non_slot_value = None
         for sub_frame, matched_frame in self.matched_sub_frames.copy().items():
             if (
                 correspondence in matched_frame.input_space.contents

@@ -10,11 +10,15 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                     self.targets["space"],
                     self.targets["start"].parent_concept.parent_space,
                 )
+                self.targets["space"] = self.targets[
+                    "start"
+                ].parent_concept.parent_space
             if self.targets["end"].is_relation:
                 self.targets["view"].specify_space(
                     self.targets["space"],
                     self.targets["start"].conceptual_space,
                 )
+                self.targets["space"] = self.targets["start"].conceptual_space
         if self.targets["sub_view"].super_views.not_empty:
             self.bubble_chamber.loggers["activity"].log_set(
                 self.targets["sub_view"].super_views, "super views"

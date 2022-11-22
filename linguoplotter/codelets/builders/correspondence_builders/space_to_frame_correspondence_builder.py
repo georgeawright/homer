@@ -9,11 +9,15 @@ class SpaceToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                     self.targets["space"],
                     self.targets["start"].parent_concept.parent_space,
                 )
+                self.targets["space"] = self.targets[
+                    "start"
+                ].parent_concept.parent_space
             if self.targets["end"].is_relation:
                 self.targets["view"].specify_space(
                     self.targets["space"],
                     self.targets["start"].conceptual_space,
                 )
+                self.targets["space"] = self.targets["start"].conceptual_space
         if (
             self.targets["end"].is_link
             and self.targets["end"].parent_concept.is_slot

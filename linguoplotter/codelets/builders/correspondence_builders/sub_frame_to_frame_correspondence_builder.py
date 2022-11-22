@@ -9,11 +9,15 @@ class SubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                     self.targets["space"],
                     self.targets["start"].parent_concept.parent_space,
                 )
+                self.targets["space"] = self.targets[
+                    "start"
+                ].parent_concept.parent_space
             if self.targets["end"].is_relation:
                 self.targets["view"].specify_space(
                     self.targets["space"],
                     self.targets["start"].conceptual_space,
                 )
+                self.targets["space"] = self.targets["start"].conceptual_space
         if (
             self.targets["end"].is_link
             and not self.targets["end"].parent_concept.is_filled_in
