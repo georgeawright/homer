@@ -129,20 +129,8 @@ class RelationSuggester(Suggester):
             self.bubble_chamber.loggers["activity"].log(
                 f"Preliminary classification: {classification}"
             )
-            if classification < 0.5:
-                original_concept = self.targets["concept"]
-                self.targets["concept"] = self.bubble_chamber.new_compound_concept(
-                    self.bubble_chamber.concepts["not"], [self.targets["concept"]]
-                )
-                if (
-                    self.targets["concept"].reverse is None
-                    and original_concept.reverse is not None
-                ):
-                    reverse = self.bubble_chamber.new_compound_concept(
-                        self.bubble_chamber.concepts["not"], [original_concept.reverse]
-                    )
-                    self.targets["concept"].reverse = reverse
-                    reverse.reverse = self.targets["concept"]
+            if classification < self.bubble_chamber.random_machine.generate_number():
+                return False
             if self.targets["end"] is None:
                 try:
                     self.targets["end"] = self.targets["start"].get_potential_relative(
@@ -232,4 +220,58 @@ class RelationSuggester(Suggester):
         )
 
     def _fizzle(self):
-        pass
+        if None in [
+            self.targets["concept"],
+            self.targets["space"],
+            self.targets["end"],
+        ]:
+            return
+        possible_target_pairs = [
+            (self.targets["start"], self.targets["end"]),
+            (self.targets["end"], self.targets["start"]),
+        ]
+        possible_spaces = [self.targets["space"]]
+        original_concept = self.targets["concept"]
+        negated_concept = self.bubble_chamber.new_compound_concept(
+            self.bubble_chamber.concepts["not"], [self.targets["concept"]]
+        )
+        if negated_concept.reverse is None and original_concept.reverse is not None:
+            negated_concept.reverse = self.bubble_chamber.new_compound_concept(
+                self.bubble_chamber.concepts["not"], [original_concept.reverse]
+            )
+            negated_concept.reverse.reverse = negated_concept
+        possible_concepts = [original_concept, negated_concept]
+        if self.targets["concept"].is_compound_concept:
+            for arg in self.targets["concept"].args:
+                possible_concepts.append(arg)
+        possible_target_combos = [
+            self.bubble_chamber.new_dict(
+                {"start": start, "end": end, "space": space, "concept": concept},
+                name="targets",
+            )
+            for start, end in possible_target_pairs
+            for space in possible_spaces
+            for concept in possible_concepts
+        ]
+        targets = self.bubble_chamber.random_machine.select(
+            possible_target_combos,
+            key=lambda x: x["concept"].classifier.classify(
+                start=x["start"],
+                end=x["end"],
+                concept=x["concept"],
+                space=x["space"],
+            ),
+        )
+        self.child_codelets.append(
+            RelationSuggester.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                targets,
+                targets["concept"].classifier.classify(
+                    start=targets["start"],
+                    end=targets["end"],
+                    concept=targets["concept"],
+                    space=targets["space"],
+                ),
+            )
+        )

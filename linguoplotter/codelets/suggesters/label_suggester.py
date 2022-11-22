@@ -89,10 +89,8 @@ class LabelSuggester(Suggester):
             self.bubble_chamber.loggers["activity"].log(
                 f"Preliminary classification: {classification}"
             )
-            if classification < 0.5:
-                self.targets["concept"] = self.bubble_chamber.new_compound_concept(
-                    self.bubble_chamber.concepts["not"], [self.targets["concept"]]
-                )
+            if classification < self.bubble_chamber.random_machine.generate_number():
+                return False
         else:
             try:
                 conceptual_space = self.bubble_chamber.conceptual_spaces.filter(
@@ -148,4 +146,28 @@ class LabelSuggester(Suggester):
         )
 
     def _fizzle(self):
-        pass
+        if self.targets["concept"] is None:
+            return
+        possible_concepts = [self.targets["concept"]]
+        possible_concepts.append(
+            self.bubble_chamber.new_compound_concept(
+                self.bubble_chamber.concepts["not"], [self.targets["concept"]]
+            )
+        )
+        if self.targets["concept"].is_compound_concept:
+            for arg in self.targets["concept"].args:
+                possible_concepts.append(arg)
+        targets = self.bubble_chamber.new_dict(name="targets")
+        targets["start"] = self.targets["start"]
+        targets["concept"] = self.bubble_chamber.random_machine.select(
+            possible_concepts,
+            key=lambda x: x.classifier.classify(start=targets["start"], concept=x),
+        )
+        self.child_codelets.append(
+            LabelSuggester.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                targets,
+                targets["concept"].proximity_to(targets["start"]),
+            )
+        )
