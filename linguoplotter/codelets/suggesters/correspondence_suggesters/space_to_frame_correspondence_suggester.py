@@ -248,6 +248,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         lambda x: child_codelet.targets["space"].subsumes(
                             x.parent_concept.parent_spaces
                         )
+                        and x.quality * x.activation > 0
                         and x.parent_concept
                         in child_codelet.targets[
                             "end"
@@ -269,8 +270,8 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         (x.start == structure_one_start)
                         or (structure_one_start is None)
                     )
-                    and x.start.quality > 0
-                    and x.quality > 0
+                    and x.start.quality * x.start.activation > 0
+                    and x.quality * x.activation > 0
                     and child_codelet.targets["space"].subsumes(
                         x.parent_concept.parent_spaces
                     )
@@ -322,7 +323,13 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 structure_one_end = None
             matching_relations = source_collection.filter(
                 lambda x: x.is_relation
-                and all([x.quality > 0, x.start.quality > 0, x.end.quality > 0])
+                and all(
+                    [
+                        x.quality * x.activation > 0,
+                        x.start.quality * x.start.activation > 0,
+                        x.end.quality * x.end.activation > 0,
+                    ]
+                )
                 and (x.start == structure_one_start or structure_one_start is None)
                 and (x.end == structure_one_end or structure_one_end is None)
                 and any(
