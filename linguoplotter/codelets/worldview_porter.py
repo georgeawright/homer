@@ -139,22 +139,18 @@ class WorldviewPorter(Codelet):
         proportion_of_input = self._proportion_of_input_in_views(views)
         number_of_frames = sum(len(view.frames) for view in views)
         view_quality = statistics.fmean([view.quality for view in views])
-        return sum(
+        satisfaction = sum(
             [
                 self.INPUT_WEIGHT * proportion_of_input,
                 self.VIEW_WEIGHT * view_quality,
                 self.FRAMES_WEIGHT * 1 / number_of_frames,
             ]
         )
-
-    #        return fuzzy.AND(
-    #            self._proportion_of_input_in_views(views),
-    #            fuzzy.OR(
-    #                self._view_quality_score(views),
-    #                self._frame_depth_score(views),
-    #                self._frame_types_score(views),
-    #            ),
-    #        )
+        view_ids = [view.structure_id for view in views]
+        self.bubble_chamber.loggers["activity"].log(
+            f"Satisfaction for {view_ids}: {satisfaction}"
+        )
+        return satisfaction
 
     def _view_quality_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
         if views.is_empty:
@@ -186,9 +182,6 @@ class WorldviewPorter(Codelet):
             )
         )
         proportion = size_of_raw_input_in_views / self.bubble_chamber.size_of_raw_input
-        self.bubble_chamber.loggers["activity"].log(
-            f"Proportion of input in view: {proportion}"
-        )
         return proportion
 
     def _frame_types_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
