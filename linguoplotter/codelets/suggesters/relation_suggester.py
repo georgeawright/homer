@@ -256,25 +256,28 @@ class RelationSuggester(Suggester):
                 end=end, parent_concept=concept, conceptual_space=space
             ).is_empty
         ]
-        targets = self.bubble_chamber.random_machine.select(
-            possible_target_combos,
-            key=lambda x: x["concept"].classifier.classify(
-                start=x["start"],
-                end=x["end"],
-                concept=x["concept"],
-                space=x["space"],
-            ),
-        )
-        self.child_codelets.append(
-            RelationSuggester.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                targets,
-                targets["concept"].classifier.classify(
-                    start=targets["start"],
-                    end=targets["end"],
-                    concept=targets["concept"],
-                    space=targets["space"],
+        try:
+            targets = self.bubble_chamber.random_machine.select(
+                possible_target_combos,
+                key=lambda x: x["concept"].classifier.classify(
+                    start=x["start"],
+                    end=x["end"],
+                    concept=x["concept"],
+                    space=x["space"],
                 ),
             )
-        )
+            self.child_codelets.append(
+                RelationSuggester.spawn(
+                    self.codelet_id,
+                    self.bubble_chamber,
+                    targets,
+                    targets["concept"].classifier.classify(
+                        start=targets["start"],
+                        end=targets["end"],
+                        concept=targets["concept"],
+                        space=targets["space"],
+                    ),
+                )
+            )
+        except MissingStructureError:
+            pass
