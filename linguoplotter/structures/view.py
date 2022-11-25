@@ -66,6 +66,7 @@ class View(Structure):
         self._grouped_nodes = {}
         self.matched_sub_frames = {}
         self.slot_values = {}
+        self.conceptual_spaces_map = {}
         self.is_view = True
 
     def __dict__(self) -> dict:
@@ -283,6 +284,13 @@ class View(Structure):
         return statistics.fmean([proportion_in_self, proportion_in_other])
 
     def specify_space(self, abstract_space, conceptual_space):
+        if (
+            abstract_space in self.parent_frame.input_space.conceptual_spaces
+            or abstract_space in self.parent_frame.output_space.conceptual_spaces
+        ):
+            self.conceptual_spaces_map[conceptual_space] = abstract_space
+        if abstract_space in self.conceptual_spaces_map:
+            self.conceptual_spaces_map.pop(abstract_space)
         for frame in self.frames:
             frame.specify_space(abstract_space, conceptual_space)
 
@@ -335,14 +343,33 @@ class View(Structure):
     def remove(self, correspondence: "Correspondence"):
         self.members.remove(correspondence)
         if correspondence.end.is_link and correspondence.end.parent_concept.is_slot:
-            for item in correspondence.end.parent_space.contents.where(is_link=True):
-                if (
+            if not any(
+                [
                     item.is_link
                     and item.parent_concept == correspondence.end.parent_concept
                     and item != correspondence.end
-                ):
-                    break
+                    for item in correspondence.end.parent_space.contents.where(
+                        is_link=True
+                    )
+                ]
+            ):
                 correspondence.end.parent_concept._non_slot_value = None
+        if correspondence.conceptual_space is not None:
+            if not any(
+                [
+                    c.conceptual_space == correspondence.conceptual_space
+                    for c in self.members.excluding(correspondence)
+                ]
+            ):
+                try:
+                    self.specify_space(
+                        correspondence.conceptual_space,
+                        correspondence.parent_view.conceptual_spaces_map[
+                            correspondence.conceptual_space
+                        ],
+                    )
+                except KeyError:
+                    pass
         for sub_frame, matched_frame in self.matched_sub_frames.copy().items():
             if (
                 correspondence in matched_frame.input_space.contents
