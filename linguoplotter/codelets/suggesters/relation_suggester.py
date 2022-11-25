@@ -252,6 +252,9 @@ class RelationSuggester(Suggester):
             for start, end in possible_target_pairs
             for space in possible_spaces
             for concept in possible_concepts
+            if start.relations.where(
+                end=end, parent_concept=concept, conceptual_space=space
+            ).is_empty
         ]
         targets = self.bubble_chamber.random_machine.select(
             possible_target_combos,
