@@ -48,5 +48,12 @@ for i in range(number_of_runs):
     os.chdir("../..")
     result = narrator.run()
     results.append(result)
+    with open(f"{logs_dir_path}/details.txt", "a") as f:
+        text = result["result"]
+        satisfaction = result["satisfaction"]
+        codelets_run = result["codelets_run"]
+        f.write(
+            f"Result: {text}\nSatisfaction: {satisfaction}\nCodelets run: {codelets_run}"
+        )
 
 print(results)
