@@ -66,11 +66,6 @@ class Node(Structure):
     def nearby(self, space: Space = None) -> StructureSet:
         raise NotImplementedError
 
-    def get_potential_relative(
-        self, space: Space = None, concept: "Concept" = None
-    ) -> Node:
-        raise NotImplementedError
-
     def spread_activation(self):
         pass
 

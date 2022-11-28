@@ -220,11 +220,3 @@ class ContextualSpace(Space):
                 except MissingStructureError:
                     break
         return new_space, copies
-
-    def to_long_string(self) -> str:
-        string = "-" * 120 + "\n"
-        string += f"{self.structure_id}\n"
-        string += "-" * 120 + "\n"
-        for structure in self.contents.where_not(is_correspondence=True):
-            string += f"{structure}\n"
-        return string

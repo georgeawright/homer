@@ -5,7 +5,6 @@ from typing import Callable, List
 
 from linguoplotter.classifier import Classifier
 from linguoplotter.errors import NoLocationError
-from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
 from linguoplotter.structure_collections import StructureSet
@@ -124,26 +123,6 @@ class Concept(Node):
         self.unhappiness = 0.5 ** sum(
             instance.activation for instance in self.instances
         )
-
-    def compatibility_with(self, other: Concept) -> FloatBetweenOneAndZero:
-        if (
-            self == other
-            or self.parent_space.parent_concept == other
-            or other.parent_space.parent_concept == self
-        ):
-            return 1.0
-        if self.parent_space == other.parent_space:
-            return self.proximity_to(other)
-        return 0.0
-
-    def friends(self, space: Space = None) -> StructureSet:
-        space = self.parent_space if space is None else space
-        friend_concepts = self.relatives.filter(
-            lambda x: not x.is_slot and x.is_concept and x in space.contents
-        )
-        if friend_concepts.is_empty:
-            friend_concepts.add(self)
-        return friend_concepts
 
     def distance_from(self, other: Node, return_nan: bool = False):
         try:

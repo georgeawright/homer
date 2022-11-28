@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 
 from linguoplotter import fuzzy
-from linguoplotter.errors import NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure import Structure
@@ -88,32 +87,6 @@ class Frame(Structure):
     def conceptual_spaces(self) -> StructureSet:
         return StructureSet.union(
             self.input_space.conceptual_spaces, self.output_space.conceptual_spaces
-        )
-
-    @property
-    def corresponded_items(self) -> StructureSet:
-        return StructureSet.union(
-            self.input_space.contents.filter(lambda x: x.correspondences.not_empty),
-            self.output_space.contents.filter(lambda x: x.correspondences.not_empty),
-        ).where(is_correspondence=False)
-
-    @property
-    def uncorresponded_items(self) -> StructureSet:
-        return StructureSet.union(
-            self.input_space.contents.filter(
-                lambda x: x.correspondences.where(end=x).is_empty
-            ),
-            self.output_space.contents.filter(
-                lambda x: x.parent_space != self.output_space
-                and x.correspondences.where(start=x).is_empty
-            ),
-        ).where(is_correspondence=False, is_link_or_node=False)
-
-    @property
-    def unprojected_items(self) -> StructureSet:
-        return self.output_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and x.correspondences.where(start=x).is_empty
         )
 
     @property

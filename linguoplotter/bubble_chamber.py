@@ -110,12 +110,6 @@ class BubbleChamber:
         )
 
     @property
-    def labellable_items(self) -> StructureSet:
-        return StructureSet.union(
-            *[space.contents.where(is_labellable=True) for space in self.input_spaces]
-        )
-
-    @property
     def size_of_raw_input(self) -> int:
         return sum(
             [
@@ -169,11 +163,6 @@ class BubbleChamber:
             self.satisfaction = self.general_satisfaction
 
     def recalculate_general_satisfaction(self):
-        # small number of top-level chunks
-        # links in a large proportion of conceptual spaces with high quality and activation
-        # empty space has zero quality
-        # av(link.q*link.a) / sum(unchunked.q*unchunked.a)
-
         main_input_space = self.contextual_spaces.where(is_main_input=True).get()
         average_view_quality = (
             statistics.fmean([view.quality for view in self.views])
@@ -187,14 +176,6 @@ class BubbleChamber:
                 self.WORLDVIEW_WEIGHT * self.worldview.satisfaction,
             ]
         )
-
-        # spaces = StructureSet.union(self.input_spaces, self.output_spaces)
-        # self.general_satisfaction = statistics.fmean(
-        #    [
-        #        statistics.fmean([space.quality for space in spaces]),
-        #        self.worldview.satisfaction,
-        #    ]
-        # )
 
     def spread_activations(self):
         for structure in self.structures:
@@ -214,26 +195,6 @@ class BubbleChamber:
             if self.log_count % self.ACTIVATION_LOGGING_FREQUENCY == 0:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
-
-    def refresh_concept_activations(self) -> None:
-        builtin_spaces = [
-            self.spaces["activity"],
-            self.spaces["structure"],
-            self.spaces["direction"],
-            self.spaces["space-type"],
-        ]
-        for structure in StructureSet.union(
-            self.concepts.filter(lambda x: x.parent_space not in builtin_spaces),
-            self.letter_chunks.filter(
-                lambda x: x.parent_space is None or x.parent_space.is_conceptual_space
-            ),
-            self.frames,
-        ):
-            structure._activation = 0.0
-            structure._activation_buffer = 0.0
-            for link in structure.links:
-                link._activation = 0.0
-                link._activation_buffer = 0.0
 
     def new_dict(self, structures: dict = None, name: str = None) -> StructureDict:
         structures = {} if structures is None else structures

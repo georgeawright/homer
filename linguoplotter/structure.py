@@ -87,10 +87,6 @@ class Structure(ABC):
         raise NotImplementedError
 
     @property
-    def is_labellable(self) -> bool:
-        return (self.is_chunk or self.is_label or self.is_relation) and not self.is_slot
-
-    @property
     def parent_space(self) -> Structure:
         return self._parent_space
 
@@ -237,16 +233,6 @@ class Structure(ABC):
         return self.links_out.where(is_label=True)
 
     @property
-    def positive_labels(self) -> StructureSet:
-        return self.links_out.filter(
-            lambda x: x.is_label
-            and (
-                not x.parent_concept.is_compound_concept
-                or x.parent_concept.root.name != "not"
-            )
-        )
-
-    @property
     def relations(self) -> StructureSet:
         return StructureSet.union(
             self.links_in.where(is_relation=True),
@@ -278,17 +264,6 @@ class Structure(ABC):
 
     def nearby(self, space: Structure = None):
         raise NotImplementedError
-
-    def similarity_with(self, other: Structure):
-        return statistics.fmean(
-            [
-                location.space.proximity_between(self, other)
-                if other.has_location_in_space(location.space)
-                else 0.0
-                for location in self.locations
-                if location.space.is_conceptual_space
-            ]
-        )
 
     def is_near(self, other: Structure) -> bool:
         for other_location in other.locations:
@@ -330,12 +305,6 @@ class Structure(ABC):
             if label.parent_concept.name == name:
                 return label.activation
         return 0.0
-
-    def label_of_type(self, concept: Structure):
-        for label in self.labels:
-            if label.parent_concept == concept:
-                return label
-        raise MissingStructureError
 
     def labels_in_space(self, space: Structure) -> StructureSet:
         return self.labels.filter(lambda x: x in space.contents)

@@ -40,9 +40,6 @@ class Space(Structure):
         self.is_space = True
         self.is_main_input = False
 
-    def is_compatible_with(self, other: Space) -> bool:
-        return self.parent_concept.is_compatible_with(other.parent_concept)
-
     def distance_between(self, a: Structure, b: Structure, return_nan: bool = False):
         return self.parent_concept.distance_between(
             a, b, space=self, return_nan=return_nan

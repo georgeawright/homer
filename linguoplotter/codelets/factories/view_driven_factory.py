@@ -188,11 +188,6 @@ class ViewDrivenFactory(Factory):
                 ].parent_concept.parent_space.contents.where(
                     is_concept=True, is_slot=False
                 )
-            possible_concepts = possible_concepts.filter(
-                lambda x: self.targets["view"].can_accept_concept_for_slot(
-                    x, self.targets["slot"]
-                )
-            )
             possible_target_combos = [
                 self.bubble_chamber.new_dict(
                     {"start": start, "concept": concept}, name="targets"

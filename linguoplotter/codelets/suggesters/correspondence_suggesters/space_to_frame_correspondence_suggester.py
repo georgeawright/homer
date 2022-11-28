@@ -122,18 +122,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
             return False
         if (
-            self.targets["end"].is_link
-            and self.targets["end"].parent_concept.is_slot
-            and not self.targets["end"].parent_concept.is_filled_in
-            and not self.targets["view"].can_accept_concept_for_slot(
-                self.targets["start"].parent_concept, self.targets["end"]
-            )
-        ):
-            self.bubble_chamber.loggers["activity"].log(
-                "Suggested concept is incompatible with existing concepts"
-            )
-            return False
-        if (
             self.targets["end"].is_label
             and not self.targets["space"].is_slot
             and not self.targets["start"].has_location_in_space(self.targets["space"])
