@@ -5,6 +5,10 @@ class ID:
     COUNTS = defaultdict(int)
 
     @classmethod
+    def reset(cls):
+        cls.COUNTS = defaultdict(int)
+
+    @classmethod
     def new(cls, typ: type, qualifier: str = None) -> str:
         qualifier = qualifier if qualifier is not None else ""
         type_name = qualifier + typ.__name__

@@ -1,5 +1,7 @@
 from linguoplotter.location import Location
 from linguoplotter.codelets.builders import ProjectionBuilder
+from linguoplotter.errors import MissingStructureError
+from linguoplotter.structure_collection_keys import activation
 
 
 class LetterChunkProjectionBuilder(ProjectionBuilder):
@@ -16,14 +18,14 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         return self.bubble_chamber.concepts["letter-chunk"]
 
     def _process_structure(self):
-        if not self.target_projectee.is_slot:
-            abstract_chunk = self.target_projectee.abstract_chunk
+        if not self.targets["projectee"].is_slot:
+            abstract_chunk = self.targets["projectee"].abstract_chunk
             output_location = Location(
-                self.target_projectee.location.coordinates,
-                self.target_view.output_space,
+                self.targets["projectee"].location.coordinates,
+                self.targets["view"].output_space,
             )
-            if abstract_chunk.members.is_empty():
-                word = self.target_projectee.abstract_chunk.copy_to_location(
+            if abstract_chunk.members.is_empty:
+                word = self.targets["projectee"].abstract_chunk.copy_to_location(
                     output_location,
                     parent_id=self.codelet_id,
                     bubble_chamber=self.bubble_chamber,
@@ -37,35 +39,35 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 word = self.bubble_chamber.new_letter_chunk(
                     name=None,
                     locations=locations,
-                    parent_space=self.target_view.output_space,
+                    parent_space=self.targets["view"].output_space,
                     abstract_chunk=abstract_chunk,
                     parent_id=self.codelet_id,
                 )
         else:
             abstract_chunk = self._get_abstract_chunk()
             self.bubble_chamber.loggers["activity"].log(
-                self, f"Found abstract chunk: {abstract_chunk}"
+                f"Found abstract chunk: {abstract_chunk}"
             )
-            self.target_projectee.abstract_chunk = abstract_chunk
-            sameness_relations = self.target_projectee.links_in.where(
+            self.targets["projectee"].abstract_chunk = abstract_chunk
+            sameness_relations = self.targets["projectee"].links_in.where(
                 is_relation=True, parent_concept=self.bubble_chamber.concepts["same"]
             )
             output_chunk_name = abstract_chunk.name
-            if not sameness_relations.is_empty():
+            if sameness_relations.not_empty:
                 sameness_start_correspondences_to_output = (
                     sameness_relations.get().start.correspondences_to_space(
-                        self.target_view.output_space
+                        self.targets["view"].output_space
                     )
                 )
-                if not sameness_start_correspondences_to_output.is_empty():
+                if sameness_start_correspondences_to_output.not_empty:
                     if (
                         sameness_start_correspondences_to_output.get().end.name
                         == abstract_chunk.name
                     ):
                         output_chunk_name = ""
             output_location = Location(
-                self.target_projectee.location.coordinates,
-                self.target_view.output_space,
+                self.targets["projectee"].location.coordinates,
+                self.targets["view"].output_space,
             )
             locations = [
                 location
@@ -75,59 +77,59 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
             word = self.bubble_chamber.new_letter_chunk(
                 name=output_chunk_name,
                 locations=locations,
-                parent_space=self.target_view.output_space,
+                parent_space=self.targets["view"].output_space,
                 abstract_chunk=abstract_chunk,
                 parent_id=self.codelet_id,
             )
+            self.bubble_chamber.loggers["activity"].log(f"Built Letter Chunk {word}")
             self.bubble_chamber.loggers["activity"].log(
-                self, f"Built Letter Chunk {word}"
+                f"Left branch {word.left_branch}"
             )
             self.bubble_chamber.loggers["activity"].log(
-                self, f"Left branch {word.left_branch}"
+                f"Right branch {word.right_branch}"
             )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Right branch {word.right_branch}"
-            )
-        for member in self.target_projectee.left_branch:
-            if member.has_correspondence_to_space(self.target_view.output_space):
+        for member in self.targets["projectee"].left_branch:
+            if member.has_correspondence_to_space(self.targets["view"].output_space):
                 correspondence = member.correspondences_to_space(
-                    self.target_view.output_space
+                    self.targets["view"].output_space
                 ).get()
                 correspondee = correspondence.end
                 self.bubble_chamber.loggers["activity"].log(
-                    self, f"Adding {correspondee} to left branch of {word}"
+                    f"Adding {correspondee} to left branch of {word}"
                 )
                 word.left_branch.add(correspondee)
                 word.members.add(correspondee)
                 word.sub_chunks.add(correspondee)
                 correspondee.super_chunks.add(word)
-        for member in self.target_projectee.right_branch:
-            if member.has_correspondence_to_space(self.target_view.output_space):
+        for member in self.targets["projectee"].right_branch:
+            if member.has_correspondence_to_space(self.targets["view"].output_space):
                 correspondence = member.correspondences_to_space(
-                    self.target_view.output_space
+                    self.targets["view"].output_space
                 ).get()
                 correspondee = correspondence.end
                 self.bubble_chamber.loggers["activity"].log(
-                    self, f"Adding {correspondee} to right branch of {word}"
+                    f"Adding {correspondee} to right branch of {word}"
                 )
                 word.right_branch.add(correspondee)
                 word.members.add(correspondee)
                 word.sub_chunks.add(correspondee)
                 correspondee.super_chunks.add(word)
-        for super_chunk in self.target_projectee.super_chunks:
-            if super_chunk.has_correspondence_to_space(self.target_view.output_space):
+        for super_chunk in self.targets["projectee"].super_chunks:
+            if super_chunk.has_correspondence_to_space(
+                self.targets["view"].output_space
+            ):
                 correspondence = super_chunk.correspondences_to_space(
-                    self.target_view.output_space
+                    self.targets["view"].output_space
                 ).get()
                 correspondee = correspondence.end
-                if self.target_projectee in super_chunk.left_branch:
+                if self.targets["projectee"] in super_chunk.left_branch:
                     self.bubble_chamber.loggers["activity"].log(
-                        self, f"Adding {word} to left branch of {correspondee}"
+                        f"Adding {word} to left branch of {correspondee}"
                     )
                     correspondee.left_branch.add(word)
-                elif self.target_projectee in super_chunk.right_branch:
+                elif self.targets["projectee"] in super_chunk.right_branch:
                     self.bubble_chamber.loggers["activity"].log(
-                        self, f"Adding {word} to right branch of {correspondee}"
+                        f"Adding {word} to right branch of {correspondee}"
                     )
                     correspondee.right_branch.add(word)
                 correspondee.members.add(word)
@@ -135,85 +137,153 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 word.super_chunks.add(correspondee)
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
-            start=self.target_projectee,
+            start=self.targets["projectee"],
             end=word,
-            locations=[self.target_projectee.location, word.location],
+            locations=[self.targets["projectee"].location, word.location],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
-            parent_view=self.target_view,
+            parent_view=self.targets["view"],
             quality=0.0,
         )
-        self.child_structures = self.bubble_chamber.new_structure_collection(
-            word, frame_to_output_correspondence
-        )
-        self.bubble_chamber.loggers["structure"].log_view(self.target_view)
+        self.child_structures.add(word)
+        self.child_structures.add(frame_to_output_correspondence)
+        self.bubble_chamber.loggers["structure"].log_view(self.targets["view"])
 
     def _get_abstract_chunk(self):
-        if not self.target_projectee.members.is_empty():
+        if self.targets["projectee"].members.not_empty:
             self.bubble_chamber.loggers["activity"].log(
-                self, "Target projectee is abstract chunk"
+                "Target projectee is abstract chunk"
             )
-            return self.target_projectee
-        if not self.target_projectee.correspondences.is_empty():
+            return self.targets["projectee"]
+        if self.targets["projectee"].correspondences.not_empty:
             self.bubble_chamber.loggers["activity"].log(
-                self, "Correspondee to target projectee is abstract chunk"
+                "Correspondee to target projectee is abstract chunk"
             )
-            node_group = [
-                group
-                for group in self.target_view.node_groups
-                if self.target_projectee in group.values()
-            ][0]
-            return [node for node in node_group.values() if node.name is not None][0]
-        if not self.target_projectee.links_in.where(is_relation=True).is_empty():
+            return self._get_abstract_chunk_from_correspondence()
+        if self.targets["projectee"].links_in.where(is_relation=True).not_empty:
             self.bubble_chamber.loggers["activity"].log(
-                self, "Abstract chunk is based on relations"
+                "Abstract chunk is based on relations"
             )
-            relation = self.target_projectee.relations.get()
-            relative = self.target_projectee.relatives.get()
-            relative_correspondee = (
-                relative.correspondences_to_space(self.target_view.output_space)
-                .get()
-                .end
-            )
-            abstract_relation = relative_correspondee.abstract_chunk.relations.where(
-                parent_concept=relation.parent_concept,
-                start=relative_correspondee.abstract_chunk,
-            ).get()
-            return abstract_relation.arguments.get(
-                exclude=[relative_correspondee.abstract_chunk]
-            )
-        self.bubble_chamber.loggers["activity"].log(
-            self, "Abstract chunk is based on labels"
+            return self._get_abstract_chunk_from_relations()
+        self.bubble_chamber.loggers["activity"].log("Abstract chunk is based on labels")
+        return self._get_abstract_chunk_from_labels()
+
+    def _get_abstract_chunk_from_correspondence(self):
+        node_group = [
+            group
+            for group in self.targets["view"].node_groups
+            if self.targets["projectee"] in group.values()
+        ][0]
+        return [node for node in node_group.values() if node.name is not None][0]
+
+    def _get_abstract_chunk_from_relations(self):
+        # TODO: further divide according to combination types of meaning concept
+        relation = self.targets["projectee"].relations.get()
+        relative = self.targets["projectee"].relatives.get()
+        relative_correspondee = (
+            relative.correspondences_to_space(self.targets["view"].output_space)
+            .get()
+            .end
         )
-        grammar_label = self.target_projectee.labels.filter(
-            lambda x: x.parent_concept.parent_space
-            == self.bubble_chamber.conceptual_spaces["grammar"]
+        abstract_relation = relative_correspondee.abstract_chunk.relations.where(
+            parent_concept=relation.parent_concept,
+            start=relative_correspondee.abstract_chunk,
         ).get()
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Grammar label: {grammar_label}"
+        return abstract_relation.arguments.get(
+            exclude=[relative_correspondee.abstract_chunk]
         )
+
+    def _get_abstract_chunk_from_labels(self):
+        def _abstract_chunk_from_concepts(meaning_concept, grammar_concept):
+            try:
+                return (
+                    meaning_concept.relations.where(parent_concept=grammar_concept)
+                    .get(key=lambda x: x.end.activation)
+                    .end
+                )
+            except MissingStructureError:
+                root_letter_chunk = (
+                    meaning_concept.root.relations.where(parent_concept=grammar_concept)
+                    .get(key=lambda x: x.end.activation)
+                    .end
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    f"Root letter chunk: {root_letter_chunk}"
+                )
+                arg_letter_chunk = _abstract_chunk_from_concepts(
+                    meaning_concept.args[0], grammar_concept
+                )
+                self.bubble_chamber.loggers["activity"].log(
+                    f"Arg letter chunk: {arg_letter_chunk}"
+                )
+                return self.bubble_chamber.new_letter_chunk(
+                    name=f"{root_letter_chunk.name} {arg_letter_chunk.name}",
+                    locations=[
+                        location.copy()
+                        for location in meaning_concept.locations
+                        + grammar_concept.locations
+                    ],
+                    parent_space=meaning_concept.parent_space,
+                    parent_id=self.codelet_id,
+                    left_branch=self.bubble_chamber.new_set(root_letter_chunk),
+                    right_branch=self.bubble_chamber.new_set(arg_letter_chunk),
+                    meaning_concept=meaning_concept,
+                    grammar_concept=grammar_concept,
+                )
+
+        grammar_label = (
+            self.targets["projectee"]
+            .labels.filter(
+                lambda x: x.parent_concept.parent_space
+                == self.bubble_chamber.conceptual_spaces["grammar"]
+            )
+            .get()
+        )
+        self.bubble_chamber.loggers["activity"].log(f"Grammar label: {grammar_label}")
         grammar_concept = (
             grammar_label.parent_concept
             if not grammar_label.parent_concept.is_slot
             else grammar_label.parent_concept.non_slot_value
         )
-        meaning_label = self.target_projectee.labels.filter(
-            lambda x: x.parent_concept.parent_space
-            != self.bubble_chamber.conceptual_spaces["grammar"]
-        ).get()
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Meaning label: {meaning_label}"
+        meaning_label = (
+            self.targets["projectee"]
+            .labels.filter(
+                lambda x: x.parent_concept.parent_space
+                != self.bubble_chamber.conceptual_spaces["grammar"]
+            )
+            .get()
         )
+        self.bubble_chamber.loggers["activity"].log(f"Meaning label: {meaning_label}")
         meaning_concept = (
             meaning_label.parent_concept
             if not meaning_label.parent_concept.is_slot
             else meaning_label.parent_concept.non_slot_value
         )
+        if meaning_concept is None:
+            meaning_concept = meaning_label.parent_concept._non_slot_value = (
+                meaning_label.parent_concept.parent_space.contents.where(
+                    is_concept=True,
+                    is_compound_concept=False,
+                    parent_space=meaning_label.parent_concept.parent_space,
+                )
+                .filter(
+                    lambda x: all(
+                        [
+                            x.has_relation_with(
+                                relation.arguments.excluding(
+                                    meaning_label.parent_concept
+                                )
+                                .get()
+                                .non_slot_value,
+                                relation.parent_concept.non_slot_value,
+                            )
+                            for relation in meaning_label.parent_concept.relations
+                        ]
+                    )
+                )
+                .get(key=activation)
+            )
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Meaning concept: {meaning_concept}"
+            f"Meaning concept: {meaning_concept}"
         )
-        return (
-            meaning_concept.relations.where(parent_concept=grammar_concept)
-            .get(key=lambda x: x.end.activation)
-            .end
-        )
+        return _abstract_chunk_from_concepts(meaning_concept, grammar_concept)

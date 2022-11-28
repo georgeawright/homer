@@ -22,7 +22,14 @@ class CoderackCleaner(Codelet):
         last_satisfaction_score: FloatBetweenOneAndZero,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        Codelet.__init__(
+            self,
+            codelet_id,
+            parent_id,
+            bubble_chamber,
+            bubble_chamber.new_dict(),
+            urgency,
+        )
         self.coderack = coderack
         self.last_satisfaction_score = last_satisfaction_score
 
@@ -47,7 +54,7 @@ class CoderackCleaner(Codelet):
 
     def run(self) -> CodeletResult:
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Coderack population size: {self.coderack.population_size}"
+            f"Coderack population size: {self.coderack.population_size}"
         )
         current_satisfaction_score = self.bubble_chamber.satisfaction
         change_in_satisfaction_score = (
@@ -59,8 +66,8 @@ class CoderackCleaner(Codelet):
         probability_of_codelet_deletion = 1 - statistics.fmean(
             [current_satisfaction_score, transposed_change_in_satisfaction_score]
         )
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, self.coderack.recently_run, "Recently run"
+        self.bubble_chamber.loggers["activity"].log_set(
+            self.coderack.recently_run, "Recently run"
         )
         for codelet in list(self.coderack._codelets):
             if type(codelet) not in self.coderack.recently_run:
@@ -71,7 +78,7 @@ class CoderackCleaner(Codelet):
             if probability_of_deleting_codelet > random.random() and not isinstance(
                 codelet, self.coderack.PROTECTED_CODELET_TYPES
             ):
-                self.bubble_chamber.loggers["activity"].log(self, f"Deleting {codelet}")
+                self.bubble_chamber.loggers["activity"].log(f"Deleting {codelet}")
                 self.coderack.remove_codelet(codelet)
         self.coderack.recently_run = set()
         self.child_codelets.append(
@@ -84,11 +91,9 @@ class CoderackCleaner(Codelet):
             )
         )
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Coderack population size: {self.coderack.population_size}"
+            f"Coderack population size: {self.coderack.population_size}"
         )
         self.result = CodeletResult.FINISH
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
         return FloatBetweenOneAndZero(

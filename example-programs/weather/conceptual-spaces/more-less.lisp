@@ -6,12 +6,12 @@
   (def-conceptual-space :name "more-less" :parent_concept more-less-concept
     :no_of_dimensions 1))
 (define more-concept
-  (def-concept :name "more" :locations (list (Location (list (list 5)) more-less-space))
-    :classifier (DifferenceClassifier 5) :instance_type Chunk :structure_type Relation
+  (def-concept :name "more" :locations (list (Location (list (list 1)) more-less-space))
+    :classifier (DifferenceClassifier 1) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
 (define less-concept
-  (def-concept :name "less" :locations (list (Location (list (list -5)) more-less-space))
-    :classifier (DifferenceClassifier -5) :instance_type Chunk :structure_type Relation
+  (def-concept :name "less" :locations (list (Location (list (list -1)) more-less-space))
+    :classifier (DifferenceClassifier -1) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
 
 (def-relation :start more-concept :end more-concept :parent_concept more-concept :activation 1.0)

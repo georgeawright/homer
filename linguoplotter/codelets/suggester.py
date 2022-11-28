@@ -4,7 +4,7 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures.nodes import Concept
 
 
@@ -14,11 +14,10 @@ class Suggester(Codelet):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: dict,
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self._target_structures = target_structures
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.confidence = 0.0
 
     @classmethod
@@ -47,24 +46,20 @@ class Suggester(Codelet):
         raise NotImplementedError
 
     def run(self) -> CodeletResult:
-        self.bubble_chamber.loggers["activity"].log_targets_dict(self)
+        self.bubble_chamber.loggers["activity"].log_dict(self.targets)
         if not self._passes_preliminary_checks():
             self._decay_activations()
             self._fizzle()
             self.result = CodeletResult.FIZZLE
         else:
-            self.bubble_chamber.loggers["activity"].log(
-                self, "Preliminary checks passed"
-            )
+            self.bubble_chamber.loggers["activity"].log("Preliminary checks passed")
             self._calculate_confidence()
             self.bubble_chamber.loggers["activity"].log(
-                self, f"Confidence: {self.confidence}"
+                f"Confidence: {self.confidence}"
             )
             self._boost_activations()
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     @property
@@ -78,23 +73,6 @@ class Suggester(Codelet):
     @property
     def _structure_concept(self):
         raise NotImplementedError
-
-    @property
-    def target_structures(self):
-        return StructureCollection.union(
-            self.bubble_chamber.new_structure_collection(
-                *[
-                    structure
-                    for structure in self._target_structures.values()
-                    if not isinstance(structure, StructureCollection)
-                ]
-            ),
-            *[
-                structure_collection
-                for structure_collection in self._target_structures.values()
-                if isinstance(structure_collection, StructureCollection)
-            ],
-        )
 
     def _boost_activations(self):
         self._suggest_concept.boost_activation(self.confidence)
@@ -121,7 +99,7 @@ class Suggester(Codelet):
             self.get_follow_up_class().spawn(
                 self.codelet_id,
                 self.bubble_chamber,
-                self.targets_dict,
+                self.targets,
                 1 / (1 + math.e ** -(10 * self.confidence - 5)),
                 # TODO: this should be a hyper-parameter
             )

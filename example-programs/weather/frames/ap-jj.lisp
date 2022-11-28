@@ -2,21 +2,21 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection temperature-space height-space goodness-space)
+    :possible_instances (StructureSet temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
 (define jj-input
   (def-contextual-space :name "ap[jj].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection conceptual-space)))
+    :conceptual_spaces (StructureSet conceptual-space)))
 (define jj-output
   (def-contextual-space :name "ap[jj].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
 (define jj-frame
   (def-frame :name "ap[jj]"
     :parent_concept ap-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection label-parent-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet label-parent-concept)
     :input_space jj-input :output_space jj-output))
 (define chunk
   (def-chunk :locations (list (Location (list (list Nan)) conceptual-space)
@@ -50,8 +50,8 @@
     :locations (list ap-location
 		     (Location (list) jj-output))
     :parent_space jj-output
-    :left_branch (StructureCollection letter-chunk)
-    :right_branch (StructureCollection null-chunk)))
+    :left_branch (StructureSet letter-chunk)
+    :right_branch (StructureSet null-chunk)))
 (define ap-super-chunk-label
   (def-label :start ap-super-chunk :parent_concept ap-concept
     :locations (list ap-location

@@ -2,55 +2,57 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection temperature-space height-space goodness-space)
+    :possible_instances (StructureSet temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
 (define comparison-concept
-  (def-concept :name "" :is_slot True :parent_space more-less-space))
+  (def-concept :name "" :is_slot True :parent_space more-less-space
+    :possible_instances (StructureSet more-concept less-concept)
+    :locations (list (Location (list) more-less-space))))
  
 (define location-sub-frame-input
   (def-contextual-space :name "location-sub-frame.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space)))
+    :conceptual_spaces (StructureSet location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space location-space)))
+    :conceptual_spaces (StructureSet grammar-space location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-[in/de]crease-location-sub"
     :parent_concept pp-inessive-location-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection location-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet location-concept)
     :input_space location-sub-frame-input
     :output_space location-sub-frame-output))
 
 (define time-sub-frame-input
   (def-contextual-space :name "time-sub-frame.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection time-space)))
+    :conceptual_spaces (StructureSet time-space)))
 (define time-sub-frame-output
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space time-space)))
+    :conceptual_spaces (StructureSet grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-[in/de]crease-time-sub"
     :parent_concept pp-directional-time-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet)
     :input_space time-sub-frame-input
     :output_space time-sub-frame-output))
 
 (define increase-sentence-input
   (def-contextual-space :name "s-[in/de]crease.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space time-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space time-space conceptual-space)))
 (define increase-sentence-output
   (def-contextual-space :name "s-[in/de]crease.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space time-space conceptual-space)))
 (define increase-sentence
   (def-frame :name "s-[in/de]crease" :parent_concept sentence-concept :parent_frame None
     :depth 6
-    :sub_frames (StructureCollection location-sub-frame time-sub-frame)
-    :concepts (StructureCollection location-concept comparison-concept)
+    :sub_frames (StructureSet location-sub-frame time-sub-frame)
+    :concepts (StructureSet location-concept comparison-concept)
     :input_space increase-sentence-input
     :output_space increase-sentence-output))
 
@@ -157,8 +159,8 @@
     :locations (list v-location
 		     (Location (list) increase-sentence-output))
     :parent_space increase-sentence-output
-    :left_branch (StructureCollection sentence-word-2)
-    :right_branch (StructureCollection sentence-word-3)))
+    :left_branch (StructureSet sentence-word-2)
+    :right_branch (StructureSet sentence-word-3)))
 (define v-super-chunk-label
   (def-label :start v-super-chunk :parent_concept v-concept
     :locations (list v-location
@@ -168,8 +170,8 @@
     :locations (list predicate-location
 		     (Location (list) increase-sentence-output))
     :parent_space increase-sentence-output
-    :left_branch (StructureCollection sentence-word-4)
-    :right_branch (StructureCollection sentence-word-5)))
+    :left_branch (StructureSet sentence-word-4)
+    :right_branch (StructureSet sentence-word-5)))
 (define pred-super-chunk-label
   (def-label :start pred-super-chunk :parent_concept predicate-concept
     :locations (list predicate-location
@@ -179,8 +181,8 @@
     :locations (list vp-location
 		     (Location (list) increase-sentence-output))
     :parent_space increase-sentence-output
-    :left_branch (StructureCollection v-super-chunk)
-    :right_branch (StructureCollection pred-super-chunk)))
+    :left_branch (StructureSet v-super-chunk)
+    :right_branch (StructureSet pred-super-chunk)))
 (define vp-super-chunk-label
   (def-label :start vp-super-chunk :parent_concept vp-concept
     :locations (list vp-location
@@ -190,8 +192,8 @@
     :locations (list sentence-location
 		     (Location (list) increase-sentence-output))
     :parent_space increase-sentence-output
-    :left_branch (StructureCollection sentence-word-1)
-    :right_branch (StructureCollection vp-super-chunk)))
+    :left_branch (StructureSet sentence-word-1)
+    :right_branch (StructureSet vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
     :locations (list sentence-location

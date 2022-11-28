@@ -7,6 +7,7 @@ from linguoplotter.codelets.suggesters import (
 )
 from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
+from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 
 
 class BottomUpSuggesterFactory(BottomUpFactory):
@@ -18,33 +19,23 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         proportion_of_unfilled_slots = self._proportion_of_unfilled_slots()
 
         self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Proportion of unchunked raw chunks: {proportion_of_unchunked_raw_chunks}",
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Proportion of unlabeled chunks: {proportion_of_unlabeled_chunks}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Proportion of unrelated chunks: {proportion_of_unrelated_chunks}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Proportion of uncorresponded links: {proportion_of_uncorresponded_links}",
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            self,
-            f"Proportion of unfilled_slots: {proportion_of_unfilled_slots}",
+            f"Proportion of unchunked raw chunks: {proportion_of_unchunked_raw_chunks}\n"
+            + f"Proportion of unlabeled chunks: {proportion_of_unlabeled_chunks}\n"
+            + f"Proportion of unrelated chunks: {proportion_of_unrelated_chunks}\n"
+            + f"Proportion of uncorresponded links: {proportion_of_uncorresponded_links}\n"
+            + f"Proportion of unfilled_slots: {proportion_of_unfilled_slots}",
         )
 
-        follow_up_classes = [
-            (ChunkSuggester, proportion_of_unchunked_raw_chunks),
-            (LabelSuggester, proportion_of_unlabeled_chunks),
-            (RelationSuggester, proportion_of_unrelated_chunks),
-            (CorrespondenceSuggester, proportion_of_unfilled_slots),
-            (ViewSuggester, proportion_of_uncorresponded_links),
-        ]
-        follow_up_classes.sort(key=lambda x: x[1], reverse=True)
-        follow_up_class = follow_up_classes[0][0]
+        follow_up_class = self.bubble_chamber.random_machine.select(
+            [
+                (ChunkSuggester, proportion_of_unchunked_raw_chunks),
+                (LabelSuggester, proportion_of_unlabeled_chunks),
+                (RelationSuggester, proportion_of_unrelated_chunks),
+                (CorrespondenceSuggester, proportion_of_unfilled_slots),
+                (ViewSuggester, proportion_of_uncorresponded_links),
+            ],
+            key=lambda x: x[1],
+        )[0]
 
         self.child_codelets.append(
             follow_up_class.make(self.codelet_id, self.bubble_chamber)
@@ -63,10 +54,10 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             non_raw_chunks = input_space.contents.filter(
                 lambda x: x.is_chunk and not x.is_raw
             ).sample(10)
-            unlabeled_non_raw_chunks = non_raw_chunks.filter(
-                lambda x: x.labels.is_empty()
+            total_label_quality = sum(
+                label.quality for chunk in non_raw_chunks for label in chunk.labels
             )
-            return len(unlabeled_non_raw_chunks) / len(non_raw_chunks)
+            return 1 - FloatBetweenOneAndZero(total_label_quality / len(non_raw_chunks))
         except MissingStructureError:
             return float("-inf")
 
@@ -76,10 +67,14 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             non_raw_chunks = input_space.contents.filter(
                 lambda x: x.is_chunk and not x.is_raw
             ).sample(10)
-            unrelated_non_raw_chunks = non_raw_chunks.filter(
-                lambda x: x.relations.is_empty()
+            total_relation_quality = sum(
+                relation.quality
+                for chunk in non_raw_chunks
+                for relation in chunk.relations
             )
-            return len(unrelated_non_raw_chunks) / len(non_raw_chunks)
+            return 1 - FloatBetweenOneAndZero(
+                total_relation_quality / len(non_raw_chunks)
+            )
         except MissingStructureError:
             return float("-inf")
 
@@ -90,7 +85,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 lambda x: x.is_label or x.is_relation
             ).sample(10)
             uncorresponded_links = labels_and_relations.filter(
-                lambda x: x.correspondences.is_empty()
+                lambda x: x.correspondences.is_empty
             )
             return len(uncorresponded_links) / len(labels_and_relations)
         except MissingStructureError:

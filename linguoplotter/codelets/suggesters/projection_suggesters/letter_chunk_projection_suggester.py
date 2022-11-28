@@ -36,62 +36,67 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
             if urgency is not None
             else target_letter_chunk.corresponding_exigency
         )
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            {"target_view": target_view, "target_projectee": target_letter_chunk},
-            urgency,
+        targets = bubble_chamber.new_dict(
+            {"view": target_view, "projectee": target_letter_chunk}, name="targets"
         )
+        return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["letter-chunk"]
 
     def _passes_preliminary_checks(self) -> bool:
-        if self.target_projectee.is_slot:
+        if self.targets["projectee"].is_slot:
             if (
-                len(self.target_projectee.parent_spaces.where(is_contextual_space=True))
+                len(
+                    self.targets["projectee"].parent_spaces.where(
+                        is_contextual_space=True
+                    )
+                )
                 > 1
-                and self.target_projectee.correspondences.is_empty()
+                and self.targets["projectee"].correspondences.is_empty
             ):
                 self.bubble_chamber.loggers["activity"].log(
-                    self, "mismatch between parent spaces and correspondences"
+                    "mismatch between parent spaces and correspondences"
                 )
                 return False
             try:
                 node_group = [
                     group
-                    for group in self.target_view.node_groups
-                    if self.target_projectee in group.values()
+                    for group in self.targets["view"].node_groups
+                    if self.targets["projectee"] in group.values()
                 ][0]
                 nodes_with_name = [node for node in node_group if node.name is not None]
                 if len(nodes_with_name) == 0:
                     self.bubble_chamber.loggers["activity"].log(
-                        self, "No correspondees with name"
+                        "No correspondees with name"
                     )
                     return False
             except IndexError:
                 pass
-            for label in self.target_projectee.labels:
+            for label in self.targets["projectee"].labels:
                 parent_concept = label.parent_concept
                 if parent_concept.is_slot and not parent_concept.is_filled_in:
-                    self.bubble_chamber.loggers["activity"].log(
-                        self, "Target projectee has label with unfilled parent concept"
-                    )
-                    return False
-            for relation in self.target_projectee.relations.where(
-                end=self.target_projectee
+                    if self.targets["view"].parent_frame.input_space.contents.where(
+                        is_link=True, parent_concept=parent_concept
+                    ):
+                        self.bubble_chamber.loggers["activity"].log(
+                            "Target projectee has label with unfilled parent concept"
+                        )
+                        return False
+            for relation in self.targets["projectee"].relations.where(
+                end=self.targets["projectee"]
             ):
                 if (
                     relation.start.is_slot
                     and not relation.start.has_correspondence_to_space(
-                        self.target_view.output_space
+                        self.targets["view"].output_space
                     )
                 ):
                     self.bubble_chamber.loggers["activity"].log(
-                        self, "Target projectee is related to a non projected slot"
+                        "Target projectee is related to a non projected slot"
                     )
                     return False
-        return not self.target_projectee.has_correspondence_to_space(
-            self.target_view.output_space
+        return not self.targets["projectee"].has_correspondence_to_space(
+            self.targets["view"].output_space
         )

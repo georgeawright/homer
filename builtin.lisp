@@ -3,7 +3,7 @@
 
 (define views-space
   (def-contextual-space :name "views" :parent_concept None
-    :conceptual_spaces (StructureCollection)))
+    :conceptual_spaces (StructureSet)))
 
 (define activity-concept (def-concept :name "activity"))
 (define activity-space

@@ -9,16 +9,16 @@
 
 (define pp-from-to-locations-input
   (def-contextual-space :name "pp[from-to-locations].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space time-space)))
+    :conceptual_spaces (StructureSet location-space time-space)))
 (define pp-from-to-locations-output
   (def-contextual-space :name "pp[from-to-locations].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space location-space time-space)))
+    :conceptual_spaces (StructureSet grammar-space location-space time-space)))
 (define pp-from-to-locations
   (def-frame :name "pp[from-to-locations]"
     :parent_concept pp-directional-location-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection early-location-concept late-location-concept
+    :sub_frames (StructureSet)
+    :concepts (StructureSet early-location-concept late-location-concept
 				   early-time-concept late-time-concept)
     :input_space pp-from-to-locations-input
     :output_space pp-from-to-locations-output))
@@ -61,8 +61,8 @@
 		     (TwoPointLocation (list) (list) pp-from-to-locations-input))
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
-    :locations (list (Location (list (list Nan)) more-less-space)
+  (def-relation :start early-chunk :end late-chunk :parent_concept not-same-concept
+    :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
 		     (TwoPointLocation (list) (list) pp-from-to-locations-input))
     :conceptual_space location-space))
@@ -125,38 +125,38 @@
     :locations (list np-location
 		     (Location (list) pp-from-to-locations-output))
     :parent_space pp-from-to-locations-output
-    :left_branch (StructureCollection pp-word-2)
-    :right_branch (StructureCollection pp-word-3)))
+    :left_branch (StructureSet pp-word-2)
+    :right_branch (StructureSet pp-word-3)))
 (define pp-super-chunk-1
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) pp-from-to-locations-output))
     :parent_space pp-from-to-locations-output
-    :left_branch (StructureCollection pp-word-1)
-    :right_branch (StructureCollection np-super-chunk-1)))
+    :left_branch (StructureSet pp-word-1)
+    :right_branch (StructureSet np-super-chunk-1)))
 
 (define np-super-chunk-2
   (def-letter-chunk :name None
     :locations (list np-location
 		     (Location (list) pp-from-to-locations-output))
     :parent_space pp-from-to-locations-output
-    :left_branch (StructureCollection pp-word-5)
-    :right_branch (StructureCollection pp-word-6)))
+    :left_branch (StructureSet pp-word-5)
+    :right_branch (StructureSet pp-word-6)))
 (define pp-super-chunk-2
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) pp-from-to-locations-output))
     :parent_space pp-from-to-locations-output
-    :left_branch (StructureCollection pp-word-4)
-    :right_branch (StructureCollection np-super-chunk-2)))
+    :left_branch (StructureSet pp-word-4)
+    :right_branch (StructureSet np-super-chunk-2)))
 
 (define pp-super-super-chunk
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) pp-from-to-locations-output))
     :parent_space pp-from-to-locations-output
-    :left_branch (StructureCollection pp-super-chunk-1)
-    :right_branch (StructureCollection pp-super-chunk-2)))
+    :left_branch (StructureSet pp-super-chunk-1)
+    :right_branch (StructureSet pp-super-chunk-2)))
 (define pp-super-super-chunk-label
   (def-label :start pp-super-super-chunk :parent_concept pp-directional-location-concept
     :locations (list pp-location

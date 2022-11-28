@@ -3,41 +3,54 @@ import statistics
 from typing import Iterable, List, Union
 
 
-def shortest_distance(a, b) -> float:
+def shortest_distance(a, b, return_nan: bool = False) -> float:
+    nan_return_value = math.nan if return_nan else 0.0
     distance = min([math.dist(a_point, b_point) for a_point in a for b_point in b])
-    return distance if not math.isnan(distance) else 0
+    return distance if not math.isnan(distance) else nan_return_value
 
 
-def centroid_euclidean_distance(a, b) -> float:
+def centroid_euclidean_distance(a, b, return_nan: bool = False) -> float:
+    nan_return_value = math.nan if return_nan else 0.0
     if len(a) == len(b) == 0:
         # TODO: possibly get rid of this if statment
         return 0.0
     distance = math.dist(average_vector(a), average_vector(b))
-    return distance if not math.isnan(distance) else 0
+    return distance if not math.isnan(distance) else nan_return_value
 
 
-def area_euclidean_distance(a, b) -> float:
+def area_euclidean_distance(a, b, return_nan: bool = False) -> float:
+    nan_return_value = math.nan if return_nan else 0.0
+    if len(a) > 1 and len(b) > 1:
+        return centroid_euclidean_distance(a, b, return_nan)
     distance = statistics.fmean(
         [shortest_distance(a, [b_point]) for b_point in b]
         + [shortest_distance(b, [a_point]) for a_point in a]
     )
-    return distance if not math.isnan(distance) else 0
+    return distance if not math.isnan(distance) else nan_return_value
 
 
-def size_euclidean_distance(a, b) -> float:
+def size_euclidean_distance(a, b, return_nan: bool = False) -> float:
     return abs(len(a) - len(b))
 
 
-def centroid_difference(a, b) -> float:
+def centroid_difference(a, b, return_nan: bool = False) -> float:
+    nan_return_value = math.nan if return_nan else 0.0
     difference = average_vector(a)[0] - average_vector(b)[0]
-    return difference if not math.isnan(difference) else 0
+    return difference if not math.isnan(difference) else nan_return_value
 
 
-def boolean_distance(a, b) -> float:
-    for coordinates_a, coordinates_b in zip(a, b):
-        for c_a, c_b in zip(coordinates_a, coordinates_b):
-            if c_a != c_b and not math.isnan(c_a) and not math.isnan(c_b):
-                return math.inf
+def boolean_distance(a, b, return_nan: bool = False) -> float:
+    # TODO: this is not fully general
+    if all([math.isnan(coord) for a_coords in a for coord in a_coords]):
+        return 0.0
+    if all([math.isnan(coord) for b_coords in b for coord in b_coords]):
+        return 0.0
+    for a_coords in a:
+        if not a_coords in b:
+            return math.inf
+    for b_coords in b:
+        if not b_coords in a:
+            return math.inf
     return 0.0
 
 

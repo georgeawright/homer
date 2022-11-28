@@ -16,34 +16,33 @@ class ChunkProjectionBuilder(ProjectionBuilder):
         return self.bubble_chamber.concepts["chunk"]
 
     def _passes_preliminary_checks(self) -> bool:
-        return not self.target_projectee.has_correspondence_to_space(
-            self.target_view.output_space
+        return not self.targets["projectee"].has_correspondence_to_space(
+            self.targets["view"].output_space
         )
 
     def _process_structure(self):
         output_location = Location(
-            self.target_projectee.location.coordinates,
-            self.target_view.output_space,
+            self.targets["projectee"].location.coordinates,
+            self.targets["view"].output_space,
         )
-        chunk = self.target_projectee.copy_to_location(
+        chunk = self.targets["projectee"].copy_to_location(
             output_location, self.bubble_chamber, parent_id=self.codelet_id
         )
-        self.target_view.output_space.add(chunk)
+        self.targets["view"].output_space.add(chunk)
         self.bubble_chamber.chunks.add(chunk)
         for location in chunk.locations:
             self.bubble_chamber.loggers["structure"].log(location.space)
         self.bubble_chamber.loggers["structure"].log(chunk)
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
-            start=self.target_projectee,
+            start=self.targets["projectee"],
             end=chunk,
-            locations=[self.target_projectee.location, chunk.location],
+            locations=[self.targets["projectee"].location, chunk.location],
             parent_concept=self.bubble_chamber.concepts["same"],
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
-            parent_view=self.target_view,
+            parent_view=self.targets["view"],
             quality=0.0,
         )
-        self.child_structures = self.bubble_chamber.new_structure_collection(
-            chunk, frame_to_output_correspondence
-        )
-        self.bubble_chamber.loggers["structure"].log_view(self.target_view)
+        self.child_structures.add(chunk)
+        self.child_structures.add(frame_to_output_correspondence)
+        self.bubble_chamber.loggers["structure"].log_view(self.targets["view"])

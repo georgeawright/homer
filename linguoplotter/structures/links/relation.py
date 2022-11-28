@@ -1,11 +1,12 @@
 from __future__ import annotations
 from typing import List
 
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Link, Space
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.spaces import ConceptualSpace
@@ -18,17 +19,17 @@ class Relation(Link):
         parent_id: str,
         start: Structure,
         end: Structure,
-        arguments: StructureCollection,
+        arguments: StructureSet,
         parent_concept: Concept,
         conceptual_space: ConceptualSpace,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
         parent_space: Space,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         is_stable: bool = False,
@@ -133,9 +134,9 @@ class Relation(Link):
             parent_space=self.parent_space,
         )
 
-    def nearby(self, space: Space = None) -> StructureCollection:
+    def nearby(self, space: Space = None) -> StructureSet:
         return (
-            StructureCollection.intersection(
+            StructureSet.intersection(
                 self.start.relations,
                 self.end.relations,
             )
@@ -152,9 +153,15 @@ class Relation(Link):
         ):
             return
         self.parent_concept.boost_activation(self.quality)
-        self.parent_concept.relations.where(
-            parent_concept=self.conceptual_space.parent_concept
-        ).get().end.boost_activation(self.quality)
+        try:
+            self.parent_concept.relations.where(
+                parent_concept=self.conceptual_space.parent_concept
+            ).get().end.boost_activation(self.quality)
+        except MissingStructureError:
+            # TODO: this is for spreading activation to MORE-TEMPERATURE concept etc
+            # that might be irrelevant if that becomes a compound concept
+            # possibly replace with more generic more-less-temperature concept?
+            pass
 
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name

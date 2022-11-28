@@ -15,10 +15,11 @@ class ChunkEvaluator(Evaluator):
         target = bubble_chamber.input_nodes.where(
             is_chunk=True, is_letter_chunk=False, is_raw=False, is_slot=False
         ).get(key=lambda x: abs(x.activation - x.quality))
+        targets = bubble_chamber.new_set(target, name="targets")
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            bubble_chamber.new_structure_collection(target),
+            targets,
             abs(target.activation - target.quality),
         )
 
@@ -28,7 +29,7 @@ class ChunkEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_chunk = self.target_structures.get()
+        target_chunk = self.targets.get()
         self.confidence = SamenessClassifier().classify(
             collection=target_chunk.members,
             concept=self.bubble_chamber.concepts["same"],

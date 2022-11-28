@@ -1,7 +1,6 @@
 import statistics
 from typing import Callable, Dict, List, Union
 
-from . import fuzzy
 from .classifier import Classifier
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
@@ -10,24 +9,21 @@ from .hyper_parameters import HyperParameters
 from .id import ID
 from .location import Location
 from .logger import Logger
-from .problem import Problem
 from .random_machine import RandomMachine
 from .recycle_bin import RecycleBin
 from .structure import Structure
-from .structure_collection import StructureCollection
-from .structures import Frame, LinkOrNode, Space, View
+from .structure_collections import StructureDict, StructureList, StructureSet
+from .structures import Frame, Space, View
 from .structures.links import Correspondence, Label, Relation
 from .structures.nodes import Chunk, Concept
 from .structures.nodes.chunks import LetterChunk
+from .structures.nodes.concepts import CompoundConcept
 from .structures.spaces import ConceptualSpace, ContextualSpace
 from .worldview import Worldview
-
-# TODO: new_structure methods should accept activation as arg with rand as default
 
 
 class BubbleChamber:
     JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
-
     MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
     VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_VIEW_QUALITIES_WEIGHT
     WORLDVIEW_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WORLDVIEW_WEIGHT
@@ -72,53 +68,45 @@ class BubbleChamber:
     def reset(self, loggers: Dict[str, Logger]):
         self.loggers = loggers
         self.focus = Focus()
-        self.worldview = Worldview(self.new_structure_collection())
-        self.conceptual_spaces = self.new_structure_collection()
-        self.contextual_spaces = self.new_structure_collection()
-        self.frames = self.new_structure_collection()
-        self.frame_instances = self.new_structure_collection()
-        self.concepts = self.new_structure_collection()
-        self.chunks = self.new_structure_collection()
-        self.letter_chunks = self.new_structure_collection()
-        self.concept_links = self.new_structure_collection()
-        self.correspondences = self.new_structure_collection()
-        self.labels = self.new_structure_collection()
-        self.relations = self.new_structure_collection()
-        self.views = self.new_structure_collection()
+        self.worldview = Worldview(self.new_set())
+        self.conceptual_spaces = self.new_set()
+        self.contextual_spaces = self.new_set()
+        self.frames = self.new_set()
+        self.frame_instances = self.new_set()
+        self.concepts = self.new_set()
+        self.chunks = self.new_set()
+        self.letter_chunks = self.new_set()
+        self.concept_links = self.new_set()
+        self.correspondences = self.new_set()
+        self.labels = self.new_set()
+        self.relations = self.new_set()
+        self.views = self.new_set()
         self.satisfaction = 0
         self.general_satisfaction = 0
         self.result = None
         self.log_count = 0
 
     @property
-    def spaces(self) -> StructureCollection:
-        return StructureCollection.union(
+    def spaces(self) -> StructureSet:
+        return StructureSet.union(
             self.conceptual_spaces, self.contextual_spaces, self.frames
         )
 
     @property
-    def input_spaces(self) -> StructureCollection:
-        return StructureCollection.union(
+    def input_spaces(self) -> StructureSet:
+        return StructureSet.union(
             *[view.input_spaces for view in self.views],
             self.contextual_spaces.where(is_main_input=True),
         )
 
     @property
-    def output_spaces(self) -> StructureCollection:
-        return self.new_structure_collection(
-            *[view.output_space for view in self.views]
-        )
+    def output_spaces(self) -> StructureSet:
+        return self.new_set(*[view.output_space for view in self.views])
 
     @property
-    def input_nodes(self) -> StructureCollection:
-        return StructureCollection.union(
+    def input_nodes(self) -> StructureSet:
+        return StructureSet.union(
             *[space.contents.where(is_node=True) for space in self.input_spaces]
-        )
-
-    @property
-    def labellable_items(self) -> StructureCollection:
-        return StructureCollection.union(
-            *[space.contents.where(is_labellable=True) for space in self.input_spaces]
         )
 
     @property
@@ -131,8 +119,8 @@ class BubbleChamber:
         )
 
     @property
-    def structures(self) -> StructureCollection:
-        return StructureCollection.union(
+    def structures(self) -> StructureSet:
+        return StructureSet.union(
             self.conceptual_spaces,
             self.contextual_spaces,
             self.frames,
@@ -158,6 +146,7 @@ class BubbleChamber:
             # nodes
             Chunk: "chunks",
             Concept: "concepts",
+            CompoundConcept: "concepts",
             LetterChunk: "letter_chunks",
             # links
             Correspondence: "correspondences",
@@ -174,15 +163,10 @@ class BubbleChamber:
             self.satisfaction = self.general_satisfaction
 
     def recalculate_general_satisfaction(self):
-        # small number of top-level chunks
-        # links in a large proportion of conceptual spaces with high quality and activation
-        # empty space has zero quality
-        # av(link.q*link.a) / sum(unchunked.q*unchunked.a)
-
         main_input_space = self.contextual_spaces.where(is_main_input=True).get()
         average_view_quality = (
             statistics.fmean([view.quality for view in self.views])
-            if not self.views.is_empty()
+            if not self.views.is_empty
             else 0
         )
         self.general_satisfaction = sum(
@@ -192,14 +176,6 @@ class BubbleChamber:
                 self.WORLDVIEW_WEIGHT * self.worldview.satisfaction,
             ]
         )
-
-        # spaces = StructureCollection.union(self.input_spaces, self.output_spaces)
-        # self.general_satisfaction = statistics.fmean(
-        #    [
-        #        statistics.fmean([space.quality for space in spaces]),
-        #        self.worldview.satisfaction,
-        #    ]
-        # )
 
     def spread_activations(self):
         for structure in self.structures:
@@ -220,30 +196,15 @@ class BubbleChamber:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
 
-    def refresh_concept_activations(self) -> None:
-        builtin_spaces = [
-            self.spaces["activity"],
-            self.spaces["structure"],
-            self.spaces["direction"],
-            self.spaces["space-type"],
-        ]
-        for structure in StructureCollection.union(
-            self.concepts.filter(lambda x: x.parent_space not in builtin_spaces),
-            self.letter_chunks.filter(
-                lambda x: x.parent_space is None or x.parent_space.is_conceptual_space
-            ),
-            self.frames,
-        ):
-            structure._activation = 0.0
-            structure._activation_buffer = 0.0
-            for link in structure.links:
-                link._activation = 0.0
-                link._activation_buffer = 0.0
+    def new_dict(self, structures: dict = None, name: str = None) -> StructureDict:
+        structures = {} if structures is None else structures
+        return StructureDict(self, structures, name=name)
 
-    def new_structure_collection(
-        self, *structures: List[Structure]
-    ) -> StructureCollection:
-        return StructureCollection(self, structures)
+    def new_list(self, *structures: list, name: str = None) -> StructureList:
+        return StructureList(self, structures, name=name)
+
+    def new_set(self, *structures: list, name: str = None) -> StructureSet:
+        return StructureSet(self, structures, name=name)
 
     def add(self, item):
         self.loggers["structure"].log(item)
@@ -282,6 +243,8 @@ class BubbleChamber:
             for argument in item.arguments:
                 argument.links_out.remove(item)
                 argument.links_in.remove(item)
+                argument.champion_labels.remove(item)
+                argument.champion_relations.remove(item)
                 argument.recalculate_exigency()
         if item.is_chunk:
             for view in self.views.copy():
@@ -303,9 +266,10 @@ class BubbleChamber:
         self,
         name: str,
         parent_concept: Concept,
+        breadth: int = 1,
         no_of_dimensions: int = 0,
         parent_id: str = "",
-        possible_instances: StructureCollection = None,
+        possible_instances: StructureSet = None,
         dimensions: List[ConceptualSpace] = None,
         sub_spaces: List[ConceptualSpace] = None,
         is_basic_level: bool = False,
@@ -313,9 +277,7 @@ class BubbleChamber:
         super_space_to_coordinate_function_map: Dict[str, Callable] = None,
     ) -> ConceptualSpace:
         possible_instances = (
-            self.new_structure_collection()
-            if possible_instances is None
-            else possible_instances
+            self.new_set() if possible_instances is None else possible_instances
         )
         dimensions = [] if dimensions is None else dimensions
         sub_spaces = [] if sub_spaces is None else sub_spaces
@@ -324,19 +286,20 @@ class BubbleChamber:
             parent_id=parent_id,
             name=name,
             parent_concept=parent_concept,
-            contents=self.new_structure_collection(),
+            contents=self.new_set(),
+            breadth=breadth,
             no_of_dimensions=no_of_dimensions,
             dimensions=dimensions,
             sub_spaces=sub_spaces,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
-            parent_spaces=self.new_structure_collection(),
+            links_in=self.new_set(),
+            links_out=self.new_set(),
+            parent_spaces=self.new_set(),
             possible_instances=possible_instances,
             is_basic_level=is_basic_level,
             is_symbolic=is_symbolic,
             super_space_to_coordinate_function_map=super_space_to_coordinate_function_map,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         self.add(space)
         return space
@@ -345,7 +308,7 @@ class BubbleChamber:
         self,
         name: str,
         parent_concept: Concept,
-        conceptual_spaces: StructureCollection,
+        conceptual_spaces: StructureSet,
         parent_id: str = "",
         is_main_input: bool = False,
     ) -> ContextualSpace:
@@ -354,14 +317,14 @@ class BubbleChamber:
             parent_id=parent_id,
             name=name,
             parent_concept=parent_concept,
-            contents=self.new_structure_collection(),
+            contents=self.new_set(),
             conceptual_spaces=conceptual_spaces,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
-            parent_spaces=self.new_structure_collection(),
+            links_in=self.new_set(),
+            links_out=self.new_set(),
+            parent_spaces=self.new_set(),
             is_main_input=is_main_input,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         self.add(space)
         return space
@@ -372,8 +335,8 @@ class BubbleChamber:
         name: str,
         parent_concept: Concept,
         parent_frame: Frame,
-        sub_frames: StructureCollection,
-        concepts: StructureCollection,
+        sub_frames: StructureSet,
+        concepts: StructureSet,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
         parent_id: str = "",
@@ -390,14 +353,14 @@ class BubbleChamber:
             concepts=concepts,
             input_space=input_space,
             output_space=output_space,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
-            parent_spaces=self.new_structure_collection(),
-            instances=self.new_structure_collection(),
+            links_in=self.new_set(),
+            links_out=self.new_set(),
+            parent_spaces=self.new_set(),
+            instances=self.new_set(),
             is_sub_frame=is_sub_frame,
             depth=depth,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         if parent_frame is not None:
             parent_frame.instances.add(frame)
@@ -409,8 +372,8 @@ class BubbleChamber:
         name: str,
         parent_concept: Concept,
         parent_frame: Frame,
-        sub_frames: StructureCollection,
-        concepts: StructureCollection,
+        sub_frames: StructureSet,
+        concepts: StructureSet,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
         parent_id: str = "",
@@ -431,7 +394,7 @@ class BubbleChamber:
         self,
         locations: List[Location],
         parent_space: Space,
-        members: StructureCollection = None,
+        members: StructureSet = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         activation: FloatBetweenOneAndZero = 0.0,
@@ -439,11 +402,9 @@ class BubbleChamber:
         is_raw: bool = False,
     ) -> Chunk:
         if members is None:
-            members = self.new_structure_collection()
+            members = self.new_set()
         locations.append(Location([[len(members)]], self.conceptual_spaces["size"]))
-        parent_spaces = self.new_structure_collection(
-            *[location.space for location in locations]
-        )
+        parent_spaces = self.new_set(*[location.space for location in locations])
         chunk = Chunk(
             structure_id=ID.new(Chunk),
             parent_id=parent_id,
@@ -451,25 +412,25 @@ class BubbleChamber:
             members=members,
             parent_space=parent_space,
             quality=quality,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
+            links_in=self.new_set(),
+            links_out=self.new_set(),
             parent_spaces=parent_spaces,
-            super_chunks=self.new_structure_collection(),
-            sub_chunks=self.new_structure_collection(),
+            super_chunks=self.new_set(),
+            sub_chunks=self.new_set(),
             abstract_chunk=abstract_chunk,
             is_raw=is_raw,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         for existing_chunk in self.chunks:
-            if not chunk.members.is_empty() and all(
+            if not chunk.members.is_empty and all(
                 member in existing_chunk.members for member in chunk.members
             ):
                 chunk.super_chunks.add(existing_chunk)
                 existing_chunk.sub_chunks.add(chunk)
                 existing_chunk.recalculate_exigency()
                 self.loggers["structure"].log(existing_chunk)
-            if not existing_chunk.members.is_empty() and all(
+            if not existing_chunk.members.is_empty and all(
                 member in chunk.members for member in existing_chunk.members
             ):
                 chunk.sub_chunks.add(existing_chunk)
@@ -489,25 +450,23 @@ class BubbleChamber:
         self,
         name: Union[str, None],
         locations: List[Location],
-        members: StructureCollection = None,
+        members: StructureSet = None,
         parent_space: Space = None,
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
-        left_branch: StructureCollection = None,
-        right_branch: StructureCollection = None,
+        left_branch: StructureSet = None,
+        right_branch: StructureSet = None,
         meaning_concept: Concept = None,
         grammar_concept: Concept = None,
         abstract_chunk: LetterChunk = None,
     ) -> LetterChunk:
         if left_branch is None:
-            left_branch = self.new_structure_collection()
+            left_branch = self.new_set()
         if right_branch is None:
-            right_branch = self.new_structure_collection()
+            right_branch = self.new_set()
         if members is None:
-            members = StructureCollection.union(left_branch, right_branch)
-        parent_spaces = self.new_structure_collection(
-            *[location.space for location in locations]
-        )
+            members = StructureSet.union(left_branch, right_branch)
+        parent_spaces = self.new_set(*[location.space for location in locations])
         letter_chunk = LetterChunk(
             structure_id=ID.new(LetterChunk),
             parent_id=parent_id,
@@ -518,14 +477,14 @@ class BubbleChamber:
             quality=quality,
             left_branch=left_branch,
             right_branch=right_branch,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
+            links_in=self.new_set(),
+            links_out=self.new_set(),
             parent_spaces=parent_spaces,
-            super_chunks=self.new_structure_collection(),
-            sub_chunks=self.new_structure_collection(),
+            super_chunks=self.new_set(),
+            sub_chunks=self.new_set(),
             abstract_chunk=abstract_chunk,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
@@ -535,7 +494,11 @@ class BubbleChamber:
         self.add(letter_chunk)
         if meaning_concept is not None:
             self.new_relation(
-                parent_id, meaning_concept, letter_chunk, grammar_concept, [], 1.0
+                meaning_concept,
+                letter_chunk,
+                grammar_concept,
+                quality=1.0,
+                parent_id=parent_id,
             )
         return letter_chunk
 
@@ -549,14 +512,23 @@ class BubbleChamber:
         structure_type: type = None,
         parent_space: Space = None,
         distance_function: Callable = None,
+        chunking_distance_function: Callable = None,
+        possible_instances: StructureSet = None,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         activation: FloatBetweenOneAndZero = None,
         is_slot: bool = False,
+        reverse: Concept = None,
     ) -> Concept:
         locations = [] if locations is None else locations
-        parent_spaces = self.new_structure_collection(
-            *[location.space for location in locations]
+        parent_spaces = self.new_set(*[location.space for location in locations])
+        possible_instances = (
+            self.new_set() if possible_instances is None else possible_instances
+        )
+        chunking_distance_function = (
+            chunking_distance_function
+            if chunking_distance_function is not None
+            else distance_function
         )
         concept = Concept(
             structure_id=ID.new(Concept),
@@ -567,47 +539,92 @@ class BubbleChamber:
             instance_type=instance_type,
             structure_type=structure_type,
             parent_space=parent_space,
-            child_spaces=self.new_structure_collection(),
+            child_spaces=self.new_set(),
             distance_function=distance_function,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
+            chunking_distance_function=chunking_distance_function,
+            possible_instances=possible_instances,
+            links_in=self.new_set(),
+            links_out=self.new_set(),
             parent_spaces=parent_spaces,
-            instances=self.new_structure_collection(),
+            instances=self.new_set(),
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
             is_slot=is_slot,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            reverse=reverse,
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         if activation is not None:
             concept._activation = activation
         self.add(concept)
         return concept
 
-    def new_link_or_node(
+    def new_compound_concept(
         self,
-        parent_space: Space = None,
-        locations: List[Location] = None,
+        root: Concept,
+        args: List[Concept],
         parent_id: str = "",
-        quality: FloatBetweenOneAndZero = 0.0,
-    ) -> LinkOrNode:
-        parent_spaces = self.new_structure_collection(
-            *[location.space for location in locations]
-        )
-        link_or_node = LinkOrNode(
-            structure_id=ID.new(LinkOrNode),
-            parent_id=parent_id,
-            parent_space=parent_space,
-            locations=locations,
-            quality=quality,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
-            parent_spaces=parent_spaces,
-        )
-        for space in parent_spaces:
-            space.add(link_or_node)
-        self.loggers["structure"].log(link_or_node)
-        return link_or_node
+        is_slot: bool = False,
+        reverse: Concept = None,
+    ):
+        try:
+            return self.concepts.where(
+                is_compound_concept=True, root=root, args=args
+            ).get()
+        except MissingStructureError:
+            parent_spaces = self.new_set(
+                *[location.space for location in args[0].locations]
+            )
+            concept = CompoundConcept(
+                structure_id=ID.new(Concept),
+                parent_id=parent_id,
+                root=root,
+                args=args,
+                child_spaces=self.new_set(),
+                possible_instances=self.new_set(),
+                links_in=self.new_set(),
+                links_out=self.new_set(),
+                parent_spaces=parent_spaces,
+                instances=self.new_set(),
+                champion_labels=self.new_set(),
+                champion_relations=self.new_set(),
+                is_slot=is_slot,
+                reverse=reverse,
+            )
+            self.add(concept)
+            self.new_relation(root, concept, quality=1.0, parent_id=parent_id)
+            for arg in args:
+                self.new_relation(arg, concept, quality=1.0, parent_id=parent_id)
+            try:
+                if all(
+                    arg.has_relation_with(
+                        self.concepts["more"], parent_concept=self.concepts["more"]
+                    )
+                    for arg in args
+                ):
+                    self.new_relation(
+                        concept,
+                        self.concepts["more"],
+                        self.concepts["more"],
+                        quality=1.0,
+                        parent_id=parent_id,
+                    )
+                elif all(
+                    arg.has_relation_with(
+                        self.concepts["less"], parent_concept=self.concepts["more"]
+                    )
+                    for arg in args
+                ):
+                    self.new_relation(
+                        concept,
+                        self.concepts["less"],
+                        self.concepts["more"],
+                        quality=1.0,
+                        parent_id=parent_id,
+                    )
+            except KeyError:
+                pass
+            return concept
 
     def new_correspondence(
         self,
@@ -630,27 +647,25 @@ class BubbleChamber:
                 ]
             else:
                 locations = []
-        parent_spaces = self.new_structure_collection(
-            *[location.space for location in locations]
-        )
+        parent_spaces = self.new_set(*[location.space for location in locations])
         correspondence = Correspondence(
             structure_id=ID.new(Correspondence),
             parent_id=parent_id,
             start=start,
             end=end,
-            arguments=self.new_structure_collection(start, end),
+            arguments=self.new_set(start, end),
             locations=locations,
             parent_concept=parent_concept,
             conceptual_space=conceptual_space,
             parent_view=parent_view,
             quality=quality,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
+            links_in=self.new_set(),
+            links_out=self.new_set(),
             parent_spaces=parent_spaces,
             is_excitatory=is_excitatory,
             is_privileged=is_privileged,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         while parent_view is not None:
             parent_view.add(correspondence)
@@ -681,23 +696,21 @@ class BubbleChamber:
         parent_space: ContextualSpace = None,
     ) -> Label:
         parent_space = start.parent_space if parent_space is None else parent_space
-        parent_spaces = self.new_structure_collection(
-            *[location.space for location in locations]
-        )
+        parent_spaces = self.new_set(*[location.space for location in locations])
         label = Label(
             structure_id=ID.new(Label),
             parent_id=parent_id,
             start=start,
-            arguments=self.new_structure_collection(start),
+            arguments=self.new_set(start),
             parent_concept=parent_concept,
             locations=locations,
             quality=quality,
             parent_space=parent_space,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
+            links_in=self.new_set(),
+            links_out=self.new_set(),
             parent_spaces=parent_spaces,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         if start is not None:
             start.links_out.add(label)
@@ -723,28 +736,26 @@ class BubbleChamber:
     ) -> Relation:
         parent_space = start.parent_space if parent_space is None else parent_space
         locations = [] if locations is None else locations
-        parent_spaces = self.new_structure_collection(
-            *[location.space for location in locations]
-        )
+        parent_spaces = self.new_set(*[location.space for location in locations])
         relation = Relation(
             structure_id=ID.new(Relation),
             parent_id=parent_id,
             start=start,
             end=end,
-            arguments=self.new_structure_collection(start, end),
+            arguments=self.new_set(start, end),
             parent_concept=parent_concept,
             conceptual_space=conceptual_space,
             locations=locations,
             quality=quality,
             parent_space=parent_space,
-            links_in=self.new_structure_collection(),
-            links_out=self.new_structure_collection(),
+            links_in=self.new_set(),
+            links_out=self.new_set(),
             parent_spaces=parent_spaces,
             is_bidirectional=is_bidirectional,
             is_excitatory=is_excitatory,
             is_stable=stable_activation is not None,
-            champion_labels=self.new_structure_collection(),
-            champion_relations=self.new_structure_collection(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
         )
         if activation is not None:
             relation._activation = activation

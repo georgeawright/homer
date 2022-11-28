@@ -33,26 +33,18 @@ class ChunkProjectionSuggester(ProjectionSuggester):
             key=corresponding_exigency
         )
         urgency = urgency if urgency is not None else target_view.activation
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            {"target_view": target_view, "target_projectee": target_chunk},
-            urgency,
+        targets = bubble_chamber.new_dict(
+            {"view": target_view, "projectee": target_chunk}, name="targets"
         )
+        return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 
     @property
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
     def _passes_preliminary_checks(self) -> bool:
-        self.target_view = self._target_structures["target_view"]
-        self.target_projectee = self._target_structures["target_projectee"]
-        self._target_structures["target_correspondence"] = None
-        self._target_structures["frame_correspondee"] = None
-        self._target_structures["non_frame"] = None
-        self._target_structures["non_frame_correspondee"] = None
-        return not self.target_projectee.has_correspondence_to_space(
-            self.target_view.output_space
+        return not self.targets["projectee"].has_correspondence_to_space(
+            self.targets["view"].output_space
         )
 
     def _calculate_confidence(self):

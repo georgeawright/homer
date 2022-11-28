@@ -2,7 +2,7 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection temperature-space height-space goodness-space)
+    :possible_instances (StructureSet temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define conceptual-label-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
@@ -11,59 +11,59 @@
  
 (define description-sub-frame-input
   (def-contextual-space :name "description-sub-frame.input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection conceptual-space)))
+    :conceptual_spaces (StructureSet conceptual-space)))
 (define description-sub-frame-output
   (def-contextual-space :name "description-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
 (define description-sub-frame
   (def-sub-frame :name "s-be-ap-sub" :parent_concept ap-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection conceptual-label-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet conceptual-label-concept)
     :input_space description-sub-frame-input
     :output_space description-sub-frame-output))
 
 (define location-sub-frame-input
   (def-contextual-space :name "location-sub-frame.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space)))
+    :conceptual_spaces (StructureSet location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space location-space)))
+    :conceptual_spaces (StructureSet grammar-space location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-be-location-sub"
     :parent_concept pp-inessive-location-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection location-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet location-concept)
     :input_space location-sub-frame-input
     :output_space location-sub-frame-output))
 
 (define time-sub-frame-input
   (def-contextual-space :name "time-sub-frame.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection time-space)))
+    :conceptual_spaces (StructureSet time-space)))
 (define time-sub-frame-output
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space time-space)))
+    :conceptual_spaces (StructureSet grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-be-time-sub"
     :parent_concept pp-directional-time-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet)
     :input_space time-sub-frame-input
     :output_space time-sub-frame-output))
 
 (define be-sentence-input
   (def-contextual-space :name "s-be.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space time-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space time-space conceptual-space)))
 (define be-sentence-output
   (def-contextual-space :name "s-be.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space time-space conceptual-space)))
 (define be-sentence
   (def-frame :name "s-be" :parent_concept sentence-concept :parent_frame None
     :depth 6
-    :sub_frames (StructureCollection description-sub-frame location-sub-frame time-sub-frame)
-    :concepts (StructureCollection location-concept)
+    :sub_frames (StructureSet description-sub-frame location-sub-frame time-sub-frame)
+    :concepts (StructureSet location-concept)
     :input_space be-sentence-input
     :output_space be-sentence-output))
 
@@ -77,7 +77,7 @@
     :parent_space be-sentence-input))
 (define early-chunk-conceptual-label
   (def-label :start early-chunk :parent_concept conceptual-label-concept
-    :locations (list (Location (list) conceptual-space)
+    :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) description-sub-frame-input)
 		     (Location (list) be-sentence-input))
     :parent_space description-sub-frame-input))
@@ -179,8 +179,8 @@
     :locations (list v-location
 		     (Location (list) be-sentence-output))
     :parent_space be-sentence-output
-    :left_branch (StructureCollection sentence-word-2)
-    :right_branch (StructureCollection sentence-word-3)))
+    :left_branch (StructureSet sentence-word-2)
+    :right_branch (StructureSet sentence-word-3)))
 (define v-super-chunk-label
   (def-label :start v-super-chunk :parent_concept v-concept
     :locations (list v-location
@@ -190,8 +190,8 @@
     :locations (list pp-location
 		     (Location (list) be-sentence-output))
     :parent_space be-sentence-output
-    :left_branch (StructureCollection sentence-word-5)
-    :right_branch (StructureCollection sentence-word-6)))
+    :left_branch (StructureSet sentence-word-5)
+    :right_branch (StructureSet sentence-word-6)))
 (define pp-super-chunk-label
   (def-label :start pp-super-chunk :parent_concept pp-concept
     :locations (list pp-location
@@ -201,8 +201,8 @@
     :locations (list predicate-location
 		     (Location (list) be-sentence-output))
     :parent_space be-sentence-output
-    :left_branch (StructureCollection sentence-word-4)
-    :right_branch (StructureCollection pp-super-chunk)))
+    :left_branch (StructureSet sentence-word-4)
+    :right_branch (StructureSet pp-super-chunk)))
 (define pred-super-chunk-label
   (def-label :start pred-super-chunk :parent_concept predicate-concept
     :locations (list predicate-location
@@ -212,8 +212,8 @@
     :locations (list vp-location
 		     (Location (list) be-sentence-output))
     :parent_space be-sentence-output
-    :left_branch (StructureCollection v-super-chunk)
-    :right_branch (StructureCollection pred-super-chunk)))
+    :left_branch (StructureSet v-super-chunk)
+    :right_branch (StructureSet pred-super-chunk)))
 (define vp-super-chunk-label
   (def-label :start vp-super-chunk :parent_concept vp-concept
     :locations (list vp-location
@@ -223,8 +223,8 @@
     :locations (list sentence-location
 		     (Location (list) be-sentence-output))
     :parent_space be-sentence-output
-    :left_branch (StructureCollection sentence-word-1)
-    :right_branch (StructureCollection vp-super-chunk)))
+    :left_branch (StructureSet sentence-word-1)
+    :right_branch (StructureSet vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
     :locations (list sentence-location

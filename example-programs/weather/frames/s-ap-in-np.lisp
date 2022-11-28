@@ -2,7 +2,7 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection temperature-space height-space goodness-space)
+    :possible_instances (StructureSet temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
@@ -11,41 +11,41 @@
     :locations (list (Location (list) conceptual-space))))
 (define ap-sub-frame-input
   (def-contextual-space :name "ap-sub-frame.input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space conceptual-space)))
 (define ap-sub-frame-output
   (def-contextual-space :name "ap-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space conceptual-space)))
 (define ap-sub-frame
   (def-sub-frame :name "s[ap-in-np]-ap-sub" :parent_concept ap-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection label-parent-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet label-parent-concept)
     :input_space ap-sub-frame-input
     :output_space ap-sub-frame-output))
 (define np-sub-frame-input
   (def-contextual-space :name "np-sub-frame.input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space conceptual-space)))
 (define np-sub-frame-output
   (def-contextual-space :name "np-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space conceptual-space)))
 (define np-sub-frame
   (def-sub-frame :name "s[ap-in-np]-np-sub" :parent_concept np-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection label-parent-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet label-parent-concept)
     :input_space np-sub-frame-input
     :output_space np-sub-frame-output))
 (define descriptive-sentence-input
   (def-contextual-space :name "s[ap-in-np].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space conceptual-space)))
 (define descriptive-sentence-output
   (def-contextual-space :name "s[ap-in-np].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space conceptual-space)))
 (define descriptive-sentence
   (def-frame :name "s[ap-in-np]" :parent_concept sentence-concept :parent_frame None
-    :sub_frames (StructureCollection ap-sub-frame np-sub-frame)
-    :concepts (StructureCollection label-parent-concept location-concept)
+    :sub_frames (StructureSet ap-sub-frame np-sub-frame)
+    :concepts (StructureSet label-parent-concept location-concept)
     :input_space descriptive-sentence-input
     :output_space descriptive-sentence-output))
 (define chunk
@@ -123,8 +123,8 @@
     :locations (list vb-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-2)
-    :right_branch (StructureCollection sentence-word-3)))
+    :left_branch (StructureSet sentence-word-2)
+    :right_branch (StructureSet sentence-word-3)))
 (define vb-super-chunk-label
   (def-label :start vb-super-chunk :parent_concept vb-concept
     :locations (list vb-location
@@ -134,22 +134,22 @@
     :locations (list np-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-6)
-    :right_branch (StructureCollection sentence-word-7)))
+    :left_branch (StructureSet sentence-word-6)
+    :right_branch (StructureSet sentence-word-7)))
 (define pp-super-chunk
   (def-letter-chunk :name None
     :locations (list np-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-5)
-    :right_branch (StructureCollection np-super-chunk)))
+    :left_branch (StructureSet sentence-word-5)
+    :right_branch (StructureSet np-super-chunk)))
 (define pred-super-chunk
   (def-letter-chunk :name None
     :locations (list predicate-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-4)
-    :right_branch (StructureCollection pp-super-chunk)))
+    :left_branch (StructureSet sentence-word-4)
+    :right_branch (StructureSet pp-super-chunk)))
 (define pred-super-chunk-label
    (def-label :start pred-super-chunk :parent_concept predicate-concept
     :locations (list predicate-location
@@ -159,8 +159,8 @@
     :locations (list vp-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection vb-super-chunk)
-    :right_branch (StructureCollection pred-super-chunk)))
+    :left_branch (StructureSet vb-super-chunk)
+    :right_branch (StructureSet pred-super-chunk)))
 (define vp-super-chunk-label
    (def-label :start vp-super-chunk :parent_concept vp-concept
     :locations (list vp-location
@@ -170,8 +170,8 @@
     :locations (list sentence-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-1)
-    :right_branch (StructureCollection vp-super-chunk)))
+    :left_branch (StructureSet sentence-word-1)
+    :right_branch (StructureSet vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
     :locations (list sentence-location

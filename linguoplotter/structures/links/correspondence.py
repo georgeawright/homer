@@ -5,7 +5,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Link, View
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.spaces import ConceptualSpace
@@ -18,17 +18,17 @@ class Correspondence(Link):
         parent_id: str,
         start: Structure,
         end: Structure,
-        arguments: StructureCollection,
+        arguments: StructureSet,
         locations: List[Location],
         parent_concept: Concept,
         conceptual_space: ConceptualSpace,
         parent_view: View,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         is_privileged: bool = False,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
@@ -106,12 +106,12 @@ class Correspondence(Link):
         return [(self.start.start, self.end.start), (self.start.end, self.end.end)]
 
     def nearby(self):
-        return StructureCollection.difference(
-            StructureCollection.union(
+        return StructureSet.difference(
+            StructureSet.union(
                 self.start.correspondences_to_space(self.end.parent_space),
                 self.end.correspondences_to_space(self.start.parent_space),
             ),
-            StructureCollection.intersection(
+            StructureSet.intersection(
                 self.start.correspondences_to_space(self.end.parent_space),
                 self.end.correspondences_to_space(self.start.parent_space),
             ),
@@ -133,8 +133,8 @@ class Correspondence(Link):
             return self.end
         raise Exception("Correspondence has no non slot argument")
 
-    def common_arguments_with(self, other: Correspondence) -> StructureCollection:
-        return StructureCollection.intersection(self.arguments, other.arguments)
+    def common_arguments_with(self, other: Correspondence) -> StructureSet:
+        return StructureSet.intersection(self.arguments, other.arguments)
 
     def spread_activation(self):
         if not self.is_fully_active():

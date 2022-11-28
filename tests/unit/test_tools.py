@@ -1,7 +1,20 @@
+import math
 import pytest
 from unittest.mock import Mock
 
 from linguoplotter.tools import *
+
+
+@pytest.mark.parametrize(
+    "a, b, result",
+    [
+        ([[24]], [[24]], 0.0),
+        ([[24], [24]], [[24]], 0.0),
+        ([[math.nan]], [[24]], 0.0),
+    ],
+)
+def test_boolean_distance(a, b, result):
+    assert boolean_distance(a, b) == result
 
 
 @pytest.mark.parametrize(

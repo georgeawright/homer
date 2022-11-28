@@ -3,7 +3,7 @@ import statistics
 
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 
 
 class Space(Structure):
@@ -13,13 +13,13 @@ class Space(Structure):
         parent_id: str,
         name: str,
         parent_concept: "Concept",
-        contents: StructureCollection,
+        contents: StructureSet,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
     ):
         Structure.__init__(
             self,
@@ -40,14 +40,18 @@ class Space(Structure):
         self.is_space = True
         self.is_main_input = False
 
-    def is_compatible_with(self, other: Space) -> bool:
-        return self.parent_concept.is_compatible_with(other.parent_concept)
+    def distance_between(self, a: Structure, b: Structure, return_nan: bool = False):
+        return self.parent_concept.distance_between(
+            a, b, space=self, return_nan=return_nan
+        )
 
-    def distance_between(self, a: Structure, b: Structure):
-        return self.parent_concept.distance_between(a, b, space=self)
+    def proximity_between(self, a: Structure, b: Structure, return_nan: bool = False):
+        return self.parent_concept.proximity_between(
+            a, b, space=self, return_nan=return_nan
+        )
 
-    def proximity_between(self, a: Structure, b: Structure):
-        return self.parent_concept.proximity_between(a, b, space=self)
+    def adjacency_of(self, a: Structure, b: Structure, return_nan: bool = False):
+        return self.parent_concept.adjacency_of(a, b, space=self, return_nan=return_nan)
 
     def update_activation(self):
         self._activation = (

@@ -6,10 +6,11 @@ class ViewEvaluator(Evaluator):
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         target = bubble_chamber.views.get(key=lambda x: abs(x.activation - x.quality))
+        targets = bubble_chamber.new_set(target, name="targets")
         return cls.spawn(
             parent_id,
             bubble_chamber,
-            bubble_chamber.new_structure_collection(target),
+            targets,
             abs(target.activation - target.quality),
         )
 
@@ -25,7 +26,7 @@ class ViewEvaluator(Evaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        target_view = self.target_structures.get()
+        target_view = self.targets.get()
         self.confidence = target_view.calculate_quality()
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_view.activation

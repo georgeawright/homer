@@ -3,9 +3,10 @@ import random
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 
 
 class Selector(Codelet):
@@ -14,11 +15,13 @@ class Selector(Codelet):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        champions: StructureCollection,
+        champions: StructureSet,
         urgency: FloatBetweenOneAndZero,
-        challengers: StructureCollection = None,
+        challengers: StructureSet = None,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        Codelet.__init__(
+            self, codelet_id, parent_id, bubble_chamber, champions, urgency
+        )
         self.champions = champions
         self.challengers = challengers
         self.winners = None
@@ -31,9 +34,9 @@ class Selector(Codelet):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        champions: StructureCollection,
+        champions: StructureSet,
         urgency: FloatBetweenOneAndZero,
-        challengers: StructureCollection = None,
+        challengers: StructureSet = None,
     ):
         codelet_id = ID.new(cls)
         return cls(
@@ -46,39 +49,53 @@ class Selector(Codelet):
         )
 
     def run(self) -> CodeletResult:
-        self.bubble_chamber.loggers["activity"].log_champions(self)
-        self.bubble_chamber.loggers["activity"].log_challengers(self)
+        if self.challengers is None:
+            self.challengers = self.bubble_chamber.new_set(name="challengers")
+        self.winners = self.bubble_chamber.new_set(name="winners")
+        self.losers = self.bubble_chamber.new_set(name="losers")
+        self.bubble_chamber.loggers["activity"].log_set(self.champions)
+        self.bubble_chamber.loggers["activity"].log_set(self.challengers)
         if not self._passes_preliminary_checks():
             self._fizzle()
             self._decay_activations()
             self.result = CodeletResult.FIZZLE
             return self.result
-        if self.challengers is not None:
+        if self.challengers.not_empty:
             self._hold_competition()
-            self.bubble_chamber.loggers["activity"].log_winners(self)
-            self.bubble_chamber.loggers["activity"].log_losers(self)
+            self.bubble_chamber.loggers["activity"].log_set(self.winners)
+            self.bubble_chamber.loggers["activity"].log_set(self.losers)
             self._boost_winners()
             self._decay_losers()
-            for structure in StructureCollection.union(self.winners, self.losers):
+            for structure in StructureSet.union(self.winners, self.losers):
                 self.bubble_chamber.loggers["structure"].log(structure)
         else:
-            self.winners = self.champions
-            self.bubble_chamber.loggers["activity"].log_winners(self)
-            self.confidence = self.winners.get().quality
-            random_number = self.bubble_chamber.random_machine.generate_number()
-            if self.confidence > random_number:
-                self._boost_winners()
-            for structure in self.winners:
-                self.bubble_chamber.loggers["structure"].log(structure)
+            self.confidence = self.champions.get().quality
+            if self.confidence == 0.0:
+                for champion in self.champions:
+                    self.losers.add(champion)
+                self.bubble_chamber.loggers["activity"].log_set(self.losers)
+                self._decay_losers()
+                for structure in self.losers:
+                    self.bubble_chamber.loggers["structure"].log(structure)
+            else:
+                for champion in self.champions:
+                    self.winners.add(champion)
+                self.bubble_chamber.loggers["activity"].log_set(self.winners)
+                random_number = self.bubble_chamber.random_machine.generate_number()
+                if self.confidence > random_number:
+                    self._boost_winners()
+                for structure in self.winners:
+                    self.bubble_chamber.loggers["structure"].log(structure)
+                self._rearrange_champions()
         self._boost_activations()
-        self._rearrange_champions()
-        self.follow_up_urgency = FloatBetweenOneAndZero(
-            self.winners.get().quality - self.winners.get().activation
-        )
+        try:
+            self.follow_up_urgency = FloatBetweenOneAndZero(
+                self.winners.get().quality - self.winners.get().activation
+            )
+        except MissingStructureError:
+            self.follow_up_urgency = 0.0
         self._engender_follow_up()
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
         self.result = CodeletResult.FINISH
-        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     def _hold_competition(self):
@@ -86,11 +103,11 @@ class Selector(Codelet):
         challenger_representative = self._get_representative(self.challengers)
         champions_quality = champion_representative.quality
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Champion quality: {champions_quality}"
+            f"Champion quality: {champions_quality}"
         )
         challengers_quality = challenger_representative.quality
         self.bubble_chamber.loggers["activity"].log(
-            self, f"Challenger quality: {challengers_quality}"
+            f"Challenger quality: {challengers_quality}"
         )
         champ_size_adjusted_quality = champions_quality * self._champions_size
         chall_size_adjusted_quality = challengers_quality * self._challengers_size
@@ -126,16 +143,6 @@ class Selector(Codelet):
     @property
     def _structure_concept(self):
         raise NotImplementedError
-
-    @property
-    def target_structures(self):
-        structures = self.bubble_chamber.new_structure_collection()
-        for champion in self.champions:
-            structures.add(champion)
-        if self.challengers is not None:
-            for challenger in self.challengers:
-                structures.add(challenger)
-        return structures
 
     @property
     def _champions_size(self):
@@ -179,7 +186,7 @@ class Selector(Codelet):
     def _rearrange_champions(self):
         pass
 
-    def _get_representative(self, collection: StructureCollection):
+    def _get_representative(self, collection: StructureSet):
         return collection.get()
 
     def _passes_preliminary_checks(self):

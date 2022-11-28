@@ -1,13 +1,13 @@
 from __future__ import annotations
+import math
 import statistics
 from typing import Callable, List
 
 from linguoplotter.classifier import Classifier
 from linguoplotter.errors import NoLocationError
-from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Node, Space
 
 
@@ -22,17 +22,20 @@ class Concept(Node):
         instance_type: type,
         structure_type: type,
         parent_space: Space,
-        child_spaces: StructureCollection,
+        child_spaces: StructureSet,
         distance_function: Callable,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        instances: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        chunking_distance_function: Callable,
+        possible_instances: StructureSet,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        instances: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         is_slot: bool = False,
+        reverse: Concept = None,
     ):
         quality = None
         Node.__init__(
@@ -54,12 +57,15 @@ class Concept(Node):
         self.structure_type = structure_type
         self.child_spaces = child_spaces
         self.distance_function = distance_function
+        self.chunking_distance_function = chunking_distance_function
+        self.possible_instances = possible_instances
         self.instances = instances
         self._depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
         self.is_concept = True
         self._is_slot = is_slot
         self._non_slot_value = None
+        self.reverse = reverse
 
     def __dict__(self) -> dict:
         return {
@@ -102,56 +108,28 @@ class Concept(Node):
         return self._non_slot_value.non_slot_value
 
     @property
+    def number_of_components(self):
+        return 1
+
+    @property
     def parent_basic_space(self) -> "ConceptualSpace":
         return self.parent_spaces.where(is_basic_level=True).get()
+
+    @property
+    def is_reversible(self) -> bool:
+        return self.reverse is not None
 
     def recalculate_unhappiness(self):
         self.unhappiness = 0.5 ** sum(
             instance.activation for instance in self.instances
         )
 
-    def letter_chunk_forms(
-        self, grammar_concept: Concept = None
-    ) -> StructureCollection:
-        return StructureCollection.union(
-            *[
-                link.arguments.excluding(self)
-                for link in self.links_out.filter(
-                    lambda x: x.end.is_word
-                    and (
-                        x.parent_concept == grammar_concept
-                        if grammar_concept is not None
-                        else True
-                    )
-                )
-            ]
-        )
-
-    def compatibility_with(self, other: Concept) -> FloatBetweenOneAndZero:
-        if (
-            self == other
-            or self.parent_space.parent_concept == other
-            or other.parent_space.parent_concept == self
-        ):
-            return 1.0
-        if self.parent_space == other.parent_space:
-            return self.proximity_to(other)
-        return 0.0
-
-    def friends(self, space: Space = None) -> StructureCollection:
-        space = self.parent_space if space is None else space
-        friend_concepts = self.relatives.filter(
-            lambda x: not x.is_slot and x.is_concept and x in space.contents
-        )
-        if friend_concepts.is_empty():
-            friend_concepts.add(self)
-        return friend_concepts
-
-    def distance_from(self, other: Node):
+    def distance_from(self, other: Node, return_nan: bool = False):
         try:
             return self.distance_function(
                 self.location_in_space(self.parent_space).coordinates,
                 other.location_in_space(self.parent_space).coordinates,
+                return_nan=return_nan,
             )
         except NotImplementedError:
             return statistics.mean(
@@ -159,10 +137,12 @@ class Concept(Node):
                     self.distance_function(
                         self.location_in_space(self.parent_space).start_coordinates,
                         other.location_in_space(self.parent_space).start_coordinates,
+                        return_nan=return_nan,
                     ),
                     self.distance_function(
                         self.location_in_space(self.parent_space).end_coordinates,
                         other.location_in_space(self.parent_space).end_coordinates,
+                        return_nan=return_nan,
                     ),
                 ]
             )
@@ -184,58 +164,75 @@ class Concept(Node):
             )
             if new_location is None:
                 raise NoLocationError
-            return self.distance_from(mock_node)
+            return self.distance_from(mock_node, return_nan)
 
-    def distance_from_start(self, other: Node, end: Location = None):
-        return self.distance_function(
-            self.location_in_space(self.parent_space, end=end).start_coordinates,
-            other.location_in_space(self.parent_space).coordinates,
-        )
-
-    def distance_from_end(self, other: Node, start: Location = None):
-        return self.distance_function(
-            self.location_in_space(self.parent_space, start=start).end_coordinates,
-            other.location_in_space(self.parent_space).coordinates,
-        )
-
-    def proximity_to(self, other: Node):
+    def proximity_to(self, other: Node, return_nan: bool = False):
         try:
-            return self._distance_to_proximity(self.distance_from(other))
+            distance = self.distance_from(other, return_nan)
+            if math.isnan(distance) and return_nan:
+                return math.nan
+            return self._distance_to_proximity(distance)
         except NoLocationError:
             return 0.0
 
-    def proximity_to_start(self, other: Node, end: Location = None):
-        return self._distance_to_proximity(self.distance_from_start(other, end=end))
-
-    def proximity_to_end(self, other: Node, start: Location = None):
-        return self._distance_to_proximity(self.distance_from_end(other, start=start))
-
-    def distance_between(self, a: Node, b: Node, space: "Space" = None):
+    def distance_between(
+        self,
+        a: Node,
+        b: Node,
+        space: "Space" = None,
+        distance_function: callable = None,
+        return_nan: bool = False,
+    ):
         space = self.parent_space if space is None else space
+        distance_function = (
+            self.distance_function if distance_function is None else distance_function
+        )
         try:
-            return self.distance_function(
+            return distance_function(
                 a.location_in_space(space).coordinates,
                 b.location_in_space(space).coordinates,
+                return_nan,
             )
         except NotImplementedError:
             try:
                 return statistics.mean(
                     [
-                        self.distance_function(
+                        distance_function(
                             a.location_in_space(space).start_coordinates,
                             b.location_in_space(space).start_coordinates,
+                            return_nan,
                         ),
-                        self.distance_function(
+                        distance_function(
                             a.location_in_space(space).end_coordinates,
                             b.location_in_space(space).end_coordinates,
+                            return_nan,
                         ),
                     ]
                 )
             except AttributeError:
                 return 0.0
 
-    def proximity_between(self, a: Node, b: Node, space: "Space" = None):
-        return self._distance_to_proximity(self.distance_between(a, b, space=space))
+    def proximity_between(
+        self, a: Node, b: Node, space: "Space" = None, return_nan: bool = False
+    ):
+        distance = self.distance_between(a, b, space=space, return_nan=return_nan)
+        if math.isnan(distance) and return_nan:
+            return math.nan
+        return self._distance_to_proximity(distance)
+
+    def adjacency_of(
+        self, a: Node, b: Node, space: "Space" = None, return_nan: bool = False
+    ):
+        distance = self.distance_between(
+            a,
+            b,
+            space=space,
+            distance_function=self.chunking_distance_function,
+            return_nan=return_nan,
+        )
+        if math.isnan(distance) and return_nan:
+            return math.nan
+        return self._distance_to_proximity(distance)
 
     def _distance_to_proximity(self, value: float) -> float:
         # TODO: consider using a distance_to_proximity function instead of weight
@@ -256,6 +253,7 @@ class Concept(Node):
             structure_type=self.structure_type,
             parent_space=self.parent_space,
             distance_function=self.distance_function,
+            possible_instances=self.possible_instances.copy(),
             depth=self.depth,
             distance_to_proximity_weight=self.distance_to_proximity_weight,
             is_slot=self.is_slot,

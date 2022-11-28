@@ -2,21 +2,21 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection location-space time-space)
+    :possible_instances (StructureSet location-space time-space)
     :no_of_dimensions Nan))
 (define label-parent-concept
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
 (define nn-input
   (def-contextual-space :name "np[nn].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection conceptual-space)))
+    :conceptual_spaces (StructureSet conceptual-space)))
 (define nn-output
   (def-contextual-space :name "np[nn].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
 (define nn-frame
   (def-frame :name "np[nn]"
     :parent_concept np-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection label-parent-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet label-parent-concept)
     :input_space nn-input :output_space nn-output))
 (define chunk
   (def-chunk :locations (list (Location (list (list)) conceptual-space)
@@ -50,8 +50,8 @@
     :locations (list np-location
 		     (Location (list) nn-output))
     :parent_space nn-output
-    :left_branch (StructureCollection letter-chunk)
-    :right_branch (StructureCollection null-chunk)))
+    :left_branch (StructureSet letter-chunk)
+    :right_branch (StructureSet null-chunk)))
 (define np-super-chunk-label
   (def-label :start np-super-chunk :parent_concept np-concept
     :locations (list np-location

@@ -1,8 +1,8 @@
-from linguoplotter import fuzzy
+import statistics
+
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluators import ProjectionEvaluator
 from linguoplotter.errors import MissingStructureError
-from linguoplotter.structure_collection import StructureCollection
 
 
 class LetterChunkProjectionEvaluator(ProjectionEvaluator):
@@ -18,18 +18,9 @@ class LetterChunkProjectionEvaluator(ProjectionEvaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["letter-chunk"]
         word = bubble_chamber.input_nodes.where(is_letter_chunk=True).get()
-        correspondences = word.correspondences.where(end=word)
-        if correspondences.is_empty():
-            raise MissingStructureError
-        target_structures = StructureCollection.union(
-            bubble_chamber.new_structure_collection(word), correspondences
-        )
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            target_structures,
-            structure_type.activation,
-        )
+        correspondence = word.correspondences.where(end=word).get()
+        targets = bubble_chamber.new_set(word, correspondence, name="targets")
+        return cls.spawn(parent_id, bubble_chamber, targets, structure_type.activation)
 
     @property
     def _parent_link(self):
@@ -37,28 +28,21 @@ class LetterChunkProjectionEvaluator(ProjectionEvaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        letter_chunk = self.target_structures.where(is_letter_chunk=True).get()
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Letter chunk: {letter_chunk} {letter_chunk.name}"
-        )
+        letter_chunk = self.targets.where(is_letter_chunk=True).get()
+        correspondence = self.targets.where(is_correspondence=True).get()
+        view = correspondence.parent_view
         try:
-            non_frame_item = (
-                self.target_structures.where(is_correspondence=True)
-                .filter(lambda x: not x.start.is_slot)
-                .get()
-                .start
-            )
-            frame_item = (
-                self.target_structures.where(is_correspondence=True)
-                .filter(lambda x: x.start.is_slot)
-                .get()
-                .start
-            )
-            correspondence_to_frame = non_frame_item.correspondences_with(
-                frame_item
+            meaning_concept = letter_chunk.concepts.filter(
+                lambda x: x.parent_space.name != "grammar"
             ).get()
-            self.confidence = fuzzy.AND(
-                non_frame_item.quality, correspondence_to_frame.quality
+            self.confidence = statistics.fmean(
+                [
+                    c.quality
+                    for c in view.members
+                    if c.start.parent_space in view.input_spaces
+                    and c.start.is_link
+                    and c.start.parent_concept == meaning_concept
+                ]
             )
         except MissingStructureError:
             self.confidence = 1.0

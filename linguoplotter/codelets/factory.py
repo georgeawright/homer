@@ -4,6 +4,7 @@ from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
+from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.tools import hasinstance
 
@@ -21,9 +22,10 @@ class Factory(Codelet):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         coderack: "Coderack",
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
         self.result = None
 
@@ -36,7 +38,8 @@ class Factory(Codelet):
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        return cls(codelet_id, parent_id, bubble_chamber, coderack, urgency)
+        targets = bubble_chamber.new_dict()
+        return cls(codelet_id, parent_id, bubble_chamber, coderack, targets, urgency)
 
     def run(self) -> CodeletResult:
         try:
@@ -53,8 +56,6 @@ class Factory(Codelet):
                     self.follow_up_urgency(),
                 )
             )
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     def _engender_follow_up(self):
@@ -162,7 +163,7 @@ class Factory(Codelet):
         view = self.bubble_chamber.concepts["view"]
         letter_chunk = self.bubble_chamber.concepts["letter-chunk"]
 
-        nsc = lambda *x: self.bubble_chamber.new_structure_collection(*x)
+        nsc = lambda *x: self.bubble_chamber.new_set(*x)
 
         return {
             "inner-or-outer": {

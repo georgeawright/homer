@@ -8,7 +8,7 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Frame
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.space import Space
@@ -19,7 +19,6 @@ class View(Structure):
     """A collection of spaces and self-consistent correspondences between them."""
 
     FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
-
     CORRESPONDENCE_WEIGHT = HyperParameters.VIEW_QUALITY_CORRESPONDENCE_WEIGHT
     INPUT_WEIGHT = HyperParameters.VIEW_QUALITY_INPUT_WEIGHT
 
@@ -29,18 +28,18 @@ class View(Structure):
         parent_id: str,
         parent_frame: Frame,
         locations: List[Location],
-        members: StructureCollection,
-        frames: StructureCollection,
-        input_spaces: StructureCollection,
+        members: StructureSet,
+        frames: StructureSet,
+        input_spaces: StructureSet,
         output_space: ContextualSpace,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        sub_views: StructureCollection,
-        super_views: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        sub_views: StructureSet,
+        super_views: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
     ):
         Structure.__init__(
             self,
@@ -66,6 +65,7 @@ class View(Structure):
         self._grouped_nodes = {}
         self.matched_sub_frames = {}
         self.slot_values = {}
+        self.conceptual_spaces_map = {}
         self.is_view = True
 
     def __dict__(self) -> dict:
@@ -121,7 +121,7 @@ class View(Structure):
 
     # TODO: this should be a property
     def raw_input_nodes(self):
-        return StructureCollection.union(
+        return StructureSet.union(
             *[
                 node.raw_members
                 for node in self.grouped_nodes
@@ -184,7 +184,7 @@ class View(Structure):
         return self.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
             and not x.is_chunk
-            and x.correspondences.where(end=x).is_empty()
+            and x.correspondences.where(end=x).is_empty
         )
 
     @property
@@ -192,25 +192,25 @@ class View(Structure):
         return self.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
             and x.parent_space != self.parent_frame.output_space
-            and x.correspondences.where(end=x).is_empty()
+            and x.correspondences.where(end=x).is_empty
         )
 
     @property
     def unfilled_projectable_structures(self):
         return self.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
-            and x.correspondences_to_space(self.output_space).is_empty()
+            and x.correspondences_to_space(self.output_space).is_empty
         )
 
     @property
     def grouped_nodes(self):
-        if self.super_views.is_empty():
+        if self.super_views.is_empty:
             return self._grouped_nodes
         return self.super_views.get().grouped_nodes
 
     @property
     def node_groups(self):
-        if self.super_views.is_empty():
+        if self.super_views.is_empty:
             return self._node_groups
         return self.super_views.get().node_groups
 
@@ -218,7 +218,7 @@ class View(Structure):
     def output(self):
         return (
             self.output_space.contents.filter(
-                lambda x: x.is_letter_chunk and x.super_chunks.is_empty()
+                lambda x: x.is_letter_chunk and x.super_chunks.is_empty
             )
             .get()
             .name
@@ -243,6 +243,12 @@ class View(Structure):
         self.exigency = fuzzy.AND(self.unhappiness, self.activation)
 
     def calculate_quality(self):
+        for member in self.members:
+            if (
+                member.parent_concept.is_compound_concept
+                and member.parent_concept.root.name == "not"
+            ):
+                return 0.0
         total_slots = len(self.members) + self.number_of_items_left_to_process
         correspondence_quality = (
             sum(correspondence.quality for correspondence in self.members) / total_slots
@@ -262,15 +268,32 @@ class View(Structure):
             ]
         )
 
+    def is_equivalent_to(self, other: View):
+        try:
+            return self.structures == other.structures and self.output == other.output
+        except MissingStructureError:
+            return False
+
     def input_overlap_with(self, other: View):
-        shared_raw_nodes = StructureCollection.intersection(
+        shared_raw_nodes = StructureSet.intersection(
             self.raw_input_nodes, other.raw_input_nodes
         )
         proportion_in_self = len(shared_raw_nodes) / len(self.raw_input_nodes)
         proportion_in_other = len(shared_raw_nodes) / len(other.raw_input_nodes)
         return statistics.fmean([proportion_in_self, proportion_in_other])
 
-    def nearby(self, space: Space = None) -> StructureCollection:
+    def specify_space(self, abstract_space, conceptual_space):
+        if (
+            abstract_space in self.parent_frame.input_space.conceptual_spaces
+            or abstract_space in self.parent_frame.output_space.conceptual_spaces
+        ):
+            self.conceptual_spaces_map[conceptual_space] = abstract_space
+        if abstract_space in self.conceptual_spaces_map:
+            self.conceptual_spaces_map.pop(abstract_space)
+        for frame in self.frames:
+            frame.specify_space(abstract_space, conceptual_space)
+
+    def nearby(self, space: Space = None) -> StructureSet:
         space = space if space is not None else self.location.space
         return (
             space.contents.where(is_view=True)
@@ -313,11 +336,39 @@ class View(Structure):
                 )
                 self._grouped_nodes[node_pair[0]] = True
                 self._grouped_nodes[node_pair[1]] = True
-        if not self.super_views.is_empty():
+        if self.super_views.not_empty:
             self.super_views.get().add(correspondence)
 
     def remove(self, correspondence: "Correspondence"):
         self.members.remove(correspondence)
+        if correspondence.end.is_link and correspondence.end.parent_concept.is_slot:
+            if not any(
+                [
+                    item.is_link
+                    and item.parent_concept == correspondence.end.parent_concept
+                    and item != correspondence.end
+                    for item in correspondence.end.parent_space.contents.where(
+                        is_link=True
+                    )
+                ]
+            ):
+                correspondence.end.parent_concept._non_slot_value = None
+        if correspondence.conceptual_space is not None:
+            if not any(
+                [
+                    c.conceptual_space == correspondence.conceptual_space
+                    for c in self.members.excluding(correspondence)
+                ]
+            ):
+                try:
+                    self.specify_space(
+                        correspondence.conceptual_space,
+                        correspondence.parent_view.conceptual_spaces_map[
+                            correspondence.conceptual_space
+                        ],
+                    )
+                except KeyError:
+                    pass
         for sub_frame, matched_frame in self.matched_sub_frames.copy().items():
             if (
                 correspondence in matched_frame.input_space.contents
@@ -326,7 +377,7 @@ class View(Structure):
                 if self.members.filter(
                     lambda x: x in matched_frame.input_space.contents
                     or x in matched_frame.output_space.contents
-                ).is_empty():
+                ).is_empty:
                     try:
                         sub_view = self.sub_views.where(
                             parent_frame=matched_frame
@@ -341,7 +392,7 @@ class View(Structure):
         self._node_groups = []
         for member in self.members:
             self.add(member)
-        if not self.super_views.is_empty():
+        if self.super_views.not_empty:
             self.super_views.get().remove(correspondence)
 
     def has_member(
@@ -351,12 +402,12 @@ class View(Structure):
         start: Structure,
         end: Structure,
     ) -> bool:
-        return not self.members.where(
+        return self.members.where(
             parent_concept=parent_concept,
             conceptual_space=conceptual_space,
             start=start,
             end=end,
-        ).is_empty()
+        ).not_empty
 
     def can_accept_member(
         self,
@@ -402,15 +453,15 @@ class View(Structure):
             different_concepts = end_concept.relatives.filter(
                 lambda x: not x.relations_with(end_concept)
                 .where(name="different")
-                .is_empty()
+                .is_empty
             )
             if start_concept in different_concepts:
                 return False
-        if not end.correspondences.filter(
+        if end.correspondences.filter(
             lambda x: x.end == end
             and x in self.members
             and x.start in start.parent_space.contents
-        ).is_empty():
+        ).not_empty:
             return False
         potential_node_groups = (
             [{start.parent_space: start, end.parent_space: end}]
@@ -461,7 +512,7 @@ class View(Structure):
                     )
                 ):
                     return False
-        if self.super_views.is_empty():
+        if self.super_views.is_empty:
             return True
         return self.super_views.get().can_accept_member(
             parent_concept,
@@ -482,478 +533,3 @@ class View(Structure):
             + f"from {inputs} to {self.output_space.structure_id} "
             + f"with {self.parent_frame}>"
         )
-
-    def to_long_string(self) -> str:
-        def space_to_long_string(space):
-            string = "-" * 120 + "\n"
-            string += f"{space.structure_id}\n"
-            string += "-" * 120 + "\n"
-            for structure in space.contents.filter(
-                lambda x: not x.correspondences.filter(
-                    lambda y: y in self.members
-                ).is_empty()
-            ):
-                string += f"{structure}\n"
-            return string
-
-        string = "-" * 120 + "\n"
-        string += f"{self.structure_id}\n"
-        string += "-" * 120 + "\n"
-        string += "Inputs:\n"
-        for input_space in self.input_spaces:
-            string += space_to_long_string(input_space)
-        string += "Frames:'n"
-        for frame in self.frames:
-            string += "-" * 120 + "\n"
-            string += f"{frame.structure_id}\n"
-            string += space_to_long_string(frame.input_space)
-            string += space_to_long_string(frame.output_space)
-        string += "-" * 120 + "\n"
-        string += "Output:\n" + space_to_long_string(self.output_space)
-        string += "-" * 120 + "\n"
-        string += "Correspondences:\n"
-        for correspondence in self.members:
-            string += f"{correspondence}\n"
-        return string
-
-    def to_concise_dot_string(self) -> str:
-        dot_string = """
-digraph G {"""
-        cluster_count = 0
-        for space in self.input_spaces:
-            dot_string += f"""
-subgraph cluster_{cluster_count} {{
-    style=filled;
-    color=lightblue;
-    node [style=filled, color=white];"""
-            for node in space.contents.filter(
-                lambda x: x.is_node and x in self.grouped_nodes
-            ):
-                node_label = (
-                    node.name
-                    if node.is_letter_chunk and node.name is not None
-                    else node.structure_id
-                )
-                dot_string += f"""
-    {node.structure_id} [label="{node_label}"];"""
-            for letter_chunk in space.contents.filter(
-                lambda x: x.is_letter_chunk and x.in_self.grouped_nodes
-            ):
-                for left_member in letter_chunk.left_branch:
-                    dot_string += f"""
-    {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
-                for right_member in letter_chunk.right_branch:
-                    dot_string += f"""
-    {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
-            for label in space.contents.filter(
-                lambda x: x.is_label and x.has_correspondence_in_view(self)
-            ):
-                dot_string += f"""
-    {label.structure_id} [label="{label.parent_concept.name}"];
-    {label.structure_id} -> {label.start.structure_id} [label="start"];"""
-            for relation in space.contents.filter(
-                lambda x: x.is_relation and x.has_correspondence_in_view(self)
-            ):
-                concept_label = (
-                    relation.parent_concept.name
-                    if not relation.parent_concept.is_slot
-                    else relation.structure_id
-                )
-                dot_string += f"""
-    {relation.structure_id} [label="{relation.parent_concept.name}"];
-    {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-    {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-            dot_string += f"""
-    label = "{space.structure_id}";
-}}"""
-            cluster_count += 1
-        dot_string += f"""
-subgraph cluster_{cluster_count} {{
-    style=filled;
-    color=palegreen;
-    node [style=filled, color=white];"""
-        for node in self.output_space.contents.where(is_node=True):
-            node_label = (
-                node.name
-                if node.is_letter_chunk and node.name is not None
-                else node.structure_id
-            )
-            dot_string += f"""
-    {node.structure_id} [label="{node_label}"];"""
-        for letter_chunk in self.output_space.contents.where(is_letter_chunk=True):
-            for left_member in letter_chunk.left_branch:
-                dot_string += f"""
-    {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
-            for right_member in letter_chunk.right_branch:
-                dot_string += f"""
-    {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
-        for label in self.output_space.contents.where(is_label=True):
-            dot_string += f"""
-    {label.structure_id} [label="{label.parent_concept.name}"];
-    {label.structure_id} -> {label.start.structure_id} [label="start"];"""
-        for relation in self.output_space.contents.where(is_relation=True):
-            dot_string += f"""
-    {relation.structure_id} [label="{relation.parent_concept.name}"];
-    {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-    {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-        dot_string += f"""
-    label = "{self.output_space.structure_id}";
-}}"""
-        cluster_count += 1
-        dot_string += f"""
-subgraph cluster_{cluster_count} {{
-    style=filled;
-    color=lightgray;
-    node [style=filled, color=white];"""
-        cluster_count += 1
-        dot_string += f"""
-    subgraph cluster_{cluster_count} {{
-        style=filled;
-        color=pink;
-        node [style=filled, color=white];"""
-        for concept in self.parent_frame.concepts.where(is_concept=True):
-            dot_string += f"""
-        {concept.structure_id};"""
-        for concept in self.parent_frame.concepts.where(is_concept=True):
-            for relation in concept.links_out.filter(
-                lambda x: x.is_relation and x.end in self.parent_frame.concepts
-            ):
-                dot_string += f"""
-        {relation.structure_id} [label={relation.parent_concept.name}];
-        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-        dot_string += f"""
-        label = "Concepts";
-    }}"""
-        cluster_count += 1
-        dot_string += f"""
-    subgraph cluster_{cluster_count} {{
-        style=filled;
-        color=lightblue;
-        node [style=filled, color=white];"""
-        for node in self.parent_frame.input_space.contents.where(is_node=True):
-            node_label = (
-                node.name
-                if node.is_letter_chunk and node.name is not None
-                else node.structure_id
-            )
-            dot_string += f"""
-        {node.structure_id} [label="{node_label}"];"""
-        for letter_chunk in self.parent_frame.input_space.contents.where(
-            is_letter_chunk=True
-        ):
-            for left_member in letter_chunk.left_branch:
-                dot_string += f"""
-        {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
-            for right_member in letter_chunk.right_branch:
-                dot_string += f"""
-        {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
-        for label in self.parent_frame.input_space.contents.where(is_label=True):
-            concept_label = (
-                label.parent_concept.name
-                if not label.parent_concept.is_slot
-                else label.structure_id
-            )
-            dot_string += f"""
-        {label.structure_id} [label="{concept_label}"];
-        {label.structure_id} -> {label.start.structure_id} [label="start"];"""
-        for relation in self.parent_frame.input_space.contents.where(is_relation=True):
-            concept_label = (
-                relation.parent_concept.name
-                if not relation.parent_concept.is_slot
-                else relation.structure_id
-            )
-            dot_string += f"""
-        {relation.structure_id} [label="{concept_label}"];
-        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-        dot_string += f"""
-        label = "{self.parent_frame.input_space.structure_id}";
-    }}"""
-        cluster_count += 1
-        dot_string += f"""
-    subgraph cluster_{cluster_count} {{
-        style=filled;
-        color=palegreen;
-        node [style=filled, color=white];"""
-        for node in self.parent_frame.output_space.contents.where(is_node=True):
-            node_label = (
-                node.name
-                if node.is_letter_chunk and node.name is not None
-                else node.structure_id
-            )
-            dot_string += f"""
-        {node.structure_id} [label="{node_label}"];"""
-        for letter_chunk in self.parent_frame.output_space.contents.where(
-            is_letter_chunk=True
-        ):
-            for left_member in letter_chunk.left_branch:
-                dot_string += f"""
-        {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
-            for right_member in letter_chunk.right_branch:
-                dot_string += f"""
-        {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
-        for label in self.parent_frame.output_space.contents.where(is_label=True):
-            concept_label = (
-                label.parent_concept.name
-                if not label.parent_concept.is_slot
-                else label.structure_id
-            )
-            dot_string += f"""
-        {label.structure_id} [label="{concept_label}"];
-        {label.structure_id} -> {label.start.structure_id} [label="start"];"""
-        for relation in self.parent_frame.output_space.contents.where(is_relation=True):
-            concept_label = (
-                relation.parent_concept.name
-                if not relation.parent_concept.is_slot
-                else relation.structure_id
-            )
-            dot_string += f"""
-        {relation.structure_id} [label="{concept_label}"];
-        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-        dot_string += f"""
-        label = "{self.parent_frame.output_space.structure_id}";
-    }}"""
-        for label in self.parent_frame.input_space.contents.where(is_label=True):
-            if label.parent_concept in self.parent_frame.concepts:
-                dot_string += f"""
-    {label.structure_id} -> {label.parent_concept.structure_id} [label="parent_concept"];"""
-        for relation in self.parent_frame.input_space.contents.where(is_relation=True):
-            if relation.parent_concept in self.parent_frame.concepts:
-                dot_string += f"""
-    {relation.structure_id} -> {relation.parent_concept.structure_id} [label="parent_concept"];"""
-        for label in self.parent_frame.output_space.contents.where(is_label=True):
-            if label.parent_concept in self.parent_frame.concepts:
-                dot_string += f"""
-    {label.structure_id} -> {label.parent_concept.structure_id} [label="parent_concept"];"""
-        for relation in self.parent_frame.output_space.contents.where(is_relation=True):
-            if relation.parent_concept in self.parent_frame.concepts:
-                dot_string += f"""
-    {relation.structure_id} -> {relation.parent_concept.structure_id} [label="parent_concept"];"""
-        dot_string += f"""
-    label = "{self.parent_frame.structure_id}";
-}}"""
-        for correspondence in self.members:
-            if (
-                correspondence.start.parent_space in self.input_spaces
-                or correspondence.start in self.parent_frame.output_space.contents
-            ) and (
-                correspondence.end in self.parent_frame.input_space.contents
-                or correspondence.end in self.output_space.contents
-            ):
-                dot_string += f"""
-    {correspondence.structure_id} [label="{correspondence.parent_concept.name}"];
-    {correspondence.structure_id} -> {correspondence.start.structure_id};
-    {correspondence.structure_id} -> {correspondence.end.structure_id};"""
-        dot_string += """
-}"""
-        return dot_string
-
-    def to_long_dot_string(self) -> str:
-        # TODO: should show sub_view output spaces and letter chunk names
-        # TODO: check why frame elements have the wrong parent concept
-        dot_string = """
-digraph G {"""
-        cluster_count = 0
-        for space in self.input_spaces:
-            dot_string += f"""
-subgraph cluster_{cluster_count} {{
-    style=filled;
-    color=lightblue;
-    node [style=filled, color=white];"""
-            for node in space.contents.filter(
-                lambda x: x.is_node and x in self.grouped_nodes
-            ):
-                dot_string += f"""
-    {node.structure_id};"""
-            for letter_chunk in space.contents.filter(
-                lambda x: x.is_letter_chunk and x.in_self.grouped_nodes
-            ):
-                for left_member in letter_chunk.left_branch:
-                    dot_string += f"""
-    {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
-                for right_member in letter_chunk.right_branch:
-                    dot_string += f"""
-    {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
-            for label in space.contents.filter(
-                lambda x: x.is_label and x.has_correspondence_in_view(self)
-            ):
-                dot_string += f"""
-    {label.structure_id} [label="{label.parent_concept.name}"];
-    {label.structure_id} -> {label.start.structure_id} [label="start"];"""
-            for relation in space.contents.filter(
-                lambda x: x.is_relation and x.has_correspondence_in_view(self)
-            ):
-                concept_label = (
-                    relation.parent_concept.name
-                    if not relation.parent_concept.is_slot
-                    else relation.structure_id
-                )
-                dot_string += f"""
-    {relation.structure_id} [label="{relation.parent_concept.name}"];
-    {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-    {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-            dot_string += f"""
-    label = "{space.structure_id}";
-}}"""
-            cluster_count += 1
-        dot_string += f"""
-subgraph cluster_{cluster_count} {{
-    style=filled;
-    color=palegreen;
-    node [style=filled, color=white];"""
-        for node in self.output_space.contents.where(is_node=True):
-            dot_string += f"""
-    {node.structure_id};"""
-        for letter_chunk in self.output_space.contents.where(is_letter_chunk=True):
-            for left_member in letter_chunk.left_branch:
-                dot_string += f"""
-    {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
-            for right_member in letter_chunk.right_branch:
-                dot_string += f"""
-    {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
-        for label in self.output_space.contents.where(is_label=True):
-            dot_string += f"""
-    {label.structure_id} [label="{label.parent_concept.name}"];
-    {label.structure_id} -> {label.start.structure_id} [label="start"];"""
-        for relation in self.output_space.contents.where(is_relation=True):
-            dot_string += f"""
-    {relation.structure_id} [label="{relation.parent_concept.name}"];
-    {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-    {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-        dot_string += f"""
-    label = "{self.output_space.structure_id}";
-}}"""
-        cluster_count += 1
-        for frame in self.frames:
-            dot_string += f"""
-subgraph cluster_{cluster_count} {{
-    style=filled;
-    color=lightgray;
-    node [style=filled, color=white];"""
-            cluster_count += 1
-            dot_string += f"""
-    subgraph cluster_{cluster_count} {{
-        style=filled;
-        color=pink;
-        node [style=filled, color=white];"""
-            for concept in frame.concepts.where(is_concept=True):
-                dot_string += f"""
-        {concept.structure_id};"""
-            for concept in frame.concepts.where(is_concept=True):
-                for relation in concept.links_out.filter(
-                    lambda x: x.is_relation and x.end in frame.concepts
-                ):
-                    dot_string += f"""
-        {relation.structure_id} [label={relation.parent_concept.name}];
-        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-            dot_string += f"""
-        label = "Concepts";
-    }}"""
-            cluster_count += 1
-            dot_string += f"""
-    subgraph cluster_{cluster_count} {{
-        style=filled;
-        color=lightblue;
-        node [style=filled, color=white];"""
-            for node in frame.input_space.contents.where(is_node=True):
-                dot_string += f"""
-        {node.structure_id};"""
-            for letter_chunk in frame.input_space.contents.where(is_letter_chunk=True):
-                for left_member in letter_chunk.left_branch:
-                    dot_string += f"""
-        {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
-                for right_member in letter_chunk.right_branch:
-                    dot_string += f"""
-        {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
-            for label in frame.input_space.contents.where(is_label=True):
-                concept_label = (
-                    label.parent_concept.name
-                    if not label.parent_concept.is_slot
-                    else label.structure_id
-                )
-                dot_string += f"""
-        {label.structure_id} [label="{concept_label}"];
-        {label.structure_id} -> {label.start.structure_id} [label="start"];"""
-            for relation in frame.input_space.contents.where(is_relation=True):
-                concept_label = (
-                    relation.parent_concept.name
-                    if not relation.parent_concept.is_slot
-                    else relation.structure_id
-                )
-                dot_string += f"""
-        {relation.structure_id} [label="{concept_label}"];
-        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-            dot_string += f"""
-        label = "{frame.input_space.structure_id}";
-    }}"""
-            cluster_count += 1
-            dot_string += f"""
-    subgraph cluster_{cluster_count} {{
-        style=filled;
-        color=palegreen;
-        node [style=filled, color=white];"""
-            for node in frame.output_space.contents.where(is_node=True):
-                dot_string += f"""
-        {node.structure_id};"""
-            for letter_chunk in frame.output_space.contents.where(is_letter_chunk=True):
-                for left_member in letter_chunk.left_branch:
-                    dot_string += f"""
-        {letter_chunk.structure_id} -> {left_member.structure_id} [label="left"];"""
-                for right_member in letter_chunk.right_branch:
-                    dot_string += f"""
-        {letter_chunk.structure_id} -> {right_member.structure_id} [label="right"];"""
-            for label in frame.output_space.contents.where(is_label=True):
-                concept_label = (
-                    label.parent_concept.name
-                    if not label.parent_concept.is_slot
-                    else label.structure_id
-                )
-                dot_string += f"""
-        {label.structure_id} [label="{concept_label}"];
-        {label.structure_id} -> {label.start.structure_id} [label="start"];"""
-            for relation in frame.output_space.contents.where(is_relation=True):
-                concept_label = (
-                    relation.parent_concept.name
-                    if not relation.parent_concept.is_slot
-                    else relation.structure_id
-                )
-                dot_string += f"""
-        {relation.structure_id} [label="{concept_label}"];
-        {relation.structure_id} -> {relation.start.structure_id} [label="start"];
-        {relation.structure_id} -> {relation.end.structure_id} [label="end"];"""
-            dot_string += f"""
-        label = "{frame.output_space.structure_id}";
-    }}"""
-            for label in frame.input_space.contents.where(is_label=True):
-                if label.parent_concept in frame.concepts:
-                    dot_string += f"""
-    {label.structure_id} -> {label.parent_concept.structure_id} [label="parent_concept"];"""
-            for relation in frame.input_space.contents.where(is_relation=True):
-                if relation.parent_concept in frame.concepts:
-                    dot_string += f"""
-    {relation.structure_id} -> {relation.parent_concept.structure_id} [label="parent_concept"];"""
-            for label in frame.output_space.contents.where(is_label=True):
-                if label.parent_concept in frame.concepts:
-                    dot_string += f"""
-    {label.structure_id} -> {label.parent_concept.structure_id} [label="parent_concept"];"""
-            for relation in frame.output_space.contents.where(is_relation=True):
-                if relation.parent_concept in frame.concepts:
-                    dot_string += f"""
-    {relation.structure_id} -> {relation.parent_concept.structure_id} [label="parent_concept"];"""
-            dot_string += f"""
-    label = "{frame.structure_id}";
-}}"""
-        for correspondence in self.members:
-            #            dot_string += f"""
-            #    {correspondence.structure_id} [label="{correspondence.parent_concept.name}"];
-            #    {correspondence.structure_id} -> {correspondence.start.structure_id};
-            #    {correspondence.structure_id} -> {correspondence.end.structure_id};"""
-            dot_string += f"""
-    {correspondence.start.structure_id} -> {correspondence.end.structure_id};"""
-        dot_string += """
-}"""
-        return dot_string

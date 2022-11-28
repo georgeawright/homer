@@ -3,16 +3,16 @@
 
 (define pp-inessive-location-input
   (def-contextual-space :name "pp[in-location].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space)))
+    :conceptual_spaces (StructureSet location-space)))
 (define pp-inessive-location-output
   (def-contextual-space :name "pp[in-location].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space location-space)))
+    :conceptual_spaces (StructureSet grammar-space location-space)))
 (define pp-inessive-location
   (def-frame :name "pp[in-location]"
     :parent_concept pp-inessive-location-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection location-label-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet location-label-concept)
     :input_space pp-inessive-location-input
     :output_space pp-inessive-location-output))
 
@@ -58,15 +58,15 @@
     :locations (list np-location
 		     (Location (list) pp-inessive-location-output))
     :parent_space pp-inessive-location-output
-    :left_branch (StructureCollection pp-word-2)
-    :right_branch (StructureCollection pp-word-3)))
+    :left_branch (StructureSet pp-word-2)
+    :right_branch (StructureSet pp-word-3)))
 (define pp-super-chunk
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) pp-inessive-location-output))
     :parent_space pp-inessive-location-output
-    :left_branch (StructureCollection pp-word-1)
-    :right_branch (StructureCollection np-super-chunk)))
+    :left_branch (StructureSet pp-word-1)
+    :right_branch (StructureSet np-super-chunk)))
 (define pp-super-chunk-label
   (def-label :start pp-super-chunk :parent_concept pp-inessive-location-concept
     :locations (list pp-location

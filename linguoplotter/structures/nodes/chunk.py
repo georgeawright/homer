@@ -1,11 +1,12 @@
 from __future__ import annotations
-from math import prod
 import statistics
 from typing import List
 
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collection_keys import relating_exigency
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Node, Space
 
 from .concept import Concept
@@ -17,16 +18,16 @@ class Chunk(Node):
         structure_id: str,
         parent_id: str,
         locations: List[Location],
-        members: StructureCollection,
+        members: StructureSet,
         parent_space: Space,
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        super_chunks: StructureCollection,
-        sub_chunks: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        super_chunks: StructureSet,
+        sub_chunks: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
         abstract_chunk: Chunk = None,
         is_raw: bool = False,
     ):
@@ -93,12 +94,12 @@ class Chunk(Node):
         )
 
     @property
-    def raw_members(self) -> StructureCollection:
+    def raw_members(self) -> StructureSet:
         if self.is_raw:
             raw_members = self.members.copy()
             raw_members.add(self)
             return raw_members
-        return StructureCollection.union(
+        return StructureSet.union(
             *[chunk.raw_members for chunk in self.members.where(is_slot=False)]
         )
 
@@ -134,14 +135,10 @@ class Chunk(Node):
         )
 
     @property
-    def potential_chunk_mates(self) -> StructureCollection:
+    def potential_chunk_mates(self) -> StructureSet:
         return self.nearby().filter(
             lambda x: x not in self.sub_chunks and x not in self.super_chunks
         )
-
-    @property
-    def adjacent(self) -> StructureCollection:
-        return self.parent_space.contents.next_to(self.location).where(is_node=True)
 
     @property
     def is_recyclable(self) -> bool:
@@ -152,7 +149,7 @@ class Chunk(Node):
             and self.activation == 0.0
         )
 
-    def nearby(self, space: Space = None) -> StructureCollection:
+    def nearby(self, space: Space = None) -> StructureSet:
         if self.is_raw:
             if space is not None:
                 return (
@@ -160,7 +157,7 @@ class Chunk(Node):
                     .near(self.location_in_space(space))
                     .excluding(self),
                 )
-            return StructureCollection.intersection(
+            return StructureSet.intersection(
                 *[
                     location.space.contents.where(
                         is_chunk=True, parent_space=self.parent_space
@@ -172,9 +169,7 @@ class Chunk(Node):
                 ]
             ).excluding(self)
         return (
-            StructureCollection.union(
-                *[member.nearby(space=space) for member in self.members]
-            )
+            StructureSet.union(*[member.nearby(space=space) for member in self.members])
             .filter(lambda x: self not in x.super_chunks and x not in self.super_chunks)
             .excluding(self)
         )
@@ -183,6 +178,12 @@ class Chunk(Node):
         self, space: Space = None, concept: Concept = None
     ) -> Chunk:
         space = self.parent_space if space is None else space
+        try:
+            return self.relatives.filter(
+                lambda x: self.relations.where(end=x, conceptual_space=space).is_empty
+            ).get(key=relating_exigency)
+        except MissingStructureError:
+            pass
         chunks = space.contents.filter(
             lambda x: x.is_chunk
             and not x.is_letter_chunk
@@ -208,7 +209,7 @@ class Chunk(Node):
                 for location in chunk.locations
                 if location.space.is_conceptual_space
             ] + [location]
-            members = bubble_chamber.new_structure_collection()
+            members = bubble_chamber.new_set()
             for member in chunk.members:
                 if member not in copies:
                     copies[member] = copy_recursively(
@@ -238,7 +239,7 @@ class Chunk(Node):
             for location in self.locations
             if location.space.is_conceptual_space
         ] + [new_location]
-        new_members = bubble_chamber.new_structure_collection()
+        new_members = bubble_chamber.new_set()
         for member in self.members:
             if member not in copies:
                 copies[member] = member.copy(
@@ -262,4 +263,8 @@ class Chunk(Node):
         members = "{" + ",".join([member.structure_id for member in self.members]) + "}"
         if self.parent_space is None:
             return f"<{self.structure_id} {members}>"
-        return f"<{self.structure_id} {members} in {self.parent_space.structure_id} {self.locations}>"
+        return (
+            f"<{self.structure_id} {members} in {self.parent_space.structure_id}\n"
+            + "\n".join([f"    {location}" for location in self.locations])
+            + ">"
+        )

@@ -5,6 +5,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collection_keys import exigency
+from linguoplotter.structure_collections import StructureDict
 
 
 class FocusSetter(Codelet):
@@ -14,9 +15,10 @@ class FocusSetter(Codelet):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         coderack: "Coderack",
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
         self.result = None
 
@@ -29,26 +31,23 @@ class FocusSetter(Codelet):
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        return cls(codelet_id, parent_id, bubble_chamber, coderack, urgency)
+        targets = bubble_chamber.new_dict()
+        return cls(codelet_id, parent_id, bubble_chamber, coderack, targets, urgency)
 
     def run(self) -> CodeletResult:
         try:
             target_view = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness > 0
+                and x.members.filter(
+                    lambda x: x.parent_concept.name == "not(same)"
+                ).is_empty
             ).get(key=exigency)
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target view: {target_view}"
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Target view exigency: {target_view.exigency}"
-            )
             self.bubble_chamber.focus.view = target_view
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Set focus: {target_view}"
-            )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(
-                self, f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
+                f"Set focus: {target_view}"
+                + f"Exigency: {target_view.exigency}"
+                + f"Satisfaction: {self.bubble_chamber.focus.satisfaction}"
             )
             self._update_codelet_urgencies()
             self._engender_follow_up()
@@ -56,8 +55,6 @@ class FocusSetter(Codelet):
         except MissingStructureError:
             self.result = CodeletResult.FIZZLE
             self._fizzle()
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     def _update_codelet_urgencies(self):

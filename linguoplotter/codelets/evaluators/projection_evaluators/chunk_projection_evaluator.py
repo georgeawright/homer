@@ -1,7 +1,5 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluators import ProjectionEvaluator
-from linguoplotter.errors import MissingStructureError
-from linguoplotter.structure_collection import StructureCollection
 
 
 class ChunkProjectionEvaluator(ProjectionEvaluator):
@@ -17,18 +15,9 @@ class ChunkProjectionEvaluator(ProjectionEvaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         structure_type = bubble_chamber.concepts["chunk"]
         chunk = bubble_chamber.input_nodes.where(is_chunk=True).get()
-        correspondences = chunk.correspondences.where(end=chunk)
-        if correspondences.is_empty():
-            raise MissingStructureError
-        target_structures = StructureCollection.union(
-            bubble_chamber.new_structure_collection(chunk), correspondences
-        )
-        return cls.spawn(
-            parent_id,
-            bubble_chamber,
-            target_structures,
-            structure_type.activation,
-        )
+        correspondence = chunk.correspondences.where(end=chunk).get()
+        targets = bubble_chamber.new_set(chunk, correspondence, name="targets")
+        return cls.spawn(parent_id, bubble_chamber, targets, structure_type.activation)
 
     @property
     def _parent_link(self):
@@ -36,7 +25,7 @@ class ChunkProjectionEvaluator(ProjectionEvaluator):
         return structure_concept.relations_with(self._evaluate_concept).get()
 
     def _calculate_confidence(self):
-        chunk = self.target_structures.where(is_chunk=True).get()
+        chunk = self.targets.where(is_chunk=True).get()
         self.confidence = 1.0
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - chunk.activation

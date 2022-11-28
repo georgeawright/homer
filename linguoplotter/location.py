@@ -51,12 +51,6 @@ class Location:
         )
         return distance <= 2 * self.space.parent_concept.distance_to_proximity_weight
 
-    def get_adjacent_location_right(self) -> Location:
-        return Location([[self.coordinates[-1][0] + 1]], self.space)
-
-    def get_adjacent_location_left(self) -> Location:
-        return Location([[self.coordinates[0][0] - 1]], self.space)
-
     def copy(self) -> Location:
         return Location(
             [[c for c in coordinates_list] for coordinates_list in self.coordinates],

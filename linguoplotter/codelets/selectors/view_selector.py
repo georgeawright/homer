@@ -1,9 +1,9 @@
 from linguoplotter.codelets.selector import Selector
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collection_keys import exigency
+from linguoplotter.structure_collection_keys import activation, exigency
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import View
-from linguoplotter.structure_collection_keys import activation
 
 
 class ViewSelector(Selector):
@@ -28,7 +28,7 @@ class ViewSelector(Selector):
         return self.bubble_chamber.concepts["view"]
 
     def _passes_preliminary_checks(self):
-        if self.challengers is not None:
+        if self.challengers.not_empty:
             return True
         try:
             self._get_challenger()
@@ -37,49 +37,52 @@ class ViewSelector(Selector):
         return True
 
     def _engender_follow_up(self):
-        # spawn a top-down view suggester with copy of winning view's frame
-        winning_view = self.winners.get()
-        if winning_view.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE:
-            try:
-                target_frame = winning_view.parent_frame.parent_concept.relatives.where(
-                    is_frame=True
-                ).get(key=exigency)
-            except MissingStructureError:
-                target_frame = winning_view.parent_frame
-            self.child_codelets.append(
-                self.get_follow_up_class().make(
-                    self.codelet_id,
-                    self.bubble_chamber,
-                    frame=target_frame,
+        try:
+            winning_view = self.winners.get()
+            if winning_view.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE:
+                target_frame = (
+                    StructureSet.union(
+                        self.bubble_chamber.new_set(winning_view.parent_frame),
+                        winning_view.parent_frame.parent_concept.relatives.where(
+                            is_frame=True
+                        ),
+                    )
+                    .filter(
+                        lambda f: self.bubble_chamber.views.filter(
+                            lambda v: v.parent_frame.parent_concept == f.parent_concept
+                            and v.members.is_empty
+                        ).is_empty
+                    )
+                    .get(key=exigency)
                 )
-            )
-        self.child_codelets.append(
-            self.get_follow_up_evaluator().spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.winners,
-                self.follow_up_urgency,
-            )
-        )
+                self.child_codelets.append(
+                    self.get_follow_up_class().make(
+                        self.codelet_id,
+                        self.bubble_chamber,
+                        frame=target_frame,
+                        urgency=target_frame.activation,
+                    )
+                )
+        except MissingStructureError:
+            pass
 
     def _get_challenger(self):
-        champion_view = self.champions.get()
-        challenger_view = (
+        champion = self.champions.get()
+        self.challengers.add(
             self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
-                == champion_view.parent_frame.parent_concept
-                and not champion_view.members.filter(
+                == champion.parent_frame.parent_concept
+                and champion.members.filter(
                     lambda c: c.start.parent_space in x.input_spaces
-                ).is_empty()
-                and not x.members.filter(
-                    lambda c: c.start.parent_space in x.input_spaces
-                ).is_empty()
-                and x.raw_input_nodes() == champion_view.raw_input_nodes()
+                ).not_empty
+                and x.members.filter(
+                    lambda c: c.start.parent_space in champion.input_spaces
+                ).not_empty
+                and x.raw_input_nodes() == champion.raw_input_nodes()
             )
-            .excluding(champion_view)
+            .excluding(champion)
             .get(key=activation)
         )
-        self.challengers = self.bubble_chamber.new_structure_collection(challenger_view)
 
     def _fizzle(self):
         pass

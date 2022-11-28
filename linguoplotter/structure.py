@@ -7,7 +7,7 @@ from .errors import MissingStructureError, NoLocationError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
 from .location import Location
-from .structure_collection import StructureCollection
+from .structure_collections import StructureSet
 
 
 class Structure(ABC):
@@ -22,11 +22,11 @@ class Structure(ABC):
         parent_id: str,
         locations: List[Location],
         quality: FloatBetweenOneAndZero,
-        links_in: StructureCollection,
-        links_out: StructureCollection,
-        parent_spaces: StructureCollection,
-        champion_labels: StructureCollection,
-        champion_relations: StructureCollection,
+        links_in: StructureSet,
+        links_out: StructureSet,
+        parent_spaces: StructureSet,
+        champion_labels: StructureSet,
+        champion_relations: StructureSet,
     ):
         self.structure_id = structure_id
         self.parent_id = parent_id
@@ -60,6 +60,7 @@ class Structure(ABC):
         self.is_link_or_node = False
         self.is_node = False
         self.is_concept = False
+        self.is_compound_concept = False
         self.is_chunk = False
         self.is_letter_chunk = False
         self.is_link = False
@@ -86,12 +87,12 @@ class Structure(ABC):
         raise NotImplementedError
 
     @property
-    def is_labellable(self) -> bool:
-        return (self.is_chunk or self.is_label or self.is_relation) and not self.is_slot
-
-    @property
     def parent_space(self) -> Structure:
         return self._parent_space
+
+    @property
+    def parent_space_location(self) -> Location:
+        return self.location_in_space(self.parent_space)
 
     @property
     def parent_concept(self) -> Structure:
@@ -141,15 +142,34 @@ class Structure(ABC):
         self.chunking_exigency = statistics.fmean([self.activation, self.unchunkedness])
 
     def recalculate_labeling_exigency(self):
-        self.labeling_exigency = statistics.fmean([self.activation, self.unlabeledness])
+        if self.quality is None:
+            self.labeling_exigency = statistics.fmean(
+                [self.activation, self.unlabeledness]
+            )
+        else:
+            self.labeling_exigency = statistics.fmean(
+                [self.activation * self.quality, self.unlabeledness]
+            )
 
     def recalculate_relating_exigency(self):
-        self.relating_exigency = statistics.fmean([self.activation, self.unrelatedness])
+        if self.quality is None:
+            self.relating_exigency = statistics.fmean(
+                [self.activation, self.unrelatedness]
+            )
+        else:
+            self.relating_exigency = statistics.fmean(
+                [self.activation * self.quality, self.unrelatedness]
+            )
 
     def recalculate_corresponding_exigency(self):
-        self.corresponding_exigency = statistics.fmean(
-            [self.activation, self.uncorrespondedness]
-        )
+        if self.quality is None:
+            self.corresponding_exigency = statistics.fmean(
+                [self.activation, self.uncorrespondedness]
+            )
+        else:
+            self.corresponding_exigency = statistics.fmean(
+                [self.activation * self.quality, self.uncorrespondedness]
+            )
 
     @property
     def quality(self) -> FloatBetweenOneAndZero:
@@ -185,7 +205,7 @@ class Structure(ABC):
     def recalculate_unlabeledness(self):
         try:
             self.unlabeledness = 1 - FloatBetweenOneAndZero(
-                len(self.labels) / len(self.locations)
+                sum([label.quality for label in self.labels]) / len(self.locations)
             )
         except ZeroDivisionError:
             self.unlabeledness = 1
@@ -193,7 +213,8 @@ class Structure(ABC):
     def recalculate_unrelatedness(self):
         try:
             self.unrelatedness = 1 - FloatBetweenOneAndZero(
-                len(self.relations) / len(self.locations)
+                sum([relation.quality for relation in self.relations])
+                / len(self.locations)
             )
         except ZeroDivisionError:
             self.unrelatedness = 1
@@ -204,56 +225,45 @@ class Structure(ABC):
         )
 
     @property
-    def links(self) -> StructureCollection:
-        return StructureCollection.union(self.links_in, self.links_out)
+    def links(self) -> StructureSet:
+        return StructureSet.union(self.links_in, self.links_out)
 
     @property
-    def labels(self) -> StructureCollection:
+    def labels(self) -> StructureSet:
         return self.links_out.where(is_label=True)
 
     @property
-    def relations(self) -> StructureCollection:
-        return StructureCollection.union(
+    def relations(self) -> StructureSet:
+        return StructureSet.union(
             self.links_in.where(is_relation=True),
             self.links_out.where(is_relation=True),
         )
 
     @property
-    def correspondences(self) -> StructureCollection:
-        return StructureCollection.union(
+    def correspondences(self) -> StructureSet:
+        return StructureSet.union(
             self.links_in.where(is_correspondence=True),
             self.links_out.where(is_correspondence=True),
         )
 
     @property
-    def relatives(self) -> StructureCollection:
-        if self.relations.is_empty():
+    def relatives(self) -> StructureSet:
+        if self.relations.is_empty:
             return self.relations.copy()
-        return StructureCollection.union(
+        return StructureSet.union(
             *[relation.arguments for relation in self.relations]
         ).excluding(self)
 
     @property
-    def correspondees(self) -> StructureCollection:
-        if self.correspondences.is_empty():
+    def correspondees(self) -> StructureSet:
+        if self.correspondences.is_empty:
             return self.correspondences.copy()
-        return StructureCollection.union(
+        return StructureSet.union(
             *[correspondence.arguments for correspondence in self.correspondences]
         ).excluding(self)
 
     def nearby(self, space: Structure = None):
         raise NotImplementedError
-
-    def similarity_with(self, other: Structure):
-        return statistics.fmean(
-            [
-                location.space.proximity_between(self, other)
-                if other.has_location_in_space(location.space)
-                else 0.0
-                for location in self.locations
-                if location.space.is_conceptual_space
-            ]
-        )
 
     def is_near(self, other: Structure) -> bool:
         for other_location in other.locations:
@@ -269,20 +279,19 @@ class Structure(ABC):
         except NoLocationError:
             return False
 
-    def location_in_space(
-        self, space: Structure, start: Location = None, end: Location = None
-    ) -> Location:
+    def location_in_space(self, space: Structure) -> Location:
         locations = self.locations
         for location in locations:
             if location is not None and location.space == space:
-                if (
-                    start is not None
-                    and location.start_coordinates != start.coordinates
-                ):
-                    continue
-                if end is not None and location.end_coordinates != end.coordinates:
-                    continue
                 return location
+        if space.is_conceptual_space:
+            for location in locations:
+                if (
+                    location is not None
+                    and location.space.is_conceptual_space
+                    and location.space.subsumes(space)
+                ):
+                    return location
         raise NoLocationError(f"{self} has no location in space {space}")
 
     def has_label(self, concept: Structure) -> FloatBetweenOneAndZero:
@@ -297,13 +306,7 @@ class Structure(ABC):
                 return label.activation
         return 0.0
 
-    def label_of_type(self, concept: Structure):
-        for label in self.labels:
-            if label.parent_concept == concept:
-                return label
-        raise MissingStructureError
-
-    def labels_in_space(self, space: Structure) -> StructureCollection:
+    def labels_in_space(self, space: Structure) -> StructureSet:
         return self.labels.filter(lambda x: x in space.contents)
 
     def has_relation(
@@ -335,26 +338,26 @@ class Structure(ABC):
                 return relation
         raise MissingStructureError
 
-    def relations_in_space(self, space: Structure) -> StructureCollection:
+    def relations_in_space(self, space: Structure) -> StructureSet:
         return self.relations.filter(lambda x: x in space.contents)
 
     def relations_in_space_with(
         self, space: Structure, other: Structure
-    ) -> StructureCollection:
+    ) -> StructureSet:
         return self.relations.filter(
             lambda x: x in space.contents and other in x.arguments
         )
 
-    def relations_with(self, other: Structure) -> StructureCollection:
+    def relations_with(self, other: Structure) -> StructureSet:
         return self.relations.filter(lambda x: other in x.arguments)
 
     def has_relation_with(
         self, other: Structure, parent_concept: Structure = None
-    ) -> StructureCollection:
+    ) -> StructureSet:
         relations = self.relations_with(other)
         if parent_concept is not None:
             relations = relations.where(parent_concept=parent_concept)
-        return not relations.is_empty()
+        return relations.not_empty
 
     def relation_in_space_of_type_with(
         self, space: Structure, concept: Structure, start: Structure, end: Structure
@@ -437,10 +440,9 @@ class Structure(ABC):
                 except MissingStructureError:
                     pass
                 relatives_total += relation.activation
-            if relatives_total >= 1:
-                self._activation_buffer += (
-                    self.ACTIVATION_UPDATE_COEFFICIENT * relatives_total
-                )
+            self._activation_buffer += (
+                self.ACTIVATION_UPDATE_COEFFICIENT * relatives_total
+            )
             if self._activation_buffer == 0.0:
                 self.decay_activation(self.DECAY_RATE)
             self._activation = FloatBetweenOneAndZero(

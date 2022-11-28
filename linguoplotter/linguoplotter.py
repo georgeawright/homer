@@ -5,10 +5,9 @@ from .codelets.suggesters import ChunkSuggester
 from .coderack import Coderack
 from .errors import NoMoreCodelets
 from .hyper_parameters import HyperParameters
+from .id import ID
 from .interpreter import Interpreter
 from .logger import Logger
-from .structure_collection import StructureCollection
-from .structures.spaces import ConceptualSpace
 
 
 class Linguoplotter:
@@ -31,6 +30,7 @@ class Linguoplotter:
 
     @classmethod
     def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
+        ID.reset()
         bubble_chamber = BubbleChamber.setup(loggers, random_seed=random_seed)
         coderack = Coderack.setup(bubble_chamber, loggers)
         loggers["structure"].coderack = coderack
@@ -47,6 +47,18 @@ class Linguoplotter:
         loggers["structure"].coderack = self.coderack
 
     def run(self):
+        self.bubble_chamber.concepts["same"].reverse = self.bubble_chamber.concepts[
+            "same"
+        ]
+        self.bubble_chamber.concepts[
+            "different"
+        ].reverse = self.bubble_chamber.concepts["different"]
+        self.bubble_chamber.concepts["less"].reverse = self.bubble_chamber.concepts[
+            "more"
+        ]
+        self.bubble_chamber.concepts["more"].reverse = self.bubble_chamber.concepts[
+            "less"
+        ]
         for _ in range(self.NUMBER_OF_START_CHUNK_SUGGESTERS):
             self.coderack.add_codelet(ChunkSuggester.make("", self.bubble_chamber, 1.0))
         while self.bubble_chamber.result is None:
@@ -102,7 +114,7 @@ class Linguoplotter:
             + f"recycle bin: {len(self.bubble_chamber.recycle_bin)}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
-        if not self.bubble_chamber.worldview.views.is_empty():
+        if self.bubble_chamber.worldview.views.not_empty:
             view_output = self.bubble_chamber.worldview.output
             print(view_output)
         print("=" * 200)
@@ -112,7 +124,9 @@ class Linguoplotter:
         print(f"satisfaction: {self.bubble_chamber.worldview.satisfaction}")
         print(f"result: {self.bubble_chamber.result}")
         main_input = self.bubble_chamber.spaces.where(is_main_input=True).get()
-        for chunk in main_input.contents.where(is_chunk=True, quality=1, activation=1):
+        for chunk in main_input.contents.filter(
+            lambda x: x.is_chunk and x.quality > 0.5 and x.is_fully_active()
+        ):
             print(chunk, chunk.quality, chunk.activation)
             print(chunk.champion_labels)
             print(chunk.champion_relations)
@@ -120,6 +134,7 @@ class Linguoplotter:
                 print(label, label.quality, label.activation)
             for relation in chunk.relations:
                 print(relation, relation.quality, relation.activation)
+            print()
         for chunk in main_input.contents.where(is_chunk=True):
             print(
                 chunk.structure_id,

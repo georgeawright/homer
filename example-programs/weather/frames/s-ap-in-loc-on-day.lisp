@@ -2,7 +2,7 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection temperature-space height-space goodness-space)
+    :possible_instances (StructureSet temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
@@ -14,58 +14,58 @@
 
 (define ap-sub-frame-input
   (def-contextual-space :name "ap-sub-frame.input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection conceptual-space)))
+    :conceptual_spaces (StructureSet conceptual-space)))
 (define ap-sub-frame-output
   (def-contextual-space :name "ap-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
 (define ap-sub-frame
   (def-sub-frame :name "s[ap-in-loc-on-day]-ap-sub"
     :parent_concept ap-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection label-parent-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet label-parent-concept)
     :input_space ap-sub-frame-input
     :output_space ap-sub-frame-output))
 
 (define loc-sub-frame-input
   (def-contextual-space :name "loc-sub-frame.input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space)))
+    :conceptual_spaces (StructureSet location-space)))
 (define loc-sub-frame-output
   (def-contextual-space :name "loc-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space location-space)))
+    :conceptual_spaces (StructureSet grammar-space location-space)))
 (define loc-sub-frame
   (def-sub-frame :name "s[ap-in-loc-on-day]-loc-sub"
     :parent_concept pp-inessive-location-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection location-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet location-concept)
     :input_space loc-sub-frame-input
     :output_space loc-sub-frame-output))
 
 (define day-sub-frame-input
   (def-contextual-space :name "day-sub-frame.input" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection time-space)))
+    :conceptual_spaces (StructureSet time-space)))
 (define day-sub-frame-output
   (def-contextual-space :name "day-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space time-space)))
+    :conceptual_spaces (StructureSet grammar-space time-space)))
 (define day-sub-frame
   (def-sub-frame :name "s[ap-in-loc-on-day]-day-sub"
     :parent_concept pp-inessive-time-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection time-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet time-concept)
     :input_space day-sub-frame-input
     :output_space day-sub-frame-output))
 
 (define descriptive-sentence-input
   (def-contextual-space :name "s[ap-in-loc-on-day].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space time-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space time-space conceptual-space)))
 (define descriptive-sentence-output
   (def-contextual-space :name "s[ap-in-loc-on-day].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space time-space conceptual-space)))
 (define descriptive-sentence
   (def-frame :name "s[ap-in-loc-on-day]"
     :parent_concept sentence-concept :parent_frame None
-    :sub_frames (StructureCollection ap-sub-frame loc-sub-frame day-sub-frame)
-    :concepts (StructureCollection label-parent-concept location-concept time-concept)
+    :sub_frames (StructureSet ap-sub-frame loc-sub-frame day-sub-frame)
+    :concepts (StructureSet label-parent-concept location-concept time-concept)
     :input_space descriptive-sentence-input
     :output_space descriptive-sentence-output))
 
@@ -156,8 +156,8 @@
     :locations (list vb-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-2)
-    :right_branch (StructureCollection sentence-word-3)))
+    :left_branch (StructureSet sentence-word-2)
+    :right_branch (StructureSet sentence-word-3)))
 (define vb-super-chunk-label
   (def-label :start vb-super-chunk :parent_concept vb-concept
     :locations (list vb-location
@@ -167,15 +167,15 @@
     :locations (list pp-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-5)
-    :right_branch (StructureCollection sentence-word-6)))
+    :left_branch (StructureSet sentence-word-5)
+    :right_branch (StructureSet sentence-word-6)))
 (define pred-super-chunk
   (def-letter-chunk :name None
     :locations (list predicate-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-4)
-    :right_branch (StructureCollection pp-super-chunk)))
+    :left_branch (StructureSet sentence-word-4)
+    :right_branch (StructureSet pp-super-chunk)))
 (define pred-super-chunk-label
    (def-label :start pred-super-chunk :parent_concept predicate-concept
     :locations (list predicate-location
@@ -185,8 +185,8 @@
     :locations (list vp-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection vb-super-chunk)
-    :right_branch (StructureCollection pred-super-chunk)))
+    :left_branch (StructureSet vb-super-chunk)
+    :right_branch (StructureSet pred-super-chunk)))
 (define vp-super-chunk-label
    (def-label :start vp-super-chunk :parent_concept vp-concept
     :locations (list vp-location
@@ -196,8 +196,8 @@
     :locations (list sentence-location
 		     (Location (list) descriptive-sentence-output))
     :parent_space descriptive-sentence-output
-    :left_branch (StructureCollection sentence-word-1)
-    :right_branch (StructureCollection vp-super-chunk)))
+    :left_branch (StructureSet sentence-word-1)
+    :right_branch (StructureSet vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
     :locations (list sentence-location

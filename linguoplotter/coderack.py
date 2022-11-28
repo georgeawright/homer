@@ -1,4 +1,3 @@
-import statistics
 from typing import Dict
 
 from .bubble_chamber import BubbleChamber
@@ -97,23 +96,13 @@ class Coderack:
             return
         if not isinstance(codelet, self.PROTECTED_CODELET_TYPES):
             for existing_codelet in self._codelets:
-                if isinstance(codelet, Suggester) or isinstance(codelet, Builder):
+                if isinstance(codelet, (Builder, Evaluator, Suggester)):
                     if (
                         type(codelet) == type(existing_codelet)
-                        and codelet.targets_dict == existing_codelet.targets_dict
+                        and codelet.targets == existing_codelet.targets
                     ):
-                        existing_codelet.urgency = statistics.fmean(
-                            [codelet.urgency, existing_codelet.urgency]
-                        )
-                        return
-                if isinstance(codelet, Evaluator):
-                    if (
-                        type(codelet) == type(existing_codelet)
-                        and codelet.target_structures
-                        == existing_codelet.target_structures
-                    ):
-                        existing_codelet.urgency = statistics.fmean(
-                            [codelet.urgency, existing_codelet.urgency]
+                        existing_codelet.urgency = (
+                            existing_codelet.urgency + codelet.urgency
                         )
                         return
                 if isinstance(codelet, Selector):
@@ -122,8 +111,8 @@ class Coderack:
                         and codelet.champions == existing_codelet.champions
                         and codelet.challengers == existing_codelet.challengers
                     ):
-                        existing_codelet.urgency = statistics.fmean(
-                            [codelet.urgency, existing_codelet.urgency]
+                        existing_codelet.urgency = (
+                            existing_codelet.urgency + codelet.urgency
                         )
                         return
         try:
@@ -143,6 +132,7 @@ class Coderack:
 
     def select_and_run_codelet(self):
         codelet = self._select_a_codelet()
+        self.loggers["activity"].log_codelet_start(codelet)
         if HyperParameters.TESTING:
             try:
                 codelet.run()
@@ -157,20 +147,9 @@ class Coderack:
             )
         self.recently_run.add(type(codelet))
         self.codelets_run += 1
-        view_count = len(self.bubble_chamber.views)
-        self.loggers["activity"].log(
-            codelet,
-            f"Time: {self.codelets_run} | "
-            + f"Satisfaction: {self.bubble_chamber.satisfaction} | "
-            + f"Coderack Population Size: {self.population_size} | "
-            + f"View Count: {view_count}\n"
-            + f"Focus: {self.bubble_chamber.focus.view}\n"
-            + f"Worldview: {self.bubble_chamber.worldview.views}\n",
-        )
-        self.loggers["activity"]._log_coderack_population(self.population_size)
-        self.loggers["activity"]._log_view_count(len(self.bubble_chamber.views))
         for child_codelet in codelet.child_codelets:
             self.add_codelet(child_codelet)
+        self.loggers["activity"].log_codelet_end(self.population_size)
 
     def _select_a_codelet(self) -> Codelet:
         try:

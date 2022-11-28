@@ -1,6 +1,5 @@
 import statistics
 
-from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -8,14 +7,13 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
-from linguoplotter.structure_collection import StructureCollection
+from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structures import View
 
 
 class WorldviewPorter(Codelet):
 
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-
     INPUT_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_PROPORTION_OF_INPUT_WEIGHT
     VIEW_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_VIEW_QUALITY_WEIGHT
     FRAMES_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_NUMBER_OF_FRAMES_WEIGHT
@@ -26,11 +24,11 @@ class WorldviewPorter(Codelet):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         coderack: "Coderack",
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
+        Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
-        self.target_view = None
         self.result = None
 
     @classmethod
@@ -42,34 +40,27 @@ class WorldviewPorter(Codelet):
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
-        return cls(codelet_id, parent_id, bubble_chamber, coderack, urgency)
+        targets = bubble_chamber.new_dict(name="targets")
+        return cls(codelet_id, parent_id, bubble_chamber, coderack, targets, urgency)
 
     def run(self) -> CodeletResult:
         try:
-            self.target_view = self.bubble_chamber.views.filter(
+            self.targets["view"] = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
                 and x.parent_frame.parent_concept.name == "sentence"
                 and x not in self.bubble_chamber.worldview.views
             ).get(key=lambda x: x.activation * (1 - (1 / len(x.members))))
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Found target view: {self.target_view}"
-            )
-            self.bubble_chamber.loggers["activity"].log(
-                self, f"Target view activation: {self.target_view.activation}"
-            )
             self.run_competition()
             self._engender_follow_up()
         except MissingStructureError:
             self.result = CodeletResult.FIZZLE
             self._fizzle()
-        self.bubble_chamber.loggers["activity"].log_follow_ups(self)
-        self.bubble_chamber.loggers["activity"].log_result(self)
         return self.result
 
     def run_competition(self):
         competing_view_collection = self._get_competing_view_collection()
-        self.bubble_chamber.loggers["activity"].log_collection(
-            self, competing_view_collection, "Assembled competing views"
+        self.bubble_chamber.loggers["activity"].log_set(
+            competing_view_collection, "Assembled competing views"
         )
         current_worldview_satisfaction = self._calculate_satisfaction(
             self.bubble_chamber.worldview.views
@@ -98,26 +89,18 @@ class WorldviewPorter(Codelet):
             self.result = CodeletResult.FIZZLE
 
     def _fizzle(self):
+        urgency = self.MINIMUM_CODELET_URGENCY
         self.child_codelets.append(
-            self.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.coderack,
-                self.MINIMUM_CODELET_URGENCY,
-            )
+            self.spawn(self.codelet_id, self.bubble_chamber, self.coderack, urgency)
         )
 
     def _engender_follow_up(self):
+        urgency = max(
+            self.bubble_chamber.worldview.satisfaction,
+            self.MINIMUM_CODELET_URGENCY,
+        )
         self.child_codelets.append(
-            self.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.coderack,
-                max(
-                    self.bubble_chamber.worldview.satisfaction,
-                    self.MINIMUM_CODELET_URGENCY,
-                ),
-            )
+            self.spawn(self.codelet_id, self.bubble_chamber, self.coderack, urgency)
         )
 
     def _update_publisher_urgency(self):
@@ -127,68 +110,60 @@ class WorldviewPorter(Codelet):
                 return
         raise Exception
 
-    def _get_competing_view_collection(self) -> StructureCollection:
-        compatible_views = self.bubble_chamber.new_structure_collection(
-            self.target_view
-        )
+    def _get_competing_view_collection(self) -> StructureSet:
+        compatible_views = self.bubble_chamber.new_set(self.targets["view"])
         current_worldview_views = self.bubble_chamber.worldview.views.copy()
-        while not current_worldview_views.is_empty():
+        while current_worldview_views.not_empty:
             view = current_worldview_views.pop()
             if self._is_compatible(view, compatible_views):
                 compatible_views.add(view)
         return compatible_views
 
-    def _is_compatible(self, view: View, views: StructureCollection) -> bool:
-        collected_raw_input = StructureCollection.union(
+    def _is_compatible(self, view: View, views: StructureSet) -> bool:
+        collected_raw_input = StructureSet.union(
             *[view.raw_input_nodes() for collected_view in views]
         )
         for collected_view in views:
             if collected_view.output == view.output:
                 return False
-            overlapping_raw_input = StructureCollection.intersection(
+            overlapping_raw_input = StructureSet.intersection(
                 view.raw_input_nodes(), collected_raw_input
             )
             if len(overlapping_raw_input) / len(view.raw_input_nodes()) > 0.5:
                 return False
         return True
 
-    def _calculate_satisfaction(
-        self, views: StructureCollection
-    ) -> FloatBetweenOneAndZero:
-        if views.is_empty():
+    def _calculate_satisfaction(self, views: StructureSet) -> FloatBetweenOneAndZero:
+        if views.is_empty:
             return 0
         proportion_of_input = self._proportion_of_input_in_views(views)
         number_of_frames = sum(len(view.frames) for view in views)
         view_quality = statistics.fmean([view.quality for view in views])
-        return sum(
+        satisfaction = sum(
             [
                 self.INPUT_WEIGHT * proportion_of_input,
                 self.VIEW_WEIGHT * view_quality,
                 self.FRAMES_WEIGHT * 1 / number_of_frames,
             ]
         )
+        view_ids = [view.structure_id for view in views]
+        self.bubble_chamber.loggers["activity"].log(
+            f"Satisfaction for {view_ids}: {satisfaction}"
+        )
+        return satisfaction
 
-    #        return fuzzy.AND(
-    #            self._proportion_of_input_in_views(views),
-    #            fuzzy.OR(
-    #                self._view_quality_score(views),
-    #                self._frame_depth_score(views),
-    #                self._frame_types_score(views),
-    #            ),
-    #        )
-
-    def _view_quality_score(self, views: StructureCollection) -> FloatBetweenOneAndZero:
-        if views.is_empty():
+    def _view_quality_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
+        if views.is_empty:
             return 0
         return statistics.fmean([view.quality for view in views])
 
     def _proportion_of_input_in_views(
-        self, views: StructureCollection
+        self, views: StructureSet
     ) -> FloatBetweenOneAndZero:
-        if views.is_empty():
+        if views.is_empty:
             return 0
         size_of_raw_input_in_views = len(
-            self.bubble_chamber.new_structure_collection(
+            self.bubble_chamber.new_set(
                 *[
                     (raw_input_member, correspondence.conceptual_space)
                     for view in views
@@ -196,7 +171,7 @@ class WorldviewPorter(Codelet):
                     if correspondence.start.is_link
                     and correspondence.start.start.is_chunk
                     and correspondence.start.parent_space.is_main_input
-                    for raw_input_member in StructureCollection.union(
+                    for raw_input_member in StructureSet.union(
                         *[
                             argument.raw_members
                             for argument in correspondence.start.arguments
@@ -207,15 +182,12 @@ class WorldviewPorter(Codelet):
             )
         )
         proportion = size_of_raw_input_in_views / self.bubble_chamber.size_of_raw_input
-        self.bubble_chamber.loggers["activity"].log(
-            self, f"Proportion of input in view: {proportion}"
-        )
         return proportion
 
-    def _frame_types_score(self, views: StructureCollection) -> FloatBetweenOneAndZero:
-        if views.is_empty():
+    def _frame_types_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
+        if views.is_empty:
             return 0
-        frame_types = self.bubble_chamber.new_structure_collection()
+        frame_types = self.bubble_chamber.new_set()
         for view in views:
             for frame in view.frames:
                 frame_type = frame
@@ -227,9 +199,9 @@ class WorldviewPorter(Codelet):
         self.bubble_chamber.loggers["activity"].log(self, f"Frame types score: {score}")
         return score
 
-    def _frame_depth_score(self, views: StructureCollection) -> FloatBetweenOneAndZero:
-        if views.is_empty():
+    def _frame_depth_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
+        if views.is_empty:
             return 0
         score = statistics.fmean([view.parent_frame.depth / 10 for view in views])
-        self.bubble_chamber.loggers["activity"].log(self, f"Frame depth score: {score}")
+        self.bubble_chamber.loggers["activity"].log(f"Frame depth score: {score}")
         return score

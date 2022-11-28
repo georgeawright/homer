@@ -5,6 +5,7 @@ from linguoplotter.codelets.builder import Builder
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.id import ID
+from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures.nodes import Chunk
 
 
@@ -14,14 +15,10 @@ class ChunkBuilder(Builder):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: dict,
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
-        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, urgency)
-        self.target_structure_one = target_structures.get("target_structure_one")
-        self.target_structure_two = target_structures.get("target_structure_two")
-        self.target_members = target_structures.get("target_members")
-        self._target_structures = target_structures
+        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -50,61 +47,53 @@ class ChunkBuilder(Builder):
     def _structure_concept(self):
         return self.bubble_chamber.concepts["chunk"]
 
-    @property
-    def targets_dict(self):
-        return {
-            "target_structure_one": self.target_structure_one,
-            "target_structure_two": self.target_structure_two,
-            "target_members": self.target_members,
-        }
-
     def _passes_preliminary_checks(self):
         equivalent_chunks = self.bubble_chamber.chunks.where(
-            members=self.target_members
+            members=self.targets["members"]
         )
-        if not equivalent_chunks.is_empty():
-            self.child_structures = self.bubble_chamber.new_structure_collection(
-                equivalent_chunks.get()
-            )
+        if equivalent_chunks.not_empty:
+            self.child_structures.add(equivalent_chunks.get())
         return True
 
     def _process_structure(self):
-        if not self.child_structures.is_empty():
+        if self.child_structures.not_empty:
             self.bubble_chamber.loggers["activity"].log(
-                self, "Equivalent chunk already exists"
+                "Equivalent chunk already exists"
             )
             return
         chunk_locations = [
             Location.merge(
                 *[
-                    member.location_in_space(self.target_structure_one.parent_space)
-                    for member in self.target_members
+                    member.location_in_space(self.targets["node_one"].parent_space)
+                    for member in self.targets["members"]
                 ]
             )
         ] + [
             Location.merge(
-                *[member.location_in_space(space) for member in self.target_members]
+                *[member.location_in_space(space) for member in self.targets["members"]]
             )
-            for space in self.target_structure_one.parent_space.conceptual_spaces
+            for space in self.targets["node_one"].parent_space.conceptual_spaces
             if space.name != "size"
-            and self.target_structure_one.has_location_in_space(space)
+            and self.targets["node_one"].has_location_in_space(space)
         ]
         chunk = self.bubble_chamber.new_chunk(
             parent_id=self.codelet_id,
             locations=chunk_locations,
-            members=self.target_members,
-            parent_space=self.target_structure_one.parent_space,
+            members=self.targets["members"],
+            parent_space=self.targets["node_one"].parent_space,
             quality=0.0,
         )
-        for member in self.target_members:
+        for member in self.targets["members"]:
             for member_super_chunk in member.super_chunks.excluding(chunk):
-                if all([c in self.target_members for c in member_super_chunk.members]):
+                if all(
+                    [c in self.targets["members"] for c in member_super_chunk.members]
+                ):
                     chunk.sub_chunks.add(member_super_chunk)
                     member_super_chunk.super_chunks.add(chunk)
             member.super_chunks.add(chunk)
         self._structure_concept.instances.add(chunk)
         self._structure_concept.recalculate_exigency()
-        self.child_structures = self.bubble_chamber.new_structure_collection(chunk)
+        self.child_structures.add(chunk)
 
     def _fizzle(self):
         pass

@@ -1,6 +1,7 @@
 activation = lambda x: x.activation
 unhappiness = lambda x: x.unhappiness
 exigency = lambda x: x.exigency
+quality_and_activation = lambda x: x.quality * x.activation
 
 unchunkedness = lambda x: x.unchunkedness
 uncorrespondedness = lambda x: x.uncorrespondedness

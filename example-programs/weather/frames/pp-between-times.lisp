@@ -9,16 +9,16 @@
 
 (define pp-directional-time-input
   (def-contextual-space :name "pp[between-times].meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection time-space)))
+    :conceptual_spaces (StructureSet time-space)))
 (define pp-directional-time-output
   (def-contextual-space :name "pp[between-times].text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection grammar-space time-space)))
+    :conceptual_spaces (StructureSet grammar-space time-space)))
 (define pp-directional-time
   (def-frame :name "pp[between-times]"
     :parent_concept pp-directional-time-concept
     :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection early-time-concept late-time-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet early-time-concept late-time-concept)
     :input_space pp-directional-time-input
     :output_space pp-directional-time-output))
 
@@ -95,30 +95,22 @@
     :locations (list conj-location
 		     (Location (list) pp-directional-time-output))
     :parent_space pp-directional-time-output
-    :left_branch (StructureCollection pp-word-3)
-    :right_branch (StructureCollection pp-word-4)))
-(define conj-super-chunk-label
-  (def-label :start conj-super-chunk :parent_concept pp-directional-time-concept
-    :locations (list conj-location
-		     (Location (list) pp-directional-time-output))))
+    :left_branch (StructureSet pp-word-3)
+    :right_branch (StructureSet pp-word-4)))
 (define np-super-chunk
   (def-letter-chunk :name None
     :locations (list np-location
 		     (Location (list) pp-directional-time-output))
     :parent_space pp-directional-time-output
-    :left_branch (StructureCollection pp-word-2)
-    :right_branch (StructureCollection conj-super-chunk)))
-(define np-super-chunk-label
-  (def-label :start np-super-chunk :parent_concept pp-directional-time-concept
-    :locations (list np-location
-		     (Location (list) pp-directional-time-output))))
+    :left_branch (StructureSet pp-word-2)
+    :right_branch (StructureSet conj-super-chunk)))
 (define pp-super-chunk
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) pp-directional-time-output))
     :parent_space pp-directional-time-output
-    :left_branch (StructureCollection pp-word-1)
-    :right_branch (StructureCollection np-super-chunk)))
+    :left_branch (StructureSet pp-word-1)
+    :right_branch (StructureSet np-super-chunk)))
 (define pp-super-chunk-label
   (def-label :start pp-super-chunk :parent_concept pp-directional-time-concept
     :locations (list pp-location

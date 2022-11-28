@@ -2,7 +2,7 @@
   (def-concept :name "" :is_slot True))
 (define conceptual-space
   (def-conceptual-space :name "" :parent_concept space-parent-concept
-    :possible_instances (StructureCollection temperature-space height-space goodness-space)
+    :possible_instances (StructureSet temperature-space height-space goodness-space)
     :no_of_dimensions 1))
 (define location-concept-1
   (def-concept :name "" :is_slot True :parent_space location-space))
@@ -18,55 +18,55 @@
   :parent_concept more-concept)
 (define rp-sub-frame-input
   (def-contextual-space :name "rp-sub-frame.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space conceptual-space)))
 (define rp-sub-frame-output
   (def-contextual-space :name "rp-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space conceptual-space)))
 (define rp-sub-frame
   (def-sub-frame :name "s-comparative-rp-sub" :parent_concept rp-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection label-parent-concept relation-parent-concept)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet label-parent-concept relation-parent-concept)
     :input_space rp-sub-frame-input
     :output_space rp-sub-frame-output))
 (define nn-sub-frame-1-input
   (def-contextual-space :name "nn-sub-frame-1.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space conceptual-space)))
 (define nn-sub-frame-1-output
   (def-contextual-space :name "nn-sub-frame-1.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space conceptual-space)))
 (define nn-sub-frame-1
   (def-sub-frame :name "s-comparative-nn-sub-1" :parent_concept np-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection location-concept-1)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet location-concept-1)
     :input_space nn-sub-frame-1-input
     :output_space nn-sub-frame-1-output))
 (define nn-sub-frame-2-input
   (def-contextual-space :name "nn-sub-frame-2.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space conceptual-space)))
 (define nn-sub-frame-2-output
   (def-contextual-space :name "nn-sub-frame-2.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space conceptual-space)))
 (define nn-sub-frame-2
   (def-sub-frame :name "s-comparative-nn-sub-2" :parent_concept np-concept :parent_frame None
-    :sub_frames (StructureCollection)
-    :concepts (StructureCollection location-concept-2)
+    :sub_frames (StructureSet)
+    :concepts (StructureSet location-concept-2)
     :input_space nn-sub-frame-2-input
     :output_space nn-sub-frame-2-output))
 (define comparative-sentence-input
   (def-contextual-space :name "s-comparative.meaning" :parent_concept input-concept
-    :conceptual_spaces (StructureCollection location-space conceptual-space)))
+    :conceptual_spaces (StructureSet location-space conceptual-space)))
 (define comparative-sentence-output
   (def-contextual-space :name "s-comparative.text" :parent_concept text-concept
-    :conceptual_spaces (StructureCollection
+    :conceptual_spaces (StructureSet
 			grammar-space location-space conceptual-space)))
 (define comparative-sentence
   (def-frame :name "s-comparative" :parent_concept sentence-concept :parent_frame None
     :depth 6
-    :sub_frames (StructureCollection rp-sub-frame nn-sub-frame-1 nn-sub-frame-2)
-    :concepts (StructureCollection
+    :sub_frames (StructureSet rp-sub-frame nn-sub-frame-1 nn-sub-frame-2)
+    :concepts (StructureSet
 	       label-parent-concept relation-parent-concept location-concept-1 location-concept-2)
     :input_space comparative-sentence-input
     :output_space comparative-sentence-output))
@@ -194,8 +194,8 @@
     :locations (list vb-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-2)
-    :right_branch (StructureCollection sentence-word-3)))
+    :left_branch (StructureSet sentence-word-2)
+    :right_branch (StructureSet sentence-word-3)))
 (define vb-super-chunk-label
   (def-label :start vb-super-chunk :parent_concept vb-concept
     :locations (list vb-location
@@ -205,50 +205,50 @@
     :locations (list np-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-6)
-    :right_branch (StructureCollection sentence-word-7)))
+    :left_branch (StructureSet sentence-word-6)
+    :right_branch (StructureSet sentence-word-7)))
 (define np-2-super-chunk
   (def-letter-chunk :name None
     :locations (list np-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-10)
-    :right_branch (StructureCollection sentence-word-11)))
+    :left_branch (StructureSet sentence-word-10)
+    :right_branch (StructureSet sentence-word-11)))
 (define pp-1-super-chunk
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-5)
-    :right_branch (StructureCollection np-1-super-chunk)))
+    :left_branch (StructureSet sentence-word-5)
+    :right_branch (StructureSet np-1-super-chunk)))
 (define pp-2-super-chunk
   (def-letter-chunk :name None
     :locations (list pp-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-9)
-    :right_branch (StructureCollection np-2-super-chunk)))
+    :left_branch (StructureSet sentence-word-9)
+    :right_branch (StructureSet np-2-super-chunk)))
 (define rp-super-chunk
   (def-letter-chunk :name None
     :locations (list rp-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-4)
-    :right_branch (StructureCollection pp-1-super-chunk)))
+    :left_branch (StructureSet sentence-word-4)
+    :right_branch (StructureSet pp-1-super-chunk)))
 (define comp-super-chunk
   (def-letter-chunk :name None
     :locations (list predicate-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-8)
-    :right_branch (StructureCollection pp-2-super-chunk)))
+    :left_branch (StructureSet sentence-word-8)
+    :right_branch (StructureSet pp-2-super-chunk)))
 (define pred-super-chunk
   (def-letter-chunk :name None
     :locations (list predicate-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection rp-super-chunk)
-    :right_branch (StructureCollection comp-super-chunk)))
+    :left_branch (StructureSet rp-super-chunk)
+    :right_branch (StructureSet comp-super-chunk)))
 (define pred-super-chunk-label
    (def-label :start pred-super-chunk :parent_concept predicate-concept
     :locations (list predicate-location
@@ -258,8 +258,8 @@
     :locations (list vp-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection vb-super-chunk)
-    :right_branch (StructureCollection pred-super-chunk)))
+    :left_branch (StructureSet vb-super-chunk)
+    :right_branch (StructureSet pred-super-chunk)))
 (define vp-super-chunk-label
    (def-label :start vp-super-chunk :parent_concept vp-concept
     :locations (list vp-location
@@ -269,8 +269,8 @@
     :locations (list sentence-location
 		     (Location (list) comparative-sentence-output))
     :parent_space comparative-sentence-output
-    :left_branch (StructureCollection sentence-word-1)
-    :right_branch (StructureCollection vp-super-chunk)))
+    :left_branch (StructureSet sentence-word-1)
+    :right_branch (StructureSet vp-super-chunk)))
 (define sentence-super-chunk-label
   (def-label :start sentence-super-chunk :parent_concept sentence-concept
     :locations (list sentence-location
