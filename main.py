@@ -8,10 +8,15 @@ pwd = os.getcwd()
 
 results = []
 
-for i in range(5):
+program_file = "narration-1.lisp"
+number_of_runs = 5
+
+for i in range(number_of_runs):
     time_string = str(time.time())
     logs_dir_path = f"{pwd}/logs/{time_string}"
     os.mkdir(logs_dir_path)
+    with open(f"{logs_dir_path}/details.txt", "w") as f:
+        f.write(f"Program: {program_file}\nRandom seed: {i}\n")
     structure_logs_dir_path = f"{logs_dir_path}/structures"
     os.mkdir(structure_logs_dir_path)
 
@@ -39,7 +44,7 @@ for i in range(5):
     narrator.interpreter.interpret_file("builtin.lisp")
 
     os.chdir("example-programs/weather")
-    narrator.interpreter.interpret_file("narration-6.lisp")
+    narrator.interpreter.interpret_file(program_file)
     os.chdir("../..")
     result = narrator.run()
     results.append(result)
