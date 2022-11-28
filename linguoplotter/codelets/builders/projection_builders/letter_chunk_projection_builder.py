@@ -262,7 +262,9 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         if meaning_concept is None:
             meaning_concept = meaning_label.parent_concept._non_slot_value = (
                 meaning_label.parent_concept.parent_space.contents.where(
-                    is_concept=True, is_compound_concept=False
+                    is_concept=True,
+                    is_compound_concept=False,
+                    parent_space=meaning_label.parent_concept.parent_space,
                 )
                 .filter(
                     lambda x: all(

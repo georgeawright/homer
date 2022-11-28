@@ -85,6 +85,12 @@ class Frame(Structure):
         ).where(is_correspondence=False)
 
     @property
+    def conceptual_spaces(self) -> StructureSet:
+        return StructureSet.union(
+            self.input_space.conceptual_spaces, self.output_space.conceptual_spaces
+        )
+
+    @property
     def corresponded_items(self) -> StructureSet:
         return StructureSet.union(
             self.input_space.contents.filter(lambda x: x.correspondences.not_empty),
@@ -168,7 +174,9 @@ class Frame(Structure):
         for concept in self.concepts:
             if concept.parent_space == abstract_space:
                 concept.parent_space = conceptual_space
-            if concept.has_location_in_space(abstract_space):
+            if abstract_space in concept.parent_spaces:
+                concept.parent_spaces.remove(abstract_space)
+                concept.parent_spaces.add(conceptual_space)
                 concept.location_in_space(abstract_space).space = conceptual_space
 
     def instantiate(

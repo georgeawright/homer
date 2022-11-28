@@ -10,11 +10,11 @@
     :possible_instances (StructureSet more-concept less-concept)
     :locations (list (Location (list (list Nan)) more-less-space))))
 (define early-location-concept
-  (def-concept :name "" :is_slot True :parent_space location-space
+  (def-concept :name "" :is_slot True :parent_space unidimensional-location-space
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list (list Nan)) unidimensional-location-space))))
 (define late-location-concept
-  (def-concept :name "" :is_slot True :parent_space location-space
+  (def-concept :name "" :is_slot True :parent_space unidimensional-location-space
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list (list Nan)) unidimensional-location-space))))
 (def-relation :start late-location-concept :end location-relation-concept
