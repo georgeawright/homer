@@ -8,10 +8,10 @@ pwd = os.getcwd()
 
 results = []
 
-program_file = "narration-1.lisp"
-number_of_runs = 5
+program_file = "narration-5.lisp"
+random_seeds = range(5)
 
-for i in range(number_of_runs):
+for i in random_seeds:
     time_string = str(time.time())
     logs_dir_path = f"{pwd}/logs/{time_string}"
     os.mkdir(logs_dir_path)
