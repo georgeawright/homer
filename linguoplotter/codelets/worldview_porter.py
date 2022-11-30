@@ -112,26 +112,10 @@ class WorldviewPorter(Codelet):
 
     def _get_competing_view_collection(self) -> StructureSet:
         compatible_views = self.bubble_chamber.new_set(self.targets["view"])
-        current_worldview_views = self.bubble_chamber.worldview.views.copy()
-        while current_worldview_views.not_empty:
-            view = current_worldview_views.pop()
-            if self._is_compatible(view, compatible_views):
+        if self.bubble_chamber.worldview.views is not None:
+            for view in self.bubble_chamber.worldview.views:
                 compatible_views.add(view)
         return compatible_views
-
-    def _is_compatible(self, view: View, views: StructureSet) -> bool:
-        collected_raw_input = StructureSet.union(
-            *[view.raw_input_nodes() for collected_view in views]
-        )
-        for collected_view in views:
-            if collected_view.output == view.output:
-                return False
-            overlapping_raw_input = StructureSet.intersection(
-                view.raw_input_nodes(), collected_raw_input
-            )
-            if len(overlapping_raw_input) / len(view.raw_input_nodes()) > 0.5:
-                return False
-        return True
 
     def _calculate_satisfaction(self, views: StructureSet) -> FloatBetweenOneAndZero:
         if views.is_empty:
