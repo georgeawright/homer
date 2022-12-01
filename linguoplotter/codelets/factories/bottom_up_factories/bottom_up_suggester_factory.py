@@ -1,5 +1,3 @@
-import statistics
-
 from linguoplotter.codelets.factories import BottomUpFactory
 from linguoplotter.codelets.suggesters import (
     ChunkSuggester,
@@ -9,32 +7,37 @@ from linguoplotter.codelets.suggesters import (
 )
 from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
+from linguoplotter.structure_collection_keys import (
+    uncorrespondedness,
+    unlabeledness,
+    unrelatedness,
+)
 from linguoplotter.structure_collections import StructureSet
 
 
 class BottomUpSuggesterFactory(BottomUpFactory):
     def _engender_follow_up(self):
-        unchunkedness = self._unchunkedness_of_raw_chunks()
-        unlabeledness = self._unlabeledness_of_chunks()
-        unrelatedness = self._unrelatedness_of_chunks()
-        uncorrespondedness = self._uncorrespondedness_of_links()
-        unfilledness = self._unfilledness_of_slots()
+        chamber_unchunkedness = self._unchunkedness_of_raw_chunks()
+        chamber_unlabeledness = self._unlabeledness_of_chunks()
+        chamber_unrelatedness = self._unrelatedness_of_chunks()
+        chamber_uncorrespondedness = self._uncorrespondedness_of_links()
+        chamber_unfilledness = self._unfilledness_of_slots()
 
         self.bubble_chamber.loggers["activity"].log(
-            f"Proportion of unchunked raw chunks: {unchunkedness}\n"
-            + f"Proportion of unlabeled chunks: {unlabeledness}\n"
-            + f"Proportion of unrelated chunks: {unrelatedness}\n"
-            + f"Proportion of uncorresponded links: {uncorrespondedness}\n"
-            + f"Proportion of unfilled_slots: {unfilledness}",
+            f"Unchunked of raw chunks: {chamber_unchunkedness}\n"
+            + f"Unlabeledness of chunks: {chamber_unlabeledness}\n"
+            + f"Unrelatedness of chunks: {chamber_unrelatedness}\n"
+            + f"Unfilledness of slots: {chamber_unfilledness}\n"
+            + f"Uncorrespondedness of links: {chamber_uncorrespondedness}",
         )
 
         follow_up_class = self.bubble_chamber.random_machine.select(
             [
-                (ChunkSuggester, unchunkedness),
-                (LabelSuggester, unlabeledness),
-                (RelationSuggester, unrelatedness),
-                (ViewSuggester, uncorrespondedness),
-                (CorrespondenceSuggester, unfilledness),
+                (ChunkSuggester, chamber_unchunkedness),
+                (LabelSuggester, chamber_unlabeledness),
+                (RelationSuggester, chamber_unrelatedness),
+                (ViewSuggester, chamber_uncorrespondedness),
+                (CorrespondenceSuggester, chamber_unfilledness),
             ],
             key=lambda x: x[1],
         )[0]
@@ -53,8 +56,10 @@ class BottomUpSuggesterFactory(BottomUpFactory):
     def _unlabeledness_of_chunks(self):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()
         try:
-            chunk = input_space.contents.where(is_chunk=True, is_raw=False).get()
-            return 1 - sum([l.quality for l in chunk.labels]) / len(
+            chunk = input_space.contents.where(is_chunk=True, is_raw=False).get(
+                key=unlabeledness
+            )
+            return 1 - sum([l.quality * l.activation for l in chunk.labels]) / len(
                 input_space.conceptual_spaces
             )
         except MissingStructureError:
@@ -63,9 +68,11 @@ class BottomUpSuggesterFactory(BottomUpFactory):
     def _unrelatedness_of_chunks(self):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()
         try:
-            chunks = input_space.contents.where(is_chunk=True, is_raw=False).sample(2)
+            chunks = input_space.contents.where(is_chunk=True, is_raw=False).sample(
+                2, key=unrelatedness
+            )
             relations = StructureSet.intersection(*[c.relations for c in chunks])
-            return 1 - sum([r.quality for r in relations]) / len(
+            return 1 - sum([r.quality * r.activation for r in relations]) / len(
                 input_space.conceptual_spaces
             )
         except MissingStructureError:
@@ -76,7 +83,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         try:
             labels_and_relations = input_space.contents.filter(
                 lambda x: x.is_label or x.is_relation
-            ).sample(10)
+            ).sample(10, key=uncorrespondedness)
             uncorresponded_links = labels_and_relations.filter(
                 lambda x: x.correspondences.is_empty
             )
