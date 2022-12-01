@@ -189,8 +189,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
 
     @staticmethod
     def _get_target_structure_one(parent_codelet, child_codelet):
+        bubble_chamber = parent_codelet.bubble_chamber
         start_space = child_codelet.targets["view"].input_spaces.get()
         source_collection = start_space.contents
+        random_number = bubble_chamber.random_machine.generate_number()
         if child_codelet.targets["end"].is_link:
             if (
                 child_codelet.targets["end"].start
@@ -204,12 +206,12 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 try:
                     structure_one_start = start_node_group[start_space]
                 except KeyError:
-                    parent_codelet.bubble_chamber.loggers["activity"].log(
+                    bubble_chamber.loggers["activity"].log(
                         "Start node group has no member in target space one",
                     )
                     structure_one_start = None
             else:
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Structure two start not in grouped nodes"
                 )
                 structure_one_start = None
@@ -222,7 +224,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 )
                 .not_empty
             ):
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Searching for target structure one via correspondences"
                 )
                 child_codelet.targets["start"] = (
@@ -237,6 +239,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                             x.parent_concept.parent_spaces
                         )
                         and x.quality * x.activation > 0
+                        and x.uncorrespondedness > random_number
                         and x.parent_concept
                         in child_codelet.targets[
                             "end"
@@ -249,7 +252,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     .get(key=quality_and_activation)
                 )
             else:
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Searching for target structure one via source collection"
                 )
                 child_codelet.targets["start"] = source_collection.filter(
@@ -260,6 +263,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     )
                     and x.start.quality * x.start.activation > 0
                     and x.quality * x.activation > 0
+                    and x.uncorrespondedness > random_number
                     and child_codelet.targets["space"].subsumes(
                         x.parent_concept.parent_spaces
                     )
@@ -300,12 +304,12 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 try:
                     structure_one_end = end_node_group[start_space]
                 except KeyError:
-                    parent_codelet.bubble_chamber.loggers["activity"].log(
+                    bubble_chamber.loggers["activity"].log(
                         "End node group has no member in target space one"
                     )
                     structure_one_end = None
             else:
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Structure two end not in grouped nodes"
                 )
                 structure_one_end = None
@@ -316,6 +320,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         x.quality * x.activation > 0,
                         x.start.quality * x.start.activation > 0,
                         x.end.quality * x.end.activation > 0,
+                        x.uncorrespondedness > random_number,
                     ]
                 )
                 and (x.start == structure_one_start or structure_one_start is None)
@@ -344,7 +349,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     else True
                 )
             )
-            parent_codelet.bubble_chamber.loggers["activity"].log_set(
+            bubble_chamber.loggers["activity"].log_set(
                 matching_relations, "matching input relations"
             )
             child_codelet.targets["start"] = matching_relations.get(
@@ -360,7 +365,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     for group in child_codelet.targets["view"].node_groups
                     if child_codelet.targets["end"] in group.values()
                 ][0]
-                parent_codelet.bubble_chamber.loggers["activity"].log_dict(
+                bubble_chamber.loggers["activity"].log_dict(
                     node_group, "Target structure two node group"
                 )
                 if start_space in node_group:
@@ -381,7 +386,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         raise MissingStructureError
             else:
                 # TODO: possible defunct branch?
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Target structure two not in node group"
                 )
                 child_codelet.targets["start"] = source_collection.filter(

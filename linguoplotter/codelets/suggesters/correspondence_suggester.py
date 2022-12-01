@@ -171,6 +171,7 @@ class CorrespondenceSuggester(Suggester):
 
     @staticmethod
     def _get_target_structure_one(parent_codelet, child_codelet):
+        bubble_chamber = parent_codelet.bubble_chamber
         source_collection = child_codelet.targets["start_space"].contents
         if child_codelet.targets["end"].is_link:
             if (
@@ -186,16 +187,16 @@ class CorrespondenceSuggester(Suggester):
                     structure_one_start = start_node_group[
                         child_codelet.targets["start_space"]
                     ]
-                    parent_codelet.bubble_chamber.loggers["activity"].log(
+                    bubble_chamber.loggers["activity"].log(
                         f"Found structure one start: {structure_one_start}"
                     )
                 except KeyError:
-                    parent_codelet.bubble_chamber.loggers["activity"].log(
+                    bubble_chamber.loggers["activity"].log(
                         "Start node group has no member in target space one"
                     )
                     structure_one_start = None
             else:
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Structure two start not in grouped nodes"
                 )
                 structure_one_start = None
@@ -208,7 +209,7 @@ class CorrespondenceSuggester(Suggester):
                 )
                 .not_empty
             ):
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Searching for target structure one via correspondences"
                 )
                 child_codelet.targets["start"] = (
@@ -226,7 +227,7 @@ class CorrespondenceSuggester(Suggester):
                     .get()
                 )
             else:
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Searching for target structure one via source collection"
                 )
                 child_codelet.targets["start"] = source_collection.filter(
@@ -266,16 +267,16 @@ class CorrespondenceSuggester(Suggester):
                     structure_one_end = end_node_group[
                         child_codelet.targets["start_space"]
                     ]
-                    parent_codelet.bubble_chamber.loggers["activity"].log(
+                    bubble_chamber.loggers["activity"].log(
                         f"Found structure one end: {structure_one_end}"
                     )
                 except KeyError:
-                    parent_codelet.bubble_chamber.loggers["activity"].log(
+                    bubble_chamber.loggers["activity"].log(
                         "End node group has no member in target space one"
                     )
                     structure_one_end = None
             else:
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Structure two end not in grouped nodes"
                 )
                 structure_one_end = None
@@ -303,7 +304,7 @@ class CorrespondenceSuggester(Suggester):
                 )
                 and child_codelet.targets["space"].subsumes(x.conceptual_space)
             )
-            parent_codelet.bubble_chamber.loggers["activity"].log_set(
+            bubble_chamber.loggers["activity"].log_set(
                 matching_relations, "matching input relations"
             )
             child_codelet.targets["start"] = matching_relations.get(
@@ -319,7 +320,7 @@ class CorrespondenceSuggester(Suggester):
                     for group in child_codelet.targets["view"].node_groups
                     if child_codelet.targets["end"] in group.values()
                 ][0]
-                parent_codelet.bubble_chamber.loggers["activity"].log_dict(
+                bubble_chamber.loggers["activity"].log_dict(
                     node_group, "Target structure two node group"
                 )
                 if child_codelet.targets["start_space"] in node_group:
@@ -342,7 +343,7 @@ class CorrespondenceSuggester(Suggester):
                         raise MissingStructureError
             else:
                 # TODO: possible defunct branch?
-                parent_codelet.bubble_chamber.loggers["activity"].log(
+                bubble_chamber.loggers["activity"].log(
                     "Target structure two not in node group"
                 )
                 child_codelet.targets["start"] = source_collection.filter(
