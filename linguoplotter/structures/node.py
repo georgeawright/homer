@@ -2,8 +2,8 @@ from __future__ import annotations
 import math
 from typing import List
 
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
 from linguoplotter.structure_collections import StructureSet
@@ -22,6 +22,7 @@ class Node(Structure):
         links_in: StructureSet,
         links_out: StructureSet,
         parent_spaces: StructureSet,
+        instances: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
     ):
@@ -37,6 +38,7 @@ class Node(Structure):
             champion_labels=champion_labels,
             champion_relations=champion_relations,
         )
+        self.instances = instances
         self._parent_space = parent_space
         self.is_node = True
 
@@ -65,37 +67,6 @@ class Node(Structure):
 
     def nearby(self, space: Space = None) -> StructureSet:
         raise NotImplementedError
-
-    def spread_activation(self):
-        pass
-
-    def update_activation(self):
-        if self.parent_space is None or self.parent_space.is_conceptual_space:
-            relatives_total = 0
-            for relation in self.relations:
-                try:
-                    if not relation.arguments.excluding(self).get().is_fully_active():
-                        continue
-                except MissingStructureError:
-                    pass
-                relatives_total += relation.activation
-            if relatives_total >= 1:
-                self._activation_buffer += (
-                    self.ACTIVATION_UPDATE_COEFFICIENT * relatives_total
-                )
-            if self._activation_buffer == 0.0:
-                self.decay_activation(self.DECAY_RATE)
-            self._activation = FloatBetweenOneAndZero(
-                self._activation + self._activation_buffer
-            )
-            self._activation_buffer = 0.0
-            self.recalculate_exigency()
-            if (
-                self.is_fully_active()
-                and self.parent_space is not None
-                and self.parent_space.is_conceptual_space
-            ):
-                self.parent_space.parent_concept.activate()
 
     def __repr__(self) -> str:
         if self.parent_space is None:

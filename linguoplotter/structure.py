@@ -15,6 +15,8 @@ class Structure(ABC):
     MINIMUM_ACTIVATION_UPDATE = HyperParameters.MINIMUM_ACTIVATION_UPDATE
     ACTIVATION_UPDATE_COEFFICIENT = HyperParameters.ACTIVATION_UPDATE_COEFFICIENT
     DECAY_RATE = HyperParameters.DECAY_RATE
+    RELATIVES_ACTIVATION_WEIGHT = HyperParameters.RELATIVES_ACTIVATION_WEIGHT
+    INSTANCES_ACTIVATION_WEIGHT = HyperParameters.INSTANCES_ACTIVATION_WEIGHT
 
     def __init__(
         self,
@@ -113,6 +115,12 @@ class Structure(ABC):
     @locations.setter
     def locations(self, locations: List[Location]):
         self._locations = locations
+
+    @property
+    def parent_and_super_spaces(self) -> StructureSet:
+        return self.parent_spaces.filter(
+            lambda x: x == self.parent_space or self.parent_space in x.sub_spaces
+        )
 
     @property
     def size(self) -> int:
@@ -399,23 +407,19 @@ class Structure(ABC):
     def is_fully_active(self) -> bool:
         return self.activation == 1.0
 
-    def boost_activation(self, amount: float = None):
+    def boost_activation(self, amount: float):
         if self.is_stable:
             return
-        if amount is None:
-            amount = self.MINIMUM_ACTIVATION_UPDATE
-        self._activation_buffer += (
-            self._activation_update_coefficient * (1 / self.depth) * amount
-        )
+        if amount > self.activation and amount > self._activation_buffer:
+            self._activation_buffer = amount
 
     def decay_activation(self, amount: float = None):
         if self.is_stable:
             return
         if amount is None:
-            amount = self.MINIMUM_ACTIVATION_UPDATE
-        self._activation_buffer -= (
-            self._activation_update_coefficient * (1 / self.depth) * amount
-        )
+            amount = -self.MINIMUM_ACTIVATION_UPDATE
+        if amount < self._activation_buffer:
+            self._activation_buffer = amount
 
     def activate(self):
         if self.is_stable:
@@ -430,24 +434,36 @@ class Structure(ABC):
     def spread_activation(self):
         raise NotImplementedError
 
+    def recalculate_activation(self):
+        if self.is_stable:
+            return
+        if self.parent_space is None or self.parent_space.is_conceptual_space:
+            relatives_total = FloatBetweenOneAndZero(
+                sum(
+                    [
+                        relation.activation
+                        for relation in self.relations
+                        if relation.arguments.excluding(self).not_empty
+                        and relation.arguments.excluding(self).get().is_fully_active()
+                    ]
+                )
+            )
+            instances_total = FloatBetweenOneAndZero(
+                sum(
+                    [
+                        instance.quality * instance.activation
+                        for instance in self.instances
+                    ]
+                )
+            )
+            self._activation_buffer = FloatBetweenOneAndZero(
+                relatives_total * self.RELATIVES_ACTIVATION_WEIGHT
+                + instances_total * self.INSTANCES_ACTIVATION_WEIGHT
+            )
+
     def update_activation(self):
         if self.parent_space is None or self.parent_space.is_conceptual_space:
-            relatives_total = 0
-            for relation in self.relations:
-                try:
-                    if not relation.arguments.excluding(self).get().is_fully_active():
-                        continue
-                except MissingStructureError:
-                    pass
-                relatives_total += relation.activation
-            self._activation_buffer += (
-                self.ACTIVATION_UPDATE_COEFFICIENT * relatives_total
-            )
-            if self._activation_buffer == 0.0:
-                self.decay_activation(self.DECAY_RATE)
-            self._activation = FloatBetweenOneAndZero(
-                self._activation + self._activation_buffer
-            )
+            self._activation = self._activation_buffer
             self._activation_buffer = 0.0
             self.recalculate_exigency()
 

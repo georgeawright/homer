@@ -144,25 +144,6 @@ class Relation(Link):
             .excluding(self)
         )
 
-    def spread_activation(self):
-        if (
-            not self.is_fully_active()
-            or self.parent_space is None
-            or self.parent_space.is_conceptual_space
-            or not self.parent_space.is_main_input
-        ):
-            return
-        self.parent_concept.boost_activation(self.quality)
-        try:
-            self.parent_concept.relations.where(
-                parent_concept=self.conceptual_space.parent_concept
-            ).get().end.boost_activation(self.quality)
-        except MissingStructureError:
-            # TODO: this is for spreading activation to MORE-TEMPERATURE concept etc
-            # that might be irrelevant if that becomes a compound concept
-            # possibly replace with more generic more-less-temperature concept?
-            pass
-
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name
         conceptual_space = (

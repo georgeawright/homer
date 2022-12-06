@@ -8,7 +8,7 @@ pwd = os.getcwd()
 
 results = []
 
-program_file = "narration-5.lisp"
+program_file = "narration-6.lisp"
 random_seeds = range(5)
 
 for i in random_seeds:

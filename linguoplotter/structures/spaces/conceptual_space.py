@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import Callable, Dict, List
 
+from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
 from linguoplotter.structure import Structure
@@ -183,3 +184,15 @@ class ConceptualSpace(Space):
                     Location(location.end_coordinates, location.space)
                 )
             return TwoPointLocation(start_coordinates, end_coordinates, self)
+
+    def recalculate_activation(self):
+        self._activation_buffer = FloatBetweenOneAndZero(
+            sum(
+                [concept.activation for concept in self.contents.where(is_concept=True)]
+            )
+        )
+
+    def update_activation(self):
+        Space.update_activation(self)
+        if self.is_fully_active():
+            self.parent_concept.activate()

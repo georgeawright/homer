@@ -394,6 +394,7 @@ class View(Structure):
             self.add(member)
         if self.super_views.not_empty:
             self.super_views.get().remove(correspondence)
+        self.recalculate_exigency()
 
     def has_member(
         self,
@@ -521,10 +522,11 @@ class View(Structure):
             end,
         )
 
-    def spread_activation(self):
-        if self.is_fully_active():
-            self.parent_frame.parent_concept.boost_activation(self.quality)
-            self.parent_frame.progenitor.boost_activation(self.quality)
+    def recalculate_activation(self):
+        pass
+
+    def update_activation(self):
+        pass
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])

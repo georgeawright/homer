@@ -91,6 +91,19 @@ conceptual_space_file_map = {
     "peripheralness": None,
 }
 
+frame_file_map = {
+    "ap[jj]": None,
+    "np[nn]": None,
+    "pp[between-times]": None,
+    "pp[in-location]": None,
+    "pp[from-to-locations]": None,
+    "pp[from-wards-locations]": None,
+    "s-be": None,
+    "s-[in/de]crease": None,
+    "s-move": None,
+    "s-spread": None,
+    "s-expand": None,
+}
 
 log_directories = os.listdir("logs/")
 log_directories.sort()
@@ -116,6 +129,16 @@ for log_file in log_files:
                 file_data = json.load(f)
                 if file_data["name"] in conceptual_space_file_map:
                     conceptual_space_file_map[file_data["name"]] = log_file
+        except FileNotFoundError:
+            pass
+for log_file in log_files:
+    if re.match(r"Frame[1-9]", log_file):
+        file_name = f"{structures_directory}/{log_file}/0.json"
+        try:
+            with open(file_name, "r") as f:
+                file_data = json.load(f)
+                if file_data["name"] in frame_file_map:
+                    frame_file_map[file_data["name"]] = log_file
         except FileNotFoundError:
             pass
 
@@ -218,11 +241,25 @@ generate_plot(
 generate_plot(
     log_directory,
     [
-        "Frame21",
-        "Frame25",
-        "Frame29",
-        "Frame32",
+        frame_file_map["s-be"],
+        frame_file_map["s-[in/de]crease"],
+        frame_file_map["s-move"],
+        frame_file_map["s-spread"],
+        frame_file_map["s-expand"],
     ],
     "activation",
-    "Selected Structures Activation Over Time",
+    "Sentence Frames Activation Over Time",
+)
+
+generate_plot(
+    log_directory,
+    [
+        frame_file_map["ap[jj]"],
+        frame_file_map["pp[between-times]"],
+        frame_file_map["pp[in-location]"],
+        frame_file_map["pp[from-to-locations]"],
+        frame_file_map["pp[from-wards-locations]"],
+    ],
+    "activation",
+    "Phrase Frames Activation Over Time",
 )

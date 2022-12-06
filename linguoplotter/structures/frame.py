@@ -256,8 +256,5 @@ class Frame(Structure):
             new_frame.specify_space(abstract_space, conceptual_space)
         return new_frame
 
-    def spread_activation(self):
-        pass
-
     def __repr__(self) -> str:
         return f"<{self.structure_id} {self.name}>"

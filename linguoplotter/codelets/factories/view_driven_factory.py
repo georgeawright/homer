@@ -80,7 +80,9 @@ class ViewDrivenFactory(Factory):
         ].parent_frame.output_space or (
             self.targets["slot"]
             in self.targets["view"].parent_frame.output_space.contents
-            and self.targets["slot"].correspondences.not_empty
+            and self.targets["slot"]
+            .correspondences.where(end=self.targets["slot"])
+            .not_empty
         ):
             follow_up = self._spawn_projection_suggester()
         else:  # slot is in sub-frame

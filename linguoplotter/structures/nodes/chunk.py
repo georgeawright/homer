@@ -24,6 +24,7 @@ class Chunk(Node):
         links_in: StructureSet,
         links_out: StructureSet,
         parent_spaces: StructureSet,
+        instances: StructureSet,
         super_chunks: StructureSet,
         sub_chunks: StructureSet,
         champion_labels: StructureSet,
@@ -41,6 +42,7 @@ class Chunk(Node):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            instances=instances,
             champion_labels=champion_labels,
             champion_relations=champion_relations,
         )

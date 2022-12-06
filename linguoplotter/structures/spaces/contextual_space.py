@@ -116,19 +116,6 @@ class ContextualSpace(Space):
                     except KeyError:
                         pass
 
-    def decay_activation(self, amount: float = None):
-        if amount is None:
-            amount = self.MINIMUM_ACTIVATION_UPDATE
-        for item in self.contents:
-            item.decay_activation(amount)
-
-    def update_activation(self):
-        self._activation = (
-            statistics.median([item.activation for item in self.contents])
-            if len(self.contents) != 0
-            else 0.0
-        )
-
     def copy(self, **kwargs: dict) -> ContextualSpace:
         """Requires keyword arguments 'bubble_chamber' and 'parent_id'."""
         bubble_chamber = kwargs["bubble_chamber"]

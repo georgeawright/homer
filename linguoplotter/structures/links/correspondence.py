@@ -136,15 +136,6 @@ class Correspondence(Link):
     def common_arguments_with(self, other: Correspondence) -> StructureSet:
         return StructureSet.intersection(self.arguments, other.arguments)
 
-    def spread_activation(self):
-        if not self.is_fully_active():
-            return
-        if self.start.is_slot and self.end.is_slot:
-            return
-        Link.spread_activation(self)
-        if self.parent_view is not None:
-            self.parent_view.boost_activation(self.quality)
-
     def __repr__(self) -> str:
         return (
             f"<{self.structure_id} {self.parent_concept.name}("

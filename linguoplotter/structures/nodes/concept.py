@@ -48,6 +48,7 @@ class Concept(Node):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            instances=instances,
             champion_labels=champion_labels,
             champion_relations=champion_relations,
         )
@@ -59,7 +60,6 @@ class Concept(Node):
         self.distance_function = distance_function
         self.chunking_distance_function = chunking_distance_function
         self.possible_instances = possible_instances
-        self.instances = instances
         self._depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
         self.is_concept = True
@@ -160,7 +160,7 @@ class Concept(Node):
                     except KeyError:
                         pass
             mock_node = Node(
-                "", "", [new_location], None, None, None, None, None, None, None
+                "", "", [new_location], None, None, None, None, None, None, None, None
             )
             if new_location is None:
                 raise NoLocationError

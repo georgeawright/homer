@@ -247,10 +247,10 @@
 		     (Location (list) move-sentence-output))))
 
 (def-relation :start pp-directional-location-concept :end move-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start pp-directional-time-concept :end move-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start ap-concept :end move-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)
 (def-relation :start same-temperature-concept :end move-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)

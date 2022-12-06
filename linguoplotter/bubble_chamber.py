@@ -1,3 +1,4 @@
+import math
 import statistics
 from typing import Callable, Dict, List, Union
 
@@ -177,21 +178,17 @@ class BubbleChamber:
             ]
         )
 
-    def spread_activations(self):
-        for structure in self.structures:
-            structure.spread_activation()
-
     def update_activations(self) -> None:
         self.worldview.activate()
         for structure in self.structures:
-            structure_old_activation = structure.activation
+            structure.recalculate_activation()
+        for structure in self.structures:
             structure.update_activation()
             if (
-                # structure.activation > structure_old_activation
                 structure.activation > self.JUMP_THRESHOLD
                 and self.random_machine.coin_flip()
             ):
-                structure._activation = 1.0
+                structure.activate()
             if self.log_count % self.ACTIVATION_LOGGING_FREQUENCY == 0:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
@@ -234,18 +231,31 @@ class BubbleChamber:
                 super_view.sub_views.remove(item)
                 for frame in item.frames:
                     super_view.frames.remove(frame)
+            item.parent_frame.progenitor.instances.remove(item)
+            item.parent_frame.parent_concept.instances.remove(item)
         if item.is_frame:
             item.parent_frame.instances.remove(item)
             item.parent_frame.recalculate_exigency()
         if item.is_correspondence:
             item.parent_view.remove(item)
         if item.is_link:
+            item.parent_concept.instances.remove(item)
             for argument in item.arguments:
                 argument.links_out.remove(item)
                 argument.links_in.remove(item)
                 argument.champion_labels.remove(item)
                 argument.champion_relations.remove(item)
                 argument.recalculate_exigency()
+        if item.is_relation:
+            if item.parent_concept is not None:
+                item.parent_concept.instances.remove(item)
+            if None not in {item.parent_concept, item.conceptual_space}:
+                try:
+                    item.parent_concept.relations.where(
+                        parent_concept=item.conceptual_space.parent_concept
+                    ).get().end.instances.remove(item)
+                except MissingStructureError:
+                    pass
         if item.is_chunk:
             for view in self.views.copy():
                 if item in view.grouped_nodes:
@@ -259,6 +269,9 @@ class BubbleChamber:
                 self.remove(link)
         for space in item.parent_spaces:
             space.contents.remove(item)
+        if item.is_letter_chunk:
+            if item.abstract_chunk is not None:
+                item.abstract_chunk.instances.remove(item)
         collection_name = self.collections[type(item)]
         getattr(self, collection_name).remove(item)
 
@@ -415,6 +428,7 @@ class BubbleChamber:
             links_in=self.new_set(),
             links_out=self.new_set(),
             parent_spaces=parent_spaces,
+            instances=self.new_set(),
             super_chunks=self.new_set(),
             sub_chunks=self.new_set(),
             abstract_chunk=abstract_chunk,
@@ -480,6 +494,7 @@ class BubbleChamber:
             links_in=self.new_set(),
             links_out=self.new_set(),
             parent_spaces=parent_spaces,
+            instances=self.new_set(),
             super_chunks=self.new_set(),
             sub_chunks=self.new_set(),
             abstract_chunk=abstract_chunk,
@@ -500,6 +515,8 @@ class BubbleChamber:
                 quality=1.0,
                 parent_id=parent_id,
             )
+        if abstract_chunk is not None:
+            abstract_chunk.instances.add(letter_chunk)
         return letter_chunk
 
     def new_concept(
@@ -521,6 +538,14 @@ class BubbleChamber:
         reverse: Concept = None,
     ) -> Concept:
         locations = [] if locations is None else locations
+        if parent_space is not None:
+            if not any([location.space == parent_space for location in locations]):
+                locations.append(
+                    Location(
+                        [[math.nan for _ in range(parent_space.no_of_dimensions)]],
+                        parent_space,
+                    )
+                )
         parent_spaces = self.new_set(*[location.space for location in locations])
         possible_instances = (
             self.new_set() if possible_instances is None else possible_instances
@@ -667,6 +692,12 @@ class BubbleChamber:
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
         )
+        start.links_out.add(correspondence)
+        start.links_in.add(correspondence)
+        start.recalculate_exigency()
+        end.links_out.add(correspondence)
+        end.links_in.add(correspondence)
+        end.recalculate_exigency()
         while parent_view is not None:
             parent_view.add(correspondence)
             parent_view.recalculate_exigency()
@@ -675,12 +706,6 @@ class BubbleChamber:
                 parent_view = parent_view.super_views.get()
             except MissingStructureError:
                 parent_view = None
-        start.links_out.add(correspondence)
-        start.links_in.add(correspondence)
-        start.recalculate_exigency()
-        end.links_out.add(correspondence)
-        end.links_in.add(correspondence)
-        end.recalculate_exigency()
         self.add(correspondence)
         self.loggers["structure"].log(start)
         self.loggers["structure"].log(end)
@@ -717,6 +742,7 @@ class BubbleChamber:
             start.recalculate_exigency()
             self.loggers["structure"].log(start)
         self.add(label)
+        parent_concept.instances.add(label)
         return label
 
     def new_relation(
@@ -766,6 +792,15 @@ class BubbleChamber:
         start.recalculate_exigency()
         end.recalculate_exigency()
         self.add(relation)
+        if parent_concept is not None:
+            parent_concept.instances.add(relation)
+        if None not in {parent_concept, conceptual_space}:
+            try:
+                parent_concept.relations.where(
+                    parent_concept=conceptual_space.parent_concept
+                ).get().end.instances.add(relation)
+            except MissingStructureError:
+                pass
         self.loggers["structure"].log(start)
         self.loggers["structure"].log(end)
         return relation

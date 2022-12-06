@@ -99,6 +99,8 @@ class ViewBuilder(Builder):
             champion_labels=self.bubble_chamber.new_set(),
             champion_relations=self.bubble_chamber.new_set(),
         )
+        frame_instance.progenitor.instances.add(view)
+        frame_instance.parent_concept.instances.add(view)
         self.bubble_chamber.loggers["structure"].log(view_output)
         self.bubble_chamber.contextual_spaces.add(view_output)
         self.bubble_chamber.loggers["structure"].log(view)
