@@ -30,6 +30,7 @@ class Concept(Node):
         links_out: StructureSet,
         parent_spaces: StructureSet,
         instances: StructureSet,
+        subsumes: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
         depth: int = 1,
@@ -60,6 +61,7 @@ class Concept(Node):
         self.distance_function = distance_function
         self.chunking_distance_function = chunking_distance_function
         self.possible_instances = possible_instances
+        self._subsumes = subsumes
         self._depth = depth
         self.distance_to_proximity_weight = distance_to_proximity_weight
         self.is_concept = True
@@ -118,6 +120,30 @@ class Concept(Node):
     @property
     def is_reversible(self) -> bool:
         return self.reverse is not None
+
+    def subsumes(self, other) -> bool:
+        return (
+            any(
+                [
+                    self == other,
+                    other in self._subsumes,
+                    other in self.possible_instances,
+                    self.is_slot and self.parent_space.subsumes(other.parent_space),
+                ]
+            )
+            or (
+                other.is_slot
+                and other.is_filled_in
+                and self.subsumes(other.non_slot_value)
+            )
+            or (
+                other.is_slot
+                and not other.is_filled_in
+                and any(
+                    [self.subsumes(instance) for instance in other.possible_instances]
+                )
+            )
+        )
 
     def recalculate_unhappiness(self):
         self.unhappiness = 0.5 ** sum(

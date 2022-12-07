@@ -531,6 +531,7 @@ class BubbleChamber:
         distance_function: Callable = None,
         chunking_distance_function: Callable = None,
         possible_instances: StructureSet = None,
+        subsumes: StructureSet = None,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         activation: FloatBetweenOneAndZero = None,
@@ -550,6 +551,7 @@ class BubbleChamber:
         possible_instances = (
             self.new_set() if possible_instances is None else possible_instances
         )
+        subsumes = self.new_set() if subsumes is None else subsumes
         chunking_distance_function = (
             chunking_distance_function
             if chunking_distance_function is not None
@@ -572,6 +574,7 @@ class BubbleChamber:
             links_out=self.new_set(),
             parent_spaces=parent_spaces,
             instances=self.new_set(),
+            subsumes=subsumes,
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
             is_slot=is_slot,
@@ -591,7 +594,9 @@ class BubbleChamber:
         parent_id: str = "",
         is_slot: bool = False,
         reverse: Concept = None,
+        subsumes: StructureSet = None,
     ):
+        subsumes = self.new_set() if subsumes is None else subsumes
         try:
             return self.concepts.where(
                 is_compound_concept=True, root=root, args=args
@@ -611,6 +616,7 @@ class BubbleChamber:
                 links_out=self.new_set(),
                 parent_spaces=parent_spaces,
                 instances=self.new_set(),
+                subsumes=subsumes,
                 champion_labels=self.new_set(),
                 champion_relations=self.new_set(),
                 is_slot=is_slot,

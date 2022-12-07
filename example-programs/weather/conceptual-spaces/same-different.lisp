@@ -11,11 +11,13 @@
     :classifier (SamenessClassifier) :instance_type Chunk :structure_type Relation
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 (define not-same-concept
-  (def-compound-concept :root not-concept :args (list same-concept)))
+  (def-compound-concept :root not-concept :args (list same-concept)
+    :subsumes (StructureSet more-concept less-concept)))
 (define different-concept
   (def-concept :name "different"
     :locations (list (Location (list (list 10)) same-different-space))
     :classifier (DifferentnessClassifier) :instance_type Chunk :structure_type Relation
+    :subsumes (StructureSet more-concept less-concept)
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
 (define not-different-concept
   (def-compound-concept :root not-concept :args (list different-concept)))

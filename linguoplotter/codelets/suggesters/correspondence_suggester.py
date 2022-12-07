@@ -286,7 +286,9 @@ class CorrespondenceSuggester(Suggester):
                 and (x.end == structure_one_end or structure_one_end is None)
                 and any(
                     [
-                        x.parent_concept == child_codelet.targets["end"].parent_concept,
+                        child_codelet.targets["end"].parent_concept.subsumes(
+                            x.parent_concept
+                        ),
                         child_codelet.targets["end"].parent_concept.is_slot,
                         (
                             x.parent_concept.is_compound_concept
@@ -299,10 +301,12 @@ class CorrespondenceSuggester(Suggester):
                         ),
                     ]
                 )
-                and child_codelet.targets["end"].parent_concept.parent_space.subsumes(
-                    x.parent_concept.parent_space
+                and (
+                    child_codelet.targets["space"].subsumes_or_is_parent_of(
+                        x.conceptual_space
+                    )
+                    or x.conceptual_space in child_codelet.targets["space"].sub_spaces
                 )
-                and child_codelet.targets["space"].subsumes(x.conceptual_space)
             )
             bubble_chamber.loggers["activity"].log_set(
                 matching_relations, "matching input relations"

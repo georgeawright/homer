@@ -145,6 +145,15 @@ class ConceptualSpace(Space):
                 return True
         return False
 
+    def subsumes_or_is_parent_of(self, other) -> bool:
+        return (
+            self.subsumes(other)
+            or other in self.sub_spaces
+            or any(
+                [instance in self.sub_spaces for instance in other.possible_instances]
+            )
+        )
+
     def unifies_with(self, other) -> bool:
         return self.subsumes(other) or other.subsumes(self)
 

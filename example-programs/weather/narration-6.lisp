@@ -1,7 +1,7 @@
 (load "conceptual-spaces/grammar.lisp")
 (load "conceptual-spaces/negativeness.lisp")
-(load "conceptual-spaces/same-different.lisp")
 (load "conceptual-spaces/more-less.lisp")
+(load "conceptual-spaces/same-different.lisp")
 (load "conceptual-spaces/magnitude.lisp")
 (load "conceptual-spaces/height.lisp")
 (load "conceptual-spaces/goodness.lisp")
