@@ -539,6 +539,13 @@ class BubbleChamber:
         reverse: Concept = None,
     ) -> Concept:
         locations = [] if locations is None else locations
+        for location in locations:
+            for sub_space in location.space.sub_spaces:
+                if not any([l.space == sub_space for l in locations]):
+                    location_in_sub_space = (
+                        sub_space.location_from_super_space_location(location)
+                    )
+                    locations.append(location_in_sub_space)
         if parent_space is not None:
             if not any([location.space == parent_space for location in locations]):
                 locations.append(
