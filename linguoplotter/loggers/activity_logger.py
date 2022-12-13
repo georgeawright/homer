@@ -27,12 +27,12 @@ class ActivityLogger(Logger):
 
     @property
     def stream(self):
-        if self.codelets_run % self.LOG_LENGTH == 1 and (
-            self.log_files_count == 0
-            or self.codelets_run // self.log_files_count > self.LOG_LENGTH
-        ):
-            if self._stream is not None:
-                self._stream.close()
+        if self.log_files_count == 0:
+            self.log_files_count += 1
+            new_log_file_name = f"{self.log_file_name}{self.log_files_count}.log"
+            self._stream = open(new_log_file_name, "w")
+        elif self.codelets_run // self.log_files_count > self.LOG_LENGTH:
+            self._stream.close()
             self.log_files_count += 1
             new_log_file_name = f"{self.log_file_name}{self.log_files_count}.log"
             self._stream = open(new_log_file_name, "w")
