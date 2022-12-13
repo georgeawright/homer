@@ -2,7 +2,6 @@ from linguoplotter.codelets.selector import Selector
 from linguoplotter.codelets.suggesters import LabelSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.structure_collection_keys import activation, labeling_exigency
-from linguoplotter.structures.links import Label
 
 
 class LabelSelector(Selector):
@@ -11,14 +10,14 @@ class LabelSelector(Selector):
         return self.bubble_chamber.concepts["label"]
 
     def _passes_preliminary_checks(self):
-        if self.challengers is not None:
+        if self.challengers.not_empty:
             return True
         champion = self.champions.get()
         try:
             self.challengers.add(
                 champion.start.champion_labels.filter(
                     lambda x: x.parent_concept.parent_basic_space
-                    == champion.parent_concept.parent_space
+                    == champion.parent_concept.parent_basic_space
                 )
                 .excluding(champion)
                 .get()

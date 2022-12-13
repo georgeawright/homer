@@ -9,7 +9,7 @@ class CorrespondenceSelector(Selector):
         return self.bubble_chamber.concepts["correspondence"]
 
     def _passes_preliminary_checks(self):
-        if self.challengers is not None:
+        if self.challengers.not_empty:
             return True
         champion = self.champions.get()
         candidates = champion.nearby()

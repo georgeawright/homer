@@ -11,7 +11,7 @@ class ChunkSelector(Selector):
         return self.bubble_chamber.concepts["chunk"]
 
     def _passes_preliminary_checks(self):
-        if self.challengers is not None:
+        if self.challengers.not_empty:
             return True
         try:
             champion = self.champions.get()
