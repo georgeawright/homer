@@ -1,5 +1,4 @@
 from __future__ import annotations
-import statistics
 from typing import List
 
 from linguoplotter import fuzzy
@@ -119,7 +118,7 @@ class View(Structure):
             lambda x: x.parent_concept.name == "input"
         ).get()
 
-    # TODO: this should be a property
+    @property
     def raw_input_nodes(self):
         return StructureSet.union(
             *[
@@ -274,14 +273,6 @@ class View(Structure):
         except MissingStructureError:
             return False
 
-    def input_overlap_with(self, other: View):
-        shared_raw_nodes = StructureSet.intersection(
-            self.raw_input_nodes, other.raw_input_nodes
-        )
-        proportion_in_self = len(shared_raw_nodes) / len(self.raw_input_nodes)
-        proportion_in_other = len(shared_raw_nodes) / len(other.raw_input_nodes)
-        return statistics.fmean([proportion_in_self, proportion_in_other])
-
     def specify_space(self, abstract_space, conceptual_space):
         if (
             abstract_space in self.parent_frame.input_space.conceptual_spaces
@@ -293,14 +284,6 @@ class View(Structure):
         for frame in self.frames:
             frame.specify_space(abstract_space, conceptual_space)
 
-    def nearby(self, space: Space = None) -> StructureSet:
-        space = space if space is not None else self.location.space
-        return (
-            space.contents.where(is_view=True)
-            .filter(lambda x: self.input_overlap_with(x) > 0.5)
-            .excluding(self)
-        )
-
     def decay_activation(self, amount: float = None):
         if amount is None:
             amount = self.MINIMUM_ACTIVATION_UPDATE
@@ -308,9 +291,6 @@ class View(Structure):
         for member in self.members:
             member.decay_activation(amount)
         self.output_space.decay_activation(amount)
-
-    def copy(self, **kwargs: dict):
-        raise NotImplementedError
 
     def add(self, correspondence: "Correspondence"):
         self.members.add(correspondence)

@@ -79,21 +79,6 @@ class ContextualSpace(Space):
             ]
         )
 
-    #        built_structures = self.contents.filter(
-    #            lambda x: (x.is_chunk and not x.is_raw) or x.is_label or x.is_relation
-    #        )
-    #        unused_raw_structures = self.contents.filter(
-    #            lambda x: x.is_chunk and x.is_raw and x.super_chunks.is_empty
-    #        )
-    #        if built_structures.is_empty:
-    #            return 0.0
-    #        return statistics.fmean(
-    #            [
-    #                fuzzy.AND(structure.quality, structure.activation)
-    #                for structure in built_structures
-    #            ]
-    #        ) / (len(unused_raw_structures) + 1)
-
     def add(self, structure: Structure):
         if structure not in self.contents:
             self.contents.add(structure)

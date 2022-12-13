@@ -8,7 +8,6 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict, StructureSet
-from linguoplotter.structures import View
 
 
 class WorldviewPorter(Codelet):

@@ -78,7 +78,7 @@ class ViewSelector(Selector):
                 and x.members.filter(
                     lambda c: c.start.parent_space in champion.input_spaces
                 ).not_empty
-                and x.raw_input_nodes() == champion.raw_input_nodes()
+                and x.raw_input_nodes == champion.raw_input_nodes
             )
             .excluding(champion)
             .get(key=activation)
