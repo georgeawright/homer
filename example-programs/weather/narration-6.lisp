@@ -27,6 +27,8 @@
 (load "frames/s-spread.lisp")
 (load "frames/s-expand.lisp")
 
+(load "frames/s-and.lisp")
+
 (define input-space
   (def-contextual-space
     :name "input" :parent_concept input-concept :is_main_input True

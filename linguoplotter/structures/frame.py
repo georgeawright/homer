@@ -71,6 +71,12 @@ class Frame(Structure):
         return self._depth if self._depth is not None else self.parent_concept.depth
 
     @property
+    def tree_depth(self) -> int:
+        if self.sub_frames.is_empty:
+            return 1
+        return 1 + max([f.tree_depth for f in self.sub_frames])
+
+    @property
     def slots(self) -> StructureSet:
         return StructureSet.union(
             self.input_space.contents.where(is_slot=True),

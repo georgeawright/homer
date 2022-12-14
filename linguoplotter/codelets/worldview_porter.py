@@ -110,23 +110,39 @@ class WorldviewPorter(Codelet):
         raise Exception
 
     def _get_competing_view_collection(self) -> StructureSet:
-        compatible_views = self.bubble_chamber.new_set(self.targets["view"])
+        competing_views = self.bubble_chamber.new_set(name="competing views")
+        component_views = []
+
+        def add_to_competing_views(view):
+            if view.output in component_views:
+                return
+            super_views = [view]
+            while len(super_views) > 0:
+                super_view = super_views.pop()
+                component_views.append(super_view.output)
+                for sub_view in super_view.sub_views:
+                    if sub_view.parent_frame.parent_concept.name == "sentence":
+                        super_views.append(sub_view)
+            competing_views.add(view)
+
+        add_to_competing_views(self.targets["view"])
         if self.bubble_chamber.worldview.views is not None:
             for view in self.bubble_chamber.worldview.views:
-                compatible_views.add(view)
-        return compatible_views
+                add_to_competing_views(view)
+
+        return competing_views
 
     def _calculate_satisfaction(self, views: StructureSet) -> FloatBetweenOneAndZero:
         if views.is_empty:
             return 0
         proportion_of_input = self._proportion_of_input_in_views(views)
-        number_of_frames = sum(len(view.frames) for view in views)
+        sum_of_tree_depths = sum(v.parent_frame.tree_depth for v in views)
         view_quality = statistics.fmean([view.quality for view in views])
         satisfaction = sum(
             [
                 self.INPUT_WEIGHT * proportion_of_input,
                 self.VIEW_WEIGHT * view_quality,
-                self.FRAMES_WEIGHT * 1 / number_of_frames,
+                self.FRAMES_WEIGHT * 1 / sum_of_tree_depths,
             ]
         )
         view_ids = [view.structure_id for view in views]
