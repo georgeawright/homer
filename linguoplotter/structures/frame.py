@@ -56,6 +56,8 @@ class Frame(Structure):
         self._depth = depth
         self.is_sub_frame = is_sub_frame
         self.is_frame = True
+        self.early_chunk = None
+        self.late_chunk = None
 
     def __dict__(self) -> dict:
         return {

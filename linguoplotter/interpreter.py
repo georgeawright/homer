@@ -59,6 +59,7 @@ class Interpreter:
             "list": lambda *x: list(x),
             "tuple": lambda *x: tuple(x),
             "dict": dict,
+            "setattr": setattr,
             "python": lambda *x: eval(x[-1]),
             "StructureDict": bubble_chamber.new_dict,
             "StructureList": bubble_chamber.new_list,

@@ -9,7 +9,7 @@ from linguoplotter.location import Location
 from linguoplotter.structure import Structure
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Frame
-from linguoplotter.structures.nodes import Concept
+from linguoplotter.structures.nodes import Chunk, Concept
 from linguoplotter.structures.space import Space
 from linguoplotter.structures.spaces import ContextualSpace
 
@@ -162,6 +162,44 @@ class View(Structure):
     @property
     def slots(self):
         return self.parent_frame.slots
+
+    @property
+    def early_chunk(self) -> Chunk:
+        if self.parent_frame.early_chunk is not None:
+            return self.parent_frame.early_chunk
+        chunks = [v.early_chunk for v in self.sub_views]
+        if all([c is not None for c in chunks]):
+            try:
+                chunks.sort(
+                    key=lambda x: [
+                        group for group in self.node_groups if x in group.values()
+                    ][0][self.input_spaces.get()]
+                    .location_in_space_with_name("time")
+                    .coordinates[0][0]
+                )
+            except KeyError:
+                return None
+            return chunks[0]
+        return None
+
+    @property
+    def late_chunk(self) -> Chunk:
+        if self.parent_frame.late_chunk is not None:
+            return self.parent_frame.late_chunk
+        chunks = [v.late_chunk for v in self.sub_views]
+        if all([c is not None for c in chunks]):
+            try:
+                chunks.sort(
+                    key=lambda x: [
+                        group for group in self.node_groups if x in group.values()
+                    ][0][self.input_spaces.get()]
+                    .location_in_space_with_name("time")
+                    .coordinates[0][0]
+                )
+            except KeyError:
+                return None
+            return chunks[-1]
+        return None
 
     @property
     def is_recyclable(self) -> bool:

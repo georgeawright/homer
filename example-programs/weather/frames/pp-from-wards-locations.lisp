@@ -53,6 +53,8 @@
 			      (Location (list (list Nan)) time-space)
 			      (Location (list) pp-from-wards-locations-input))
     :parent_space pp-from-wards-locations-input))
+(setattr pp-from-wards-locations "early_chunk" early-chunk)
+(setattr pp-from-wards-locations "late_chunk" late-chunk)
 (define early-chunk-time-label
   (def-label :start early-chunk :parent_concept early-time-concept
     :locations (list (Location (list (list Nan)) time-space)

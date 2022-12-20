@@ -302,6 +302,12 @@ class Structure(ABC):
                     return location
         raise NoLocationError(f"{self} has no location in space {space}")
 
+    def location_in_space_with_name(self, name: str) -> Location:
+        for location in self.locations:
+            if location is not None and location.space.name == name:
+                return location
+        raise NoLocationError(f"{self} has no location in space with name {name}")
+
     def has_label(self, concept: Structure) -> FloatBetweenOneAndZero:
         for label in self.labels:
             if label.parent_concept == concept:

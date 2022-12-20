@@ -30,6 +30,8 @@
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) pp-directional-time-input))
     :parent_space pp-directional-time-input))
+(setattr pp-directional-time "early_chunk" early-chunk)
+(setattr pp-directional-time "late_chunk" late-chunk)
 (define early-chunk-time-label
   (def-label :start early-chunk :parent_concept early-time-concept
     :locations (list (Location (list (list Nan)) time-space)

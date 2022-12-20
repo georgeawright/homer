@@ -78,6 +78,14 @@
 		     (Location (list) location-sub-frame-input)
 		     (Location (list) increase-sentence-input))
     :parent_space location-sub-frame-input))
+
+(setattr increase-sentence "early_chunk" early-chunk)
+(setattr increase-sentence "late_chunk" late-chunk)
+(setattr time-sub-frame "early_chunk" early-chunk)
+(setattr time-sub-frame "late_chunk" late-chunk)
+(setattr location-sub-frame "early_chunk" early-chunk)
+(setattr location-sub-frame "late_chunk" late-chunk)
+
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
     :quality 1.0

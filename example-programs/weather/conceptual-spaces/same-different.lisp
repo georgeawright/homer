@@ -10,20 +10,20 @@
     :locations (list (Location (list (list 10)) same-different-space))
     :classifier (SamenessClassifier) :instance_type Chunk :structure_type Relation
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
-(define not-same-concept
-  (def-compound-concept :root not-concept :args (list same-concept)
-    :subsumes (StructureSet more-concept less-concept)))
 (define different-concept
   (def-concept :name "different"
     :locations (list (Location (list (list 10)) same-different-space))
     :classifier (DifferentnessClassifier) :instance_type Chunk :structure_type Relation
     :subsumes (StructureSet more-concept less-concept)
     :parent_space same-different-space :distance_function centroid_euclidean_distance))
-(define not-different-concept
-  (def-compound-concept :root not-concept :args (list different-concept)))
 
 (define same-word (def-letter-chunk :name "same" :locations (list)))
 (def-relation :start same-concept :end same-word :parent_concept jj-concept)
 (define different-word (def-letter-chunk :name "different" :locations (list)))
 (def-relation :start different-concept :end different-word :parent_concept jj-concept)
 
+(define not-same-concept
+  (def-compound-concept :root not-concept :args (list same-concept)
+    :subsumes (StructureSet more-concept less-concept)))
+(define not-different-concept
+  (def-compound-concept :root not-concept :args (list different-concept)))
