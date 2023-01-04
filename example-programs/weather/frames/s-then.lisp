@@ -41,29 +41,30 @@
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) then-sub-frame-1-input)
 			      (Location (list) then-sentence-input))
-    :parent_space then-sentence-input))
+    :parent_space then-sub-frame-1-input))
 (define chunk-2
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) then-sub-frame-1-input)
 			      (Location (list) then-sentence-input))
-    :parent_space then-sentence-input))
+    :parent_space then-sub-frame-1-input))
 (define chunk-3
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) then-sub-frame-2-input)
 			      (Location (list) then-sentence-input))
-    :parent_space then-sentence-input))
+    :parent_space then-sub-frame-2-input))
 (define chunk-4
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) then-sub-frame-2-input)
 			      (Location (list) then-sentence-input))
-    :parent_space then-sentence-input))
+    :parent_space then-sub-frame-2-input))
 (define less-time-relation-1
   (def-relation :start chunk-1 :end chunk-3 :parent_concept less-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) then-sentence-input))
-    :parent_space then-sentence-input
+    :is_interspatial_relation True
+    :parent_space None
     :conceptual_space time-space))
 (define less-time-relation-2
   (def-relation :start chunk-2 :end chunk-4 :parent_concept less-concept
@@ -71,7 +72,8 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) then-sentence-input))
-    :parent_space then-sentence-input
+    :is_interspatial_relation True
+    :parent_space None
     :conceptual_space time-space))
 (define not-more-time-relation
   (def-relation :start chunk-2 :end chunk-3 :parent_concept not-more-concept
@@ -79,8 +81,12 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) then-sentence-input))
-    :parent_space then-sentence-input
+    :is_interspatial_relation True
+    :parent_space None
     :conceptual_space time-space))
+((getattr (getattr then-sentence "interspatial_relations") "add") less-time-relation-1)
+((getattr (getattr then-sentence "interspatial_relations") "add") less-time-relation-2)
+((getattr (getattr then-sentence "interspatial_relations") "add") not-more-time-relation)
 (setattr then-sentence "early_chunk" chunk-1)
 (setattr then-sentence "late_chunk" chunk-4)
 (setattr then-sub-frame-1 "early_chunk" chunk-1)

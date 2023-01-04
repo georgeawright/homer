@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import List
 
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
@@ -33,6 +32,7 @@ class Relation(Link):
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         is_stable: bool = False,
+        is_interspatial_relation: bool = False,
     ):
         Link.__init__(
             self,
@@ -53,6 +53,7 @@ class Relation(Link):
         self._parent_space = parent_space
         self.conceptual_space = conceptual_space
         self.is_relation = True
+        self.is_interspatial_relation = is_interspatial_relation
         self.is_bidirectional = is_bidirectional
         self.is_excitatory = is_excitatory
         self.is_stable = is_stable

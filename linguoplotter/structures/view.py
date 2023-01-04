@@ -206,6 +206,12 @@ class View(Structure):
         return self.activation < self.FLOATING_POINT_TOLERANCE
 
     @property
+    def unfilled_interspatial_structures(self):
+        return self.parent_frame.interspatial_relations.filter(
+            lambda x: x.correspondences.where(end=x).is_empty
+        )
+
+    @property
     def unfilled_sub_frame_input_structures(self):
         return self.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
@@ -294,7 +300,8 @@ class View(Structure):
             input_quality = min(
                 correspondence.start.quality
                 for correspondence in self.members
-                if correspondence.start.parent_space.is_main_input
+                if correspondence.start.parent_space is not None
+                and correspondence.start.parent_space.is_main_input
             )
         except ValueError:
             input_quality = 0
@@ -342,6 +349,10 @@ class View(Structure):
                     node_group[node_pair[1].parent_space] = node_pair[1]
                     self._grouped_nodes[node_pair[0]] = True
                     self._grouped_nodes[node_pair[1]] = True
+                    for space in node_group:
+                        if space.is_main_input:
+                            for _, node in node_group.items():
+                                node._non_slot_value = node_group[space]
             if (
                 node_pair[0] not in self._grouped_nodes
                 or node_pair[1] not in self._grouped_nodes
@@ -354,11 +365,15 @@ class View(Structure):
                 )
                 self._grouped_nodes[node_pair[0]] = True
                 self._grouped_nodes[node_pair[1]] = True
+                if node_pair[0].parent_space.is_main_input:
+                    node_pair[1]._non_slot_value = node_pair[0]
         if self.super_views.not_empty:
             self.super_views.get().add(correspondence)
 
     def remove(self, correspondence: "Correspondence"):
         self.members.remove(correspondence)
+        for node_pair in correspondence.node_pairs:
+            node_pair[1]._non_slot_value = None
         if correspondence.end.is_link and correspondence.end.parent_concept.is_slot:
             if not any(
                 [

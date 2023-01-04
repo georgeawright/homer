@@ -83,6 +83,8 @@ class RelationSelector(Selector):
     def _engender_follow_up(self):
         try:
             winner_relation = self.winners.get()
+            if winner_relation.parent_space is None:
+                return
             parent_concept = winner_relation.parent_concept
             target_space = (
                 winner_relation.parent_space.conceptual_spaces_and_sub_spaces.filter(

@@ -64,18 +64,26 @@ class RelationBuilder(Builder):
         )
         location_coordinates = centroid_difference(start_coordinates, end_coordinates)
         locations = [
-            Location([], self.targets["start"].parent_space),
             Location([[location_coordinates]], self.targets["concept"].parent_space),
             TwoPointLocation(start_coordinates, end_coordinates, self.targets["space"]),
         ]
+        if self.targets["start"].parent_space == self.targets["end"].parent_space:
+            locations.append(
+                Location([], self.targets["start"].parent_space),
+            )
+            parent_space = self.targets["start"].parent_space
+        else:
+            parent_space = None
         relation = self.bubble_chamber.new_relation(
             parent_id=self.codelet_id,
             start=self.targets["start"],
             end=self.targets["end"],
             locations=locations,
             parent_concept=self.targets["concept"],
+            parent_space=parent_space,
             conceptual_space=self.targets["space"],
             quality=0,
+            is_interspatial_relation=parent_space is None,
         )
         self._structure_concept.instances.add(relation)
         self.child_structures.add(relation)
@@ -86,8 +94,10 @@ class RelationBuilder(Builder):
                 end=self.targets["start"],
                 locations=locations,
                 parent_concept=self.targets["concept"].reverse,
+                parent_space=parent_space,
                 conceptual_space=self.targets["space"],
                 quality=0,
+                is_interspatial_relation=parent_space is None,
             )
             self._structure_concept.instances.add(mirror_relation)
             self.child_structures.add(mirror_relation)

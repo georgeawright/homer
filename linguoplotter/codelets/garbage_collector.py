@@ -45,6 +45,7 @@ class GarbageCollector(Codelet):
         return self.result
 
     def _remove_items(self):
+        # TODO: don't delete interspatial relations
         for structure in self.bubble_chamber.recycle_bin:
             if not structure.is_recyclable:
                 self.bubble_chamber.recycle_bin.remove(structure)

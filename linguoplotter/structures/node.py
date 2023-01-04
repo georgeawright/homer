@@ -3,7 +3,6 @@ import math
 from typing import List
 
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
 from linguoplotter.structure_collections import StructureSet
@@ -41,6 +40,7 @@ class Node(Structure):
         self.instances = instances
         self._parent_space = parent_space
         self.is_node = True
+        self._non_slot_value = None
 
     @property
     def parent_space(self) -> Space:
@@ -59,6 +59,18 @@ class Node(Structure):
                 for coordinates in location.coordinates
             ]
         )
+
+    @property
+    def is_filled_in(self) -> bool:
+        return self.non_slot_value is not None
+
+    @property
+    def non_slot_value(self) -> Node:
+        if self._non_slot_value is None:
+            return None
+        if not self._non_slot_value.is_slot:
+            return self._non_slot_value
+        return self._non_slot_value.non_slot_value
 
     def recalculate_uncorrespondedness(self):
         self.uncorrespondedness = 0.5 * 0.5 ** sum(

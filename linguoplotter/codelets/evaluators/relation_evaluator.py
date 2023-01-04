@@ -36,9 +36,22 @@ class RelationEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_relation = self.targets.get()
-        minimum_argument_quality = min(
-            target_relation.start.quality, target_relation.end.quality
+        start = (
+            target_relation.start.non_slot_value
+            if target_relation.start.is_slot
+            else target_relation.start
         )
+        end = (
+            target_relation.end.non_slot_value
+            if target_relation.end.is_slot
+            else target_relation.end
+        )
+        if None in [start, end]:
+            self.confidence = 0.0
+            self.change_in_confidence = abs(self.confidence - self.original_confidence)
+            self.activation_difference = self.confidence - target_relation.activation
+            return
+        minimum_argument_quality = min(start.quality, end.quality)
         parallel_relations = StructureSet.intersection(
             target_relation.start.relations, target_relation.end.relations
         )
@@ -49,8 +62,12 @@ class RelationEvaluator(Evaluator):
             relation: relation.parent_concept.classifier.classify(
                 space=relation.conceptual_space,
                 concept=relation.parent_concept,
-                start=relation.start,
-                end=relation.end,
+                start=relation.start
+                if not relation.start.is_slot
+                else relation.start.non_slot_value,
+                end=relation.end
+                if not relation.end.is_slot
+                else relation.end.non_slot_value,
             )
             * minimum_argument_quality
             / relation.parent_concept.number_of_components

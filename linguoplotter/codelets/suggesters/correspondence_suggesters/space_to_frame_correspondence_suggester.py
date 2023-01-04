@@ -6,7 +6,6 @@ from linguoplotter.structure_collection_keys import (
     activation,
     corresponding_exigency,
     exigency,
-    quality_and_activation,
     uncorrespondedness,
 )
 from linguoplotter.structures.nodes import Concept
@@ -192,7 +191,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber = parent_codelet.bubble_chamber
         start_space = child_codelet.targets["view"].input_spaces.get()
         source_collection = start_space.contents
-        random_number = bubble_chamber.random_machine.generate_number()
         if child_codelet.targets["end"].is_link:
             if (
                 child_codelet.targets["end"].start
@@ -239,7 +237,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                             x.parent_concept.parent_spaces
                         )
                         and x.quality * x.activation > 0
-                        and x.uncorrespondedness > random_number
                         and x.parent_concept
                         in child_codelet.targets[
                             "end"
@@ -249,7 +246,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         ].parent_concept.possible_instances.is_empty
                         else True
                     )
-                    .get(key=quality_and_activation)
+                    .get(key=lambda x: x.quality * x.activation * x.uncorrespondedness)
                 )
             else:
                 bubble_chamber.loggers["activity"].log(
@@ -263,7 +260,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     )
                     and x.start.quality * x.start.activation > 0
                     and x.quality * x.activation > 0
-                    and x.uncorrespondedness > random_number
                     and child_codelet.targets["space"].subsumes(
                         x.parent_concept.parent_and_super_spaces
                     )
@@ -290,7 +286,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         ].parent_concept.possible_instances.not_empty
                         else True
                     )
-                ).get(key=quality_and_activation)
+                ).get(key=lambda x: x.quality * x.activation * x.uncorrespondedness)
         if child_codelet.targets["end"].is_relation:
             if (
                 child_codelet.targets["end"].end
@@ -320,7 +316,6 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         x.quality * x.activation > 0,
                         x.start.quality * x.start.activation > 0,
                         x.end.quality * x.end.activation > 0,
-                        x.uncorrespondedness > random_number,
                     ]
                 )
                 and (x.start == structure_one_start or structure_one_start is None)
@@ -353,7 +348,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 matching_relations, "matching input relations"
             )
             child_codelet.targets["start"] = matching_relations.get(
-                key=quality_and_activation
+                key=lambda x: x.quality * x.activation * x.uncorrespondedness
             )
         if child_codelet.targets["end"].is_node:
             if (

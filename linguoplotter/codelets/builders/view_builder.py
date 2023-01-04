@@ -105,7 +105,6 @@ class ViewBuilder(Builder):
         self.bubble_chamber.contextual_spaces.add(view_output)
         self.bubble_chamber.loggers["structure"].log(view)
         self.bubble_chamber.views.add(view)
-        self.bubble_chamber.loggers["structure"].log_view(view)
         self._structure_concept.instances.add(view)
         self._structure_concept.recalculate_exigency()
         self.child_structures.add(view)

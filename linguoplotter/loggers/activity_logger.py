@@ -71,7 +71,7 @@ class ActivityLogger(Logger):
             self.log(f"{name}: {{")
             for item in structure_set:
                 self.log(f"    {item},")
-            self.log("}}")
+            self.log("}")
 
     def log_list(self, structure_list, name: str = None):
         name = structure_list.name if name is None else name
@@ -96,7 +96,7 @@ class ActivityLogger(Logger):
 
     def log_codelet_end(self, coderack_population: int):
         if hasattr(self.codelet, "child_structures"):
-            self.log_list(self.codelet.child_structures, "Follow ups")
+            self.log_list(self.codelet.child_structures, "Child structures")
         self.log_set(self.codelet.child_codelets, "Follow ups")
         if CodeletResult.FINISH == self.codelet.result:
             self.log("Result: FINISH")

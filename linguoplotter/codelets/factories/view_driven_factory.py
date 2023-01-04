@@ -1,7 +1,12 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Factory
-from linguoplotter.codelets.suggesters import LabelSuggester, RelationSuggester
+from linguoplotter.codelets.suggesters import (
+    LabelSuggester,
+    RelationSuggester,
+    ViewSuggester,
+)
 from linguoplotter.codelets.suggesters.correspondence_suggesters import (
+    InterspatialCorrespondenceSuggester,
     PotentialSubFrameToFrameCorrespondenceSuggester,
     SpaceToFrameCorrespondenceSuggester,
     SubFrameToFrameCorrespondenceSuggester,
@@ -12,7 +17,6 @@ from linguoplotter.codelets.suggesters.projection_suggesters import (
     LetterChunkProjectionSuggester,
     RelationProjectionSuggester,
 )
-from linguoplotter.codelets.suggesters import ViewSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
@@ -66,7 +70,12 @@ class ViewDrivenFactory(Factory):
     def _engender_follow_up(self):
         self._set_target_view()
         self._set_target_slot()
-        if (
+        if self.targets["slot"].parent_space is None:
+            try:
+                follow_up = self._spawn_interspatial_correspondence_suggester()
+            except MissingStructureError:
+                follow_up = self._spawn_interspatial_relation_suggester()
+        elif (
             len(self.targets["slot"].parent_spaces.where(is_contextual_space=True)) == 1
             and self.targets["slot"].parent_space
             == self.targets["view"].parent_frame.input_space
@@ -112,6 +121,7 @@ class ViewDrivenFactory(Factory):
 
     def _set_target_slot(self):
         for structures in [
+            self.targets["view"].unfilled_interspatial_structures,
             self.targets["view"].unfilled_sub_frame_input_structures,
             self.targets["view"].unfilled_input_structures,
             self.targets["view"].unfilled_output_structures,
@@ -120,6 +130,7 @@ class ViewDrivenFactory(Factory):
                 self.targets["slot"] = structures.where(is_relation=True).get()
                 return
         for structures in [
+            self.targets["view"].unfilled_interspatial_structures,
             self.targets["view"].unfilled_sub_frame_input_structures,
             self.targets["view"].unfilled_input_structures,
             self.targets["view"].unfilled_output_structures,
@@ -301,6 +312,131 @@ class ViewDrivenFactory(Factory):
             )
         raise Exception("Slot is not a label or a relation.")
 
+    def _spawn_interspatial_relation_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            "Spawning interspatial relation suggester"
+        )
+        target_start = None
+        target_end = None
+        for node_group in self.targets["view"].node_groups:
+            if None in node_group and self.targets["slot"].start in node_group.values():
+                target_start = node_group[None]
+            if None in node_group and self.targets["slot"].end in node_group.values():
+                target_end = node_group[None]
+        for sub_frame in self.targets["view"].parent_frame.sub_frames:
+            if (
+                self.targets["slot"].start in sub_frame.input_space.contents
+                or self.targets["slot"].start in sub_frame.input_space.contents
+            ):
+                start_sub_frame = sub_frame
+            if (
+                self.targets["slot"].end in sub_frame.input_space.contents
+                or self.targets["slot"].end in sub_frame.input_space.contents
+            ):
+                end_sub_frame = sub_frame
+        potential_start_views = self.bubble_chamber.views.filter(
+            lambda x: x.parent_frame.parent_concept == start_sub_frame.parent_concept
+        )
+        potential_start_views = potential_start_views.sample(
+            len(potential_start_views) // 2
+        )
+        potential_start_targets = self.bubble_chamber.new_set(
+            *[
+                view.early_chunk
+                if self.targets["slot"].start == start_sub_frame.early_chunk
+                else view.late_chunk
+                for view in potential_start_views
+                if not view.early_chunk.is_slot or view.early_chunk.is_filled_in
+            ]
+        )
+        potential_end_views = self.bubble_chamber.views.filter(
+            lambda x: x.parent_frame.parent_concept == end_sub_frame.parent_concept
+            and x not in potential_start_views
+        )
+        potential_end_targets = self.bubble_chamber.new_set(
+            *[
+                view.early_chunk
+                if self.targets["slot"].end == end_sub_frame.early_chunk
+                else view.late_chunk
+                for view in potential_end_views
+                if not view.late_chunk.is_slot or view.late_chunk.is_filled_in
+            ]
+        )
+        # TODO: prioritise completed views
+        possible_target_pairs = [
+            (a, b)
+            for a in potential_start_targets
+            for b in potential_end_targets
+            if a != b
+            and (a == target_start if target_start is not None else True)
+            and (b == target_end if target_end is not None else True)
+        ]
+        if not self.targets["slot"].parent_concept.is_slot:
+            possible_concepts = [self.targets["slot"].parent_concept]
+        elif self.targets["slot"].parent_concept.is_filled_in:
+            possible_concepts = [self.targets["slot"].parent_concept.non_slot_value]
+        elif self.targets["slot"].parent_concept.possible_instances.not_empty:
+            possible_concepts = list(
+                self.targets["slot"].parent_concept.possible_instances
+            )
+        else:
+            possible_concepts = [
+                concept
+                for space in self.targets["slot"].parent_spaces.filter(
+                    lambda x: x.is_conceptual_space
+                    and x.parent_concept.structure_type == Relation
+                )
+                for concept in space.contents.where(is_concept=True, is_slot=False)
+            ]
+        if not self.targets["slot"].conceptual_space.is_slot:
+            possible_spaces = [self.targets["slot"].conceptual_space]
+        else:
+            possible_spaces = list(
+                self.targets["slot"].conceptual_space.possible_instances.filter(
+                    lambda x: x
+                    in self.targets["view"]
+                    .input_spaces.get()
+                    .conceptual_spaces_and_sub_spaces
+                )
+            )
+        possible_target_combos = [
+            self.bubble_chamber.new_dict(
+                {"start": start, "end": end, "space": space, "concept": concept},
+                name="targets",
+            )
+            for start, end in possible_target_pairs
+            for space in possible_spaces
+            for concept in possible_concepts
+        ]
+        targets = self.bubble_chamber.random_machine.select(
+            possible_target_combos,
+            key=lambda x: x["concept"].classifier.classify(
+                start=x["start"].non_slot_value if x["start"].is_slot else x["start"],
+                end=x["end"].non_slot_value if x["end"].is_slot else x["end"],
+                concept=x["concept"],
+                space=x["space"],
+            ),
+        )
+        self.bubble_chamber.loggers["activity"].log_dict(targets)
+        return RelationSuggester.spawn(
+            self.codelet_id,
+            self.bubble_chamber,
+            targets,
+            targets["concept"].classifier.classify(
+                start=targets["start"].non_slot_value
+                if targets["start"].is_slot
+                else targets["start"],
+                end=targets["end"].non_slot_value
+                if targets["end"].is_slot
+                else targets["end"],
+                concept=targets["concept"],
+                space=targets["space"],
+            )
+            if self.targets["slot"].parent_concept.is_slot
+            and not self.targets["slot"].parent_concept.is_filled_in
+            else self.targets["view"].unhappiness,
+        )
+
     def _spawn_projection_suggester(self):
         self.bubble_chamber.loggers["activity"].log("Spawning ProjectionSuggester")
         if self.targets["slot"].is_letter_chunk:
@@ -323,6 +459,28 @@ class ViewDrivenFactory(Factory):
             if not self.targets["slot"].is_chunk
             else 1.0,
         )
+
+    def _spawn_interspatial_correspondence_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            "Spawning InterspatialCorrespondenceSuggester"
+        )
+        targets = self.bubble_chamber.new_dict(
+            {
+                "view": self.targets["view"],
+                "end": self.targets["slot"],
+                "concept": self.bubble_chamber.concepts["same"],
+            },
+            name="targets",
+        )
+        follow_up = InterspatialCorrespondenceSuggester.spawn(
+            self.codelet_id,
+            self.bubble_chamber,
+            targets,
+            self.targets["view"].unhappiness,
+        )
+        follow_up._get_target_conceptual_space(self, follow_up)
+        follow_up._get_target_structure_one(self, follow_up)
+        return follow_up
 
     def _spawn_space_to_frame_correspondence_suggester(self):
         self.bubble_chamber.loggers["activity"].log(

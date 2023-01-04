@@ -103,7 +103,7 @@ frame_file_map = {
     "s-move": None,
     "s-spread": None,
     "s-expand": None,
-    "s-and": None,
+    "s-then": None,
 }
 
 log_directories = os.listdir("logs/")
@@ -247,7 +247,7 @@ generate_plot(
         frame_file_map["s-move"],
         frame_file_map["s-spread"],
         frame_file_map["s-expand"],
-        frame_file_map["s-and"],
+        frame_file_map["s-then"],
     ],
     "activation",
     "Sentence Frames Activation Over Time",

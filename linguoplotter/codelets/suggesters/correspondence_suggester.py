@@ -40,6 +40,7 @@ class CorrespondenceSuggester(Suggester):
         target_view: View = None,
     ):
         from linguoplotter.codelets.suggesters.correspondence_suggesters import (
+            InterspatialCorrespondenceSuggester,
             PotentialSubFrameToFrameCorrespondenceSuggester,
             SpaceToFrameCorrespondenceSuggester,
             SubFrameToFrameCorrespondenceSuggester,
@@ -58,6 +59,16 @@ class CorrespondenceSuggester(Suggester):
             and x.parent_space != target_view.parent_frame.output_space
             and x.correspondences.is_empty
         )
+        if target_view.unfilled_interspatial_structures.not_empty:
+            end = target_view.unfilled_interspatial_structures.get()
+            targets = bubble_chamber.new_dict(
+                {"view": target_view, "end": end},
+                name="targets",
+            )
+            urgency = urgency if urgency is not None else end.uncorrespondedness
+            return InterspatialCorrespondenceSuggester.spawn(
+                parent_id, bubble_chamber, targets, urgency
+            )
         if input_structures.where(is_relation=True).not_empty:
             end = input_structures.where(is_relation=True).get()
         elif input_structures.where(is_label=True).not_empty:

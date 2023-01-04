@@ -147,7 +147,6 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         )
         self.child_structures.add(word)
         self.child_structures.add(frame_to_output_correspondence)
-        self.bubble_chamber.loggers["structure"].log_view(self.targets["view"])
 
     def _get_abstract_chunk(self):
         if self.targets["projectee"].members.not_empty:

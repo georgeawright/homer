@@ -45,4 +45,3 @@ class ChunkProjectionBuilder(ProjectionBuilder):
         )
         self.child_structures.add(chunk)
         self.child_structures.add(frame_to_output_correspondence)
-        self.bubble_chamber.loggers["structure"].log_view(self.targets["view"])

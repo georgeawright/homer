@@ -154,3 +154,5 @@ class Linguoplotter:
                     if node.parent_space.is_main_input
                 ],
             )
+        for relation in self.bubble_chamber.interspatial_relations:
+            print(relation)
