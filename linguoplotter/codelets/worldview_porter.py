@@ -169,6 +169,7 @@ class WorldviewPorter(Codelet):
                     for correspondence in view.members
                     if correspondence.start.is_link
                     and correspondence.start.start.is_chunk
+                    and correspondence.start.parent_space is not None
                     and correspondence.start.parent_space.is_main_input
                     for raw_input_member in StructureSet.union(
                         *[

@@ -118,53 +118,87 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
     def _get_target_structure_one(parent_codelet, child_codelet):
         bubble_chamber = parent_codelet.bubble_chamber
         source_collection = bubble_chamber.interspatial_relations
-        if (
-            child_codelet.targets["end"].start
-            in child_codelet.targets["view"].grouped_nodes
-        ):
-            start_node_group = [
-                group
-                for group in child_codelet.targets["view"].node_groups
-                if child_codelet.targets["end"].start in group.values()
-            ][0]
-            try:
-                structure_one_start = start_node_group[None]
-            except KeyError:
-                bubble_chamber.loggers["activity"].log(
-                    "Start node group has no member in target space one",
-                )
-                structure_one_start = None
-        else:
-            bubble_chamber.loggers["activity"].log(
-                "Structure two start not in grouped nodes"
+        target_start_space = None
+        target_end_space = None
+        for relation in child_codelet.targets[
+            "view"
+        ].parent_frame.interspatial_relations:
+            for correspondee in relation.correspondees:
+                if (
+                    relation.start.parent_space
+                    == child_codelet.targets["end"].start.parent_space
+                ):
+                    target_start_space = correspondee.start.parent_space
+                if (
+                    relation.end.parent_space
+                    == child_codelet.targets["end"].start.parent_space
+                ):
+                    target_start_space = correspondee.end.parent_space
+                if (
+                    relation.start.parent_space
+                    == child_codelet.targets["end"].end.parent_space
+                ):
+                    target_end_space = correspondee.start.parent_space
+                if (
+                    relation.end.parent_space
+                    == child_codelet.targets["end"].end.parent_space
+                ):
+                    target_end_space = correspondee.end.parent_space
+        for sub_frame in child_codelet.targets["view"].parent_frame.sub_frames:
+            if (
+                child_codelet.targets["end"].start in sub_frame.input_space.contents
+                or child_codelet.targets["end"].start in sub_frame.input_space.contents
+            ):
+                start_sub_frame = sub_frame
+            if (
+                child_codelet.targets["end"].end in sub_frame.input_space.contents
+                or child_codelet.targets["end"].end in sub_frame.input_space.contents
+            ):
+                end_sub_frame = sub_frame
+        if target_start_space is None:
+            potential_start_views = bubble_chamber.views.filter(
+                lambda x: x.parent_frame.parent_concept
+                == start_sub_frame.parent_concept
             )
-            structure_one_start = None
-        if (
-            child_codelet.targets["end"].end
-            in child_codelet.targets["view"].grouped_nodes
-        ):
-            end_node_group = [
-                group
-                for group in child_codelet.targets["view"].node_groups
-                if child_codelet.targets["end"].end in group.values()
-            ][0]
-            try:
-                structure_one_end = end_node_group[None]
-            except KeyError:
-                bubble_chamber.loggers["activity"].log(
-                    "End node group has no member in target space one"
-                )
-                structure_one_end = None
-        else:
-            bubble_chamber.loggers["activity"].log(
-                "Structure two end not in grouped nodes"
+            potential_start_views = potential_start_views.sample(
+                len(potential_start_views) // 2
             )
-            structure_one_end = None
+        else:
+            potential_start_views = child_codelet.targets["view"].sub_views.filter(
+                lambda x: target_start_space
+                in [x.parent_frame.input_space, x.parent_frame.output_space]
+            )
+        potential_start_targets = bubble_chamber.new_set(
+            *[
+                view.early_chunk
+                if child_codelet.targets["end"].start == start_sub_frame.early_chunk
+                else view.late_chunk
+                for view in potential_start_views
+            ]
+        ).filter(lambda x: not x.is_slot or x.is_filled_in)
+        if target_end_space is None:
+            potential_end_views = bubble_chamber.views.filter(
+                lambda x: x.parent_frame.parent_concept == end_sub_frame.parent_concept
+                and x not in potential_start_views
+            )
+        else:
+            potential_end_views = child_codelet.targets["view"].sub_views.filter(
+                lambda x: target_end_space
+                in [x.parent_frame.input_space, x.parent_frame.output_space]
+            )
+        potential_end_targets = bubble_chamber.new_set(
+            *[
+                view.early_chunk
+                if child_codelet.targets["end"].end == end_sub_frame.early_chunk
+                else view.late_chunk
+                for view in potential_end_views
+            ]
+        ).filter(lambda x: not x.is_slot or x.is_filled_in)
         matching_relations = source_collection.filter(
             lambda x: x.is_relation
             and x.quality * x.activation > 0
-            and (x.start == structure_one_start or structure_one_start is None)
-            and (x.end == structure_one_end or structure_one_end is None)
+            and (x.start in potential_start_targets)
+            and (x.end in potential_end_targets)
             and any(
                 [
                     x.parent_concept == child_codelet.targets["end"].parent_concept,
@@ -173,7 +207,8 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         x.parent_concept.is_compound_concept
                         and x.parent_concept.args[0]
                         == child_codelet.targets["end"].parent_concept
-                    ),
+                    )
+                    and child_codelet.targets["view"].members.not_empty,
                 ]
             )
             and child_codelet.targets["end"].parent_concept.parent_space.subsumes(

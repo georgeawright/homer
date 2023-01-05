@@ -4,12 +4,18 @@ from linguoplotter.structure_collections import StructureSet
 
 class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
-        if self.targets["start_sub_view"].super_views.not_empty:
+        if (
+            self.targets["start_sub_view"].super_views.not_empty
+            and self.targets["view"] not in self.targets["start_sub_view"].super_views
+        ):
             self.bubble_chamber.loggers["activity"].log_set(
                 self.targets["start_sub_view"].super_views, "super views"
             )
             return False
-        if self.targets["end_sub_view"].super_views.not_empty:
+        if (
+            self.targets["end_sub_view"].super_views.not_empty
+            and self.targets["view"] not in self.targets["end_sub_view"].super_views
+        ):
             self.bubble_chamber.loggers["activity"].log_set(
                 self.targets["end_sub_view"].super_views, "super views"
             )
@@ -36,30 +42,32 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 return False
         except KeyError:
             pass
-        for correspondence in self.targets["start_sub_view"].members:
-            if not self.targets["view"].can_accept_member(
-                correspondence.parent_concept,
-                correspondence.conceptual_space,
-                correspondence.start,
-                correspondence.end,
-                sub_view=self.targets["start_sub_view"],
-            ):
-                self.bubble_chamber.loggers["activity"].log(
-                    repr(self.targets["view"]) + f" cannot accept {correspondence}"
-                )
-                return False
-        for correspondence in self.targets["end_sub_view"].members:
-            if not self.targets["view"].can_accept_member(
-                correspondence.parent_concept,
-                correspondence.conceptual_space,
-                correspondence.start,
-                correspondence.end,
-                sub_view=self.targets["end_sub_view"],
-            ):
-                self.bubble_chamber.loggers["activity"].log(
-                    repr(self.targets["view"]) + f" cannot accept {correspondence}"
-                )
-                return False
+        if self.targets["start_sub_view"] not in self.targets["view"].sub_views:
+            for correspondence in self.targets["start_sub_view"].members:
+                if not self.targets["view"].can_accept_member(
+                    correspondence.parent_concept,
+                    correspondence.conceptual_space,
+                    correspondence.start,
+                    correspondence.end,
+                    sub_view=self.targets["start_sub_view"],
+                ):
+                    self.bubble_chamber.loggers["activity"].log(
+                        repr(self.targets["view"]) + f" cannot accept {correspondence}"
+                    )
+                    return False
+        if self.targets["end_sub_view"] not in self.targets["view"].sub_views:
+            for correspondence in self.targets["end_sub_view"].members:
+                if not self.targets["view"].can_accept_member(
+                    correspondence.parent_concept,
+                    correspondence.conceptual_space,
+                    correspondence.start,
+                    correspondence.end,
+                    sub_view=self.targets["end_sub_view"],
+                ):
+                    self.bubble_chamber.loggers["activity"].log(
+                        repr(self.targets["view"]) + f" cannot accept {correspondence}"
+                    )
+                    return False
         return self.targets["view"].can_accept_member(
             self.targets["concept"],
             self.targets["space"],

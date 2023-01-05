@@ -54,9 +54,10 @@ class Node(Structure):
     def is_slot(self):
         return any(
             [
-                math.nan in coordinates
+                math.isnan(c)
                 for location in self.locations
                 for coordinates in location.coordinates
+                for c in coordinates
             ]
         )
 

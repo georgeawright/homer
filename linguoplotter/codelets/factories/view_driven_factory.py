@@ -316,13 +316,21 @@ class ViewDrivenFactory(Factory):
         self.bubble_chamber.loggers["activity"].log(
             "Spawning interspatial relation suggester"
         )
-        target_start = None
-        target_end = None
-        for node_group in self.targets["view"].node_groups:
-            if None in node_group and self.targets["slot"].start in node_group.values():
-                target_start = node_group[None]
-            if None in node_group and self.targets["slot"].end in node_group.values():
-                target_end = node_group[None]
+        target_start_space = None
+        target_end_space = None
+        for relation in self.targets["view"].parent_frame.interspatial_relations:
+            for correspondee in relation.correspondees:
+                if (
+                    relation.start.parent_space
+                    == self.targets["slot"].start.parent_space
+                ):
+                    target_start_space = correspondee.start.parent_space
+                if relation.end.parent_space == self.targets["slot"].start.parent_space:
+                    target_start_space = correspondee.end.parent_space
+                if relation.start.parent_space == self.targets["slot"].end.parent_space:
+                    target_end_space = correspondee.start.parent_space
+                if relation.end.parent_space == self.targets["slot"].end.parent_space:
+                    target_end_space = correspondee.end.parent_space
         for sub_frame in self.targets["view"].parent_frame.sub_frames:
             if (
                 self.targets["slot"].start in sub_frame.input_space.contents
@@ -334,42 +342,51 @@ class ViewDrivenFactory(Factory):
                 or self.targets["slot"].end in sub_frame.input_space.contents
             ):
                 end_sub_frame = sub_frame
-        potential_start_views = self.bubble_chamber.views.filter(
-            lambda x: x.parent_frame.parent_concept == start_sub_frame.parent_concept
-        )
-        potential_start_views = potential_start_views.sample(
-            len(potential_start_views) // 2
-        )
+        if target_start_space is None:
+            potential_start_views = self.bubble_chamber.views.filter(
+                lambda x: x.parent_frame.parent_concept
+                == start_sub_frame.parent_concept
+            )
+            potential_start_views = potential_start_views.sample(
+                len(potential_start_views) // 2
+            )
+        else:
+            potential_start_views = self.targets["view"].sub_views.filter(
+                lambda x: target_start_space
+                in [x.parent_frame.input_space, x.parent_frame.output_space]
+            )
         potential_start_targets = self.bubble_chamber.new_set(
             *[
                 view.early_chunk
                 if self.targets["slot"].start == start_sub_frame.early_chunk
                 else view.late_chunk
                 for view in potential_start_views
-                if not view.early_chunk.is_slot or view.early_chunk.is_filled_in
             ]
-        )
-        potential_end_views = self.bubble_chamber.views.filter(
-            lambda x: x.parent_frame.parent_concept == end_sub_frame.parent_concept
-            and x not in potential_start_views
-        )
+        ).filter(lambda x: not x.is_slot or x.is_filled_in)
+        if target_end_space is None:
+            potential_end_views = self.bubble_chamber.views.filter(
+                lambda x: x.parent_frame.parent_concept == end_sub_frame.parent_concept
+                and x not in potential_start_views
+            )
+        else:
+            potential_end_views = self.targets["view"].sub_views.filter(
+                lambda x: target_end_space
+                in [x.parent_frame.input_space, x.parent_frame.output_space]
+            )
         potential_end_targets = self.bubble_chamber.new_set(
             *[
                 view.early_chunk
                 if self.targets["slot"].end == end_sub_frame.early_chunk
                 else view.late_chunk
                 for view in potential_end_views
-                if not view.late_chunk.is_slot or view.late_chunk.is_filled_in
             ]
-        )
+        ).filter(lambda x: not x.is_slot or x.is_filled_in)
         # TODO: prioritise completed views
         possible_target_pairs = [
             (a, b)
             for a in potential_start_targets
             for b in potential_end_targets
             if a != b
-            and (a == target_start if target_start is not None else True)
-            and (b == target_end if target_end is not None else True)
         ]
         if not self.targets["slot"].parent_concept.is_slot:
             possible_concepts = [self.targets["slot"].parent_concept]

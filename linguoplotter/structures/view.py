@@ -450,8 +450,11 @@ class View(Structure):
         start: Structure,
         end: Structure,
         sub_view: View = None,
+        verbose=False,
     ) -> bool:
         if self.has_member(parent_concept, conceptual_space, start, end):
+            if verbose:
+                print("1")
             return False
         if (
             start.is_link
@@ -478,11 +481,15 @@ class View(Structure):
                         if not start_concept.has_relation_with(
                             relative_concept, relation_concept
                         ):
+                            if verbose:
+                                print("2")
                             return False
                     if not relative.is_slot:
                         if not start_concept.has_relation_with(
                             end_concept, relation_concept
                         ):
+                            if verbose:
+                                print("3")
                             return False
             different_concepts = end_concept.relatives.filter(
                 lambda x: not x.relations_with(end_concept)
@@ -490,12 +497,16 @@ class View(Structure):
                 .is_empty
             )
             if start_concept in different_concepts:
+                if verbose:
+                    print("4")
                 return False
         if end.correspondences.filter(
             lambda x: x.end == end
             and x in self.members
             and x.start in start.parent_space.contents
         ).not_empty:
+            if verbose:
+                print("5")
             return False
         potential_node_groups = (
             [{start.parent_space: start, end.parent_space: end}]
@@ -545,9 +556,16 @@ class View(Structure):
                         for space in shared_spaces
                     )
                 ):
+                    if verbose:
+                        print("6")
+                        print(existing_node_group)
+                        print(potential_group)
+                        print(shared_spaces)
                     return False
         if self.super_views.is_empty:
             return True
+        if verbose:
+            print("super")
         return self.super_views.get().can_accept_member(
             parent_concept,
             conceptual_space,
