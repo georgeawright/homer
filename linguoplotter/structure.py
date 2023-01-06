@@ -463,7 +463,7 @@ class Structure(ABC):
                     ]
                 )
             )
-            self._activation_buffer = FloatBetweenOneAndZero(
+            self._activation_buffer += FloatBetweenOneAndZero(
                 relatives_total * self.RELATIVES_ACTIVATION_WEIGHT
                 + instances_total * self.INSTANCES_ACTIVATION_WEIGHT
             )

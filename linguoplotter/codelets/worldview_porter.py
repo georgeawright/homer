@@ -47,8 +47,7 @@ class WorldviewPorter(Codelet):
             self.targets["view"] = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
                 and x.parent_frame.parent_concept.name == "sentence"
-                and x not in self.bubble_chamber.worldview.views
-            ).get(key=lambda x: x.activation * (1 - (1 / len(x.members))))
+            ).get(key=lambda x: x.activation)
             self.run_competition()
             self._engender_follow_up()
         except MissingStructureError:
@@ -88,9 +87,13 @@ class WorldviewPorter(Codelet):
             self.result = CodeletResult.FIZZLE
 
     def _fizzle(self):
-        urgency = self.MINIMUM_CODELET_URGENCY
         self.child_codelets.append(
-            self.spawn(self.codelet_id, self.bubble_chamber, self.coderack, urgency)
+            self.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.coderack,
+                self.MINIMUM_CODELET_URGENCY,
+            )
         )
 
     def _engender_follow_up(self):
