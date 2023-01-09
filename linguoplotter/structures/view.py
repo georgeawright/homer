@@ -177,9 +177,9 @@ class View(Structure):
                     .location_in_space_with_name("time")
                     .coordinates[0][0]
                 )
-            except KeyError:
+                return chunks[0]
+            except (KeyError, IndexError):
                 return None
-            return chunks[0]
         return None
 
     @property
@@ -196,9 +196,9 @@ class View(Structure):
                     .location_in_space_with_name("time")
                     .coordinates[0][0]
                 )
-            except KeyError:
+                return chunks[-1]
+            except (KeyError, IndexError):
                 return None
-            return chunks[-1]
         return None
 
     @property

@@ -362,7 +362,7 @@ class ViewDrivenFactory(Factory):
                 else view.late_chunk
                 for view in potential_start_views
             ]
-        ).filter(lambda x: not x.is_slot or x.is_filled_in)
+        ).filter(lambda x: x is not None and (not x.is_slot or x.is_filled_in))
         if target_end_space is None:
             potential_end_views = self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept == end_sub_frame.parent_concept
@@ -380,13 +380,13 @@ class ViewDrivenFactory(Factory):
                 else view.late_chunk
                 for view in potential_end_views
             ]
-        ).filter(lambda x: not x.is_slot or x.is_filled_in)
+        ).filter(lambda x: x is not None and (not x.is_slot or x.is_filled_in))
         # TODO: prioritise completed views
         possible_target_pairs = [
             (a, b)
             for a in potential_start_targets
             for b in potential_end_targets
-            if a != b
+            if a != b and a.parent_space != b.parent_space
         ]
         if not self.targets["slot"].parent_concept.is_slot:
             possible_concepts = [self.targets["slot"].parent_concept]

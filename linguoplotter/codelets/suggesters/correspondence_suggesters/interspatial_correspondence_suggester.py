@@ -175,7 +175,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 else view.late_chunk
                 for view in potential_start_views
             ]
-        ).filter(lambda x: not x.is_slot or x.is_filled_in)
+        ).filter(lambda x: x is not None and (not x.is_slot or x.is_filled_in))
         if target_end_space is None:
             potential_end_views = bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept == end_sub_frame.parent_concept
@@ -193,7 +193,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 else view.late_chunk
                 for view in potential_end_views
             ]
-        ).filter(lambda x: not x.is_slot or x.is_filled_in)
+        ).filter(lambda x: x is not None and (not x.is_slot or x.is_filled_in))
         matching_relations = source_collection.filter(
             lambda x: x.is_relation
             and x.quality * x.activation > 0
