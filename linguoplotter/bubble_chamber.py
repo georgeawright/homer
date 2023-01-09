@@ -698,6 +698,7 @@ class BubbleChamber:
         quality: FloatBetweenOneAndZero = 0.0,
         is_excitatory: bool = True,
         is_privileged: bool = False,
+        is_projection: bool = False,
     ) -> Correspondence:
         if locations is None:
             if start.parent_space is not None and end.parent_space is not None:
@@ -724,6 +725,7 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_excitatory=is_excitatory,
             is_privileged=is_privileged,
+            is_projection=is_projection,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
         )

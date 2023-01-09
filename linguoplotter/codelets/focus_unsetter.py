@@ -85,11 +85,17 @@ class FocusUnsetter(Codelet):
         if random_number > probability_of_unsetting_focus:
             self._update_view_driven_factory_urgency()
             self.bubble_chamber.loggers["activity"].log("Focus left set.")
+            if change_in_satisfaction_score > 0:
+                self.bubble_chamber.focus.view.boost_activation(
+                    transposed_change_in_satisfaction_score
+                )
             self.result = CodeletResult.FIZZLE
             self._fizzle()
         else:
             if transposed_change_in_satisfaction_score <= 0.5:
-                self.bubble_chamber.loggers["activity"].log("Decaying focus")
+                self.bubble_chamber.focus.view.decay_activation(
+                    1 - transposed_change_in_satisfaction_score
+                )
                 self._update_recycler_urgency()
                 self._update_bottom_up_factories_urgencies()
             self.bubble_chamber.focus.view = None

@@ -32,6 +32,7 @@ class Correspondence(Link):
         is_privileged: bool = False,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
+        is_projection: bool = False,
     ):
         Link.__init__(
             self,
@@ -54,6 +55,7 @@ class Correspondence(Link):
         self.is_privileged = is_privileged
         self.is_bidirectional = is_bidirectional
         self.is_excitatory = is_excitatory
+        self.is_projection = is_projection
         self.is_correspondence = True
 
     def __dict__(self) -> dict:

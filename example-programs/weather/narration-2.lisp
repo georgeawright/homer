@@ -28,6 +28,7 @@
 (load "frames/s-expand.lisp")
 
 (load "frames/s-and.lisp")
+(load "frames/s-then.lisp")
 
 (define input-space
   (def-contextual-space

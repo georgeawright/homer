@@ -329,14 +329,6 @@ class View(Structure):
         for frame in self.frames:
             frame.specify_space(abstract_space, conceptual_space)
 
-    def decay_activation(self, amount: float = None):
-        if amount is None:
-            amount = self.MINIMUM_ACTIVATION_UPDATE
-        self._activation_buffer -= self._activation_update_coefficient * amount
-        for member in self.members:
-            member.decay_activation(amount)
-        self.output_space.decay_activation(amount)
-
     def add(self, correspondence: "Correspondence"):
         self.members.add(correspondence)
         for node_pair in correspondence.node_pairs:
@@ -574,10 +566,9 @@ class View(Structure):
         )
 
     def recalculate_activation(self):
-        pass
-
-    def update_activation(self):
-        pass
+        self._activation_buffer = FloatBetweenOneAndZero(
+            self.activation + self._activation_buffer
+        )
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])

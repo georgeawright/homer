@@ -49,6 +49,7 @@ class LabelProjectionBuilder(ProjectionBuilder):
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
             parent_view=self.targets["view"],
             quality=0.0,
+            is_projection=True,
         )
         self.child_structures.add(label)
         self.child_structures.add(frame_to_output_correspondence)

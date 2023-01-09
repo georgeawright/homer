@@ -423,10 +423,9 @@ class Structure(ABC):
     def decay_activation(self, amount: float = None):
         if self.is_stable:
             return
-        if amount is None:
-            amount = -self.MINIMUM_ACTIVATION_UPDATE
-        if amount < self._activation_buffer:
-            self._activation_buffer = amount
+        amount = 0.0 if amount is None else amount
+        if 0 - amount < self._activation_buffer:
+            self._activation_buffer = 0 - amount
 
     def activate(self):
         if self.is_stable:
@@ -463,8 +462,9 @@ class Structure(ABC):
                     ]
                 )
             )
-            self._activation_buffer += FloatBetweenOneAndZero(
-                relatives_total * self.RELATIVES_ACTIVATION_WEIGHT
+            self._activation_buffer = FloatBetweenOneAndZero(
+                self._activation_buffer
+                + relatives_total * self.RELATIVES_ACTIVATION_WEIGHT
                 + instances_total * self.INSTANCES_ACTIVATION_WEIGHT
             )
 
