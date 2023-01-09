@@ -60,6 +60,8 @@ class WorldviewPorter(Codelet):
         self.bubble_chamber.loggers["activity"].log_set(
             competing_view_collection, "Assembled competing views"
         )
+        if competing_view_collection == self.bubble_chamber.worldview.views:
+            raise MissingStructureError
         current_worldview_satisfaction = self._calculate_satisfaction(
             self.bubble_chamber.worldview.views
         )
