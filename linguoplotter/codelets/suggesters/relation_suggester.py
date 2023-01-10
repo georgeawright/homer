@@ -217,6 +217,14 @@ class RelationSuggester(Suggester):
             if not self.targets["end"].is_slot
             else self.targets["end"].non_slot_value
         )
+        start_time = end.location_in_space(
+            self.bubble_chamber.spaces["time"]
+        ).coordinates[0][0]
+        end_time = start.location_in_space(
+            self.bubble_chamber.spaces["time"]
+        ).coordinates[0][0]
+        time_diff = abs(start_time - end_time)
+        times_are_adjacent = 1 if time_diff <= 24 else 0.5
         classification = self.targets["concept"].classifier.classify(
             concept=self.targets["concept"],
             space=self.targets["space"],
@@ -228,6 +236,7 @@ class RelationSuggester(Suggester):
             classification
             * min(start.quality, end.quality)
             / self.targets["concept"].number_of_components
+            * times_are_adjacent
         )
 
     def _fizzle(self):

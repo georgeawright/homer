@@ -46,6 +46,14 @@ class RelationEvaluator(Evaluator):
             if target_relation.end.is_slot
             else target_relation.end
         )
+        start_time = start.location_in_space(
+            self.bubble_chamber.spaces["time"]
+        ).coordinates[0][0]
+        end_time = end.location_in_space(
+            self.bubble_chamber.spaces["time"]
+        ).coordinates[0][0]
+        time_diff = abs(start_time - end_time)
+        times_are_adjacent = 1 if time_diff <= 24 else 0.5
         if None in [start, end]:
             self.confidence = 0.0
             self.change_in_confidence = abs(self.confidence - self.original_confidence)
@@ -71,6 +79,7 @@ class RelationEvaluator(Evaluator):
             )
             * minimum_argument_quality
             / relation.parent_concept.number_of_components
+            * times_are_adjacent
             for relation in parallel_relations
         }
         sameness_classifications = {
