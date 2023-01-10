@@ -83,9 +83,6 @@ class WorldviewPorter(Codelet):
             self.result = CodeletResult.FINISH
         else:
             self.bubble_chamber.worldview.satisfaction = current_worldview_satisfaction
-            self.bubble_chamber.concepts["publish"].boost_activation(
-                self.bubble_chamber.general_satisfaction
-            )
             self._update_publisher_urgency()
             self.result = CodeletResult.FIZZLE
 
@@ -145,6 +142,13 @@ class WorldviewPorter(Codelet):
         proportion_of_input = self._proportion_of_input_in_views(views)
         sum_of_tree_depths = sum(v.parent_frame.tree_depth for v in views)
         view_quality = statistics.fmean([view.quality for view in views])
+        self.bubble_chamber.loggers["activity"].log(
+            f"proportion of input {proportion_of_input}"
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            f"sum of tree depths {sum_of_tree_depths}"
+        )
+        self.bubble_chamber.loggers["activity"].log(f"view quality {view_quality}")
         satisfaction = sum(
             [
                 self.INPUT_WEIGHT * proportion_of_input,
