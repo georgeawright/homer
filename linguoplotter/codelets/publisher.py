@@ -56,31 +56,38 @@ class Publisher(Codelet):
             self.bubble_chamber.loggers["activity"].log("There is no worldview.")
             self._fizzle()
             self.result = CodeletResult.FIZZLE
-        else:
-            self.bubble_chamber.loggers["activity"].log("Worldview is not empty")
-            publish_concept = self.bubble_chamber.concepts["publish"]
+            return
+        self.bubble_chamber.loggers["activity"].log("Worldview is not empty")
+        satisfaction_difference = (
+            self.bubble_chamber.general_satisfaction - self.last_satisfaction
+        )
+        time_difference = self.coderack.codelets_run - self.last_time
+        satisfaction_gradient = satisfaction_difference / time_difference
+        random_number = self.bubble_chamber.random_machine.generate_number() - 0.5
+        self.bubble_chamber.loggers["activity"].log(
+            f"Satisfaction gradient: {satisfaction_gradient}"
+        )
+        self.bubble_chamber.loggers["activity"].log(f"Random number: {random_number}")
+        if satisfaction_gradient > random_number:
             self.bubble_chamber.loggers["activity"].log(
-                f"Publish concept activation: {publish_concept.activation}"
+                "Satisfaction is increasing too much."
             )
-            if publish_concept.is_fully_active():
-                self.bubble_chamber.result = self.bubble_chamber.worldview.output
-                self.result = CodeletResult.FINISH
-            else:
-                satisfaction_difference = (
-                    self.bubble_chamber.general_satisfaction - self.last_satisfaction
-                )
-                time_difference = self.coderack.codelets_run - self.last_time
-                satisfaction_gradient = satisfaction_difference / time_difference
-                random_number = self.bubble_chamber.random_machine.generate_number()
-                if satisfaction_gradient < random_number:
-                    self.bubble_chamber.loggers["activity"].log(
-                        "Boosting publish concept"
-                    )
-                    publish_concept.boost_activation(
-                        self.bubble_chamber.worldview.satisfaction
-                    )
-                self._fizzle()
-                self.result = CodeletResult.FIZZLE
+            self._fizzle()
+            self.result = CodeletResult.FIZZLE
+            return
+        publish_concept = self.bubble_chamber.concepts["publish"]
+        self.bubble_chamber.loggers["activity"].log(
+            f"Publish concept activation: {publish_concept.activation}"
+        )
+        if not publish_concept.is_fully_active():
+            self.bubble_chamber.loggers["activity"].log("Boosting publish concept")
+            publish_concept.boost_activation(self.bubble_chamber.worldview.satisfaction)
+            self._fizzle()
+            self.result = CodeletResult.FIZZLE
+            return
+        self.bubble_chamber.loggers["activity"].log("Publishing")
+        self.bubble_chamber.result = self.bubble_chamber.worldview.output
+        self.result = CodeletResult.FINISH
 
     def _fizzle(self) -> CodeletResult:
         self.child_codelets.append(

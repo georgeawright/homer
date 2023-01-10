@@ -68,9 +68,10 @@ class WorldviewPorter(Codelet):
         potential_worldview_satisfaction = self._calculate_satisfaction(
             competing_view_collection
         )
-        if (
+        if self.bubble_chamber.random_machine.randomize_number(
             potential_worldview_satisfaction
-            > self.bubble_chamber.worldview.satisfaction
+        ) > self.bubble_chamber.random_machine.randomize_number(
+            self.bubble_chamber.worldview.satisfaction
         ):
             self.bubble_chamber.worldview.views = competing_view_collection
             self.bubble_chamber.worldview.satisfaction = (
@@ -133,7 +134,8 @@ class WorldviewPorter(Codelet):
         add_to_competing_views(self.targets["view"])
         if self.bubble_chamber.worldview.views is not None:
             for view in self.bubble_chamber.worldview.views:
-                add_to_competing_views(view)
+                if self.bubble_chamber.random_machine.coin_flip():
+                    add_to_competing_views(view)
 
         return competing_views
 
