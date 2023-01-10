@@ -17,26 +17,39 @@ class Publisher(Codelet):
         codelet_id: str,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        coderack: "Coderack",
         targets: StructureDict,
+        last_satisfaction: FloatBetweenOneAndZero,
+        last_time: int,
         urgency: FloatBetweenOneAndZero,
     ):
         Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
+        self.coderack = coderack
+        self.last_satisfaction = last_satisfaction
+        self.last_time = last_time
 
     @classmethod
     def spawn(
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
+        coderack: "Coderack",
+        last_satisfaction: FloatBetweenOneAndZero,
+        last_time: int,
         urgency: FloatBetweenOneAndZero,
     ):
         targets = bubble_chamber.new_dict(name="targets")
         urgency = max(urgency, cls.MINIMUM_CODELET_URGENCY)
-        return cls(ID.new(cls), parent_id, bubble_chamber, targets, urgency)
-
-    @classmethod
-    def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        urgency = bubble_chamber.concepts["publish"]
-        return cls.spawn(parent_id, bubble_chamber, urgency)
+        return cls(
+            ID.new(cls),
+            parent_id,
+            bubble_chamber,
+            coderack,
+            targets,
+            last_satisfaction,
+            last_time,
+            urgency,
+        )
 
     def run(self) -> CodeletResult:
         if self.bubble_chamber.worldview.views.is_empty:
@@ -53,15 +66,30 @@ class Publisher(Codelet):
                 self.bubble_chamber.result = self.bubble_chamber.worldview.output
                 self.result = CodeletResult.FINISH
             else:
-                self.bubble_chamber.loggers["activity"].log("Boosting publish concept")
-                publish_concept.boost_activation(
-                    self.bubble_chamber.worldview.satisfaction
+                satisfaction_difference = (
+                    self.bubble_chamber.general_satisfaction - self.last_satisfaction
                 )
+                time_difference = self.coderack.codelets_run - self.last_time
+                satisfaction_gradient = satisfaction_difference / time_difference
+                random_number = self.bubble_chamber.random_machine.generate_number()
+                if satisfaction_gradient < random_number:
+                    self.bubble_chamber.loggers["activity"].log(
+                        "Boosting publish concept"
+                    )
+                    publish_concept.boost_activation(
+                        self.bubble_chamber.worldview.satisfaction
+                    )
                 self._fizzle()
                 self.result = CodeletResult.FIZZLE
 
     def _fizzle(self) -> CodeletResult:
-        urgency = self.bubble_chamber.worldview.satisfaction
         self.child_codelets.append(
-            self.spawn(self.codelet_id, self.bubble_chamber, urgency)
+            self.spawn(
+                self.codelet_id,
+                self.bubble_chamber,
+                self.coderack,
+                last_satisfaction=self.bubble_chamber.general_satisfaction,
+                last_time=self.coderack.codelets_run,
+                urgency=self.bubble_chamber.worldview.satisfaction,
+            )
         )

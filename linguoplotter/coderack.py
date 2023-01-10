@@ -56,7 +56,9 @@ class Coderack:
     def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
-            Publisher.spawn("", bubble_chamber, cls.MINIMUM_CODELET_URGENCY),
+            Publisher.spawn(
+                "", bubble_chamber, coderack, 0.0, 0, cls.MINIMUM_CODELET_URGENCY
+            ),
             GarbageCollector.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
