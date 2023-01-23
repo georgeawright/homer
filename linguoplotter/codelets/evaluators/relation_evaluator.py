@@ -53,7 +53,7 @@ class RelationEvaluator(Evaluator):
             self.bubble_chamber.spaces["time"]
         ).coordinates[0][0]
         time_diff = abs(start_time - end_time)
-        times_are_adjacent = 1 if time_diff <= 24 else 0.5
+        times_are_adjacent = 1 if time_diff <= 24 else 0.0
         if None in [start, end]:
             self.confidence = 0.0
             self.change_in_confidence = abs(self.confidence - self.original_confidence)

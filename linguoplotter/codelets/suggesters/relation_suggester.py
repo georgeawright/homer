@@ -224,7 +224,7 @@ class RelationSuggester(Suggester):
             self.bubble_chamber.spaces["time"]
         ).coordinates[0][0]
         time_diff = abs(start_time - end_time)
-        times_are_adjacent = 1 if time_diff <= 24 else 0.5
+        times_are_adjacent = 1 if time_diff <= 24 else 0.0
         classification = self.targets["concept"].classifier.classify(
             concept=self.targets["concept"],
             space=self.targets["space"],
