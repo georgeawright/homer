@@ -150,7 +150,7 @@ class LetterChunk(Chunk):
             )
             return bubble_chamber.new_letter_chunk(
                 parent_id=parent_id,
-                name=self.name,
+                name=chunk.name,
                 locations=locations,
                 members=members,
                 parent_space=location.space,
