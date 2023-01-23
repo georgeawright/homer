@@ -67,6 +67,15 @@ class GarbageCollector(Codelet):
                             or structure in codelet.targets["view"].sub_views
                         )
                     )
+                    or structure.is_view
+                    and any(
+                        [
+                            any([link in codelet.targets for link in chunk.links])
+                            for chunk in structure.parent_frame.input_space.contents.where(
+                                is_chunk=True
+                            )
+                        ]
+                    )
                     for codelet in self.coderack._codelets
                 ]
             ):
