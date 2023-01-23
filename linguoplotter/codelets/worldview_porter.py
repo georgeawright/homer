@@ -47,6 +47,8 @@ class WorldviewPorter(Codelet):
             self.targets["view"] = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
                 and x.parent_frame.parent_concept.name == "sentence"
+                and self.bubble_chamber.new_set(x)
+                != self.bubble_chamber.worldview.views
             ).get(key=lambda x: x.activation)
             self.run_competition()
             self._engender_follow_up()
@@ -129,10 +131,10 @@ class WorldviewPorter(Codelet):
             competing_views.add(view)
 
         add_to_competing_views(self.targets["view"])
-        if self.bubble_chamber.worldview.views is not None:
-            for view in self.bubble_chamber.worldview.views:
-                if self.bubble_chamber.random_machine.coin_flip():
-                    add_to_competing_views(view)
+        #        if self.bubble_chamber.worldview.views is not None:
+        #            for view in self.bubble_chamber.worldview.views:
+        #                if self.bubble_chamber.random_machine.coin_flip():
+        #                    add_to_competing_views(view)
 
         return competing_views
 
@@ -149,13 +151,15 @@ class WorldviewPorter(Codelet):
             f"sum of tree depths {sum_of_tree_depths}"
         )
         self.bubble_chamber.loggers["activity"].log(f"view quality {view_quality}")
-        satisfaction = sum(
-            [
-                self.INPUT_WEIGHT * proportion_of_input,
-                self.VIEW_WEIGHT * view_quality,
-                self.FRAMES_WEIGHT * 1 / sum_of_tree_depths,
-            ]
-        )
+        # satisfaction = (
+        #    [
+        #        self.INPUT_WEIGHT * proportion_of_input,
+        #        self.VIEW_WEIGHT * view_quality,
+        #        self.FRAMES_WEIGHT * 1 / sum_of_tree_depths,
+        #    ]
+        # )
+        # satisfaction = proportion_of_input * view_quality * 1 / sum_of_tree_depths
+        satisfaction = proportion_of_input * view_quality
         view_ids = [view.structure_id for view in views]
         self.bubble_chamber.loggers["activity"].log(
             f"Satisfaction for {view_ids}: {satisfaction}"
