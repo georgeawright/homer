@@ -53,11 +53,17 @@ class Publisher(Codelet):
 
     def run(self) -> CodeletResult:
         if self.bubble_chamber.worldview.views.is_empty:
-            self.bubble_chamber.loggers["activity"].log("There is no worldview.")
+            self.bubble_chamber.loggers["activity"].log("Worldview is empty.")
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return
-        self.bubble_chamber.loggers["activity"].log("Worldview is not empty")
+        self.bubble_chamber.loggers["activity"].log("Worldview is not empty.")
+        if self.bubble_chamber.focus.view is not None:
+            self.bubble_chamber.loggers["activity"].log("Focus is not empty.")
+            self._fizzle()
+            self.result = CodeletResult.FIZZLE
+            return
+        self.bubble_chamber.loggers["activity"].log("Focus is empty.")
         satisfaction_difference = (
             self.bubble_chamber.general_satisfaction - self.last_satisfaction
         )
