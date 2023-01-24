@@ -4,31 +4,39 @@ from linguoplotter.codelets.suggesters import (
     CorrespondenceSuggester,
     LabelSuggester,
     RelationSuggester,
+    ViewSuggester,
 )
-from linguoplotter.codelets.suggesters import ViewSuggester
+from linguoplotter.codelets.suggesters.relation_suggesters import (
+    InterspatialRelationSuggester,
+)
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.structure_collection_keys import (
     uncorrespondedness,
     unlabeledness,
     unrelatedness,
 )
+from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.structure_collections import StructureSet
 
 
 class BottomUpSuggesterFactory(BottomUpFactory):
+    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
+
     def _engender_follow_up(self):
         chamber_unchunkedness = self._unchunkedness_of_raw_chunks()
         chamber_unlabeledness = self._unlabeledness_of_chunks()
         chamber_unrelatedness = self._unrelatedness_of_chunks()
         chamber_uncorrespondedness = self._uncorrespondedness_of_links()
         chamber_unfilledness = self._unfilledness_of_slots()
+        chamber_uncohesiveness = self._uncohesiveness_of_texts()
 
         self.bubble_chamber.loggers["activity"].log(
             f"Unchunked of raw chunks: {chamber_unchunkedness}\n"
             + f"Unlabeledness of chunks: {chamber_unlabeledness}\n"
             + f"Unrelatedness of chunks: {chamber_unrelatedness}\n"
             + f"Unfilledness of slots: {chamber_unfilledness}\n"
-            + f"Uncorrespondedness of links: {chamber_uncorrespondedness}",
+            + f"Uncorrespondedness of links: {chamber_uncorrespondedness}\n"
+            + f"Uncohesiveness of texts: {chamber_uncohesiveness}",
         )
 
         follow_up_class = self.bubble_chamber.random_machine.select(
@@ -38,6 +46,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 (RelationSuggester, chamber_unrelatedness),
                 (ViewSuggester, chamber_uncorrespondedness),
                 (CorrespondenceSuggester, chamber_unfilledness),
+                (InterspatialRelationSuggester, chamber_uncohesiveness),
             ],
             key=lambda x: x[1],
         )[0]
@@ -100,5 +109,31 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 for view in views
             )
             return unfilled_slots / slots
+        except MissingStructureError:
+            return float("-inf")
+
+    def _uncohesiveness_of_texts(self):
+        try:
+            views = self.bubble_chamber.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept
+                == self.bubble_chamber.concepts["sentence"]
+            ).sample(2)
+            view = views.get()
+            letter_chunks = view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and x.members.is_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            )
+            relations = StructureSet.intersection(
+                *[
+                    c.relations.where(is_interspatial_relation=True)
+                    for c in letter_chunks
+                ]
+            )
+            return 1 - sum([r.quality * r.activation for r in relations]) / len(
+                view.output_space.conceptual_spaces
+            )
+
         except MissingStructureError:
             return float("-inf")
