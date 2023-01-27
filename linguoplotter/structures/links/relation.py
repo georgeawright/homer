@@ -32,7 +32,7 @@ class Relation(Link):
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         is_stable: bool = False,
-        is_interspatial_relation: bool = False,
+        is_interspatial: bool = False,
     ):
         Link.__init__(
             self,
@@ -53,7 +53,7 @@ class Relation(Link):
         self._parent_space = parent_space
         self.conceptual_space = conceptual_space
         self.is_relation = True
-        self.is_interspatial_relation = is_interspatial_relation
+        self.is_interspatial = is_interspatial
         self.is_bidirectional = is_bidirectional
         self.is_excitatory = is_excitatory
         self.is_stable = is_stable
@@ -133,6 +133,7 @@ class Relation(Link):
             locations=new_locations,
             quality=self.quality,
             parent_space=self.parent_space,
+            is_interspatial=self.is_interspatial,
         )
 
     def nearby(self, space: Space = None) -> StructureSet:

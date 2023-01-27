@@ -48,6 +48,7 @@ class BubbleChamber:
         self.concept_links = None
         self.correspondences = None
         self.labels = None
+        self.interspatial_labels = None
         self.relations = None
         self.interspatial_relations = None
 
@@ -81,6 +82,7 @@ class BubbleChamber:
         self.concept_links = self.new_set()
         self.correspondences = self.new_set()
         self.labels = self.new_set()
+        self.interspatial_labels = self.new_set()
         self.relations = self.new_set()
         self.interspatial_relations = self.new_set()
         self.views = self.new_set()
@@ -212,7 +214,9 @@ class BubbleChamber:
             self.loggers["structure"].log(space)
         collection_name = self.collections[type(item)]
         getattr(self, collection_name).add(item)
-        if item.is_interspatial_relation:
+        if item.is_interspatial and item.is_label:
+            self.interspatial_labels.add(item)
+        if item.is_interspatial and item.is_relation:
             self.interspatial_relations.add(item)
 
     def remove(self, item):
@@ -240,21 +244,23 @@ class BubbleChamber:
         if item.is_frame:
             item.parent_frame.instances.remove(item)
             item.parent_frame.recalculate_exigency()
-            for relation in item.interspatial_relations:
-                self.interspatial_relations.remove(relation)
-                self.remove(relation)
+            for link in item.interspatial_links:
+                self.interspatial_labels.remove(link)
+                self.interspatial_relations.remove(link)
+                self.remove(link)
             for x in item.input_space.contents.copy():
                 for link in x.links:
-                    if link.is_interspatial_relation:
+                    if link.is_interspatial:
                         self.remove(link)
             for x in item.output_space.contents.copy():
                 for link in x.links:
-                    if link.is_interspatial_relation:
+                    if link.is_interspatial:
                         self.remove(link)
         if item.is_correspondence:
             item.parent_view.remove(item)
         if item.is_link:
-            if item.is_interspatial_relation:
+            if item.is_interspatial:
+                self.interspatial_labels.remove(item)
                 self.interspatial_relations.remove(item)
             item.parent_concept.instances.remove(item)
             for argument in item.arguments:
@@ -369,13 +375,13 @@ class BubbleChamber:
         concepts: StructureSet,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
-        interspatial_relations: StructureSet = None,
+        interspatial_links: StructureSet = None,
         parent_id: str = "",
         is_sub_frame: bool = False,
         depth: int = None,
     ) -> Frame:
-        interspatial_relations = (
-            self.new_set() if interspatial_relations is None else interspatial_relations
+        interspatial_links = (
+            self.new_set() if interspatial_links is None else interspatial_links
         )
         frame = Frame(
             structure_id=ID.new(Frame),
@@ -385,7 +391,7 @@ class BubbleChamber:
             parent_frame=parent_frame,
             sub_frames=sub_frames,
             concepts=concepts,
-            interspatial_relations=interspatial_relations,
+            interspatial_links=interspatial_links,
             input_space=input_space,
             output_space=output_space,
             links_in=self.new_set(),
@@ -414,14 +420,14 @@ class BubbleChamber:
         parent_id: str = "",
     ) -> Frame:
         return self.new_frame(
-            name,
-            parent_concept,
-            parent_frame,
-            sub_frames,
-            concepts,
-            input_space,
-            output_space,
-            parent_id,
+            name=name,
+            parent_concept=parent_concept,
+            parent_frame=parent_frame,
+            sub_frames=sub_frames,
+            concepts=concepts,
+            input_space=input_space,
+            output_space=output_space,
+            parent_id=parent_id,
             is_sub_frame=True,
         )
 
@@ -756,6 +762,7 @@ class BubbleChamber:
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         parent_space: ContextualSpace = None,
+        is_interspatial: bool = False,
     ) -> Label:
         parent_space = start.parent_space if parent_space is None else parent_space
         parent_spaces = self.new_set(*[location.space for location in locations])
@@ -773,6 +780,7 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
+            is_interspatial=is_interspatial,
         )
         if start is not None:
             start.links_out.add(label)
@@ -794,7 +802,7 @@ class BubbleChamber:
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
-        is_interspatial_relation: bool = False,
+        is_interspatial: bool = False,
         activation: FloatBetweenOneAndZero = None,
         stable_activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
@@ -822,7 +830,7 @@ class BubbleChamber:
             is_bidirectional=is_bidirectional,
             is_excitatory=is_excitatory,
             is_stable=stable_activation is not None,
-            is_interspatial_relation=is_interspatial_relation,
+            is_interspatial=is_interspatial,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
         )

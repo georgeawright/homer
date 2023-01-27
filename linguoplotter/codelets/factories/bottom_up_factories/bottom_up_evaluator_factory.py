@@ -6,13 +6,15 @@ from linguoplotter.codelets.evaluators import (
     RelationEvaluator,
     ViewEvaluator,
 )
+from linguoplotter.codelets.evaluators.label_evaluators import (
+    InterspatialLabelEvaluator,
+)
 from linguoplotter.codelets.evaluators.relation_evaluators import (
     InterspatialRelationEvaluator,
 )
 from linguoplotter.codelets.factories import BottomUpFactory
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collections import StructureSet
 
 
 class BottomUpEvaluatorFactory(BottomUpFactory):
@@ -26,13 +28,15 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         labels_per_space_per_chunk = self._labels_per_space_per_chunk()
         super_chunks_per_raw_chunk = self._super_chunks_per_raw_chunk()
         related_texts_per_letter_chunk = self._related_texts_per_letter_chunk()
+        labels_per_space_per_letter_chunk = self._labels_per_space_per_letter_chunk()
 
         self.bubble_chamber.loggers["activity"].log(
             f"Views per frame type per chunk: {views_per_frame_type_per_chunk}\n"
             + f"Relations per space per end per chunk: {relations_per_space_per_end_per_chunk}\n"
             + f"Labels per space per chunk: {labels_per_space_per_chunk}\n"
             + f"Super chunks per raw chunk: {super_chunks_per_raw_chunk}\n"
-            + f"Related texts per letter chunk: {related_texts_per_letter_chunk}",
+            + f"Related texts per letter chunk: {related_texts_per_letter_chunk}\n"
+            + f"Labels per space per letter chunk: {labels_per_space_per_letter_chunk}",
         )
 
         follow_up_class = self.bubble_chamber.random_machine.select(
@@ -42,6 +46,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
                 (RelationEvaluator, relations_per_space_per_end_per_chunk),
                 (ViewEvaluator, views_per_frame_type_per_chunk),
                 (InterspatialRelationEvaluator, related_texts_per_letter_chunk),
+                (InterspatialLabelEvaluator, labels_per_space_per_letter_chunk),
             ],
             key=lambda x: x[1],
         )[0]
@@ -128,11 +133,33 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             return statistics.fmean(
                 [
                     (
-                        len(chunk.relations)
+                        len(chunk.relations.where(is_interspatial=True))
                         / len([relative.parent_space for relative in chunk.relatives])
                     )
                     if chunk.relations.not_empty
                     else 0
+                    for chunk in letter_chunks
+                ]
+            )
+        except MissingStructureError:
+            return 0
+
+    def _labels_per_space_per_letter_chunk(self):
+        try:
+            view = self.bubble_chamber.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept
+                == self.bubble_chamber.concepts["sentence"]
+            ).get()
+            letter_chunks = view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and x.members.is_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            )
+            return statistics.fmean(
+                [
+                    len(chunk.labels.where(is_interspatial=True))
+                    / len(chunk.parent_spaces.where(is_conceptual_space=True))
                     for chunk in letter_chunks
                 ]
             )

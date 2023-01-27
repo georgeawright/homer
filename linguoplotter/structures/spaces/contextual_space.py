@@ -147,7 +147,7 @@ class ContextualSpace(Space):
                 new_space.add(new_label)
                 copies[label] = new_label
             for relation in item.links_out.where(
-                is_relation=True, is_interspatial_relation=False
+                is_relation=True, is_interspatial=False
             ):
                 if relation.end not in copies:
                     continue
@@ -163,7 +163,7 @@ class ContextualSpace(Space):
                 new_space.add(new_relation)
                 copies[relation] = new_relation
             for relation in item.links_in.where(
-                is_relation=True, is_interspatial_relation=False
+                is_relation=True, is_interspatial=False
             ):
                 if relation.start not in copies:
                     continue

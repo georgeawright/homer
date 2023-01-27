@@ -120,30 +120,11 @@ class RelationSuggester(Suggester):
             self.targets["space"],
             self.targets["end"],
         ]:
-            if any(
-                [
-                    self.targets["start"].is_slot
-                    and not self.targets["start"].is_filled_in,
-                    self.targets["end"].is_slot
-                    and not self.targets["end"].is_filled_in,
-                ]
-            ):
-                return False
-            start = (
-                self.targets["start"]
-                if not self.targets["start"].is_slot
-                else self.targets["start"].non_slot_value
-            )
-            end = (
-                self.targets["end"]
-                if not self.targets["end"].is_slot
-                else self.targets["end"].non_slot_value
-            )
             classification = self.targets["concept"].classifier.classify(
                 concept=self.targets["concept"],
                 space=self.targets["space"],
-                start=start,
-                end=end,
+                start=self.targets["start"],
+                end=self.targets["end"],
             )
             self.bubble_chamber.loggers["activity"].log(
                 f"Preliminary classification: {classification}"
@@ -246,14 +227,6 @@ class RelationSuggester(Suggester):
             self.targets["end"],
         ]:
             return
-        if any(
-            [
-                self.targets["start"].is_slot
-                and not self.targets["start"].is_filled_in,
-                self.targets["end"].is_slot and not self.targets["end"].is_filled_in,
-            ]
-        ):
-            return False
         possible_target_pairs = [
             (self.targets["start"], self.targets["end"]),
             (self.targets["end"], self.targets["start"]),
@@ -288,26 +261,20 @@ class RelationSuggester(Suggester):
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
                 key=lambda x: x["concept"].classifier.classify(
-                    start=x["start"]
-                    if not x["start"].is_slot
-                    else x["start"].non_slot_value,
-                    end=x["end"] if not x["end"].is_slot else x["end"].non_slot_value,
+                    start=x["start"],
+                    end=x["end"],
                     concept=x["concept"],
                     space=x["space"],
                 ),
             )
             self.child_codelets.append(
-                RelationSuggester.spawn(
+                type(self).spawn(
                     self.codelet_id,
                     self.bubble_chamber,
                     targets,
                     targets["concept"].classifier.classify(
-                        start=targets["start"]
-                        if not targets["start"].is_slot
-                        else targets["start"].non_slot_value,
-                        end=targets["end"]
-                        if not targets["end"].is_slot
-                        else targets["end"].non_slot_value,
+                        start=targets["start"],
+                        end=targets["end"],
                         concept=targets["concept"],
                         space=targets["space"],
                     ),

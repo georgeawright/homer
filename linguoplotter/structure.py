@@ -68,8 +68,8 @@ class Structure(ABC):
         self.is_link = False
         self.is_correspondence = False
         self.is_label = False
+        self.is_interspatial = False
         self.is_relation = False
-        self.is_interspatial_relation = False
         self.is_view = False
         self.is_space = False
         self.is_conceptual_space = False

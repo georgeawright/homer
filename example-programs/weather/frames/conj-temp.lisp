@@ -42,28 +42,48 @@
 			      (Location (list) conj-temp-sub-frame-1-input)
 			      (Location (list) conj-temp-sentence-input))
     :parent_space conj-temp-sub-frame-1-input))
+(define sub-frame-1-least-time
+  (def-label :start chunk-1 :parent_concept least-concept
+    :locations (list (Location (list (list Nan)) time-space)
+		     (Location (list) conj-temp-sub-frame-1-input))
+    :is_interspatial True))
 (define chunk-2
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) conj-temp-sub-frame-1-input)
 			      (Location (list) conj-temp-sentence-input))
     :parent_space conj-temp-sub-frame-1-input))
+(define sub-frame-1-most-time
+  (def-label :start chunk-2 :parent_concept most-concept
+    :locations (list (Location (list (list Nan)) time-space)
+		     (Location (list) conj-temp-sub-frame-1-input))
+    :is_interspatial True))
 (define chunk-3
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) conj-temp-sub-frame-2-input)
 			      (Location (list) conj-temp-sentence-input))
     :parent_space conj-temp-sub-frame-2-input))
+(define sub-frame-2-least-time
+  (def-label :start chunk-3 :parent_concept least-concept
+    :locations (list (Location (list (list Nan)) time-space)
+		     (Location (list) conj-temp-sub-frame-2-input))
+    :is_interspatial True))
 (define chunk-4
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) conj-temp-sub-frame-2-input)
 			      (Location (list) conj-temp-sentence-input))
     :parent_space conj-temp-sub-frame-2-input))
+(define sub-frame-2-most-time
+  (def-label :start chunk-4 :parent_concept most-concept
+    :locations (list (Location (list (list Nan)) time-space)
+		     (Location (list) conj-temp-sub-frame-2-input))
+    :is_interspatial True))
 (define less-time-relation-1
   (def-relation :start chunk-1 :end chunk-3 :parent_concept less-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) conj-temp-sentence-input))
-    :is_interspatial_relation True
+    :is_interspatial True
     :parent_space None
     :conceptual_space time-space))
 (define less-time-relation-2
@@ -72,7 +92,7 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) conj-temp-sentence-input))
-    :is_interspatial_relation True
+    :is_interspatial True
     :parent_space None
     :conceptual_space time-space))
 (define not-more-time-relation
@@ -81,18 +101,16 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) conj-temp-sentence-input))
-    :is_interspatial_relation True
+    :is_interspatial True
     :parent_space None
     :conceptual_space time-space))
-((getattr (getattr conj-temp-sentence "interspatial_relations") "add") less-time-relation-1)
-((getattr (getattr conj-temp-sentence "interspatial_relations") "add") less-time-relation-2)
-((getattr (getattr conj-temp-sentence "interspatial_relations") "add") not-more-time-relation)
-(setattr conj-temp-sentence "early_chunk" chunk-1)
-(setattr conj-temp-sentence "late_chunk" chunk-4)
-(setattr conj-temp-sub-frame-1 "early_chunk" chunk-1)
-(setattr conj-temp-sub-frame-1 "late_chunk" chunk-2)
-(setattr conj-temp-sub-frame-2 "early_chunk" chunk-3)
-(setattr conj-temp-sub-frame-2 "late_chunk" chunk-4)
+((getattr (getattr conj-temp-sentence "interspatial_links") "add") sub-frame-1-least-time)
+((getattr (getattr conj-temp-sentence "interspatial_links") "add") sub-frame-1-most-time)
+((getattr (getattr conj-temp-sentence "interspatial_links") "add") sub-frame-2-least-time)
+((getattr (getattr conj-temp-sentence "interspatial_links") "add") sub-frame-2-most-time)
+((getattr (getattr conj-temp-sentence "interspatial_links") "add") less-time-relation-1)
+((getattr (getattr conj-temp-sentence "interspatial_links") "add") less-time-relation-2)
+((getattr (getattr conj-temp-sentence "interspatial_links") "add") not-more-time-relation)
 
 (define conj-temp-subject-1
   (def-letter-chunk :name None

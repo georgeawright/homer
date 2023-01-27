@@ -75,6 +75,11 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) be-sentence-input))
     :parent_space be-sentence-input))
+(define early-chunk-least-time-label
+  (def-label :start early-chunk :parent_concept least-concept
+    :locations (list (Location (list (list Nan)) time-space)
+		     (Location (list) be-sentence-input))
+    :is_interspatial True))
 (define early-chunk-conceptual-label
   (def-label :start early-chunk :parent_concept conceptual-label-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
@@ -89,21 +94,17 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) be-sentence-input))
     :parent_space be-sentence-input))
+(define late-chunk-most-time-label
+  (def-label :start late-chunk :parent_concept most-concept
+    :locations (list (Location (list (list Nan)) time-space)
+		     (Location (list) be-sentence-input))
+    :is_interspatial True))
 (define late-chunk-location-label
   (def-label :start late-chunk :parent_concept location-concept
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list) location-sub-frame-input)
 		     (Location (list) be-sentence-input))
     :parent_space location-sub-frame-input))
-
-(setattr be-sentence "early_chunk" early-chunk)
-(setattr be-sentence "late_chunk" late-chunk)
-(setattr description-sub-frame "early_chunk" early-chunk)
-(setattr description-sub-frame "late_chunk" early-chunk)
-(setattr time-sub-frame "early_chunk" early-chunk)
-(setattr time-sub-frame "late_chunk" late-chunk)
-(setattr location-sub-frame "early_chunk" early-chunk)
-(setattr location-sub-frame "late_chunk" late-chunk)
 
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept

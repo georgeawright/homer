@@ -1,15 +1,12 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import RelationSuggester
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.structure_collection_keys import relating_exigency
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.links import Relation
 
 
 class InterspatialRelationSuggester(RelationSuggester):
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.builders.relation_builders import (
@@ -44,30 +41,11 @@ class InterspatialRelationSuggester(RelationSuggester):
             self.targets["space"],
             self.targets["end"],
         ]:
-            if any(
-                [
-                    self.targets["start"].is_slot
-                    and not self.targets["start"].is_filled_in,
-                    self.targets["end"].is_slot
-                    and not self.targets["end"].is_filled_in,
-                ]
-            ):
-                return False
-            start = (
-                self.targets["start"]
-                if not self.targets["start"].is_slot
-                else self.targets["start"].non_slot_value
-            )
-            end = (
-                self.targets["end"]
-                if not self.targets["end"].is_slot
-                else self.targets["end"].non_slot_value
-            )
             classification = self.targets["concept"].classifier.classify(
                 concept=self.targets["concept"],
                 space=self.targets["space"],
-                start=start,
-                end=end,
+                start=self.targets["start"],
+                end=self.targets["end"],
             )
             self.bubble_chamber.loggers["activity"].log(
                 f"Preliminary classification: {classification}"

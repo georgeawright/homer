@@ -9,7 +9,7 @@ from linguoplotter.location import Location
 from linguoplotter.structure import Structure
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Frame
-from linguoplotter.structures.nodes import Chunk, Concept
+from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.space import Space
 from linguoplotter.structures.spaces import ContextualSpace
 
@@ -164,50 +164,12 @@ class View(Structure):
         return self.parent_frame.slots
 
     @property
-    def early_chunk(self) -> Chunk:
-        if self.parent_frame.early_chunk is not None:
-            return self.parent_frame.early_chunk
-        chunks = [v.early_chunk for v in self.sub_views]
-        if all([c is not None for c in chunks]):
-            try:
-                chunks.sort(
-                    key=lambda x: [
-                        group for group in self.node_groups if x in group.values()
-                    ][0][self.input_spaces.get()]
-                    .location_in_space_with_name("time")
-                    .coordinates[0][0]
-                )
-                return chunks[0]
-            except (KeyError, IndexError):
-                return None
-        return None
-
-    @property
-    def late_chunk(self) -> Chunk:
-        if self.parent_frame.late_chunk is not None:
-            return self.parent_frame.late_chunk
-        chunks = [v.late_chunk for v in self.sub_views]
-        if all([c is not None for c in chunks]):
-            try:
-                chunks.sort(
-                    key=lambda x: [
-                        group for group in self.node_groups if x in group.values()
-                    ][0][self.input_spaces.get()]
-                    .location_in_space_with_name("time")
-                    .coordinates[0][0]
-                )
-                return chunks[-1]
-            except (KeyError, IndexError):
-                return None
-        return None
-
-    @property
     def is_recyclable(self) -> bool:
         return self.activation < self.FLOATING_POINT_TOLERANCE
 
     @property
     def unfilled_interspatial_structures(self):
-        return self.parent_frame.interspatial_relations.filter(
+        return self.parent_frame.interspatial_links.filter(
             lambda x: x.correspondences.where(end=x).is_empty
         )
 
@@ -215,6 +177,7 @@ class View(Structure):
     def unfilled_sub_frame_input_structures(self):
         return self.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
+            and not x.is_interspatial
             and not x.is_chunk
             and (
                 len(x.correspondences.where(end=x))
@@ -226,6 +189,7 @@ class View(Structure):
     def unfilled_input_structures(self):
         return self.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
+            and not x.is_interspatial
             and not x.is_chunk
             and x.correspondences.where(end=x).is_empty
         )
@@ -234,6 +198,7 @@ class View(Structure):
     def unfilled_output_structures(self):
         return self.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
+            and not x.is_interspatial
             and x.parent_space != self.parent_frame.output_space
             and x.correspondences.where(end=x).is_empty
         )
@@ -242,6 +207,7 @@ class View(Structure):
     def unfilled_projectable_structures(self):
         return self.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
+            and not x.is_interspatial
             and x.correspondences_to_space(self.output_space).is_empty
         )
 

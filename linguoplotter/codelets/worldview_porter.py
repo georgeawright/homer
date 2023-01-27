@@ -151,15 +151,14 @@ class WorldviewPorter(Codelet):
             f"sum of tree depths {sum_of_tree_depths}"
         )
         self.bubble_chamber.loggers["activity"].log(f"view quality {view_quality}")
-        # satisfaction = (
-        #    [
-        #        self.INPUT_WEIGHT * proportion_of_input,
-        #        self.VIEW_WEIGHT * view_quality,
-        #        self.FRAMES_WEIGHT * 1 / sum_of_tree_depths,
-        #    ]
-        # )
-        # satisfaction = proportion_of_input * view_quality * 1 / sum_of_tree_depths
-        satisfaction = proportion_of_input * view_quality
+        satisfaction = sum(
+            [
+                self.INPUT_WEIGHT * proportion_of_input,
+                self.VIEW_WEIGHT * view_quality,
+                self.FRAMES_WEIGHT * 1 / sum_of_tree_depths,
+            ]
+        )
+        # satisfaction = proportion_of_input * view_quality
         view_ids = [view.structure_id for view in views]
         self.bubble_chamber.loggers["activity"].log(
             f"Satisfaction for {view_ids}: {satisfaction}"

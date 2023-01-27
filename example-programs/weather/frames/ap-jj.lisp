@@ -22,8 +22,6 @@
   (def-chunk :locations (list (Location (list (list Nan)) conceptual-space)
 			      (Location (list) jj-input))
     :parent_space jj-input))
-(setattr jj-frame "early_chunk" chunk)
-(setattr jj-frame "late_chunk" chunk)
 (define chunk-label
   (def-label :start chunk :parent_concept label-parent-concept
     :locations (list (Location (list (list Nan)) conceptual-space)

@@ -36,30 +36,17 @@ class RelationEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_relation = self.targets.get()
-        start = (
-            target_relation.start.non_slot_value
-            if target_relation.start.is_slot
-            else target_relation.start
-        )
-        end = (
-            target_relation.end.non_slot_value
-            if target_relation.end.is_slot
-            else target_relation.end
-        )
-        start_time = start.location_in_space(
+        start_time = target_relation.start.location_in_space(
             self.bubble_chamber.spaces["time"]
         ).coordinates[0][0]
-        end_time = end.location_in_space(
+        end_time = target_relation.end.location_in_space(
             self.bubble_chamber.spaces["time"]
         ).coordinates[0][0]
         time_diff = abs(start_time - end_time)
         times_are_adjacent = 1 if time_diff <= 24 else 0.0
-        if None in [start, end]:
-            self.confidence = 0.0
-            self.change_in_confidence = abs(self.confidence - self.original_confidence)
-            self.activation_difference = self.confidence - target_relation.activation
-            return
-        minimum_argument_quality = min(start.quality, end.quality)
+        minimum_argument_quality = min(
+            target_relation.start.quality, target_relation.end.quality
+        )
         parallel_relations = StructureSet.intersection(
             target_relation.start.relations, target_relation.end.relations
         )

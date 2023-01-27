@@ -51,11 +51,13 @@ class CorrespondenceSuggester(Suggester):
             target_view = bubble_chamber.views.filter(lambda x: x.unhappiness > 0).get()
         input_structures = target_view.parent_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
+            and not x.is_interspatial
             and len(x.correspondences.where(end=x))
             < len(x.parent_spaces.where(is_contextual_space=True))
         )
         output_structures = target_view.parent_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
+            and not x.is_interspatial
             and x.parent_space != target_view.parent_frame.output_space
             and x.correspondences.is_empty
         )

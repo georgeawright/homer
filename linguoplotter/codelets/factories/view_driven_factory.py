@@ -17,9 +17,11 @@ from linguoplotter.codelets.suggesters.projection_suggesters import (
     LetterChunkProjectionSuggester,
     RelationProjectionSuggester,
 )
+from linguoplotter.codelets.suggesters.relation_suggesters import (
+    InterspatialRelationSuggester,
+)
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structure_collection_keys import activation
@@ -30,8 +32,6 @@ from linguoplotter.structures.links import Relation
 class ViewDrivenFactory(Factory):
     """Finds a view with unfilled slots
     and spawns a codelet to suggest a structure that could fill a slot"""
-
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
 
     def __init__(
         self,
@@ -312,13 +312,17 @@ class ViewDrivenFactory(Factory):
             )
         raise Exception("Slot is not a label or a relation.")
 
-    def _spawn_interspatial_relation_suggester(self):
+    def _spawn_interspatial_link_suggester(self):
+        # TODO: actually spawn interspatial relation suggester
+        # TODO: also relations should be between letter chunks
+        # so then semantics and early/late chunks need redefining
+        # should letter chunk's be labeled earliest, latest, northmost etc before being related?
         self.bubble_chamber.loggers["activity"].log(
-            "Spawning interspatial relation suggester"
+            "Spawning interspatial link suggester"
         )
         target_start_space = None
         target_end_space = None
-        for relation in self.targets["view"].parent_frame.interspatial_relations:
+        for relation in self.targets["view"].parent_frame.interspatial_links:
             for correspondee in relation.correspondees:
                 if (
                     relation.start.parent_space
@@ -346,6 +350,7 @@ class ViewDrivenFactory(Factory):
             potential_start_views = self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
                 == start_sub_frame.parent_concept
+                and x.unhappiness < self.FLOATING_POINT_TOLERANCE
             )
             potential_start_views = potential_start_views.sample(
                 len(potential_start_views) // 2
@@ -355,18 +360,21 @@ class ViewDrivenFactory(Factory):
                 lambda x: target_start_space
                 in [x.parent_frame.input_space, x.parent_frame.output_space]
             )
-        potential_start_targets = self.bubble_chamber.new_set(
+        potential_start_targets = StructureSet.union(
             *[
-                view.early_chunk
-                if self.targets["slot"].start == start_sub_frame.early_chunk
-                else view.late_chunk
+                view.output_space.contents.filter(
+                    lambda x: x.is_letter_chunk
+                    and x.members.is_empty
+                    and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+                )
                 for view in potential_start_views
             ]
-        ).filter(lambda x: x is not None and (not x.is_slot or x.is_filled_in))
+        )
         if target_end_space is None:
             potential_end_views = self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept == end_sub_frame.parent_concept
                 and x not in potential_start_views
+                and x.unhappiness < self.FLOATING_POINT_TOLERANCE
             )
         else:
             potential_end_views = self.targets["view"].sub_views.filter(
@@ -375,13 +383,14 @@ class ViewDrivenFactory(Factory):
             )
         potential_end_targets = self.bubble_chamber.new_set(
             *[
-                view.early_chunk
-                if self.targets["slot"].end == end_sub_frame.early_chunk
-                else view.late_chunk
+                view.output_space.contents.filter(
+                    lambda x: x.is_letter_chunk
+                    and x.members.is_empty
+                    and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+                )
                 for view in potential_end_views
             ]
-        ).filter(lambda x: x is not None and (not x.is_slot or x.is_filled_in))
-        # TODO: prioritise completed views
+        )
         possible_target_pairs = [
             (a, b)
             for a in potential_start_targets
@@ -435,7 +444,7 @@ class ViewDrivenFactory(Factory):
             ),
         )
         self.bubble_chamber.loggers["activity"].log_dict(targets)
-        return RelationSuggester.spawn(
+        return InterspatialRelationSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
             targets,

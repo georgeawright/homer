@@ -20,7 +20,7 @@ class Frame(Structure):
         sub_frames: StructureSet,  # collection of frames (all slots)
         # structures have locations in frame and sub-frame spaces
         concepts: StructureSet,
-        interspatial_relations: StructureSet,
+        interspatial_links: StructureSet,
         input_space: "ContextualSpace",
         output_space: "ContextualSpace",
         links_in: StructureSet,
@@ -50,7 +50,7 @@ class Frame(Structure):
         self.parent_frame = parent_frame
         self.sub_frames = sub_frames
         self.concepts = concepts
-        self.interspatial_relations = interspatial_relations
+        self.interspatial_links = interspatial_links
         self.input_space = input_space
         self.output_space = output_space
         self.slot_values = {}
@@ -58,8 +58,6 @@ class Frame(Structure):
         self._depth = depth
         self.is_sub_frame = is_sub_frame
         self.is_frame = True
-        self.early_chunk = None
-        self.late_chunk = None
 
     def __dict__(self) -> dict:
         return {
@@ -250,23 +248,36 @@ class Frame(Structure):
                     copy.parent_space = space_copies[original.parent_space]
                 elif original.is_label or original.is_relation:
                     copy._parent_space = space_copies[original.parent_space]
-        interspatial_relations = bubble_chamber.new_set(
-            *[
-                relation.copy(
-                    bubble_chamber=bubble_chamber,
-                    start=input_copies[relation.start]
-                    if relation.start in input_copies
-                    else output_copies[relation.start],
-                    end=input_copies[relation.end]
-                    if relation.end in input_copies
-                    else output_copies[relation.end],
-                )
-                for relation in self.interspatial_relations
-            ]
+        interspatial_links = StructureSet.union(
+            bubble_chamber.new_set(
+                *[
+                    relation.copy(
+                        bubble_chamber=bubble_chamber,
+                        start=input_copies[relation.start]
+                        if relation.start in input_copies
+                        else output_copies[relation.start],
+                        end=input_copies[relation.end]
+                        if relation.end in input_copies
+                        else output_copies[relation.end],
+                    )
+                    for relation in self.interspatial_links.where(is_relation=True)
+                ]
+            ),
+            bubble_chamber.new_set(
+                *[
+                    label.copy(
+                        bubble_chamber=bubble_chamber,
+                        start=input_copies[label.start]
+                        if label.start in input_copies
+                        else output_copies[label.start],
+                    )
+                    for label in self.interspatial_links.where(is_label=True)
+                ]
+            ),
         )
-        for relation in interspatial_relations:
-            if relation.parent_concept in concept_copies:
-                relation._parent_concept = concept_copies[relation.parent_concept]
+        for link in interspatial_links:
+            if link.parent_concept in concept_copies:
+                link._parent_concept = concept_copies[link.parent_concept]
         new_frame = bubble_chamber.new_frame(
             parent_id=parent_id,
             name=ID.new_frame_instance(self.name),
@@ -274,22 +285,12 @@ class Frame(Structure):
             parent_frame=self,
             sub_frames=sub_frames,
             concepts=concepts,
-            interspatial_relations=interspatial_relations,
+            interspatial_links=interspatial_links,
             input_space=input_space_copy,
             output_space=output_space_copy,
             is_sub_frame=self.is_sub_frame,
             depth=self.depth,
         )
-        if self.early_chunk is None:
-            new_frame.early_chunk = None
-            new_frame.late_chunk = None
-        else:
-            try:
-                new_frame.early_chunk = input_copies[self.early_chunk]
-                new_frame.late_chunk = input_copies[self.late_chunk]
-            except KeyError:
-                new_frame.early_chunk = output_copies[self.early_chunk]
-                new_frame.late_chunk = output_copies[self.late_chunk]
         for abstract_space, conceptual_space in conceptual_spaces_map:
             new_frame.specify_space(abstract_space, conceptual_space)
         return new_frame

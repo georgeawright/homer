@@ -7,6 +7,7 @@ from linguoplotter.structure_collection_keys import (
     exigency,
     uncorrespondedness,
 )
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.nodes import Concept
 
 
@@ -120,39 +121,41 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
         source_collection = bubble_chamber.interspatial_relations
         target_start_space = None
         target_end_space = None
-        for relation in child_codelet.targets[
-            "view"
-        ].parent_frame.interspatial_relations:
-            for correspondee in relation.correspondees:
+        for link in child_codelet.targets["view"].parent_frame.interspatial_links:
+            for correspondee in link.correspondees:
                 if (
-                    relation.start.parent_space
+                    link.start.parent_space
                     == child_codelet.targets["end"].start.parent_space
                 ):
                     target_start_space = correspondee.start.parent_space
                 if (
-                    relation.end.parent_space
+                    link.is_relation
+                    and link.end.parent_space
                     == child_codelet.targets["end"].start.parent_space
                 ):
                     target_start_space = correspondee.end.parent_space
                 if (
-                    relation.start.parent_space
+                    child_codelet.targets["end"].is_relation
+                    and link.start.parent_space
                     == child_codelet.targets["end"].end.parent_space
                 ):
                     target_end_space = correspondee.start.parent_space
                 if (
-                    relation.end.parent_space
+                    link.is_relation
+                    and child_codelet.targets["end"].is_relation
+                    and link.end.parent_space
                     == child_codelet.targets["end"].end.parent_space
                 ):
                     target_end_space = correspondee.end.parent_space
         for sub_frame in child_codelet.targets["view"].parent_frame.sub_frames:
             if (
                 child_codelet.targets["end"].start in sub_frame.input_space.contents
-                or child_codelet.targets["end"].start in sub_frame.input_space.contents
+                or child_codelet.targets["end"].start in sub_frame.output_space.contents
             ):
                 start_sub_frame = sub_frame
-            if (
+            if child_codelet.targets["end"].is_relation and (
                 child_codelet.targets["end"].end in sub_frame.input_space.contents
-                or child_codelet.targets["end"].end in sub_frame.input_space.contents
+                or child_codelet.targets["end"].end in sub_frame.output_space.contents
             ):
                 end_sub_frame = sub_frame
         if target_start_space is None:
@@ -168,14 +171,21 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 lambda x: target_start_space
                 in [x.parent_frame.input_space, x.parent_frame.output_space]
             )
-        potential_start_targets = bubble_chamber.new_set(
+        if potential_start_views.is_empty:
+            raise MissingStructureError
+        potential_start_targets = StructureSet.union(
             *[
-                view.early_chunk
-                if child_codelet.targets["end"].start == start_sub_frame.early_chunk
-                else view.late_chunk
+                view.output_space.contents.filter(
+                    lambda x: x.is_letter_chunk and x.members.is_empty
+                )
+                if child_codelet.targets["end"]
+                in child_codelet.targets["view"].parent_frame.output_space.contents
+                else view.parent_frame.input_space.contents.filter(
+                    lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+                )
                 for view in potential_start_views
             ]
-        ).filter(lambda x: x is not None and (not x.is_slot or x.is_filled_in))
+        )
         if target_end_space is None:
             potential_end_views = bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept == end_sub_frame.parent_concept
@@ -186,50 +196,76 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 lambda x: target_end_space
                 in [x.parent_frame.input_space, x.parent_frame.output_space]
             )
-        potential_end_targets = bubble_chamber.new_set(
+        if potential_end_views.is_empty:
+            raise MissingStructureError
+        potential_end_targets = StructureSet.union(
             *[
-                view.early_chunk
-                if child_codelet.targets["end"].end == end_sub_frame.early_chunk
-                else view.late_chunk
+                view.output_space.contents.filter(
+                    lambda x: x.is_letter_chunk and x.members.is_empty
+                )
+                if child_codelet.targets["end"]
+                in child_codelet.targets["view"].parent_frame.output_space.contents
+                else view.parent_frame.input_space.contents.filter(
+                    lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+                )
                 for view in potential_end_views
             ]
-        ).filter(lambda x: x is not None and (not x.is_slot or x.is_filled_in))
-        matching_relations = source_collection.filter(
-            lambda x: x.is_relation
-            and x.quality * x.activation > 0
-            and (x.start in potential_start_targets)
-            and (x.end in potential_end_targets)
-            and any(
-                [
-                    x.parent_concept == child_codelet.targets["end"].parent_concept,
-                    child_codelet.targets["end"].parent_concept.is_slot,
-                    (
-                        x.parent_concept.is_compound_concept
-                        and x.parent_concept.args[0]
-                        == child_codelet.targets["end"].parent_concept
-                    )
-                    and child_codelet.targets["view"].members.not_empty,
-                ]
-            )
-            and child_codelet.targets["end"].parent_concept.parent_space.subsumes(
-                x.parent_concept.parent_space
-            )
-            and child_codelet.targets["space"].subsumes(x.conceptual_space)
-            and (
-                x.parent_concept
-                in child_codelet.targets["end"].parent_concept.possible_instances
-                if child_codelet.targets[
-                    "end"
-                ].parent_concept.possible_instances.not_empty
-                else True
-            )
         )
-        bubble_chamber.loggers["activity"].log_set(
-            matching_relations, "matching input relations"
-        )
-        child_codelet.targets["start"] = matching_relations.get(
-            key=lambda x: x.quality * x.activation * x.uncorrespondedness
-        )
+        if child_codelet.targets["end"].is_label:
+            matching_labels = source_collection.filter(
+                lambda x: x.is_label
+                and x.is_interspatial
+                and x.quality * x.activation > 0
+                and x.start in potential_start_targets
+                and x.parent_concept == child_codelet.targets["end"].parent_concept
+                and x.parent_spaces.where(is_conceptual_space=True)
+                == child_codelet.targets["end"].parent_spaces.where(
+                    is_conceptual_space=True
+                )
+            )
+            bubble_chamber.loggers["activity"].log_set(
+                matching_labels, "matching input labels"
+            )
+            child_codelet.targets["start"] = matching_labels.get(
+                key=lambda x: x.quality * x.activation * x.uncorrespondedness
+            )
+        elif child_codelet.targets["end"].is_relation:
+            matching_relations = source_collection.filter(
+                lambda x: x.is_relation
+                and x.quality * x.activation > 0
+                and x.start in potential_start_targets
+                and x.end in potential_end_targets
+                and any(
+                    [
+                        x.parent_concept == child_codelet.targets["end"].parent_concept,
+                        child_codelet.targets["end"].parent_concept.is_slot,
+                        (
+                            x.parent_concept.is_compound_concept
+                            and x.parent_concept.args[0]
+                            == child_codelet.targets["end"].parent_concept
+                        )
+                        and child_codelet.targets["view"].members.not_empty,
+                    ]
+                )
+                and child_codelet.targets["end"].parent_concept.parent_space.subsumes(
+                    x.parent_concept.parent_space
+                )
+                and child_codelet.targets["space"].subsumes(x.conceptual_space)
+                and (
+                    x.parent_concept
+                    in child_codelet.targets["end"].parent_concept.possible_instances
+                    if child_codelet.targets[
+                        "end"
+                    ].parent_concept.possible_instances.not_empty
+                    else True
+                )
+            )
+            bubble_chamber.loggers["activity"].log_set(
+                matching_relations, "matching input relations"
+            )
+            child_codelet.targets["start"] = matching_relations.get(
+                key=lambda x: x.quality * x.activation * x.uncorrespondedness
+            )
         for view in bubble_chamber.views:
             if (
                 child_codelet.targets["start"].start

@@ -13,6 +13,14 @@
   (def-concept :name "less" :locations (list (Location (list (list -1)) more-less-space))
     :classifier (DifferenceClassifier -1) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
+(define most-concept
+  (def-concept :name "most" :locations (list (Location (list (list 1)) more-less-space))
+    :classifier (MostClassifier) :instance_type Chunk :structure_type Label
+    :parent_space more-less-space :distance_function centroid_euclidean_distance))
+(define least-concept
+  (def-concept :name "least" :locations (list (Location (list (list -1)) more-less-space))
+    :classifier (LeastClassifier) :instance_type Chunk :structure_type Label
+    :parent_space more-less-space :distance_function centroid_euclidean_distance))
 
 (def-relation :start more-concept :end more-concept :parent_concept more-concept :activation 1.0)
 (def-relation :start less-concept :end less-concept :parent_concept more-concept :activation 1.0)

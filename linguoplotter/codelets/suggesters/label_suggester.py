@@ -164,7 +164,7 @@ class LabelSuggester(Suggester):
             key=lambda x: x.classifier.classify(start=targets["start"], concept=x),
         )
         self.child_codelets.append(
-            LabelSuggester.spawn(
+            type(self).spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 targets,
