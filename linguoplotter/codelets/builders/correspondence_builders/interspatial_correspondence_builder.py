@@ -4,23 +4,6 @@ from linguoplotter.structure_collections import StructureSet
 
 class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
-        if (
-            self.targets["start_sub_view"].super_views.not_empty
-            and self.targets["view"] not in self.targets["start_sub_view"].super_views
-        ):
-            self.bubble_chamber.loggers["activity"].log_set(
-                self.targets["start_sub_view"].super_views, "super views"
-            )
-            return False
-        if (
-            self.targets["end_sub_view"] is not None
-            and self.targets["end_sub_view"].super_views.not_empty
-            and self.targets["view"] not in self.targets["end_sub_view"].super_views
-        ):
-            self.bubble_chamber.loggers["activity"].log_set(
-                self.targets["end_sub_view"].super_views, "super views"
-            )
-            return False
         try:
             matched_start_sub_frame = self.targets["view"].matched_sub_frames[
                 self.targets["start_sub_frame"]

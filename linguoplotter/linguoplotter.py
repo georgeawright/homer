@@ -154,8 +154,10 @@ class Linguoplotter:
                     if node.parent_space.is_main_input
                 ],
             )
-        for relation in self.bubble_chamber.interspatial_relations:
-            print(relation)
-        for count in ID.COUNTS:
-            if "Interspatial" in count:
-                print(count, ID.COUNTS[count])
+        for view in self.bubble_chamber.views.filter(
+            lambda x: x.unhappiness == 0
+            and x.parent_frame.parent_concept.name == "sentence"
+        ):
+            print(view)
+            print(view.output)
+            print(view.super_views)

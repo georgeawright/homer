@@ -375,28 +375,66 @@ class ViewDrivenFactory(Factory):
                 potential_start_views = potential_start_views.sample(
                     len(potential_start_views) // 2
                 )
+                if potential_start_views.is_empty:
+                    raise MissingStructureError
+                potential_start_targets = StructureSet.union(
+                    *[
+                        view.output_space.contents.filter(
+                            lambda x: x.is_chunk
+                            and x.members.is_empty
+                            and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+                        )
+                        if self.targets["slot"]
+                        in self.targets["view"].parent_frame.output_space.contents
+                        else view.parent_frame.input_space.contents.filter(
+                            lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+                        )
+                        for view in potential_start_views
+                    ]
+                )
             else:
                 potential_start_views = self.targets["view"].sub_views.filter(
                     lambda x: target_start_space
                     in [x.parent_frame.input_space, x.parent_frame.output_space]
                 )
-            if potential_start_views.is_empty:
-                raise MissingStructureError
-            potential_start_targets = StructureSet.union(
-                *[
-                    view.output_space.contents.filter(
-                        lambda x: x.is_chunk
-                        and x.members.is_empty
-                        and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+                if self.targets["slot"].start in self.targets["view"].grouped_nodes:
+                    start_node_group = [
+                        group
+                        for group in self.targets["view"].node_groups
+                        if self.targets["slot"].start in group.values()
+                    ][0]
+                    try:
+                        structure_one_start = start_node_group[target_start_space]
+                        self.bubble_chamber.loggers["activity"].log(
+                            f"Found structure one start: {structure_one_start}"
+                        )
+                    except KeyError:
+                        self.bubble_chamber.loggers["activity"].log(
+                            "Start node group has no member in target space one"
+                        )
+                        structure_one_start = None
+                else:
+                    self.bubble_chamber.loggers["activity"].log(
+                        "Structure two start not in grouped nodes"
                     )
-                    if self.targets["slot"]
-                    in self.targets["view"].parent_frame.output_space.contents
-                    else view.parent_frame.input_space.contents.filter(
-                        lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+                    structure_one_start = None
+                if structure_one_start is not None:
+                    potential_start_targets = [structure_one_start]
+                else:
+                    potential_start_targets = StructureSet.union(
+                        *[
+                            view.output_space.contents.filter(
+                                lambda x: x.is_chunk and x.members.is_empty
+                            )
+                            if self.targets["slot"]
+                            in self.targets["view"].parent_frame.output_space.contents
+                            else view.parent_frame.input_space.contents.filter(
+                                lambda x: x.is_chunk
+                                and (not x.is_slot or x.is_filled_in)
+                            )
+                            for view in potential_start_views
+                        ]
                     )
-                    for view in potential_start_views
-                ]
-            )
             if target_end_space is None:
                 potential_end_views = self.bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
@@ -406,28 +444,66 @@ class ViewDrivenFactory(Factory):
                     and x != self.targets["view"]
                     and x.super_views.is_empty
                 )
+                if potential_end_views.is_empty:
+                    raise MissingStructureError
+                potential_end_targets = StructureSet.union(
+                    *[
+                        view.output_space.contents.filter(
+                            lambda x: x.is_chunk
+                            and x.members.is_empty
+                            and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+                        )
+                        if self.targets["slot"]
+                        in self.targets["view"].parent_frame.output_space.contents
+                        else view.parent_frame.input_space.contents.filter(
+                            lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+                        )
+                        for view in potential_end_views
+                    ]
+                )
             else:
                 potential_end_views = self.targets["view"].sub_views.filter(
                     lambda x: target_end_space
                     in [x.parent_frame.input_space, x.parent_frame.output_space]
                 )
-            if potential_end_views.is_empty:
-                raise MissingStructureError
-            potential_end_targets = StructureSet.union(
-                *[
-                    view.output_space.contents.filter(
-                        lambda x: x.is_chunk
-                        and x.members.is_empty
-                        and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+                if self.targets["slot"].end in self.targets["view"].grouped_nodes:
+                    end_node_group = [
+                        group
+                        for group in self.targets["view"].node_groups
+                        if self.targets["slot"].end in group.values()
+                    ][0]
+                    try:
+                        structure_one_end = end_node_group[target_end_space]
+                        self.bubble_chamber.loggers["activity"].log(
+                            f"Found structure one end: {structure_one_end}"
+                        )
+                    except KeyError:
+                        self.bubble_chamber.loggers["activity"].log(
+                            "End node group has no member in target space one"
+                        )
+                        structure_one_end = None
+                else:
+                    self.bubble_chamber.loggers["activity"].log(
+                        "Structure two end not in grouped nodes"
                     )
-                    if self.targets["slot"]
-                    in self.targets["view"].parent_frame.output_space.contents
-                    else view.parent_frame.input_space.contents.filter(
-                        lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+                    structure_one_end = None
+                if structure_one_end is not None:
+                    potential_end_targets = [structure_one_end]
+                else:
+                    potential_end_targets = StructureSet.union(
+                        *[
+                            view.output_space.contents.filter(
+                                lambda x: x.is_chunk and x.members.is_empty
+                            )
+                            if self.targets["slot"]
+                            in self.targets["view"].parent_frame.output_space.contents
+                            else view.parent_frame.input_space.contents.filter(
+                                lambda x: x.is_chunk
+                                and (not x.is_slot or x.is_filled_in)
+                            )
+                            for view in potential_end_views
+                        ]
                     )
-                    for view in potential_end_views
-                ]
-            )
             possible_target_pairs = [
                 (a, b)
                 for a in potential_start_targets

@@ -163,8 +163,8 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 potential_start_views = bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
+                    and x.unhappiness < child_codelet.FLOATING_POINT_TOLERANCE
                     and x != child_codelet.targets["view"]
-                    and x.super_views.is_empty
                 )
                 potential_start_views = potential_start_views.sample(
                     len(potential_start_views) // 2
@@ -201,9 +201,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         if child_codelet.targets["end"].start in group.values()
                     ][0]
                     try:
-                        structure_one_start = start_node_group[
-                            child_codelet.targets["start_space"]
-                        ]
+                        structure_one_start = start_node_group[target_start_space]
                         bubble_chamber.loggers["activity"].log(
                             f"Found structure one start: {structure_one_start}"
                         )
@@ -241,6 +239,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     lambda x: x.parent_frame.parent_concept
                     == end_sub_frame.parent_concept
                     and x not in potential_start_views
+                    and x.unhappiness < child_codelet.FLOATING_POINT_TOLERANCE
                 )
                 if potential_end_views.is_empty:
                     raise MissingStructureError
@@ -274,9 +273,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         if child_codelet.targets["end"].end in group.values()
                     ][0]
                     try:
-                        structure_one_end = end_node_group[
-                            child_codelet.targets["start_space"]
-                        ]
+                        structure_one_end = end_node_group[target_end_space]
                         bubble_chamber.loggers["activity"].log(
                             f"Found structure one end: {structure_one_end}"
                         )
@@ -401,7 +398,13 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
                     and x != child_codelet.targets["view"]
-                    and x.super_views.is_empty
+                    and x.unhappiness < child_codelet.FLOATING_POINT_TOLERANCE
+                    and not any(
+                        [
+                            x.raw_input_nodes == sub_view.raw_input_nodes
+                            for sub_view in child_codelet.targets["view"].sub_views
+                        ]
+                    )
                 )
                 potential_start_views = potential_start_views.sample(
                     len(potential_start_views) // 2
@@ -438,9 +441,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         if child_codelet.targets["end"].start in group.values()
                     ][0]
                     try:
-                        structure_one_start = start_node_group[
-                            child_codelet.targets["start_space"]
-                        ]
+                        structure_one_start = start_node_group[target_start_space]
                         bubble_chamber.loggers["activity"].log(
                             f"Found structure one start: {structure_one_start}"
                         )

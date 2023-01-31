@@ -45,4 +45,3 @@ class InterspatialLabelEvaluator(LabelEvaluator):
         self.confidence = classification / parent_concept.number_of_components
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_label.activation
-        exit()
