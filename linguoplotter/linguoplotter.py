@@ -156,3 +156,6 @@ class Linguoplotter:
             )
         for relation in self.bubble_chamber.interspatial_relations:
             print(relation)
+        for count in ID.COUNTS:
+            if "Interspatial" in count:
+                print(count, ID.COUNTS[count])

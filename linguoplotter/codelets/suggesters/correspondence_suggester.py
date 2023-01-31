@@ -62,7 +62,14 @@ class CorrespondenceSuggester(Suggester):
             and x.correspondences.is_empty
         )
         if target_view.unfilled_interspatial_structures.not_empty:
-            end = target_view.unfilled_interspatial_structures.get()
+            if target_view.unfilled_interspatial_structures.where(
+                is_label=True
+            ).not_empty:
+                end = target_view.unfilled_interspatial_structures.where(
+                    is_label=True
+                ).get()
+            else:
+                end = target_view.unfilled_interspatial_structures.get()
             targets = bubble_chamber.new_dict(
                 {"view": target_view, "end": end},
                 name="targets",

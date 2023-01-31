@@ -41,8 +41,8 @@ class InterspatialLabelEvaluator(LabelEvaluator):
         classification = parent_concept.classifier.classify(
             concept=parent_concept, space=space, start=target_node
         )
-        self.confidence = (
-            classification * target_node.quality / parent_concept.number_of_components
-        )
+        self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
+        self.confidence = classification / parent_concept.number_of_components
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_label.activation
+        exit()

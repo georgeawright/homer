@@ -29,6 +29,8 @@ class InterspatialRelationBuilder(RelationBuilder):
         locations = [
             Location([[location_coordinates]], self.targets["concept"].parent_space),
             TwoPointLocation(start_coordinates, end_coordinates, self.targets["space"]),
+            Location([], self.targets["start"].parent_space),
+            Location([], self.targets["end"].parent_space),
         ]
         relation = self.bubble_chamber.new_relation(
             parent_id=self.codelet_id,

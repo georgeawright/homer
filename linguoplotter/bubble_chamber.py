@@ -221,11 +221,7 @@ class BubbleChamber:
 
     def remove(self, item):
         if item.is_view:
-            correspondences = item.members.where(parent_view=item)
-            for correspondence in correspondences:
-                self.remove(correspondence)
-            for frame in item.frames:
-                self.remove(frame)
+            item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
             for super_view in item.super_views.copy():
@@ -236,26 +232,17 @@ class BubbleChamber:
                         in item.parent_frame.output_space.contents
                     ):
                         self.remove(correspondence)
+                    if correspondence.parent_view in item_sub_views:
+                        super_view.remove(correspondence)
                 super_view.sub_views.remove(item)
                 for frame in item.frames:
                     super_view.frames.remove(frame)
+            correspondences = item.members.where(parent_view=item)
+            for correspondence in correspondences:
+                self.remove(correspondence)
             item.parent_frame.progenitor.instances.remove(item)
             item.parent_frame.parent_concept.instances.remove(item)
-        if item.is_frame:
-            item.parent_frame.instances.remove(item)
-            item.parent_frame.recalculate_exigency()
-            for link in item.interspatial_links:
-                self.interspatial_labels.remove(link)
-                self.interspatial_relations.remove(link)
-                self.remove(link)
-            for x in item.input_space.contents.copy():
-                for link in x.links:
-                    if link.is_interspatial:
-                        self.remove(link)
-            for x in item.output_space.contents.copy():
-                for link in x.links:
-                    if link.is_interspatial:
-                        self.remove(link)
+            self.remove(item.parent_frame)
         if item.is_correspondence:
             item.parent_view.remove(item)
         if item.is_link:
@@ -763,6 +750,7 @@ class BubbleChamber:
         quality: FloatBetweenOneAndZero = 0.0,
         parent_space: ContextualSpace = None,
         is_interspatial: bool = False,
+        activation: FloatBetweenOneAndZero = None,
     ) -> Label:
         parent_space = start.parent_space if parent_space is None else parent_space
         parent_spaces = self.new_set(*[location.space for location in locations])
@@ -782,6 +770,8 @@ class BubbleChamber:
             champion_relations=self.new_set(),
             is_interspatial=is_interspatial,
         )
+        if activation is not None:
+            label._activation = activation
         if start is not None:
             start.links_out.add(label)
             start.recalculate_exigency()

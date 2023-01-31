@@ -134,6 +134,7 @@ class Relation(Link):
             quality=self.quality,
             parent_space=self.parent_space,
             is_interspatial=self.is_interspatial,
+            activation=self.activation,
         )
 
     def nearby(self, space: Space = None) -> StructureSet:

@@ -72,10 +72,10 @@ class InterspatialLabelSuggester(LabelSuggester):
             else:
                 possible_concepts = [self.targets["concept"]]
             if self.targets["space"] is None:
-                possible_spaces = self.bubble_chamber.conceptual_spaces.filter(
-                    lambda x: x.is_basic_level
-                    and isinstance(self.targets["start"], x.instance_type)
-                    and self.targets["start"].has_location_in_space(x)
+                possible_spaces = self.targets["start"].parent_spaces.filter(
+                    lambda x: x.is_conceptual_space
+                    and x.no_of_dimensions == 1
+                    and not x.is_symbolic
                 )
             else:
                 possible_spaces = [self.targets["space"]]
@@ -113,3 +113,6 @@ class InterspatialLabelSuggester(LabelSuggester):
             * self.targets["start"].quality
             / self.targets["concept"].number_of_components
         )
+
+    def _fizzle(self):
+        pass

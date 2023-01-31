@@ -4,7 +4,7 @@
     :instance_type LetterChunk))
 (define grammar-space
   (def-conceptual-space :name "grammar" :parent_concept grammar-concept
-    :no_of_dimensions 0 :is_basic_level True))
+    :no_of_dimensions 0 :is_basic_level True :is_symbolic True))
 
 (define sentence-location (Location (list (list 1)) grammar-space))
 (define np-location (Location (list (list 2)) grammar-space))

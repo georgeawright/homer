@@ -11,7 +11,7 @@ class LeastClassifier(Classifier):
 
         start_location = start.location_in_space(space)
 
-        for item in start.parent_space.where(is_chunk=True, is_raw=False):
+        for item in start.parent_space.contents.where(is_chunk=True, is_raw=False):
             if item == start:
                 continue
             if not item.has_location_in_space(space):

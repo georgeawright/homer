@@ -16,6 +16,7 @@ class WorldviewPorter(Codelet):
     INPUT_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_PROPORTION_OF_INPUT_WEIGHT
     VIEW_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_VIEW_QUALITY_WEIGHT
     FRAMES_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_NUMBER_OF_FRAMES_WEIGHT
+    COHESION_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COHESION_WEIGHT
 
     def __init__(
         self,
@@ -144,6 +145,7 @@ class WorldviewPorter(Codelet):
         proportion_of_input = self._proportion_of_input_in_views(views)
         sum_of_tree_depths = sum(v.parent_frame.tree_depth for v in views)
         view_quality = statistics.fmean([view.quality for view in views])
+        cohesiveness_of_view = self._cohesiveness_of_view(views)
         self.bubble_chamber.loggers["activity"].log(
             f"proportion of input {proportion_of_input}"
         )
@@ -151,11 +153,15 @@ class WorldviewPorter(Codelet):
             f"sum of tree depths {sum_of_tree_depths}"
         )
         self.bubble_chamber.loggers["activity"].log(f"view quality {view_quality}")
+        self.bubble_chamber.loggers["activity"].log(
+            f"cohesivenss of view {cohesiveness_of_view}"
+        )
         satisfaction = sum(
             [
                 self.INPUT_WEIGHT * proportion_of_input,
                 self.VIEW_WEIGHT * view_quality,
                 self.FRAMES_WEIGHT * 1 / sum_of_tree_depths,
+                self.COHESION_WEIGHT * cohesiveness_of_view,
             ]
         )
         # satisfaction = proportion_of_input * view_quality
@@ -197,6 +203,33 @@ class WorldviewPorter(Codelet):
         )
         proportion = size_of_raw_input_in_views / self.bubble_chamber.size_of_raw_input
         return proportion
+
+    def _cohesiveness_of_view(self, views: StructureSet) -> FloatBetweenOneAndZero:
+        spaces = self.bubble_chamber.new_set(
+            *[view.output_space for view in views]
+            + [view.parent_frame.input_space for view in views]
+        )
+        words = StructureSet.union(
+            *[
+                view.output_space.contents.filter(
+                    lambda x: x.is_letter_chunk and x.members.is_empty
+                )
+                for view in views
+            ]
+        )
+        relations = StructureSet.union(
+            *[
+                word.relations.filter(
+                    lambda x: x.is_interspatial
+                    and x.start.parent_space in spaces
+                    and x.end.parent_space in spaces
+                )
+                for word in words
+            ]
+        )
+        return FloatBetweenOneAndZero(
+            sum([r.quality for r in relations]) / (len(words) * 0.5)
+        )
 
     def _frame_types_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
         if views.is_empty:

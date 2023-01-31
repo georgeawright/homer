@@ -325,14 +325,18 @@ class View(Structure):
                 self._grouped_nodes[node_pair[1]] = True
                 if node_pair[0].parent_space.is_main_input:
                     node_pair[1]._non_slot_value = node_pair[0]
-        if self.super_views.not_empty:
-            self.super_views.get().add(correspondence)
+        for super_view in self.super_views:
+            super_view.add(correspondence)
 
     def remove(self, correspondence: "Correspondence"):
         self.members.remove(correspondence)
         for node_pair in correspondence.node_pairs:
             node_pair[1]._non_slot_value = None
-        if correspondence.end.is_link and correspondence.end.parent_concept.is_slot:
+        if (
+            correspondence.parent_view == self
+            and correspondence.end.is_link
+            and correspondence.end.parent_concept.is_slot
+        ):
             if not any(
                 [
                     item.is_link
@@ -344,7 +348,10 @@ class View(Structure):
                 ]
             ):
                 correspondence.end.parent_concept._non_slot_value = None
-        if correspondence.conceptual_space is not None:
+        if (
+            correspondence.parent_view == self
+            and correspondence.conceptual_space is not None
+        ):
             if not any(
                 [
                     c.conceptual_space == correspondence.conceptual_space
@@ -383,8 +390,8 @@ class View(Structure):
         self._node_groups = []
         for member in self.members:
             self.add(member)
-        if self.super_views.not_empty:
-            self.super_views.get().remove(correspondence)
+        for super_view in self.super_views:
+            super_view.remove(correspondence)
         self.recalculate_exigency()
 
     def has_member(
