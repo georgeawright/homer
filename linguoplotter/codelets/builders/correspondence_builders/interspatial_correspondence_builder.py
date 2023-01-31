@@ -113,8 +113,14 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["view"].add(correspondence)
             self.targets["view"].sub_views.add(self.targets["start_sub_view"])
             self.targets["start_sub_view"].super_views.add(self.targets["view"])
+            if self.targets["start_sub_view"].champion_super_view is None:
+                self.targets["start_sub_view"].champion_super_view = self.targets[
+                    "view"
+                ]
             self.targets["view"].sub_views.add(self.targets["end_sub_view"])
             self.targets["end_sub_view"].super_views.add(self.targets["view"])
+            if self.targets["end_sub_view"].champion_super_view is None:
+                self.targets["end_sub_view"].champion_super_view = self.targets["view"]
             if self.targets["space"] is not None and self.targets["space"].is_slot:
                 self.targets["view"].specify_space(
                     self.targets["space"],
@@ -158,6 +164,10 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["view"].add(correspondence)
             self.targets["view"].sub_views.add(self.targets["start_sub_view"])
             self.targets["start_sub_view"].super_views.add(self.targets["view"])
+            if self.targets["start_sub_view"].champion_super_view is None:
+                self.targets["start_sub_view"].champion_super_view = self.targets[
+                    "view"
+                ]
             if self.targets["space"] is not None and self.targets["space"].is_slot:
                 self.targets["view"].specify_space(
                     self.targets["space"],

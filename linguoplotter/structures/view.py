@@ -60,6 +60,7 @@ class View(Structure):
         self.members = members
         self.sub_views = sub_views
         self.super_views = super_views
+        self.champion_super_view = None
         self._node_groups = []
         self._grouped_nodes = {}
         self.matched_sub_frames = {}
@@ -213,15 +214,15 @@ class View(Structure):
 
     @property
     def grouped_nodes(self):
-        if self.super_views.is_empty:
+        if self.champion_super_view is None:
             return self._grouped_nodes
-        return self.super_views.get().grouped_nodes
+        return self.champion_super_view.grouped_nodes
 
     @property
     def node_groups(self):
-        if self.super_views.is_empty:
+        if self.champion_super_view is None:
             return self._node_groups
-        return self.super_views.get().node_groups
+        return self.champion_super_view.node_groups
 
     @property
     def output(self):
@@ -382,6 +383,8 @@ class View(Structure):
                         ).get()
                         sub_view.super_views.remove(self)
                         self.sub_views.remove(sub_view)
+                        if sub_view.champion_super_view == self:
+                            sub_view.champion_super_view = None
                     except MissingStructureError:
                         pass
                     self.frames.remove(sub_frame)
@@ -527,15 +530,18 @@ class View(Structure):
                         print(potential_group)
                         print(shared_spaces)
                     return False
-        if self.super_views.is_empty:
-            return True
         if verbose:
             print("super")
-        return self.super_views.get().can_accept_member(
-            parent_concept,
-            conceptual_space,
-            start,
-            end,
+        return all(
+            [
+                super_view.can_accept_member(
+                    parent_concept,
+                    conceptual_space,
+                    start,
+                    end,
+                )
+                for super_view in self.super_views
+            ]
         )
 
     def recalculate_activation(self):

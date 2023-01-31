@@ -224,6 +224,8 @@ class BubbleChamber:
             item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
+                if sub_view.champion_super_view == item:
+                    sub_view.champion_super_view = None
             for super_view in item.super_views.copy():
                 for correspondence in super_view.members.copy():
                     if (
@@ -734,7 +736,7 @@ class BubbleChamber:
             parent_view.recalculate_exigency()
             self.loggers["structure"].log(parent_view)
             try:
-                parent_view = parent_view.super_views.get()
+                parent_view = parent_view.champion_super_view
             except MissingStructureError:
                 parent_view = None
         self.loggers["structure"].log(start)
