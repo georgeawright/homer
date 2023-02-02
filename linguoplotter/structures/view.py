@@ -130,6 +130,12 @@ class View(Structure):
         )
 
     @property
+    def tree_depth(self):
+        if self.sub_views.is_empty:
+            return 1
+        return 1 + max([v.tree_depth for v in self.sub_views])
+
+    @property
     def input_contextual_spaces(self):
         return self.input_spaces.where(is_contextual_space=True)
 

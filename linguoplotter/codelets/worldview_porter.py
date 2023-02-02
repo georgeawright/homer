@@ -143,7 +143,7 @@ class WorldviewPorter(Codelet):
         if views.is_empty:
             return 0
         proportion_of_input = self._proportion_of_input_in_views(views)
-        sum_of_tree_depths = sum(v.parent_frame.tree_depth for v in views)
+        sum_of_tree_depths = sum(v.tree_depth for v in views)
         view_quality = statistics.fmean([view.quality for view in views])
         cohesiveness_of_view = self._cohesiveness_of_view(views)
         self.bubble_chamber.loggers["activity"].log(
@@ -154,7 +154,7 @@ class WorldviewPorter(Codelet):
         )
         self.bubble_chamber.loggers["activity"].log(f"view quality {view_quality}")
         self.bubble_chamber.loggers["activity"].log(
-            f"cohesivenss of view {cohesiveness_of_view}"
+            f"cohesiveness of view {cohesiveness_of_view}"
         )
         satisfaction = sum(
             [
@@ -207,7 +207,7 @@ class WorldviewPorter(Codelet):
     def _cohesiveness_of_view(self, views: StructureSet) -> FloatBetweenOneAndZero:
         spaces = self.bubble_chamber.new_set(
             *[view.output_space for view in views]
-            + [view.parent_frame.input_space for view in views]
+            + [frame.input_space for view in views for frame in view.frames]
         )
         words = StructureSet.union(
             *[
@@ -217,15 +217,19 @@ class WorldviewPorter(Codelet):
                 for view in views
             ]
         )
-        relations = StructureSet.union(
+        chunks = StructureSet.union(
             *[
-                word.relations.filter(
-                    lambda x: x.is_interspatial
-                    and x.start.parent_space in spaces
-                    and x.end.parent_space in spaces
-                )
-                for word in words
+                frame.input_space.contents.filter(lambda x: x.is_chunk)
+                for view in views
+                for frame in view.frames
             ]
+        )
+        relations = StructureSet.union(
+            *[word.relations for word in words] + [chunk.relations for chunk in chunks]
+        ).filter(
+            lambda x: x.is_interspatial
+            and x.start.parent_space in spaces
+            and x.end.parent_space in spaces
         )
         return FloatBetweenOneAndZero(
             sum([r.quality for r in relations]) / (len(words) * 0.5)

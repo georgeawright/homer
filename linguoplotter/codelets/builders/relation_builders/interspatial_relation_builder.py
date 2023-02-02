@@ -25,7 +25,11 @@ class InterspatialRelationBuilder(RelationBuilder):
         end_coordinates = (
             self.targets["end"].location_in_space(self.targets["space"]).coordinates
         )
-        location_coordinates = centroid_difference(start_coordinates, end_coordinates)
+        location_coordinates = (
+            centroid_difference(start_coordinates, end_coordinates)
+            if start_coordinates != [] and end_coordinates != []
+            else []
+        )
         locations = [
             Location([[location_coordinates]], self.targets["concept"].parent_space),
             TwoPointLocation(start_coordinates, end_coordinates, self.targets["space"]),

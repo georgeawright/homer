@@ -138,8 +138,4 @@ class InterspatialRelationSuggester(RelationSuggester):
             end=end,
         )
         self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
-        self.confidence = (
-            classification
-            * min(start.quality, end.quality)
-            / self.targets["concept"].number_of_components
-        )
+        self.confidence = classification / self.targets["concept"].number_of_components

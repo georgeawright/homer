@@ -52,13 +52,16 @@ class InterspatialLabelSelector(LabelSelector):
                 and x.members.is_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             ).get(key=labeling_exigency)
+            space = start.parent_spaces.filter(
+                lambda x: x.is_conceptual_space
+                and x.no_of_dimensions == 1
+                and not x.is_symbolic
+            ).get(key=activation)
             targets = self.bubble_chamber.new_dict(
                 {
                     "start": start,
                     "concept": winning_label.parent_concept,
-                    "space": winning_label.parent_spaces.where(
-                        is_conceptual_space=True
-                    ).get(),
+                    "space": space,
                 },
                 name="targets",
             )
@@ -67,7 +70,7 @@ class InterspatialLabelSelector(LabelSelector):
                     self.codelet_id,
                     self.bubble_chamber,
                     targets,
-                    new_start.unlabeledness,
+                    start.unlabeledness,
                 )
             )
         except MissingStructureError:

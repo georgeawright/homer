@@ -79,26 +79,31 @@ class InterspatialLabelSuggester(LabelSuggester):
                 )
             else:
                 possible_spaces = [self.targets["space"]]
-        possible_target_combos = [
-            self.bubble_chamber.new_dict(
-                {
-                    "start": self.targets["start"],
-                    "space": space,
-                    "concept": concept,
-                },
-                name="targets",
+            possible_target_combos = [
+                self.bubble_chamber.new_dict(
+                    {
+                        "start": self.targets["start"],
+                        "space": space,
+                        "concept": concept,
+                    },
+                    name="targets",
+                )
+                for space in possible_spaces
+                for concept in possible_concepts
+            ]
+            targets = self.bubble_chamber.random_machine.select(
+                possible_target_combos,
+                key=lambda x: x["concept"].classifier.classify(
+                    start=x["start"],
+                    concept=x["concept"],
+                    space=x["space"],
+                ),
             )
-            for space in possible_spaces
-            for concept in possible_concepts
-        ]
-        self.targets = self.bubble_chamber.random_machine.select(
-            possible_target_combos,
-            key=lambda x: x["concept"].classifier.classify(
-                start=x["start"],
-                concept=x["concept"],
-                space=x["space"],
-            ),
-        )
+            self.targets["start"], self.targets["concept"], self.targets["space"] = (
+                targets["start"],
+                targets["concept"],
+                targets["space"],
+            )
         return True
 
     def _calculate_confidence(self):
@@ -108,11 +113,7 @@ class InterspatialLabelSuggester(LabelSuggester):
             start=self.targets["start"],
         )
         self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
-        self.confidence = (
-            classification
-            * self.targets["start"].quality
-            / self.targets["concept"].number_of_components
-        )
+        self.confidence = classification / self.targets["concept"].number_of_components
 
     def _fizzle(self):
         pass
