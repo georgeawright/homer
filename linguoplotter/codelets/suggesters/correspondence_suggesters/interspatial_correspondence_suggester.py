@@ -165,6 +165,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     == start_sub_frame.parent_concept
                     and x.unhappiness < child_codelet.FLOATING_POINT_TOLERANCE
                     and x != child_codelet.targets["view"]
+                    and x.super_views.is_empty
                 )
                 potential_start_views = potential_start_views.sample(
                     len(potential_start_views) // 2
@@ -399,6 +400,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     == start_sub_frame.parent_concept
                     and x != child_codelet.targets["view"]
                     and x.unhappiness < child_codelet.FLOATING_POINT_TOLERANCE
+                    and x.super_views.is_empty
                     and not any(
                         [
                             x.raw_input_nodes == sub_view.raw_input_nodes

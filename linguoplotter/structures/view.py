@@ -60,7 +60,6 @@ class View(Structure):
         self.members = members
         self.sub_views = sub_views
         self.super_views = super_views
-        self.champion_super_view = None
         self._node_groups = []
         self._grouped_nodes = {}
         self.matched_sub_frames = {}
@@ -220,15 +219,15 @@ class View(Structure):
 
     @property
     def grouped_nodes(self):
-        if self.champion_super_view is None:
+        if self.super_views.is_empty:
             return self._grouped_nodes
-        return self.champion_super_view.grouped_nodes
+        return self.super_views.get().grouped_nodes
 
     @property
     def node_groups(self):
-        if self.champion_super_view is None:
+        if self.super_views.is_empty:
             return self._node_groups
-        return self.champion_super_view.node_groups
+        return self.super_views.get().node_groups
 
     @property
     def output(self):
@@ -423,8 +422,6 @@ class View(Structure):
                         ).get()
                         sub_view.super_views.remove(self)
                         self.sub_views.remove(sub_view)
-                        if sub_view.champion_super_view == self:
-                            sub_view.champion_super_view = None
                     except MissingStructureError:
                         pass
                     self.frames.remove(sub_frame)

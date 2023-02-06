@@ -4,6 +4,23 @@ from linguoplotter.structure_collections import StructureSet
 
 class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
+        if (
+            self.targets["start_sub_view"].super_views.not_empty
+            and self.targets["view"] not in self.targets["start_sub_view"].super_views
+        ):
+            self.bubble_chamber.loggers["activity"].log_set(
+                self.targets["start_sub_view"].super_views, "super views"
+            )
+            return False
+        if (
+            self.targets["end_sub_view"] is not None
+            and self.targets["end_sub_view"].super_views.not_empty
+            and self.targets["view"] not in self.targets["end_sub_view"].super_views
+        ):
+            self.bubble_chamber.loggers["activity"].log_set(
+                self.targets["end_sub_view"].super_views, "super views"
+            )
+            return False
         try:
             matched_start_sub_frame = self.targets["view"].matched_sub_frames[
                 self.targets["start_sub_frame"]
@@ -96,14 +113,8 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["view"].add(correspondence)
             self.targets["view"].sub_views.add(self.targets["start_sub_view"])
             self.targets["start_sub_view"].super_views.add(self.targets["view"])
-            if self.targets["start_sub_view"].champion_super_view is None:
-                self.targets["start_sub_view"].champion_super_view = self.targets[
-                    "view"
-                ]
             self.targets["view"].sub_views.add(self.targets["end_sub_view"])
             self.targets["end_sub_view"].super_views.add(self.targets["view"])
-            if self.targets["end_sub_view"].champion_super_view is None:
-                self.targets["end_sub_view"].champion_super_view = self.targets["view"]
             if self.targets["space"] is not None and self.targets["space"].is_slot:
                 self.targets["view"].specify_space(
                     self.targets["space"],
@@ -147,10 +158,6 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["view"].add(correspondence)
             self.targets["view"].sub_views.add(self.targets["start_sub_view"])
             self.targets["start_sub_view"].super_views.add(self.targets["view"])
-            if self.targets["start_sub_view"].champion_super_view is None:
-                self.targets["start_sub_view"].champion_super_view = self.targets[
-                    "view"
-                ]
             if self.targets["space"] is not None and self.targets["space"].is_slot:
                 self.targets["view"].specify_space(
                     self.targets["space"],

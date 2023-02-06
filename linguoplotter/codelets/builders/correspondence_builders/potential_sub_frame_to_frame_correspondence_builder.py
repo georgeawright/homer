@@ -52,7 +52,6 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             self.targets["view"].add(correspondence)
         self.targets["view"].sub_views.add(self.targets["sub_view"])
         self.targets["sub_view"].super_views.add(self.targets["view"])
-        self.targets["sub_view"].champion_super_views = self.targets["view"]
         if self.targets["space"] is not None and self.targets["space"].is_slot:
             if self.targets["end"].is_label:
                 self.targets["view"].specify_space(
