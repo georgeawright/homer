@@ -7,6 +7,7 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collection_keys import activation, exigency
+from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures import Frame
 
 
@@ -36,7 +37,7 @@ class ViewSuggester(Suggester):
         cls,
         parent_id: str,
         bubble_chamber: BubbleChamber,
-        target_structures: dict,
+        targets: StructureDict,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -44,7 +45,7 @@ class ViewSuggester(Suggester):
             codelet_id,
             parent_id,
             bubble_chamber,
-            target_structures,
+            targets,
             urgency,
         )
 
