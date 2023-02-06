@@ -109,7 +109,7 @@ class ActivityLogger(Logger):
             + f"Coderack Population Size: {coderack_population} | "
             + f"View Count: {len(self.codelet.bubble_chamber.views)}\n"
             + f"Focus: {self.codelet.bubble_chamber.focus.view}\n"
-            + f"Worldview: {self.codelet.bubble_chamber.worldview.views}\n",
+            + f"Worldview: {self.codelet.bubble_chamber.worldview.view}\n",
         )
         self._log_satisfaction()
         self._log_coderack_population(coderack_population)

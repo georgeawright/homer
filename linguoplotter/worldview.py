@@ -1,16 +1,21 @@
-from .structure_collections import StructureSet
+from linguoplotter.structures import View
 
 
 class Worldview:
-    def __init__(self, views: StructureSet):
-        self.views = views
+    def __init__(self, view: View):
+        self.view = view
         self.satisfaction = 0
 
     @property
     def output(self):
-        return ". ".join([view.output for view in self.views])
+        if self.view is None:
+            return ""
+        return self.view.output
 
     def activate(self):
+        if self.view is None:
+            return
+
         def activate_view(view):
             view.activate()
             for member in view.members:
@@ -18,5 +23,4 @@ class Worldview:
             for sub_view in view.sub_views:
                 activate_view(sub_view)
 
-        for view in self.views:
-            activate_view(view)
+        activate_view(self.view)

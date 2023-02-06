@@ -52,7 +52,7 @@ class Publisher(Codelet):
         )
 
     def run(self) -> CodeletResult:
-        if self.bubble_chamber.worldview.views.is_empty:
+        if self.bubble_chamber.worldview.view is None:
             self.bubble_chamber.loggers["activity"].log("Worldview is empty.")
             self._fizzle()
             self.result = CodeletResult.FIZZLE

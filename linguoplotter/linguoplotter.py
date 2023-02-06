@@ -113,7 +113,7 @@ class Linguoplotter:
             + f"recycle bin: {len(self.bubble_chamber.recycle_bin)}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
-        if self.bubble_chamber.worldview.views.not_empty:
+        if self.bubble_chamber.worldview.view is not None:
             view_output = self.bubble_chamber.worldview.output
             print(view_output)
         print("=" * 200)

@@ -71,7 +71,7 @@ class BubbleChamber:
     def reset(self, loggers: Dict[str, Logger]):
         self.loggers = loggers
         self.focus = Focus()
-        self.worldview = Worldview(self.new_set())
+        self.worldview = Worldview(None)
         self.conceptual_spaces = self.new_set()
         self.contextual_spaces = self.new_set()
         self.frames = self.new_set()

@@ -17,10 +17,11 @@ class InterspatialLabelEvaluator(LabelEvaluator):
         target = bubble_chamber.interspatial_labels.get(
             key=lambda x: fuzzy.OR(
                 abs(x.activation - x.quality),
-                any(
+                bubble_chamber.worldview.view is not None
+                and any(
                     [
                         x in view.output_space.contents
-                        for view in bubble_chamber.worldview.views
+                        for view in bubble_chamber.worldview.view.all_sub_views
                     ]
                 ),
             )

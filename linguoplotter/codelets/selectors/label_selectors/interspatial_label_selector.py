@@ -42,7 +42,8 @@ class InterspatialLabelSelector(LabelSelector):
                 == self.bubble_chamber.concepts["sentence"]
             ).get(
                 key=lambda x: fuzzy.OR(
-                    x in self.bubble_chamber.worldview.views,
+                    self.bubble_chamber.worldview.view is not None
+                    and x in self.bubble_chamber.worldview.view.all_sub_views,
                     x.super_views.not_empty,
                     x.activation,
                 )

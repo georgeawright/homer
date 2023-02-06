@@ -4,6 +4,7 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection_keys import relating_exigency
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.links import Relation
+from linguoplotter.structures.nodes import Concept
 
 
 class InterspatialRelationSuggester(RelationSuggester):
@@ -33,6 +34,62 @@ class InterspatialRelationSuggester(RelationSuggester):
         ).get(key=relating_exigency)
         urgency = urgency if urgency is not None else start.unrelatedness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
+        return cls.spawn(parent_id, bubble_chamber, targets, urgency)
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        parent_concept: Concept,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        view = bubble_chamber.views.filter(
+            lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
+            and x.parent_frame.parent_concept == bubble_chamber.concepts["sentence"]
+        ).get()
+        potential_spaces = view.output_space.conceptual_spaces.filter(
+            lambda x: not x.is_symbolic
+            and (
+                x.no_of_dimensions == 1
+                if parent_concept.parent_space.name == "more-less"
+                else True
+            )
+        )
+        potential_targets = view.output_space.contents.filter(
+            lambda x: x.is_letter_chunk
+            and x.members.is_empty
+            and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+        ).get(key=relating_exigency)
+        potential_pairs = [
+            (a, b) for a in potential_targets for b in potential_targets if a != b
+        ]
+        possible_target_combos = [
+            bubble_chamber.new_dict(
+                {
+                    "start": pair[0],
+                    "end": pair[1],
+                    "space": space,
+                    "concept": parent_concept,
+                },
+                name="targets",
+            )
+            for pair in potential_pairs
+            for space in potential_spaces
+            if pair[0].has_location_in_space(space)
+            and pair[1].has_location_in_space(space)
+        ]
+        targets = bubble_chamber.random_machine.select(
+            possible_target_combos,
+            key=lambda x: x["concept"].classifier.classify(
+                start=x["start"],
+                end=x["end"],
+                concept=x["concept"],
+                space=x["space"],
+            ),
+        )
+        targets.name = "targets"
+        urgency = urgency if urgency is not None else targets["start"].unrelatedness
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 
     def _passes_preliminary_checks(self):

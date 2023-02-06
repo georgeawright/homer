@@ -8,15 +8,15 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict, StructureSet
+from linguoplotter.structures import View
 
 
 class WorldviewPorter(Codelet):
 
-    MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-    INPUT_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_PROPORTION_OF_INPUT_WEIGHT
-    VIEW_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_VIEW_QUALITY_WEIGHT
-    FRAMES_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_NUMBER_OF_FRAMES_WEIGHT
-    COHESION_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COHESION_WEIGHT
+    CORRECTNESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_CORRECTNESS_WEIGHT
+    COMPLETENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COMPLETENESS_WEIGHT
+    CONCISENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_CONCISENESS_WEIGHT
+    COHESIVENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COHESION_WEIGHT
 
     def __init__(
         self,
@@ -48,8 +48,7 @@ class WorldviewPorter(Codelet):
             self.targets["view"] = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
                 and x.parent_frame.parent_concept.name == "sentence"
-                and self.bubble_chamber.new_set(x)
-                != self.bubble_chamber.worldview.views
+                and x != self.bubble_chamber.worldview.view
             ).get(key=lambda x: x.activation)
             self.run_competition()
             self._engender_follow_up()
@@ -59,33 +58,20 @@ class WorldviewPorter(Codelet):
         return self.result
 
     def run_competition(self):
-        competing_view_collection = self._get_competing_view_collection()
-        self.bubble_chamber.loggers["activity"].log_set(
-            competing_view_collection, "Assembled competing views"
+        chosen_worldview = self.bubble_chamber.random_machine.select(
+            [self.bubble_chamber.worldview.view, self.targets["view"]],
+            key=self._calculate_satisfaction,
         )
-        if competing_view_collection == self.bubble_chamber.worldview.views:
-            raise MissingStructureError
-        current_worldview_satisfaction = self._calculate_satisfaction(
-            self.bubble_chamber.worldview.views
+        self.bubble_chamber.worldview.satisfaction = self._calculate_satisfaction(
+            chosen_worldview
         )
-        potential_worldview_satisfaction = self._calculate_satisfaction(
-            competing_view_collection
-        )
-        if self.bubble_chamber.random_machine.randomize_number(
-            potential_worldview_satisfaction
-        ) > self.bubble_chamber.random_machine.randomize_number(
-            self.bubble_chamber.worldview.satisfaction
-        ):
-            self.bubble_chamber.worldview.views = competing_view_collection
-            self.bubble_chamber.worldview.satisfaction = (
-                potential_worldview_satisfaction
-            )
+        if chosen_worldview != self.bubble_chamber.worldview.view:
+            self.bubble_chamber.worldview.view = chosen_worldview
             self.bubble_chamber.concepts["publish"].decay_activation(
                 self.bubble_chamber.general_satisfaction
             )
             self.result = CodeletResult.FINISH
         else:
-            self.bubble_chamber.worldview.satisfaction = current_worldview_satisfaction
             self._update_publisher_urgency()
             self.result = CodeletResult.FIZZLE
 
@@ -115,77 +101,39 @@ class WorldviewPorter(Codelet):
                 return
         raise Exception
 
-    def _get_competing_view_collection(self) -> StructureSet:
-        competing_views = self.bubble_chamber.new_set(name="competing views")
-        component_views = []
-
-        def add_to_competing_views(view):
-            if view.output in component_views:
-                return
-            super_views = [view]
-            while len(super_views) > 0:
-                super_view = super_views.pop()
-                component_views.append(super_view.output)
-                for sub_view in super_view.sub_views:
-                    if sub_view.parent_frame.parent_concept.name == "sentence":
-                        super_views.append(sub_view)
-            competing_views.add(view)
-
-        add_to_competing_views(self.targets["view"])
-        #        if self.bubble_chamber.worldview.views is not None:
-        #            for view in self.bubble_chamber.worldview.views:
-        #                if self.bubble_chamber.random_machine.coin_flip():
-        #                    add_to_competing_views(view)
-
-        return competing_views
-
-    def _calculate_satisfaction(self, views: StructureSet) -> FloatBetweenOneAndZero:
-        if views.is_empty:
-            return 0
-        proportion_of_input = self._proportion_of_input_in_views(views)
-        sum_of_tree_depths = sum(v.tree_depth for v in views)
-        view_quality = statistics.fmean([view.quality for view in views])
-        cohesiveness_of_view = self._cohesiveness_of_view(views)
-        self.bubble_chamber.loggers["activity"].log(
-            f"proportion of input {proportion_of_input}"
-        )
-        self.bubble_chamber.loggers["activity"].log(
-            f"sum of tree depths {sum_of_tree_depths}"
-        )
-        self.bubble_chamber.loggers["activity"].log(f"view quality {view_quality}")
-        self.bubble_chamber.loggers["activity"].log(
-            f"cohesiveness of view {cohesiveness_of_view}"
-        )
+    def _calculate_satisfaction(self, view: View) -> FloatBetweenOneAndZero:
+        if view is None:
+            return 0.0
+        correctness = self._calculate_correctness(view)
+        completeness = self._calculate_completeness(view)
+        conciseness = self._calculate_conciseness(view)
+        cohesiveness = self._calculate_cohesiveness(view)
         satisfaction = sum(
             [
-                self.INPUT_WEIGHT * proportion_of_input,
-                self.VIEW_WEIGHT * view_quality,
-                self.FRAMES_WEIGHT * 1 / sum_of_tree_depths,
-                self.COHESION_WEIGHT * cohesiveness_of_view,
+                self.CORRECTNESS_WEIGHT * correctness,
+                self.COMPLETENESS_WEIGHT * completeness,
+                self.CONCISENESS_WEIGHT * conciseness,
+                self.COHESIVENESS_WEIGHT * cohesiveness,
             ]
         )
-        # satisfaction = proportion_of_input * view_quality
-        view_ids = [view.structure_id for view in views]
         self.bubble_chamber.loggers["activity"].log(
-            f"Satisfaction for {view_ids}: {satisfaction}"
+            f"Calculating satisfaction for {view}\n"
+            + f"Correctness: {correctness}\n"
+            + f"Completeness: {completeness}\n"
+            + f"Conciseness: {conciseness}\n"
+            + f"Cohesiveness: {cohesiveness}\n"
+            + f"Overall satisfaction: {satisfaction}"
         )
         return satisfaction
 
-    def _view_quality_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
-        if views.is_empty:
-            return 0
-        return statistics.fmean([view.quality for view in views])
+    def _calculate_correctness(self, view: View) -> FloatBetweenOneAndZero:
+        return view.quality
 
-    def _proportion_of_input_in_views(
-        self, views: StructureSet
-    ) -> FloatBetweenOneAndZero:
-        if views.is_empty:
-            return 0
+    def _calculate_completeness(self, view: View) -> FloatBetweenOneAndZero:
         size_of_raw_input_in_views = len(
             self.bubble_chamber.new_set(
                 *[
                     (raw_input_member, correspondence.conceptual_space)
-                    for view in views
                     for correspondence in view.members
                     if correspondence.start.is_link
                     and correspondence.start.start.is_chunk
@@ -204,23 +152,22 @@ class WorldviewPorter(Codelet):
         proportion = size_of_raw_input_in_views / self.bubble_chamber.size_of_raw_input
         return proportion
 
-    def _cohesiveness_of_view(self, views: StructureSet) -> FloatBetweenOneAndZero:
+    def _calculate_conciseness(self, view: View) -> FloatBetweenOneAndZero:
+        if view.parent_frame.parent_concept != self.bubble_chamber.concepts["sentence"]:
+            return 0
+        return 1 + max([self._calculate_conciseness(v) for v in view.sub_views])
+
+    def _calculate_cohesiveness(self, view: View) -> FloatBetweenOneAndZero:
         spaces = self.bubble_chamber.new_set(
-            *[view.output_space for view in views]
-            + [frame.input_space for view in views for frame in view.frames]
+            *[v.output_space for v in view.all_sub_views]
+            + [frame.input_space for frame in view.frames]
         )
-        words = StructureSet.union(
-            *[
-                view.output_space.contents.filter(
-                    lambda x: x.is_letter_chunk and x.members.is_empty
-                )
-                for view in views
-            ]
+        words = view.output_space.contents.filter(
+            lambda x: x.is_letter_chunk and x.members.is_empty
         )
         chunks = StructureSet.union(
             *[
                 frame.input_space.contents.filter(lambda x: x.is_chunk)
-                for view in views
                 for frame in view.frames
             ]
         )
@@ -234,25 +181,3 @@ class WorldviewPorter(Codelet):
         return FloatBetweenOneAndZero(
             sum([r.quality for r in relations]) / (len(words) * 0.5)
         )
-
-    def _frame_types_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
-        if views.is_empty:
-            return 0
-        frame_types = self.bubble_chamber.new_set()
-        for view in views:
-            for frame in view.frames:
-                frame_type = frame
-                while frame_type.parent_frame is not None:
-                    frame_type = frame_type.parent_frame
-                frame_types.add(frame_type)
-        number_of_frame_types_in_views = len(frame_types)
-        score = 1 / number_of_frame_types_in_views
-        self.bubble_chamber.loggers["activity"].log(self, f"Frame types score: {score}")
-        return score
-
-    def _frame_depth_score(self, views: StructureSet) -> FloatBetweenOneAndZero:
-        if views.is_empty:
-            return 0
-        score = statistics.fmean([view.parent_frame.depth / 10 for view in views])
-        self.bubble_chamber.loggers["activity"].log(f"Frame depth score: {score}")
-        return score

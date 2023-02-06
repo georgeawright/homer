@@ -11,6 +11,7 @@ class Codelet(ABC):
     """A unit of work to be carried out in the bubble chamber."""
 
     FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
+    MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
     def __init__(
         self,

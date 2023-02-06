@@ -130,12 +130,6 @@ class View(Structure):
         )
 
     @property
-    def tree_depth(self):
-        if self.sub_views.is_empty:
-            return 1
-        return 1 + max([v.tree_depth for v in self.sub_views])
-
-    @property
     def input_contextual_spaces(self):
         return self.input_spaces.where(is_contextual_space=True)
 
@@ -148,6 +142,12 @@ class View(Structure):
         return self.parent_frame.output_space.contents.filter(
             lambda x: x.is_slot
             and len(x.parent_spaces.where(is_contextual_space=True)) > 1
+        )
+
+    @property
+    def all_sub_views(self) -> StructureSet:
+        return StructureSet.union(
+            *[self.sub_views] + [sub_view.all_sub_views for sub_view in self.sub_views]
         )
 
     @property
@@ -290,6 +290,40 @@ class View(Structure):
             return self.structures == other.structures and self.output == other.output
         except MissingStructureError:
             return False
+
+    def cohesiveness_with(self, other: View) -> FloatBetweenOneAndZero:
+        spaces = (
+            [self.output_space, other.output_space]
+            + [frame.input_space for frame in self.frames]
+            + [frame.input_space for frame in other.frames]
+        )
+        words = StructureSet.union(
+            self.output_space.contents.filter(
+                lambda x: x.is_letter_chunk and x.members.is_empty
+            ),
+            other.output_space.contents.filter(
+                lambda x: x.is_letter_chunk and x.members.is_empty
+            ),
+        )
+        chunks = StructureSet.union(
+            *[
+                frame.input_space.contents.filter(lambda x: x.is_chunk)
+                for frame in StructureSet.union(self.frames, other.frames)
+            ]
+        )
+        relations = StructureSet.union(
+            *[word.relations for word in words] + [chunk.relations for chunk in chunks]
+        ).filter(
+            lambda x: x.is_interspatial
+            and x.start.parent_space in spaces
+            and x.end.parent_space in spaces
+        )
+        try:
+            return FloatBetweenOneAndZero(
+                sum([r.quality for r in relations]) / (len(words) * 0.5)
+            )
+        except ZeroDivisionError:
+            return 0.0
 
     def specify_space(self, abstract_space, conceptual_space):
         if (

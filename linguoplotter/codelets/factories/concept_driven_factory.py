@@ -1,6 +1,7 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Factory
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.structure_collection_keys import activation
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.links import Label, Relation
 from linguoplotter.structures.nodes import Concept
@@ -64,7 +65,13 @@ class ConceptDrivenFactory(Factory):
 
     def _get_follow_up_class(self):
         action_concept = self.bubble_chamber.concepts["suggest"]
-        space_concept = self.bubble_chamber.concepts["inner"]
+        space_concept = self.bubble_chamber.random_machine.select(
+            [
+                self.bubble_chamber.concepts["inner"],
+                self.bubble_chamber.concepts["outer"],
+            ],
+            key=activation,
+        )
         direction_concept = self.bubble_chamber.concepts["forward"]
         if self.targets["concept"] in self._get_label_concepts():
             structure_concept = self.bubble_chamber.concepts["label"]

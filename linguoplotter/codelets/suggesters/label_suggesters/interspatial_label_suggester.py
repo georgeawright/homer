@@ -29,7 +29,8 @@ class InterspatialLabelSuggester(LabelSuggester):
             and x.parent_frame.parent_concept == bubble_chamber.concepts["sentence"]
         ).get(
             key=lambda x: fuzzy.OR(
-                x in bubble_chamber.worldview.views,
+                bubble_chamber.worldview.view is not None
+                and x in bubble_chamber.worldview.view.sub_views,
                 x.super_views.not_empty,
                 x.activation,
             )
@@ -41,6 +42,40 @@ class InterspatialLabelSuggester(LabelSuggester):
         ).get(key=labeling_exigency)
         urgency = urgency if urgency is not None else start.unlabeledness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
+        return cls.spawn(parent_id, bubble_chamber, targets, urgency)
+
+    @classmethod
+    def make_top_down(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        concept: Concept,
+        urgency: FloatBetweenOneAndZero = None,
+    ):
+        view = bubble_chamber.views.filter(
+            lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
+            and x.parent_frame.parent_concept == bubble_chamber.concepts["sentence"]
+        ).get(
+            key=lambda x: fuzzy.OR(
+                x in bubble_chamber.worldview.view.sub_views,
+                x.super_views.not_empty,
+                x.activation,
+            )
+        )
+        start = view.output_space.contents.filter(
+            lambda x: x.is_letter_chunk
+            and x.members.is_empty
+            and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+        ).get(key=labeling_exigency)
+        space = start.parent_spaces.filter(
+            lambda x: x.is_conceptual_space
+            and x.no_of_dimensions == 1
+            and not x.is_symbolic
+        )
+        urgency = urgency if urgency is not None else start.unlabeledness
+        targets = bubble_chamber.new_dict(
+            {"start": start, "concept": concept, "space": space}, name="targets"
+        )
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 
     def _passes_preliminary_checks(self):

@@ -1,3 +1,4 @@
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import CorrespondenceSuggester
 from linguoplotter.errors import MissingStructureError
@@ -214,7 +215,17 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             views_with_compatible_nodes, "Compatible sub views"
         )
         child_codelet.targets["sub_view"] = views_with_compatible_nodes.get(
-            key=exigency
+            key=lambda x: fuzzy.OR(
+                x.exigency,
+                max(
+                    [
+                        x.cohesiveness_with(sub_view)
+                        for sub_view in child_codelet.targets["view"].sub_views
+                    ]
+                ),
+            )
+            if child_codelet.targets["view"].sub_views.not_empty
+            else x.exigency
         )
         child_codelet.targets["start_space"] = (
             child_codelet.targets["sub_view"].parent_frame.input_space

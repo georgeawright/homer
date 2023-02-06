@@ -72,13 +72,16 @@ class ViewSelector(Selector):
             self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
                 == champion.parent_frame.parent_concept
-                and champion.members.filter(
-                    lambda c: c.start.parent_space in x.input_spaces
-                ).not_empty
-                and x.members.filter(
-                    lambda c: c.start.parent_space in champion.input_spaces
-                ).not_empty
-                and x.raw_input_nodes == champion.raw_input_nodes
+                and (
+                    champion.members.filter(
+                        lambda c: c.start.parent_space in x.input_spaces
+                    ).not_empty
+                    and x.members.filter(
+                        lambda c: c.start.parent_space in champion.input_spaces
+                    ).not_empty
+                    and x.raw_input_nodes == champion.raw_input_nodes
+                )
+                or (any([x in sub_view.super_views for sub_view in champion.sub_views]))
             )
             .excluding(champion)
             .get(key=activation)

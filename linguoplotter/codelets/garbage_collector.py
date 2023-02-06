@@ -81,15 +81,9 @@ class GarbageCollector(Codelet):
             ):
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
-            if self.bubble_chamber.worldview.views.not_empty and (
-                any(
-                    structure in view.grouped_nodes
-                    for view in self.bubble_chamber.worldview.views
-                )
-                or any(
-                    structure in view.members
-                    for view in self.bubble_chamber.worldview.views
-                )
+            if self.bubble_chamber.worldview.view is not None and (
+                structure in self.bubble_chamber.worldview.view.grouped_nodes
+                or structure in self.bubble_chamber.worldview.view.members
             ):
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
