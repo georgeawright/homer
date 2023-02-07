@@ -14,12 +14,6 @@ class ViewSelector(Selector):
         return ViewSuggester
 
     @classmethod
-    def get_follow_up_evaluator(cls) -> type:
-        from linguoplotter.codelets.evaluators import ViewEvaluator
-
-        return ViewEvaluator
-
-    @classmethod
     def get_target_class(cls):
         return View
 
