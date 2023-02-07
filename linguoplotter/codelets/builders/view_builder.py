@@ -87,6 +87,7 @@ class ViewBuilder(Builder):
             parent_frame=frame_instance,
             locations=[Location([], self.bubble_chamber.spaces["views"])],
             members=self.bubble_chamber.new_set(),
+            secondary_frames=self.bubble_chamber.new_set(),
             frames=self.bubble_chamber.new_set(frame_instance),
             input_spaces=self.bubble_chamber.new_set(self.targets["contextual_space"]),
             output_space=view_output,

@@ -28,6 +28,7 @@ class View(Structure):
         parent_frame: Frame,
         locations: List[Location],
         members: StructureSet,
+        secondary_frames: StructureSet,
         frames: StructureSet,
         input_spaces: StructureSet,
         output_space: ContextualSpace,
@@ -54,6 +55,7 @@ class View(Structure):
         )
         self.parent_frame = parent_frame
         self.value = None
+        self.secondary_frames = secondary_frames
         self.frames = frames
         self.input_spaces = input_spaces
         self.output_space = output_space
