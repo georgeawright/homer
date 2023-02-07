@@ -38,6 +38,8 @@
   (def-letter-chunk :name "decrease" :parent_space grammar-space
     :locations (list vb-location)))
 (def-relation :start less-concept :end decrease-word :parent_concept vb-concept)
+(def-relation :start increase-word :end decrease-word :parent_concept opposite-concept)
+(def-relation :start decrease-word :end increase-word :parent_concept opposite-concept)
 
 (define not-more-concept
   (def-compound-concept :root not-concept :args (list more-concept)))

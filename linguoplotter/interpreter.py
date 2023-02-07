@@ -27,6 +27,7 @@ class Interpreter:
             "Chunk": structures.nodes.Chunk,
             "LetterChunk": structures.nodes.chunks.LetterChunk,
             # Classifier Types
+            "AbstractRelationClassifier": classifiers.AbstractRelationClassifier,
             "DifferenceClassifier": classifiers.DifferenceClassifier,
             "DifferentnessClassifier": classifiers.DifferentnessClassifier,
             "EverywhereClassifier": classifiers.EverywhereClassifier,

@@ -42,6 +42,11 @@
     :locations (list (Location (list (list 1)) size-space))))
 (def-relation :start small-concept :end shrink-word :parent_concept vb-concept)
 
+(def-relation :start expand-word :end shrink-word :parent_concept opposite-concept)
+(def-relation :start shrink-word :end expand-word :parent_concept opposite-concept)
+(def-relation :start large-word :end small-word :parent_concept opposite-concept)
+(def-relation :start small-word :end large-word :parent_concept opposite-concept)
+
 (define same-size-concept (def-concept :name "same-size"))
 (def-relation :start same-concept :end same-size-concept
   :parent_concept size-concept)

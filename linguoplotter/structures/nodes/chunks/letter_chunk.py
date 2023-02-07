@@ -97,6 +97,36 @@ class LetterChunk(Chunk):
     def concepts(self):
         return self.relatives.where(is_concept=True)
 
+    @property
+    def left_neighbour(self):
+        super_chunk = self.super_chunks.get()
+        if self in super_chunk.right_branch:
+            return super_chunk.left_branch.get().rightmost_child
+        if self in super_chunk.left_branch:
+            return super_chunk.left_neighbour
+
+    @property
+    def right_neighbour(self):
+        super_chunk = self.super_chunks.get()
+        if self in super_chunk.left_branch:
+            return super_chunk.right_branch.get().leftmost_child
+        if self in super_chunk.right_branch:
+            return super_chunk.right_neighbour
+
+    @property
+    def leftmost_child(self):
+        if self.members.is_empty:
+            return self
+        return self.left_branch.get().leftmost_child
+
+    @property
+    def rightmost_child(self):
+        if self.members.is_empty:
+            return self
+        if self.right_branch.not_empty:
+            return self.right_branch.get().rightmost_child
+        return self.left_branch.get().rightmost_child
+
     def recalculate_unchunkedness(self):
         if self.is_abstract:
             self.unchunkedness = 0

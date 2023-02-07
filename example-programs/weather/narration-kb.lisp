@@ -1,3 +1,4 @@
+(load "conceptual-spaces/oppositeness.lisp")
 (load "conceptual-spaces/grammar.lisp")
 (load "conceptual-spaces/negativeness.lisp")
 (load "conceptual-spaces/more-less.lisp")

@@ -1,3 +1,4 @@
+from .abstract_relation_classifier import AbstractRelationClassifier
 from .difference_classifier import DifferenceClassifier
 from .differentness_classifier import DifferentnessClassifier
 from .everywhere_classifier import EverywhereClassifier
