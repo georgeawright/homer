@@ -5,21 +5,10 @@ from linguoplotter.codelets.builder import Builder
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.id import ID
-from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures.nodes import Chunk
 
 
 class ChunkBuilder(Builder):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        targets: StructureDict,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.evaluators import ChunkEvaluator

@@ -10,18 +10,6 @@ from linguoplotter.structure_collections import StructureDict
 
 
 class ProjectionSuggester(Suggester):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        targets: StructureDict,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        Suggester.__init__(
-            self, codelet_id, parent_id, bubble_chamber, targets, urgency
-        )
-
     @classmethod
     def spawn(
         cls,

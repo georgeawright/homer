@@ -11,18 +11,6 @@ from linguoplotter.structure_collection_keys import chunking_exigency
 
 
 class ChunkSuggester(Suggester):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        targets: StructureDict,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        Suggester.__init__(
-            self, codelet_id, parent_id, bubble_chamber, targets, urgency
-        )
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.builders import ChunkBuilder
