@@ -30,6 +30,7 @@ class Frame(Structure):
         champion_labels: StructureSet,
         champion_relations: StructureSet,
         is_sub_frame: bool = False,
+        is_secondary: bool = False,
         depth: int = None,
     ):
         quality = 1
@@ -57,6 +58,7 @@ class Frame(Structure):
         self.instances = instances
         self._depth = depth
         self.is_sub_frame = is_sub_frame
+        self.is_secondary = is_secondary
         self.is_frame = True
 
     def __dict__(self) -> dict:
@@ -97,6 +99,61 @@ class Frame(Structure):
         while self_progenitor.parent_frame is not None:
             self_progenitor = self_progenitor.parent_frame
         return self_progenitor
+
+    @property
+    def unfilled_interspatial_structures(self):
+        return self.interspatial_links.filter(
+            lambda x: x.correspondences.where(end=x).is_empty
+        )
+
+    @property
+    def unfilled_sub_frame_input_structures(self):
+        return self.input_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and not x.is_interspatial
+            and not x.is_chunk
+            and (
+                len(x.correspondences.where(end=x))
+                < len(x.parent_spaces.where(is_contextual_space=True)) - 1
+            )
+        )
+
+    @property
+    def unfilled_input_structures(self):
+        return self.input_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and not x.is_interspatial
+            and not x.is_chunk
+            and x.correspondences.where(end=x).is_empty
+        )
+
+    @property
+    def unfilled_output_structures(self):
+        return self.output_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and not x.is_interspatial
+            and x.parent_space != self.output_space
+            and x.correspondences.where(end=x).is_empty
+        )
+
+    @property
+    def unfilled_projectable_structures(self):
+        return self.output_space.contents.filter(
+            lambda x: not x.is_correspondence
+            and not x.is_interspatial
+            and x.correspondences.filter(lambda c: c.start == x).is_empty
+        )
+
+    @property
+    def number_of_items_left_to_process(self):
+        return sum(
+            [
+                len(self.unfilled_sub_frame_input_structures),
+                len(self.unfilled_input_structures),
+                len(self.unfilled_output_structures),
+                len(self.unfilled_projectable_structures),
+            ]
+        )
 
     def recalculate_unhappiness(self):
         self.unhappiness = 1 / (

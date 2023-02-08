@@ -5,36 +5,12 @@ from .structures import View
 class Focus:
     def __init__(self):
         self.view = None
-        self.spaces_quality_history = []
+        self.frame = None
         self.satisfaction = 0
 
     @property
-    def focussedness(self):
-        if self.view is None:
-            return 0
-        if self.change_in_spaces_quality is None:
-            return self.view.unhappiness
-        return FloatBetweenOneAndZero(
-            self.view.unhappiness
-            + self.change_in_spaces_quality * len(self.spaces_quality_history)
-        )
-
-    @property
-    def change_in_spaces_quality(self):
-        try:
-            difference = (
-                self.spaces_quality_history[-1] - self.spaces_quality_history[0]
-            )
-            diff_float = (
-                0.5 / difference
-                if difference > 0
-                else -1 * (1 - (0.5 / difference))
-                if difference < 0
-                else 0
-            )
-            return 0.5 + diff_float
-        except IndexError:
-            return None
+    def unhappiness(self):
+        return 1 - 0.5 ** self.frame.number_of_items_left_to_process
 
     def recalculate_satisfaction(self):
         if self.view is None:
@@ -42,7 +18,3 @@ class Focus:
         else:
             self.satisfaction = self.view.calculate_quality()
             self.view.quality = self.satisfaction
-
-    def change_view(self, view: View):
-        self.view = view
-        self.spaces_quality_history = []

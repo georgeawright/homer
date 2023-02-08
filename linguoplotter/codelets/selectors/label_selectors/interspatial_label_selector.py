@@ -38,8 +38,12 @@ class InterspatialLabelSelector(LabelSelector):
             winning_label = self.winners.get()
             view = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                and x.parent_frame.parent_concept
-                == self.bubble_chamber.concepts["sentence"]
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
             ).get(
                 key=lambda x: fuzzy.OR(
                     self.bubble_chamber.worldview.view is not None

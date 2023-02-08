@@ -364,6 +364,7 @@ class BubbleChamber:
         output_space: ContextualSpace,
         interspatial_links: StructureSet = None,
         parent_id: str = "",
+        is_secondary: bool = False,
         is_sub_frame: bool = False,
         depth: int = None,
     ) -> Frame:
@@ -385,6 +386,7 @@ class BubbleChamber:
             links_out=self.new_set(),
             parent_spaces=self.new_set(),
             instances=self.new_set(),
+            is_secondary=is_secondary,
             is_sub_frame=is_sub_frame,
             depth=depth,
             champion_labels=self.new_set(),

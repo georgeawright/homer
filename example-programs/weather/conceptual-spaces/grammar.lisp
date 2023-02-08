@@ -7,6 +7,7 @@
     :no_of_dimensions 0 :is_basic_level True :is_symbolic True))
 
 (define sentence-location (Location (list (list 1)) grammar-space))
+(define conjunction-location (Location (list (list 1)) grammar-space))
 (define np-location (Location (list (list 2)) grammar-space))
 (define vp-location (Location (list (list 3)) grammar-space))
 (define ap-location (Location (list (list 4)) grammar-space))
@@ -28,6 +29,12 @@
 
 (define sentence-concept
   (def-concept :name "sentence" :locations (list sentence-location)
+    :classifier (ProximityClassifier)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 4 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define conjunction-concept
+  (def-concept :name "conjunction" :locations (list conjunction-location)
     :classifier (ProximityClassifier)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 4 :distance_function boolean_distance

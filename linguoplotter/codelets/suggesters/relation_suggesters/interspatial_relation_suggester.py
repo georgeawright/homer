@@ -25,7 +25,12 @@ class InterspatialRelationSuggester(RelationSuggester):
     ):
         view = bubble_chamber.views.filter(
             lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
-            and x.parent_frame.parent_concept == bubble_chamber.concepts["sentence"]
+            and x.parent_frame.parent_concept.location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
+            == bubble_chamber.concepts["sentence"].location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
         ).get()
         start = view.output_space.contents.filter(
             lambda x: x.is_letter_chunk
@@ -46,7 +51,12 @@ class InterspatialRelationSuggester(RelationSuggester):
     ):
         view = bubble_chamber.views.filter(
             lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
-            and x.parent_frame.parent_concept == bubble_chamber.concepts["sentence"]
+            and x.parent_frame.parent_concept.location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
+            == bubble_chamber.concepts["sentence"].location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
         ).get()
         potential_spaces = view.output_space.conceptual_spaces.filter(
             lambda x: not x.is_symbolic

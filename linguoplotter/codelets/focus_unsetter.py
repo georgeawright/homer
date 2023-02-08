@@ -99,6 +99,7 @@ class FocusUnsetter(Codelet):
                 self._update_recycler_urgency()
                 self._update_bottom_up_factories_urgencies()
             self.bubble_chamber.focus.view = None
+            self.bubble_chamber.focus.frame = None
             self.bubble_chamber.loggers["activity"].log("Focus unset.")
             self._engender_follow_up()
             self.result = CodeletResult.FINISH

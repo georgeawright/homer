@@ -63,12 +63,16 @@
 (define letter-chunk-concept
   (def-concept :name "letter-chunk" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
+(define frame-concept
+  (def-concept :name "frame" :locations (list (Location (list) structure-space))
+    :parent_space structure-space))
 (define view-concept
   (def-concept :name "view" :locations (list (Location (list) structure-space))
     :parent_space structure-space))
 
 (def-relation :start suggest-concept :end chunk-concept)
 (def-relation :start suggest-concept :end correspondence-concept)
+(def-relation :start suggest-concept :end frame-concept)
 (def-relation :start suggest-concept :end label-concept)
 (def-relation :start suggest-concept :end letter-chunk-concept)
 (def-relation :start suggest-concept :end relation-concept)
@@ -76,6 +80,7 @@
 
 (def-relation :start build-concept :end chunk-concept)
 (def-relation :start build-concept :end correspondence-concept)
+(def-relation :start build-concept :end frame-concept)
 (def-relation :start build-concept :end label-concept)
 (def-relation :start build-concept :end letter-chunk-concept)
 (def-relation :start build-concept :end relation-concept)
@@ -83,6 +88,7 @@
 
 (def-relation :start evaluate-concept :end chunk-concept)
 (def-relation :start evaluate-concept :end correspondence-concept)
+(def-relation :start evaluate-concept :end frame-concept)
 (def-relation :start evaluate-concept :end label-concept)
 (def-relation :start evaluate-concept :end letter-chunk-concept)
 (def-relation :start evaluate-concept :end relation-concept)
@@ -90,6 +96,7 @@
 
 (def-relation :start select-concept :end chunk-concept)
 (def-relation :start select-concept :end correspondence-concept)
+(def-relation :start select-concept :end frame-concept)
 (def-relation :start select-concept :end label-concept)
 (def-relation :start select-concept :end letter-chunk-concept)
 (def-relation :start select-concept :end relation-concept)
@@ -124,6 +131,11 @@
 (def-relation :start relation-concept :end view-concept
   :is_bidirectional False :activation 0.33)
 (def-relation :start view-concept :end relation-concept
+  :is_bidirectional False :is_excitatory False :activation 1.0)
+
+(def-relation :start relation-concept :end frame-concept
+  :is_bidirectional False :activation 0.33)
+(def-relation :start frame-concept :end relation-concept
   :is_bidirectional False :is_excitatory False :activation 1.0)
 
 (def-relation :start view-concept :end correspondence-concept

@@ -143,10 +143,6 @@ class Coderack:
         else:
             codelet.run()
         self.bubble_chamber.recalculate_satisfaction()
-        if self.bubble_chamber.focus.view is not None:
-            self.bubble_chamber.focus.spaces_quality_history.append(
-                self.bubble_chamber.focus.satisfaction
-            )
         self.recently_run.add(type(codelet))
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:

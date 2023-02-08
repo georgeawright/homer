@@ -1,5 +1,3 @@
-import statistics
-
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -47,7 +45,12 @@ class WorldviewPorter(Codelet):
         try:
             self.targets["view"] = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
-                and x.parent_frame.parent_concept.name == "sentence"
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
                 and x != self.bubble_chamber.worldview.view
             ).get(key=lambda x: x.activation)
             self.run_competition()
@@ -153,31 +156,18 @@ class WorldviewPorter(Codelet):
         return proportion
 
     def _calculate_conciseness(self, view: View) -> FloatBetweenOneAndZero:
-        if view.parent_frame.parent_concept != self.bubble_chamber.concepts["sentence"]:
+        if view.parent_frame.parent_concept.location_in_space(
+            self.bubble_chamber.spaces["grammar"]
+        ) != self.bubble_chamber.concepts["sentence"].location_in_space(
+            self.bubble_chamber.spaces["grammar"]
+        ):
             return 0
         return 1 + max([self._calculate_conciseness(v) for v in view.sub_views])
 
     def _calculate_cohesiveness(self, view: View) -> FloatBetweenOneAndZero:
-        spaces = self.bubble_chamber.new_set(
-            *[v.output_space for v in view.all_sub_views]
-            + [frame.input_space for frame in view.frames]
+        number_of_secondary_views = len(
+            view.secondary_frames.filter(
+                lambda x: x.number_of_items_left_to_process == 0
+            )
         )
-        words = view.output_space.contents.filter(
-            lambda x: x.is_letter_chunk and x.members.is_empty
-        )
-        chunks = StructureSet.union(
-            *[
-                frame.input_space.contents.filter(lambda x: x.is_chunk)
-                for frame in view.frames
-            ]
-        )
-        relations = StructureSet.union(
-            *[word.relations for word in words] + [chunk.relations for chunk in chunks]
-        ).filter(
-            lambda x: x.is_interspatial
-            and x.start.parent_space in spaces
-            and x.end.parent_space in spaces
-        )
-        return FloatBetweenOneAndZero(
-            sum([r.quality for r in relations]) / (len(words) * 0.5)
-        )
+        return 1 - 0.5 ** number_of_secondary_views

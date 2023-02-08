@@ -20,7 +20,12 @@ class InterspatialRelationEvaluator(RelationEvaluator):
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
         view = bubble_chamber.views.filter(
             lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
-            and x.parent_frame.parent_concept == bubble_chamber.concepts["sentence"]
+            and x.parent_frame.parent_concept.location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
+            == bubble_chamber.concepts["sentence"].location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
         ).get()
         target = view.output_space.contents.filter(
             lambda x: x.is_interspatial and x.is_relation

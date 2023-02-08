@@ -177,47 +177,23 @@ class View(Structure):
 
     @property
     def unfilled_interspatial_structures(self):
-        return self.parent_frame.interspatial_links.filter(
-            lambda x: x.correspondences.where(end=x).is_empty
-        )
+        return self.parent_frame.unfilled_interspatial_structures
 
     @property
     def unfilled_sub_frame_input_structures(self):
-        return self.parent_frame.input_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and not x.is_interspatial
-            and not x.is_chunk
-            and (
-                len(x.correspondences.where(end=x))
-                < len(x.parent_spaces.where(is_contextual_space=True)) - 1
-            )
-        )
+        return self.parent_frame.unfilled_sub_frame_input_structures
 
     @property
     def unfilled_input_structures(self):
-        return self.parent_frame.input_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and not x.is_interspatial
-            and not x.is_chunk
-            and x.correspondences.where(end=x).is_empty
-        )
+        return self.parent_frame.unfilled_input_structures
 
     @property
     def unfilled_output_structures(self):
-        return self.parent_frame.output_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and not x.is_interspatial
-            and x.parent_space != self.parent_frame.output_space
-            and x.correspondences.where(end=x).is_empty
-        )
+        return self.parent_frame.unfilled_output_structures
 
     @property
     def unfilled_projectable_structures(self):
-        return self.parent_frame.output_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and not x.is_interspatial
-            and x.correspondences_to_space(self.output_space).is_empty
-        )
+        return self.parent_frame.unfilled_projectable_structures
 
     @property
     def grouped_nodes(self):

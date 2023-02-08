@@ -43,6 +43,13 @@ class FocusSetter(Codelet):
                 ).is_empty
             ).get(key=exigency)
             self.bubble_chamber.focus.view = target_view
+            self.bubble_chamber.focus.frame = (
+                target_view.parent_frame
+                if target_view.secondary_frames.is_empty
+                else target_view.secondary_frames.filter(
+                    lambda x: x.number_of_items_left_to_process > 0
+                ).get(key=exigency)
+            )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(
                 f"Set focus: {target_view}"

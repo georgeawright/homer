@@ -26,7 +26,12 @@ class InterspatialLabelSuggester(LabelSuggester):
     ):
         view = bubble_chamber.views.filter(
             lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
-            and x.parent_frame.parent_concept == bubble_chamber.concepts["sentence"]
+            and x.parent_frame.parent_concept.location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
+            == bubble_chamber.concepts["sentence"].location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
         ).get(
             key=lambda x: fuzzy.OR(
                 bubble_chamber.worldview.view is not None
@@ -54,7 +59,12 @@ class InterspatialLabelSuggester(LabelSuggester):
     ):
         view = bubble_chamber.views.filter(
             lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
-            and x.parent_frame.parent_concept == bubble_chamber.concepts["sentence"]
+            and x.parent_frame.parent_concept.location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
+            == bubble_chamber.concepts["sentence"].location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
         ).get(
             key=lambda x: fuzzy.OR(
                 x in bubble_chamber.worldview.view.sub_views,

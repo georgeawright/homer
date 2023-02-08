@@ -2,6 +2,7 @@ from linguoplotter.codelets.factories import BottomUpFactory
 from linguoplotter.codelets.suggesters import (
     ChunkSuggester,
     CorrespondenceSuggester,
+    FrameSuggester,
     LabelSuggester,
     RelationSuggester,
     ViewSuggester,
@@ -28,6 +29,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         input_unrelatedness = self._unrelatedness_of_chunks()
         input_uncorrespondedness = self._uncorrespondedness_of_links()
         frames_unfilledness = self._unfilledness_of_slots()
+        text_uncohesiveness = self._uncohesiveness_of_texts()
         text_unlabeledness = self._unlabeledness_of_letter_chunks()
         text_unrelatedness = self._unrelatedness_of_letter_chunks()
 
@@ -37,6 +39,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             + f"Unrelatedness of chunks: {input_unrelatedness}\n"
             + f"Unfilledness of slots: {frames_unfilledness}\n"
             + f"Uncorrespondedness of links: {input_uncorrespondedness}\n"
+            + f"Unchohesivenss of texts: {text_uncohesiveness}\n"
             + f"Unlabeledness of letter chunks: {text_unlabeledness}\n"
             + f"Unrelatedness of letter chunks: {text_unrelatedness}",
         )
@@ -48,6 +51,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 (RelationSuggester, input_unrelatedness),
                 (ViewSuggester, input_uncorrespondedness),
                 (CorrespondenceSuggester, frames_unfilledness),
+                (FrameSuggester, text_uncohesiveness),
                 (InterspatialLabelSuggester, text_unrelatedness),
                 (InterspatialRelationSuggester, text_unrelatedness),
             ],
@@ -115,12 +119,30 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         except MissingStructureError:
             return float("-inf")
 
-    def _unlabeledness_of_letter_chunks(self):
+    def _uncohesiveness_of_texts(self):
         try:
             view = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
                 and x.parent_frame.parent_concept
-                == self.bubble_chamber.concepts["sentence"]
+                == self.bubble_chamber.concepts["conjunction"]
+            ).get()
+        except MissingStructureError:
+            return float("-inf")
+        try:
+            return 1 / len(view.secondary_frames)
+        except ZeroDivisionError:
+            return 1
+
+    def _unlabeledness_of_letter_chunks(self):
+        try:
+            view = self.bubble_chamber.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
             ).get()
             letter_chunks = view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
@@ -140,8 +162,12 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         try:
             views = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                and x.parent_frame.parent_concept
-                == self.bubble_chamber.concepts["sentence"]
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
             ).sample(2)
             view = views.get()
             letter_chunks = view.output_space.contents.filter(

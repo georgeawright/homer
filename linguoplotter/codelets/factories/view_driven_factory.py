@@ -33,8 +33,9 @@ from linguoplotter.structures.links import Relation
 
 
 class ViewDrivenFactory(Factory):
-    """Finds a view with unfilled slots
-    and spawns a codelet to suggest a structure that could fill a slot"""
+    """
+    Finds an unfilled slot in the focus frame
+    spawns a suggester codelet that targets the slot"""
 
     def __init__(
         self,
@@ -114,16 +115,20 @@ class ViewDrivenFactory(Factory):
             raise MissingStructureError
         if self.targets["view"] is None:
             self.targets["view"] = self.bubble_chamber.focus.view
+            self.targets["frame"] = self.bubble_chamber.focus.frame
+            if self.targets["frame"] != self.targets["view"].parent_frame:
+                return
         try:
             self.targets["view"] = (
                 self.targets["view"].sub_views.filter(lambda x: x.unhappiness > 0).get()
             )
+            self.targets["frame"] = self.targets["view"].parent_frame
             self._set_target_view()
         except MissingStructureError:
             pass
 
     def _set_target_slot(self):
-        interspatial_structures = self.targets["view"].unfilled_interspatial_structures
+        interspatial_structures = self.targets["frame"].unfilled_interspatial_structures
         if interspatial_structures.not_empty:
             if interspatial_structures.where(is_label=True).not_empty:
                 self.targets["slot"] = interspatial_structures.where(
@@ -132,21 +137,21 @@ class ViewDrivenFactory(Factory):
             else:
                 self.targets["slot"] = interspatial_structures.get()
             return
-        if self.targets["view"].unfilled_interspatial_structures.not_empty:
-            self.targets["view"].unfilled_interspatial_structures.get()
+        if self.targets["frame"].unfilled_interspatial_structures.not_empty:
+            self.targets["frame"].unfilled_interspatial_structures.get()
             return
         for structures in [
-            self.targets["view"].unfilled_sub_frame_input_structures,
-            self.targets["view"].unfilled_input_structures,
-            self.targets["view"].unfilled_output_structures,
+            self.targets["frame"].unfilled_sub_frame_input_structures,
+            self.targets["frame"].unfilled_input_structures,
+            self.targets["frame"].unfilled_output_structures,
         ]:
             if structures.where(is_relation=True).not_empty:
                 self.targets["slot"] = structures.where(is_relation=True).get()
                 return
         for structures in [
-            self.targets["view"].unfilled_sub_frame_input_structures,
-            self.targets["view"].unfilled_input_structures,
-            self.targets["view"].unfilled_output_structures,
+            self.targets["frame"].unfilled_sub_frame_input_structures,
+            self.targets["frame"].unfilled_input_structures,
+            self.targets["frame"].unfilled_output_structures,
         ]:
             if structures.where(is_label=True).not_empty:
                 self.targets["slot"] = structures.where(is_label=True).get()
@@ -154,7 +159,7 @@ class ViewDrivenFactory(Factory):
             if structures.where(is_chunk=True).not_empty:
                 self.targets["slot"] = structures.where(is_chunk=True).get()
                 return
-        projectable_structures = self.targets["view"].unfilled_projectable_structures
+        projectable_structures = self.targets["frame"].unfilled_projectable_structures
         if projectable_structures.where(is_chunk=True).not_empty:
             self.targets["slot"] = projectable_structures.where(is_chunk=True).get()
             return
@@ -332,7 +337,7 @@ class ViewDrivenFactory(Factory):
         if self.targets["slot"].is_relation:
             target_start_space = None
             target_end_space = None
-            for link in self.targets["view"].parent_frame.interspatial_links:
+            for link in self.targets["frame"].interspatial_links:
                 for correspondee in link.correspondees:
                     if (
                         link.start.parent_space
@@ -353,7 +358,7 @@ class ViewDrivenFactory(Factory):
                         == self.targets["slot"].end.parent_space
                     ):
                         target_end_space = correspondee.end.parent_space
-            for sub_frame in self.targets["view"].parent_frame.sub_frames:
+            for sub_frame in self.targets["frame"].sub_frames:
                 if (
                     self.targets["slot"].start in sub_frame.input_space.contents
                     or self.targets["slot"].start in sub_frame.output_space.contents
@@ -385,7 +390,7 @@ class ViewDrivenFactory(Factory):
                             and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
                         )
                         if self.targets["slot"]
-                        in self.targets["view"].parent_frame.output_space.contents
+                        in self.targets["frame"].output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                         )
@@ -427,7 +432,7 @@ class ViewDrivenFactory(Factory):
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
                             if self.targets["slot"]
-                            in self.targets["view"].parent_frame.output_space.contents
+                            in self.targets["frame"].output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
                                 and (not x.is_slot or x.is_filled_in)
@@ -454,7 +459,7 @@ class ViewDrivenFactory(Factory):
                             and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
                         )
                         if self.targets["slot"]
-                        in self.targets["view"].parent_frame.output_space.contents
+                        in self.targets["frame"].output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                         )
@@ -496,7 +501,7 @@ class ViewDrivenFactory(Factory):
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
                             if self.targets["slot"]
-                            in self.targets["view"].parent_frame.output_space.contents
+                            in self.targets["frame"].output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
                                 and (not x.is_slot or x.is_filled_in)
@@ -575,11 +580,11 @@ class ViewDrivenFactory(Factory):
                 )
                 if self.targets["slot"].parent_concept.is_slot
                 and not self.targets["slot"].parent_concept.is_filled_in
-                else self.targets["view"].unhappiness,
+                else self.bubble_chamber.focus.unhappiness,
             )
         elif self.targets["slot"].is_label:
             target_start_space = None
-            for link in self.targets["view"].parent_frame.interspatial_links:
+            for link in self.targets["frame"].interspatial_links:
                 for correspondee in link.correspondees:
                     if (
                         link.start.parent_space
@@ -592,7 +597,7 @@ class ViewDrivenFactory(Factory):
                         == self.targets["slot"].start.parent_space
                     ):
                         target_start_space = correspondee.end.parent_space
-            for sub_frame in self.targets["view"].parent_frame.sub_frames:
+            for sub_frame in self.targets["frame"].sub_frames:
                 if (
                     self.targets["slot"].start in sub_frame.input_space.contents
                     or self.targets["slot"].start in sub_frame.output_space.contents
@@ -624,7 +629,7 @@ class ViewDrivenFactory(Factory):
                         and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
                     )
                     if self.targets["slot"]
-                    in self.targets["view"].parent_frame.output_space.contents
+                    in self.targets["frame"].output_space.contents
                     else view.parent_frame.input_space.contents.filter(
                         lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                     )
@@ -705,7 +710,7 @@ class ViewDrivenFactory(Factory):
                 )
                 if self.targets["slot"].parent_concept.is_slot
                 and not self.targets["slot"].parent_concept.is_filled_in
-                else self.targets["view"].unhappiness,
+                else self.bubble_chamber.focus.unhappiness,
             )
 
     def _spawn_projection_suggester(self):
