@@ -209,12 +209,13 @@ class View(Structure):
 
     @property
     def output(self):
-        return (
-            self.output_space.contents.filter(
-                lambda x: x.is_letter_chunk and x.super_chunks.is_empty
-            )
-            .get()
-            .name
+        return ". ".join(
+            [
+                chunk.name
+                for chunk in self.output_space.contents.filter(
+                    lambda x: x.is_letter_chunk and x.super_chunks.is_empty
+                )
+            ]
         )
 
     @property

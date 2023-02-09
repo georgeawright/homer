@@ -32,7 +32,7 @@ class FrameBuilder(Builder):
     def _passes_preliminary_checks(self):
         return not any(
             [
-                frame.subsumes(self.targets["frame"])
+                frame.is_equivalent_to(self.targets["frame"])
                 for frame in self.targets["view"].secondary_frames
             ]
         )

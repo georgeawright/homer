@@ -724,7 +724,11 @@ class ViewDrivenFactory(Factory):
         elif self.targets["slot"].is_relation:
             follow_up_class = RelationProjectionSuggester
         targets = self.bubble_chamber.new_dict(
-            {"view": self.targets["view"], "projectee": self.targets["slot"]},
+            {
+                "view": self.targets["view"],
+                "frame": self.targets["frame"],
+                "projectee": self.targets["slot"],
+            },
             name="targets",
         )
         return follow_up_class.spawn(
@@ -743,6 +747,7 @@ class ViewDrivenFactory(Factory):
         targets = self.bubble_chamber.new_dict(
             {
                 "view": self.targets["view"],
+                "frame": self.targets["frame"],
                 "end": self.targets["slot"],
                 "concept": self.bubble_chamber.concepts["same"],
             },
@@ -765,6 +770,7 @@ class ViewDrivenFactory(Factory):
         targets = self.bubble_chamber.new_dict(
             {
                 "view": self.targets["view"],
+                "frame": self.targets["frame"],
                 "end": self.targets["slot"],
                 "concept": self.bubble_chamber.concepts["same"],
             },
@@ -785,7 +791,12 @@ class ViewDrivenFactory(Factory):
             "Spawning SubFrameToFrameCorrespondenceSuggester"
         )
         targets = self.bubble_chamber.new_dict(
-            {"view": self.targets["view"], "end": self.targets["slot"]}, name="targets"
+            {
+                "view": self.targets["view"],
+                "frame": self.targets["frame"],
+                "end": self.targets["slot"],
+            },
+            name="targets",
         )
         targets["end_space"] = (
             targets["view"].parent_frame.input_space
@@ -832,7 +843,12 @@ class ViewDrivenFactory(Factory):
             "Spawning PotentialSubFrameToFrameCorrespondenceSuggester"
         )
         targets = self.bubble_chamber.new_dict(
-            {"view": self.targets["view"], "end": self.targets["slot"]}, name="targets"
+            {
+                "view": self.targets["view"],
+                "frame": self.targets["frame"],
+                "end": self.targets["slot"],
+            },
+            name="targets",
         )
         targets["end_space"] = (
             targets["view"].parent_frame.input_space
@@ -871,7 +887,9 @@ class ViewDrivenFactory(Factory):
         )
         self.bubble_chamber.loggers["activity"].log(f"Found sub frame: {sub_frame}")
         frame = self.bubble_chamber.frames.where(
-            is_sub_frame=False, parent_concept=sub_frame.parent_concept
+            is_sub_frame=False,
+            is_secondary=False,
+            parent_concept=sub_frame.parent_concept,
         ).get(key=activation)
         self.bubble_chamber.loggers["activity"].log(f"Found target frame: {frame}")
         urgency = self.targets["view"].unhappiness

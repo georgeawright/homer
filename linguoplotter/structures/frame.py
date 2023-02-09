@@ -155,6 +155,17 @@ class Frame(Structure):
             ]
         )
 
+    def is_equivalent_to(self, other: Frame) -> bool:
+        if self.progenitor != other.progenitor:
+            return False
+        for space in other.conceptual_spaces:
+            if not space.is_slot and space not in self.conceptual_spaces:
+                return False
+        for space in self.conceptual_spaces:
+            if not space.is_slot and space not in other.conceptual_spaces:
+                return False
+        return True
+
     def recalculate_unhappiness(self):
         self.unhappiness = 1 / (
             sum([instance.activation for instance in self.instances]) + 1

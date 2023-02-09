@@ -118,45 +118,38 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
     @staticmethod
     def _get_target_structure_one(parent_codelet, child_codelet):
         bubble_chamber = parent_codelet.bubble_chamber
-        if child_codelet.targets["end"].is_relation:
+        target_view = child_codelet.targets["view"]
+        target_frame = child_codelet.targets["frame"]
+        target_end = child_codelet.targets["end"]
+        if target_end.is_relation:
             source_collection = bubble_chamber.interspatial_relations
             target_start_space = None
             target_end_space = None
-            for link in child_codelet.targets["view"].parent_frame.interspatial_links:
+            for link in target_frame.interspatial_links:
                 for correspondee in link.correspondees:
-                    if (
-                        link.start.parent_space
-                        == child_codelet.targets["end"].start.parent_space
-                    ):
+                    if link.start.parent_space == target_end.start.parent_space:
                         target_start_space = correspondee.start.parent_space
                     if (
                         link.is_relation
-                        and link.end.parent_space
-                        == child_codelet.targets["end"].start.parent_space
+                        and link.end.parent_space == target_end.start.parent_space
                     ):
                         target_start_space = correspondee.end.parent_space
-                    if (
-                        link.start.parent_space
-                        == child_codelet.targets["end"].end.parent_space
-                    ):
+                    if link.start.parent_space == target_end.end.parent_space:
                         target_end_space = correspondee.start.parent_space
                     if (
                         link.is_relation
-                        and link.end.parent_space
-                        == child_codelet.targets["end"].end.parent_space
+                        and link.end.parent_space == target_end.end.parent_space
                     ):
                         target_end_space = correspondee.end.parent_space
-            for sub_frame in child_codelet.targets["view"].parent_frame.sub_frames:
+            for sub_frame in target_frame.sub_frames:
                 if (
-                    child_codelet.targets["end"].start in sub_frame.input_space.contents
-                    or child_codelet.targets["end"].start
-                    in sub_frame.output_space.contents
+                    target_end.start in sub_frame.input_space.contents
+                    or target_end.start in sub_frame.output_space.contents
                 ):
                     start_sub_frame = sub_frame
                 if (
-                    child_codelet.targets["end"].end in sub_frame.input_space.contents
-                    or child_codelet.targets["end"].end
-                    in sub_frame.output_space.contents
+                    target_end.end in sub_frame.input_space.contents
+                    or target_end.end in sub_frame.output_space.contents
                 ):
                     end_sub_frame = sub_frame
             if target_start_space is None:
@@ -164,7 +157,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
                     and x.unhappiness < child_codelet.FLOATING_POINT_TOLERANCE
-                    and x != child_codelet.targets["view"]
+                    and x != target_view
                     and x.super_views.is_empty
                 )
                 potential_start_views = potential_start_views.sample(
@@ -177,7 +170,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         view.output_space.contents.filter(
                             lambda x: x.is_chunk and x.members.is_empty
                         )
-                        if child_codelet.targets["end"]
+                        if target_end
                         in child_codelet.targets[
                             "view"
                         ].parent_frame.output_space.contents
@@ -188,18 +181,15 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     ]
                 )
             else:
-                potential_start_views = child_codelet.targets["view"].sub_views.filter(
+                potential_start_views = target_view.sub_views.filter(
                     lambda x: target_start_space
                     in [x.parent_frame.input_space, x.parent_frame.output_space]
                 )
-                if (
-                    child_codelet.targets["end"].start
-                    in child_codelet.targets["view"].grouped_nodes
-                ):
+                if target_end.start in target_view.grouped_nodes:
                     start_node_group = [
                         group
-                        for group in child_codelet.targets["view"].node_groups
-                        if child_codelet.targets["end"].start in group.values()
+                        for group in target_view.node_groups
+                        if target_end.start in group.values()
                     ][0]
                     try:
                         structure_one_start = start_node_group[target_start_space]
@@ -224,7 +214,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             view.output_space.contents.filter(
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
-                            if child_codelet.targets["end"]
+                            if target_end
                             in child_codelet.targets[
                                 "view"
                             ].parent_frame.output_space.contents
@@ -249,7 +239,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         view.output_space.contents.filter(
                             lambda x: x.is_chunk and x.members.is_empty
                         )
-                        if child_codelet.targets["end"]
+                        if target_end
                         in child_codelet.targets[
                             "view"
                         ].parent_frame.output_space.contents
@@ -260,18 +250,15 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     ]
                 )
             else:
-                potential_end_views = child_codelet.targets["view"].sub_views.filter(
+                potential_end_views = target_view.sub_views.filter(
                     lambda x: target_end_space
                     in [x.parent_frame.input_space, x.parent_frame.output_space]
                 )
-                if (
-                    child_codelet.targets["end"].end
-                    in child_codelet.targets["view"].grouped_nodes
-                ):
+                if target_end.end in target_view.grouped_nodes:
                     end_node_group = [
                         group
-                        for group in child_codelet.targets["view"].node_groups
-                        if child_codelet.targets["end"].end in group.values()
+                        for group in target_view.node_groups
+                        if target_end.end in group.values()
                     ][0]
                     try:
                         structure_one_end = end_node_group[target_end_space]
@@ -296,7 +283,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             view.output_space.contents.filter(
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
-                            if child_codelet.targets["end"]
+                            if target_end
                             in child_codelet.targets[
                                 "view"
                             ].parent_frame.output_space.contents
@@ -314,23 +301,21 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 and x.end in potential_end_targets
                 and any(
                     [
-                        x.parent_concept == child_codelet.targets["end"].parent_concept,
-                        child_codelet.targets["end"].parent_concept.is_slot,
+                        x.parent_concept == target_end.parent_concept,
+                        target_end.parent_concept.is_slot,
                         (
                             x.parent_concept.is_compound_concept
-                            and x.parent_concept.args[0]
-                            == child_codelet.targets["end"].parent_concept
+                            and x.parent_concept.args[0] == target_end.parent_concept
                         )
-                        and child_codelet.targets["view"].members.not_empty,
+                        and target_view.members.not_empty,
                     ]
                 )
-                and child_codelet.targets["end"].parent_concept.parent_space.subsumes(
+                and target_end.parent_concept.parent_space.subsumes(
                     x.parent_concept.parent_space
                 )
                 and child_codelet.targets["space"].subsumes(x.conceptual_space)
                 and (
-                    x.parent_concept
-                    in child_codelet.targets["end"].parent_concept.possible_instances
+                    x.parent_concept in target_end.parent_concept.possible_instances
                     if child_codelet.targets[
                         "end"
                     ].parent_concept.possible_instances.not_empty
@@ -358,53 +343,46 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     in view.parent_frame.output_space.contents
                 ):
                     child_codelet.targets["end_sub_view"] = view
-            for sub_frame in child_codelet.targets["view"].parent_frame.sub_frames:
+            for sub_frame in target_frame.sub_frames:
                 if (
-                    child_codelet.targets["end"].start in sub_frame.input_space.contents
-                    or child_codelet.targets["end"].start
-                    in sub_frame.output_space.contents
+                    target_end.start in sub_frame.input_space.contents
+                    or target_end.start in sub_frame.output_space.contents
                 ):
                     child_codelet.targets["start_sub_frame"] = sub_frame
                 if (
-                    child_codelet.targets["end"].end in sub_frame.input_space.contents
-                    or child_codelet.targets["end"].end
-                    in sub_frame.output_space.contents
+                    target_end.end in sub_frame.input_space.contents
+                    or target_end.end in sub_frame.output_space.contents
                 ):
                     child_codelet.targets["end_sub_frame"] = sub_frame
-        elif child_codelet.targets["end"].is_label:
+        elif target_end.is_label:
             source_collection = bubble_chamber.interspatial_labels
             target_start_space = None
-            for link in child_codelet.targets["view"].parent_frame.interspatial_links:
+            for link in target_frame.interspatial_links:
                 for correspondee in link.correspondees:
-                    if (
-                        link.start.parent_space
-                        == child_codelet.targets["end"].start.parent_space
-                    ):
+                    if link.start.parent_space == target_end.start.parent_space:
                         target_start_space = correspondee.start.parent_space
                     if (
                         link.is_relation
-                        and link.end.parent_space
-                        == child_codelet.targets["end"].start.parent_space
+                        and link.end.parent_space == target_end.start.parent_space
                     ):
                         target_start_space = correspondee.end.parent_space
-            for sub_frame in child_codelet.targets["view"].parent_frame.sub_frames:
+            for sub_frame in target_frame.sub_frames:
                 if (
-                    child_codelet.targets["end"].start in sub_frame.input_space.contents
-                    or child_codelet.targets["end"].start
-                    in sub_frame.output_space.contents
+                    target_end.start in sub_frame.input_space.contents
+                    or target_end.start in sub_frame.output_space.contents
                 ):
                     start_sub_frame = sub_frame
             if target_start_space is None:
                 potential_start_views = bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
-                    and x != child_codelet.targets["view"]
+                    and x != target_view
                     and x.unhappiness < child_codelet.FLOATING_POINT_TOLERANCE
                     and x.super_views.is_empty
                     and not any(
                         [
                             x.raw_input_nodes == sub_view.raw_input_nodes
-                            for sub_view in child_codelet.targets["view"].sub_views
+                            for sub_view in target_view.sub_views
                         ]
                     )
                 )
@@ -418,7 +396,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         view.output_space.contents.filter(
                             lambda x: x.is_chunk and x.members.is_empty
                         )
-                        if child_codelet.targets["end"]
+                        if target_end
                         in child_codelet.targets[
                             "view"
                         ].parent_frame.output_space.contents
@@ -429,18 +407,15 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     ]
                 )
             else:
-                potential_start_views = child_codelet.targets["view"].sub_views.filter(
+                potential_start_views = target_view.sub_views.filter(
                     lambda x: target_start_space
                     in [x.parent_frame.input_space, x.parent_frame.output_space]
                 )
-                if (
-                    child_codelet.targets["end"].start
-                    in child_codelet.targets["view"].grouped_nodes
-                ):
+                if target_end.start in target_view.grouped_nodes:
                     start_node_group = [
                         group
-                        for group in child_codelet.targets["view"].node_groups
-                        if child_codelet.targets["end"].start in group.values()
+                        for group in target_view.node_groups
+                        if target_end.start in group.values()
                     ][0]
                     try:
                         structure_one_start = start_node_group[target_start_space]
@@ -465,7 +440,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             view.output_space.contents.filter(
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
-                            if child_codelet.targets["end"]
+                            if target_end
                             in child_codelet.targets[
                                 "view"
                             ].parent_frame.output_space.contents
@@ -481,11 +456,9 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 and x.is_interspatial
                 and x.quality * x.activation > 0
                 and x.start in potential_start_targets
-                and x.parent_concept == child_codelet.targets["end"].parent_concept
+                and x.parent_concept == target_end.parent_concept
                 and x.parent_spaces.where(is_conceptual_space=True)
-                == child_codelet.targets["end"].parent_spaces.where(
-                    is_conceptual_space=True
-                )
+                == target_end.parent_spaces.where(is_conceptual_space=True)
             )
             bubble_chamber.loggers["activity"].log_set(
                 matching_labels, "matching input labels"
@@ -501,10 +474,9 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     in view.parent_frame.output_space.contents
                 ):
                     child_codelet.targets["start_sub_view"] = view
-            for sub_frame in child_codelet.targets["view"].parent_frame.sub_frames:
+            for sub_frame in target_frame.sub_frames:
                 if (
-                    child_codelet.targets["end"].start in sub_frame.input_space.contents
-                    or child_codelet.targets["end"].start
-                    in sub_frame.output_space.contents
+                    target_end.start in sub_frame.input_space.contents
+                    or target_end.start in sub_frame.output_space.contents
                 ):
                     child_codelet.targets["start_sub_frame"] = sub_frame

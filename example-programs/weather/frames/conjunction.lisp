@@ -92,13 +92,6 @@
     :locations (list sentence-location
 		     (Location (list) conjunction-sub-frame-1-output))))
 
-(define conjunction
-  (def-letter-chunk :name "fstop"
-    :locations (list conj-location
-		     (Location (list) conjunction-sentence-output))
-    :parent_space conjunction-sentence-output
-    :abstract_chunk fstop))
-
 (define conjunction-subject-2
   (def-letter-chunk :name None
     :locations (list nsubj-location
@@ -153,19 +146,6 @@
   (def-label :start conjunction-clause-2 :parent_concept sentence-concept
     :locations (list sentence-location
 		     (Location (list) conjunction-sub-frame-2-output))))
-
-(define conjunction-super-chunk
-  (def-letter-chunk :name None
-    :locations (list conj-location
-		     (Location (list) conjunction-sentence-output))
-    :left_branch (StructureSet conjunction)
-    :right_branch (StructureSet conjunction-clause-2)))
-(define sentence-super-chunk
-  (def-letter-chunk :name None
-    :locations (list sentence-location
-		     (Location (list) conjunction-sentence-output))
-    :left_branch (StructureSet conjunction-clause-1)
-    :right_branch (StructureSet conjunction-super-chunk)))
 
 (def-relation :start same-concept :end conjunction-sentence
   :is_bidirectional True :stable_activation 0.5)

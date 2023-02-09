@@ -38,7 +38,7 @@ class ViewSelector(Selector):
                     StructureSet.union(
                         self.bubble_chamber.new_set(winning_view.parent_frame),
                         winning_view.parent_frame.parent_concept.relatives.where(
-                            is_frame=True
+                            is_frame=True, is_sub_frame=False, is_secondary=False
                         ),
                     )
                     .filter(

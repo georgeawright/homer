@@ -72,6 +72,7 @@ class BottomUpViewSuggester(ViewSuggester):
             self.targets["frame"] = self.bubble_chamber.frames.filter(
                 lambda x: x.parent_frame is None
                 and not x.is_sub_frame
+                and not x.is_secondary
                 and x.exigency > 0
             ).get(key=exigency)
         except MissingStructureError:

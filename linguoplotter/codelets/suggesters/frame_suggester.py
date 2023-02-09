@@ -79,7 +79,7 @@ class BottomUpFrameSuggester(FrameSuggester):
                 lambda x: x.is_secondary
                 and not any(
                     [
-                        x.subsumes(frame)
+                        x.is_equivalent_to(frame)
                         for frame in self.targets["view"].secondary_frames
                     ]
                 )
@@ -95,7 +95,7 @@ class TopDownFrameSuggester(FrameSuggester):
             self.targets["view"] = self.bubble_chamber.views.filter(
                 lambda x: not any(
                     [
-                        frame.subsumes(self.targets["frame"])
+                        frame.is_equivalent_to(self.targets["frame"])
                         for frame in x.secondary_frames
                     ]
                 )
