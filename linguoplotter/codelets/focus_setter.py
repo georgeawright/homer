@@ -36,12 +36,23 @@ class FocusSetter(Codelet):
 
     def run(self) -> CodeletResult:
         try:
-            target_view = self.bubble_chamber.views.filter(
-                lambda x: x.unhappiness > 0
-                and x.members.filter(
-                    lambda x: x.parent_concept.name == "not(same)"
-                ).is_empty
-            ).get(key=exigency)
+            if (
+                self.bubble_chamber.worldview.view is not None
+                and self.bubble_chamber.worldview.view.secondary_frames.filter(
+                    lambda x: x.number_of_items_left_to_process > 0
+                ).not_empty
+            ):
+                target_view = self.bubble_chamber.worldview.view
+            else:
+                target_view = self.bubble_chamber.views.filter(
+                    lambda v: v.unhappiness > self.FLOATING_POINT_TOLERANCE
+                    or v.secondary_frames.filter(
+                        lambda f: f.number_of_items_left_to_process > 0
+                    ).not_empty
+                    and v.members.filter(
+                        lambda c: c.parent_concept.name == "not(same)"
+                    ).is_empty
+                ).get(key=exigency)
             self.bubble_chamber.focus.view = target_view
             self.bubble_chamber.focus.frame = (
                 target_view.parent_frame
@@ -52,8 +63,10 @@ class FocusSetter(Codelet):
             )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(
-                f"Set focus: {target_view}"
-                + f"Exigency: {target_view.exigency}"
+                "Set focus\n"
+                + f"View: {target_view}\n"
+                + f"Frame: {self.bubble_chamber.focus.frame}\n"
+                + f"Exigency: {target_view.exigency}\n"
                 + f"Satisfaction: {self.bubble_chamber.focus.satisfaction}"
             )
             self._update_codelet_urgencies()

@@ -66,7 +66,10 @@ class FocusUnsetter(Codelet):
         self.bubble_chamber.loggers["activity"].log(
             f"Transposed change in satisfaction: {transposed_change_in_satisfaction_score}",
         )
-        if self.bubble_chamber.focus.view.unhappiness == 0.0:
+        if (
+            self.bubble_chamber.focus.view.unhappiness < self.FLOATING_POINT_TOLERANCE
+            and self.bubble_chamber.focus.frame.number_of_items_left_to_process == 0
+        ):
             probability_of_unsetting_focus = 1
             self._check_for_and_merge_with_equivalent_views()
             self._update_worldview_porter_urgency()
@@ -93,9 +96,6 @@ class FocusUnsetter(Codelet):
             self._fizzle()
         else:
             if transposed_change_in_satisfaction_score <= 0.5:
-                self.bubble_chamber.focus.view.decay_activation(
-                    1 - transposed_change_in_satisfaction_score
-                )
                 self._update_recycler_urgency()
                 self._update_bottom_up_factories_urgencies()
             self.bubble_chamber.focus.view = None
@@ -138,6 +138,7 @@ class FocusUnsetter(Codelet):
         # if not self.target_view.super_views.is_empty: return ?
         for view in self.bubble_chamber.views.excluding(self.target_view).filter(
             lambda x: x.super_views.is_empty
+            and x.unhappiness < self.FLOATING_POINT_TOLERANCE
         ):
             if self.target_view.is_equivalent_to(view):
                 view.quality = 0.0

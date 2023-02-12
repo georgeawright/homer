@@ -17,7 +17,6 @@ from linguoplotter.structures.spaces import ContextualSpace
 class View(Structure):
     """A collection of spaces and self-consistent correspondences between them."""
 
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
     CORRESPONDENCE_WEIGHT = HyperParameters.VIEW_QUALITY_CORRESPONDENCE_WEIGHT
     INPUT_WEIGHT = HyperParameters.VIEW_QUALITY_INPUT_WEIGHT
 
@@ -65,6 +64,7 @@ class View(Structure):
         self._node_groups = []
         self._grouped_nodes = {}
         self.matched_sub_frames = {}
+        self.matched_secondary_sub_frames = {}
         self.slot_values = {}
         self.conceptual_spaces_map = {}
         self.is_view = True
@@ -75,6 +75,7 @@ class View(Structure):
             "parent_id": self.parent_id,
             "parent_frame": self.parent_frame.structure_id,
             "parent_frame_name": self.parent_frame.name,
+            "secondary_frames": [frame.structure_id for frame in self.secondary_frames],
             "frames": [frame.structure_id for frame in self.frames],
             "super_views": [view.structure_id for view in self.super_views],
             "sub_views": [view.structure_id for view in self.sub_views],
@@ -230,7 +231,13 @@ class View(Structure):
         )
 
     def recalculate_unhappiness(self):
-        self.unhappiness = 1 - 0.5 ** self.number_of_items_left_to_process
+        self.unhappiness = max(
+            [1 - 0.5 ** self.parent_frame.number_of_items_left_to_process]
+            + [
+                1 - 0.5 ** frame.number_of_items_left_to_process
+                for frame in self.secondary_frames
+            ]
+        )
 
     def recalculate_exigency(self):
         self.recalculate_unhappiness()

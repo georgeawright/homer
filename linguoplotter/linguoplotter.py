@@ -154,3 +154,6 @@ class Linguoplotter:
                     if node.parent_space.is_main_input
                 ],
             )
+        for count in ID.COUNTS:
+            if "Frame" in count:
+                print(count, ID.COUNTS[count])

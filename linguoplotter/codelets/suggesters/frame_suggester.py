@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import activation, exigency
 from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures import Frame
 
@@ -41,8 +41,22 @@ class FrameSuggester(Suggester):
         bubble_chamber: BubbleChamber,
         urgency: float = None,
     ):
-        targets = bubble_chamber.new_dict(name="targets")
-        urgency = urgency if urgency is not None else 1 - bubble_chamber.satisfaction
+        view = bubble_chamber.views.filter(
+            lambda x: x.parent_frame.parent_concept
+            == bubble_chamber.concepts["conjunction"]
+            and x.unhappiness < cls.FLOATING_POINT_TOLERANCE
+        ).get(
+            key=lambda x: fuzzy.OR(
+                x == bubble_chamber.focus.view,
+                x == bubble_chamber.worldview.view,
+                x.exigency,
+            )
+        )
+        targets = bubble_chamber.new_dict({"view": view}, name="targets")
+        uncohesiveness_of_view = (
+            1 / len(view.secondary_frames) if view.secondary_frames.not_empty else 1
+        )
+        urgency = urgency if urgency is not None else uncohesiveness_of_view
         return BottomUpFrameSuggester.spawn(parent_id, bubble_chamber, targets, urgency)
 
     @classmethod
@@ -71,10 +85,6 @@ class FrameSuggester(Suggester):
 class BottomUpFrameSuggester(FrameSuggester):
     def _passes_preliminary_checks(self):
         try:
-            self.targets["view"] = self.bubble_chamber.views.filter(
-                lambda x: x.parent_frame.parent_concept
-                == self.bubble_chamber.concepts["conjunction"]
-            ).get(key=exigency)
             self.targets["frame"] = self.bubble_chamber.frames.filter(
                 lambda x: x.is_secondary
                 and not any(
@@ -93,12 +103,19 @@ class TopDownFrameSuggester(FrameSuggester):
     def _passes_preliminary_checks(self):
         try:
             self.targets["view"] = self.bubble_chamber.views.filter(
-                lambda x: not any(
+                lambda x: x.unhappines < self.FLOATING_POINT_TOLERANCE
+                and not any(
                     [
                         frame.is_equivalent_to(self.targets["frame"])
                         for frame in x.secondary_frames
                     ]
                 )
-            ).get(key=activation)
+            ).get(
+                key=lambda x: fuzzy.OR(
+                    x == self.bubble_chamber.focus.view,
+                    x == self.bubble_chamber.worldview.view,
+                    x.exigency,
+                )
+            )
         except MissingStructureError:
             return False

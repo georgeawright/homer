@@ -2,7 +2,7 @@ from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.codelets.suggesters import LabelSuggester
-from linguoplotter.structure_collection_keys import labeling_exigency
+from linguoplotter.structure_collection_keys import activation, labeling_exigency
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.links import Label, Relation
 from linguoplotter.structures.nodes import Concept
@@ -67,7 +67,9 @@ class InterspatialLabelSuggester(LabelSuggester):
             )
         ).get(
             key=lambda x: fuzzy.OR(
-                x in bubble_chamber.worldview.view.sub_views,
+                x in bubble_chamber.worldview.view.sub_views
+                if bubble_chamber.worldview.view is not None
+                else False,
                 x.super_views.not_empty,
                 x.activation,
             )
@@ -81,7 +83,7 @@ class InterspatialLabelSuggester(LabelSuggester):
             lambda x: x.is_conceptual_space
             and x.no_of_dimensions == 1
             and not x.is_symbolic
-        )
+        ).get(key=activation)
         urgency = urgency if urgency is not None else start.unlabeledness
         targets = bubble_chamber.new_dict(
             {"start": start, "concept": concept, "space": space}, name="targets"

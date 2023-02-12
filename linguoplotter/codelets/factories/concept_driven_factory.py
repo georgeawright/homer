@@ -43,12 +43,12 @@ class ConceptDrivenFactory(Factory):
         return self.coderack.MINIMUM_CODELET_URGENCY
 
     def _engender_follow_up(self):
-        parent_concept = self._get_parent_concept()
+        self._get_parent_concept()
         follow_up_class = self._get_follow_up_class()
         rand = self.bubble_chamber.random_machine.generate_number()
         if self.coderack.proportion_of_codelets_of_type(follow_up_class) < rand:
             follow_up = follow_up_class.make_top_down(
-                self.codelet_id, self.bubble_chamber, parent_concept
+                self.codelet_id, self.bubble_chamber, self.targets["concept"]
             )
             self.child_codelets.append(follow_up)
 
@@ -61,17 +61,27 @@ class ConceptDrivenFactory(Factory):
             .filter(lambda x: x.is_fully_active())
             .get()
         )
-        return self.targets["concept"]
 
     def _get_follow_up_class(self):
         action_concept = self.bubble_chamber.concepts["suggest"]
-        space_concept = self.bubble_chamber.random_machine.select(
-            [
-                self.bubble_chamber.concepts["inner"],
-                self.bubble_chamber.concepts["outer"],
-            ],
-            key=activation,
-        )
+        if (
+            self.targets["concept"].structure_type == Label
+            and self.targets["concept"].parent_space.structure_type == Label
+        ):
+            space_concept = self.bubble_chamber.concepts["inner"]
+        elif (
+            self.targets["concept"].structure_type == Label
+            and self.targets["concept"].parent_space.structure_type == Relation
+        ):
+            space_concept = self.bubble_chamber.concepts["outer"]
+        else:
+            space_concept = self.bubble_chamber.random_machine.select(
+                [
+                    self.bubble_chamber.concepts["inner"],
+                    self.bubble_chamber.concepts["outer"],
+                ],
+                key=activation,
+            )
         direction_concept = self.bubble_chamber.concepts["forward"]
         if self.targets["concept"] in self._get_label_concepts():
             structure_concept = self.bubble_chamber.concepts["label"]

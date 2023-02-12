@@ -84,7 +84,9 @@ class Frame(Structure):
     @property
     def items(self) -> StructureSet:
         return StructureSet.union(
-            self.input_space.contents, self.output_space.contents
+            self.input_space.contents,
+            self.output_space.contents,
+            *[sub_frame.items for sub_frame in self.sub_frames],
         ).where(is_correspondence=False)
 
     @property
@@ -351,6 +353,7 @@ class Frame(Structure):
             input_space=input_space_copy,
             output_space=output_space_copy,
             is_sub_frame=self.is_sub_frame,
+            is_secondary=self.is_secondary,
             depth=self.depth,
         )
         for abstract_space, conceptual_space in conceptual_spaces_map:

@@ -26,7 +26,9 @@ class CorrespondenceSuggester(Suggester):
         target_view: View = None,
     ):
         from linguoplotter.codelets.suggesters.correspondence_suggesters import (
+            FrameToSecondaryFrameCorrespondenceSuggester,
             InterspatialCorrespondenceSuggester,
+            PotentialFrameToSecondaryFrameCorrespondenceSuggester,
             PotentialSubFrameToFrameCorrespondenceSuggester,
             SpaceToFrameCorrespondenceSuggester,
             SubFrameToFrameCorrespondenceSuggester,
@@ -104,27 +106,33 @@ class CorrespondenceSuggester(Suggester):
                     target_frame.output_space,
                 ]
             ).get()
-        if target_space_two == target_frame.input_space:
-            follow_up_class = SpaceToFrameCorrespondenceSuggester
-            sub_frame = None
-        else:
-            sub_frame = target_frame.sub_frames.filter(
-                lambda x: target_space_two in (x.input_space, x.output_space)
-            ).get()
-            if sub_frame in target_view.matched_sub_frames:
-                follow_up_class = SubFrameToFrameCorrespondenceSuggester
-            else:
-                follow_up_class = PotentialSubFrameToFrameCorrespondenceSuggester
-        urgency = urgency if urgency is not None else end.uncorrespondedness
         targets = bubble_chamber.new_dict(
             {
                 "view": target_view,
                 "frame": target_frame,
                 "end": end,
-                "sub_frame": sub_frame,
             },
-            name="targets",
         )
+        if target_space_two == target_frame.input_space:
+            follow_up_class = SpaceToFrameCorrespondenceSuggester
+        elif target_frame == target_view.parent_frame:
+            targets["sub_frame"] = target_frame.sub_frames.filter(
+                lambda x: target_space_two in (x.input_space, x.output_space)
+            ).get()
+            if targets["sub_frame"] in target_view.matched_sub_frames:
+                follow_up_class = SubFrameToFrameCorrespondenceSuggester
+            else:
+                follow_up_class = PotentialSubFrameToFrameCorrespondenceSuggester
+        else:
+            targets["end_frame"] = target_frame.sub_frames.filter(
+                lambda x: target_space_two in (x.input_space, x.output_space)
+            ).get()
+            if targets["end_frame"] in target_view.matched_secondary_sub_frames:
+                follow_up_class = FrameToSecondaryFrameCorrespondenceSuggester
+            else:
+                follow_up_class = PotentialFrameToSecondaryFrameCorrespondenceSuggester
+        urgency = urgency if urgency is not None else end.uncorrespondedness
+        targets.name = "targets"
         return follow_up_class.spawn(parent_id, bubble_chamber, targets, urgency)
 
     @classmethod

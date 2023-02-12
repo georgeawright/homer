@@ -14,6 +14,20 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["view"].matched_sub_frames, "matched sub frames"
             )
             return False
+        if self.targets["sub_view"].parent_frame.parent_concept.location_in_space(
+            self.bubble_chamber.spaces["grammar"]
+        ) == self.bubble_chamber.concepts["sentence"].location_in_space(
+            self.bubble_chamber.spaces["grammar"]
+        ):
+            if self.targets["sub_view"].unhappiness > self.FLOATING_POINT_TOLERANCE:
+                return False
+            if any(
+                [
+                    self.targets["sub_view"].raw_input_nodes == v.raw_input_nodes
+                    for v in self.targets["view"].sub_views
+                ]
+            ):
+                return False
         for correspondence in self.targets["sub_view"].members:
             if not self.targets["view"].can_accept_member(
                 correspondence.parent_concept,

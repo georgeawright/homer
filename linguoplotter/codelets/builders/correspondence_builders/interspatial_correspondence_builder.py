@@ -22,24 +22,26 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
             )
             return False
         try:
-            matched_start_sub_frame = self.targets["view"].matched_sub_frames[
+            matched_start_sub_frame = self.targets["view"].matched_secondary_sub_frames[
                 self.targets["start_sub_frame"]
             ]
             if matched_start_sub_frame != self.targets["start_sub_view"].parent_frame:
                 self.bubble_chamber.loggers["activity"].log_set(
-                    self.targets["view"].matched_sub_frames, "matched sub frames"
+                    self.targets["view"].matched_secondary_sub_frames,
+                    "matched sub frames",
                 )
                 return False
         except KeyError:
             pass
         if self.targets["end"].is_relation:
             try:
-                matched_end_sub_frame = self.targets["view"].matched_sub_frames[
-                    self.targets["end_sub_frame"]
-                ]
+                matched_end_sub_frame = self.targets[
+                    "view"
+                ].matched_secondary_sub_frames[self.targets["end_sub_frame"]]
                 if matched_end_sub_frame != self.targets["end_sub_view"].parent_frame:
                     self.bubble_chamber.loggers["activity"].log_set(
-                        self.targets["view"].matched_sub_frames, "matched sub frames"
+                        self.targets["view"].matched_secondary_sub_frames,
+                        "matched sub frames",
                     )
                     return False
             except KeyError:
@@ -87,24 +89,24 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["start_sub_view"].frames,
                 self.targets["end_sub_view"].frames,
             )
-            self.targets["view"].matched_sub_frames[
+            self.targets["view"].matched_secondary_sub_frames[
                 self.targets["start_sub_frame"]
             ] = self.targets["start_sub_view"].parent_frame
-            self.targets["view"].matched_sub_frames[
+            self.targets["view"].matched_secondary_sub_frames[
                 self.targets["end_sub_frame"]
             ] = self.targets["end_sub_view"].parent_frame
             for (
                 matched_sub_frame,
                 matching_sub_frame,
-            ) in self.targets["start_sub_view"].matched_sub_frames.items():
-                self.targets["view"].matched_sub_frames[
+            ) in self.targets["start_sub_view"].matched_secondary_sub_frames.items():
+                self.targets["view"].matched_secondary_sub_frames[
                     matched_sub_frame
                 ] = matching_sub_frame
             for (
                 matched_sub_frame,
                 matching_sub_frame,
-            ) in self.targets["end_sub_view"].matched_sub_frames.items():
-                self.targets["view"].matched_sub_frames[
+            ) in self.targets["end_sub_view"].matched_secondary_sub_frames.items():
+                self.targets["view"].matched_secondary_sub_frames[
                     matched_sub_frame
                 ] = matching_sub_frame
             for correspondence in self.targets["start_sub_view"].members:
@@ -144,14 +146,14 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["view"].frames,
                 self.targets["start_sub_view"].frames,
             )
-            self.targets["view"].matched_sub_frames[
+            self.targets["view"].matched_secondary_sub_frames[
                 self.targets["start_sub_frame"]
             ] = self.targets["start_sub_view"].parent_frame
             for (
                 matched_sub_frame,
                 matching_sub_frame,
-            ) in self.targets["start_sub_view"].matched_sub_frames.items():
-                self.targets["view"].matched_sub_frames[
+            ) in self.targets["start_sub_view"].matched_secondary_sub_frames.items():
+                self.targets["view"].matched_secondary_sub_frames[
                     matched_sub_frame
                 ] = matching_sub_frame
             for correspondence in self.targets["start_sub_view"].members:

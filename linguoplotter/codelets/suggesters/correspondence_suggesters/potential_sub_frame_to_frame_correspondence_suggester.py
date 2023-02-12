@@ -109,12 +109,8 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             self.targets["concept"] = self.bubble_chamber.concepts["same"]
         if self.targets["start_space"] is None:
             try:
-                PotentialSubFrameToFrameCorrespondenceSuggester._get_target_space_one(
-                    self, self
-                )
-                PotentialSubFrameToFrameCorrespondenceSuggester._get_target_structure_one(
-                    self, self
-                )
+                self._get_target_space_one(self, self)
+                self._get_target_structure_one(self, self)
             except MissingStructureError:
                 return False
         for correspondence in self.targets["sub_view"].members:
@@ -157,24 +153,38 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     @staticmethod
     def _get_target_space_one(parent_codelet, child_codelet):
         bubble_chamber = parent_codelet.bubble_chamber
+        target_view = child_codelet.targets["view"]
         compatible_sub_views = bubble_chamber.views.filter(
-            lambda x: x != child_codelet.targets["view"]
+            lambda x: x != target_view
+            and (
+                x.unhappiness < parent_codelet.FLOATING_POINT_TOLERANCE
+                and not any(
+                    [
+                        x.raw_input_nodes == v.raw_input_nodes
+                        for v in target_view.sub_views
+                    ]
+                )
+            )
+            if x.parent_frame.parent_concept.location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
+            == bubble_chamber.concepts["sentence"].location_in_space(
+                bubble_chamber.spaces["grammar"]
+            )
+            else True
             and x.super_views.is_empty
             and (
                 x.parent_frame.parent_concept
                 == child_codelet.targets["sub_frame"].parent_concept
             )
-            and (
-                x.parent_frame.progenitor
-                != child_codelet.targets["view"].parent_frame.progenitor
-            )
-            and (x.input_spaces == child_codelet.targets["view"].input_spaces)
+            and (x.parent_frame.progenitor != target_view.parent_frame.progenitor)
+            and (x.input_spaces == target_view.input_spaces)
             and x.members.filter(
                 lambda c: c.parent_concept.is_compound_concept
             ).is_empty
             and all(
                 [
-                    child_codelet.targets["view"].can_accept_member(
+                    target_view.can_accept_member(
                         member.parent_concept,
                         member.conceptual_space,
                         member.start,
@@ -189,14 +199,14 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             lambda x: x.members.is_empty
             or any(
                 [
-                    child_codelet.targets["view"].can_accept_member(
+                    target_view.can_accept_member(
                         member.parent_concept,
                         member.conceptual_space,
                         member.start,
                         child_codelet.targets["end"],
                         sub_view=x,
                     )
-                    and child_codelet.targets["view"].can_accept_member(
+                    and target_view.can_accept_member(
                         member.parent_concept,
                         member.conceptual_space,
                         member.end,
@@ -220,11 +230,11 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 max(
                     [
                         x.cohesiveness_with(sub_view)
-                        for sub_view in child_codelet.targets["view"].sub_views
+                        for sub_view in target_view.sub_views
                     ]
                 ),
             )
-            if child_codelet.targets["view"].sub_views.not_empty
+            if target_view.sub_views.not_empty
             else x.exigency
         )
         child_codelet.targets["start_space"] = (

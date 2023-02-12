@@ -70,7 +70,7 @@ class InterspatialRelationSuggester(RelationSuggester):
             lambda x: x.is_letter_chunk
             and x.members.is_empty
             and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
-        ).get(key=relating_exigency)
+        )
         potential_pairs = [
             (a, b) for a in potential_targets for b in potential_targets if a != b
         ]

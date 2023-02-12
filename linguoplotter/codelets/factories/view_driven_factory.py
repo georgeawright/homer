@@ -6,7 +6,9 @@ from linguoplotter.codelets.suggesters import (
     ViewSuggester,
 )
 from linguoplotter.codelets.suggesters.correspondence_suggesters import (
+    FrameToSecondaryFrameCorrespondenceSuggester,
     InterspatialCorrespondenceSuggester,
+    PotentialFrameToSecondaryFrameCorrespondenceSuggester,
     PotentialSubFrameToFrameCorrespondenceSuggester,
     SpaceToFrameCorrespondenceSuggester,
     SubFrameToFrameCorrespondenceSuggester,
@@ -89,16 +91,15 @@ class ViewDrivenFactory(Factory):
             except MissingStructureError:
                 follow_up = self._spawn_non_projection_suggester()
         elif self.targets["slot"].parent_space == self.targets[
-            "view"
-        ].parent_frame.output_space or (
-            self.targets["slot"]
-            in self.targets["view"].parent_frame.output_space.contents
+            "frame"
+        ].output_space or (
+            self.targets["slot"] in self.targets["frame"].output_space.contents
             and self.targets["slot"]
             .correspondences.where(end=self.targets["slot"])
             .not_empty
         ):
             follow_up = self._spawn_projection_suggester()
-        else:  # slot is in sub-frame
+        elif self.targets["frame"] == self.targets["view"].parent_frame:
             try:
                 follow_up = self._spawn_sub_frame_to_frame_correspondence_suggester()
             except MissingStructureError:
@@ -108,6 +109,15 @@ class ViewDrivenFactory(Factory):
                     )
                 except MissingStructureError:
                     follow_up = self._spawn_view_suggester()
+        else:
+            try:
+                follow_up = (
+                    self._spawn_frame_to_secondary_frame_correspondence_suggester()
+                )
+            except MissingStructureError:
+                follow_up = (
+                    self._spawn_potential_frame_to_secondary_frame_correspondence_suggester()
+                )
         self.child_codelets.append(follow_up)
 
     def _set_target_view(self):
@@ -370,18 +380,10 @@ class ViewDrivenFactory(Factory):
                 ):
                     end_sub_frame = sub_frame
             if target_start_space is None:
-                potential_start_views = self.bubble_chamber.views.filter(
+                potential_start_views = self.targets["view"].sub_views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
-                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                    and x != self.targets["view"]
-                    and x.super_views.is_empty
                 )
-                potential_start_views = potential_start_views.sample(
-                    len(potential_start_views) // 2
-                )
-                if potential_start_views.is_empty:
-                    raise MissingStructureError
                 potential_start_targets = StructureSet.union(
                     *[
                         view.output_space.contents.filter(
@@ -441,13 +443,9 @@ class ViewDrivenFactory(Factory):
                         ]
                     )
             if target_end_space is None:
-                potential_end_views = self.bubble_chamber.views.filter(
+                potential_end_views = self.targets["view"].sub_views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == end_sub_frame.parent_concept
-                    and x not in potential_start_views
-                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                    and x != self.targets["view"]
-                    and x.super_views.is_empty
                 )
                 if potential_end_views.is_empty:
                     raise MissingStructureError
@@ -604,12 +602,9 @@ class ViewDrivenFactory(Factory):
                 ):
                     start_sub_frame = sub_frame
             if target_start_space is None:
-                potential_start_views = self.bubble_chamber.views.filter(
+                potential_start_views = self.targets["view"].sub_views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
-                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                    and x != self.targets["view"]
-                    and x.super_views.is_empty
                 )
                 potential_start_views = potential_start_views.sample(
                     len(potential_start_views) // 2
@@ -804,8 +799,8 @@ class ViewDrivenFactory(Factory):
             else targets["view"].parent_frame.output_space
         )
         targets["sub_frame"] = (
-            targets["view"]
-            .parent_frame.sub_frames.filter(
+            targets["frame"]
+            .sub_frames.filter(
                 lambda x: (
                     x.input_space in targets["end"].parent_spaces
                     or x.output_space in targets["end"].parent_spaces
@@ -896,3 +891,78 @@ class ViewDrivenFactory(Factory):
         return ViewSuggester.make(
             self.codelet_id, self.bubble_chamber, frame=frame, urgency=urgency
         )
+
+    def _spawn_frame_to_secondary_frame_correspondence_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            "Spawning FrameToSecondaryFrameCorrespondenceSuggester"
+        )
+        targets = self.bubble_chamber.new_dict(
+            {
+                "view": self.targets["view"],
+                "frame": self.targets["frame"],
+                "end": self.targets["slot"],
+            },
+            name="targets",
+        )
+        targets["end_space"] = (
+            targets["frame"].input_space
+            if targets["end"] in targets["frame"].input_space.contents
+            else targets["frame"].output_space
+        )
+        targets["sub_frame"] = (
+            targets["frame"]
+            .sub_frames.filter(
+                lambda x: (
+                    x.input_space in targets["end"].parent_spaces
+                    or x.output_space in targets["end"].parent_spaces
+                )
+                and not targets["end"].has_correspondence_to_space(
+                    targets["view"].matched_secondary_sub_frames[x].input_space
+                )
+                if x in targets["view"].matched_secondary_sub_frames
+                else False
+                and not targets["end"].has_correspondence_to_space(
+                    targets["view"].matched_secondary_sub_frames[x].output_space
+                )
+                if x in targets["view"].matched_secondary_sub_frames
+                else False
+            )
+            .get()
+        )
+        if targets["sub_frame"] not in targets["view"].matched_secondary_sub_frames:
+            raise MissingStructureError
+        matching_frame = targets["view"].matched_secondary_sub_frames[
+            targets["sub_frame"]
+        ]
+        targets["start_space"] = (
+            matching_frame.input_space
+            if targets["end_space"] == targets["view"].parent_frame.input_space
+            else matching_frame.output_space
+        )
+        follow_up = FrameToSecondaryFrameCorrespondenceSuggester.spawn(
+            self.codelet_id, self.bubble_chamber, targets, targets["view"].unhappiness
+        )
+        follow_up._get_target_conceptual_space(self, follow_up)
+        follow_up._get_target_structure_one(self, follow_up)
+        return follow_up
+
+    def _spawn_potential_frame_to_secondary_frame_correspondence_suggester(self):
+        self.bubble_chamber.loggers["activity"].log(
+            "Spawning PotentialFrameToSecondaryFrameCorrespondenceSuggester"
+        )
+        targets = self.bubble_chamber.new_dict(
+            {
+                "view": self.targets["view"],
+                "frame": self.targets["frame"],
+                "end": self.targets["slot"],
+                "concept": self.bubble_chamber.concepts["same"],
+            },
+            name="targets",
+        )
+        follow_up = PotentialFrameToSecondaryFrameCorrespondenceSuggester.spawn(
+            self.codelet_id, self.bubble_chamber, targets, targets["view"].unhappiness
+        )
+        follow_up._get_target_conceptual_space(self, follow_up)
+        follow_up._get_target_space_one(self, follow_up)
+        follow_up._get_target_structure_one(self, follow_up)
+        return follow_up
