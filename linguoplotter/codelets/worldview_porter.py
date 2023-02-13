@@ -44,7 +44,7 @@ class WorldviewPorter(Codelet):
     def run(self) -> CodeletResult:
         try:
             self.targets["view"] = self.bubble_chamber.views.filter(
-                lambda x: x.unhappiness < HyperParameters.FLOATING_POINT_TOLERANCE
+                lambda x: x.parent_frame.number_of_items_left_to_process == 0
                 and x.parent_frame.parent_concept.location_in_space(
                     self.bubble_chamber.spaces["grammar"]
                 )

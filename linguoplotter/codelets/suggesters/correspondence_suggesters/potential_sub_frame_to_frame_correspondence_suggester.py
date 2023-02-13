@@ -157,21 +157,23 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         compatible_sub_views = bubble_chamber.views.filter(
             lambda x: x != target_view
             and (
-                x.unhappiness < parent_codelet.FLOATING_POINT_TOLERANCE
-                and not any(
-                    [
-                        x.raw_input_nodes == v.raw_input_nodes
-                        for v in target_view.sub_views
-                    ]
+                (
+                    x.unhappiness < parent_codelet.FLOATING_POINT_TOLERANCE
+                    and not any(
+                        [
+                            x.raw_input_nodes == v.raw_input_nodes
+                            for v in target_view.sub_views
+                        ]
+                    )
                 )
+                if x.parent_frame.parent_concept.location_in_space(
+                    bubble_chamber.spaces["grammar"]
+                )
+                == bubble_chamber.concepts["sentence"].location_in_space(
+                    bubble_chamber.spaces["grammar"]
+                )
+                else True
             )
-            if x.parent_frame.parent_concept.location_in_space(
-                bubble_chamber.spaces["grammar"]
-            )
-            == bubble_chamber.concepts["sentence"].location_in_space(
-                bubble_chamber.spaces["grammar"]
-            )
-            else True
             and x.super_views.is_empty
             and (
                 x.parent_frame.parent_concept

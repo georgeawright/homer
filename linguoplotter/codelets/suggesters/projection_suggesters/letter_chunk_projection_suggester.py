@@ -28,7 +28,8 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
             if bubble_chamber.focus.view is not None
             else bubble_chamber.views.get(key=activation)
         )
-        target_letter_chunk = target_view.parent_frame.output_space.contents.where(
+        frame = target_view.parent_frame
+        target_letter_chunk = frame.output_space.contents.where(
             is_letter_chunk=True
         ).get(key=corresponding_exigency)
         urgency = (
@@ -37,7 +38,8 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
             else target_letter_chunk.corresponding_exigency
         )
         targets = bubble_chamber.new_dict(
-            {"view": target_view, "projectee": target_letter_chunk}, name="targets"
+            {"view": target_view, "frame": frame, "projectee": target_letter_chunk},
+            name="targets",
         )
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 

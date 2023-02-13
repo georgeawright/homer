@@ -3,6 +3,7 @@ from math import prod
 import re
 from typing import List, Union
 
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure_collections import StructureSet
@@ -96,6 +97,15 @@ class LetterChunk(Chunk):
     @property
     def concepts(self):
         return self.relatives.where(is_concept=True)
+
+    @property
+    def most_super_chunk(self) -> LetterChunk:
+        if self.super_chunks.is_empty:
+            raise MissingStructureError
+        try:
+            return self.super_chunks.get().most_super_chunk
+        except MissingStructureError:
+            return self.super_chunks.get()
 
     @property
     def left_neighbour(self):

@@ -214,7 +214,14 @@ class View(Structure):
             [
                 chunk.name
                 for chunk in self.output_space.contents.filter(
-                    lambda x: x.is_letter_chunk and x.super_chunks.is_empty
+                    lambda x: x.is_letter_chunk
+                    and x.name is not None
+                    and (
+                        x.super_chunks.is_empty
+                        or (
+                            x.super_chunks.not_empty and x.most_super_chunk.name is None
+                        )
+                    )
                 )
             ]
         )

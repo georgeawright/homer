@@ -18,93 +18,100 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         return self.bubble_chamber.concepts["letter-chunk"]
 
     def _process_structure(self):
+        # TODO: if projecting from secondary frame, find if equivalent item is already in output space and just build a correspondence to it (item with same abstract chunk?)
         if not self.targets["projectee"].is_slot:
             abstract_chunk = self.targets["projectee"].abstract_chunk
-            output_location = Location(
-                self.targets["projectee"].location.coordinates,
-                self.targets["view"].output_space,
-            )
-            if abstract_chunk.members.is_empty:
-                word = abstract_chunk.copy_to_location(
-                    output_location,
-                    parent_id=self.codelet_id,
-                    bubble_chamber=self.bubble_chamber,
+            try:
+                word = self._get_equivalent_projection()
+            except MissingStructureError:
+                output_location = Location(
+                    self.targets["projectee"].location.coordinates,
+                    self.targets["view"].output_space,
                 )
-            else:
-                locations = [
-                    location
-                    for location in abstract_chunk.locations
-                    if location.space.is_conceptual_space
-                ] + [output_location]
-                word = self.bubble_chamber.new_letter_chunk(
-                    name=None,
-                    locations=locations,
-                    parent_space=self.targets["view"].output_space,
-                    abstract_chunk=abstract_chunk,
-                    parent_id=self.codelet_id,
-                )
+                if abstract_chunk.members.is_empty:
+                    word = abstract_chunk.copy_to_location(
+                        output_location,
+                        parent_id=self.codelet_id,
+                        bubble_chamber=self.bubble_chamber,
+                    )
+                else:
+                    locations = [
+                        location
+                        for location in abstract_chunk.locations
+                        if location.space.is_conceptual_space
+                    ] + [output_location]
+                    word = self.bubble_chamber.new_letter_chunk(
+                        name=None,
+                        locations=locations,
+                        parent_space=self.targets["view"].output_space,
+                        abstract_chunk=abstract_chunk,
+                        parent_id=self.codelet_id,
+                    )
         else:
             abstract_chunk = self._get_abstract_chunk()
-            self.bubble_chamber.loggers["activity"].log(
-                f"Found abstract chunk: {abstract_chunk}"
-            )
-            if (
-                self.targets["projectee"].members.is_empty
-                and abstract_chunk.members.not_empty
-            ):
-                output_location = Location(
-                    self.targets["projectee"].location.coordinates,
-                    self.targets["view"].output_space,
+            try:
+                word = self._get_equivalent_projection()
+            except MissingStructureError:
+                self.bubble_chamber.loggers["activity"].log(
+                    f"Found abstract chunk: {abstract_chunk}"
                 )
-                word = abstract_chunk.copy_to_location(
-                    output_location,
-                    parent_id=self.codelet_id,
-                    bubble_chamber=self.bubble_chamber,
-                )
-            else:
-                self.targets["projectee"].abstract_chunk = abstract_chunk
-                sameness_relations = self.targets["projectee"].links_in.where(
-                    is_relation=True,
-                    parent_concept=self.bubble_chamber.concepts["same"],
-                )
-                output_chunk_name = abstract_chunk.name
-                if sameness_relations.not_empty:
-                    sameness_start_correspondences_to_output = (
-                        sameness_relations.get().start.correspondences_to_space(
-                            self.targets["view"].output_space
-                        )
+                if (
+                    self.targets["projectee"].members.is_empty
+                    and abstract_chunk.members.not_empty
+                ):
+                    output_location = Location(
+                        self.targets["projectee"].location.coordinates,
+                        self.targets["view"].output_space,
                     )
-                    if sameness_start_correspondences_to_output.not_empty:
-                        if (
-                            sameness_start_correspondences_to_output.get().end.name
-                            == abstract_chunk.name
-                        ):
-                            output_chunk_name = ""
-                output_location = Location(
-                    self.targets["projectee"].location.coordinates,
-                    self.targets["view"].output_space,
-                )
-                locations = [
-                    location
-                    for location in abstract_chunk.locations
-                    if location.space.is_conceptual_space
-                ] + [output_location]
-                word = self.bubble_chamber.new_letter_chunk(
-                    name=output_chunk_name,
-                    locations=locations,
-                    parent_space=self.targets["view"].output_space,
-                    abstract_chunk=abstract_chunk,
-                    parent_id=self.codelet_id,
-                )
-                self.bubble_chamber.loggers["activity"].log(
-                    f"Built Letter Chunk {word}"
-                )
-                self.bubble_chamber.loggers["activity"].log(
-                    f"Left branch {word.left_branch}"
-                )
-                self.bubble_chamber.loggers["activity"].log(
-                    f"Right branch {word.right_branch}"
-                )
+                    word = abstract_chunk.copy_to_location(
+                        output_location,
+                        parent_id=self.codelet_id,
+                        bubble_chamber=self.bubble_chamber,
+                    )
+                else:
+                    self.targets["projectee"].abstract_chunk = abstract_chunk
+                    sameness_relations = self.targets["projectee"].links_in.where(
+                        is_relation=True,
+                        parent_concept=self.bubble_chamber.concepts["same"],
+                    )
+                    output_chunk_name = abstract_chunk.name
+                    if sameness_relations.not_empty:
+                        sameness_start_correspondences_to_output = (
+                            sameness_relations.get().start.correspondences_to_space(
+                                self.targets["view"].output_space
+                            )
+                        )
+                        if sameness_start_correspondences_to_output.not_empty:
+                            if (
+                                sameness_start_correspondences_to_output.get().end.name
+                                == abstract_chunk.name
+                            ):
+                                output_chunk_name = ""
+                    output_location = Location(
+                        self.targets["projectee"].location.coordinates,
+                        self.targets["view"].output_space,
+                    )
+                    locations = [
+                        location
+                        for location in abstract_chunk.locations
+                        if location.space.is_conceptual_space
+                    ] + [output_location]
+                    word = self.bubble_chamber.new_letter_chunk(
+                        name=output_chunk_name,
+                        locations=locations,
+                        parent_space=self.targets["view"].output_space,
+                        abstract_chunk=abstract_chunk,
+                        parent_id=self.codelet_id,
+                    )
+                    self.bubble_chamber.loggers["activity"].log(
+                        f"Built Letter Chunk {word}"
+                    )
+                    self.bubble_chamber.loggers["activity"].log(
+                        f"Left branch {word.left_branch}"
+                    )
+                    self.bubble_chamber.loggers["activity"].log(
+                        f"Right branch {word.right_branch}"
+                    )
         for member in self.targets["projectee"].left_branch:
             if member.has_correspondence_to_space(self.targets["view"].output_space):
                 correspondence = member.correspondences_to_space(
@@ -165,6 +172,32 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         )
         self.child_structures.add(word)
         self.child_structures.add(frame_to_output_correspondence)
+
+    def _get_equivalent_projection(self):
+        """
+        Find the equivalent item in output space
+        if target projectee is in a secondary frame and is matched with
+        an item in a sub view.
+        secondary frame -> sub_view frame -> view parent_frame -> output space"""
+        if self.targets["frame"] == self.targets["view"].parent_frame:
+            raise MissingStructureError
+        sub_view_correspondee = (
+            self.targets["projectee"]
+            .correspondences.filter(lambda x: x.end == self.targets["projectee"])
+            .get()
+            .start
+        )
+        parent_frame_correspondee = (
+            sub_view_correspondee.correspondences.filter(
+                lambda x: x.end in self.targets["view"].parent_frame.items
+            )
+            .get()
+            .end
+        )
+        output_space_correspondee = parent_frame_correspondee.correspondees.filter(
+            lambda x: x.parent_space == self.targets["view"].output_space
+        ).get()
+        return output_space_correspondee
 
     def _get_abstract_chunk(self):
         if self.targets["projectee"].members.not_empty:
