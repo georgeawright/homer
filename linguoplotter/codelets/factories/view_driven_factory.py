@@ -433,7 +433,7 @@ class ViewDrivenFactory(Factory):
                             view.output_space.contents.filter(
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
-                            if self.targets["slot"]
+                            if self.targets["slot"].start
                             in self.targets["frame"].output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
@@ -456,7 +456,7 @@ class ViewDrivenFactory(Factory):
                             and x.members.is_empty
                             and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
                         )
-                        if self.targets["slot"]
+                        if self.targets["slot"].end
                         in self.targets["frame"].output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
@@ -467,7 +467,7 @@ class ViewDrivenFactory(Factory):
             else:
                 potential_end_views = self.targets["view"].sub_views.filter(
                     lambda x: target_end_space
-                    in [x.parent_frame.input_space, x.parent_frame.output_space]
+                    in [x.parent_frame.input_space, x.output_space]
                 )
                 if self.targets["slot"].end in self.targets["view"].grouped_nodes:
                     end_node_group = [
@@ -498,7 +498,7 @@ class ViewDrivenFactory(Factory):
                             view.output_space.contents.filter(
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
-                            if self.targets["slot"]
+                            if self.targets["slot"].end
                             in self.targets["frame"].output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
@@ -549,6 +549,8 @@ class ViewDrivenFactory(Factory):
                 for start, end in possible_target_pairs
                 for space in possible_spaces
                 for concept in possible_concepts
+                if start.has_location_in_space(space)
+                and end.has_location_in_space(space)
             ]
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,

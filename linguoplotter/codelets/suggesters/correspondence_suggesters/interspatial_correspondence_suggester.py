@@ -200,7 +200,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             else:
                 potential_start_views = target_view.sub_views.filter(
                     lambda x: target_start_space
-                    in [x.parent_frame.input_space, x.parent_frame.output_space]
+                    in [x.parent_frame.input_space, x.output_space]
                 )
                 if target_end.start in target_view.grouped_nodes:
                     start_node_group = [
