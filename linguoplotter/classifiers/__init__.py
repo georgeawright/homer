@@ -2,6 +2,8 @@ from .abstract_relation_classifier import AbstractRelationClassifier
 from .difference_classifier import DifferenceClassifier
 from .differentness_classifier import DifferentnessClassifier
 from .everywhere_classifier import EverywhereClassifier
+from .first_word_of_type_classifier import FirstWordOfTypeClassifier
+from .last_word_of_type_classifier import LastWordOfTypeClassifier
 from .least_classifier import LeastClassifier
 from .magnitude_proximity_classifier import MagnitudeProximityClassifier
 from .most_classifier import MostClassifier

@@ -10,7 +10,7 @@ class FirstWordOfTypeClassifier(Classifier):
         previous = start
         while True:
             try:
-                previous = start.left_neighbour
+                previous = previous.left_neighbour
                 if previous.has_location_in_space(space):
                     return 0.0
             except MissingStructureError:

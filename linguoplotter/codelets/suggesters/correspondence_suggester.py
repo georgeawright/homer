@@ -183,23 +183,15 @@ class CorrespondenceSuggester(Suggester):
     @staticmethod
     def _get_target_conceptual_space(parent_codelet, child_codelet):
         child_codelet.targets["space"] = None
-        if (
-            child_codelet.targets["end"].is_link
-            and child_codelet.targets["end"].is_node
-        ):
-            child_codelet.targets["space"] = (
-                child_codelet.targets["end"]
-                .parent_spaces.where(is_conceptual_space=True, is_basic_level=True)
-                .get()
-            )
-        elif child_codelet.targets["end"].is_label:
-            child_codelet.targets["space"] = child_codelet.targets[
-                "end"
-            ].parent_concept.parent_space
-        elif child_codelet.targets["end"].is_relation:
-            child_codelet.targets["space"] = child_codelet.targets[
-                "end"
-            ].conceptual_space
+        end = child_codelet.targets["end"]
+        if end.is_label and end.is_interspatial:
+            child_codelet.targets["space"] = end.parent_spaces.where(
+                is_conceptual_space=True
+            ).get()
+        elif end.is_label:
+            child_codelet.targets["space"] = end.parent_concept.parent_space
+        elif end.is_relation:
+            child_codelet.targets["space"] = end.conceptual_space
 
     @staticmethod
     def _get_target_structure_one(parent_codelet, child_codelet):

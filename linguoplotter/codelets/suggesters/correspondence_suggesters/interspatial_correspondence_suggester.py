@@ -73,7 +73,14 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             )
         ):
             if self.targets["space"] is not None and self.targets["space"].is_slot:
-                classification_space = self.targets["start"].conceptual_space
+                if self.targets["start"].is_label:
+                    classification_space = (
+                        self.targets["start"]
+                        .parent_spaces.where(is_conceptual_space=True)
+                        .get()
+                    )
+                else:
+                    classification_space = self.targets["start"].conceptual_space
             else:
                 classification_space = self.targets["space"]
             classification = self.targets["concept"].classifier.classify(
@@ -183,7 +190,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         view.output_space.contents.filter(
                             lambda x: x.is_chunk and x.members.is_empty
                         )
-                        if target_end in target_frame.output_space.contents
+                        if target_end.start in target_frame.output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                         )
@@ -224,7 +231,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             view.output_space.contents.filter(
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
-                            if target_end in target_frame.output_space.contents
+                            if target_end.start in target_frame.output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
                                 and (not x.is_slot or x.is_filled_in)
@@ -246,7 +253,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         view.output_space.contents.filter(
                             lambda x: x.is_chunk and x.members.is_empty
                         )
-                        if target_end in target_frame.output_space.contents
+                        if target_end.start in target_frame.output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                         )
@@ -256,7 +263,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             else:
                 potential_end_views = target_view.sub_views.filter(
                     lambda x: target_end_space
-                    in [x.parent_frame.input_space, x.parent_frame.output_space]
+                    in [x.parent_frame.input_space, x.output_space]
                 )
                 if target_end.end in target_view.grouped_nodes:
                     end_node_group = [
@@ -287,7 +294,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             view.output_space.contents.filter(
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
-                            if target_end in target_frame.output_space.contents
+                            if target_end.start in target_frame.output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
                                 and (not x.is_slot or x.is_filled_in)
@@ -398,7 +405,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         view.output_space.contents.filter(
                             lambda x: x.is_chunk and x.members.is_empty
                         )
-                        if target_end in target_frame.output_space.contents
+                        if target_end.start in target_frame.output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                         )
@@ -408,7 +415,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             else:
                 potential_start_views = target_view.sub_views.filter(
                     lambda x: target_start_space
-                    in [x.parent_frame.input_space, x.parent_frame.output_space]
+                    in [x.parent_frame.input_space, x.output_space]
                 )
                 if target_end.start in target_view.grouped_nodes:
                     start_node_group = [
@@ -439,7 +446,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             view.output_space.contents.filter(
                                 lambda x: x.is_chunk and x.members.is_empty
                             )
-                            if target_end in target_frame.output_space.contents
+                            if target_end.start in target_frame.output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
                                 and (not x.is_slot or x.is_filled_in)
@@ -453,8 +460,15 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 and x.quality * x.activation > 0
                 and x.start in potential_start_targets
                 and x.parent_concept == target_end.parent_concept
-                and x.parent_spaces.where(is_conceptual_space=True)
-                == target_end.parent_spaces.where(is_conceptual_space=True)
+                and any(
+                    [
+                        space1.subsumes(space2)
+                        for space1 in target_end.parent_spaces.where(
+                            is_conceptual_space=True
+                        )
+                        for space2 in x.parent_spaces.where(is_conceptual_space=True)
+                    ]
+                )
             )
             bubble_chamber.loggers["activity"].log_set(
                 matching_labels, "matching input labels"
@@ -467,7 +481,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     child_codelet.targets["start"].start
                     in view.parent_frame.input_space.contents
                     or child_codelet.targets["start"].start
-                    in view.parent_frame.output_space.contents
+                    in view.output_space.contents
                 ):
                     child_codelet.targets["start_sub_view"] = view
             for sub_frame in target_frame.sub_frames:

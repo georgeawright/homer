@@ -5,6 +5,7 @@ from linguoplotter.codelets.suggesters.label_suggesters import (
 )
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.structure_collection_keys import activation, labeling_exigency
+from linguoplotter.structure_collections import StructureSet
 
 
 class InterspatialLabelSelector(LabelSelector):
@@ -14,23 +15,20 @@ class InterspatialLabelSelector(LabelSelector):
         champion = self.champions.get()
         try:
             self.challengers.add(
-                champion.start.champion_labels.filter(
-                    lambda x: x.parent_spaces == champion.parent_spaces
-                )
-                .excluding(champion)
-                .get()
+                StructureSet.union(
+                    *[
+                        node.labels.filter(
+                            lambda x: x.parent_concept == champion.parent_concept
+                            and x.parent_spaces == champion.parent_spaces
+                        )
+                        for node in champion.parent_space.contents.where(
+                            is_chunk=True
+                        ).excluding(champion.start)
+                    ]
+                ).get()
             )
         except MissingStructureError:
-            try:
-                self.challengers.add(
-                    champion.start.labels.filter(
-                        lambda x: x.parent_spaces == champion.parent_spaces
-                    )
-                    .excluding(champion)
-                    .get(key=activation)
-                )
-            except MissingStructureError:
-                return True
+            return True
         return True
 
     def _engender_follow_up(self):

@@ -21,6 +21,14 @@
   (def-concept :name "least" :locations (list (Location (list (list -1)) more-less-space))
     :classifier (LeastClassifier) :instance_type Chunk :structure_type Label
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
+(define first-concept
+  (def-concept :name "first" :locations (list (Location (list (list 1)) more-less-space))
+    :classifier (FirstWordOfTypeClassifier) :instance_type Chunk :structure_type Label
+    :parent_space more-less-space :distance_function centroid_euclidean_distance))
+(define last-concept
+  (def-concept :name "last" :locations (list (Location (list (list 1)) more-less-space))
+    :classifier (LastWordOfTypeClassifier) :instance_type Chunk :structure_type Label
+    :parent_space more-less-space :distance_function centroid_euclidean_distance))
 
 (def-relation :start more-concept :end more-concept :parent_concept more-concept :activation 1.0)
 (def-relation :start less-concept :end less-concept :parent_concept more-concept :activation 1.0)

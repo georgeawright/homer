@@ -230,6 +230,7 @@ class View(Structure):
     def number_of_items_left_to_process(self):
         return sum(
             [
+                len(self.unfilled_interspatial_structures),
                 len(self.unfilled_sub_frame_input_structures),
                 len(self.unfilled_input_structures),
                 len(self.unfilled_output_structures),
@@ -326,6 +327,8 @@ class View(Structure):
         if abstract_space in self.conceptual_spaces_map:
             self.conceptual_spaces_map.pop(abstract_space)
         for frame in self.frames:
+            frame.specify_space(abstract_space, conceptual_space)
+        for frame in self.secondary_frames:
             frame.specify_space(abstract_space, conceptual_space)
 
     def add(self, correspondence: "Correspondence"):
@@ -455,6 +458,22 @@ class View(Structure):
                 print("1")
             return False
         if (
+            end.is_link
+            and end.is_interspatial
+            and end.correspondences.where(end=end).not_empty
+        ):
+            if verbose:
+                print("1.1")
+            return False
+        if (
+            start.is_link
+            and start.is_interspatial
+            and start.correspondences.filter(lambda x: x in self.members).not_empty
+        ):
+            if verbose:
+                print("1.2")
+            return False
+        if (
             start.is_link
             and end.is_link
             and (not start.parent_concept.is_slot or start.parent_concept.is_filled_in)
@@ -538,28 +557,37 @@ class View(Structure):
                     ):
                         for space in sub_view_node_group:
                             potential_node_group[space] = sub_view_node_group[space]
-        for existing_node_group in self.node_groups:
-            for potential_group in potential_node_groups:
-                shared_spaces = [
-                    space for space in existing_node_group if space in potential_group
-                ]
-                if (
-                    len(shared_spaces) > 1
-                    and any(
-                        existing_node_group[space] == potential_group[space]
-                        for space in shared_spaces
-                    )
-                    and not all(
-                        existing_node_group[space] == potential_group[space]
-                        for space in shared_spaces
-                    )
-                ):
-                    if verbose:
-                        print("6")
-                        print(existing_node_group)
-                        print(potential_group)
-                        print(shared_spaces)
-                    return False
+        if not all(
+            [
+                node.links.where(is_interspatial=True).not_empty
+                for group in potential_node_groups
+                for node in group.values()
+            ]
+        ):
+            for existing_node_group in self.node_groups:
+                for potential_group in potential_node_groups:
+                    shared_spaces = [
+                        space
+                        for space in existing_node_group
+                        if space in potential_group
+                    ]
+                    if (
+                        len(shared_spaces) > 1
+                        and any(
+                            existing_node_group[space] == potential_group[space]
+                            for space in shared_spaces
+                        )
+                        and not all(
+                            existing_node_group[space] == potential_group[space]
+                            for space in shared_spaces
+                        )
+                    ):
+                        if verbose:
+                            print("6")
+                            print(existing_node_group)
+                            print(potential_group)
+                            print(shared_spaces)
+                        return False
         if verbose:
             print("super")
         return all(

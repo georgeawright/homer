@@ -139,8 +139,6 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 conceptual_space=self.targets["space"],
                 parent_view=self.targets["view"],
             )
-            self._structure_concept.instances.add(correspondence)
-            self.child_structures.add(correspondence)
         elif self.targets["end"].is_label:
             self.targets["view"].frames = StructureSet.union(
                 self.targets["view"].frames,
@@ -179,6 +177,55 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["end"].parent_concept._non_slot_value = self.targets[
                     "start"
                 ].parent_concept
+            if (
+                any(
+                    [
+                        link.correspondences.not_empty
+                        for link in self.targets["start"].start.links.where(
+                            is_interspatial=True
+                        )
+                    ]
+                )
+                and self.targets["end"].start not in self.targets["view"].grouped_nodes
+            ):
+                node_group = [
+                    group
+                    for group in self.targets["view"].node_groups
+                    if self.targets["start"].start in group.values()
+                ][0]
+                old_end_start = self.targets["end"].start
+                new_end_start = node_group[self.targets["end"].start.parent_space]
+                for link in old_end_start.links_out:
+                    link.start = new_end_start
+                    new_end_start.links_out.add(link)
+                for link in old_end_start.links_in:
+                    link.end = new_end_start
+                    new_end_start.links_in.add(link)
+                for relation in new_end_start.relations.copy():
+                    while (
+                        len(
+                            new_end_start.relations.where(
+                                start=relation.start,
+                                end=relation.end,
+                                parent_concept=relation.parent_concept,
+                                conceptual_space=relation.conceptual_space,
+                            )
+                        )
+                        > 1
+                    ):
+                        relation_to_remove = new_end_start.relations.where(
+                            start=relation.start,
+                            end=relation.end,
+                            parent_concept=relation.parent_concept,
+                            conceptual_space=relation.conceptual_space,
+                        ).get()
+                        relation_to_remove.start.links_out.remove(relation_to_remove)
+                        relation_to_remove.end.links_in.remove(relation_to_remove)
+                        self.targets["frame"].interspatial_links.remove(
+                            relation_to_remove
+                        )
+                for space in old_end_start.parent_spaces:
+                    space.contents.remove(old_end_start)
             correspondence = self.bubble_chamber.new_correspondence(
                 parent_id=self.codelet_id,
                 start=self.targets["start"],
@@ -188,5 +235,5 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 conceptual_space=self.targets["space"],
                 parent_view=self.targets["view"],
             )
-            self._structure_concept.instances.add(correspondence)
-            self.child_structures.add(correspondence)
+        self._structure_concept.instances.add(correspondence)
+        self.child_structures.add(correspondence)

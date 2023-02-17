@@ -391,7 +391,7 @@ class ViewDrivenFactory(Factory):
                             and x.members.is_empty
                             and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
                         )
-                        if self.targets["slot"]
+                        if self.targets["slot"].start
                         in self.targets["frame"].output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
@@ -402,7 +402,7 @@ class ViewDrivenFactory(Factory):
             else:
                 potential_start_views = self.targets["view"].sub_views.filter(
                     lambda x: target_start_space
-                    in [x.parent_frame.input_space, x.parent_frame.output_space]
+                    in [x.parent_frame.input_space, x.output_space]
                 )
                 if self.targets["slot"].start in self.targets["view"].grouped_nodes:
                     start_node_group = [
@@ -605,14 +605,13 @@ class ViewDrivenFactory(Factory):
                 potential_start_views = self.targets["view"].sub_views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
-                )
-                potential_start_views = potential_start_views.sample(
-                    len(potential_start_views) // 2
+                    and x.parent_frame
+                    not in self.targets["view"].matched_secondary_sub_frames.values()
                 )
             else:
                 potential_start_views = self.targets["view"].sub_views.filter(
                     lambda x: target_start_space
-                    in [x.parent_frame.input_space, x.parent_frame.output_space]
+                    in [x.parent_frame.input_space, x.output_space]
                 )
             if potential_start_views.is_empty:
                 raise MissingStructureError
@@ -623,7 +622,7 @@ class ViewDrivenFactory(Factory):
                         and x.members.is_empty
                         and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
                     )
-                    if self.targets["slot"]
+                    if self.targets["slot"].start
                     in self.targets["frame"].output_space.contents
                     else view.parent_frame.input_space.contents.filter(
                         lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)

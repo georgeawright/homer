@@ -10,6 +10,15 @@ class InterspatialLabelBuilder(LabelBuilder):
 
         return InterspatialLabelEvaluator
 
+    def _passes_preliminary_checks(self):
+        equivalent_labels = self.targets["start"].labels.filter(
+            lambda x: x.parent_concept == self.targets["concept"]
+            and x.has_location_in_space(self.targets["space"])
+        )
+        if equivalent_labels.not_empty:
+            self.child_structures.add(equivalent_labels.get())
+        return True
+
     def _process_structure(self):
         if self.child_structures.not_empty:
             self.bubble_chamber.loggers["activity"].log(

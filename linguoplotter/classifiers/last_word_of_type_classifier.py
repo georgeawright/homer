@@ -10,7 +10,7 @@ class LastWordOfTypeClassifier(Classifier):
         previous = start
         while True:
             try:
-                previous = start.right_neighbour
+                previous = previous.right_neighbour
                 if previous.has_location_in_space(space):
                     return 0.0
             except MissingStructureError:

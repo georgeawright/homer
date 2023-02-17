@@ -134,6 +134,7 @@ class Frame(Structure):
         return self.output_space.contents.filter(
             lambda x: not x.is_correspondence
             and not x.is_interspatial
+            and x.links.where(is_interspatial=True).is_empty
             and x.parent_space != self.output_space
             and x.correspondences.where(end=x).is_empty
         )
@@ -143,6 +144,7 @@ class Frame(Structure):
         return self.output_space.contents.filter(
             lambda x: not x.is_correspondence
             and not x.is_interspatial
+            and x.links.where(is_interspatial=True).is_empty
             and x.correspondences.filter(lambda c: c.start == x).is_empty
         )
 
@@ -150,6 +152,7 @@ class Frame(Structure):
     def number_of_items_left_to_process(self):
         return sum(
             [
+                len(self.unfilled_interspatial_structures),
                 len(self.unfilled_sub_frame_input_structures),
                 len(self.unfilled_input_structures),
                 len(self.unfilled_output_structures),
@@ -188,7 +191,9 @@ class Frame(Structure):
             self.concepts.remove(abstract_space.parent_concept)
         self.concepts.add(conceptual_space.parent_concept)
         for item in StructureSet.union(
-            self.input_space.contents, self.output_space.contents
+            self.input_space.contents,
+            self.output_space.contents,
+            self.interspatial_links,
         ):
             if item.parent_space == abstract_space:
                 item.parent_space = conceptual_space

@@ -157,3 +157,8 @@ class Linguoplotter:
         for count in ID.COUNTS:
             if "Frame" in count:
                 print(count, ID.COUNTS[count])
+
+        for view in self.bubble_chamber.views.filter(
+            lambda x: x.secondary_frames.not_empty
+        ):
+            print(view)

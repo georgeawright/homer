@@ -31,6 +31,8 @@ class Interpreter:
             "DifferenceClassifier": classifiers.DifferenceClassifier,
             "DifferentnessClassifier": classifiers.DifferentnessClassifier,
             "EverywhereClassifier": classifiers.EverywhereClassifier,
+            "FirstWordOfTypeClassifier": classifiers.FirstWordOfTypeClassifier,
+            "LastWordOfTypeClassifier": classifiers.LastWordOfTypeClassifier,
             "LeastClassifier": classifiers.LeastClassifier,
             "MagnitudeProximityClassifier": classifiers.MagnitudeProximityClassifier,
             "MostClassifier": classifiers.MostClassifier,
