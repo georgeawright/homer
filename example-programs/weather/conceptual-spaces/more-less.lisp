@@ -40,11 +40,11 @@
 
 (define increase-word
   (def-letter-chunk :name "increase" :parent_space grammar-space
-    :locations (list vb-location)))
+    :locations (list vb-location increase-location)))
 (def-relation :start more-concept :end increase-word :parent_concept vb-concept)
 (define decrease-word
   (def-letter-chunk :name "decrease" :parent_space grammar-space
-    :locations (list vb-location)))
+    :locations (list vb-location decrease-location)))
 (def-relation :start less-concept :end decrease-word :parent_concept vb-concept)
 (def-relation :start increase-word :end decrease-word :parent_concept opposite-concept)
 (def-relation :start decrease-word :end increase-word :parent_concept opposite-concept)

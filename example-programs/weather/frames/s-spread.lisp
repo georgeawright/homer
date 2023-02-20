@@ -1,6 +1,6 @@
 (define spread-word
   (def-letter-chunk :name "spread" :parent_space grammar-space
-    :locations (list vb-location)))
+    :locations (list vb-location spread-location)))
 
 (define space-parent-concept
   (def-concept :name "" :is_slot True))

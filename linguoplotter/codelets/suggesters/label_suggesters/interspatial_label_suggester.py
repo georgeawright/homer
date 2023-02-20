@@ -138,6 +138,8 @@ class InterspatialLabelSuggester(LabelSuggester):
                 for space in possible_spaces
                 for concept in possible_concepts
             ]
+            if possible_target_combos == []:
+                return False
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
                 key=lambda x: x["concept"].classifier.classify(

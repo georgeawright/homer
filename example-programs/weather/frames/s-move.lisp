@@ -1,6 +1,6 @@
 (define move-word
   (def-letter-chunk :name "move" :parent_space grammar-space
-    :locations (list vb-location)))
+    :locations (list vb-location move-location)))
 
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
