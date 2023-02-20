@@ -29,19 +29,19 @@
 
 (define friday-word
   (def-letter-chunk :name "friday" :parent_space time-space
-    :locations (list (Location (list (list 0)) time-space))))
+    :locations (list nn-location (Location (list (list 0)) time-space))))
 (def-relation :start friday-concept :end friday-word :parent_concept nn-concept)
 (define saturday-word
   (def-letter-chunk :name "saturday" :parent_space time-space
-    :locations (list (Location (list (list 24)) time-space))))
+    :locations (list nn-location (Location (list (list 24)) time-space))))
 (def-relation :start saturday-concept :end saturday-word :parent_concept nn-concept)
 (define sunday-word
   (def-letter-chunk :name "sunday" :parent_space time-space
-    :locations (list (Location (list (list 48)) time-space))))
+    :locations (list nn-location (Location (list (list 48)) time-space))))
 (def-relation :start sunday-concept :end sunday-word :parent_concept nn-concept)
 (define everyday-word
   (def-letter-chunk :name "everyday" :parent_space time-space
-    :locations (list (Location (list (list 0) (list 24) (list 48)) time-space))))
+    :locations (list nn-location (Location (list (list 0) (list 24) (list 48)) time-space))))
 (def-relation :start always-concept :end everyday-word :parent_concept nn-concept)
 (define throughout-the-weekend-phrase
   (def-letter-chunk :name "throughout~the~weekend" :parent_space time-space

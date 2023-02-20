@@ -24,4 +24,4 @@
 
 (load "frames/conjunction.lisp")
 
-(load "frames/coherence-disanalogy-1.lisp")
+(load "frames/coherence-text-order.lisp")

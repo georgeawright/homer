@@ -44,17 +44,6 @@
     :input_space textual-order-sub-2-input
     :output_space textual-order-sub-2-output))
 
-(define relation-concept-1
-  (def-concept :name "" :is_slot True :parent_space more-less-space
-    :locations (list (Location (list) more-less-space))))
-(define relation-concept-2-positive
-  (def-concept :name "" :is_slot True :parent_space more-less-space
-    :locations (list (Location (list) more-less-space))))
-(define relation-concept-2
-  (def-compound-concept :root not-concept :args (list relation-concept-2-positive)))
-(def-relation :start relation-concept-1 :end relation-concept-2-positive
-  :parent_concept opposite-concept :activation 1.0)
-
 (define textual-order-input
   (def-contextual-space :name "textual-order.meaning" :parent_concept input-concept
     :conceptual_spaces (StructureSet)))
@@ -66,7 +55,7 @@
     :is_secondary True
     :depth 8
     :sub_frames (StructureSet textual-order-sub-1 textual-order-sub-2)
-    :concepts (StructureSet relation-concept-1 relation-concept-2)
+    :concepts (StructureSet)
     :input_space textual-order-input
     :output_space textual-order-output))
 
@@ -115,7 +104,7 @@
 		     (Location (list) textual-order-sub-2-output))
     :is_interspatial True))
 (define relation-1-3
-  (def-relation :start letter-chunk-1 :end letter-chunk-3 :parent_concept relation-concept-1
+  (def-relation :start letter-chunk-1 :end letter-chunk-3 :parent_concept less-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
@@ -124,7 +113,7 @@
     :parent_space None
     :conceptual_space conceptual-space))
 (define relation-2-4
-  (def-relation :start letter-chunk-2 :end letter-chunk-4 :parent_concept relation-concept-1
+  (def-relation :start letter-chunk-2 :end letter-chunk-4 :parent_concept less-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
@@ -133,7 +122,7 @@
     :parent_space None
     :conceptual_space conceptual-space))
 (define relation-2-3
-  (def-relation :start letter-chunk-2 :end letter-chunk-3 :parent_concept relation-concept-2
+  (def-relation :start letter-chunk-2 :end letter-chunk-3 :parent_concept not-more-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
