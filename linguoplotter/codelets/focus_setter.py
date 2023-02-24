@@ -1,3 +1,4 @@
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -45,10 +46,12 @@ class FocusSetter(Codelet):
                 target_view = self.bubble_chamber.worldview.view
             else:
                 target_view = self.bubble_chamber.views.filter(
-                    lambda v: v.unhappiness > self.FLOATING_POINT_TOLERANCE
-                    or v.secondary_frames.filter(
-                        lambda f: f.number_of_items_left_to_process > 0
-                    ).not_empty
+                    lambda v: (
+                        v.unhappiness > 0
+                        or v.secondary_frames.filter(
+                            lambda f: f.number_of_items_left_to_process > 0
+                        ).not_empty
+                    )
                     and v.members.filter(
                         lambda c: c.parent_concept.name == "not(same)"
                     ).is_empty
@@ -60,6 +63,11 @@ class FocusSetter(Codelet):
                 else target_view.secondary_frames.filter(
                     lambda x: x.number_of_items_left_to_process > 0
                 ).get(key=exigency)
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                "Set focus\n"
+                + f"View: {target_view}\n"
+                + f"Frame: {self.bubble_chamber.focus.frame}"
             )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(

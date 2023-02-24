@@ -53,15 +53,12 @@ class Factory(Codelet):
                     self.codelet_id,
                     self.bubble_chamber,
                     self.coderack,
-                    self.follow_up_urgency(),
+                    self.follow_up_urgency,
                 )
             )
         return self.result
 
     def _engender_follow_up(self):
-        raise NotImplementedError
-
-    def follow_up_urgency(self):
         raise NotImplementedError
 
     def _get_codelet_type_from_concepts(

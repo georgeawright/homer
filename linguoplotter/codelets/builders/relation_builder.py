@@ -71,18 +71,27 @@ class RelationBuilder(Builder):
         self._structure_concept.instances.add(relation)
         self.child_structures.add(relation)
         if self.targets["concept"].is_reversible:
-            mirror_relation = self.bubble_chamber.new_relation(
-                parent_id=self.codelet_id,
-                start=self.targets["end"],
-                end=self.targets["start"],
-                locations=locations,
-                parent_concept=self.targets["concept"].reverse,
-                parent_space=self.targets["start"].parent_space,
-                conceptual_space=self.targets["space"],
-                quality=0,
-            )
-            self._structure_concept.instances.add(mirror_relation)
-            self.child_structures.add(mirror_relation)
+            if (
+                self.targets["start"]
+                .relations.where(
+                    start=self.targets["end"],
+                    parent_concept=self.targets["concept"].reverse,
+                    conceptual_space=self.targets["space"],
+                )
+                .is_empty
+            ):
+                mirror_relation = self.bubble_chamber.new_relation(
+                    parent_id=self.codelet_id,
+                    start=self.targets["end"],
+                    end=self.targets["start"],
+                    locations=locations,
+                    parent_concept=self.targets["concept"].reverse,
+                    parent_space=self.targets["start"].parent_space,
+                    conceptual_space=self.targets["space"],
+                    quality=0,
+                )
+                self._structure_concept.instances.add(mirror_relation)
+                self.child_structures.add(mirror_relation)
         self._structure_concept.recalculate_exigency()
 
     def _fizzle(self):

@@ -220,6 +220,13 @@ class BubbleChamber:
             self.interspatial_relations.add(item)
 
     def remove(self, item):
+        if item.is_frame:
+            if item.is_secondary:
+                for correspondence in item.correspondences:
+                    self.remove(correspondence)
+                item.parent_view.secondary_frames.remove(item)
+                item.parent_view = None
+            self.frames.remove(item)
         if item.is_view:
             item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:

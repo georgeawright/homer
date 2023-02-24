@@ -66,6 +66,7 @@ class ViewDrivenFactory(Factory):
         targets = bubble_chamber.new_dict({"view": target_view}, name="targets")
         return cls(codelet_id, parent_id, bubble_chamber, coderack, targets, urgency)
 
+    @property
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
         if self.bubble_chamber.focus.view is None:
             return self.coderack.MINIMUM_CODELET_URGENCY
@@ -75,6 +76,8 @@ class ViewDrivenFactory(Factory):
 
     def _engender_follow_up(self):
         self._set_target_view()
+        if self.targets["frame"].has_failed_to_match:
+            return
         self._set_target_slot()
         if self.targets["slot"].is_interspatial:
             try:
@@ -235,6 +238,7 @@ class ViewDrivenFactory(Factory):
                 )
                 for start in possible_nodes
                 for concept in possible_concepts
+                if start.labels.where(parent_concept=concept).is_empty
             ]
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
@@ -313,6 +317,9 @@ class ViewDrivenFactory(Factory):
                 for start, end in possible_target_pairs
                 for space in possible_spaces
                 for concept in possible_concepts
+                if start.relations.where(
+                    end=end, conceptual_space=space, parent_concept=concept
+                ).is_empty
             ]
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,

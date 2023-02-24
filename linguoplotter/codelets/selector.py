@@ -102,13 +102,7 @@ class Selector(Codelet):
         champion_representative = self._get_representative(self.champions)
         challenger_representative = self._get_representative(self.challengers)
         champions_quality = champion_representative.quality
-        self.bubble_chamber.loggers["activity"].log(
-            f"Champion quality: {champions_quality}"
-        )
         challengers_quality = challenger_representative.quality
-        self.bubble_chamber.loggers["activity"].log(
-            f"Challenger quality: {challengers_quality}"
-        )
         champ_size_adjusted_quality = champions_quality * self._champions_size
         chall_size_adjusted_quality = challengers_quality * self._challengers_size
         total_quality = champ_size_adjusted_quality + chall_size_adjusted_quality
@@ -116,21 +110,31 @@ class Selector(Codelet):
             champ_normalized_quality = champ_size_adjusted_quality / total_quality
         except ZeroDivisionError:
             champ_normalized_quality = 0.0
-        choice = random.random()
-        if choice < champ_normalized_quality:
-            self.winners, self.losers = self.champions, self.challengers
-            self.confidence = FloatBetweenOneAndZero(
-                champ_size_adjusted_quality - chall_size_adjusted_quality
-            )
-        else:
-            self.losers, self.winners = self.champions, self.challengers
-            self.confidence = FloatBetweenOneAndZero(
-                chall_size_adjusted_quality - champ_size_adjusted_quality
-            )
-        if self.challengers.get().activation > self.champions.get().activation:
-            tmp = self.champions
-            self.champions = self.challengers
-            self.challengers = tmp
+        try:
+            chall_normalized_quality = chall_size_adjusted_quality / total_quality
+        except ZeroDivisionError:
+            chall_normalized_quality = 0.0
+        self.bubble_chamber.loggers["activity"].log(
+            f"Champion quality: {champions_quality}\n"
+            f"Challenger quality: {challengers_quality}\n"
+            f"Champion size adjusted quality: {champ_size_adjusted_quality}\n"
+            f"Challenger size adjusted quality: {chall_size_adjusted_quality}\n"
+            f"Champion normalized quality: {champ_normalized_quality}"
+            f"Challenger normalized quality: {chall_normalized_quality}"
+        )
+        choices = [
+            (self.champions, champ_normalized_quality),
+            (self.challengers, chall_normalized_quality),
+        ]
+        self.winners = self.bubble_chamber.random_machine.select(
+            choices, key=lambda x: x[1]
+        )[0]
+        self.winners.name = "winners"
+        self.losers = (
+            self.challengers if self.winners == self.champions else self.champions
+        )
+        self.losers.name = "losers"
+        self.confidence = abs(champ_normalized_quality - chall_normalized_quality)
 
     @property
     def _parent_link(self):

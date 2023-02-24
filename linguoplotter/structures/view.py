@@ -125,9 +125,17 @@ class View(Structure):
     def raw_input_nodes(self):
         return StructureSet.union(
             *[
-                node.raw_members
-                for node in self.grouped_nodes
-                if node.parent_space in self.input_spaces
+                chunk.raw_members
+                for chunk in StructureSet.union(
+                    *[
+                        c.arguments
+                        for c in self.members.filter(lambda x: x.start.is_chunk)
+                    ]
+                    + [
+                        c.start.arguments
+                        for c in self.members.filter(lambda x: x.start.is_link)
+                    ]
+                ).filter(lambda x: x.parent_space.is_main_input)
             ]
         )
 
@@ -271,12 +279,14 @@ class View(Structure):
             )
         except ValueError:
             input_quality = 0
-        return sum(
-            [
-                self.CORRESPONDENCE_WEIGHT * correspondence_quality,
-                self.INPUT_WEIGHT * input_quality,
-            ]
-        )
+        return fuzzy.AND(correspondence_quality, input_quality)
+
+    #        return sum(
+    #            [
+    #                self.CORRESPONDENCE_WEIGHT * correspondence_quality,
+    #                self.INPUT_WEIGHT * input_quality,
+    #            ]
+    #        )
 
     def is_equivalent_to(self, other: View):
         try:

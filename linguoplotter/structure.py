@@ -456,11 +456,12 @@ class Structure(ABC):
                 )
             )
             instances_total = FloatBetweenOneAndZero(
-                sum(
+                max(
                     [
                         instance.quality * instance.activation
                         for instance in self.instances
                     ]
+                    + [0]
                 )
             )
             self._activation_buffer = FloatBetweenOneAndZero(

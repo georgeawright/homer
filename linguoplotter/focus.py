@@ -19,26 +19,13 @@ class Focus:
             self.satisfaction = self.view.calculate_quality()
             self.view.quality = self.satisfaction
         else:
-            members = self.view.members.filter(
-                lambda x: any(
-                    [
-                        x.start in self.frame.input_space.contents,
-                        x.start in self.frame.output_space.contents,
-                        x.end in self.frame.input_space.contents,
-                        x.end in self.frame.output_space.contents,
-                    ]
-                )
-            )
-            if any(
-                [
-                    member.parent_concept.is_compound_concept
-                    and member.parent_concept.root.name == "not"
-                    for member in members
-                ]
-            ):
+            if self.frame.has_failed_to_match:
                 self.satisfaction = 0
             else:
-                total_slots = len(members) + self.frame.number_of_items_left_to_process
+                total_slots = (
+                    len(self.frame.correspondences)
+                    + self.frame.number_of_items_left_to_process
+                )
                 self.satisfaction = (
-                    sum(member.quality for member in members) / total_slots
+                    sum(c.quality for c in self.frame.correspondences) / total_slots
                 )

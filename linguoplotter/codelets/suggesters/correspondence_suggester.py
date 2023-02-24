@@ -50,6 +50,8 @@ class CorrespondenceSuggester(Suggester):
                     lambda x: x.number_of_items_left_to_process > 0
                 ).get(key=exigency)
             )
+        if target_frame.has_failed_to_match:
+            raise MissingStructureError
         input_structures = target_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
             and not x.is_interspatial

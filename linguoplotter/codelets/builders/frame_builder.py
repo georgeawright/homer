@@ -59,6 +59,7 @@ class FrameBuilder(Builder):
             f"Created frame instance: {frame_instance}"
         )
         self.targets["view"].secondary_frames.add(frame_instance)
+        frame_instance.parent_view = self.targets["view"]
         frame_instance.progenitor.instances.add(self.targets["view"])
         frame_instance.parent_concept.instances.add(self.targets["view"])
         self.bubble_chamber.loggers["structure"].log(self.targets["view"])

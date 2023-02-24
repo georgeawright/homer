@@ -15,6 +15,7 @@ from linguoplotter.codelets.evaluators.relation_evaluators import (
 )
 from linguoplotter.codelets.factories import BottomUpFactory
 from linguoplotter.errors import MissingStructureError
+from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 
 
@@ -42,18 +43,23 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             + f"Labels per space per letter chunk: {labels_per_space_per_letter_chunk}",
         )
 
+        class_urgencies = [
+            (ChunkEvaluator, super_chunks_per_raw_chunk),
+            (LabelEvaluator, labels_per_space_per_chunk),
+            (RelationEvaluator, relations_per_space_per_end_per_chunk),
+            (ViewEvaluator, views_per_frame_type_per_chunk),
+            (FrameEvaluator, secondary_frames_per_view),
+            (InterspatialRelationEvaluator, related_texts_per_letter_chunk),
+            (InterspatialLabelEvaluator, labels_per_space_per_letter_chunk),
+        ]
+
         follow_up_class = self.bubble_chamber.random_machine.select(
-            [
-                (ChunkEvaluator, super_chunks_per_raw_chunk),
-                (LabelEvaluator, labels_per_space_per_chunk),
-                (RelationEvaluator, relations_per_space_per_end_per_chunk),
-                (ViewEvaluator, views_per_frame_type_per_chunk),
-                (FrameEvaluator, secondary_frames_per_view),
-                (InterspatialRelationEvaluator, related_texts_per_letter_chunk),
-                (InterspatialLabelEvaluator, labels_per_space_per_letter_chunk),
-            ],
-            key=lambda x: x[1],
+            class_urgencies, key=lambda x: x[1]
         )[0]
+
+        self.most_urgent_class_urgency = FloatBetweenOneAndZero(
+            max(x[1] for x in class_urgencies)
+        )
 
         self.child_codelets.append(
             follow_up_class.make(self.codelet_id, self.bubble_chamber)

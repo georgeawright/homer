@@ -231,6 +231,8 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                             x.parent_concept.parent_spaces
                         )
                         and x.quality * x.activation > 0
+                        and x.uncorrespondedness
+                        > bubble_chamber.random_machine.generate_number()
                         and x.parent_concept
                         in child_codelet.targets[
                             "end"
@@ -317,6 +319,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         (
                             x.parent_concept.is_compound_concept
                             and x.parent_concept.args[0] == target_end.parent_concept
+                        ),
+                        (
+                            target_end.parent_concept.is_compound_concept
+                            and x.parent_concept == target_end.parent_concept.args[0]
                         ),
                     ]
                 )

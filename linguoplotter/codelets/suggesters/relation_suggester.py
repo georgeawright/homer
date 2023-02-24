@@ -9,6 +9,7 @@ from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structure_collection_keys import relating_exigency
 from linguoplotter.structures.links import Relation
 from linguoplotter.structures.nodes import Concept
+from linguoplotter.structures.spaces import ConceptualSpace
 
 
 class RelationSuggester(Suggester):
@@ -51,21 +52,23 @@ class RelationSuggester(Suggester):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         parent_concept: Concept,
+        conceptual_space: ConceptualSpace = None,
         urgency: FloatBetweenOneAndZero = None,
     ):
         input_space = bubble_chamber.input_spaces.get()
-        target_space = input_space.conceptual_spaces.filter(
-            lambda x: (
-                x.no_of_dimensions == 1
-                if parent_concept.parent_space.name == "more-less"
-                else True
-            )
-            and (
-                x in input_space.conceptual_spaces
-                if parent_concept.parent_space.name == "same-different"
-                else True
-            )
-        ).get()
+        if conceptual_space is None:
+            conceptual_space = input_space.conceptual_spaces.filter(
+                lambda x: (
+                    x.no_of_dimensions == 1
+                    if parent_concept.parent_space.name == "more-less"
+                    else True
+                )
+                and (
+                    x in input_space.conceptual_spaces
+                    if parent_concept.parent_space.name == "same-different"
+                    else True
+                )
+            ).get()
         potential_targets = input_space.contents.filter(
             lambda x: x.is_node and x.is_slot and x.quality > 0
         )
@@ -76,7 +79,7 @@ class RelationSuggester(Suggester):
             start, end = bubble_chamber.random_machine.select(
                 possible_pairs,
                 key=lambda x: parent_concept.classifier.classify(
-                    start=x[0], end=x[1], space=target_space
+                    start=x[0], end=x[1], space=conceptual_space
                 ),
             )
 
@@ -91,7 +94,7 @@ class RelationSuggester(Suggester):
             {
                 "start": start,
                 "end": end,
-                "space": target_space,
+                "space": conceptual_space,
                 "concept": parent_concept,
             },
             name="targets",
@@ -166,7 +169,8 @@ class RelationSuggester(Suggester):
                 end=x["end"],
                 concept=x["concept"],
                 space=x["space"],
-            ),
+            )
+            / x["concept"].number_of_components,
         )
         self.targets["concept"], self.targets["end"], self.targets["space"] = (
             targets["concept"],

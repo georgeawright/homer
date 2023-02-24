@@ -1,10 +1,9 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Suggester
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collection_keys import activation, labeling_exigency
-from linguoplotter.structure_collections import StructureDict
+from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structures.links import Label
 from linguoplotter.structures.nodes import Concept
 
@@ -80,46 +79,22 @@ class LabelSuggester(Suggester):
             if classification < self.bubble_chamber.random_machine.generate_number():
                 return False
         else:
-            try:
-                conceptual_space = self.bubble_chamber.conceptual_spaces.filter(
-                    lambda x: x.is_basic_level
-                    and isinstance(self.targets["start"], x.instance_type)
-                    and self.targets["start"].has_location_in_space(x)
-                ).get()
-                self.targets["start"].location_in_space(conceptual_space)
-            except MissingStructureError:
-                return False
-            try:
-                self.targets["concept"] = conceptual_space.contents.where(
-                    is_concept=True, structure_type=Label, is_slot=False
-                ).get(
-                    key=lambda x: x.distance_function(
-                        x.location_in_space(conceptual_space).coordinates,
-                        self.targets["start"]
-                        .location_in_space(conceptual_space)
-                        .coordinates,
+            possible_concepts = StructureSet.union(
+                *[
+                    space.contents.where(
+                        is_concept=True, structure_type=Label, is_slot=False
                     )
+                    for space in self.targets["start"].parent_spaces.where(
+                        is_conceptual_space=True
+                    )
+                ]
+            )
+            self.targets["concept"] = possible_concepts.get(
+                key=lambda x: x.classifier.classify(
+                    concept=x, start=self.targets["start"]
                 )
-            except MissingStructureError:
-                try:
-                    self.targets["concept"] = (
-                        conceptual_space.contents.where(
-                            is_concept=True, structure_type=Label
-                        )
-                        .where_not(classifier=None)
-                        .get(
-                            key=lambda x: x.distance_function(
-                                x.location_in_space(conceptual_space).coordinates,
-                                self.targets["start"]
-                                .location_in_space(conceptual_space)
-                                .coordinates,
-                            )
-                        )
-                    )
-                except MissingStructureError:
-                    return False
-        if self.targets["concept"] is None:
-            return False
+                / x.number_of_components
+            )
         return True
 
     def _calculate_confidence(self):

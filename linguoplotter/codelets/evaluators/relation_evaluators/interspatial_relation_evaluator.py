@@ -44,49 +44,17 @@ class InterspatialRelationEvaluator(RelationEvaluator):
             target_relation.start.parent_space.quality,
             target_relation.end.parent_space.quality,
         )
-        parallel_relations = StructureSet.intersection(
-            target_relation.start.parent_space.contents.filter(
-                lambda x: x.is_relation
-                and x.start.parent_space == target_relation.start.parent_space
-                and x.parent_concept
-                == target_relation.parent_concept  # TODO: or negation of opposite
-                and x.conceptual_space == target_relation.conceptual_space
-            ),
-            target_relation.end.parent_space.contents.filter(
-                lambda x: x.is_relation
-                and x.end.parent_space == target_relation.end.parent_space
-                and x.parent_concept == target_relation.parent_concept
-                and x.conceptual_space == target_relation.conceptual_space
-            ),
+        classification = target_relation.parent_concept.classifier.classify(
+            space=target_relation.conceptual_space,
+            concept=target_relation.parent_concept,
+            start=target_relation.start
+            if not target_relation.start.is_slot
+            else target_relation.start.non_slot_value,
+            end=target_relation.end
+            if not target_relation.end.is_slot
+            else target_relation.end.non_slot_value,
         )
-        self.bubble_chamber.loggers["activity"].log_set(
-            parallel_relations, "Parallel relations"
-        )
-        classifications = {
-            relation: relation.parent_concept.classifier.classify(
-                space=relation.conceptual_space,
-                concept=relation.parent_concept,
-                start=relation.start
-                if not relation.start.is_slot
-                else relation.start.non_slot_value,
-                end=relation.end
-                if not relation.end.is_slot
-                else relation.end.non_slot_value,
-            )
-            * minimum_space_quality
-            / relation.parent_concept.number_of_components
-            for relation in parallel_relations
-        }
-        overall_classification = fuzzy.OR(
-            *[classification for _, classification in classifications.items()]
-        )
-        for relation in classifications:
-            relation.quality = sum(
-                [
-                    classifications[relation] * self.CLASSIFICATION_WEIGHT,
-                    overall_classification * 1 - self.CLASSIFICATION_WEIGHT,
-                ]
-            )
+        target_relation.quality = classification * minimum_space_quality
         self.confidence = target_relation.quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_relation.activation

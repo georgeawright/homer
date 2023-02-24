@@ -317,7 +317,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         )
                         and target_view.members.filter(
                             lambda x: x.end in target_frame.input_space.contents
-                            or x.end in target_frame.output_space.contents
+                            or x.end in target_view.output_space.contents
                         ).not_empty,
                     ]
                 )

@@ -23,6 +23,7 @@ class ConceptDrivenFactory(Factory):
             self, codelet_id, parent_id, bubble_chamber, coderack, targets, urgency
         )
 
+    @property
     def follow_up_urgency(self):
         if self.bubble_chamber.focus.view is None:
             try:

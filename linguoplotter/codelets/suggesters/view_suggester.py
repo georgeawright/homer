@@ -82,8 +82,7 @@ class BottomUpViewSuggester(ViewSuggester):
     def _calculate_confidence(self):
         number_of_equivalent_views = len(
             self.bubble_chamber.views.filter(
-                lambda x: x.parent_frame.parent_concept
-                == self.targets["frame"].parent_concept
+                lambda x: x.parent_frame.progenitor == self.targets["frame"].progenitor
                 and x.unhappiness > self.FLOATING_POINT_TOLERANCE
             )
         )  # these views should be completed or deleted before more are built

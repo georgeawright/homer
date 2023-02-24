@@ -4,7 +4,7 @@ from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collections import StructureDict
+from linguoplotter.structure_collections import StructureDict, StructureSet
 
 
 class GarbageCollector(Codelet):
@@ -45,12 +45,14 @@ class GarbageCollector(Codelet):
         return self.result
 
     def _remove_items(self):
-        # TODO: don't delete interspatial relations
         for structure in self.bubble_chamber.recycle_bin:
             if not structure.is_recyclable:
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
-            if structure is self.bubble_chamber.focus.view:
+            if structure in (
+                self.bubble_chamber.focus.view,
+                self.bubble_chamber.focus.frame,
+            ):
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
             if any(
@@ -70,9 +72,37 @@ class GarbageCollector(Codelet):
                     or structure.is_view
                     and any(
                         [
-                            any([link in codelet.targets for link in chunk.links])
-                            for chunk in structure.parent_frame.input_space.contents.where(
-                                is_chunk=True
+                            item in codelet.targets
+                            for item in StructureSet.union(
+                                *[
+                                    sub_frame.input_space.contents
+                                    for sub_frame in structure.parent_frame.sub_frames
+                                ],
+                                *[
+                                    sub_frame.output_space.contents
+                                    for sub_frame in structure.parent_frame.sub_frames
+                                ],
+                                structure.parent_frame.input_space.contents,
+                                structure.parent_frame.output_space.contents,
+                                structure.output_space.contents,
+                            )
+                        ]
+                    )
+                    or structure.is_frame
+                    and any(
+                        [
+                            item in codelet.targets
+                            for item in StructureSet.union(
+                                *[
+                                    sub_frame.input_space.contents
+                                    for sub_frame in structure.sub_frames
+                                ],
+                                *[
+                                    sub_frame.output_space.contents
+                                    for sub_frame in structure.sub_frames
+                                ],
+                                structure.input_space.contents,
+                                structure.output_space.contents,
                             )
                         ]
                     )

@@ -14,11 +14,8 @@ from linguoplotter.codelets.suggesters.relation_suggesters import (
     InterspatialRelationSuggester,
 )
 from linguoplotter.errors import MissingStructureError
-from linguoplotter.structure_collection_keys import (
-    uncorrespondedness,
-    unlabeledness,
-    unrelatedness,
-)
+from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.structure_collection_keys import activation
 from linguoplotter.structure_collections import StructureSet
 
 
@@ -34,29 +31,34 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         text_unrelatedness = self._unrelatedness_of_letter_chunks()
 
         self.bubble_chamber.loggers["activity"].log(
-            f"Unchunked of raw chunks: {input_unchunkedness}\n"
+            f"Unchunkedness of raw chunks: {input_unchunkedness}\n"
             + f"Unlabeledness of chunks: {input_unlabeledness}\n"
             + f"Unrelatedness of chunks: {input_unrelatedness}\n"
             + f"Unfilledness of slots: {frames_unfilledness}\n"
             + f"Uncorrespondedness of links: {input_uncorrespondedness}\n"
-            + f"Unchohesivenss of texts: {text_uncohesiveness}\n"
+            + f"Unchohesiveness of texts: {text_uncohesiveness}\n"
             + f"Unlabeledness of letter chunks: {text_unlabeledness}\n"
             + f"Unrelatedness of letter chunks: {text_unrelatedness}",
         )
 
+        class_urgencies = [
+            (ChunkSuggester, input_unchunkedness),
+            (LabelSuggester, input_unlabeledness),
+            (RelationSuggester, input_unrelatedness),
+            (ViewSuggester, input_uncorrespondedness),
+            (CorrespondenceSuggester, frames_unfilledness),
+            (FrameSuggester, text_uncohesiveness),
+            (InterspatialLabelSuggester, text_unrelatedness),
+            (InterspatialRelationSuggester, text_unrelatedness),
+        ]
+
         follow_up_class = self.bubble_chamber.random_machine.select(
-            [
-                (ChunkSuggester, input_unchunkedness),
-                (LabelSuggester, input_unlabeledness),
-                (RelationSuggester, input_unrelatedness),
-                (ViewSuggester, input_uncorrespondedness),
-                (CorrespondenceSuggester, frames_unfilledness),
-                (FrameSuggester, text_uncohesiveness),
-                (InterspatialLabelSuggester, text_unrelatedness),
-                (InterspatialRelationSuggester, text_unrelatedness),
-            ],
-            key=lambda x: x[1],
+            class_urgencies, key=lambda x: x[1]
         )[0]
+
+        self.most_urgent_class_urgency = FloatBetweenOneAndZero(
+            max(x[1] for x in class_urgencies)
+        )
 
         self.child_codelets.append(
             follow_up_class.make(self.codelet_id, self.bubble_chamber)
@@ -73,7 +75,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()
         try:
             chunk = input_space.contents.where(is_chunk=True, is_raw=False).get(
-                key=unlabeledness
+                key=activation
             )
             return 1 - sum([l.quality * l.activation for l in chunk.labels]) / len(
                 input_space.conceptual_spaces
@@ -85,7 +87,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()
         try:
             chunks = input_space.contents.where(is_chunk=True, is_raw=False).sample(
-                2, key=unrelatedness
+                2, key=activation
             )
             relations = StructureSet.intersection(*[c.relations for c in chunks])
             return 1 - sum([r.quality * r.activation for r in relations]) / len(
@@ -99,20 +101,22 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         try:
             labels_and_relations = input_space.contents.filter(
                 lambda x: x.is_label or x.is_relation
-            ).sample(10, key=uncorrespondedness)
+            ).sample(10, key=activation)
             uncorresponded_links = labels_and_relations.filter(
                 lambda x: x.correspondences.is_empty
             )
-            return len(uncorresponded_links) / len(labels_and_relations)
+            return sum(
+                link.quality * link.activation for link in uncorresponded_links
+            ) / len(labels_and_relations)
         except MissingStructureError:
             return float("-inf")
 
     def _unfilledness_of_slots(self):
         try:
-            views = self.bubble_chamber.views.sample(10)
-            unfilled_slots = sum(len(view.unfilled_input_structures) for view in views)
+            views = self.bubble_chamber.views.sample(10, key=activation)
+            unfilled_slots = sum(view.number_of_items_left_to_process for view in views)
             slots = sum(
-                len(view.parent_frame.input_space.contents.where(is_link=True))
+                len(view.members) + view.number_of_items_left_to_process
                 for view in views
             )
             return unfilled_slots / slots
@@ -125,7 +129,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
                 and x.parent_frame.parent_concept
                 == self.bubble_chamber.concepts["conjunction"]
-            ).get()
+            ).get(key=activation)
         except MissingStructureError:
             return float("-inf")
         try:
@@ -143,7 +147,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 == self.bubble_chamber.concepts["sentence"].location_in_space(
                     self.bubble_chamber.spaces["grammar"]
                 )
-            ).get()
+            ).get(key=activation)
             letter_chunks = view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
                 and x.members.is_empty
@@ -168,7 +172,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 == self.bubble_chamber.concepts["sentence"].location_in_space(
                     self.bubble_chamber.spaces["grammar"]
                 )
-            ).sample(2)
+            ).sample(2, key=activation)
             view = views.get()
             letter_chunks = view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk

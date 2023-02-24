@@ -13,6 +13,8 @@
   (def-concept :name "less" :locations (list (Location (list (list -1)) more-less-space))
     :classifier (DifferenceClassifier -1) :instance_type Chunk :structure_type Relation
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
+(setattr more-concept "reverse" less-concept)
+(setattr less-concept "reverse" more-concept)
 (define most-concept
   (def-concept :name "most" :locations (list (Location (list (list 1)) more-less-space))
     :classifier (MostClassifier) :instance_type Chunk :structure_type Label

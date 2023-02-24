@@ -161,7 +161,15 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     x.unhappiness < parent_codelet.FLOATING_POINT_TOLERANCE
                     and not any(
                         [
-                            x.raw_input_nodes == v.raw_input_nodes
+                            x.members.filter(
+                                lambda c: c.start.parent_space is not None
+                                and c.start.parent_space.is_main_input
+                            ).not_empty
+                            and v.members.filter(
+                                lambda c: c.start.parent_space is not None
+                                and c.start.parent_space.is_main_input
+                            ).not_empty
+                            and x.raw_input_nodes == v.raw_input_nodes
                             for v in target_view.sub_views
                         ]
                     )

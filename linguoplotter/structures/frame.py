@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 from linguoplotter import fuzzy
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure import Structure
@@ -60,6 +61,7 @@ class Frame(Structure):
         self.is_sub_frame = is_sub_frame
         self.is_secondary = is_secondary
         self.is_frame = True
+        self.parent_view = None
 
     def __dict__(self) -> dict:
         return {
@@ -88,6 +90,19 @@ class Frame(Structure):
             self.output_space.contents,
             *[sub_frame.items for sub_frame in self.sub_frames],
         ).where(is_correspondence=False)
+
+    @property
+    def correspondences(self) -> StructureSet:
+        return self.parent_view.members.filter(
+            lambda x: any(
+                [
+                    x.start in self.input_space.contents,
+                    x.start in self.output_space.contents,
+                    x.end in self.input_space.contents,
+                    x.end in self.output_space.contents,
+                ]
+            )
+        )
 
     @property
     def conceptual_spaces(self) -> StructureSet:
@@ -157,6 +172,24 @@ class Frame(Structure):
                 len(self.unfilled_input_structures),
                 len(self.unfilled_output_structures),
                 len(self.unfilled_projectable_structures),
+            ]
+        )
+
+    @property
+    def is_recyclable(self) -> bool:
+        return (
+            self.is_secondary
+            and self.parent_view is not None
+            and self.activation == 0.0
+        )
+
+    @property
+    def has_failed_to_match(self) -> bool:
+        return any(
+            [
+                correspondence.parent_concept.is_compound_concept
+                and correspondence.parent_concept.root.name == "not"
+                for correspondence in self.correspondences
             ]
         )
 
