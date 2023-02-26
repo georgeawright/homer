@@ -273,6 +273,9 @@ class View(Structure):
         try:
             input_quality = min(
                 correspondence.start.quality
+                * correspondence.end.parent_concept.number_of_components
+                if correspondence.end.is_link
+                else correspondence.start.quality
                 for correspondence in self.members
                 if correspondence.start.parent_space is not None
                 and correspondence.start.parent_space.is_main_input

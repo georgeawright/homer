@@ -1,4 +1,5 @@
 from __future__ import annotations
+import statistics
 
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Suggester
@@ -82,7 +83,8 @@ class BottomUpViewSuggester(ViewSuggester):
     def _calculate_confidence(self):
         number_of_equivalent_views = len(
             self.bubble_chamber.views.filter(
-                lambda x: x.parent_frame.progenitor == self.targets["frame"].progenitor
+                lambda x: x.parent_frame.parent_concept
+                == self.targets["frame"].parent_concept
                 and x.unhappiness > self.FLOATING_POINT_TOLERANCE
             )
         )  # these views should be completed or deleted before more are built
@@ -102,4 +104,20 @@ class TopDownViewSuggester(ViewSuggester):
         return True
 
     def _calculate_confidence(self):
-        self.confidence = self.urgency
+        number_of_equivalent_views = len(
+            self.bubble_chamber.views.filter(
+                lambda x: x.parent_frame.parent_concept
+                == self.targets["frame"].parent_concept
+                and x.unhappiness > self.FLOATING_POINT_TOLERANCE
+            )
+        )  # these views should be completed or deleted before more are built
+        self.bubble_chamber.loggers["activity"].log(
+            "Frame activation: " + str(self.targets["frame"].activation)
+        )
+        self.bubble_chamber.loggers["activity"].log(
+            f"Number of equivalent views: {number_of_equivalent_views}"
+        )
+        self.confidence = (
+            self.targets["frame"].activation * 0.5 ** number_of_equivalent_views
+        )
+        self.confidence = statistics.fmean([self.confidence, self.urgency])

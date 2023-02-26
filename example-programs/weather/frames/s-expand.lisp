@@ -104,7 +104,7 @@
 			      (Location (list) expand-sentence-input))
     :parent_space expand-sentence-input))
 (define late-chunk-size-label
-  (def-label :start early-chunk :parent_concept size-label-concept
+  (def-label :start late-chunk :parent_concept size-label-concept
     :locations (list (Location (list (list Nan)) size-space)
 		     (Location (list) expand-sentence-input))
     :parent_space expand-sentence-input))
@@ -307,8 +307,5 @@
   :is_bidirectional True :stable_activation 0.2)
 (def-relation :start ap-concept :end expand-sentence
   :is_bidirectional True :stable_activation 0.2)
-(def-relation :start large-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.2)
-(def-relation :start small-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.2)
-
+(def-relation :start more-size-concept :end expand-sentence
+  :is_bidirectional True :stable_activation 0.4)

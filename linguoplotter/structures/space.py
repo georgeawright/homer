@@ -55,8 +55,10 @@ class Space(Structure):
 
     def recalculate_activation(self):
         self._activation_buffer = (
-            statistics.median([item.activation for item in self.contents])
-            if len(self.contents) != 0
+            statistics.median(
+                [item.activation for item in self.contents.where(is_slot=False)]
+            )
+            if len(self.contents.where(is_slot=False)) != 0
             else 0.0
         )
 

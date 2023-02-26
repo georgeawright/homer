@@ -203,5 +203,5 @@ class ConceptualSpace(Space):
 
     def update_activation(self):
         Space.update_activation(self)
-        if self.is_fully_active():
-            self.parent_concept.activate()
+        self.parent_concept._activation_buffer = self.activation
+        self.parent_concept._activation = self.activation

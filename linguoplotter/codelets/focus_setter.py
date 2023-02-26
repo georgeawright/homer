@@ -56,7 +56,6 @@ class FocusSetter(Codelet):
                         lambda c: c.parent_concept.name == "not(same)"
                     ).is_empty
                 ).get(key=exigency)
-            self.bubble_chamber.focus.view = target_view
             self.bubble_chamber.focus.frame = (
                 target_view.parent_frame
                 if target_view.secondary_frames.is_empty
@@ -64,6 +63,7 @@ class FocusSetter(Codelet):
                     lambda x: x.number_of_items_left_to_process > 0
                 ).get(key=exigency)
             )
+            self.bubble_chamber.focus.view = target_view
             self.bubble_chamber.loggers["activity"].log(
                 "Set focus\n"
                 + f"View: {target_view}\n"
@@ -71,16 +71,14 @@ class FocusSetter(Codelet):
             )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(
-                "Set focus\n"
-                + f"View: {target_view}\n"
-                + f"Frame: {self.bubble_chamber.focus.frame}\n"
-                + f"Exigency: {target_view.exigency}\n"
+                f"Exigency: {target_view.exigency}\n"
                 + f"Satisfaction: {self.bubble_chamber.focus.satisfaction}"
             )
             self._update_codelet_urgencies()
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
         except MissingStructureError:
+            self.bubble_chamber.loggers["activity"].log("No view and frame found.")
             self.result = CodeletResult.FIZZLE
             self._fizzle()
         return self.result

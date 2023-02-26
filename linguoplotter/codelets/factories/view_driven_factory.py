@@ -220,7 +220,13 @@ class ViewDrivenFactory(Factory):
             ):
                 possible_concepts = StructureSet.union(
                     *[
-                        space.contents.where(is_concept=True, is_slot=False)
+                        space.contents.filter(
+                            lambda x: x.is_concept
+                            and not x.is_slot
+                            and (
+                                not x.is_compound_concept or x.args[0].is_fully_active()
+                            )
+                        )
                         for space in self.targets[
                             "slot"
                         ].parent_concept.parent_space.possible_instances
@@ -229,8 +235,10 @@ class ViewDrivenFactory(Factory):
             else:
                 possible_concepts = self.targets[
                     "slot"
-                ].parent_concept.parent_space.contents.where(
-                    is_concept=True, is_slot=False
+                ].parent_concept.parent_space.contents.filter(
+                    lambda x: x.is_concept
+                    and not x.is_slot
+                    and (not x.is_compound_concept or x.args[0].is_fully_active())
                 )
             possible_target_combos = [
                 self.bubble_chamber.new_dict(
@@ -296,7 +304,11 @@ class ViewDrivenFactory(Factory):
                         lambda x: x.is_conceptual_space
                         and x.parent_concept.structure_type == Relation
                     )
-                    for concept in space.contents.where(is_concept=True, is_slot=False)
+                    for concept in space.contents.filter(
+                        lambda x: x.is_concept
+                        and not x.is_slot
+                        and (not x.is_compound_concept or x.args[0].is_fully_active())
+                    )
                 ]
             if not self.targets["slot"].conceptual_space.is_slot:
                 possible_spaces = [self.targets["slot"].conceptual_space]
@@ -317,8 +329,11 @@ class ViewDrivenFactory(Factory):
                 for start, end in possible_target_pairs
                 for space in possible_spaces
                 for concept in possible_concepts
-                if start.relations.where(
-                    end=end, conceptual_space=space, parent_concept=concept
+                if start.relations.filter(
+                    lambda x: x.end == end
+                    and x.conceptual_space == space
+                    and x.parent_concept == concept
+                    and x.activation > 0
                 ).is_empty
             ]
             targets = self.bubble_chamber.random_machine.select(

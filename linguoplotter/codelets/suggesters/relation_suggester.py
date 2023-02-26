@@ -245,9 +245,16 @@ class RelationSuggester(Suggester):
             for start, end in possible_target_pairs
             for space in possible_spaces
             for concept in possible_concepts
-            if start.relations.where(
-                end=end, parent_concept=concept, conceptual_space=space
+            if start.relations.filter(
+                lambda x: x.end == end
+                and x.parent_concept == concept
+                and x.conceptual_space == space
+                and x.activation > 0
             ).is_empty
+            and (start == self.targets["start"] or concept == self.targets["concept"])
+            # top down relation suggesters are spawned either:
+            # because an active concept is being searched for hence the concept should be kept the same
+            # or because a frame's slot needs to be filled hence the arguments shoudld be kept the same
         ]
         try:
             targets = self.bubble_chamber.random_machine.select(

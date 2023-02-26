@@ -61,6 +61,7 @@ concept_file_map = {
     "pp-inessive-location": None,
     "pp-inessive-time": None,
     # semantic
+    "temperature": None,
     "hot": None,
     "warm": None,
     "mild": None,
@@ -172,6 +173,7 @@ generate_plot(
 generate_plot(
     log_directory,
     [
+        concept_file_map["temperature"],
         concept_file_map["hot"],
         concept_file_map["warm"],
         concept_file_map["mild"],
