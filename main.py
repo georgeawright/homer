@@ -9,7 +9,7 @@ pwd = os.getcwd()
 results = []
 
 program_file = "narration-1.lisp"
-random_seeds = range(4, 5)
+random_seeds = range(5)
 
 for i in random_seeds:
     time_string = str(time.time())

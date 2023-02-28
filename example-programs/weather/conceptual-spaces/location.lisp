@@ -238,10 +238,10 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 (define different-location-concept (def-concept :name "different-location"))
 (def-relation :start different-concept :end different-location-concept
   :parent_concept location-concept)
-(define not-same-location-concept (def-concept :name "same-location"))
+(define not-same-location-concept (def-concept :name "not-same-location"))
 (def-relation :start not-same-concept :end not-same-location-concept
   :parent_concept location-concept)
-(define not-different-location-concept (def-concept :name "different-location"))
+(define not-different-location-concept (def-concept :name "not-different-location"))
 (def-relation :start not-different-concept :end not-different-location-concept
   :parent_concept location-concept)
 (define more-location-concept (def-concept :name "more-location"))

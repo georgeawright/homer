@@ -112,6 +112,7 @@ class GarbageCollector(Codelet):
             min(1, self.MINIMUM_URGENCY * len(self.bubble_chamber.recycle_bin)),
             self.MINIMUM_URGENCY,
         )
+        urgency = self.bubble_chamber.satisfaction
         self.child_codelets.append(
             self.spawn(self.codelet_id, self.bubble_chamber, self.coderack, urgency)
         )

@@ -391,6 +391,13 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     lambda x: x.parent_frame.parent_concept
                     == child_codelet.targets["start_sub_frame"].parent_concept
                     and x.parent_frame not in target_view.matched_sub_frames.values()
+                    and x.unhappiness < parent_codelet.FLOATING_POINT_TOLERANCE
+                    and not any(
+                        [
+                            x.raw_input_nodes == sub_view.raw_input_nodes
+                            for sub_view in target_view.sub_views
+                        ]
+                    )
                 )
                 if potential_start_views.is_empty:
                     raise MissingStructureError

@@ -34,6 +34,7 @@ class InterspatialRelationSuggester(RelationSuggester):
         ).get()
         start = view.output_space.contents.filter(
             lambda x: x.is_letter_chunk
+            and not x.is_slot
             and x.members.is_empty
             and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
         ).get(key=relating_exigency)
@@ -141,6 +142,7 @@ class InterspatialRelationSuggester(RelationSuggester):
                 *[
                     view.output_space.contents.filter(
                         lambda x: x.is_letter_chunk
+                        and not x.is_slot
                         and x.members.is_empty
                         and x.parent_spaces.where(is_conceptual_space=True)
                         == self.targets["start"].parent_spaces.where(
@@ -218,5 +220,7 @@ class InterspatialRelationSuggester(RelationSuggester):
         )
         self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
         self.confidence = classification / (
-            self.targets["concept"].number_of_components + 1
+            1
+            if not self.targets["concept"].is_compound_concept
+            else self.targets["concept"].number_of_components - 1
         )

@@ -43,11 +43,8 @@ class Recycler(Codelet):
         sample_size = math.ceil(len(recyclable_structures) * self.urgency)
         try:
             structures = recyclable_structures.sample(
-                sample_size, key=lambda x: x.quality
+                sample_size, key=lambda x: 1 - x.quality
             )
-            # selecting according to quality results in irrelevant low-level frames
-            # increasingly being removed as the run proceeds, with focus applied to
-            # sentences and to some extent their conjunction
             for item in structures:
                 if item.is_recyclable and not item in self.bubble_chamber.recycle_bin:
                     probability_of_recycling = (

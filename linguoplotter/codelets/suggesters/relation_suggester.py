@@ -208,7 +208,11 @@ class RelationSuggester(Suggester):
         self.confidence = (
             classification
             * min(start.quality, end.quality)
-            / (self.targets["concept"].number_of_components + 1)
+            / (
+                1
+                if not self.targets["concept"].is_compound_concept
+                else self.targets["concept"].number_of_components - 1
+            )
             * times_are_adjacent
         )
 

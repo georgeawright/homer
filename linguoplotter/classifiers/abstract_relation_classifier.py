@@ -7,8 +7,10 @@ class AbstractRelationClassifier(Classifier):
         end = kwargs.get("end")
         concept = kwargs.get("concept")
 
-        if start.abstract_chunk.relations.filter(
-            lambda x: x.end == end.abstract_chunk and x.parent_concept == concept
-        ).not_empty:
-            return 1.0
-        return 0.0
+        return start.abstract_chunk.relations.filter(
+            lambda x: x.parent_concept == concept
+            and (
+                (x.start == start.abstract_chunk and x.end == end.abstract_chunk)
+                or (x.start == end.abstract_chunk and x.end == start.abstract_chunk)
+            )
+        ).not_empty
