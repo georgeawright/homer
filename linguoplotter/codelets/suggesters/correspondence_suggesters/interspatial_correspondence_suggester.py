@@ -147,9 +147,9 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     child_codelet.targets["end_sub_frame"] = sub_frame
             if (
                 child_codelet.targets["start_sub_frame"]
-                in target_view.matched_secondary_sub_frames
+                in target_view.matched_sub_frames
             ):
-                matching_frame = target_view.matched_secondary_sub_frames[
+                matching_frame = target_view.matched_sub_frames[
                     child_codelet.targets["start_sub_frame"]
                 ]
                 child_codelet.targets["start_sub_view"] = target_view.sub_views.where(
@@ -160,11 +160,8 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     if target_end.start in target_frame.input_space.contents
                     else child_codelet.targets["start_sub_view"].output_space
                 )
-            if (
-                child_codelet.targets["end_sub_frame"]
-                in target_view.matched_secondary_sub_frames
-            ):
-                matching_frame = target_view.matched_secondary_sub_frames[
+            if child_codelet.targets["end_sub_frame"] in target_view.matched_sub_frames:
+                matching_frame = target_view.matched_sub_frames[
                     child_codelet.targets["end_sub_frame"]
                 ]
                 child_codelet.targets["end_sub_view"] = target_view.sub_views.where(
@@ -177,11 +174,10 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 )
             # if target end's container doesn't match, find a sub view which hasn't been matched either
             if target_start_space is None:
-                potential_start_views = target_view.sub_views.filter(
+                potential_start_views = bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == child_codelet.targets["start_sub_frame"].parent_concept
-                    and x.parent_frame
-                    not in target_view.matched_secondary_sub_frames.values()
+                    and x.parent_frame not in target_view.matched_sub_frames.values()
                 )
                 if potential_start_views.is_empty:
                     raise MissingStructureError
@@ -198,7 +194,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     ]
                 )
             else:
-                potential_start_views = target_view.sub_views.filter(
+                potential_start_views = bubble_chamber.views.filter(
                     lambda x: target_start_space
                     in [x.parent_frame.input_space, x.output_space]
                 )
@@ -240,11 +236,10 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                         ]
                     )
             if target_end_space is None:
-                potential_end_views = target_view.sub_views.filter(
+                potential_end_views = bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == child_codelet.targets["end_sub_frame"].parent_concept
-                    and x.parent_frame
-                    not in target_view.matched_secondary_sub_frames.values()
+                    and x.parent_frame not in target_view.matched_sub_frames.values()
                 )
                 if potential_end_views.is_empty:
                     raise MissingStructureError
@@ -261,7 +256,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     ]
                 )
             else:
-                potential_end_views = target_view.sub_views.filter(
+                potential_end_views = bubble_chamber.views.filter(
                     lambda x: target_end_space
                     in [x.parent_frame.input_space, x.output_space]
                 )
@@ -339,7 +334,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             child_codelet.targets["start"] = matching_relations.get(
                 key=lambda x: x.quality * x.activation * x.uncorrespondedness
             )
-            for view in target_view.sub_views:
+            for view in bubble_chamber.views:
                 if (
                     child_codelet.targets["start"].start
                     in view.parent_frame.input_space.contents
@@ -378,9 +373,9 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     child_codelet.targets["start_sub_frame"] = sub_frame
             if (
                 child_codelet.targets["start_sub_frame"]
-                in target_view.matched_secondary_sub_frames
+                in target_view.matched_sub_frames
             ):
-                matching_frame = target_view.matched_secondary_sub_frames[
+                matching_frame = target_view.matched_sub_frames[
                     child_codelet.targets["start_sub_frame"]
                 ]
                 child_codelet.targets["start_sub_view"] = target_view.sub_views.where(
@@ -392,11 +387,10 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     else child_codelet.targets["start_sub_view"].output_space
                 )
             if target_start_space is None:
-                potential_start_views = target_view.sub_views.filter(
+                potential_start_views = bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == child_codelet.targets["start_sub_frame"].parent_concept
-                    and x.parent_frame
-                    not in target_view.matched_secondary_sub_frames.values()
+                    and x.parent_frame not in target_view.matched_sub_frames.values()
                 )
                 if potential_start_views.is_empty:
                     raise MissingStructureError
@@ -413,7 +407,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     ]
                 )
             else:
-                potential_start_views = target_view.sub_views.filter(
+                potential_start_views = bubble_chamber.views.filter(
                     lambda x: target_start_space
                     in [x.parent_frame.input_space, x.output_space]
                 )
@@ -476,7 +470,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             child_codelet.targets["start"] = matching_labels.get(
                 key=lambda x: x.quality * x.activation * x.uncorrespondedness
             )
-            for view in target_view.sub_views:
+            for view in bubble_chamber.views:
                 if (
                     child_codelet.targets["start"].start
                     in view.parent_frame.input_space.contents

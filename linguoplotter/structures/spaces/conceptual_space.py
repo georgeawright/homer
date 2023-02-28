@@ -197,7 +197,12 @@ class ConceptualSpace(Space):
     def recalculate_activation(self):
         self._activation_buffer = FloatBetweenOneAndZero(
             sum(
-                [concept.activation for concept in self.contents.where(is_concept=True)]
+                [
+                    concept.activation
+                    for concept in self.contents.where(
+                        is_concept=True, parent_space=self
+                    )
+                ]
             )
         )
 

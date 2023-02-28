@@ -2,7 +2,6 @@ from linguoplotter.codelets.factories import BottomUpFactory
 from linguoplotter.codelets.suggesters import (
     ChunkSuggester,
     CorrespondenceSuggester,
-    FrameSuggester,
     LabelSuggester,
     RelationSuggester,
     ViewSuggester,
@@ -12,6 +11,9 @@ from linguoplotter.codelets.suggesters.label_suggesters import (
 )
 from linguoplotter.codelets.suggesters.relation_suggesters import (
     InterspatialRelationSuggester,
+)
+from linguoplotter.codelets.suggesters.view_suggester import (
+    BottomUpCohesionViewSuggester,
 )
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -47,7 +49,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             (RelationSuggester, input_unrelatedness),
             (ViewSuggester, input_uncorrespondedness),
             (CorrespondenceSuggester, frames_unfilledness),
-            (FrameSuggester, text_uncohesiveness),
+            (BottomUpCohesionViewSuggester, text_uncohesiveness),
             (InterspatialLabelSuggester, text_unrelatedness),
             (InterspatialRelationSuggester, text_unrelatedness),
         ]
@@ -127,13 +129,17 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         try:
             view = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                and x.parent_frame.parent_concept
-                == self.bubble_chamber.concepts["conjunction"]
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
             ).get(key=activation)
         except MissingStructureError:
             return float("-inf")
         try:
-            return 1 / len(view.secondary_frames)
+            return 1 / len(view.cohesion_views)
         except ZeroDivisionError:
             return 1
 

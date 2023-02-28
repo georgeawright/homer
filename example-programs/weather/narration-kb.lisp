@@ -29,8 +29,6 @@
 (load "frames/s-move.lisp")
 (load "frames/s-spread.lisp")
 
-(load "frames/conjunction.lisp")
-
 (load "frames/coherence-temporal-order.lisp")
 (load "frames/coherence-text-order.lisp")
 (load "frames/coherence-parallelism.lisp")

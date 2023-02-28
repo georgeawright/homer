@@ -4,48 +4,37 @@ from linguoplotter.structure_collections import StructureSet
 
 class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
-        if (
-            self.targets["start_sub_view"].super_views.not_empty
-            and self.targets["view"] not in self.targets["start_sub_view"].super_views
-        ):
-            self.bubble_chamber.loggers["activity"].log_set(
-                self.targets["start_sub_view"].super_views, "super views"
-            )
-            return False
-        if (
-            self.targets["end_sub_view"] is not None
-            and self.targets["end_sub_view"].super_views.not_empty
-            and self.targets["view"] not in self.targets["end_sub_view"].super_views
-        ):
-            self.bubble_chamber.loggers["activity"].log_set(
-                self.targets["end_sub_view"].super_views, "super views"
-            )
-            return False
-        try:
-            matched_start_sub_frame = self.targets["view"].matched_secondary_sub_frames[
-                self.targets["start_sub_frame"]
-            ]
-            if matched_start_sub_frame != self.targets["start_sub_view"].parent_frame:
-                self.bubble_chamber.loggers["activity"].log_set(
-                    self.targets["view"].matched_secondary_sub_frames,
-                    "matched sub frames",
-                )
+        for sub_frame, sub_view_frame in self.targets[
+            "view"
+        ].matched_sub_frames.items():
+            if (
+                sub_frame == self.targets["start_sub_frame"]
+                and sub_view_frame != self.targets["start_sub_view"].parent_frame
+            ):
+                self.bubble_chamber.loggers["activity"].log("mismatching frames")
                 return False
-        except KeyError:
-            pass
+            if (
+                sub_frame != self.targets["start_sub_frame"]
+                and sub_view_frame == self.targets["start_sub_view"].parent_frame
+            ):
+                self.bubble_chamber.loggers["activity"].log("mismatching frames")
+                return False
         if self.targets["end"].is_relation:
-            try:
-                matched_end_sub_frame = self.targets[
-                    "view"
-                ].matched_secondary_sub_frames[self.targets["end_sub_frame"]]
-                if matched_end_sub_frame != self.targets["end_sub_view"].parent_frame:
-                    self.bubble_chamber.loggers["activity"].log_set(
-                        self.targets["view"].matched_secondary_sub_frames,
-                        "matched sub frames",
-                    )
+            for sub_frame, sub_view_frame in self.targets[
+                "view"
+            ].matched_sub_frames.items():
+                if (
+                    sub_frame == self.targets["end_sub_frame"]
+                    and sub_view_frame != self.targets["end_sub_view"].parent_frame
+                ):
+                    self.bubble_chamber.loggers["activity"].log("mismatching frames")
                     return False
-            except KeyError:
-                pass
+                if (
+                    sub_frame != self.targets["end_sub_frame"]
+                    and sub_view_frame == self.targets["end_sub_view"].parent_frame
+                ):
+                    self.bubble_chamber.loggers["activity"].log("mismatching frames")
+                    return False
         if self.targets["start_sub_view"] not in self.targets["view"].sub_views:
             for correspondence in self.targets["start_sub_view"].members:
                 if not self.targets["view"].can_accept_member(
@@ -89,24 +78,24 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["start_sub_view"].frames,
                 self.targets["end_sub_view"].frames,
             )
-            self.targets["view"].matched_secondary_sub_frames[
+            self.targets["view"].matched_sub_frames[
                 self.targets["start_sub_frame"]
             ] = self.targets["start_sub_view"].parent_frame
-            self.targets["view"].matched_secondary_sub_frames[
+            self.targets["view"].matched_sub_frames[
                 self.targets["end_sub_frame"]
             ] = self.targets["end_sub_view"].parent_frame
             for (
                 matched_sub_frame,
                 matching_sub_frame,
-            ) in self.targets["start_sub_view"].matched_secondary_sub_frames.items():
-                self.targets["view"].matched_secondary_sub_frames[
+            ) in self.targets["start_sub_view"].matched_sub_frames.items():
+                self.targets["view"].matched_sub_frames[
                     matched_sub_frame
                 ] = matching_sub_frame
             for (
                 matched_sub_frame,
                 matching_sub_frame,
-            ) in self.targets["end_sub_view"].matched_secondary_sub_frames.items():
-                self.targets["view"].matched_secondary_sub_frames[
+            ) in self.targets["end_sub_view"].matched_sub_frames.items():
+                self.targets["view"].matched_sub_frames[
                     matched_sub_frame
                 ] = matching_sub_frame
             for correspondence in self.targets["start_sub_view"].members:
@@ -114,9 +103,9 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
             for correspondence in self.targets["end_sub_view"].members:
                 self.targets["view"].add(correspondence)
             self.targets["view"].sub_views.add(self.targets["start_sub_view"])
-            self.targets["start_sub_view"].super_views.add(self.targets["view"])
+            self.targets["start_sub_view"].cohesion_views.add(self.targets["view"])
             self.targets["view"].sub_views.add(self.targets["end_sub_view"])
-            self.targets["end_sub_view"].super_views.add(self.targets["view"])
+            self.targets["end_sub_view"].cohesion_views.add(self.targets["view"])
             if self.targets["space"] is not None and self.targets["space"].is_slot:
                 self.targets["view"].specify_space(
                     self.targets["space"],
@@ -144,20 +133,20 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                 self.targets["view"].frames,
                 self.targets["start_sub_view"].frames,
             )
-            self.targets["view"].matched_secondary_sub_frames[
+            self.targets["view"].matched_sub_frames[
                 self.targets["start_sub_frame"]
             ] = self.targets["start_sub_view"].parent_frame
             for (
                 matched_sub_frame,
                 matching_sub_frame,
-            ) in self.targets["start_sub_view"].matched_secondary_sub_frames.items():
-                self.targets["view"].matched_secondary_sub_frames[
+            ) in self.targets["start_sub_view"].matched_sub_frames.items():
+                self.targets["view"].matched_sub_frames[
                     matched_sub_frame
                 ] = matching_sub_frame
             for correspondence in self.targets["start_sub_view"].members:
                 self.targets["view"].add(correspondence)
             self.targets["view"].sub_views.add(self.targets["start_sub_view"])
-            self.targets["start_sub_view"].super_views.add(self.targets["view"])
+            self.targets["start_sub_view"].cohesion_views.add(self.targets["view"])
             if self.targets["space"] is not None and self.targets["space"].is_slot:
                 self.targets["view"].specify_space(
                     self.targets["space"],
@@ -180,7 +169,9 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
             if (
                 any(
                     [
-                        link.correspondences.not_empty
+                        link.correspondences.where(
+                            parent_view=self.targets["view"]
+                        ).not_empty
                         for link in self.targets["start"].start.links.where(
                             is_interspatial=True
                         )

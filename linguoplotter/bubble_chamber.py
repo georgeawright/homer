@@ -221,17 +221,12 @@ class BubbleChamber:
 
     def remove(self, item):
         if item.is_frame:
-            if item.is_secondary:
-                for correspondence in item.correspondences:
-                    self.remove(correspondence)
-                item.parent_view.secondary_frames.remove(item)
-                item.parent_view = None
             self.frames.remove(item)
         if item.is_view:
             item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
-            for super_view in item.super_views.copy():
+            for super_view in StructureSet.union(item.super_views, item.cohesion_views):
                 for correspondence in super_view.members.copy():
                     if (
                         correspondence.start in item.parent_frame.input_space.contents
@@ -371,7 +366,6 @@ class BubbleChamber:
         output_space: ContextualSpace,
         interspatial_links: StructureSet = None,
         parent_id: str = "",
-        is_secondary: bool = False,
         is_sub_frame: bool = False,
         depth: int = None,
     ) -> Frame:
@@ -393,7 +387,6 @@ class BubbleChamber:
             links_out=self.new_set(),
             parent_spaces=self.new_set(),
             instances=self.new_set(),
-            is_secondary=is_secondary,
             is_sub_frame=is_sub_frame,
             depth=depth,
             champion_labels=self.new_set(),

@@ -27,7 +27,6 @@ class View(Structure):
         parent_frame: Frame,
         locations: List[Location],
         members: StructureSet,
-        secondary_frames: StructureSet,
         frames: StructureSet,
         input_spaces: StructureSet,
         output_space: ContextualSpace,
@@ -37,6 +36,7 @@ class View(Structure):
         parent_spaces: StructureSet,
         sub_views: StructureSet,
         super_views: StructureSet,
+        cohesion_views: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
     ):
@@ -54,17 +54,16 @@ class View(Structure):
         )
         self.parent_frame = parent_frame
         self.value = None
-        self.secondary_frames = secondary_frames
         self.frames = frames
         self.input_spaces = input_spaces
         self.output_space = output_space
         self.members = members
         self.sub_views = sub_views
         self.super_views = super_views
+        self.cohesion_views = cohesion_views
         self._node_groups = []
         self._grouped_nodes = {}
         self.matched_sub_frames = {}
-        self.matched_secondary_sub_frames = {}
         self.slot_values = {}
         self.conceptual_spaces_map = {}
         self.is_view = True
@@ -75,9 +74,9 @@ class View(Structure):
             "parent_id": self.parent_id,
             "parent_frame": self.parent_frame.structure_id,
             "parent_frame_name": self.parent_frame.name,
-            "secondary_frames": [frame.structure_id for frame in self.secondary_frames],
             "frames": [frame.structure_id for frame in self.frames],
             "super_views": [view.structure_id for view in self.super_views],
+            "cohesion_views": [view.structure_id for view in self.cohesion_views],
             "sub_views": [view.structure_id for view in self.sub_views],
             "input_spaces": [space.structure_id for space in self.input_spaces],
             "output_space": self.output_space.structure_id,
@@ -247,13 +246,7 @@ class View(Structure):
         )
 
     def recalculate_unhappiness(self):
-        self.unhappiness = max(
-            [1 - 0.5 ** self.parent_frame.number_of_items_left_to_process]
-            + [
-                1 - 0.5 ** frame.number_of_items_left_to_process
-                for frame in self.secondary_frames
-            ]
-        )
+        self.unhappiness = 1 - 0.5 ** self.parent_frame.number_of_items_left_to_process
 
     def recalculate_exigency(self):
         self.recalculate_unhappiness()
@@ -266,9 +259,16 @@ class View(Structure):
                 and member.parent_concept.root.name == "not"
             ):
                 return 0.0
-        total_slots = len(self.members) + self.number_of_items_left_to_process
+        total_slots = (
+            len(self.members.where(parent_view=self))
+            + self.number_of_items_left_to_process
+        )
         correspondence_quality = (
-            sum(correspondence.quality for correspondence in self.members) / total_slots
+            sum(
+                correspondence.quality
+                for correspondence in self.members.where(parent_view=self)
+            )
+            / total_slots
         )
         try:
             input_quality = min(
@@ -340,8 +340,6 @@ class View(Structure):
         if abstract_space in self.conceptual_spaces_map:
             self.conceptual_spaces_map.pop(abstract_space)
         for frame in self.frames:
-            frame.specify_space(abstract_space, conceptual_space)
-        for frame in self.secondary_frames:
             frame.specify_space(abstract_space, conceptual_space)
 
     def add(self, correspondence: "Correspondence"):

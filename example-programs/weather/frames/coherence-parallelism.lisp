@@ -47,8 +47,7 @@
   (def-contextual-space :name "parallelism.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet grammar-space)))
 (define parallelism
-  (def-frame :name "parallelism" :parent_concept sentence-concept :parent_frame None
-    :is_secondary True
+  (def-frame :name "parallelism" :parent_concept conjunction-concept :parent_frame None
     :depth 8
     :sub_frames (StructureSet parallelism-sub-1 parallelism-sub-2)
     :concepts (StructureSet)

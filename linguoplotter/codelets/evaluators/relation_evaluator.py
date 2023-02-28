@@ -65,7 +65,7 @@ class RelationEvaluator(Evaluator):
                 else relation.end.non_slot_value,
             )
             * minimum_argument_quality
-            / relation.parent_concept.number_of_components
+            / (relation.parent_concept.number_of_components + 1)
             * times_are_adjacent
             for relation in parallel_relations
         }

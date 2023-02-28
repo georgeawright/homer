@@ -17,15 +17,16 @@ class InterspatialLabelSelector(LabelSelector):
             self.challengers.add(
                 StructureSet.union(
                     *[
-                        node.labels.filter(
-                            lambda x: x.parent_concept == champion.parent_concept
-                            and x.parent_spaces == champion.parent_spaces
-                        )
-                        for node in champion.parent_space.contents.where(
-                            is_chunk=True
-                        ).excluding(champion.start)
+                        node.labels
+                        for node in champion.parent_space.contents.where(is_chunk=True)
                     ]
-                ).get()
+                )
+                .filter(
+                    lambda x: x.start != champion.start
+                    and x.parent_concept == champion.parent_concept
+                    and x.parent_spaces == champion.parent_spaces
+                )
+                .get()
             )
         except MissingStructureError:
             return True

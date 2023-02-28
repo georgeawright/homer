@@ -30,8 +30,7 @@
   (def-contextual-space :name "temporal-order.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet grammar-space)))
 (define temporal-order
-  (def-frame :name "temporal-order" :parent_concept sentence-concept :parent_frame None
-    :is_secondary True
+  (def-frame :name "temporal-order" :parent_concept conjunction-concept :parent_frame None
     :depth 8
     :sub_frames (StructureSet temporal-order-sub-1 temporal-order-sub-2)
     :concepts (StructureSet)
@@ -243,7 +242,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start same-concept :end temporal-order
+(def-relation :start less-time-concept :end temporal-order
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end temporal-order
   :is_bidirectional True :stable_activation 0.5)

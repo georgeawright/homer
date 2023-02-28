@@ -98,7 +98,7 @@ class FocusUnsetter(Codelet):
             if transposed_change_in_satisfaction_score <= 0.5:
                 self._update_recycler_urgency()
                 self._update_bottom_up_factories_urgencies()
-            self.bubble_chamber.focus.view._activation = (
+            self.bubble_chamber.focus.view._activation *= (
                 transposed_change_in_satisfaction_score
             )
             self.bubble_chamber.focus.view = None

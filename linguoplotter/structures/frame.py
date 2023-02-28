@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 
 from linguoplotter import fuzzy
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure import Structure
@@ -31,7 +30,6 @@ class Frame(Structure):
         champion_labels: StructureSet,
         champion_relations: StructureSet,
         is_sub_frame: bool = False,
-        is_secondary: bool = False,
         depth: int = None,
     ):
         quality = 1
@@ -59,7 +57,6 @@ class Frame(Structure):
         self.instances = instances
         self._depth = depth
         self.is_sub_frame = is_sub_frame
-        self.is_secondary = is_secondary
         self.is_frame = True
         self.parent_view = None
 
@@ -173,14 +170,6 @@ class Frame(Structure):
                 len(self.unfilled_output_structures),
                 len(self.unfilled_projectable_structures),
             ]
-        )
-
-    @property
-    def is_recyclable(self) -> bool:
-        return (
-            self.is_secondary
-            and self.parent_view is not None
-            and self.activation == 0.0
         )
 
     @property
@@ -391,7 +380,6 @@ class Frame(Structure):
             input_space=input_space_copy,
             output_space=output_space_copy,
             is_sub_frame=self.is_sub_frame,
-            is_secondary=self.is_secondary,
             depth=self.depth,
         )
         for abstract_space, conceptual_space in conceptual_spaces_map:

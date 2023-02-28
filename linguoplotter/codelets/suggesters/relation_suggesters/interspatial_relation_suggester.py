@@ -108,11 +108,21 @@ class InterspatialRelationSuggester(RelationSuggester):
             self.targets["space"],
             self.targets["end"],
         ]:
+            start = (
+                self.targets["start"]
+                if not self.targets["start"].is_slot
+                else self.targets["start"].non_slot_value
+            )
+            end = (
+                self.targets["end"]
+                if not self.targets["end"].is_slot
+                else self.targets["end"].non_slot_value
+            )
             classification = self.targets["concept"].classifier.classify(
                 concept=self.targets["concept"],
                 space=self.targets["space"],
-                start=self.targets["start"],
-                end=self.targets["end"],
+                start=start,
+                end=end,
             )
             self.bubble_chamber.loggers["activity"].log(
                 f"Preliminary classification: {classification}"
@@ -207,4 +217,6 @@ class InterspatialRelationSuggester(RelationSuggester):
             end=end,
         )
         self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
-        self.confidence = classification / self.targets["concept"].number_of_components
+        self.confidence = classification / (
+            self.targets["concept"].number_of_components + 1
+        )

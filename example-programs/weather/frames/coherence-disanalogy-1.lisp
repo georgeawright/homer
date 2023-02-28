@@ -47,8 +47,7 @@
   (def-contextual-space :name "disanalogy-1.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet grammar-space)))
 (define disanalogy-1
-  (def-frame :name "disanalogy-1" :parent_concept sentence-concept :parent_frame None
-    :is_secondary True
+  (def-frame :name "disanalogy-1" :parent_concept conjunction-concept :parent_frame None
     :depth 8
     :sub_frames (StructureSet disanalogy-1-sub-1 disanalogy-1-sub-2)
     :concepts (StructureSet)
@@ -293,7 +292,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start same-concept :end disanalogy-1
+(def-relation :start different-concept :end disanalogy-1
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end disanalogy-1
   :is_bidirectional True :stable_activation 0.5)

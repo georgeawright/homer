@@ -72,8 +72,8 @@ class BottomUpViewSuggester(ViewSuggester):
             )
             self.targets["frame"] = self.bubble_chamber.frames.filter(
                 lambda x: x.parent_frame is None
+                and x.parent_concept != self.bubble_chamber.concepts["conjunction"]
                 and not x.is_sub_frame
-                and not x.is_secondary
                 and x.exigency > 0
             ).get(key=exigency)
         except MissingStructureError:
@@ -97,6 +97,23 @@ class BottomUpViewSuggester(ViewSuggester):
         self.confidence = (
             self.targets["frame"].activation * 0.5 ** number_of_equivalent_views
         )
+
+
+class BottomUpCohesionViewSuggester(BottomUpViewSuggester):
+    def _passes_preliminary_checks(self):
+        try:
+            self.targets["contextual_space"] = self.bubble_chamber.input_spaces.get(
+                key=activation
+            )
+            self.targets["frame"] = self.bubble_chamber.frames.filter(
+                lambda x: x.parent_frame is None
+                and x.parent_concept == self.bubble_chamber.concepts["conjunction"]
+                and not x.is_sub_frame
+                and x.exigency > 0
+            ).get(key=exigency)
+        except MissingStructureError:
+            return False
+        return True
 
 
 class TopDownViewSuggester(ViewSuggester):

@@ -37,32 +37,13 @@ class FocusSetter(Codelet):
 
     def run(self) -> CodeletResult:
         try:
-            if (
-                self.bubble_chamber.worldview.view is not None
-                and self.bubble_chamber.worldview.view.secondary_frames.filter(
-                    lambda x: x.number_of_items_left_to_process > 0
-                ).not_empty
-            ):
-                target_view = self.bubble_chamber.worldview.view
-            else:
-                target_view = self.bubble_chamber.views.filter(
-                    lambda v: (
-                        v.unhappiness > 0
-                        or v.secondary_frames.filter(
-                            lambda f: f.number_of_items_left_to_process > 0
-                        ).not_empty
-                    )
-                    and v.members.filter(
-                        lambda c: c.parent_concept.name == "not(same)"
-                    ).is_empty
-                ).get(key=exigency)
-            self.bubble_chamber.focus.frame = (
-                target_view.parent_frame
-                if target_view.secondary_frames.is_empty
-                else target_view.secondary_frames.filter(
-                    lambda x: x.number_of_items_left_to_process > 0
-                ).get(key=exigency)
-            )
+            target_view = self.bubble_chamber.views.filter(
+                lambda v: (v.unhappiness > 0)
+                and v.members.filter(
+                    lambda c: c.parent_concept.name == "not(same)"
+                ).is_empty
+            ).get(key=exigency)
+            self.bubble_chamber.focus.frame = target_view.parent_frame
             self.bubble_chamber.focus.view = target_view
             self.bubble_chamber.loggers["activity"].log(
                 "Set focus\n"

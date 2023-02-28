@@ -2,7 +2,6 @@ import statistics
 
 from linguoplotter.codelets.evaluators import (
     ChunkEvaluator,
-    FrameEvaluator,
     LabelEvaluator,
     RelationEvaluator,
     ViewEvaluator,
@@ -29,7 +28,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         )
         labels_per_space_per_chunk = self._labels_per_space_per_chunk()
         super_chunks_per_raw_chunk = self._super_chunks_per_raw_chunk()
-        secondary_frames_per_view = self._secondary_frames_per_view()
+        cohesion_views_per_view = self._cohesion_views_per_view()
         related_texts_per_letter_chunk = self._related_texts_per_letter_chunk()
         labels_per_space_per_letter_chunk = self._labels_per_space_per_letter_chunk()
 
@@ -38,7 +37,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             + f"Relations per space per end per chunk: {relations_per_space_per_end_per_chunk}\n"
             + f"Labels per space per chunk: {labels_per_space_per_chunk}\n"
             + f"Super chunks per raw chunk: {super_chunks_per_raw_chunk}\n"
-            + f"Secondary frames per view: {secondary_frames_per_view}\n"
+            + f"Secondary frames per view: {cohesion_views_per_view}\n"
             + f"Related texts per letter chunk: {related_texts_per_letter_chunk}\n"
             + f"Labels per space per letter chunk: {labels_per_space_per_letter_chunk}",
         )
@@ -48,7 +47,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             (LabelEvaluator, labels_per_space_per_chunk),
             (RelationEvaluator, relations_per_space_per_end_per_chunk),
             (ViewEvaluator, views_per_frame_type_per_chunk),
-            (FrameEvaluator, secondary_frames_per_view),
+            (ViewEvaluator, cohesion_views_per_view),
             (InterspatialRelationEvaluator, related_texts_per_letter_chunk),
             (InterspatialLabelEvaluator, labels_per_space_per_letter_chunk),
         ]
@@ -127,14 +126,18 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             return 0
         return len(views) / len(view_types) / len(non_raw_chunks)
 
-    def _secondary_frames_per_view(self):
+    def _cohesion_views_per_view(self):
         try:
             view = self.bubble_chamber.views.filter(
                 lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                and x.parent_frame.parent_concept
-                == self.bubble_chamber.concepts["conjunction"]
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
             ).get()
-            return len(view.secondary_frames)
+            return len(view.cohesion_views)
         except MissingStructureError:
             return 0
 

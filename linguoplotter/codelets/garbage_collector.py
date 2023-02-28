@@ -72,7 +72,7 @@ class GarbageCollector(Codelet):
                     or structure.is_view
                     and any(
                         [
-                            item in codelet.targets
+                            item in codelet.targets.values()
                             for item in StructureSet.union(
                                 *[
                                     sub_frame.input_space.contents
@@ -84,24 +84,6 @@ class GarbageCollector(Codelet):
                                 ],
                                 structure.parent_frame.input_space.contents,
                                 structure.parent_frame.output_space.contents,
-                                structure.output_space.contents,
-                            )
-                        ]
-                    )
-                    or structure.is_frame
-                    and any(
-                        [
-                            item in codelet.targets
-                            for item in StructureSet.union(
-                                *[
-                                    sub_frame.input_space.contents
-                                    for sub_frame in structure.sub_frames
-                                ],
-                                *[
-                                    sub_frame.output_space.contents
-                                    for sub_frame in structure.sub_frames
-                                ],
-                                structure.input_space.contents,
                                 structure.output_space.contents,
                             )
                         ]

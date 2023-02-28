@@ -47,8 +47,7 @@
   (def-contextual-space :name "disanalogy-2.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet grammar-space)))
 (define disanalogy-2
-  (def-frame :name "disanalogy-2" :parent_concept sentence-concept :parent_frame None
-    :is_secondary True
+  (def-frame :name "disanalogy-2" :parent_concept conjunction-concept :parent_frame None
     :depth 8
     :sub_frames (StructureSet disanalogy-2-sub-1 disanalogy-2-sub-2)
     :concepts (StructureSet)

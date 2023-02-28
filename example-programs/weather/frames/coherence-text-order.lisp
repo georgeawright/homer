@@ -51,8 +51,7 @@
   (def-contextual-space :name "textual-order.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet grammar-space)))
 (define textual-order
-  (def-frame :name "textual-order" :parent_concept sentence-concept :parent_frame None
-    :is_secondary True
+  (def-frame :name "textual-order" :parent_concept conjunction-concept :parent_frame None
     :depth 8
     :sub_frames (StructureSet textual-order-sub-1 textual-order-sub-2)
     :concepts (StructureSet)
@@ -268,7 +267,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start same-concept :end textual-order
+(def-relation :start less-concept :end textual-order
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end textual-order
   :is_bidirectional True :stable_activation 0.5)

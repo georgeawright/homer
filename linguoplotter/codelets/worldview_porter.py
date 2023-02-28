@@ -165,9 +165,13 @@ class WorldviewPorter(Codelet):
         return 1 + max([self._calculate_conciseness(v) for v in view.sub_views])
 
     def _calculate_cohesiveness(self, view: View) -> FloatBetweenOneAndZero:
-        number_of_secondary_views = len(
-            view.secondary_frames.filter(
-                lambda x: x.number_of_items_left_to_process == 0
-            )
+        interspatial_relations = view.parent_frame.interspatial_links.where(
+            is_relation=True
         )
-        return 1 - 0.5 ** number_of_secondary_views
+        if interspatial_relations.is_empty:
+            return 0.0
+        cohesion_correspondences = StructureSet.union(
+            *[r.correspondences for r in interspatial_relations]
+        )
+        total_cohesion_quality = sum([c.quality for c in cohesion_correspondences])
+        return 1 - 0.5 ** total_cohesion_quality

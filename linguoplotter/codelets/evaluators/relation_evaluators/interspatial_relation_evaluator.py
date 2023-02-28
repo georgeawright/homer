@@ -1,8 +1,6 @@
-from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluators import RelationEvaluator
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collections import StructureSet
 
 
 class InterspatialRelationEvaluator(RelationEvaluator):
