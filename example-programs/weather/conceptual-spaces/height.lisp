@@ -18,8 +18,8 @@ lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space height-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start high-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start low-concept :end less-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start high-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start low-concept :end less-concept :parent_concept more-concept :quality 1.0)
 
 (define high-word
   (def-letter-chunk :name "high" :parent_space height-space

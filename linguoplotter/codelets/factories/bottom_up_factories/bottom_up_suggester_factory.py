@@ -139,7 +139,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         except MissingStructureError:
             return float("-inf")
         try:
-            return 1 / len(view.cohesion_views)
+            return 1 / sum([v.quality for v in view.cohesion_views])
         except ZeroDivisionError:
             return 1
 
@@ -156,6 +156,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             ).get(key=activation)
             letter_chunks = view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
+                and not x.is_slot
                 and x.members.is_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             )
@@ -182,6 +183,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             view = views.get()
             letter_chunks = view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
+                and not x.is_slot
                 and x.members.is_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             )

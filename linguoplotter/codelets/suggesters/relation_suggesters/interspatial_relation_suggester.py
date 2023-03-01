@@ -1,7 +1,7 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import RelationSuggester
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.structure_collection_keys import relating_exigency
+from linguoplotter.structure_collection_keys import unrelatedness
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.links import Relation
 from linguoplotter.structures.nodes import Concept
@@ -37,7 +37,7 @@ class InterspatialRelationSuggester(RelationSuggester):
             and not x.is_slot
             and x.members.is_empty
             and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
-        ).get(key=relating_exigency)
+        ).get(key=unrelatedness)
         urgency = urgency if urgency is not None else start.unrelatedness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)

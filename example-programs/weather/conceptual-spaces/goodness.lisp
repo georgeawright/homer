@@ -18,8 +18,8 @@ lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space goodness-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start good-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start bad-concept :end less-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start good-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start bad-concept :end less-concept :parent_concept more-concept :quality 1.0)
 
 (define good-word
   (def-letter-chunk :name "good" :parent_space goodness-space

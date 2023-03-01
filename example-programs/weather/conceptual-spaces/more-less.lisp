@@ -32,8 +32,8 @@
     :classifier (LastWordOfTypeClassifier) :instance_type Chunk :structure_type Label
     :parent_space more-less-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start more-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start less-concept :end less-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start more-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start less-concept :end less-concept :parent_concept more-concept :quality 1.0)
 
 (define more-word (def-letter-chunk :name "more" :locations (list)))
 (def-relation :start more-concept :end more-word :parent_concept jj-concept)

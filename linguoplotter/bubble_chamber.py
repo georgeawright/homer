@@ -226,6 +226,7 @@ class BubbleChamber:
             item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
+                sub_view.cohesion_views.remove(item)
             for super_view in StructureSet.union(item.super_views, item.cohesion_views):
                 for correspondence in super_view.members.copy():
                     if (

@@ -96,6 +96,7 @@ class Publisher(Codelet):
         self.result = CodeletResult.FINISH
 
     def _fizzle(self) -> CodeletResult:
+        self._update_bottom_up_factories_urgencies()
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
@@ -106,3 +107,11 @@ class Publisher(Codelet):
                 urgency=self.bubble_chamber.worldview.satisfaction,
             )
         )
+
+    def _update_bottom_up_factories_urgencies(self):
+        for codelet in self.coderack._codelets:
+            if (
+                "BottomUpSuggesterFactory" in codelet.codelet_id
+                or "BottomUpEvaluatorFactory" in codelet.codelet_id
+            ):
+                codelet.urgency = 1.0

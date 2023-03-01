@@ -22,10 +22,10 @@
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space size-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start large-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start medium-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start small-concept :end less-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start tiny-concept :end less-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start large-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start medium-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start small-concept :end less-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start tiny-concept :end less-concept :parent_concept more-concept :quality 1.0)
 
 (define large-word
   (def-letter-chunk :name "large" :parent_space size-space

@@ -18,8 +18,8 @@ lambda location: [[(c[0]*10)/48] for c in location.coordinates]
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space lateness-space :distance_function centroid_euclidean_distance))
 
-(def-relation :start late-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start early-concept :end less-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start late-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start early-concept :end less-concept :parent_concept more-concept :quality 1.0)
 
 (define early-word
   (def-letter-chunk :name "early" :parent_space lateness-space

@@ -106,22 +106,22 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
     :distance_to_proximity_weight location-dist-to-prox-weight))
 
 (def-relation :start north-concept :end more-concept
-  :parent_concept more-concept :activation 1.0)
+  :parent_concept more-concept :quality 1.0)
 (def-relation :start west-concept :end more-concept
-  :parent_concept more-concept :activation 1.0)
+  :parent_concept more-concept :quality 1.0)
 (def-relation :start northeast-concept :end more-concept
-  :parent_concept more-concept :activation 1.0)
+  :parent_concept more-concept :quality 1.0)
 (def-relation :start northwest-concept :end more-concept
-  :parent_concept more-concept :activation 1.0)
+  :parent_concept more-concept :quality 1.0)
 
 (def-relation :start south-concept :end less-concept
-  :parent_concept more-concept :activation 1.0)
+  :parent_concept more-concept :quality 1.0)
 (def-relation :start east-concept :end less-concept
-  :parent_concept more-concept :activation 1.0)
+  :parent_concept more-concept :quality 1.0)
 (def-relation :start southwest-concept :end less-concept
-  :parent_concept more-concept :activation 1.0)
+  :parent_concept more-concept :quality 1.0)
 (def-relation :start southeast-concept :end less-concept
-  :parent_concept more-concept :activation 1.0)
+  :parent_concept more-concept :quality 1.0)
 
 (define north-word
   (def-letter-chunk :name "north" :parent_space location-space
@@ -223,14 +223,14 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 (def-relation :start southwest-concept :end northeast-concept
   :parent_concept more-concept :quality 1.0)
 
-(def-relation :start northwest-concept :end north-concept :is_excitatory False :quality 1.0)
-(def-relation :start northwest-concept :end west-concept :is_excitatory False :quality 1.0)
-(def-relation :start northeast-concept :end north-concept :is_excitatory False :quality 1.0)
-(def-relation :start northeast-concept :end east-concept :is_excitatory False :quality 1.0)
-(def-relation :start southwest-concept :end south-concept :is_excitatory False :quality 1.0)
-(def-relation :start southwest-concept :end west-concept :is_excitatory False :quality 1.0)
-(def-relation :start southeast-concept :end south-concept :is_excitatory False :quality 1.0)
-(def-relation :start southeast-concept :end east-concept :is_excitatory False :quality 1.0)
+(def-relation :start northwest-concept :end north-concept :is_excitatory False :activation 1.0)
+(def-relation :start northwest-concept :end west-concept :is_excitatory False :activation 1.0)
+(def-relation :start northeast-concept :end north-concept :is_excitatory False :activation 1.0)
+(def-relation :start northeast-concept :end east-concept :is_excitatory False :activation 1.0)
+(def-relation :start southwest-concept :end south-concept :is_excitatory False :activation 1.0)
+(def-relation :start southwest-concept :end west-concept :is_excitatory False :activation 1.0)
+(def-relation :start southeast-concept :end south-concept :is_excitatory False :activation 1.0)
+(def-relation :start southeast-concept :end east-concept :is_excitatory False :activation 1.0)
 
 (define same-location-concept (def-concept :name "same-location"))
 (def-relation :start same-concept :end same-location-concept
