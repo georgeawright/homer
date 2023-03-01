@@ -100,6 +100,19 @@ class BottomUpViewSuggester(ViewSuggester):
 
 
 class BottomUpCohesionViewSuggester(BottomUpViewSuggester):
+    @classmethod
+    def make(
+        cls,
+        parent_id: str,
+        bubble_chamber: BubbleChamber,
+        urgency: float = None,
+    ):
+        targets = bubble_chamber.new_dict(name="targets")
+        urgency = urgency if urgency is not None else 1 - bubble_chamber.satisfaction
+        return BottomUpCohesionViewSuggester.spawn(
+            parent_id, bubble_chamber, targets, urgency
+        )
+
     def _passes_preliminary_checks(self):
         try:
             self.targets["contextual_space"] = self.bubble_chamber.input_spaces.get(

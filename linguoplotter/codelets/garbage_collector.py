@@ -49,11 +49,16 @@ class GarbageCollector(Codelet):
             if not structure.is_recyclable:
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
+            if self.bubble_chamber.worldview.view is not None and (
+                structure in self.bubble_chamber.worldview.view.grouped_nodes
+                or structure in self.bubble_chamber.worldview.view.members
+            ):
+                self.bubble_chamber.recycle_bin.remove(structure)
+                continue
             if structure in (
                 self.bubble_chamber.focus.view,
                 self.bubble_chamber.focus.frame,
             ):
-                self.bubble_chamber.recycle_bin.remove(structure)
                 continue
             if any(
                 [
@@ -91,18 +96,11 @@ class GarbageCollector(Codelet):
                     for codelet in self.coderack._codelets
                 ]
             ):
-                self.bubble_chamber.recycle_bin.remove(structure)
-                continue
-            if self.bubble_chamber.worldview.view is not None and (
-                structure in self.bubble_chamber.worldview.view.grouped_nodes
-                or structure in self.bubble_chamber.worldview.view.members
-            ):
-                self.bubble_chamber.recycle_bin.remove(structure)
                 continue
             probability_of_removal = (
                 self.bubble_chamber.random_machine.generate_number()
             )
-            if probability_of_removal > self.bubble_chamber.general_satisfaction:
+            if probability_of_removal > structure.quality:
                 self.bubble_chamber.loggers["activity"].log(f"Removing {structure}")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 self.bubble_chamber.remove(structure)

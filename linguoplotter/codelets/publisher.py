@@ -69,12 +69,10 @@ class Publisher(Codelet):
         )
         time_difference = self.coderack.codelets_run - self.last_time
         satisfaction_gradient = satisfaction_difference / time_difference
-        random_number = self.bubble_chamber.random_machine.generate_number() - 0.5
         self.bubble_chamber.loggers["activity"].log(
             f"Satisfaction gradient: {satisfaction_gradient}"
         )
-        self.bubble_chamber.loggers["activity"].log(f"Random number: {random_number}")
-        if satisfaction_gradient > random_number:
+        if satisfaction_gradient > 0 and self.bubble_chamber.random_machine.coin_flip():
             self.bubble_chamber.loggers["activity"].log(
                 "Satisfaction is increasing too much."
             )
@@ -114,4 +112,6 @@ class Publisher(Codelet):
                 "BottomUpSuggesterFactory" in codelet.codelet_id
                 or "BottomUpEvaluatorFactory" in codelet.codelet_id
             ):
+                codelet.urgency = 1.0
+            if "Focus" in codelet.codelet_id:
                 codelet.urgency = 1.0

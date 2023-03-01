@@ -558,6 +558,7 @@ class ViewDrivenFactory(Factory):
                 for concept in possible_concepts
                 if start.has_location_in_space(space)
                 and end.has_location_in_space(space)
+                and space in start.parent_space.conceptual_spaces
             ]
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
@@ -688,6 +689,7 @@ class ViewDrivenFactory(Factory):
                 for space in possible_spaces
                 for concept in possible_concepts
                 if start.has_location_in_space(space)
+                and space in start.parent_space.conceptual_spaces
             ]
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
