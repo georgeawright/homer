@@ -73,7 +73,10 @@ class InterspatialRelationSuggester(RelationSuggester):
             and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
         )
         potential_pairs = [
-            (a, b) for a in potential_targets for b in potential_targets if a != b
+            (a, b)
+            for a in potential_targets
+            for b in potential_targets
+            if a.parent_space != b.parent_space
         ]
         possible_target_combos = [
             bubble_chamber.new_dict(
