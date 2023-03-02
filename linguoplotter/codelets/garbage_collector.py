@@ -60,8 +60,10 @@ class GarbageCollector(Codelet):
                 self.bubble_chamber.focus.frame,
             ):
                 continue
-            if any(
-                [
+            relevant_codelets = [
+                codelet
+                for codelet in self.coderack._codelets
+                if (
                     structure in codelet.targets.values()
                     or any(
                         [link in codelet.targets.values() for link in structure.links]
@@ -93,17 +95,20 @@ class GarbageCollector(Codelet):
                             )
                         ]
                     )
-                    for codelet in self.coderack._codelets
-                ]
-            ):
-                continue
+                )
+            ]
             probability_of_removal = (
-                self.bubble_chamber.random_machine.generate_number()
+                (self.bubble_chamber.random_machine.generate_number())
+                if len(relevant_codelets) == 0
+                else 0
             )
             if probability_of_removal > structure.quality:
                 self.bubble_chamber.loggers["activity"].log(f"Removing {structure}")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 self.bubble_chamber.remove(structure)
+                # for codelet in relevant_codelets:
+                #    self.bubble_chamber.loggers["activity"].log(f"Removing {codelet}")
+                #    self.coderack.remove_codelet(codelet)
 
     def _engender_follow_up(self):
         urgency = max(
