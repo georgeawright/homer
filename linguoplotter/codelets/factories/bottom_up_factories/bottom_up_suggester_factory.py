@@ -127,15 +127,19 @@ class BottomUpSuggesterFactory(BottomUpFactory):
 
     def _uncohesiveness_of_texts(self):
         try:
-            view = self.bubble_chamber.views.filter(
-                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                and x.parent_frame.parent_concept.location_in_space(
-                    self.bubble_chamber.spaces["grammar"]
+            view = (
+                self.bubble_chamber.views.filter(
+                    lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                    and x.parent_frame.parent_concept.location_in_space(
+                        self.bubble_chamber.spaces["grammar"]
+                    )
+                    == self.bubble_chamber.concepts["sentence"].location_in_space(
+                        self.bubble_chamber.spaces["grammar"]
+                    )
                 )
-                == self.bubble_chamber.concepts["sentence"].location_in_space(
-                    self.bubble_chamber.spaces["grammar"]
-                )
-            ).get(key=activation)
+                .sample(2, key=activation)
+                .get()
+            )
         except MissingStructureError:
             return float("-inf")
         try:
