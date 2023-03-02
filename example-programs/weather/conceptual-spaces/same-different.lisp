@@ -23,9 +23,3 @@
 (def-relation :start same-concept :end same-word :parent_concept jj-concept)
 (define different-word (def-letter-chunk :name "different" :locations (list)))
 (def-relation :start different-concept :end different-word :parent_concept jj-concept)
-
-(define not-same-concept
-  (def-compound-concept :root not-concept :args (list same-concept)
-    :subsumes (StructureSet more-concept less-concept)))
-(define not-different-concept
-  (def-compound-concept :root not-concept :args (list different-concept)))

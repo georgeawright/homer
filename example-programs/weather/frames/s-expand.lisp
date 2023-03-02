@@ -128,7 +128,7 @@
     :parent_space time-sub-frame-input
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start late-chunk :end early-chunk :parent_concept not-different-concept
+  (def-relation :start late-chunk :end early-chunk :parent_concept same-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
