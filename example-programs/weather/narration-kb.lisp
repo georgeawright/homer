@@ -34,3 +34,9 @@
 (load "frames/coherence-parallelism.lisp")
 (load "frames/coherence-disanalogy-1.lisp")
 (load "frames/coherence-disanalogy-2.lisp")
+
+(define input-space
+  (def-contextual-space
+    :name "input" :parent_concept input-concept :is_main_input True
+    :conceptual_spaces (StructureSet
+			temperature-space location-space time-space size-space)))
