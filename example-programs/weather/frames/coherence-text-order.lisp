@@ -267,7 +267,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start less-concept :end textual-order
+(def-relation :start less-interspatial-concept :end textual-order
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end textual-order
   :is_bidirectional True :stable_activation 0.5)

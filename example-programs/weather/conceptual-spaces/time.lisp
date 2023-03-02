@@ -61,3 +61,7 @@
 (define less-time-concept (def-concept :name "less-time"))
 (def-relation :start less-concept :end less-time-concept
   :parent_concept time-concept)
+
+(define less-time-interspatial-concept (def-concept :name "less-time-interspatial"))
+(def-relation :start less-time-concept :end less-time-interspatial-concept
+  :parent_concept outer-concept)

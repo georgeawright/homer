@@ -153,11 +153,3 @@ class Linguoplotter:
         for count in ID.COUNTS:
             if "Frame" in count:
                 print(count, ID.COUNTS[count])
-
-        print("Views with not same")
-        for view in self.bubble_chamber.views.filter(
-            lambda x: x.members.filter(
-                lambda c: c.parent_concept.name == "not(same)"
-            ).not_empty
-        ):
-            print(view)

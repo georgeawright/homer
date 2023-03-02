@@ -253,7 +253,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start same-concept :end parallelism
+(def-relation :start same-interspatial-concept :end parallelism
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end parallelism
   :is_bidirectional True :stable_activation 0.5)

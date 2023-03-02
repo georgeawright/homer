@@ -837,12 +837,30 @@ class BubbleChamber:
         end.recalculate_exigency()
         self.add(relation)
         if parent_concept is not None:
-            parent_concept.instances.add(relation)
+            if is_interspatial:
+                try:
+                    parent_concept.relations.where(
+                        parent_concept=self.concepts["outer"]
+                    ).get().end.instances.add(relation)
+                except MissingStructureError:
+                    pass
+            else:
+                parent_concept.instances.add(relation)
         if None not in {parent_concept, conceptual_space}:
             try:
-                parent_concept.relations.where(
-                    parent_concept=conceptual_space.parent_concept
-                ).get().end.instances.add(relation)
+                concept_to_space_concept = (
+                    parent_concept.relations.where(
+                        parent_concept=conceptual_space.parent_concept
+                    )
+                    .get()
+                    .end
+                )
+                if is_interspatial:
+                    concept_to_space_concept.relations.where(
+                        parent_concept=self.concepts["outer"]
+                    ).get().end.instances.add(relation)
+                else:
+                    concept_to_space_concept.instances.add(relation)
             except MissingStructureError:
                 pass
         self.loggers["structure"].log(start)

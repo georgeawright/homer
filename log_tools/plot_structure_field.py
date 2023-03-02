@@ -104,6 +104,11 @@ frame_file_map = {
     "s-move": None,
     "s-spread": None,
     "s-expand": None,
+    "disanalogy-1": None,
+    "disanalogy-2": None,
+    "parallelism": None,
+    "temporal-order": None,
+    "textual-order": None,
 }
 
 log_directories = os.listdir("logs/")
@@ -250,7 +255,7 @@ generate_plot(
         frame_file_map["s-expand"],
     ],
     "activation",
-    "Sentence Frames Activation Over Time",
+    "Verb Frames Activation Over Time",
 )
 
 generate_plot(
@@ -264,4 +269,17 @@ generate_plot(
     ],
     "activation",
     "Phrase Frames Activation Over Time",
+)
+
+generate_plot(
+    log_directory,
+    [
+        frame_file_map["disanalogy-1"],
+        frame_file_map["disanalogy-2"],
+        frame_file_map["parallelism"],
+        frame_file_map["temporal-order"],
+        frame_file_map["textual-order"],
+    ],
+    "activation",
+    "Cohesion Frames Activation Over Time",
 )

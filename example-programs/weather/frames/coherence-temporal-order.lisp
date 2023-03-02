@@ -242,7 +242,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start less-time-concept :end temporal-order
+(def-relation :start less-time-interspatial-concept :end temporal-order
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end temporal-order
   :is_bidirectional True :stable_activation 0.5)

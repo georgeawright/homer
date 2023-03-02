@@ -221,7 +221,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start same-concept :end disanalogy-2
+(def-relation :start opposite-interspatial-concept :end disanalogy-2
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end disanalogy-2
   :is_bidirectional True :stable_activation 0.5)

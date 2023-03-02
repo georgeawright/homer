@@ -55,3 +55,10 @@
   (def-compound-concept :root not-concept :args (list more-concept)))
 (define not-less-concept
   (def-compound-concept :root not-concept :args (list less-concept)))
+
+(define more-interspatial-concept (def-concept :name "more-interspatial"))
+(def-relation :start more-concept :end more-interspatial-concept
+  :parent_concept outer-concept)
+(define less-interspatial-concept (def-concept :name "less-interspatial"))
+(def-relation :start less-concept :end less-interspatial-concept
+  :parent_concept outer-concept)
