@@ -198,6 +198,15 @@ class RelationSuggester(Suggester):
         ).coordinates[0][0]
         time_diff = abs(start_time - end_time)
         times_are_adjacent = 1 if time_diff <= 24 else 0.0
+        sameness_relations = self.targets["start"].relations.filter(
+            lambda x: x.parent_concept == self.bubble_chamber.concepts["same"]
+            and self.targets["end"] in x.arguments
+        )
+        pair_sameness = (
+            0
+            if sameness_relations.is_empty
+            else max([relation.quality for relation in sameness_relations])
+        )
         classification = self.targets["concept"].classifier.classify(
             concept=self.targets["concept"],
             space=self.targets["space"],
@@ -214,6 +223,11 @@ class RelationSuggester(Suggester):
                 else self.targets["concept"].number_of_components - 1
             )
             * times_are_adjacent
+            * (
+                pair_sameness
+                if self.targets["concept"] != self.bubble_chamber.concepts["same"]
+                else 1
+            )
         )
 
     def _fizzle(self):
