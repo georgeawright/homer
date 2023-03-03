@@ -299,7 +299,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     )
             matching_relations = source_collection.filter(
                 lambda x: x.is_relation
-                and x.quality * x.activation > 0
+                and x.quality > 0
                 and x.start in potential_start_targets
                 and x.end in potential_end_targets
                 and any(
@@ -311,8 +311,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             and x.parent_concept.args[0] == target_end.parent_concept
                         )
                         and target_view.members.filter(
-                            lambda x: x.end in target_frame.input_space.contents
-                            or x.end in target_view.output_space.contents
+                            lambda c: c.end in target_frame.interspatial_links
                         ).not_empty,
                     ]
                 )
@@ -458,7 +457,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             matching_labels = source_collection.filter(
                 lambda x: x.is_label
                 and x.is_interspatial
-                and x.quality * x.activation > 0
+                and x.quality > 0
                 and x.start in potential_start_targets
                 and x.parent_concept == target_end.parent_concept
                 and any(
