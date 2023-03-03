@@ -39,6 +39,8 @@ class SamenessClassifier(Classifier):
         if distinct_pairs == []:
             distinct_pairs = [(collection[0], collection[1])]
         if distinct_pairs[0][0].is_link:
+            if end.parent_concept.subsumes(start.parent_concept):
+                return 1.0
             start_concept = (
                 start.parent_concept
                 if not start.parent_concept.is_slot
