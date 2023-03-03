@@ -103,7 +103,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         try:
             labels_and_relations = input_space.contents.filter(
                 lambda x: x.is_label or x.is_relation
-            ).sample(10, key=activation)
+            ).sample(10, key=lambda x: x.quality * x.activation)
             uncorresponded_links = labels_and_relations.filter(
                 lambda x: x.correspondences.is_empty
             )
