@@ -42,42 +42,42 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
     (list north-south-space west-east-space nw-se-space ne-sw-space peripheralness-space)
     :is_basic_level True))
 (define north-concept
-  (def-concept :name "north" :locations (list (Location (list (list 0 4)) location-space))
+  (def-concept :name "north" :locations (list (Location (list (list 1 4)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space north-south-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define south-concept
-  (def-concept :name "south" :locations (list (Location (list (list 8 4)) location-space))
+  (def-concept :name "south" :locations (list (Location (list (list 7 4)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space north-south-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define west-concept
-  (def-concept :name "west" :locations (list (Location (list (list 4 0)) location-space))
+  (def-concept :name "west" :locations (list (Location (list (list 4 1)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space west-east-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define east-concept
-  (def-concept :name "east" :locations (list (Location (list (list 4 8)) location-space))
+  (def-concept :name "east" :locations (list (Location (list (list 4 7)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space west-east-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define northwest-concept
-  (def-concept :name "northwest" :locations (list (Location (list (list 0 0)) location-space))
+  (def-concept :name "northwest" :locations (list (Location (list (list 1 1)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space nw-se-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define northeast-concept
-  (def-concept :name "northeast" :locations (list (Location (list (list 0 8)) location-space))
+  (def-concept :name "northeast" :locations (list (Location (list (list 1 7)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space ne-sw-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define southwest-concept
-  (def-concept :name "southwest" :locations (list (Location (list (list 8 0)) location-space))
+  (def-concept :name "southwest" :locations (list (Location (list (list 7 1)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space ne-sw-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
 (define southeast-concept
-  (def-concept :name "southeast" :locations (list (Location (list (list 8 8)) location-space))
+  (def-concept :name "southeast" :locations (list (Location (list (list 7 7)) location-space))
     :classifier (ProximityClassifier) :instance_type Chunk :structure_type Label
     :parent_space nw-se-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight location-dist-to-prox-weight))
@@ -91,7 +91,7 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 (define everywhere-concept
   (def-concept :name "everywhere"
     :locations (list (Location
-		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
+		      (list (list 1 1) (list 1 7) (list 7 1) (list 7 7) (list 4 4))
 		      location-space))
     :classifier (EverywhereClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function size_euclidean_distance
@@ -99,7 +99,7 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 (define nearly-everywhere-concept
   (def-concept :name "nearly-everywhere"
     :locations (list (Location
-		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
+		      (list (list 1 1) (list 1 7) (list 7 1) (list 7 7) (list 4 4))
 		      location-space))
     :classifier (MostOfTheCountryClassifier) :instance_type Chunk :structure_type Label
     :parent_space location-space :distance_function size_euclidean_distance

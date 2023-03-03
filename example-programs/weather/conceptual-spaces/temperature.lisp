@@ -6,7 +6,7 @@
     :distance_to_proximity_weight temperature-dist-to-prox-weight))
 (define temperature-space
   (def-conceptual-space :name "temperature" :parent_concept temperature-concept
-    :breadth 2 :no_of_dimensions 1 :is_basic_level True
+    :breadth 20 :no_of_dimensions 1 :is_basic_level True
     :dimensions (list) :sub_spaces (list extremeness-space)))
 (define hot-concept
   (def-concept :name "hot" :locations (list (Location (list (list 22)) temperature-space))
