@@ -220,7 +220,7 @@
 		     (Location (list) spread-sentence-output))))
 (define np-super-super-chunk
   (def-letter-chunk :name None
-    :locations (list np-location
+    :locations (list nsubj-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
     :left_branch (StructureSet sentence-word-1)

@@ -243,7 +243,7 @@
 		     (Location (list) expand-sentence-output))))
 (define np-super-super-super-chunk
   (def-letter-chunk :name None
-    :locations (list np-location
+    :locations (list nsubj-location
 		     (Location (list) expand-sentence-output))
     :parent_space expand-sentence-output
     :left_branch (StructureSet np-super-super-chunk)
