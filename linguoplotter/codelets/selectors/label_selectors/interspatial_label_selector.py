@@ -58,6 +58,7 @@ class InterspatialLabelSelector(LabelSelector):
             ).get(key=labeling_exigency)
             space = start.parent_spaces.filter(
                 lambda x: x.is_conceptual_space
+                and x in start.parent_space.conceptual_spaces
                 and x.no_of_dimensions == 1
                 and not x.is_symbolic
             ).get(key=activation)
