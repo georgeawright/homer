@@ -66,7 +66,7 @@
     :conceptual_spaces (StructureSet location-space time-space conceptual-space)))
 (define expand-sentence-output
   (def-contextual-space :name "s-expand.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space location-space time-space
+    :conceptual_spaces (StructureSet grammar-space verb-space location-space time-space
 					    size-space conceptual-space)))
 (define expand-sentence
   (def-frame :name "s-expand" :parent_concept sentence-concept :parent_frame None

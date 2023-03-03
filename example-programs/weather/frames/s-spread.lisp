@@ -71,7 +71,7 @@
 (define spread-sentence-output
   (def-contextual-space :name "s-spread.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet unidimensional-location-space
-			grammar-space location-space time-space conceptual-space)))
+			grammar-space verb-space location-space time-space conceptual-space)))
 (define spread-sentence
   (def-frame :name "s-spread" :parent_concept sentence-concept :parent_frame None
     :depth 6

@@ -58,7 +58,7 @@
 (define be-sentence-output
   (def-contextual-space :name "s-be.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet
-			grammar-space location-space time-space conceptual-space)))
+			grammar-space verb-space location-space time-space conceptual-space)))
 (define be-sentence
   (def-frame :name "s-be" :parent_concept sentence-concept :parent_frame None
     :depth 6
