@@ -179,7 +179,9 @@ class InterspatialRelationSuggester(RelationSuggester):
             for space in possible_spaces
             for concept in possible_concepts
             if (
-                space.no_of_dimensions == 1 and concept.parent_space.name == "more-less"
+                space.no_of_dimensions == 1
+                and not space.is_symbolic
+                and concept.parent_space.name == "more-less"
             )
             or (
                 space in self.targets["start"].parent_space.conceptual_spaces
