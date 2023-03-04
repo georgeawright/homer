@@ -263,17 +263,20 @@ class ViewDrivenFactory(Factory):
                     and self.targets["slot"].end in node_group.values()
                 ):
                     target_end = node_group[input_space]
-            potential_targets = input_space.contents.filter(
-                lambda x: x.is_node and not x.is_raw and x.quality > 0
-            )
-            possible_target_pairs = [
-                (a, b)
-                for a in potential_targets
-                for b in potential_targets
-                if a != b
-                and (a == target_start if target_start is not None else True)
-                and (b == target_end if target_end is not None else True)
-            ]
+            if target_start is not None and target_end is not None:
+                possible_target_pairs = [(target_start, target_end)]
+            else:
+                potential_targets = input_space.contents.filter(
+                    lambda x: x.is_node and not x.is_raw and x.quality > 0
+                )
+                possible_target_pairs = [
+                    (a, b)
+                    for a in potential_targets
+                    for b in potential_targets
+                    if a != b
+                    and (a == target_start if target_start is not None else True)
+                    and (b == target_end if target_end is not None else True)
+                ]
             if not self.targets["slot"].parent_concept.is_slot:
                 possible_concepts = [self.targets["slot"].parent_concept]
             elif self.targets["slot"].parent_concept.is_filled_in:
