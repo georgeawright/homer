@@ -40,10 +40,15 @@ class InterspatialLabelSuggester(LabelSuggester):
                 x.activation,
             )
         )
-        start = view.output_space.contents.filter(
-            lambda x: x.is_letter_chunk
-            and x.members.is_empty
-            and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+        start = StructureSet.union(
+            view.parent_frame.input_space.contents.filter(
+                lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+            ),
+            view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and x.members.is_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            ),
         ).get(key=labeling_exigency)
         urgency = urgency if urgency is not None else start.unlabeledness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
@@ -65,25 +70,27 @@ class InterspatialLabelSuggester(LabelSuggester):
             == bubble_chamber.concepts["sentence"].location_in_space(
                 bubble_chamber.spaces["grammar"]
             )
-        ).get(
-            key=lambda x: fuzzy.OR(
-                x in bubble_chamber.worldview.view.sub_views
-                if bubble_chamber.worldview.view is not None
-                else False,
-                x.super_views.not_empty,
-                x.activation,
-            )
+        ).get(key=activation)
+        start = (
+            view.parent_frame.input_space.contents.filter(
+                lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+            ).get(key=labeling_exigency)
+            if concept
+            in (bubble_chamber.concepts["most"], bubble_chamber.concepts["least"])
+            else view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and x.members.is_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            ).get(key=labeling_exigency)
         )
-        start = view.output_space.contents.filter(
-            lambda x: x.is_letter_chunk
-            and x.members.is_empty
-            and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
-        ).get(key=labeling_exigency)
         space = start.parent_spaces.filter(
             lambda x: x.is_conceptual_space
             and x in start.parent_space.conceptual_spaces
-            and x.no_of_dimensions == 1
-            and not x.is_symbolic
+            and (
+                (x.no_of_dimensions == 1 and not x.is_symbolic)
+                or concept
+                in (bubble_chamber.concepts["first"], bubble_chamber.concepts["last"])
+            )
         ).get(key=activation)
         urgency = urgency if urgency is not None else start.unlabeledness
         targets = bubble_chamber.new_dict(
@@ -107,16 +114,15 @@ class InterspatialLabelSuggester(LabelSuggester):
                 return False
         else:
             if self.targets["concept"] is None:
-                possible_concepts = StructureSet.union(
-                    *[
-                        space.contents.filter(
-                            lambda x: x.is_concept
-                            and x.structure_type == Label
-                            and x.classifier is not None
-                        )
-                        for space in self.bubble_chamber.conceptual_spaces.filter(
-                            lambda x: x.structure_type == Relation
-                        )
+                possible_concepts = (
+                    [
+                        self.bubble_chamber.concepts["first"],
+                        self.bubble_chamber.concepts["last"],
+                    ]
+                    if self.targets["start"].is_letter_chunk
+                    else [
+                        self.bubble_chamber.concepts["most"],
+                        self.bubble_chamber.concepts["least"],
                     ]
                 )
             else:
@@ -125,8 +131,6 @@ class InterspatialLabelSuggester(LabelSuggester):
                 possible_spaces = self.targets["start"].parent_spaces.filter(
                     lambda x: x.is_conceptual_space
                     and x in self.targets["start"].parent_space.conceptual_spaces
-                    and x.no_of_dimensions == 1
-                    and not x.is_symbolic
                 )
             else:
                 possible_spaces = [self.targets["space"]]
@@ -141,6 +145,14 @@ class InterspatialLabelSuggester(LabelSuggester):
                 )
                 for space in possible_spaces
                 for concept in possible_concepts
+                if (space.no_of_dimensions == 1 and not space.is_symbolic)
+                or (
+                    concept
+                    in (
+                        self.bubble_chamber.concepts["first"],
+                        self.bubble_chamber.concepts["last"],
+                    )
+                )
             ]
             if possible_target_combos == []:
                 return False

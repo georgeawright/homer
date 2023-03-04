@@ -36,7 +36,11 @@ class InterspatialLabelEvaluator(LabelEvaluator):
 
     def _calculate_confidence(self):
         target_label = self.targets.get()
-        target_node = target_label.start
+        target_node = (
+            target_label.start
+            if not target_label.start.is_slot
+            else target_label.start.non_slot_value
+        )
         parent_concept = target_label.parent_concept
         space = target_label.parent_spaces.where(is_conceptual_space=True).get()
         classification = parent_concept.classifier.classify(

@@ -32,11 +32,16 @@ class InterspatialRelationSuggester(RelationSuggester):
                 bubble_chamber.spaces["grammar"]
             )
         ).get()
-        start = view.output_space.contents.filter(
-            lambda x: x.is_letter_chunk
-            and not x.is_slot
-            and x.members.is_empty
-            and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+        start = StructureSet.union(
+            view.parent_frame.input_space.contents.filter(
+                lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+            ),
+            view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and not x.is_slot
+                and x.members.is_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            ),
         ).get(key=unrelatedness)
         urgency = urgency if urgency is not None else start.unrelatedness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
@@ -67,40 +72,33 @@ class InterspatialRelationSuggester(RelationSuggester):
                 else True
             )
         )
-        potential_targets = view.output_space.contents.filter(
-            lambda x: x.is_letter_chunk
-            and x.members.is_empty
-            and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+        potential_starts = StructureSet.union(
+            view.parent_frame.input_space.contents.filter(
+                lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
+            ),
+            view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and not x.is_slot
+                and x.members.is_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            ),
         )
-        potential_pairs = [
-            (a, b)
-            for a in potential_targets
-            for b in potential_targets
-            if a.parent_space != b.parent_space
-        ]
         possible_target_combos = [
             bubble_chamber.new_dict(
                 {
-                    "start": pair[0],
-                    "end": pair[1],
+                    "start": start,
                     "space": space,
                     "concept": parent_concept,
                 },
                 name="targets",
             )
-            for pair in potential_pairs
+            for start in potential_starts
             for space in potential_spaces
-            if pair[0].has_location_in_space(space)
-            and pair[1].has_location_in_space(space)
+            if start.has_location_in_space(space)
         ]
         targets = bubble_chamber.random_machine.select(
             possible_target_combos,
-            key=lambda x: x["concept"].classifier.classify(
-                start=x["start"],
-                end=x["end"],
-                concept=x["concept"],
-                space=x["space"],
-            ),
+            key=lambda x: x["start"].unrelatedness * x["concept"].activation,
         )
         targets.name = "targets"
         urgency = urgency if urgency is not None else targets["start"].unrelatedness
@@ -141,6 +139,19 @@ class InterspatialRelationSuggester(RelationSuggester):
         else:
             possible_concepts = [self.targets["concept"]]
         if self.targets["end"] is None:
+            possible_end_views = self.bubble_chamber.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                and x.output_space != self.targets["start"].parent_space
+                and x.parent_frame.input_space != self.targets["start"].parent_space
+            )
+            if possible_end_views.is_empty:
+                return False
             possible_ends = StructureSet.union(
                 *[
                     view.output_space.contents.filter(
@@ -152,9 +163,11 @@ class InterspatialRelationSuggester(RelationSuggester):
                             is_conceptual_space=True
                         )
                     )
-                    for view in self.bubble_chamber.views.filter(
-                        lambda x: x.output_space != self.targets["start"].parent_space
+                    if self.targets["start"].is_letter_chunk
+                    else view.parent_frame.input_space.contents.filter(
+                        lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                     )
+                    for view in possible_end_views
                 ]
             )
         else:
@@ -179,14 +192,17 @@ class InterspatialRelationSuggester(RelationSuggester):
             for space in possible_spaces
             for concept in possible_concepts
             if (
-                space.no_of_dimensions == 1
-                and not space.is_symbolic
-                and concept.parent_space.name == "more-less"
+                (
+                    space.no_of_dimensions == 1
+                    and not space.is_symbolic
+                    and concept.parent_space.name == "more-less"
+                )
+                or (
+                    space in self.targets["start"].parent_space.conceptual_spaces
+                    and concept.parent_space.name == "same-different"
+                )
             )
-            or (
-                space in self.targets["start"].parent_space.conceptual_spaces
-                and concept.parent_space.name == "same-different"
-            )
+            and end.has_location_in_space(space)
         ]
         if possible_target_combos == []:
             return False
