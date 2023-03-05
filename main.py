@@ -9,7 +9,7 @@ pwd = os.getcwd()
 results = []
 
 program_file = "narration-1.lisp"
-random_seeds = range(1)
+random_seeds = range(5)
 
 for i in random_seeds:
     time_string = str(time.time())
@@ -56,4 +56,12 @@ for i in random_seeds:
             f"Result: {text}\nSatisfaction: {satisfaction}\nCodelets run: {codelets_run}"
         )
 
-print(results)
+for result in results:
+    seed = result["random_seed"]
+    satisfaction = result["satisfaction"]
+    codelets_run = result["codelets_run"]
+    text = result["result"]
+    print(
+        f"Random seed: {seed} | Codelets run: {codelets_run} | Satisfaction: {satisfaction}"
+    )
+    print(text)
