@@ -1,3 +1,6 @@
+import statistics
+
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -85,7 +88,11 @@ class Publisher(Codelet):
         )
         if not publish_concept.is_fully_active():
             self.bubble_chamber.loggers["activity"].log("Boosting publish concept")
-            publish_concept.boost_activation(self.bubble_chamber.worldview.satisfaction)
+            publish_concept.boost_activation(
+                statistics.fmean(
+                    [self.bubble_chamber.worldview.satisfaction, self.urgency]
+                )
+            )
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return
@@ -95,6 +102,13 @@ class Publisher(Codelet):
 
     def _fizzle(self) -> CodeletResult:
         self._update_bottom_up_factories_urgencies()
+        urgency = (
+            fuzzy.OR(self.bubble_chamber.worldview.satisfaction, self.urgency)
+            if self.last_satisfaction <= self.bubble_chamber.general_satisfaction
+            and self.bubble_chamber.focus.view is None
+            and self.bubble_chamber.worldview.view is not None
+            else self.bubble_chamber.worldview.satisfaction
+        )
         self.child_codelets.append(
             self.spawn(
                 self.codelet_id,
@@ -102,7 +116,7 @@ class Publisher(Codelet):
                 self.coderack,
                 last_satisfaction=self.bubble_chamber.general_satisfaction,
                 last_time=self.coderack.codelets_run,
-                urgency=self.bubble_chamber.worldview.satisfaction,
+                urgency=urgency,
             )
         )
 
