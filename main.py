@@ -75,30 +75,3 @@ for program_file in program_files:
                         f"{logs_dir_path}/structures/structures/{structure_dir}/{log_file}"
                     )
     print(results)
-
-# for result in results:
-#    seed = result["random_seed"]
-#    satisfaction = result["satisfaction"]
-#    codelets_run = result["codelets_run"]
-#    text = result["result"]
-#    print(
-#        f"Random seed: {seed} | Codelets run: {codelets_run} | Satisfaction: {satisfaction}"
-#    )
-#    print(text)
-
-# results = []
-# for directory in os.listdir("logs"):
-#    with open(f"logs/{directory}/details.txt") as f:
-#        result = {}
-#        for line in f.readlines():
-#            r = line.split(":")
-#            key = {
-#                "Program": "program",
-#                "Random seed": "random_seed",
-#                "Satisfaction": "satisfaction",
-#                "Codelets run": "codelets_run",
-#                "Result": "result",
-#            }[r[0]]
-#            result[key] = r[1].replace("\n", "")
-#        results.append(result)
-# print(results)
