@@ -56,7 +56,9 @@ class Coderack:
     def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
         coderack = cls(bubble_chamber, loggers)
         meta_codelets = [
-            Publisher.spawn("", bubble_chamber, cls.MINIMUM_CODELET_URGENCY),
+            Publisher.spawn(
+                "", bubble_chamber, coderack, 0.0, 0, cls.MINIMUM_CODELET_URGENCY
+            ),
             GarbageCollector.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
@@ -141,10 +143,6 @@ class Coderack:
         else:
             codelet.run()
         self.bubble_chamber.recalculate_satisfaction()
-        if self.bubble_chamber.focus.view is not None:
-            self.bubble_chamber.focus.spaces_quality_history.append(
-                self.bubble_chamber.focus.satisfaction
-            )
         self.recently_run.add(type(codelet))
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:

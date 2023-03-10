@@ -26,6 +26,7 @@ class Label(Link):
         parent_spaces: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
+        is_interspatial: bool = False,
     ):
         Link.__init__(
             self,
@@ -45,6 +46,7 @@ class Label(Link):
         )
         self._parent_space = parent_space
         self.is_label = True
+        self.is_interspatial = is_interspatial
 
     def __dict__(self) -> dict:
         return {
@@ -111,6 +113,8 @@ class Label(Link):
             locations=new_locations,
             quality=self.quality,
             parent_space=parent_space,
+            is_interspatial=self.is_interspatial,
+            activation=self.activation,
         )
 
     def nearby(self, space: Space = None) -> StructureSet:

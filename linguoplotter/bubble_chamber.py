@@ -1,3 +1,4 @@
+import math
 import statistics
 from typing import Callable, Dict, List, Union
 
@@ -47,7 +48,9 @@ class BubbleChamber:
         self.concept_links = None
         self.correspondences = None
         self.labels = None
+        self.interspatial_labels = None
         self.relations = None
+        self.interspatial_relations = None
 
         self.views = None
 
@@ -68,7 +71,7 @@ class BubbleChamber:
     def reset(self, loggers: Dict[str, Logger]):
         self.loggers = loggers
         self.focus = Focus()
-        self.worldview = Worldview(self.new_set())
+        self.worldview = Worldview(None)
         self.conceptual_spaces = self.new_set()
         self.contextual_spaces = self.new_set()
         self.frames = self.new_set()
@@ -79,7 +82,9 @@ class BubbleChamber:
         self.concept_links = self.new_set()
         self.correspondences = self.new_set()
         self.labels = self.new_set()
+        self.interspatial_labels = self.new_set()
         self.relations = self.new_set()
+        self.interspatial_relations = self.new_set()
         self.views = self.new_set()
         self.satisfaction = 0
         self.general_satisfaction = 0
@@ -177,21 +182,17 @@ class BubbleChamber:
             ]
         )
 
-    def spread_activations(self):
-        for structure in self.structures:
-            structure.spread_activation()
-
     def update_activations(self) -> None:
         self.worldview.activate()
         for structure in self.structures:
-            structure_old_activation = structure.activation
+            structure.recalculate_activation()
+        for structure in self.structures:
             structure.update_activation()
             if (
-                # structure.activation > structure_old_activation
                 structure.activation > self.JUMP_THRESHOLD
                 and self.random_machine.coin_flip()
             ):
-                structure._activation = 1.0
+                structure.activate()
             if self.log_count % self.ACTIVATION_LOGGING_FREQUENCY == 0:
                 self.loggers["structure"].log(structure)
         self.log_count += 1
@@ -213,17 +214,20 @@ class BubbleChamber:
             self.loggers["structure"].log(space)
         collection_name = self.collections[type(item)]
         getattr(self, collection_name).add(item)
+        if item.is_interspatial and item.is_label:
+            self.interspatial_labels.add(item)
+        if item.is_interspatial and item.is_relation:
+            self.interspatial_relations.add(item)
 
     def remove(self, item):
+        if item.is_frame:
+            self.frames.remove(item)
         if item.is_view:
-            correspondences = item.members.where(parent_view=item)
-            for correspondence in correspondences:
-                self.remove(correspondence)
-            for frame in item.frames:
-                self.remove(frame)
+            item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
-            for super_view in item.super_views.copy():
+                sub_view.cohesion_views.remove(item)
+            for super_view in StructureSet.union(item.super_views, item.cohesion_views):
                 for correspondence in super_view.members.copy():
                     if (
                         correspondence.start in item.parent_frame.input_space.contents
@@ -231,21 +235,40 @@ class BubbleChamber:
                         in item.parent_frame.output_space.contents
                     ):
                         self.remove(correspondence)
+                    if correspondence.parent_view in item_sub_views:
+                        super_view.remove(correspondence)
                 super_view.sub_views.remove(item)
                 for frame in item.frames:
                     super_view.frames.remove(frame)
-        if item.is_frame:
-            item.parent_frame.instances.remove(item)
-            item.parent_frame.recalculate_exigency()
+            correspondences = item.members.where(parent_view=item)
+            for correspondence in correspondences:
+                self.remove(correspondence)
+            item.parent_frame.progenitor.instances.remove(item)
+            item.parent_frame.parent_concept.instances.remove(item)
+            self.remove(item.parent_frame)
         if item.is_correspondence:
             item.parent_view.remove(item)
         if item.is_link:
+            if item.is_interspatial:
+                self.interspatial_labels.remove(item)
+                self.interspatial_relations.remove(item)
+            item.parent_concept.instances.remove(item)
             for argument in item.arguments:
                 argument.links_out.remove(item)
                 argument.links_in.remove(item)
                 argument.champion_labels.remove(item)
                 argument.champion_relations.remove(item)
                 argument.recalculate_exigency()
+        if item.is_relation:
+            if item.parent_concept is not None:
+                item.parent_concept.instances.remove(item)
+            if None not in {item.parent_concept, item.conceptual_space}:
+                try:
+                    item.parent_concept.relations.where(
+                        parent_concept=item.conceptual_space.parent_concept
+                    ).get().end.instances.remove(item)
+                except MissingStructureError:
+                    pass
         if item.is_chunk:
             for view in self.views.copy():
                 if item in view.grouped_nodes:
@@ -259,6 +282,9 @@ class BubbleChamber:
                 self.remove(link)
         for space in item.parent_spaces:
             space.contents.remove(item)
+        if item.is_letter_chunk:
+            if item.abstract_chunk is not None:
+                item.abstract_chunk.instances.remove(item)
         collection_name = self.collections[type(item)]
         getattr(self, collection_name).remove(item)
 
@@ -339,10 +365,14 @@ class BubbleChamber:
         concepts: StructureSet,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
+        interspatial_links: StructureSet = None,
         parent_id: str = "",
         is_sub_frame: bool = False,
         depth: int = None,
     ) -> Frame:
+        interspatial_links = (
+            self.new_set() if interspatial_links is None else interspatial_links
+        )
         frame = Frame(
             structure_id=ID.new(Frame),
             parent_id=parent_id,
@@ -351,6 +381,7 @@ class BubbleChamber:
             parent_frame=parent_frame,
             sub_frames=sub_frames,
             concepts=concepts,
+            interspatial_links=interspatial_links,
             input_space=input_space,
             output_space=output_space,
             links_in=self.new_set(),
@@ -379,14 +410,14 @@ class BubbleChamber:
         parent_id: str = "",
     ) -> Frame:
         return self.new_frame(
-            name,
-            parent_concept,
-            parent_frame,
-            sub_frames,
-            concepts,
-            input_space,
-            output_space,
-            parent_id,
+            name=name,
+            parent_concept=parent_concept,
+            parent_frame=parent_frame,
+            sub_frames=sub_frames,
+            concepts=concepts,
+            input_space=input_space,
+            output_space=output_space,
+            parent_id=parent_id,
             is_sub_frame=True,
         )
 
@@ -415,6 +446,7 @@ class BubbleChamber:
             links_in=self.new_set(),
             links_out=self.new_set(),
             parent_spaces=parent_spaces,
+            instances=self.new_set(),
             super_chunks=self.new_set(),
             sub_chunks=self.new_set(),
             abstract_chunk=abstract_chunk,
@@ -480,6 +512,7 @@ class BubbleChamber:
             links_in=self.new_set(),
             links_out=self.new_set(),
             parent_spaces=parent_spaces,
+            instances=self.new_set(),
             super_chunks=self.new_set(),
             sub_chunks=self.new_set(),
             abstract_chunk=abstract_chunk,
@@ -500,6 +533,8 @@ class BubbleChamber:
                 quality=1.0,
                 parent_id=parent_id,
             )
+        if abstract_chunk is not None:
+            abstract_chunk.instances.add(letter_chunk)
         return letter_chunk
 
     def new_concept(
@@ -514,6 +549,7 @@ class BubbleChamber:
         distance_function: Callable = None,
         chunking_distance_function: Callable = None,
         possible_instances: StructureSet = None,
+        subsumes: StructureSet = None,
         depth: int = 1,
         distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
         activation: FloatBetweenOneAndZero = None,
@@ -521,10 +557,26 @@ class BubbleChamber:
         reverse: Concept = None,
     ) -> Concept:
         locations = [] if locations is None else locations
+        for location in locations:
+            for sub_space in location.space.sub_spaces:
+                if not any([l.space == sub_space for l in locations]):
+                    location_in_sub_space = (
+                        sub_space.location_from_super_space_location(location)
+                    )
+                    locations.append(location_in_sub_space)
+        if parent_space is not None:
+            if not any([location.space == parent_space for location in locations]):
+                locations.append(
+                    Location(
+                        [[math.nan for _ in range(parent_space.no_of_dimensions)]],
+                        parent_space,
+                    )
+                )
         parent_spaces = self.new_set(*[location.space for location in locations])
         possible_instances = (
             self.new_set() if possible_instances is None else possible_instances
         )
+        subsumes = self.new_set() if subsumes is None else subsumes
         chunking_distance_function = (
             chunking_distance_function
             if chunking_distance_function is not None
@@ -547,6 +599,7 @@ class BubbleChamber:
             links_out=self.new_set(),
             parent_spaces=parent_spaces,
             instances=self.new_set(),
+            subsumes=subsumes,
             depth=depth,
             distance_to_proximity_weight=distance_to_proximity_weight,
             is_slot=is_slot,
@@ -566,7 +619,9 @@ class BubbleChamber:
         parent_id: str = "",
         is_slot: bool = False,
         reverse: Concept = None,
+        subsumes: StructureSet = None,
     ):
+        subsumes = self.new_set() if subsumes is None else subsumes
         try:
             return self.concepts.where(
                 is_compound_concept=True, root=root, args=args
@@ -586,6 +641,7 @@ class BubbleChamber:
                 links_out=self.new_set(),
                 parent_spaces=parent_spaces,
                 instances=self.new_set(),
+                subsumes=subsumes,
                 champion_labels=self.new_set(),
                 champion_relations=self.new_set(),
                 is_slot=is_slot,
@@ -638,6 +694,7 @@ class BubbleChamber:
         quality: FloatBetweenOneAndZero = 0.0,
         is_excitatory: bool = True,
         is_privileged: bool = False,
+        is_projection: bool = False,
     ) -> Correspondence:
         if locations is None:
             if start.parent_space is not None and end.parent_space is not None:
@@ -664,9 +721,17 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             is_excitatory=is_excitatory,
             is_privileged=is_privileged,
+            is_projection=is_projection,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
         )
+        start.links_out.add(correspondence)
+        start.links_in.add(correspondence)
+        start.recalculate_exigency()
+        end.links_out.add(correspondence)
+        end.links_in.add(correspondence)
+        end.recalculate_exigency()
+        self.add(correspondence)
         while parent_view is not None:
             parent_view.add(correspondence)
             parent_view.recalculate_exigency()
@@ -675,13 +740,6 @@ class BubbleChamber:
                 parent_view = parent_view.super_views.get()
             except MissingStructureError:
                 parent_view = None
-        start.links_out.add(correspondence)
-        start.links_in.add(correspondence)
-        start.recalculate_exigency()
-        end.links_out.add(correspondence)
-        end.links_in.add(correspondence)
-        end.recalculate_exigency()
-        self.add(correspondence)
         self.loggers["structure"].log(start)
         self.loggers["structure"].log(end)
         return correspondence
@@ -694,6 +752,8 @@ class BubbleChamber:
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         parent_space: ContextualSpace = None,
+        is_interspatial: bool = False,
+        activation: FloatBetweenOneAndZero = None,
     ) -> Label:
         parent_space = start.parent_space if parent_space is None else parent_space
         parent_spaces = self.new_set(*[location.space for location in locations])
@@ -711,12 +771,16 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
+            is_interspatial=is_interspatial,
         )
+        if activation is not None:
+            label._activation = activation
         if start is not None:
             start.links_out.add(label)
             start.recalculate_exigency()
             self.loggers["structure"].log(start)
         self.add(label)
+        parent_concept.instances.add(label)
         return label
 
     def new_relation(
@@ -731,10 +795,15 @@ class BubbleChamber:
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
+        is_interspatial: bool = False,
         activation: FloatBetweenOneAndZero = None,
         stable_activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
-        parent_space = start.parent_space if parent_space is None else parent_space
+        parent_space = (
+            start.parent_space
+            if parent_space is None and start.parent_space == end.parent_space
+            else parent_space
+        )
         locations = [] if locations is None else locations
         parent_spaces = self.new_set(*[location.space for location in locations])
         relation = Relation(
@@ -754,6 +823,7 @@ class BubbleChamber:
             is_bidirectional=is_bidirectional,
             is_excitatory=is_excitatory,
             is_stable=stable_activation is not None,
+            is_interspatial=is_interspatial,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
         )
@@ -766,6 +836,33 @@ class BubbleChamber:
         start.recalculate_exigency()
         end.recalculate_exigency()
         self.add(relation)
+        if parent_concept is not None:
+            if is_interspatial:
+                try:
+                    parent_concept.relations.where(
+                        parent_concept=self.concepts["outer"]
+                    ).get().end.instances.add(relation)
+                except MissingStructureError:
+                    pass
+            else:
+                parent_concept.instances.add(relation)
+        if None not in {parent_concept, conceptual_space}:
+            try:
+                concept_to_space_concept = (
+                    parent_concept.relations.where(
+                        parent_concept=conceptual_space.parent_concept
+                    )
+                    .get()
+                    .end
+                )
+                if is_interspatial:
+                    concept_to_space_concept.relations.where(
+                        parent_concept=self.concepts["outer"]
+                    ).get().end.instances.add(relation)
+                else:
+                    concept_to_space_concept.instances.add(relation)
+            except MissingStructureError:
+                pass
         self.loggers["structure"].log(start)
         self.loggers["structure"].log(end)
         return relation

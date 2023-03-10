@@ -41,6 +41,8 @@ def centroid_difference(a, b, return_nan: bool = False) -> float:
 
 def boolean_distance(a, b, return_nan: bool = False) -> float:
     # TODO: this is not fully general
+    if (len(a) == 0 or len(b) == 0) and a != b:
+        return math.inf
     if all([math.isnan(coord) for a_coords in a for coord in a_coords]):
         return 0.0
     if all([math.isnan(coord) for b_coords in b for coord in b_coords]):

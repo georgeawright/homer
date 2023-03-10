@@ -3,11 +3,15 @@ from abc import ABC
 from .bubble_chamber import BubbleChamber
 from .codelet_result import CodeletResult
 from .float_between_one_and_zero import FloatBetweenOneAndZero
+from .hyper_parameters import HyperParameters
 from .structure_collections import StructureSet
 
 
 class Codelet(ABC):
     """A unit of work to be carried out in the bubble chamber."""
+
+    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
+    MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
     def __init__(
         self,

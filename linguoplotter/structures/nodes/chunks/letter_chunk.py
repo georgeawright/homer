@@ -3,6 +3,7 @@ from math import prod
 import re
 from typing import List, Union
 
+from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.structure_collections import StructureSet
@@ -25,6 +26,7 @@ class LetterChunk(Chunk):
         links_in: StructureSet,
         links_out: StructureSet,
         parent_spaces: StructureSet,
+        instances: StructureSet,
         super_chunks: StructureSet,
         sub_chunks: StructureSet,
         champion_labels: StructureSet,
@@ -42,6 +44,7 @@ class LetterChunk(Chunk):
             links_in=links_in,
             links_out=links_out,
             parent_spaces=parent_spaces,
+            instances=instances,
             super_chunks=super_chunks,
             sub_chunks=sub_chunks,
             abstract_chunk=abstract_chunk,
@@ -94,6 +97,45 @@ class LetterChunk(Chunk):
     @property
     def concepts(self):
         return self.relatives.where(is_concept=True)
+
+    @property
+    def most_super_chunk(self) -> LetterChunk:
+        if self.super_chunks.is_empty:
+            raise MissingStructureError
+        try:
+            return self.super_chunks.get().most_super_chunk
+        except MissingStructureError:
+            return self.super_chunks.get()
+
+    @property
+    def left_neighbour(self):
+        super_chunk = self.super_chunks.get()
+        if self in super_chunk.right_branch:
+            return super_chunk.left_branch.get().rightmost_child
+        if self in super_chunk.left_branch:
+            return super_chunk.left_neighbour
+
+    @property
+    def right_neighbour(self):
+        super_chunk = self.super_chunks.get()
+        if self in super_chunk.left_branch:
+            return super_chunk.right_branch.get().leftmost_child
+        if self in super_chunk.right_branch:
+            return super_chunk.right_neighbour
+
+    @property
+    def leftmost_child(self):
+        if self.members.is_empty:
+            return self
+        return self.left_branch.get().leftmost_child
+
+    @property
+    def rightmost_child(self):
+        if self.members.is_empty:
+            return self
+        if self.right_branch.not_empty:
+            return self.right_branch.get().rightmost_child
+        return self.left_branch.get().rightmost_child
 
     def recalculate_unchunkedness(self):
         if self.is_abstract:
@@ -148,7 +190,7 @@ class LetterChunk(Chunk):
             )
             return bubble_chamber.new_letter_chunk(
                 parent_id=parent_id,
-                name=self.name,
+                name=chunk.name,
                 locations=locations,
                 members=members,
                 parent_space=location.space,

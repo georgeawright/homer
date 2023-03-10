@@ -47,18 +47,6 @@ class Linguoplotter:
         loggers["structure"].coderack = self.coderack
 
     def run(self):
-        self.bubble_chamber.concepts["same"].reverse = self.bubble_chamber.concepts[
-            "same"
-        ]
-        self.bubble_chamber.concepts[
-            "different"
-        ].reverse = self.bubble_chamber.concepts["different"]
-        self.bubble_chamber.concepts["less"].reverse = self.bubble_chamber.concepts[
-            "more"
-        ]
-        self.bubble_chamber.concepts["more"].reverse = self.bubble_chamber.concepts[
-            "less"
-        ]
         for _ in range(self.NUMBER_OF_START_CHUNK_SUGGESTERS):
             self.coderack.add_codelet(ChunkSuggester.make("", self.bubble_chamber, 1.0))
         while self.bubble_chamber.result is None:
@@ -66,7 +54,6 @@ class Linguoplotter:
                 if self.coderack.codelets_run % self.activation_update_frequency == 0:
                     if not HyperParameters.TESTING:
                         self.print_status_update()
-                    self.bubble_chamber.spread_activations()
                     self.bubble_chamber.update_activations()
                 if self.coderack.codelets_run >= self.CODELET_RUN_LIMIT:
                     raise NoMoreCodelets
@@ -114,7 +101,7 @@ class Linguoplotter:
             + f"recycle bin: {len(self.bubble_chamber.recycle_bin)}; "
             + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
         )
-        if self.bubble_chamber.worldview.views.not_empty:
+        if self.bubble_chamber.worldview.view is not None:
             view_output = self.bubble_chamber.worldview.output
             print(view_output)
         print("=" * 200)
@@ -127,11 +114,17 @@ class Linguoplotter:
         for chunk in main_input.contents.filter(
             lambda x: x.is_chunk and x.quality > 0.5 and x.is_fully_active()
         ):
-            print(chunk, chunk.quality, chunk.activation)
-            print(chunk.champion_labels)
-            print(chunk.champion_relations)
+            print(chunk)
+            print(
+                f"Quality: {chunk.quality}\n"
+                + f"Activation: {chunk.activation}\n"
+                + f"Unlabeledness: {chunk.unlabeledness}\n"
+                + f"Unrelatedness: {chunk.unrelatedness}\n"
+            )
+            print(", ".join([l.structure_id for l in chunk.champion_labels]))
             for label in chunk.labels:
                 print(label, label.quality, label.activation)
+            print(", ".join([r.structure_id for r in chunk.champion_relations]))
             for relation in chunk.relations:
                 print(relation, relation.quality, relation.activation)
             print()
@@ -155,3 +148,8 @@ class Linguoplotter:
                     if node.parent_space.is_main_input
                 ],
             )
+            if view.parent_frame.number_of_items_left_to_process == 0:
+                print(view.output)
+        for count in ID.COUNTS:
+            if "Frame" in count:
+                print(count, ID.COUNTS[count])

@@ -36,6 +36,14 @@ class RelationEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_relation = self.targets.get()
+        start_time = target_relation.start.location_in_space(
+            self.bubble_chamber.spaces["time"]
+        ).coordinates[0][0]
+        end_time = target_relation.end.location_in_space(
+            self.bubble_chamber.spaces["time"]
+        ).coordinates[0][0]
+        time_diff = abs(start_time - end_time)
+        times_are_adjacent = 1 if time_diff <= 24 else 0.0
         minimum_argument_quality = min(
             target_relation.start.quality, target_relation.end.quality
         )
@@ -49,11 +57,20 @@ class RelationEvaluator(Evaluator):
             relation: relation.parent_concept.classifier.classify(
                 space=relation.conceptual_space,
                 concept=relation.parent_concept,
-                start=relation.start,
-                end=relation.end,
+                start=relation.start
+                if not relation.start.is_slot
+                else relation.start.non_slot_value,
+                end=relation.end
+                if not relation.end.is_slot
+                else relation.end.non_slot_value,
             )
             * minimum_argument_quality
-            / relation.parent_concept.number_of_components
+            / (
+                1
+                if not relation.parent_concept.is_compound_concept
+                else relation.parent_concept.number_of_components - 1
+            )
+            * times_are_adjacent
             for relation in parallel_relations
         }
         sameness_classifications = {

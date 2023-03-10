@@ -1,3 +1,4 @@
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -37,22 +38,28 @@ class FocusSetter(Codelet):
     def run(self) -> CodeletResult:
         try:
             target_view = self.bubble_chamber.views.filter(
-                lambda x: x.unhappiness > 0
-                and x.members.filter(
-                    lambda x: x.parent_concept.name == "not(same)"
+                lambda v: (v.unhappiness > 0)
+                and v.members.filter(
+                    lambda c: c.parent_concept.name == "not(same)"
                 ).is_empty
             ).get(key=exigency)
+            self.bubble_chamber.focus.frame = target_view.parent_frame
             self.bubble_chamber.focus.view = target_view
+            self.bubble_chamber.loggers["activity"].log(
+                "Set focus\n"
+                + f"View: {target_view}\n"
+                + f"Frame: {self.bubble_chamber.focus.frame}"
+            )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(
-                f"Set focus: {target_view}"
-                + f"Exigency: {target_view.exigency}"
+                f"Exigency: {target_view.exigency}\n"
                 + f"Satisfaction: {self.bubble_chamber.focus.satisfaction}"
             )
             self._update_codelet_urgencies()
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
         except MissingStructureError:
+            self.bubble_chamber.loggers["activity"].log("No view and frame found.")
             self.result = CodeletResult.FIZZLE
             self._fizzle()
         return self.result

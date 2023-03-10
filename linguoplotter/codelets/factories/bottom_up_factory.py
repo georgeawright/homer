@@ -2,6 +2,7 @@ from linguoplotter.codelets import Factory
 
 
 class BottomUpFactory(Factory):
+    @property
     def follow_up_urgency(self):
         if self.bubble_chamber.focus.view is None:
             try:

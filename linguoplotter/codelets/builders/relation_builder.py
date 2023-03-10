@@ -9,16 +9,6 @@ from linguoplotter.tools import centroid_difference
 
 
 class RelationBuilder(Builder):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        targets: StructureDict,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.evaluators import RelationEvaluator
@@ -74,23 +64,34 @@ class RelationBuilder(Builder):
             end=self.targets["end"],
             locations=locations,
             parent_concept=self.targets["concept"],
+            parent_space=self.targets["start"].parent_space,
             conceptual_space=self.targets["space"],
             quality=0,
         )
         self._structure_concept.instances.add(relation)
         self.child_structures.add(relation)
         if self.targets["concept"].is_reversible:
-            mirror_relation = self.bubble_chamber.new_relation(
-                parent_id=self.codelet_id,
-                start=self.targets["end"],
-                end=self.targets["start"],
-                locations=locations,
-                parent_concept=self.targets["concept"].reverse,
-                conceptual_space=self.targets["space"],
-                quality=0,
-            )
-            self._structure_concept.instances.add(mirror_relation)
-            self.child_structures.add(mirror_relation)
+            if (
+                self.targets["start"]
+                .relations.where(
+                    start=self.targets["end"],
+                    parent_concept=self.targets["concept"].reverse,
+                    conceptual_space=self.targets["space"],
+                )
+                .is_empty
+            ):
+                mirror_relation = self.bubble_chamber.new_relation(
+                    parent_id=self.codelet_id,
+                    start=self.targets["end"],
+                    end=self.targets["start"],
+                    locations=locations,
+                    parent_concept=self.targets["concept"].reverse,
+                    parent_space=self.targets["start"].parent_space,
+                    conceptual_space=self.targets["space"],
+                    quality=0,
+                )
+                self._structure_concept.instances.add(mirror_relation)
+                self.child_structures.add(mirror_relation)
         self._structure_concept.recalculate_exigency()
 
     def _fizzle(self):

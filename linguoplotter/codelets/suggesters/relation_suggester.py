@@ -9,21 +9,10 @@ from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structure_collection_keys import relating_exigency
 from linguoplotter.structures.links import Relation
 from linguoplotter.structures.nodes import Concept
+from linguoplotter.structures.spaces import ConceptualSpace
 
 
 class RelationSuggester(Suggester):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        targets: StructureDict,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        Suggester.__init__(
-            self, codelet_id, parent_id, bubble_chamber, targets, urgency
-        )
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.builders import RelationBuilder
@@ -63,21 +52,23 @@ class RelationSuggester(Suggester):
         parent_id: str,
         bubble_chamber: BubbleChamber,
         parent_concept: Concept,
+        conceptual_space: ConceptualSpace = None,
         urgency: FloatBetweenOneAndZero = None,
     ):
         input_space = bubble_chamber.input_spaces.get()
-        target_space = input_space.conceptual_spaces.filter(
-            lambda x: (
-                x.no_of_dimensions == 1
-                if parent_concept.parent_space.name == "more-less"
-                else True
-            )
-            and (
-                x in input_space.conceptual_spaces
-                if parent_concept.parent_space.name == "same-different"
-                else True
-            )
-        ).get()
+        if conceptual_space is None:
+            conceptual_space = input_space.conceptual_spaces.filter(
+                lambda x: (
+                    x.no_of_dimensions == 1
+                    if parent_concept.parent_space.name == "more-less"
+                    else True
+                )
+                and (
+                    x in input_space.conceptual_spaces
+                    if parent_concept.parent_space.name == "same-different"
+                    else True
+                )
+            ).get()
         potential_targets = input_space.contents.filter(
             lambda x: x.is_node and x.is_slot and x.quality > 0
         )
@@ -88,7 +79,7 @@ class RelationSuggester(Suggester):
             start, end = bubble_chamber.random_machine.select(
                 possible_pairs,
                 key=lambda x: parent_concept.classifier.classify(
-                    start=x[0], end=x[1], space=target_space
+                    start=x[0], end=x[1], space=conceptual_space
                 ),
             )
 
@@ -103,7 +94,7 @@ class RelationSuggester(Suggester):
             {
                 "start": start,
                 "end": end,
-                "space": target_space,
+                "space": conceptual_space,
                 "concept": parent_concept,
             },
             name="targets",
@@ -131,13 +122,7 @@ class RelationSuggester(Suggester):
             )
             if classification < self.bubble_chamber.random_machine.generate_number():
                 return False
-            if self.targets["end"] is None:
-                try:
-                    self.targets["end"] = self.targets["start"].get_potential_relative(
-                        space=self.targets["space"], concept=self.targets["concept"]
-                    )
-                except MissingStructureError:
-                    return False
+            return True
         if self.targets["concept"] is None:
             possible_concepts = self.bubble_chamber.concepts.where(
                 structure_type=Relation, is_slot=False
@@ -184,7 +169,8 @@ class RelationSuggester(Suggester):
                 end=x["end"],
                 concept=x["concept"],
                 space=x["space"],
-            ),
+            )
+            / x["concept"].number_of_components,
         )
         self.targets["concept"], self.targets["end"], self.targets["space"] = (
             targets["concept"],
@@ -194,29 +180,54 @@ class RelationSuggester(Suggester):
         return True
 
     def _calculate_confidence(self):
-        if all(
-            [
-                self.targets["space"] == self.bubble_chamber.spaces["time"],
-                self.targets["concept"]
-                not in [
-                    self.bubble_chamber.concepts["less"],
-                    self.bubble_chamber.concepts["same"],
-                ],
-            ]
-        ):
-            self.confidence = 0.0
-            return
+        start = (
+            self.targets["start"]
+            if not self.targets["start"].is_slot
+            else self.targets["start"].non_slot_value
+        )
+        end = (
+            self.targets["end"]
+            if not self.targets["end"].is_slot
+            else self.targets["end"].non_slot_value
+        )
+        start_time = end.location_in_space(
+            self.bubble_chamber.spaces["time"]
+        ).coordinates[0][0]
+        end_time = start.location_in_space(
+            self.bubble_chamber.spaces["time"]
+        ).coordinates[0][0]
+        time_diff = abs(start_time - end_time)
+        times_are_adjacent = 1 if time_diff <= 24 else 0.0
+        sameness_relations = self.targets["start"].relations.filter(
+            lambda x: x.parent_concept == self.bubble_chamber.concepts["same"]
+            and self.targets["end"] in x.arguments
+        )
+        pair_sameness = (
+            0
+            if sameness_relations.is_empty
+            else max([relation.quality for relation in sameness_relations])
+        )
         classification = self.targets["concept"].classifier.classify(
             concept=self.targets["concept"],
             space=self.targets["space"],
-            start=self.targets["start"],
-            end=self.targets["end"],
+            start=start,
+            end=end,
         )
         self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
         self.confidence = (
             classification
-            * min(self.targets["start"].quality, self.targets["end"].quality)
-            / self.targets["concept"].number_of_components
+            * min(start.quality, end.quality)
+            / (
+                1
+                if not self.targets["concept"].is_compound_concept
+                else self.targets["concept"].number_of_components - 1
+            )
+            * times_are_adjacent
+            * (
+                pair_sameness
+                if self.targets["concept"] != self.bubble_chamber.concepts["same"]
+                else 1
+            )
         )
 
     def _fizzle(self):
@@ -252,9 +263,16 @@ class RelationSuggester(Suggester):
             for start, end in possible_target_pairs
             for space in possible_spaces
             for concept in possible_concepts
-            if start.relations.where(
-                end=end, parent_concept=concept, conceptual_space=space
+            if start.relations.filter(
+                lambda x: x.end == end
+                and x.parent_concept == concept
+                and x.conceptual_space == space
+                and x.activation > 0
             ).is_empty
+            and (start == self.targets["start"] or concept == self.targets["concept"])
+            # top down relation suggesters are spawned either:
+            # because an active concept is being searched for hence the concept should be kept the same
+            # or because a frame's slot needs to be filled hence the arguments shoudld be kept the same
         ]
         try:
             targets = self.bubble_chamber.random_machine.select(
@@ -267,7 +285,7 @@ class RelationSuggester(Suggester):
                 ),
             )
             self.child_codelets.append(
-                RelationSuggester.spawn(
+                type(self).spawn(
                     self.codelet_id,
                     self.bubble_chamber,
                     targets,

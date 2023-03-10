@@ -47,7 +47,7 @@
 (define increase-sentence-output
   (def-contextual-space :name "s-[in/de]crease.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet
-			grammar-space location-space time-space conceptual-space)))
+			grammar-space verb-space location-space time-space conceptual-space)))
 (define increase-sentence
   (def-frame :name "s-[in/de]crease" :parent_concept sentence-concept :parent_frame None
     :depth 6
@@ -78,6 +78,14 @@
 		     (Location (list) location-sub-frame-input)
 		     (Location (list) increase-sentence-input))
     :parent_space location-sub-frame-input))
+
+(setattr increase-sentence "early_chunk" early-chunk)
+(setattr increase-sentence "late_chunk" late-chunk)
+(setattr time-sub-frame "early_chunk" early-chunk)
+(setattr time-sub-frame "late_chunk" late-chunk)
+(setattr location-sub-frame "early_chunk" early-chunk)
+(setattr location-sub-frame "late_chunk" late-chunk)
+
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
     :quality 1.0
@@ -200,10 +208,8 @@
 		     (Location (list) increase-sentence-output))))
 
 (def-relation :start pp-inessive-location-concept :end increase-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start pp-directional-time-concept :end increase-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start more-temperature-concept :end increase-sentence
-  :is_bidirectional True :stable_activation 0.4)
-(def-relation :start less-temperature-concept :end increase-sentence
   :is_bidirectional True :stable_activation 0.4)

@@ -18,6 +18,8 @@ class LetterChunkProjectionSelector(ProjectionSelector):
         try:
             letter_chunk = self.winners.where(is_letter_chunk=True).get()
             correspondence = self.winners.where(is_correspondence=True).get()
+            view = correspondence.parent_view
+            frame = view.frames.filter(lambda x: letter_chunk in x.items).get()
             frame_space = correspondence.start.parent_space
             new_target = (
                 frame_space.contents.where(is_chunk=True)
@@ -25,7 +27,7 @@ class LetterChunkProjectionSelector(ProjectionSelector):
                 .get(key=uncorrespondedness)
             )
             targets = self.bubble_chamber.new_dict(
-                {"view": correspondence.parent_view, "projectee": new_target},
+                {"view": view, "frame": frame, "projectee": new_target},
                 name="targets",
             )
             self.child_codelets.append(

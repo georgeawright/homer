@@ -53,15 +53,12 @@ class Factory(Codelet):
                     self.codelet_id,
                     self.bubble_chamber,
                     self.coderack,
-                    self.follow_up_urgency(),
+                    self.follow_up_urgency,
                 )
             )
         return self.result
 
     def _engender_follow_up(self):
-        raise NotImplementedError
-
-    def follow_up_urgency(self):
         raise NotImplementedError
 
     def _get_codelet_type_from_concepts(
@@ -74,16 +71,15 @@ class Factory(Codelet):
             RelationSuggester,
             ViewSuggester,
         )
+        from linguoplotter.codelets.suggesters.label_suggesters import (
+            InterspatialLabelSuggester,
+        )
+        from linguoplotter.codelets.suggesters.relation_suggesters import (
+            InterspatialRelationSuggester,
+        )
         from linguoplotter.codelets.suggesters.correspondence_suggesters import (
             SpaceToFrameCorrespondenceSuggester,
             PotentialSubFrameToFrameCorrespondenceSuggester,
-            SubFrameToFrameCorrespondenceSuggester,
-        )
-        from linguoplotter.codelets.suggesters.projection_suggesters import (
-            ChunkProjectionSuggester,
-            LabelProjectionSuggester,
-            RelationProjectionSuggester,
-            LetterChunkProjectionSuggester,
         )
         from linguoplotter.codelets.evaluators import (
             ChunkEvaluator,
@@ -112,11 +108,9 @@ class Factory(Codelet):
                 },
                 "outer": {
                     "forward": {
-                        "chunk": ChunkProjectionSuggester,
                         "correspondence": PotentialSubFrameToFrameCorrespondenceSuggester,
-                        "label": LabelProjectionSuggester,
-                        "relation": RelationProjectionSuggester,
-                        "letter-chunk": LetterChunkProjectionSuggester,
+                        "label": InterspatialLabelSuggester,
+                        "relation": InterspatialRelationSuggester,
                     },
                 },
             },

@@ -58,7 +58,7 @@
 (define be-sentence-output
   (def-contextual-space :name "s-be.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet
-			grammar-space location-space time-space conceptual-space)))
+			grammar-space verb-space location-space time-space conceptual-space)))
 (define be-sentence
   (def-frame :name "s-be" :parent_concept sentence-concept :parent_frame None
     :depth 6
@@ -75,6 +75,12 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) be-sentence-input))
     :parent_space be-sentence-input))
+(define early-chunk-least-time-label
+  (def-label :start early-chunk :parent_concept least-concept
+    :locations (list (Location (list (list Nan)) time-space)
+		     (Location (list) be-sentence-input))
+    :is_interspatial True
+    :quality 1.0 :activation 1.0))
 (define early-chunk-conceptual-label
   (def-label :start early-chunk :parent_concept conceptual-label-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
@@ -89,12 +95,19 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) be-sentence-input))
     :parent_space be-sentence-input))
+(define late-chunk-most-time-label
+  (def-label :start late-chunk :parent_concept most-concept
+    :locations (list (Location (list (list Nan)) time-space)
+		     (Location (list) be-sentence-input))
+    :is_interspatial True
+    :quality 1.0 :activation 1.0))
 (define late-chunk-location-label
   (def-label :start late-chunk :parent_concept location-concept
     :locations (list (Location (list (list Nan Nan)) location-space)
 		     (Location (list) location-sub-frame-input)
 		     (Location (list) be-sentence-input))
     :parent_space location-sub-frame-input))
+
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
     :quality 1.0
@@ -231,12 +244,12 @@
 		     (Location (list) be-sentence-output))))
 
 (def-relation :start ap-concept :end be-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)
 (def-relation :start pp-inessive-location-concept :end be-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)
 (def-relation :start pp-directional-time-concept :end be-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)
 (def-relation :start same-location-concept :end be-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)
 (def-relation :start same-temperature-concept :end be-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)

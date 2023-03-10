@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import List
 
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
@@ -33,6 +32,7 @@ class Relation(Link):
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         is_stable: bool = False,
+        is_interspatial: bool = False,
     ):
         Link.__init__(
             self,
@@ -53,6 +53,7 @@ class Relation(Link):
         self._parent_space = parent_space
         self.conceptual_space = conceptual_space
         self.is_relation = True
+        self.is_interspatial = is_interspatial
         self.is_bidirectional = is_bidirectional
         self.is_excitatory = is_excitatory
         self.is_stable = is_stable
@@ -132,6 +133,8 @@ class Relation(Link):
             locations=new_locations,
             quality=self.quality,
             parent_space=self.parent_space,
+            is_interspatial=self.is_interspatial,
+            activation=self.activation,
         )
 
     def nearby(self, space: Space = None) -> StructureSet:
@@ -143,25 +146,6 @@ class Relation(Link):
             .filter(lambda x: x.parent_spaces == self.parent_spaces)
             .excluding(self)
         )
-
-    def spread_activation(self):
-        if (
-            not self.is_fully_active()
-            or self.parent_space is None
-            or self.parent_space.is_conceptual_space
-            or not self.parent_space.is_main_input
-        ):
-            return
-        self.parent_concept.boost_activation(self.quality)
-        try:
-            self.parent_concept.relations.where(
-                parent_concept=self.conceptual_space.parent_concept
-            ).get().end.boost_activation(self.quality)
-        except MissingStructureError:
-            # TODO: this is for spreading activation to MORE-TEMPERATURE concept etc
-            # that might be irrelevant if that becomes a compound concept
-            # possibly replace with more generic more-less-temperature concept?
-            pass
 
     def __repr__(self) -> str:
         concept = "none" if self.parent_concept is None else self.parent_concept.name

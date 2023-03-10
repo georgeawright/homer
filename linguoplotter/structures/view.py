@@ -1,5 +1,4 @@
 from __future__ import annotations
-import statistics
 from typing import List
 
 from linguoplotter import fuzzy
@@ -18,7 +17,6 @@ from linguoplotter.structures.spaces import ContextualSpace
 class View(Structure):
     """A collection of spaces and self-consistent correspondences between them."""
 
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
     CORRESPONDENCE_WEIGHT = HyperParameters.VIEW_QUALITY_CORRESPONDENCE_WEIGHT
     INPUT_WEIGHT = HyperParameters.VIEW_QUALITY_INPUT_WEIGHT
 
@@ -38,6 +36,7 @@ class View(Structure):
         parent_spaces: StructureSet,
         sub_views: StructureSet,
         super_views: StructureSet,
+        cohesion_views: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
     ):
@@ -61,6 +60,7 @@ class View(Structure):
         self.members = members
         self.sub_views = sub_views
         self.super_views = super_views
+        self.cohesion_views = cohesion_views
         self._node_groups = []
         self._grouped_nodes = {}
         self.matched_sub_frames = {}
@@ -76,6 +76,7 @@ class View(Structure):
             "parent_frame_name": self.parent_frame.name,
             "frames": [frame.structure_id for frame in self.frames],
             "super_views": [view.structure_id for view in self.super_views],
+            "cohesion_views": [view.structure_id for view in self.cohesion_views],
             "sub_views": [view.structure_id for view in self.sub_views],
             "input_spaces": [space.structure_id for space in self.input_spaces],
             "output_space": self.output_space.structure_id,
@@ -119,13 +120,21 @@ class View(Structure):
             lambda x: x.parent_concept.name == "input"
         ).get()
 
-    # TODO: this should be a property
+    @property
     def raw_input_nodes(self):
         return StructureSet.union(
             *[
-                node.raw_members
-                for node in self.grouped_nodes
-                if node.parent_space in self.input_spaces
+                chunk.raw_members
+                for chunk in StructureSet.union(
+                    *[
+                        c.arguments
+                        for c in self.members.filter(lambda x: x.start.is_chunk)
+                    ]
+                    + [
+                        c.start.arguments
+                        for c in self.members.filter(lambda x: x.start.is_link)
+                    ]
+                ).filter(lambda x: x.parent_space.is_main_input)
             ]
         )
 
@@ -142,6 +151,12 @@ class View(Structure):
         return self.parent_frame.output_space.contents.filter(
             lambda x: x.is_slot
             and len(x.parent_spaces.where(is_contextual_space=True)) > 1
+        )
+
+    @property
+    def all_sub_views(self) -> StructureSet:
+        return StructureSet.union(
+            *[self.sub_views] + [sub_view.all_sub_views for sub_view in self.sub_views]
         )
 
     @property
@@ -169,38 +184,24 @@ class View(Structure):
         return self.activation < self.FLOATING_POINT_TOLERANCE
 
     @property
+    def unfilled_interspatial_structures(self):
+        return self.parent_frame.unfilled_interspatial_structures
+
+    @property
     def unfilled_sub_frame_input_structures(self):
-        return self.parent_frame.input_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and not x.is_chunk
-            and (
-                len(x.correspondences.where(end=x))
-                < len(x.parent_spaces.where(is_contextual_space=True)) - 1
-            )
-        )
+        return self.parent_frame.unfilled_sub_frame_input_structures
 
     @property
     def unfilled_input_structures(self):
-        return self.parent_frame.input_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and not x.is_chunk
-            and x.correspondences.where(end=x).is_empty
-        )
+        return self.parent_frame.unfilled_input_structures
 
     @property
     def unfilled_output_structures(self):
-        return self.parent_frame.output_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and x.parent_space != self.parent_frame.output_space
-            and x.correspondences.where(end=x).is_empty
-        )
+        return self.parent_frame.unfilled_output_structures
 
     @property
     def unfilled_projectable_structures(self):
-        return self.parent_frame.output_space.contents.filter(
-            lambda x: not x.is_correspondence
-            and x.correspondences_to_space(self.output_space).is_empty
-        )
+        return self.parent_frame.unfilled_projectable_structures
 
     @property
     def grouped_nodes(self):
@@ -216,18 +217,27 @@ class View(Structure):
 
     @property
     def output(self):
-        return (
-            self.output_space.contents.filter(
-                lambda x: x.is_letter_chunk and x.super_chunks.is_empty
-            )
-            .get()
-            .name
+        return ". ".join(
+            [
+                chunk.name
+                for chunk in self.output_space.contents.filter(
+                    lambda x: x.is_letter_chunk
+                    and x.name is not None
+                    and (
+                        x.super_chunks.is_empty
+                        or (
+                            x.super_chunks.not_empty and x.most_super_chunk.name is None
+                        )
+                    )
+                )
+            ]
         )
 
     @property
     def number_of_items_left_to_process(self):
         return sum(
             [
+                len(self.unfilled_interspatial_structures),
                 len(self.unfilled_sub_frame_input_structures),
                 len(self.unfilled_input_structures),
                 len(self.unfilled_output_structures),
@@ -236,7 +246,7 @@ class View(Structure):
         )
 
     def recalculate_unhappiness(self):
-        self.unhappiness = 1 - 0.5 ** self.number_of_items_left_to_process
+        self.unhappiness = 1 - 0.5 ** self.parent_frame.number_of_items_left_to_process
 
     def recalculate_exigency(self):
         self.recalculate_unhappiness()
@@ -249,24 +259,37 @@ class View(Structure):
                 and member.parent_concept.root.name == "not"
             ):
                 return 0.0
-        total_slots = len(self.members) + self.number_of_items_left_to_process
+        total_slots = (
+            len(self.members.where(parent_view=self))
+            + self.number_of_items_left_to_process
+        )
         correspondence_quality = (
-            sum(correspondence.quality for correspondence in self.members) / total_slots
+            sum(
+                correspondence.quality
+                for correspondence in self.members.where(parent_view=self)
+            )
+            / total_slots
         )
         try:
             input_quality = min(
                 correspondence.start.quality
+                * correspondence.end.parent_concept.number_of_components
+                if correspondence.end.is_link
+                else correspondence.start.quality
                 for correspondence in self.members
-                if correspondence.start.parent_space.is_main_input
+                if correspondence.start.parent_space is not None
+                and correspondence.start.parent_space.is_main_input
             )
         except ValueError:
             input_quality = 0
-        return sum(
-            [
-                self.CORRESPONDENCE_WEIGHT * correspondence_quality,
-                self.INPUT_WEIGHT * input_quality,
-            ]
-        )
+        return fuzzy.AND(correspondence_quality, input_quality)
+
+    #        return sum(
+    #            [
+    #                self.CORRESPONDENCE_WEIGHT * correspondence_quality,
+    #                self.INPUT_WEIGHT * input_quality,
+    #            ]
+    #        )
 
     def is_equivalent_to(self, other: View):
         try:
@@ -274,13 +297,39 @@ class View(Structure):
         except MissingStructureError:
             return False
 
-    def input_overlap_with(self, other: View):
-        shared_raw_nodes = StructureSet.intersection(
-            self.raw_input_nodes, other.raw_input_nodes
+    def cohesiveness_with(self, other: View) -> FloatBetweenOneAndZero:
+        spaces = (
+            [self.output_space, other.output_space]
+            + [frame.input_space for frame in self.frames]
+            + [frame.input_space for frame in other.frames]
         )
-        proportion_in_self = len(shared_raw_nodes) / len(self.raw_input_nodes)
-        proportion_in_other = len(shared_raw_nodes) / len(other.raw_input_nodes)
-        return statistics.fmean([proportion_in_self, proportion_in_other])
+        words = StructureSet.union(
+            self.output_space.contents.filter(
+                lambda x: x.is_letter_chunk and x.members.is_empty
+            ),
+            other.output_space.contents.filter(
+                lambda x: x.is_letter_chunk and x.members.is_empty
+            ),
+        )
+        chunks = StructureSet.union(
+            *[
+                frame.input_space.contents.filter(lambda x: x.is_chunk)
+                for frame in StructureSet.union(self.frames, other.frames)
+            ]
+        )
+        relations = StructureSet.union(
+            *[word.relations for word in words] + [chunk.relations for chunk in chunks]
+        ).filter(
+            lambda x: x.is_interspatial
+            and x.start.parent_space in spaces
+            and x.end.parent_space in spaces
+        )
+        try:
+            return FloatBetweenOneAndZero(
+                sum([r.quality for r in relations]) / (len(words) * 0.5)
+            )
+        except ZeroDivisionError:
+            return 0.0
 
     def specify_space(self, abstract_space, conceptual_space):
         if (
@@ -292,25 +341,6 @@ class View(Structure):
             self.conceptual_spaces_map.pop(abstract_space)
         for frame in self.frames:
             frame.specify_space(abstract_space, conceptual_space)
-
-    def nearby(self, space: Space = None) -> StructureSet:
-        space = space if space is not None else self.location.space
-        return (
-            space.contents.where(is_view=True)
-            .filter(lambda x: self.input_overlap_with(x) > 0.5)
-            .excluding(self)
-        )
-
-    def decay_activation(self, amount: float = None):
-        if amount is None:
-            amount = self.MINIMUM_ACTIVATION_UPDATE
-        self._activation_buffer -= self._activation_update_coefficient * amount
-        for member in self.members:
-            member.decay_activation(amount)
-        self.output_space.decay_activation(amount)
-
-    def copy(self, **kwargs: dict):
-        raise NotImplementedError
 
     def add(self, correspondence: "Correspondence"):
         self.members.add(correspondence)
@@ -324,6 +354,10 @@ class View(Structure):
                     node_group[node_pair[1].parent_space] = node_pair[1]
                     self._grouped_nodes[node_pair[0]] = True
                     self._grouped_nodes[node_pair[1]] = True
+                    for space in node_group:
+                        if space.is_main_input:
+                            for _, node in node_group.items():
+                                node._non_slot_value = node_group[space]
             if (
                 node_pair[0] not in self._grouped_nodes
                 or node_pair[1] not in self._grouped_nodes
@@ -336,12 +370,20 @@ class View(Structure):
                 )
                 self._grouped_nodes[node_pair[0]] = True
                 self._grouped_nodes[node_pair[1]] = True
-        if self.super_views.not_empty:
-            self.super_views.get().add(correspondence)
+                if node_pair[0].parent_space.is_main_input:
+                    node_pair[1]._non_slot_value = node_pair[0]
+        for super_view in self.super_views:
+            super_view.add(correspondence)
 
     def remove(self, correspondence: "Correspondence"):
         self.members.remove(correspondence)
-        if correspondence.end.is_link and correspondence.end.parent_concept.is_slot:
+        for node_pair in correspondence.node_pairs:
+            node_pair[1]._non_slot_value = None
+        if (
+            correspondence.parent_view == self
+            and correspondence.end.is_link
+            and correspondence.end.parent_concept.is_slot
+        ):
             if not any(
                 [
                     item.is_link
@@ -353,7 +395,10 @@ class View(Structure):
                 ]
             ):
                 correspondence.end.parent_concept._non_slot_value = None
-        if correspondence.conceptual_space is not None:
+        if (
+            correspondence.parent_view == self
+            and correspondence.conceptual_space is not None
+        ):
             if not any(
                 [
                     c.conceptual_space == correspondence.conceptual_space
@@ -392,8 +437,9 @@ class View(Structure):
         self._node_groups = []
         for member in self.members:
             self.add(member)
-        if self.super_views.not_empty:
-            self.super_views.get().remove(correspondence)
+        for super_view in self.super_views:
+            super_view.remove(correspondence)
+        self.recalculate_exigency()
 
     def has_member(
         self,
@@ -416,8 +462,27 @@ class View(Structure):
         start: Structure,
         end: Structure,
         sub_view: View = None,
+        verbose=False,
     ) -> bool:
         if self.has_member(parent_concept, conceptual_space, start, end):
+            if verbose:
+                print("1")
+            return False
+        if (
+            end.is_link
+            and end.is_interspatial
+            and end.correspondences.where(end=end).not_empty
+        ):
+            if verbose:
+                print("1.1")
+            return False
+        if (
+            start.is_link
+            and start.is_interspatial
+            and start.correspondences.filter(lambda x: x in self.members).not_empty
+        ):
+            if verbose:
+                print("1.2")
             return False
         if (
             start.is_link
@@ -444,11 +509,15 @@ class View(Structure):
                         if not start_concept.has_relation_with(
                             relative_concept, relation_concept
                         ):
+                            if verbose:
+                                print("2")
                             return False
                     if not relative.is_slot:
                         if not start_concept.has_relation_with(
                             end_concept, relation_concept
                         ):
+                            if verbose:
+                                print("3")
                             return False
             different_concepts = end_concept.relatives.filter(
                 lambda x: not x.relations_with(end_concept)
@@ -456,12 +525,16 @@ class View(Structure):
                 .is_empty
             )
             if start_concept in different_concepts:
+                if verbose:
+                    print("4")
                 return False
         if end.correspondences.filter(
             lambda x: x.end == end
             and x in self.members
             and x.start in start.parent_space.contents
         ).not_empty:
+            if verbose:
+                print("5")
             return False
         potential_node_groups = (
             [{start.parent_space: start, end.parent_space: end}]
@@ -495,36 +568,55 @@ class View(Structure):
                     ):
                         for space in sub_view_node_group:
                             potential_node_group[space] = sub_view_node_group[space]
-        for existing_node_group in self.node_groups:
-            for potential_group in potential_node_groups:
-                shared_spaces = [
-                    space for space in existing_node_group if space in potential_group
-                ]
-                if (
-                    len(shared_spaces) > 1
-                    and any(
-                        existing_node_group[space] == potential_group[space]
-                        for space in shared_spaces
-                    )
-                    and not all(
-                        existing_node_group[space] == potential_group[space]
-                        for space in shared_spaces
-                    )
-                ):
-                    return False
-        if self.super_views.is_empty:
-            return True
-        return self.super_views.get().can_accept_member(
-            parent_concept,
-            conceptual_space,
-            start,
-            end,
+        if not all(
+            [
+                node.links.where(is_interspatial=True).not_empty
+                for group in potential_node_groups
+                for node in group.values()
+            ]
+        ):
+            for existing_node_group in self.node_groups:
+                for potential_group in potential_node_groups:
+                    shared_spaces = [
+                        space
+                        for space in existing_node_group
+                        if space in potential_group
+                    ]
+                    if (
+                        len(shared_spaces) > 1
+                        and any(
+                            existing_node_group[space] == potential_group[space]
+                            for space in shared_spaces
+                        )
+                        and not all(
+                            existing_node_group[space] == potential_group[space]
+                            for space in shared_spaces
+                        )
+                    ):
+                        if verbose:
+                            print("6")
+                            print(existing_node_group)
+                            print(potential_group)
+                            print(shared_spaces)
+                        return False
+        if verbose:
+            print("super")
+        return all(
+            [
+                super_view.can_accept_member(
+                    parent_concept,
+                    conceptual_space,
+                    start,
+                    end,
+                )
+                for super_view in self.super_views
+            ]
         )
 
-    def spread_activation(self):
-        if self.is_fully_active():
-            self.parent_frame.parent_concept.boost_activation(self.quality)
-            self.parent_frame.progenitor.boost_activation(self.quality)
+    def recalculate_activation(self):
+        self._activation_buffer = FloatBetweenOneAndZero(
+            self.activation + self._activation_buffer
+        )
 
     def __repr__(self) -> str:
         inputs = ", ".join([space.structure_id for space in self.input_spaces])

@@ -4,13 +4,23 @@ from linguoplotter.codelets.evaluators import (
     ChunkEvaluator,
     LabelEvaluator,
     RelationEvaluator,
+    ViewEvaluator,
 )
-from linguoplotter.codelets.evaluators import ViewEvaluator
+from linguoplotter.codelets.evaluators.label_evaluators import (
+    InterspatialLabelEvaluator,
+)
+from linguoplotter.codelets.evaluators.relation_evaluators import (
+    InterspatialRelationEvaluator,
+)
 from linguoplotter.codelets.factories import BottomUpFactory
 from linguoplotter.errors import MissingStructureError
+from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.hyper_parameters import HyperParameters
 
 
 class BottomUpEvaluatorFactory(BottomUpFactory):
+    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
+
     def _engender_follow_up(self):
         views_per_frame_type_per_chunk = self._views_per_frame_type_per_chunk()
         relations_per_space_per_end_per_chunk = (
@@ -18,23 +28,37 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         )
         labels_per_space_per_chunk = self._labels_per_space_per_chunk()
         super_chunks_per_raw_chunk = self._super_chunks_per_raw_chunk()
+        cohesion_views_per_view = self._cohesion_views_per_view()
+        related_texts_per_letter_chunk = self._related_texts_per_letter_chunk()
+        labels_per_space_per_letter_chunk = self._labels_per_space_per_letter_chunk()
 
         self.bubble_chamber.loggers["activity"].log(
             f"Views per frame type per chunk: {views_per_frame_type_per_chunk}\n"
             + f"Relations per space per end per chunk: {relations_per_space_per_end_per_chunk}\n"
             + f"Labels per space per chunk: {labels_per_space_per_chunk}\n"
-            + f"Super chunks per raw chunk: {super_chunks_per_raw_chunk}",
+            + f"Super chunks per raw chunk: {super_chunks_per_raw_chunk}\n"
+            + f"Secondary frames per view: {cohesion_views_per_view}\n"
+            + f"Related texts per letter chunk: {related_texts_per_letter_chunk}\n"
+            + f"Labels per space per letter chunk: {labels_per_space_per_letter_chunk}",
         )
 
+        class_urgencies = [
+            (ChunkEvaluator, super_chunks_per_raw_chunk),
+            (LabelEvaluator, labels_per_space_per_chunk),
+            (RelationEvaluator, relations_per_space_per_end_per_chunk),
+            (ViewEvaluator, views_per_frame_type_per_chunk),
+            (ViewEvaluator, cohesion_views_per_view),
+            (InterspatialRelationEvaluator, related_texts_per_letter_chunk),
+            (InterspatialLabelEvaluator, labels_per_space_per_letter_chunk),
+        ]
+
         follow_up_class = self.bubble_chamber.random_machine.select(
-            [
-                (ChunkEvaluator, super_chunks_per_raw_chunk),
-                (LabelEvaluator, labels_per_space_per_chunk),
-                (RelationEvaluator, relations_per_space_per_end_per_chunk),
-                (ViewEvaluator, views_per_frame_type_per_chunk),
-            ],
-            key=lambda x: x[1],
+            class_urgencies, key=lambda x: x[1]
         )[0]
+
+        self.most_urgent_class_urgency = FloatBetweenOneAndZero(
+            max(x[1] for x in class_urgencies)
+        )
 
         self.child_codelets.append(
             follow_up_class.make(self.codelet_id, self.bubble_chamber)
@@ -101,3 +125,75 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         except MissingStructureError:
             return 0
         return len(views) / len(view_types) / len(non_raw_chunks)
+
+    def _cohesion_views_per_view(self):
+        try:
+            view = self.bubble_chamber.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+            ).get()
+            return len(view.cohesion_views)
+        except MissingStructureError:
+            return 0
+
+    def _related_texts_per_letter_chunk(self):
+        try:
+            views = self.bubble_chamber.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+            ).sample(2)
+            view = views.get()
+            letter_chunks = view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and x.members.is_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            )
+            return statistics.fmean(
+                [
+                    (
+                        len(chunk.relations.where(is_interspatial=True))
+                        / len([relative.parent_space for relative in chunk.relatives])
+                    )
+                    if chunk.relations.not_empty
+                    else 0
+                    for chunk in letter_chunks
+                ]
+            )
+        except MissingStructureError:
+            return 0
+
+    def _labels_per_space_per_letter_chunk(self):
+        try:
+            view = self.bubble_chamber.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+            ).get()
+            letter_chunks = view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and x.members.is_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            )
+            return statistics.fmean(
+                [
+                    len(chunk.labels.where(is_interspatial=True))
+                    / len(chunk.parent_spaces.where(is_conceptual_space=True))
+                    for chunk in letter_chunks
+                ]
+            )
+        except MissingStructureError:
+            return 0

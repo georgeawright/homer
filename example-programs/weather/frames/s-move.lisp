@@ -1,6 +1,6 @@
 (define move-word
   (def-letter-chunk :name "move" :parent_space grammar-space
-    :locations (list vb-location)))
+    :locations (list vb-location move-location)))
 
 (define space-parent-concept
   (def-concept :name "" :is_slot True))
@@ -60,7 +60,7 @@
 (define move-sentence-output
   (def-contextual-space :name "s-move.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet
-			grammar-space location-space time-space conceptual-space)))
+			grammar-space verb-space location-space time-space conceptual-space)))
 (define move-sentence
   (def-frame :name "s-move" :parent_concept sentence-concept :parent_frame None
     :depth 6
@@ -93,6 +93,16 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) move-sentence-input))
     :parent_space move-sentence-input))
+
+(setattr move-sentence "early_chunk" early-chunk)
+(setattr move-sentence "late_chunk" late-chunk)
+(setattr ap-sub-frame "early_chunk" early-chunk)
+(setattr ap-sub-frame "late_chunk" early-chunk)
+(setattr time-sub-frame "early_chunk" early-chunk)
+(setattr time-sub-frame "late_chunk" late-chunk)
+(setattr location-sub-frame "early_chunk" early-chunk)
+(setattr location-sub-frame "late_chunk" late-chunk)
+
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
     :quality 1.0
@@ -103,7 +113,7 @@
     :parent_space time-sub-frame-input
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start early-chunk :end late-chunk :parent_concept not-same-concept
+  (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
@@ -188,7 +198,7 @@
 		     (Location (list) move-sentence-output))))
 (define np-super-super-chunk
   (def-letter-chunk :name None
-    :locations (list np-location
+    :locations (list nsubj-location
 		     (Location (list) move-sentence-output))
     :parent_space move-sentence-output
     :left_branch (StructureSet sentence-word-1)
@@ -247,10 +257,10 @@
 		     (Location (list) move-sentence-output))))
 
 (def-relation :start pp-directional-location-concept :end move-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start pp-directional-time-concept :end move-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start ap-concept :end move-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)
 (def-relation :start same-temperature-concept :end move-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.2)

@@ -42,8 +42,12 @@ class CorrespondenceEvaluator(Evaluator):
             )
         )
         min_argument_quality = min(
-            start.quality if not start.is_slot else 1.0,
-            end.quality if not end.is_slot else 1.0,
+            start.quality
+            if not start.is_slot and not (start.is_link and start.start.is_slot)
+            else 1.0,
+            end.quality
+            if not end.is_slot and not (end.is_link and end.start.is_slot)
+            else 1.0,
         )
         self.confidence = argument_compatibility * min_argument_quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

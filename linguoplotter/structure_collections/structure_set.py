@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import List
 
-from linguoplotter.errors import MissingStructureError
 from linguoplotter.structure_collection import StructureCollection
 
 

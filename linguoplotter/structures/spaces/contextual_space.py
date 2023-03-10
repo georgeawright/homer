@@ -79,21 +79,6 @@ class ContextualSpace(Space):
             ]
         )
 
-    #        built_structures = self.contents.filter(
-    #            lambda x: (x.is_chunk and not x.is_raw) or x.is_label or x.is_relation
-    #        )
-    #        unused_raw_structures = self.contents.filter(
-    #            lambda x: x.is_chunk and x.is_raw and x.super_chunks.is_empty
-    #        )
-    #        if built_structures.is_empty:
-    #            return 0.0
-    #        return statistics.fmean(
-    #            [
-    #                fuzzy.AND(structure.quality, structure.activation)
-    #                for structure in built_structures
-    #            ]
-    #        ) / (len(unused_raw_structures) + 1)
-
     def add(self, structure: Structure):
         if structure not in self.contents:
             self.contents.add(structure)
@@ -115,19 +100,6 @@ class ContextualSpace(Space):
                         break
                     except KeyError:
                         pass
-
-    def decay_activation(self, amount: float = None):
-        if amount is None:
-            amount = self.MINIMUM_ACTIVATION_UPDATE
-        for item in self.contents:
-            item.decay_activation(amount)
-
-    def update_activation(self):
-        self._activation = (
-            statistics.median([item.activation for item in self.contents])
-            if len(self.contents) != 0
-            else 0.0
-        )
 
     def copy(self, **kwargs: dict) -> ContextualSpace:
         """Requires keyword arguments 'bubble_chamber' and 'parent_id'."""
@@ -174,7 +146,9 @@ class ContextualSpace(Space):
                 new_item.links_out.add(new_label)
                 new_space.add(new_label)
                 copies[label] = new_label
-            for relation in item.links_out.where(is_relation=True):
+            for relation in item.links_out.where(
+                is_relation=True, is_interspatial=False
+            ):
                 if relation.end not in copies:
                     continue
                 new_end = copies[relation.end]
@@ -188,7 +162,9 @@ class ContextualSpace(Space):
                 new_item.links_out.add(new_relation)
                 new_space.add(new_relation)
                 copies[relation] = new_relation
-            for relation in item.links_in.where(is_relation=True):
+            for relation in item.links_in.where(
+                is_relation=True, is_interspatial=False
+            ):
                 if relation.start not in copies:
                     continue
                 new_start = copies[relation.start]

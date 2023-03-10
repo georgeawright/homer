@@ -61,7 +61,7 @@
 		     (TwoPointLocation (list) (list) pp-from-to-locations-input))
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start early-chunk :end late-chunk :parent_concept not-same-concept
+  (def-relation :start early-chunk :end late-chunk :parent_concept different-concept
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
 		     (TwoPointLocation (list) (list) pp-from-to-locations-input))
@@ -162,12 +162,7 @@
     :locations (list pp-location
 		     (Location (list) pp-from-to-locations-output))))
 
-
-(def-relation :start location-concept :end pp-from-to-locations
-  :is_bidirectional True :stable_activation 0.5)
 (def-relation :start different-location-concept :end pp-from-to-locations
-  :is_bidirectional True :stable_activation 0.5)
-(def-relation :start more-time-concept :end pp-from-to-locations
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start less-time-concept :end pp-from-to-locations
   :is_bidirectional True :stable_activation 0.5)

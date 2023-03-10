@@ -6,7 +6,7 @@
     :distance_to_proximity_weight temperature-dist-to-prox-weight))
 (define temperature-space
   (def-conceptual-space :name "temperature" :parent_concept temperature-concept
-    :breadth 2 :no_of_dimensions 1 :is_basic_level True
+    :breadth 10 :no_of_dimensions 1 :is_basic_level True
     :dimensions (list) :sub_spaces (list extremeness-space)))
 (define hot-concept
   (def-concept :name "hot" :locations (list (Location (list (list 22)) temperature-space))
@@ -35,12 +35,12 @@
     :parent_space temperature-space :distance_function centroid_euclidean_distance
     :distance_to_proximity_weight temperature-dist-to-prox-weight))
 
-(def-relation :start hot-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start warm-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start extreme-concept :end more-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start cool-concept :end less-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start cold-concept :end less-concept :parent_concept more-concept :activation 1.0)
-(def-relation :start mild-concept :end less-concept :parent_concept more-concept :activation 1.0)
+(def-relation :start hot-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start warm-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start extreme-concept :end more-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start cool-concept :end less-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start cold-concept :end less-concept :parent_concept more-concept :quality 1.0)
+(def-relation :start mild-concept :end less-concept :parent_concept more-concept :quality 1.0)
 
 (def-correspondence :start hot-concept :end high-concept :parent_concept same-concept)
 (def-correspondence :start hot-concept :end good-concept :parent_concept same-concept)

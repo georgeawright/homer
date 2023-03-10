@@ -4,7 +4,7 @@ from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collections import StructureDict
+from linguoplotter.structure_collections import StructureDict, StructureSet
 
 
 class GarbageCollector(Codelet):
@@ -49,11 +49,21 @@ class GarbageCollector(Codelet):
             if not structure.is_recyclable:
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
-            if structure is self.bubble_chamber.focus.view:
+            if self.bubble_chamber.worldview.view is not None and (
+                structure in self.bubble_chamber.worldview.view.grouped_nodes
+                or structure in self.bubble_chamber.worldview.view.members
+            ):
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
-            if any(
-                [
+            if structure in (
+                self.bubble_chamber.focus.view,
+                self.bubble_chamber.focus.frame,
+            ):
+                continue
+            relevant_codelets = [
+                codelet
+                for codelet in self.coderack._codelets
+                if (
                     structure in codelet.targets.values()
                     or any(
                         [link in codelet.targets.values() for link in structure.links]
@@ -66,30 +76,39 @@ class GarbageCollector(Codelet):
                             or structure in codelet.targets["view"].sub_views
                         )
                     )
-                    for codelet in self.coderack._codelets
-                ]
-            ):
-                self.bubble_chamber.recycle_bin.remove(structure)
-                continue
-            if self.bubble_chamber.worldview.views.not_empty and (
-                any(
-                    structure in view.grouped_nodes
-                    for view in self.bubble_chamber.worldview.views
+                    or structure.is_view
+                    and any(
+                        [
+                            item in codelet.targets.values()
+                            for item in StructureSet.union(
+                                *[
+                                    sub_frame.input_space.contents
+                                    for sub_frame in structure.parent_frame.sub_frames
+                                ],
+                                *[
+                                    sub_frame.output_space.contents
+                                    for sub_frame in structure.parent_frame.sub_frames
+                                ],
+                                structure.parent_frame.input_space.contents,
+                                structure.parent_frame.output_space.contents,
+                                structure.output_space.contents,
+                            )
+                        ]
+                    )
                 )
-                or any(
-                    structure in view.members
-                    for view in self.bubble_chamber.worldview.views
-                )
-            ):
-                self.bubble_chamber.recycle_bin.remove(structure)
-                continue
+            ]
             probability_of_removal = (
-                self.bubble_chamber.random_machine.generate_number()
+                (self.bubble_chamber.random_machine.generate_number())
+                if len(relevant_codelets) == 0
+                else 0
             )
-            if probability_of_removal > self.bubble_chamber.general_satisfaction:
+            if probability_of_removal > structure.quality:
                 self.bubble_chamber.loggers["activity"].log(f"Removing {structure}")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 self.bubble_chamber.remove(structure)
+                # for codelet in relevant_codelets:
+                #    self.bubble_chamber.loggers["activity"].log(f"Removing {codelet}")
+                #    self.coderack.remove_codelet(codelet)
 
     def _engender_follow_up(self):
         urgency = max(

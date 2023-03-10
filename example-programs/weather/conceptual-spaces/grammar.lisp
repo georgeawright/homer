@@ -4,9 +4,10 @@
     :instance_type LetterChunk))
 (define grammar-space
   (def-conceptual-space :name "grammar" :parent_concept grammar-concept
-    :no_of_dimensions 0 :is_basic_level True))
+    :no_of_dimensions 0 :is_basic_level True :is_symbolic True))
 
 (define sentence-location (Location (list (list 1)) grammar-space))
+(define conjunction-location (Location (list (list 1)) grammar-space))
 (define np-location (Location (list (list 2)) grammar-space))
 (define vp-location (Location (list (list 3)) grammar-space))
 (define ap-location (Location (list (list 4)) grammar-space))
@@ -28,6 +29,12 @@
 
 (define sentence-concept
   (def-concept :name "sentence" :locations (list sentence-location)
+    :classifier (ProximityClassifier)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 4 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
+(define conjunction-concept
+  (def-concept :name "conjunction" :locations (list conjunction-location)
     :classifier (ProximityClassifier)
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 4 :distance_function boolean_distance
@@ -207,6 +214,17 @@
     :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
 
+(define verb-space
+  (def-conceptual-space :name "verb" :parent_concept vb-concept
+    :no_of_dimensions 1 :is_basic_level True :is_symbolic True))
+(define be-location (Location (list (list 1)) verb-space))
+(define increase-location (Location (list (list 2)) verb-space))
+(define decrease-location (Location (list (list 3)) verb-space))
+(define expand-location (Location (list (list 4)) verb-space))
+(define shrink-location (Location (list (list 5)) verb-space))
+(define move-location (Location (list (list 6)) verb-space))
+(define spread-location (Location (list (list 7)) verb-space))
+
 (define the
   (def-letter-chunk :name "the" :parent_space grammar-space
     :locations (list det-location)))
@@ -218,7 +236,7 @@
     :locations (list vb-location)))
 (define be
   (def-letter-chunk :name "be" :parent_space grammar-space
-    :locations (list cop-location)))
+    :locations (list vb-location be-location)))
 (define temperatures
   (def-letter-chunk :name "temperatures" :parent_space grammar-space
     :locations (list nn-location)))
@@ -250,10 +268,10 @@
   (def-letter-chunk :name "then" :parent_space grammar-space
     :locations (list conj-location)))
 (define comma
-  (def-letter-chunk :name "comma" :parent_space grammar-space
+  (def-letter-chunk :name "," :parent_space grammar-space
     :locations (list (Location (list) grammar-space))))
 (define fstop
-  (def-letter-chunk :name "fstop" :parent_space grammar-space
+  (def-letter-chunk :name "." :parent_space grammar-space
     :locations (list (Location (list) grammar-space))))
 (define -er
   (def-letter-chunk :name "[b]er" :parent_space grammar-space

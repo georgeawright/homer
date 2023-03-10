@@ -42,7 +42,9 @@ class Recycler(Codelet):
         recyclable_structures = self.bubble_chamber.structures.where(is_recyclable=True)
         sample_size = math.ceil(len(recyclable_structures) * self.urgency)
         try:
-            structures = recyclable_structures.sample(sample_size)
+            structures = recyclable_structures.sample(
+                sample_size, key=lambda x: 1 - x.quality
+            )
             for item in structures:
                 if item.is_recyclable and not item in self.bubble_chamber.recycle_bin:
                     probability_of_recycling = (
@@ -70,10 +72,7 @@ class Recycler(Codelet):
     def _update_garbage_collector_urgency(self):
         for codelet in self.coderack._codelets:
             if "GarbageCollector" in codelet.codelet_id:
-                codelet.urgency = (
-                    len(self.bubble_chamber.recycle_bin)
-                    * self.coderack.MINIMUM_CODELET_URGENCY
-                )
+                codelet.urgency = self.bubble_chamber.satisfaction
                 return
         raise Exception
 

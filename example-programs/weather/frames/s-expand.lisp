@@ -66,7 +66,7 @@
     :conceptual_spaces (StructureSet location-space time-space conceptual-space)))
 (define expand-sentence-output
   (def-contextual-space :name "s-expand.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space location-space time-space
+    :conceptual_spaces (StructureSet grammar-space verb-space location-space time-space
 					    size-space conceptual-space)))
 (define expand-sentence
   (def-frame :name "s-expand" :parent_concept sentence-concept :parent_frame None
@@ -104,10 +104,20 @@
 			      (Location (list) expand-sentence-input))
     :parent_space expand-sentence-input))
 (define late-chunk-size-label
-  (def-label :start early-chunk :parent_concept size-label-concept
+  (def-label :start late-chunk :parent_concept size-label-concept
     :locations (list (Location (list (list Nan)) size-space)
 		     (Location (list) expand-sentence-input))
     :parent_space expand-sentence-input))
+
+(setattr expand-sentence "early_chunk" early-chunk)
+(setattr expand-sentence "late_chunk" late-chunk)
+(setattr ap-sub-frame "early_chunk" early-chunk)
+(setattr ap-sub-frame "late_chunk" early-chunk)
+(setattr time-sub-frame "early_chunk" early-chunk)
+(setattr time-sub-frame "late_chunk" late-chunk)
+(setattr location-sub-frame "early_chunk" early-chunk)
+(setattr location-sub-frame "late_chunk" late-chunk)
+
 (define time-relation
   (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
     :quality 1.0
@@ -118,7 +128,7 @@
     :parent_space time-sub-frame-input
     :conceptual_space time-space))
 (define location-relation
-  (def-relation :start late-chunk :end early-chunk :parent_concept not-different-concept
+  (def-relation :start late-chunk :end early-chunk :parent_concept same-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan Nan)) (list (list Nan Nan)) location-space)
@@ -233,7 +243,7 @@
 		     (Location (list) expand-sentence-output))))
 (define np-super-super-super-chunk
   (def-letter-chunk :name None
-    :locations (list np-location
+    :locations (list nsubj-location
 		     (Location (list) expand-sentence-output))
     :parent_space expand-sentence-output
     :left_branch (StructureSet np-super-super-chunk)
@@ -292,13 +302,10 @@
 		     (Location (list) expand-sentence-output))))
 
 (def-relation :start pp-inessive-location-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.3)
+  :is_bidirectional True :stable_activation 0.2)
 (def-relation :start pp-directional-time-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.3)
+  :is_bidirectional True :stable_activation 0.2)
 (def-relation :start ap-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.3)
-(def-relation :start large-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.3)
-(def-relation :start small-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.3)
-
+  :is_bidirectional True :stable_activation 0.2)
+(def-relation :start more-size-concept :end expand-sentence
+  :is_bidirectional True :stable_activation 0.4)

@@ -53,15 +53,14 @@ class Space(Structure):
     def adjacency_of(self, a: Structure, b: Structure, return_nan: bool = False):
         return self.parent_concept.adjacency_of(a, b, space=self, return_nan=return_nan)
 
-    def update_activation(self):
-        self._activation = (
-            statistics.median([item.activation for item in self.contents])
-            if len(self.contents) != 0
+    def recalculate_activation(self):
+        self._activation_buffer = (
+            statistics.median(
+                [item.activation for item in self.contents.where(is_slot=False)]
+            )
+            if len(self.contents.where(is_slot=False)) != 0
             else 0.0
         )
-
-    def spread_activation(self):
-        pass
 
     def __repr__(self) -> str:
         return f"<{self.structure_id} {self.name}>"

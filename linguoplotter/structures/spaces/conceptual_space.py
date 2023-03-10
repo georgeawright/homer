@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import Callable, Dict, List
 
+from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
 from linguoplotter.locations import TwoPointLocation
 from linguoplotter.structure import Structure
@@ -144,6 +145,15 @@ class ConceptualSpace(Space):
                 return True
         return False
 
+    def subsumes_or_is_parent_of(self, other) -> bool:
+        return (
+            self.subsumes(other)
+            or other in self.sub_spaces
+            or any(
+                [instance in self.sub_spaces for instance in other.possible_instances]
+            )
+        )
+
     def unifies_with(self, other) -> bool:
         return self.subsumes(other) or other.subsumes(self)
 
@@ -183,3 +193,20 @@ class ConceptualSpace(Space):
                     Location(location.end_coordinates, location.space)
                 )
             return TwoPointLocation(start_coordinates, end_coordinates, self)
+
+    def recalculate_activation(self):
+        self._activation_buffer = FloatBetweenOneAndZero(
+            sum(
+                [
+                    concept.activation
+                    for concept in self.contents.where(
+                        is_concept=True, parent_space=self
+                    )
+                ]
+            )
+        )
+
+    def update_activation(self):
+        Space.update_activation(self)
+        self.parent_concept._activation_buffer = self.activation
+        self.parent_concept._activation = self.activation

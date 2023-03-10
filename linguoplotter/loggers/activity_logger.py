@@ -27,12 +27,12 @@ class ActivityLogger(Logger):
 
     @property
     def stream(self):
-        if self.codelets_run % self.LOG_LENGTH == 1 and (
-            self.log_files_count == 0
-            or self.codelets_run // self.log_files_count > self.LOG_LENGTH
-        ):
-            if self._stream is not None:
-                self._stream.close()
+        if self.log_files_count == 0:
+            self.log_files_count += 1
+            new_log_file_name = f"{self.log_file_name}{self.log_files_count}.log"
+            self._stream = open(new_log_file_name, "w")
+        elif self.codelets_run // self.log_files_count > self.LOG_LENGTH:
+            self._stream.close()
             self.log_files_count += 1
             new_log_file_name = f"{self.log_file_name}{self.log_files_count}.log"
             self._stream = open(new_log_file_name, "w")
@@ -71,7 +71,7 @@ class ActivityLogger(Logger):
             self.log(f"{name}: {{")
             for item in structure_set:
                 self.log(f"    {item},")
-            self.log("}}")
+            self.log("}")
 
     def log_list(self, structure_list, name: str = None):
         name = structure_list.name if name is None else name
@@ -96,7 +96,7 @@ class ActivityLogger(Logger):
 
     def log_codelet_end(self, coderack_population: int):
         if hasattr(self.codelet, "child_structures"):
-            self.log_list(self.codelet.child_structures, "Follow ups")
+            self.log_list(self.codelet.child_structures, "Child structures")
         self.log_set(self.codelet.child_codelets, "Follow ups")
         if CodeletResult.FINISH == self.codelet.result:
             self.log("Result: FINISH")
@@ -109,7 +109,7 @@ class ActivityLogger(Logger):
             + f"Coderack Population Size: {coderack_population} | "
             + f"View Count: {len(self.codelet.bubble_chamber.views)}\n"
             + f"Focus: {self.codelet.bubble_chamber.focus.view}\n"
-            + f"Worldview: {self.codelet.bubble_chamber.worldview.views}\n",
+            + f"Worldview: {self.codelet.bubble_chamber.worldview.view}\n",
         )
         self._log_satisfaction()
         self._log_coderack_population(coderack_population)

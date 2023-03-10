@@ -20,6 +20,8 @@
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) pp-inessive-time-input))
     :parent_space pp-inessive-time-input))
+(setattr pp-inessive-time "early_chunk" chunk)
+(setattr pp-inessive-time "late_chunk" chunk)
 (define chunk-time-label
   (def-label :start chunk :parent_concept time-label-concept
     :locations (list (Location (list (list Nan)) time-space)

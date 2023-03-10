@@ -14,12 +14,6 @@ class ViewSelector(Selector):
         return ViewSuggester
 
     @classmethod
-    def get_follow_up_evaluator(cls) -> type:
-        from linguoplotter.codelets.evaluators import ViewEvaluator
-
-        return ViewEvaluator
-
-    @classmethod
     def get_target_class(cls):
         return View
 
@@ -44,7 +38,7 @@ class ViewSelector(Selector):
                     StructureSet.union(
                         self.bubble_chamber.new_set(winning_view.parent_frame),
                         winning_view.parent_frame.parent_concept.relatives.where(
-                            is_frame=True
+                            is_frame=True, is_sub_frame=False
                         ),
                     )
                     .filter(
@@ -72,13 +66,16 @@ class ViewSelector(Selector):
             self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
                 == champion.parent_frame.parent_concept
-                and champion.members.filter(
-                    lambda c: c.start.parent_space in x.input_spaces
-                ).not_empty
-                and x.members.filter(
-                    lambda c: c.start.parent_space in champion.input_spaces
-                ).not_empty
-                and x.raw_input_nodes() == champion.raw_input_nodes()
+                and (
+                    champion.members.filter(
+                        lambda c: c.start.parent_space in x.input_spaces
+                    ).not_empty
+                    and x.members.filter(
+                        lambda c: c.start.parent_space in champion.input_spaces
+                    ).not_empty
+                    and x.raw_input_nodes == champion.raw_input_nodes
+                )
+                or (any([x in sub_view.super_views for sub_view in champion.sub_views]))
             )
             .excluding(champion)
             .get(key=activation)

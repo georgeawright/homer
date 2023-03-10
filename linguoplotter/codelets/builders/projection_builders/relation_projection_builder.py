@@ -56,7 +56,7 @@ class RelationProjectionBuilder(ProjectionBuilder):
             conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
             parent_view=self.targets["view"],
             quality=0.0,
+            is_projection=True,
         )
         self.child_structures.add(relation)
         self.child_structures.add(frame_to_output_correspondence)
-        self.bubble_chamber.loggers["structure"].log_view(self.targets["view"])

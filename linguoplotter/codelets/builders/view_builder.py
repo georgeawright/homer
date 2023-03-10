@@ -11,16 +11,6 @@ from linguoplotter.structures.spaces import ContextualSpace
 
 
 class ViewBuilder(Builder):
-    def __init__(
-        self,
-        codelet_id: str,
-        parent_id: str,
-        bubble_chamber: BubbleChamber,
-        targets: StructureDict,
-        urgency: FloatBetweenOneAndZero,
-    ):
-        Builder.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.evaluators import ViewEvaluator
@@ -96,14 +86,17 @@ class ViewBuilder(Builder):
             parent_spaces=self.bubble_chamber.new_set(),
             sub_views=self.bubble_chamber.new_set(),
             super_views=self.bubble_chamber.new_set(),
+            cohesion_views=self.bubble_chamber.new_set(),
             champion_labels=self.bubble_chamber.new_set(),
             champion_relations=self.bubble_chamber.new_set(),
         )
+        frame_instance.parent_view = view
+        frame_instance.progenitor.instances.add(view)
+        frame_instance.parent_concept.instances.add(view)
         self.bubble_chamber.loggers["structure"].log(view_output)
         self.bubble_chamber.contextual_spaces.add(view_output)
         self.bubble_chamber.loggers["structure"].log(view)
         self.bubble_chamber.views.add(view)
-        self.bubble_chamber.loggers["structure"].log_view(view)
         self._structure_concept.instances.add(view)
         self._structure_concept.recalculate_exigency()
         self.child_structures.add(view)
