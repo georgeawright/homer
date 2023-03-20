@@ -2,23 +2,28 @@ import os
 import time
 
 from linguoplotter import Linguoplotter
-from linguoplotter.loggers import ActivityLogger, ErrorLogger, StructureLogger
+from linguoplotter.loggers import (
+    ActivityLogger,
+    ErrorLogger,
+    MockLogger,
+    StructureLogger,
+)
 
-DELETE_STRUCTURE_LOGS = True
+DELETE_STRUCTURE_LOGS = False
 
 pwd = os.getcwd()
 
 program_files = [
     "narration-1.lisp",
-    "narration-2.lisp",
-    "narration-3.lisp",
-    "narration-4.lisp",
-    "narration-5.lisp",
-    "narration-6.lisp",
+    # "narration-2.lisp",
+    # "narration-3.lisp",
+    # "narration-4.lisp",
+    # "narration-5.lisp",
+    # "narration-6.lisp",
 ]
 for program_file in program_files:
     results = []
-    random_seeds = range(50)
+    random_seeds = range(5)
 
     for i in random_seeds:
         time_string = str(time.time())
@@ -40,15 +45,17 @@ for program_file in program_files:
         error_file_name = f"{logs_dir_path}/errors.log"
         error_stream = open(error_file_name, "w")
         loggers = {
-            "activity": ActivityLogger(
-                log_file_name,
-                satisfaction_stream,
-                coderack_population_stream,
-                view_count_stream,
-                codelet_spawned_stream,
-                codelet_run_stream,
-            ),
-            "structure": StructureLogger(f"{structure_logs_dir_path}"),
+            # "activity": ActivityLogger(
+            #    log_file_name,
+            #    satisfaction_stream,
+            #    coderack_population_stream,
+            #    view_count_stream,
+            #    codelet_spawned_stream,
+            #    codelet_run_stream,
+            # ),
+            # "structure": StructureLogger(f"{structure_logs_dir_path}"),
+            "activity": MockLogger(),
+            "structure": MockLogger(),
             "error": ErrorLogger(error_stream),
         }
         narrator = Linguoplotter.setup(loggers, random_seed=i)
