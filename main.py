@@ -9,7 +9,7 @@ from linguoplotter.loggers import (
     StructureLogger,
 )
 
-DELETE_STRUCTURE_LOGS = False
+DEVELOPMENT = False
 
 pwd = os.getcwd()
 
@@ -21,6 +21,7 @@ program_files = [
     # "narration-5.lisp",
     # "narration-6.lisp",
 ]
+start_time = time.time()
 for program_file in program_files:
     results = []
     random_seeds = range(5)
@@ -31,36 +32,38 @@ for program_file in program_files:
         os.mkdir(logs_dir_path)
         with open(f"{logs_dir_path}/details.txt", "w") as f:
             f.write(f"Program: {program_file}\nRandom seed: {i}\n")
-        structure_logs_dir_path = f"{logs_dir_path}/structures"
-        os.mkdir(structure_logs_dir_path)
-
-        log_file_name = f"{logs_dir_path}/activity"
-        satisfaction_stream = open(f"{logs_dir_path}/satisfaction.csv", "w")
-        coderack_population_stream = open(
-            f"{logs_dir_path}/coderack_population.csv", "w"
-        )
-        view_count_stream = open(f"{logs_dir_path}/view_count.csv", "w")
-        codelet_spawned_stream = open(f"{logs_dir_path}/codelets_spawned", "w")
-        codelet_run_stream = open(f"{logs_dir_path}/codelets_run", "w")
         error_file_name = f"{logs_dir_path}/errors.log"
         error_stream = open(error_file_name, "w")
+        if DEVELOPMENT:
+            structure_logs_dir_path = f"{logs_dir_path}/structures"
+            os.mkdir(structure_logs_dir_path)
+            log_file_name = f"{logs_dir_path}/activity"
+            satisfaction_stream = open(f"{logs_dir_path}/satisfaction.csv", "w")
+            coderack_population_stream = open(
+                f"{logs_dir_path}/coderack_population.csv", "w"
+            )
+            view_count_stream = open(f"{logs_dir_path}/view_count.csv", "w")
+            codelet_spawned_stream = open(f"{logs_dir_path}/codelets_spawned", "w")
+            codelet_run_stream = open(f"{logs_dir_path}/codelets_run", "w")
+            activity_logger = ActivityLogger(
+                log_file_name,
+                satisfaction_stream,
+                coderack_population_stream,
+                view_count_stream,
+                codelet_spawned_stream,
+                codelet_run_stream,
+            )
+            structure_logger = StructureLogger(f"{structure_logs_dir_path}")
+        else:
+            activity_logger = MockLogger()
+            structure_logger = MockLogger()
         loggers = {
-            # "activity": ActivityLogger(
-            #    log_file_name,
-            #    satisfaction_stream,
-            #    coderack_population_stream,
-            #    view_count_stream,
-            #    codelet_spawned_stream,
-            #    codelet_run_stream,
-            # ),
-            # "structure": StructureLogger(f"{structure_logs_dir_path}"),
-            "activity": MockLogger(),
-            "structure": MockLogger(),
+            "activity": activity_logger,
+            "structure": structure_logger,
             "error": ErrorLogger(error_stream),
         }
         narrator = Linguoplotter.setup(loggers, random_seed=i)
         narrator.interpreter.interpret_file("builtin.lisp")
-
         os.chdir("example-programs/weather")
         narrator.interpreter.interpret_file(program_file)
         os.chdir("../..")
@@ -73,12 +76,7 @@ for program_file in program_files:
             f.write(
                 f"Result: {text}\nSatisfaction: {satisfaction}\nCodelets run: {codelets_run}"
             )
-        if DELETE_STRUCTURE_LOGS:
-            for structure_dir in os.listdir(f"{logs_dir_path}/structures/structures/"):
-                for log_file in os.listdir(
-                    f"{logs_dir_path}/structures/structures/{structure_dir}"
-                ):
-                    os.remove(
-                        f"{logs_dir_path}/structures/structures/{structure_dir}/{log_file}"
-                    )
+    end_time = time.time()
     print(results)
+    run_length = end_time - start_time
+    print(run_length)
