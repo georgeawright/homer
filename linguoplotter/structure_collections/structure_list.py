@@ -14,6 +14,15 @@ class StructureList(StructureCollection):
         structures = {structure: True for structure in structures}
         StructureCollection.__init__(self, bubble_chamber, structures, name=name)
 
+    def __dict__(self) -> dict:
+        return {
+            key: self.structures[key].__dict__()
+            if isinstance(self.structures[key], StructureCollection)
+            else self.structures[key].structure_id
+            for key in range(len(self.structures))
+            if self.structures[key] is not None
+        }
+
     def __getitem__(self, index: int):
         return self.structures[index]
 

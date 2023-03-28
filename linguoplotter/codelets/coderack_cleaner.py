@@ -66,8 +66,8 @@ class CoderackCleaner(Codelet):
         probability_of_codelet_deletion = 1 - statistics.fmean(
             [current_satisfaction_score, transposed_change_in_satisfaction_score]
         )
-        self.bubble_chamber.loggers["activity"].log_set(
-            self.coderack.recently_run, "Recently run"
+        self.bubble_chamber.loggers["activity"].log(
+            f"Recently run: {self.coderack.recently_run}"
         )
         for codelet in list(self.coderack._codelets):
             if type(codelet) not in self.coderack.recently_run:

@@ -3,7 +3,7 @@ var fs = require('fs');
 exports.run = function(query) {
     run_id = query.run_id;
     page = query.page == undefined ? 1 : Number(query.page);
-    items_per_page = query.items_per_page == undefined ? 100 : query.items_per_page;
+    items_per_page = query.items_per_page == undefined ? 100 : Number(query.items_per_page);
     log_directory = 'logs/' + run_id + '/';
 
     doc = '<html><body>';

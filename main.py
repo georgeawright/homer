@@ -9,7 +9,7 @@ from linguoplotter.loggers import (
     StructureLogger,
 )
 
-DEVELOPMENT = False
+DEVELOPMENT = True
 
 pwd = os.getcwd()
 
@@ -37,7 +37,10 @@ for program_file in program_files:
         if DEVELOPMENT:
             structure_logs_dir_path = f"{logs_dir_path}/structures"
             os.mkdir(structure_logs_dir_path)
-            log_file_name = f"{logs_dir_path}/activity"
+            codelets_directory = f"{logs_dir_path}/codelets"
+            os.mkdir(codelets_directory)
+            os.mkdir(f"{codelets_directory}/ids")
+            os.mkdir(f"{codelets_directory}/times")
             satisfaction_stream = open(f"{logs_dir_path}/satisfaction.csv", "w")
             coderack_population_stream = open(
                 f"{logs_dir_path}/coderack_population.csv", "w"
@@ -46,7 +49,7 @@ for program_file in program_files:
             codelet_spawned_stream = open(f"{logs_dir_path}/codelets_spawned", "w")
             codelet_run_stream = open(f"{logs_dir_path}/codelets_run", "w")
             activity_logger = ActivityLogger(
-                log_file_name,
+                codelets_directory,
                 satisfaction_stream,
                 coderack_population_stream,
                 view_count_stream,
