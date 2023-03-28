@@ -50,8 +50,7 @@ structure_to_html = function(id, query) {
     var structure_file = '';
     var latest_time = -1;
     structure_files.forEach(file => {
-	time = file.split(".")[0];
-	console.log(time > latest_time);
+	time = Number(file.split(".")[0]);
 	if (time <= query.time && time > latest_time) {
 	    structure_file = file;
 	    latest_time = time;
@@ -59,8 +58,6 @@ structure_to_html = function(id, query) {
     });
     structure_file = structure_directory + '/' + structure_file;
     var structure_json = JSON.parse(fs.readFileSync(structure_file));
-    console.log(structure_json);
-
     if (is_chunk_id(id)
 	|| is_contextual_space_id(id)
 	|| is_view_id(id)
