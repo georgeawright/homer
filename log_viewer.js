@@ -10,11 +10,17 @@ http.createServer(function (req, res) {
     console.log(path)
     if (path == '/') {
 	var module = require('./log_viewer/runs');
+	res.write(module.run(query));
     }
     else {
 	path = './' + path
-	var module = require(path);
+	try {
+	    var module = require(path);
+	    res.write(module.run(query));
+	} catch(err) {
+	    console.log(err);
+	    res.write("404");
+	}
     }
-    res.write(module.run(query));
     res.end()
 }).listen(8080); 

@@ -1,0 +1,23 @@
+{
+  "name": "linguoplotter_log_viewer",
+  "version": "1.0.0",
+  "description": "Log viewer for runs of Linguoplotter",
+  "main": "log_viewer.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node log_viewer.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgeawright/linguoplotter.git"
+  },
+  "author": "George A Wright",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/georgeawright/linguoplotter/issues"
+  },
+  "homepage": "https://github.com/georgeawright/linguoplotter#readme",
+  "dependencies": {}
+}

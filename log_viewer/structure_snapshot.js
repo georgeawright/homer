@@ -20,7 +20,8 @@ exports.run = function(query) {
     var log_file = structure_directory + '/' + structure_file;
 
     var doc = '<html><body>';
-    doc += '<h1>Linguoplotter run '+run_id+'</h1>';
+    doc += '<p><a href="../">&lt;&lt;All runs</a></p>';
+    doc += '<h1><a href="run?run_id=' + run_id + '">Linguoplotter run '+run_id+'</a></h1>';
     doc += '<p><a href="codelets?run_id=' + run_id + '">Codelets</a></p>';
     doc += '<p><a href="structures?run_id=' + run_id + '">Structures</a></p>';
 

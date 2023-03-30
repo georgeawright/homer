@@ -8,12 +8,16 @@ exports.run = function(query) {
     log_directory = 'logs/' + run_id + '/';
 
     doc = '<html><body>';
-    doc += '<h1>Linguoplotter run '+run_id+'</h1>';
+    doc += '<p><a href="../">&lt;&lt;All runs</a></p>';
+    doc += '<h1><a href="run?run_id=' + run_id + '">Linguoplotter run '+run_id+'</a></h1>';
     doc += '<p><a href="codelets?run_id=' + run_id + '">Codelets</a></p>';
     doc += '<p><a href="structures?run_id=' + run_id + '">Structures</a></p>';
 
     structure_directory = log_directory + 'structures/structures/' + structure_id;
     snapshot_files = fs.readdirSync(structure_directory);
+    snapshot_files.sort(
+	function(a, b) {return Number(a.split(".")[0]) - Number(b.split(".")[0])}
+    );
     slice_start = (page - 1) * items_per_page;
     slice_end = slice_start + items_per_page;
 
