@@ -1,4 +1,5 @@
 var fs = require('fs');
+var tools = require('./tools');
 
 exports.run = function(query) {
     run_id = query.run_id;
@@ -23,61 +24,48 @@ exports.run = function(query) {
     doc +=  `
     <div id="satisfaction_graph"></div>`;
     doc += satisfaction_graph_script(query);
+    doc +=  `
+    <div id="coderack_population_graph"></div>`;
+    doc += coderack_pop_graph_script(query);
+    doc +=  `
+    <div id="view_count_graph"></div>`;
+    doc += view_count_graph_script(query);
     doc += `
   </body>
 </html>`;
     return doc;
 }
 
-satisfaction_graph_script = function(query) {
-    const satisfaction_csv = `logs/${query.run_id}/satisfaction.csv`;
-    satisfaction_data = '[';
-    String(fs.readFileSync(satisfaction_csv))
+const satisfaction_graph_script = function(query) {
+    const satisfaction_data = data_string_from_csv(query, 'satisfaction.csv');
+    return tools.generate_graph_script('satisfaction_graph', satisfaction_data);
+}
+
+const coderack_pop_graph_script = function(query) {
+    const coderack_population_data = data_string_from_csv(query, 'coderack_population.csv');
+    return tools.generate_graph_script('coderack_population_graph', coderack_population_data);
+}
+
+const view_count_graph_script = function(query) {
+    const view_count_data = data_string_from_csv(query, 'view_count.csv');
+    return tools.generate_graph_script('view_count_graph', view_count_data);
+}
+
+const data_string_from_csv = function(query, csv_file_name) {
+    const csv = `logs/${query.run_id}/${csv_file_name}`;
+    data = '[';
+    String(fs.readFileSync(csv))
 	.split("\n")
 	.forEach(line => {
 	    const row = line.split(',');
 	    if (row == '') {
 		return;
 	    }
-	    if (satisfaction_data.length > 1) {
-		satisfaction_data += ', ';
+	    if (data.length > 1) {
+		data += ', ';
 	    }
-	    satisfaction_data += `\{time: ${row[0]}, satisfaction: ${row[1]}\}`;
+	    data += `\{time: ${row[0]}, value: ${row[1]}\}`;
 	});
-    satisfaction_data +=  ']';
-    const script = `
-<script>
-  const margin = {top: 10, right: 30, bottom: 30, left: 60},
-	width = 640 - margin.left - margin.right,
-	height = 480 - margin.top - margin.bottom;
-  const svg = d3.select("#satisfaction_graph")
-	.append("svg")
-	.attr("width", width + margin.left + margin.right)
-	.attr("height", height + margin.top + margin.bottom)
-	.append("g")
-	.attr("transform", \`translate(\${margin.left},\${margin.top})\`);
-  const data = ${satisfaction_data};
-  const x = d3.scaleLinear()
-	.domain(d3.extent(data, function(d) { return d.time; }))
-	.range([ 0, width ]);
-  svg.append("g")
-    .attr("transform", \`translate(0, \${height})\`)
-    .call(d3.axisBottom(x));
-  const y = d3.scaleLinear()
-	.domain([0, d3.max(data, function(d) { return d.satisfaction; })])
-	.range([ height, 0 ]);
-  svg.append("g")
-    .call(d3.axisLeft(y));
-  svg.append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "steelblue")
-    .attr("stroke-width", 1.5)
-    .attr("d", d3.line()
-          .x(function(d) { return x(d.time) })
-          .y(function(d) { return y(d.satisfaction) })
-         )
-</script>
-`
-    return script;
+    data +=  ']';
+    return data;
 }

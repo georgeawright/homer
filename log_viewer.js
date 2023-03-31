@@ -19,7 +19,7 @@ http.createServer(function (req, res) {
 	    res.write(module.run(query));
 	} catch(err) {
 	    console.log(err);
-	    res.write("404");
+	    res.write("error");
 	}
     }
     res.end()
