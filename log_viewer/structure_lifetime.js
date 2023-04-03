@@ -90,6 +90,11 @@ const quality_graph_script = function(query) {
 const data_string_for_field = function(query, field_name) {
     const structure_directory = `logs/${query.run_id}/structures/structures/${query.structure_id}`;
     snapshot_files = fs.readdirSync(structure_directory);
+    console.log(snapshot_files);
+    snapshot_files = fs.readdirSync(structure_directory).filter(
+	file_name => {return file_name.endsWith("json")}
+    );
+    console.log(snapshot_files);
     snapshot_files.sort(
 	function(a, b) {return Number(a.split(".")[0]) - Number(b.split(".")[0])}
     );

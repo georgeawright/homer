@@ -12,6 +12,12 @@ http.createServer(function (req, res) {
 	var module = require('./log_viewer/runs');
 	res.write(module.run(query));
     }
+    if (path == "/log_viewer/logs/1680516128.3161354/structures/structures/View50/3000.svg") {
+	res.write(fs.readFileSync("logs/1680516128.3161354/structures/structures/View50/3000.svg"));
+    }
+    if (path.startsWith("logs/")) {
+	res.write(readFileSync(path));
+    }
     else {
 	path = './' + path
 	try {

@@ -1,4 +1,28 @@
-fs = require('fs');
+const fs = require('fs');
+const {spawn} = require('child_process');
+
+exports.get_graph = function(run_id, structure_id, time) {
+    const structure_directory = `logs/${run_id}/structures/structures/${structure_id}`;
+    const file_name = `${time}.svg`;
+    const structure_files = fs.readdirSync(structure_directory);
+    if (file_name in structure_files) {
+	return `${structure_directory}/${file_name}`;
+    }
+    const python = spawn(
+	'python',
+	['log_viewer/generate_graph.py', run_id, structure_id, time]
+    );
+    python.stdout.on('data', (data) => {
+	console.log(`stdout: ${data}`);
+    });
+    python.stderr.on('data', (data) => {
+	console.log(`stdout: ${data}`);
+    });
+    python.on('close', (code) => {
+	console.log(`child process exited with code ${code}`);
+    });
+    return `${structure_directory}/${file_name}`;
+}
 
 exports.json_to_html = function(input,query) {
     if (typeof(input) === 'number') {
@@ -83,7 +107,9 @@ structure_to_html = function(id, query) {
 	return "undefined";
     }
     var structure_directory = 'logs/' + query.run_id + '/structures/structures/' + id;
-    var structure_files = fs.readdirSync(structure_directory);
+    var structure_files = fs.readdirSync(structure_directory).filter(
+	(f) => {return f.endsWith("json")}
+    );
     var structure_file = '';
     var latest_time = -1;
     structure_files.forEach(file => {

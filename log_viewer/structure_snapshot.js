@@ -12,7 +12,7 @@ exports.run = function(query) {
     var latest_time = -1;
     structure_files.forEach(file => {
 	file_time = Number(file.split(".")[0]);
-	if (file_time <= query.time && time > latest_time) {
+	if (file_time <= query.time && time > latest_time && file.endsWith("json")) {
 	    structure_file = file;
 	    latest_time = file_time;
 	}
@@ -33,6 +33,10 @@ exports.run = function(query) {
     structure_html = tools.json_to_html(structure_json, query);
 
     doc += structure_html;
+
+    graph_file = tools.get_graph(run_id, structure_id, time);
+    graph_svg = fs.readFileSync(graph_file);
+    doc += `<object type="image/svg+xml">${graph_svg}</object>`;
 
     doc += '</body></html>';
     return doc;
