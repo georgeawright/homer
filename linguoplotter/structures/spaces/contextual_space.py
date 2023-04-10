@@ -51,11 +51,9 @@ class ContextualSpace(Space):
             "parent_id": self.parent_id,
             "name": self.name,
             "contents": [item.structure_id for item in self.contents],
-            "contents_repr": [str(item) for item in self.contents],
             "conceptual_spaces": [
                 space.structure_id for space in self.conceptual_spaces
             ],
-            "conceptual_space_names": [space.name for space in self.conceptual_spaces],
             "quality": self.quality,
             "activation": self.activation,
         }

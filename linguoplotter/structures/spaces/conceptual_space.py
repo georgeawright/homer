@@ -67,6 +67,7 @@ class ConceptualSpace(Space):
             "structure_id": self.structure_id,
             "parent_id": self.parent_id,
             "name": self.name,
+            "contents": [item.structure_id for item in self.contents],
             "activation": self.activation,
         }
 
