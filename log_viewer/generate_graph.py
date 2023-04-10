@@ -18,7 +18,6 @@ def main(run_id, structure_id, time):
     if "Chunk" in structure_id[0:5]:
         return generate_chunk_graph(run_id, structure_id, time)
     if "Frame" in structure_id:
-        # TODO
         return generate_frame_graph(run_id, structure_id, time)
     if "Label" in structure_id:
         return generate_label_graph(run_id, structure_id, time)
@@ -274,8 +273,101 @@ def generate_chunk_graph(run_id, chunk_id, time):
     return chunk_graph
 
 
-def generate_frame_graph(run_id, correspondence_id, time):
-    pass
+def generate_frame_graph(run_id, frame_id, time):
+    basic_url = f"structure_snapshot?run_id={run_id}&time={time}"
+    url = lambda structure_id: f"{basic_url}&structure_id={structure_id}"
+    frame_graph = graphviz.Digraph(
+        "frame_graph", filename="frame_graph.gv", engine="dot"
+    )
+    frame_graph.attr(rankdir="TB")
+    frame_graph.attr(URL=url(frame_id))
+    frame = get_structure_json(run_id, frame_id, time)
+    spaces = [
+        get_structure_json(run_id, space_id, time)
+        for space_id in [frame["input_space"], frame["output_space"]]
+    ]
+    color = "pink"
+    cluster_number = 0
+    for space in spaces:
+        space_id = space["structure_id"]
+        if space_id not in (frame["input_space"], frame["output_space"]):
+            continue
+        cluster_name = f"cluster_{cluster_number}"
+        cluster_number += 1
+        contents = [
+            get_structure_json(run_id, item_id, time) for item_id in space["contents"]
+        ]
+        chunks = [item for item in contents if "Chunk" in item["structure_id"][0:5]]
+        letter_chunks = [
+            item for item in contents if "LetterChunk" in item["structure_id"]
+        ]
+        labels = [item for item in contents if "Label" in item["structure_id"]]
+        relations = [item for item in contents if "Relation" in item["structure_id"]]
+        link_concepts = [
+            get_structure_json(run_id, link["parent_concept"], time)
+            for link in labels + relations
+        ]
+        with frame_graph.subgraph(name=cluster_name) as c:
+            c.attr(style="filled", color=color, URL=url(space_id))
+            c.node_attr.update(shape="rectangle", style="filled", color="white")
+            for chunk in chunks:
+                c.node(chunk["structure_id"], URL=url(chunk["structure_id"]))
+            for letter_chunk in letter_chunks:
+                label = letter_chunk["name"] if letter_chunk["name"] != "" else None
+                c.node(
+                    letter_chunk["structure_id"],
+                    label=label,
+                    URL=url(letter_chunk["structure_id"]),
+                )
+            c.node_attr.update(shape="ellipse", style="filled", color="white")
+            for label in labels:
+                link_concept = [
+                    c
+                    for c in link_concepts
+                    if c["structure_id"] == label["parent_concept"]
+                ][0]
+                link_label = (
+                    link_concept["name"].upper() if link_concept["name"] != "" else None
+                )
+                c.node(
+                    label["structure_id"],
+                    label=link_label,
+                    URL=url(label["structure_id"]),
+                )
+            for relation in relations:
+                link_concept = [
+                    c
+                    for c in link_concepts
+                    if c["structure_id"] == relation["parent_concept"]
+                ][0]
+                link_label = (
+                    link_concept["name"].upper() if link_concept["name"] != "" else None
+                )
+                c.node(
+                    label["structure_id"],
+                    label=link_label,
+                    URL=url(label["structure_id"]),
+                )
+            for label in labels:
+                c.edge(label["structure_id"], label["start"], label="start")
+            for relation in relations:
+                print(relation)
+                c.edge(relation["structure_id"], relation["start"], label="start")
+                c.edge(relation["structure_id"], relation["end"], label="end")
+            for chunk in chunks:
+                for member in chunk["members"]:
+                    c.edge(chunk["structure_id"], member, label="member")
+            for letter_chunk in letter_chunks:
+                for child in letter_chunk["right_branch"]:
+                    c.edge(letter_chunk["structure_id"], child, label="right")
+                for child in letter_chunk["left_branch"]:
+                    c.edge(letter_chunk["structure_id"], child, label="left")
+            c.attr(label=space["name"])
+    frame_graph.attr(label=frame["name"])
+    frame_graph.render(
+        f"logs/{run_id}/structures/structures/{frame_id}/{time}", format="svg"
+    )
+    return frame_graph
 
 
 def generate_label_graph(run_id, label_id, time):
