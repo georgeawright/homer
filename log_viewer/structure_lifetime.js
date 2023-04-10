@@ -74,17 +74,32 @@ exports.run = function(query) {
 
 const activation_graph_script = function(query) {
     const activation_data = data_string_for_field(query, 'activation');
-    return tools.generate_graph_script('activation_graph', activation_data);
+    return tools.generate_graph_script(
+	'activation_graph',
+	activation_data,
+	x_title="Codelets Run",
+	y_title="Activation",
+    );
 }
 
 const unhappiness_graph_script = function(query) {
     const unhappiness_data = data_string_for_field(query, 'unhappiness');
-    return tools.generate_graph_script('unhappiness_graph', unhappiness_data);
+    return tools.generate_graph_script(
+	'unhappiness_graph',
+	unhappiness_data,
+	x_title="Codelets Run",
+	y_title="Unhappiness",
+    );
 }
 
 const quality_graph_script = function(query) {
     const quality_data = data_string_for_field(query, 'quality');
-    return tools.generate_graph_script('quality_graph', quality_data);
+    return tools.generate_graph_script(
+	'quality_graph',
+	quality_data,
+	x_title="Codelets Run",
+	y_title="Quality",
+    );
 }
 
 const data_string_for_field = function(query, field_name) {

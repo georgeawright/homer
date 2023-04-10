@@ -38,17 +38,32 @@ exports.run = function(query) {
 
 const satisfaction_graph_script = function(query) {
     const satisfaction_data = data_string_from_csv(query, 'satisfaction.csv');
-    return tools.generate_graph_script('satisfaction_graph', satisfaction_data);
+    return tools.generate_graph_script(
+	'satisfaction_graph',
+	satisfaction_data,
+	x_title='Codelets Run',
+	y_title='Satisfaction',
+    );
 }
 
 const coderack_pop_graph_script = function(query) {
     const coderack_population_data = data_string_from_csv(query, 'coderack_population.csv');
-    return tools.generate_graph_script('coderack_population_graph', coderack_population_data);
+    return tools.generate_graph_script(
+	'coderack_population_graph',
+	coderack_population_data,
+	x_title='Codelets Run',
+	y_title='Coderack Population',
+    );
 }
 
 const view_count_graph_script = function(query) {
     const view_count_data = data_string_from_csv(query, 'view_count.csv');
-    return tools.generate_graph_script('view_count_graph', view_count_data);
+    return tools.generate_graph_script(
+	'view_count_graph',
+	view_count_data,
+	x_title='Codelets Run',
+	y_title='View Count',
+    );
 }
 
 const data_string_from_csv = function(query, csv_file_name) {

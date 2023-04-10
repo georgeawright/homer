@@ -64,7 +64,7 @@ exports.json_to_html = function(input,query) {
     }
 }
 
-exports.generate_graph_script = function (div_id, data) {
+exports.generate_graph_script = function (div_id, data, x_title, y_title) {
     return `
 <script>
   var margin = {top: 10, right: 30, bottom: 30, left: 60},
@@ -82,12 +82,27 @@ exports.generate_graph_script = function (div_id, data) {
 	.range([ 0, width ]);
   svg.append('g')
     .attr('transform', \`translate(0, \${height})\`)
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x))
+    .append("text")
+    .attr("class", "axis-title")
+    .attr("x", width/2)
+    .attr("y", 30)
+    .style("text-anchor", "middle")
+    .attr("fill", "#000000")
+    .text("${x_title}");
   var y = d3.scaleLinear()
 	.domain([0, d3.max(data, function(d) { return d.value; })])
 	.range([ height, 0 ]);
   svg.append('g')
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y))
+    .append("text")
+    .attr("class", "axis-title")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height/2)
+    .attr("y", -30)
+    .style("text-anchor", "end")
+    .attr("fill", "#000000")
+    .text("${y_title}");
   svg.append('path')
     .datum(data)
     .attr('fill', 'none')
