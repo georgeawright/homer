@@ -10,10 +10,8 @@ close_curly = "}"
 
 def main(run_id, structure_id, time):
     if "CompoundConcept" in structure_id[0:7]:
-        # TODO
-        return generate_compound_concept_graph(run_id, structure_id, time)
+        return generate_concept_graph(run_id, structure_id, time)
     if "Concept" in structure_id[0:7]:
-        # TODO
         return generate_concept_graph(run_id, structure_id, time)
     if "Correspondence" in structure_id:
         return generate_correspondence_graph(run_id, structure_id, time)
@@ -36,12 +34,84 @@ def main(run_id, structure_id, time):
         return generate_view_graph(run_id, structure_id, time)
 
 
-def generate_compound_concept_graph(run_id, concept_id, time):
-    pass
-
-
 def generate_concept_graph(run_id, concept_id, time):
-    pass
+    basic_url = f"structure_snapshot?run_id={run_id}&time={time}"
+    url = lambda structure_id: f"{basic_url}&structure_id={structure_id}"
+    concept_graph = graphviz.Digraph(
+        "concept_graph", filename="concept_graph.gv", engine="dot"
+    )
+    concept_graph.attr(rankdir="TB")
+    concept = get_structure_json(run_id, concept_id, time)
+    links = [
+        get_structure_json(run_id, link_id, time)
+        for link_id in concept["links_out"] + concept["links_in"]
+    ]
+    labels = [item for item in links if "Label" in item["structure_id"]]
+    relations = [item for item in links if "Relation" in item["structure_id"]]
+    relative_ids = [
+        r["start"] if r["start"] != concept_id else r["end"] for r in relations
+    ]
+    relatives = [
+        get_structure_json(run_id, relative_id, time) for relative_id in relative_ids
+    ]
+    link_concepts = [
+        get_structure_json(run_id, link["parent_concept"], time)
+        for link in labels + relations
+    ]
+    label = concept["name"].upper() if concept["name"] != "" else None
+    concept_graph.node(
+        concept["structure_id"],
+        label=label,
+        shape="doublecircle",
+        URL=url(concept["structure_id"]),
+    )
+    for relative in relatives:
+        if relative["structure_id"] == concept_id:
+            continue
+        shape = "rectangle" if "Chunk" in relative["structure_id"] else "circle"
+        label = relative["name"] if relative["name"] != "" else None
+        label = label.upper() if "Concept" in relative["structure_id"] else label
+        concept_graph.node(
+            relative["structure_id"],
+            label=label,
+            shape=shape,
+            URL=url(relative["structure_id"]),
+        )
+    for label in labels:
+        link_concept = [
+            c for c in link_concepts if c["structure_id"] == label["parent_concept"]
+        ][0]
+        if link_concept["name"] == "":
+            concept_graph.node(label["structure_id"], URL=url(label["structure_id"]))
+        else:
+            concept_graph.node(
+                label["structure_id"],
+                label=link_concept["name"].upper(),
+                URL=url(label["structure_id"]),
+            )
+    for relation in relations:
+        link_concept = [
+            c for c in link_concepts if c["structure_id"] == relation["parent_concept"]
+        ][0]
+        if link_concept["name"] == "":
+            concept_graph.node(
+                relation["structure_id"], URL=url(relation["structure_id"])
+            )
+        else:
+            concept_graph.node(
+                relation["structure_id"],
+                label=link_concept["name"].upper(),
+                URL=url(relation["structure_id"]),
+            )
+    for label in labels:
+        concept_graph.edge(label["structure_id"], label["start"], label="start")
+    for relation in relations:
+        concept_graph.edge(relation["structure_id"], relation["start"], label="start")
+        concept_graph.edge(relation["structure_id"], relation["end"], label="end")
+    concept_graph.render(
+        f"logs/{run_id}/structures/structures/{concept_id}/{time}", format="svg"
+    )
+    return concept_graph
 
 
 def generate_correspondence_graph(run_id, correspondence_id, time):
@@ -265,14 +335,26 @@ def generate_letter_chunk_graph(run_id, letter_chunk_id, time):
         r["start"] if r["start"] != letter_chunk["structure_id"] else r["end"]
         for r in relations
     ]
+    relatives = [
+        get_structure_json(run_id, relative_id, time) for relative_id in relative_ids
+    ]
     concepts = [
         get_structure_json(run_id, link["parent_concept"], time)
         for link in labels + relations
     ]
-    for relative_id in relative_ids:
-        if relative_id == letter_chunk_id:
+    for relative in relatives:
+        if relative["structure_id"] == letter_chunk_id:
             continue
-        letter_chunk_graph.node(relative_id, shape="rectangle", URL=url(relative_id))
+        shape = "rectangle" if "Chunk" in relative["structure_id"] else "circle"
+        label = relative["name"] if relative["name"] != "" else None
+        label = label.upper() if "Concept" in relative["structure_id"] else label
+        letter_chunk_graph.node(
+            relative["structure_id"],
+            label=label,
+            shape=shape,
+            URL=url(relative["structure_id"]),
+        )
+
     for label in labels:
         concept = [c for c in concepts if c["structure_id"] == label["parent_concept"]][
             0
@@ -284,7 +366,7 @@ def generate_letter_chunk_graph(run_id, letter_chunk_id, time):
         else:
             letter_chunk_graph.node(
                 label["structure_id"],
-                label=concept["name"],
+                label=concept["name"].upper(),
                 URL=url(label["structure_id"]),
             )
     for relation in relations:
@@ -298,7 +380,7 @@ def generate_letter_chunk_graph(run_id, letter_chunk_id, time):
         else:
             letter_chunk_graph.node(
                 relation["structure_id"],
-                label=concept["name"],
+                label=concept["name"].upper(),
                 URL=url(relation["structure_id"]),
             )
     for label in labels:
