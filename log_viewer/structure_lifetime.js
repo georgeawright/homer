@@ -12,6 +12,11 @@ exports.run = function(query) {
 <html>
   <head>
     <script src="https://d3js.org/d3.v6.js"></script>
+    <style>
+div.plot {
+  float: left;
+}
+    </style>
   </head>
   </body>
     <p><a href="../">&lt;&lt;All runs</a></p>
@@ -43,15 +48,6 @@ exports.run = function(query) {
       <a href="structures?run_id=${run_id}&page=${last_page}&items_per_page=${items_per_page}">&gt;&gt;</a>
 `;
     }
-    doc += `
-    </p>
-    <div id="activation_graph"></div>
-    <div id="unhappiness_graph"></div>
-    <div id="quality_graph"></div>
-`;
-    doc += activation_graph_script(query);
-    doc += unhappiness_graph_script(query);
-    doc += quality_graph_script(query);
 
     doc += `
     <ul>
@@ -66,6 +62,20 @@ exports.run = function(query) {
     });
     doc += `
     </ul>
+`;
+
+    doc += `
+    </p>
+    <div id="activation_graph" class="plot"></div>
+    <div id="unhappiness_graph" class="plot"></div>
+    <div id="quality_graph" class="plot"></div>
+`;
+    doc += activation_graph_script(query);
+    doc += unhappiness_graph_script(query);
+    doc += quality_graph_script(query);
+
+    doc += `
+
   </body>
 </html>
 `;

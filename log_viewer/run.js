@@ -8,6 +8,11 @@ exports.run = function(query) {
 <html>
   <head>
     <script src="https://d3js.org/d3.v6.js"></script>
+    <style>
+div.plot {
+  float: left;
+}
+    </style>
   </head>
   </body>
     <p><a href="../">&lt;&lt;All runs</a></p>
@@ -22,13 +27,13 @@ exports.run = function(query) {
     <p>${line}</p>`;
     });
     doc +=  `
-    <div id="satisfaction_graph"></div>`;
+    <div id="satisfaction_graph" class="plot"></div>`;
     doc += satisfaction_graph_script(query);
     doc +=  `
-    <div id="coderack_population_graph"></div>`;
+    <div id="coderack_population_graph" class="plot"></div>`;
     doc += coderack_pop_graph_script(query);
     doc +=  `
-    <div id="view_count_graph"></div>`;
+    <div id="view_count_graph" class="plot"></div>`;
     doc += view_count_graph_script(query);
     doc += `
   </body>
