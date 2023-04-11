@@ -27,7 +27,9 @@ div.plot {
     <p>
 `;
     structure_directory = log_directory + 'structures/structures/' + structure_id;
-    snapshot_files = fs.readdirSync(structure_directory);
+    snapshot_files = fs.readdirSync(structure_directory).filter(
+	function(a) {return a.split(".")[1] == "json"}
+    );
     snapshot_files.sort(
 	function(a, b) {return Number(a.split(".")[0]) - Number(b.split(".")[0])}
     );
