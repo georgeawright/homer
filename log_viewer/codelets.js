@@ -7,12 +7,14 @@ exports.run = function(query) {
     items_per_page = query.items_per_page == undefined ? 100 : Number(query.items_per_page);
     filter = query.filter;
     log_directory = 'logs/' + run_id + '/';
-    doc = '<html><body>';
-    doc += '<p><a href="../">&lt;&lt;All runs</a></p>';
-    doc += '<h1><a href="run?run_id=' + run_id + '">Linguoplotter run '+run_id+'</a></h1>';
-    doc += '<p><a href="codelets?run_id=' + run_id + '">Codelets</a></p>';
-    doc += '<p><a href="structures?run_id=' + run_id + '">Structures</a></p>';
-
+    doc =`
+<html>
+  <body>
+    <p><a href="../">&lt;&lt;All runs</a></p>
+    <h1><a href="run?run_id=${run_id}">Linguoplotter run ${run_id}</a></h1>
+    <p><a href="codelets?run_id=${run_id}">Codelets</a></p>
+    <p><a href="structures?run_id=${run_id}">Structures</a></p>
+`
     codelets_directory = log_directory + 'codelets/times';
     codelet_files = fs.readdirSync(codelets_directory);
     codelet_files.sort(
@@ -57,7 +59,7 @@ exports.run = function(query) {
 	url = 'codelet?run_id=' + run_id + '&codelet_number=' + codelet_number;
 	doc += '<ul><h2>' + codelet_number + ': '
 	    + '<a href="' + url + '">' + codelet_json.id + '</a></h2>'
-	    + '<p>Parent: ' + codelet_json.parent_id
+	    + '<p>Parent: ' + tools.json_to_html(codelet_json.parent_id, query)
 	    + ' | Urgency: ' + codelet_json.urgency + '</p>'
 	    + 'Targets: ' + tools.json_to_html(codelet_json.targets, query)
 	    + 'Activity: ' + tools.json_to_html(codelet_json.activity, query)
@@ -68,7 +70,7 @@ exports.run = function(query) {
 	    + ' | Coderack population: ' + codelet_json.coderack_population
 	    + ' | View count: ' + codelet_json.view_count + '</p>'
 	    + '<p>Focus: ' + codelet_json.focus + '</p>'
-	    + '<p>Worldview: ' + codelet_json.worldview + '</p>'
+	    + '<p>Worldview: ' + tools.json_to_html(codelet_json.worldview, query) + '</p>'
 	    + '</ul>';
 
     });

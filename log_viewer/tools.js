@@ -25,6 +25,7 @@ exports.get_graph = function(run_id, structure_id, time) {
 }
 
 exports.json_to_html = function(input,query) {
+    console.log(input, is_codelet_id(input));
     if (typeof(input) === 'number') {
 	return input;
     }
@@ -204,6 +205,7 @@ is_codelet_id = function(str) {
 	|| /Factory[0-9]+$/.exec(str)
 	|| /Collector[0-9]+$/.exec(str)
 	|| /Porter[0-9]+$/.exec(str)
+	|| /Publisher[0-9]+$/.exec(str)
 	|| /Recycler[0-9]+$/.exec(str);
 }
 
