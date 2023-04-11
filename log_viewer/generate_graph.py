@@ -227,6 +227,10 @@ def generate_chunk_graph(run_id, chunk_id, time):
         get_structure_json(run_id, link["parent_concept"], time)
         for link in labels + relations
     ]
+    conceptual_spaces = [
+        get_structure_json(run_id, relation["conceptual_space"], time)
+        for relation in relations
+    ]
     chunk_graph.node(
         chunk["structure_id"], shape="doublecircle", URL=url(chunk["structure_id"])
     )
@@ -243,23 +247,32 @@ def generate_chunk_graph(run_id, chunk_id, time):
         else:
             chunk_graph.node(
                 label["structure_id"],
-                label=concept["name"],
+                label=concept["name"].upper(),
                 URL=url(label["structure_id"]),
             )
     for relation in relations:
         concept = [
             c for c in concepts if c["structure_id"] == relation["parent_concept"]
         ][0]
-        if concept["name"] == "":
-            chunk_graph.node(
-                relation["structure_id"], URL=url(relation["structure_id"])
-            )
-        else:
-            chunk_graph.node(
-                relation["structure_id"],
-                label=concept["name"],
-                URL=url(relation["structure_id"]),
-            )
+        space = [
+            s
+            for s in conceptual_spaces
+            if s["structure_id"] == relation["conceptual_space"]
+        ][0]
+        concept_name = (
+            concept["name"].upper()
+            if concept["name"] != ""
+            else concept["structure_id"]
+        )
+        space_name = (
+            space["name"].upper() if space["name"] != "" else space["structure_id"]
+        )
+        link_label = f"{concept_name}-{space_name}"
+        chunk_graph.node(
+            relation["structure_id"],
+            label=link_label,
+            URL=url(relation["structure_id"]),
+        )
     for label in labels:
         chunk_graph.edge(label["structure_id"], label["start"], label="start")
     for relation in relations:
@@ -307,6 +320,10 @@ def generate_frame_graph(run_id, frame_id, time):
             get_structure_json(run_id, link["parent_concept"], time)
             for link in labels + relations
         ]
+        conceptual_spaces = [
+            get_structure_json(run_id, link["conceptual_space"], time)
+            for link in relations
+        ]
         with frame_graph.subgraph(name=cluster_name) as c:
             c.attr(style="filled", color=color, URL=url(space_id))
             c.node_attr.update(shape="rectangle", style="filled", color="white")
@@ -340,11 +357,24 @@ def generate_frame_graph(run_id, frame_id, time):
                     for c in link_concepts
                     if c["structure_id"] == relation["parent_concept"]
                 ][0]
-                link_label = (
-                    link_concept["name"].upper() if link_concept["name"] != "" else None
+                link_space = [
+                    s
+                    for s in conceptual_spaces
+                    if s["structure_id"] == relation["conceptual_space"]
+                ][0]
+                concept_name = (
+                    link_concept["name"].upper()
+                    if link_concept["name"] != ""
+                    else link_concept["structure_id"]
                 )
+                space_name = (
+                    link_space["name"].upper()
+                    if link_space["name"] != ""
+                    else link_space["structure_id"]
+                )
+                link_label = f"{concept_name}-{space_name}"
                 c.node(
-                    label["structure_id"],
+                    relation["structure_id"],
                     label=link_label,
                     URL=url(label["structure_id"]),
                 )
@@ -688,6 +718,14 @@ def generate_view_graph(run_id, view_id, time):
     letter_chunks = [
         node for node in nodes if "LetterChunk" in node["structure_id"]
     ] + [node for node in correspondence_args if "LetterChunk" in node["structure_id"]]
+    labels = [arg for arg in correspondence_args if "Label" in arg["structure_id"]]
+    relations = [
+        arg for arg in correspondence_args if "Relation" in arg["structure_id"]
+    ]
+    conceptual_spaces = [
+        get_structure_json(run_id, relation["conceptual_space"], time)
+        for relation in relations
+    ]
     parent_space_ids = {
         node["parent_space"] for node in concepts + chunks + letter_chunks
     }
@@ -707,69 +745,86 @@ def generate_view_graph(run_id, view_id, time):
                 continue
             cluster_name = f"cluster_{cluster_number}"
             cluster_number += 1
-            sub_graph_chunks = [
-                node["structure_id"]
-                for node in chunks
-                if node["parent_space"] == space_id
+            sub_graph_chunks = [c for c in chunks if c["parent_space"] == space_id]
+            sub_graph_letter_chunks = [
+                l for l in letter_chunks if l["parent_space"] == space_id
             ]
-            sub_graph_letter_chunks = {
-                node["structure_id"]: node["name"]
-                for node in letter_chunks
-                if node["parent_space"] == space_id
-            }
             sub_graph_labels = [
-                (
-                    link["structure_id"],
-                    concept["name"].upper()
-                    if concept["name"] != ""
-                    else concept["structure_id"],
+                l
+                for l in labels
+                if any(
+                    [
+                        c["structure_id"] == l["start"]
+                        for c in sub_graph_chunks + sub_graph_letter_chunks
+                    ]
                 )
-                for link in correspondence_args
-                for concept in concepts
-                if "Label" in link["structure_id"]
-                and link["start"]
-                in sub_graph_chunks + list(sub_graph_letter_chunks.keys())
-                and link["parent_concept"] == concept["structure_id"]
             ]
             sub_graph_relations = [
-                (
-                    link["structure_id"],
-                    concept["name"].upper()
-                    if concept["name"] != ""
-                    else concept["structure_id"],
+                r
+                for r in relations
+                if any(
+                    [
+                        c["structure_id"] in (r["start"], r["end"])
+                        for c in sub_graph_chunks + sub_graph_letter_chunks
+                    ]
                 )
-                for link in correspondence_args
-                for concept in concepts
-                if "Relation" in link["structure_id"]
-                and link["start"]
-                in sub_graph_chunks + list(sub_graph_letter_chunks.keys())
-                and link["end"]
-                in sub_graph_chunks + list(sub_graph_letter_chunks.keys())
-                and link["parent_concept"] == concept["structure_id"]
             ]
             with frame_graph.subgraph(name=cluster_name) as c:
                 c.attr(style="filled", color=color, URL=url(space_id))
-                c.node_attr.update(shape="circle", style="filled", color="white")
                 c.node_attr.update(shape="rectangle", style="filled", color="white")
                 for chunk in sub_graph_chunks:
-                    c.node(chunk, URL=url(chunk))
+                    c.node(chunk["structure_id"], URL=url(chunk["structure_id"]))
                 for letter_chunk in sub_graph_letter_chunks:
+                    label = letter_chunk["name"] if letter_chunk["name"] != "" else None
                     c.node(
-                        letter_chunk,
-                        label=sub_graph_letter_chunks[letter_chunk],
-                        URL=url(letter_chunk),
+                        letter_chunk["structure_id"],
+                        label=label,
+                        URL=url(letter_chunk["structure_id"]),
                     )
                 c.node_attr.update(shape="ellipse", style="filled", color="white")
                 for label in sub_graph_labels:
-                    if label[1] == "":
-                        c.node(label[0], URL=url(label[0]))
-                    else:
-                        c.node(label[0], label=label[1], URL=url(label[0]))
+                    link_concept = [
+                        c
+                        for c in concepts
+                        if c["structure_id"] == label["parent_concept"]
+                    ][0]
+                    link_label = (
+                        link_concept["name"].upper()
+                        if link_concept["name"] != ""
+                        else link_concept["structure_id"]
+                    )
+                    c.node(
+                        label["structure_id"],
+                        label=link_label,
+                        URL=url(label["structure_id"]),
+                    )
                 for relation in sub_graph_relations:
-                    if relation[1] == "":
-                        c.node(relation[0], URL=url(relation[0]))
-                    else:
-                        c.node(relation[0], label=relation[1], URL=url(relation[0]))
+                    link_concept = [
+                        c
+                        for c in concepts
+                        if c["structure_id"] == relation["parent_concept"]
+                    ][0]
+                    link_space = [
+                        s
+                        for s in conceptual_spaces
+                        if s["structure_id"] == relation["conceptual_space"]
+                    ][0]
+                    concept_name = (
+                        link_concept["name"].upper()
+                        if link_concept["name"] != ""
+                        else link_concept["structure_id"]
+                    )
+                    space_name = (
+                        link_space["name"].upper()
+                        if link_space["name"] != ""
+                        else link_space["structure_id"]
+                    )
+                    link_label = f"{concept_name}-{space_name}"
+                    c.node(
+                        relation["structure_id"],
+                        label=link_label,
+                        URL=url(label["structure_id"]),
+                    )
                 c.attr(label=space["name"])
         frame_graph.attr(label=frame["name"])
     for space in parent_spaces:
@@ -783,64 +838,84 @@ def generate_view_graph(run_id, view_id, time):
             color = "lightgreen"
         cluster_name = f"cluster_{cluster_number}"
         cluster_number += 1
-        sub_graph_chunks = [
-            node["structure_id"] for node in chunks if node["parent_space"] == space_id
+        sub_graph_chunks = [c for c in chunks if c["parent_space"] == space_id]
+        sub_graph_letter_chunks = [
+            l for l in letter_chunks if l["parent_space"] == space_id
         ]
-        sub_graph_letter_chunks = {
-            node["structure_id"]: node["name"]
-            for node in letter_chunks
-            if node["parent_space"] == space_id
-        }
         sub_graph_labels = [
-            (
-                link["structure_id"],
-                concept["name"].upper()
-                if concept["name"] != ""
-                else concept["structure_id"],
+            l
+            for l in labels
+            if any(
+                [
+                    c["structure_id"] == l["start"]
+                    for c in sub_graph_chunks + sub_graph_letter_chunks
+                ]
             )
-            for link in correspondence_args
-            for concept in concepts
-            if "Label" in link["structure_id"]
-            and link["start"] in sub_graph_chunks + list(sub_graph_letter_chunks.keys())
-            and link["parent_concept"] == concept["structure_id"]
         ]
         sub_graph_relations = [
-            (
-                link["structure_id"],
-                concept["name"].upper()
-                if concept["name"] != ""
-                else concept["structure_id"],
+            r
+            for r in relations
+            if any(
+                [
+                    c["structure_id"] in (r["start"], r["end"])
+                    for c in sub_graph_chunks + sub_graph_letter_chunks
+                ]
             )
-            for link in correspondence_args
-            for concept in concepts
-            if "Relation" in link["structure_id"]
-            and link["start"] in sub_graph_chunks + list(sub_graph_letter_chunks.keys())
-            and link["end"] in sub_graph_chunks + list(sub_graph_letter_chunks.keys())
-            and link["parent_concept"] == concept["structure_id"]
         ]
         with view_graph.subgraph(name=cluster_name) as c:
             c.attr(style="filled", color=color, URL=url(space_id))
-            c.node_attr.update(shape="circle", style="filled", color="white")
             c.node_attr.update(shape="rectangle", style="filled", color="white")
             for chunk in sub_graph_chunks:
-                c.node(chunk, URL=url(chunk))
+                c.node(chunk["structure_id"], URL=url(chunk["structure_id"]))
             for letter_chunk in sub_graph_letter_chunks:
+                label = letter_chunk["name"] if letter_chunk["name"] != "" else None
                 c.node(
-                    letter_chunk,
-                    label=sub_graph_letter_chunks[letter_chunk],
-                    URL=url(letter_chunk),
+                    letter_chunk["structure_id"],
+                    label=label,
+                    URL=url(letter_chunk["structure_id"]),
                 )
             c.node_attr.update(shape="ellipse", style="filled", color="white")
             for label in sub_graph_labels:
-                if label[1] == "":
-                    c.node(label[0], URL=url(label[0]))
-                else:
-                    c.node(label[0], label=label[1], URL=url(label[0]))
+                link_concept = [
+                    c for c in concepts if c["structure_id"] == label["parent_concept"]
+                ][0]
+                link_label = (
+                    link_concept["name"].upper()
+                    if link_concept["name"] != ""
+                    else link_concept["structure_id"]
+                )
+                c.node(
+                    label["structure_id"],
+                    label=link_label,
+                    URL=url(label["structure_id"]),
+                )
             for relation in sub_graph_relations:
-                if relation[1] == "":
-                    c.node(relation[0], URL=url(relation[0]))
-                else:
-                    c.node(relation[0], label=relation[1], URL=url(relation[0]))
+                link_concept = [
+                    c
+                    for c in concepts
+                    if c["structure_id"] == relation["parent_concept"]
+                ][0]
+                link_space = [
+                    s
+                    for s in conceptual_spaces
+                    if s["structure_id"] == relation["conceptual_space"]
+                ][0]
+                concept_name = (
+                    link_concept["name"].upper()
+                    if link_concept["name"] != ""
+                    else link_concept["structure_id"]
+                )
+                space_name = (
+                    link_space["name"].upper()
+                    if link_space["name"] != ""
+                    else link_space["structure_id"]
+                )
+                link_label = f"{concept_name}-{space_name}"
+                c.node(
+                    relation["structure_id"],
+                    label=link_label,
+                    URL=url(label["structure_id"]),
+                )
             c.attr(label=space["name"])
     for link in correspondence_args:
         if "Label" in link["structure_id"]:
@@ -872,6 +947,24 @@ def generate_view_graph(run_id, view_id, time):
             style="dashed",
             color=color,
         )
+    for label1 in labels:
+        for label2 in labels:
+            if label1 == label2:
+                continue
+            if label1["parent_concept"] != label2["parent_concept"]:
+                continue
+            concept = [
+                c for c in concepts if c["structure_id"] == label1["parent_concept"]
+            ][0]
+            if concept["name"] != "":
+                continue
+            view_graph.edge(
+                label1["structure_id"],
+                label2["structure_id"],
+                style="dashed",
+                color="blue",
+            )
+
     view_graph.render(
         f"logs/{run_id}/structures/structures/{view_id}/{time}", format="svg"
     )
