@@ -20,12 +20,8 @@ div.plot {
     <p><a href="codelets?run_id=${run_id}">Codelets</a></p>
     <p><a href="structures?run_id=${run_id}">Structures</a></p>
 `
-    details = String(fs.readFileSync(details_file));
-    lines = details.split("\n");
-    lines.forEach(line => {
-	doc += `
-    <p>${line}</p>`;
-    });
+    details = JSON.parse(fs.readFileSync(details_file));
+    doc += tools.json_to_html(details, query);
     doc +=  `
     <div id="satisfaction_graph" class="plot"></div>`;
     doc += satisfaction_graph_script(query);

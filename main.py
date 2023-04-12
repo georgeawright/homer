@@ -1,3 +1,4 @@
+import json
 import os
 import time
 
@@ -31,7 +32,8 @@ for program_file in program_files:
         logs_dir_path = f"{pwd}/logs/{time_string}"
         os.mkdir(logs_dir_path)
         with open(f"{logs_dir_path}/details.txt", "w") as f:
-            f.write(f"Program: {program_file}\nRandom seed: {i}\n")
+            run_details = {"Program": program_file, "random_seed": i}
+            f.write(json.dumps(run_details))
         error_file_name = f"{logs_dir_path}/errors.log"
         error_stream = open(error_file_name, "w")
         if DEVELOPMENT:
@@ -72,13 +74,9 @@ for program_file in program_files:
         os.chdir("../..")
         result = narrator.run()
         results.append(result)
-        with open(f"{logs_dir_path}/details.txt", "a") as f:
-            text = result["result"]
-            satisfaction = result["satisfaction"]
-            codelets_run = result["codelets_run"]
-            f.write(
-                f"Result: {text}\nSatisfaction: {satisfaction}\nCodelets run: {codelets_run}"
-            )
+        with open(f"{logs_dir_path}/details.txt", "w") as f:
+            run_details = dict(run_details, **result)
+            f.write(json.dumps(run_details))
     end_time = time.time()
     print(results)
     run_length = end_time - start_time

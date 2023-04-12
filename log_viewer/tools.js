@@ -25,7 +25,6 @@ exports.get_graph = function(run_id, structure_id, time) {
 }
 
 exports.json_to_html = function(input,query) {
-    console.log(input, is_codelet_id(input));
     if (typeof(input) === 'number') {
 	return input;
     }
@@ -52,7 +51,6 @@ exports.json_to_html = function(input,query) {
 	return html_string;
     }
     if (typeof(input) === 'object') {
-	console.log(input);
 	html_string = '<table>';
 	Object.entries(input).forEach(([k,v]) => {
 	    html_string += '<tr>'
@@ -128,6 +126,9 @@ structure_to_html = function(id, query) {
     );
     var structure_file = '';
     var latest_time = -1;
+    if (query.time === undefined) {
+	query.time = Infinity;
+    }
     structure_files.forEach(file => {
 	time = Number(file.split(".")[0]);
 	if (time <= query.time && time > latest_time) {
@@ -135,6 +136,9 @@ structure_to_html = function(id, query) {
 	    latest_time = time;
 	}
     });
+    if (query.time === Infinity) {
+	query.time = latest_time;
+    }
     structure_file = structure_directory + '/' + structure_file;
     var structure_json = JSON.parse(fs.readFileSync(structure_file));
     if (is_chunk_id(id)
