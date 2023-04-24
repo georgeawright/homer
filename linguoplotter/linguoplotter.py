@@ -67,6 +67,7 @@ class Linguoplotter:
         return {
             "random_seed": self.bubble_chamber.random_machine.seed,
             "result": self.bubble_chamber.result,
+            "worldview": self.bubble_chamber.worldview.view.structure_id,
             "satisfaction": self.bubble_chamber.worldview.satisfaction,
             "codelets_run": self.coderack.codelets_run,
         }

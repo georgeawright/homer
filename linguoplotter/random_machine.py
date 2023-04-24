@@ -49,6 +49,9 @@ class RandomMachine:
                 collection.pop(element)
         if len(collection) < 1:
             raise MissingStructureError
+        if len(collection) == 1:
+            for item in collection:
+                return item
         sample_size = min(
             math.ceil(len(collection) * self.determinism) + 1,
             len(collection),

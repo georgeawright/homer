@@ -73,8 +73,8 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             and self.targets["view"].members.not_empty
         ):
             if self.targets["sub_frame"] in self.targets["view"].matched_sub_frames:
-                self.bubble_chamber.loggers["activity"].log_set(
-                    self.targets["view"].matched_sub_frames, "matched sub frames"
+                self.bubble_chamber.loggers["activity"].log(
+                    "sub frame already in target view matched sub frames"
                 )
                 return False
             if self.targets["space"] is not None and self.targets["space"].is_slot:

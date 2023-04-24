@@ -10,8 +10,8 @@ class PotentialSubFrameToFrameCorrespondenceBuilder(CorrespondenceBuilder):
             )
             return False
         if self.targets["sub_frame"] in self.targets["view"].matched_sub_frames:
-            self.bubble_chamber.loggers["activity"].log_set(
-                self.targets["view"].matched_sub_frames, "matched sub frames"
+            self.bubble_chamber.loggers["activity"].log(
+                "Frame already in target view matched sub frames"
             )
             return False
         if self.targets["sub_view"].parent_frame.parent_concept.location_in_space(

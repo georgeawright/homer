@@ -139,7 +139,8 @@ class Coderack:
             try:
                 codelet.run()
             except Exception:
-                self.bubble_chamber.loggers["error"].log(codelet)
+                self.loggers["activity"].log_codelet_end(self.population_size)
+                self.loggers["error"].log(codelet)
         else:
             codelet.run()
         self.bubble_chamber.recalculate_satisfaction()

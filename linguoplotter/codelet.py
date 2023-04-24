@@ -27,6 +27,7 @@ class Codelet(ABC):
         self.targets = targets
         self.urgency = urgency
         self.child_codelets = []
+        self.child_structures = None
         self.result = None
 
     @classmethod

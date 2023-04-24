@@ -309,8 +309,14 @@ class CorrespondenceSuggester(Suggester):
                     for group in target_view.node_groups
                     if target_end in group.values()
                 ][0]
-                bubble_chamber.loggers["activity"].log_dict(
-                    node_group, "Target structure two node group"
+                bubble_chamber.loggers["activity"].log(
+                    "Target structure two node group"
+                )
+                bubble_chamber.loggers["activity"].log(
+                    {
+                        space.structure_id: node.structure_id
+                        for space, node in node_group.items()
+                    }
                 )
                 if child_codelet.targets["start_space"] in node_group:
                     child_codelet.targets["start"] = node_group[

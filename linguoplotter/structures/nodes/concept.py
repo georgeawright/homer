@@ -85,6 +85,8 @@ class Concept(Node):
             if self.structure_type is not None
             else None,
             "depth": self.depth,
+            "links_out": [link.structure_id for link in self.links_out],
+            "links_in": [link.structure_id for link in self.links_in],
             "quality": self.quality,
             "activation": self.activation,
         }

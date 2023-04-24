@@ -55,9 +55,6 @@ class Label(Link):
             "parent_concept": self.parent_concept.structure_id
             if self.parent_concept is not None
             else None,
-            "parent_concept_name": self.parent_concept.name
-            if self.parent_concept is not None
-            else None,
             "start": self.start.structure_id,
             "locations": [str(location) for location in self.locations],
             "parent_space": self.parent_space.structure_id,

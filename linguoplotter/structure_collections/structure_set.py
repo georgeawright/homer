@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List
+from typing import Dict, List
 
 from linguoplotter.structure_collection import StructureCollection
 
@@ -8,7 +8,7 @@ class StructureSet(StructureCollection):
     def __init__(
         self,
         bubble_chamber: "BubbleChamber",
-        structures: List["Structure"],
+        structures: Dict["Structure", bool],
         name: str = None,
     ):
         structures = {structure: True for structure in structures}
@@ -42,6 +42,16 @@ class StructureSet(StructureCollection):
         return StructureSet(
             a.bubble_chamber, [structure for structure in a if structure not in b]
         )
+
+    def __dict__(self) -> dict:
+        keys = list(self.structures.keys())
+        return {
+            i: keys[i].__dict__()
+            if isinstance(keys[i], StructureCollection)
+            else keys[i].structure_id
+            for i in range(len(keys))
+            if keys[i] is not None
+        }
 
     def __getitem__(self, name: str):
         if self.structures_by_name is None:

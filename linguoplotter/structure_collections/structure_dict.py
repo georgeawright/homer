@@ -13,6 +13,15 @@ class StructureDict(StructureCollection):
     ):
         StructureCollection.__init__(self, bubble_chamber, structures, name=name)
 
+    def __dict__(self) -> dict:
+        return {
+            key: value.__dict__()
+            if isinstance(value, StructureCollection)
+            else value.structure_id
+            for key, value in self.structures.items()
+            if value is not None
+        }
+
     def __getitem__(self, name: str):
         try:
             return self.structures[name]
