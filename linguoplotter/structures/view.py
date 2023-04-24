@@ -73,7 +73,6 @@ class View(Structure):
             "structure_id": self.structure_id,
             "parent_id": self.parent_id,
             "parent_frame": self.parent_frame.structure_id,
-            "parent_frame_name": self.parent_frame.name,
             "frames": [frame.structure_id for frame in self.frames],
             "super_views": [view.structure_id for view in self.super_views],
             "cohesion_views": [view.structure_id for view in self.cohesion_views],
@@ -81,7 +80,6 @@ class View(Structure):
             "input_spaces": [space.structure_id for space in self.input_spaces],
             "output_space": self.output_space.structure_id,
             "members": [correspondence.structure_id for correspondence in self.members],
-            "members_repr": [str(correspondence) for correspondence in self.members],
             "node_groups": [
                 {space.structure_id: node.structure_id for space, node in group.items()}
                 for group in self._node_groups

@@ -63,11 +63,7 @@ class Correspondence(Link):
             "structure_id": self.structure_id,
             "parent_id": self.parent_id,
             "parent_concept": self.parent_concept.structure_id,
-            "parent_concept_name": self.parent_concept.name,
             "conceptual_space": self.conceptual_space.structure_id
-            if self.conceptual_space is not None
-            else None,
-            "conceptual_space_name": self.conceptual_space.name
             if self.conceptual_space is not None
             else None,
             "start": self.start.structure_id,
@@ -76,7 +72,6 @@ class Correspondence(Link):
             "parent_view": self.parent_view.structure_id
             if self.parent_view is not None
             else None,
-            "parent_view_name": str(self.parent_view),
             "quality": self.quality,
             "activation": self.activation,
         }

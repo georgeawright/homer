@@ -65,13 +65,7 @@ class Relation(Link):
             "parent_concept": self.parent_concept.structure_id
             if self.parent_concept is not None
             else None,
-            "parent_concept_name": self.parent_concept.name
-            if self.parent_concept is not None
-            else None,
             "conceptual_space": self.conceptual_space.structure_id
-            if self.conceptual_space is not None
-            else None,
-            "conceptual_space_name": self.conceptual_space.name
             if self.conceptual_space is not None
             else None,
             "start": self.start.structure_id,
