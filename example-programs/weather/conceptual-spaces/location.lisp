@@ -125,80 +125,80 @@ lambda location: [[(c[0]+8-c[1])/2] for c in location.coordinates]
 
 (define north-word
   (def-letter-chunk :name "north" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 0 4)) location-space))))
 (def-relation :start north-concept :end north-word :parent_concept nn-concept)
 (def-relation :start north-concept :end north-word :parent_concept pp-allative-concept)
 (def-relation :start north-word :end -wards :parent_concept pp-allative-concept)
 (define south-word
   (def-letter-chunk :name "south" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 10 4)) location-space))))
 (def-relation :start south-concept :end south-word :parent_concept nn-concept)
 (def-relation :start south-concept :end south-word :parent_concept pp-allative-concept)
 (def-relation :start south-word :end -wards :parent_concept pp-allative-concept)
 (define west-word
   (def-letter-chunk :name "west" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 5 0)) location-space))))
 (def-relation :start west-concept :end west-word :parent_concept nn-concept)
 (def-relation :start west-concept :end west-word :parent_concept pp-allative-concept)
 (def-relation :start west-word :end -wards :parent_concept pp-allative-concept)
 (define east-word
   (def-letter-chunk :name "east" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 5 8)) location-space))))
 (def-relation :start east-concept :end east-word :parent_concept nn-concept)
 (def-relation :start east-concept :end east-word :parent_concept pp-allative-concept)
 (def-relation :start east-word :end -wards :parent_concept pp-allative-concept)
 (define northwest-word
   (def-letter-chunk :name "northwest" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 0 0)) location-space))))
 (def-relation :start northwest-concept :end northwest-word :parent_concept nn-concept)
 (def-relation :start northwest-concept :end northwest-word :parent_concept pp-allative-concept)
 (def-relation :start northwest-word :end -wards :parent_concept pp-allative-concept)
 (define northeast-word
   (def-letter-chunk :name "northeast" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 0 8)) location-space))))
 (def-relation :start northeast-concept :end northeast-word :parent_concept nn-concept)
 (def-relation :start northeast-concept :end northeast-word :parent_concept pp-allative-concept)
 (def-relation :start northeast-word :end -wards :parent_concept pp-allative-concept)
 (define southwest-word
   (def-letter-chunk :name "southwest" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 10 0)) location-space))))
 (def-relation :start southwest-concept :end southwest-word :parent_concept nn-concept)
 (def-relation :start southwest-concept :end southwest-word :parent_concept pp-allative-concept)
 (def-relation :start southwest-word :end -wards :parent_concept pp-allative-concept)
 (define southeast-word
   (def-letter-chunk :name "southeast" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 10 8)) location-space))))
 (def-relation :start southeast-concept :end southeast-word :parent_concept nn-concept)
 (def-relation :start southeast-concept :end southeast-word :parent_concept pp-allative-concept)
 (def-relation :start southeast-word :end -wards :parent_concept pp-allative-concept)
 (define centre-word
   (def-letter-chunk :name "centre" :parent_space peripheralness-space
-    :locations (list (Location (list) grammar-space))))
+    :locations (list nn-location)))
 (def-relation :start central-concept :end centre-word :parent_concept nn-concept)
 (define midlands-word
   (def-letter-chunk :name "midlands" :parent_space peripheralness-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location (list (list 5 4)) location-space)
 		     (Location (list (list 0)) peripheralness-space))))
 (def-relation :start central-concept :end midlands-word :parent_concept nn-concept)
 (define country-word
   (def-letter-chunk :name "country" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location
 		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
 		      location-space))))
 (def-relation :start everywhere-concept :end country-word :parent_concept nn-concept)
 (define majority-of-the-country-word
   (def-letter-chunk :name """majority of the country""" :parent_space location-space
-    :locations (list (Location (list) grammar-space)
+    :locations (list nn-location
 		     (Location
 		      (list (list 0 0) (list 0 8) (list 8 0) (list 8 8) (list 4 4))
 		      location-space))))

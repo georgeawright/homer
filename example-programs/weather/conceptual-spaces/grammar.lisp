@@ -4,7 +4,13 @@
     :instance_type LetterChunk))
 (define grammar-space
   (def-conceptual-space :name "grammar" :parent_concept grammar-concept
-    :no_of_dimensions 0 :is_basic_level True :is_symbolic True))
+    :no_of_dimensions 1 :is_basic_level True :is_symbolic True))
+(define string-concept
+  (def-concept :name "string" :distance_function boolean_distance
+    :instance_type LetterChunk))
+(define string-space
+  (def-conceptual-space :name "string" :parent_concept string-concept
+    :no_of_dimensions 1 :is_basic_level False :is_symbolic True))
 
 (define sentence-location (Location (list (list 1)) grammar-space))
 (define conjunction-location (Location (list (list 1)) grammar-space))

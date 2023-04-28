@@ -62,3 +62,6 @@
 (define less-interspatial-concept (def-concept :name "less-interspatial"))
 (def-relation :start less-concept :end less-interspatial-concept
   :parent_concept outer-concept)
+
+(def-relation :start and :end then :parent_concept more-concept :conceptual_space grammar-space)
+(def-relation :start but :end then :parent_concept more-concept :conceptual_space grammar-space)

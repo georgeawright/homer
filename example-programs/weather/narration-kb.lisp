@@ -34,6 +34,7 @@
 (load "frames/coherence-parallelism.lisp")
 (load "frames/coherence-disanalogy-1.lisp")
 (load "frames/coherence-disanalogy-2.lisp")
+(load "frames/coherence-combination.lisp")
 
 (define input-space
   (def-contextual-space

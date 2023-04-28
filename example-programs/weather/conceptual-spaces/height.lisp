@@ -23,13 +23,13 @@ lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
 
 (define high-word
   (def-letter-chunk :name "high" :parent_space height-space
-    :locations (list (Location (list (list 10)) height-space))))
+    :locations (list jj-location (Location (list (list 10)) height-space))))
 (def-relation :start high-concept :end high-word :parent_concept jj-concept)
 (def-relation :start high-concept :end high-word :parent_concept jjr-concept)
 (def-relation :start high-word :end -er :parent_concept jjr-concept)
 (define low-word
   (def-letter-chunk :name "low" :parent_space height-space
-    :locations (list (Location (list (list 0)) height-space))))
+    :locations (list jj-location (Location (list (list 0)) height-space))))
 (def-relation :start low-concept :end low-word :parent_concept jj-concept)
 (def-relation :start low-concept :end low-word :parent_concept jjr-concept)
 (def-relation :start low-word :end -er :parent_concept jjr-concept)

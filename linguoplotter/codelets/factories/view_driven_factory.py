@@ -393,6 +393,7 @@ class ViewDrivenFactory(Factory):
                 potential_start_views = self.bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
+                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
                 )
                 potential_start_targets = StructureSet.union(
                     *[
@@ -456,6 +457,7 @@ class ViewDrivenFactory(Factory):
                 potential_end_views = self.bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == end_sub_frame.parent_concept
+                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
                 )
                 if potential_end_views.is_empty:
                     raise MissingStructureError
@@ -620,6 +622,7 @@ class ViewDrivenFactory(Factory):
                     == start_sub_frame.parent_concept
                     and x.parent_frame
                     not in self.targets["view"].matched_sub_frames.values()
+                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
                 )
             else:
                 potential_start_views = self.bubble_chamber.views.filter(

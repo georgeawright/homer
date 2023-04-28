@@ -142,7 +142,11 @@ class Coderack:
                 self.loggers["activity"].log_codelet_end(self.population_size)
                 self.loggers["error"].log(codelet)
         else:
-            codelet.run()
+            try:
+                codelet.run()
+            except Exception as e:
+                self.loggers["activity"].log_codelet_end(self.population_size)
+                raise e
         self.bubble_chamber.recalculate_satisfaction()
         self.recently_run.add(type(codelet))
         self.codelets_run += 1
