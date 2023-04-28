@@ -123,7 +123,7 @@
 		     (Location (list) increase-sentence-output))))
 (define sentence-word-2
   (def-letter-chunk :name "will"
-    :locations (list vb-location
+    :locations (list aux-location
 		     (Location (list) increase-sentence-output))
     :parent_space increase-sentence-output
     :abstract_chunk will))

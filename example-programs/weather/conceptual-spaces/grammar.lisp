@@ -22,16 +22,17 @@
 (define nn-location (Location (list (list 7)) grammar-space))
 (define v-location (Location (list (list 8)) grammar-space))
 (define vb-location (Location (list (list 9)) grammar-space))
-(define jj-location (Location (list (list 10)) grammar-space))
-(define jjr-location (Location (list (list 11)) grammar-space))
-(define rb-location (Location (list (list 12)) grammar-space))
-(define cop-location (Location (list (list 13)) grammar-space))
-(define prep-location (Location (list (list 14)) grammar-space))
-(define det-location (Location (list (list 15)) grammar-space))
-(define nsubj-location (Location (list (list 16)) grammar-space))
-(define predicate-location (Location (list (list 17)) grammar-space))
-(define conj-location (Location (list (list 18)) grammar-space))
-(define null-location (Location (list (list 19)) grammar-space))
+(define aux-location (Location (list (list 10)) grammar-space))
+(define jj-location (Location (list (list 11)) grammar-space))
+(define jjr-location (Location (list (list 12)) grammar-space))
+(define rb-location (Location (list (list 13)) grammar-space))
+(define cop-location (Location (list (list 14)) grammar-space))
+(define prep-location (Location (list (list 15)) grammar-space))
+(define det-location (Location (list (list 16)) grammar-space))
+(define nsubj-location (Location (list (list 17)) grammar-space))
+(define predicate-location (Location (list (list 18)) grammar-space))
+(define conj-location (Location (list (list 19)) grammar-space))
+(define null-location (Location (list (list 20)) grammar-space))
 
 (define sentence-concept
   (def-concept :name "sentence" :locations (list sentence-location)
@@ -239,7 +240,7 @@
     :locations (list cop-location)))
 (define will
   (def-letter-chunk :name "will" :parent_space grammar-space
-    :locations (list vb-location)))
+    :locations (list aux-location)))
 (define be
   (def-letter-chunk :name "be" :parent_space grammar-space
     :locations (list vb-location be-location)))

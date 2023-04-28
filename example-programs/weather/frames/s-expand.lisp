@@ -185,7 +185,7 @@
 		     (Location (list) location-sub-frame-output))))
 (define sentence-word-5
   (def-letter-chunk :name "will"
-    :locations (list vb-location
+    :locations (list aux-location
 		     (Location (list) expand-sentence-output))
     :parent_space expand-sentence-output
     :abstract_chunk will))

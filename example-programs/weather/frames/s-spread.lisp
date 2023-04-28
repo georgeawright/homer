@@ -176,7 +176,7 @@
     :abstract_chunk temperatures))
 (define sentence-word-4
   (def-letter-chunk :name "will"
-    :locations (list vb-location
+    :locations (list aux-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
     :abstract_chunk will))
