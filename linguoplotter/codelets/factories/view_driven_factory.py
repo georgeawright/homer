@@ -623,6 +623,12 @@ class ViewDrivenFactory(Factory):
                     and x.parent_frame
                     not in self.targets["view"].matched_sub_frames.values()
                     and x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                    and not any(
+                        [
+                            x.raw_input_nodes == sub_view.raw_input_nodes
+                            for sub_view in self.targets["view"].sub_views
+                        ]
+                    )
                 )
             else:
                 potential_start_views = self.bubble_chamber.views.filter(
