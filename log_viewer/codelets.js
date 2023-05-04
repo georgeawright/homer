@@ -69,7 +69,7 @@ exports.run = function(query) {
 	    + '<p>Satisfaction: ' + codelet_json.satisfaction
 	    + ' | Coderack population: ' + codelet_json.coderack_population
 	    + ' | View count: ' + codelet_json.view_count + '</p>'
-	    + '<p>Focus: ' + codelet_json.focus + '</p>'
+	    + '<p>Focus: ' + tools.json_to_html(codelet_json.focus, query) + '</p>'
 	    + '<p>Worldview: ' + tools.json_to_html(codelet_json.worldview, query) + '</p>'
 	    + '</ul>';
 
