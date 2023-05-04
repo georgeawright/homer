@@ -257,15 +257,18 @@ class View(Structure):
                 and member.parent_concept.root.name == "not"
             ):
                 return 0.0
+        relevant_correspondences = self.members.filter(
+            lambda x: x.parent_view == self
+            and not (
+                not x.start.is_slot
+                and x.start in self.parent_frame.output_space.contents
+            )
+        )
         total_slots = (
-            len(self.members.where(parent_view=self))
-            + self.number_of_items_left_to_process
+            len(relevant_correspondences) + self.number_of_items_left_to_process
         )
         correspondence_quality = (
-            sum(
-                correspondence.quality
-                for correspondence in self.members.where(parent_view=self)
-            )
+            sum(correspondence.quality for correspondence in relevant_correspondences)
             / total_slots
         )
         try:

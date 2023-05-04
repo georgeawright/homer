@@ -100,6 +100,155 @@ class ViewBuilder(Builder):
         self._structure_concept.instances.add(view)
         self._structure_concept.recalculate_exigency()
         self.child_structures.add(view)
+        self._populate_view_output_space()
+
+    def _populate_view_output_space(self):
+        view = self.child_structures.get()
+        for chunk in view.parent_frame.output_space.contents.where(
+            is_chunk=True, is_slot=False
+        ):
+            abstract_chunk = chunk.abstract_chunk
+            output_location = Location(chunk.location.coordinates, view.output_space)
+            if abstract_chunk.members.is_empty:
+                new_chunk = abstract_chunk.copy_to_location(
+                    output_location,
+                    parent_id=self.codelet_id,
+                    bubble_chamber=self.bubble_chamber,
+                )
+            else:
+                locations = [
+                    location.copy()
+                    for location in abstract_chunk.locations
+                    if location.space.is_conceptual_space
+                ] + [output_location]
+                new_chunk = self.bubble_chamber.new_letter_chunk(
+                    name=None,
+                    locations=locations,
+                    parent_space=view.output_space,
+                    abstract_chunk=abstract_chunk,
+                    parent_id=self.codelet_id,
+                )
+            for member in chunk.left_branch:
+                if member.has_correspondence_to_space(view.output_space):
+                    correspondence = member.correspondences_to_space(
+                        view.output_space
+                    ).get()
+                    correspondee = correspondence.end
+                    new_chunk.left_branch.add(correspondee)
+                    new_chunk.members.add(correspondee)
+                    new_chunk.sub_chunks.add(correspondee)
+                    correspondee.super_chunks.add(new_chunk)
+                    new_chunk.update_string_location()
+            for member in chunk.right_branch:
+                if member.has_correspondence_to_space(view.output_space):
+                    correspondence = member.correspondences_to_space(
+                        view.output_space
+                    ).get()
+                    correspondee = correspondence.end
+                    new_chunk.right_branch.add(correspondee)
+                    new_chunk.members.add(correspondee)
+                    new_chunk.sub_chunks.add(correspondee)
+                    correspondee.super_chunks.add(new_chunk)
+                    new_chunk.update_string_location()
+            for super_chunk in chunk.super_chunks:
+                if super_chunk.has_correspondence_to_space(view.output_space):
+                    correspondence = super_chunk.correspondences_to_space(
+                        view.output_space
+                    ).get()
+                    correspondee = correspondence.end
+                    if chunk in super_chunk.left_branch:
+                        correspondee.left_branch.add(new_chunk)
+                    elif chunk in super_chunk.right_branch:
+                        correspondee.right_branch.add(new_chunk)
+                    correspondee.members.add(new_chunk)
+                    correspondee.sub_chunks.add(new_chunk)
+                    new_chunk.super_chunks.add(correspondee)
+                    correspondee.update_string_location()
+            self.bubble_chamber.new_correspondence(
+                parent_id=self.codelet_id,
+                start=chunk,
+                end=new_chunk,
+                locations=[chunk.location, new_chunk.location],
+                parent_concept=self.bubble_chamber.concepts["same"],
+                conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
+                parent_view=view,
+                quality=1.0,
+                is_projection=True,
+            )
+        for label in view.parent_frame.output_space.contents.filter(
+            lambda x: x.is_label and not x.parent_concept.is_slot
+        ):
+            if not label.start.has_correspondence_to_space(view.output_space):
+                continue
+            start_correspondence = label.start.correspondences_to_space(
+                view.output_space
+            ).get()
+            corresponding_start = start_correspondence.end
+            conceptual_location = label.location_in_space(
+                label.parent_concept.parent_space
+            )
+            output_location = corresponding_start.location_in_space(view.output_space)
+            locations = [conceptual_location, output_location]
+            new_label = self.bubble_chamber.new_label(
+                parent_id=self.codelet_id,
+                start=corresponding_start,
+                parent_concept=label.parent_concept,
+                locations=locations,
+                quality=1.0,
+            )
+            self.bubble_chamber.new_correspondence(
+                parent_id=self.codelet_id,
+                start=label,
+                end=new_label,
+                locations=[label.location, new_label.location],
+                parent_concept=self.bubble_chamber.concepts["same"],
+                conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
+                parent_view=view,
+                quality=1.0,
+                is_projection=True,
+            )
+        for relation in view.parent_frame.output_space.contents.filter(
+            lambda x: x.is_relation and not x.parent_concept.is_slot
+        ):
+            if not relation.start.has_correspondence_to_space(
+                view.output_space
+            ) and not relation.end.has_correspondence_to_space(view.output_space):
+                continue
+            start_correspondence = relation.start.correspondences_to_space(
+                view.output_space
+            ).get()
+            corresponding_start = start_correspondence.end
+            end_correspondence = relation.end.correspondences_to_space(
+                view.output_space
+            ).get()
+            corresponding_end = end_correspondence.end
+            conceptual_location = relation.location_in_space(
+                relation.parent_concept.parent_space
+            )
+            output_location = corresponding_start.location_in_space(view.output_space)
+            locations = [conceptual_location, output_location]
+            new_relation = self.bubble_chamber.new_relation(
+                parent_id=self.codelet_id,
+                start=corresponding_start,
+                end=corresponding_end,
+                parent_concept=relation.parent_concept,
+                locations=locations,
+                quality=1.0,
+            )
+            self.bubble_chamber.new_correspondence(
+                parent_id=self.codelet_id,
+                start=relation,
+                end=new_relation,
+                locations=[relation.location, new_relation.location],
+                parent_concept=self.bubble_chamber.concepts["same"],
+                conceptual_space=self.bubble_chamber.conceptual_spaces["grammar"],
+                parent_view=view,
+                quality=1.0,
+                is_projection=True,
+            )
+        for item in view.output_space.contents:
+            item.quality = 1.0
+            item._activation = 1.0
 
     def _fizzle(self):
         pass
