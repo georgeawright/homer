@@ -492,13 +492,6 @@ class BubbleChamber:
         grammar_concept: Concept = None,
         abstract_chunk: LetterChunk = None,
     ) -> LetterChunk:
-        has_string_location = False
-        for location in locations:
-            if location.space == self.conceptual_spaces["string"]:
-                location.coordinates == [[name]]
-                has_string_location = True
-        if not has_string_location:
-            locations.append(Location([[name]], self.conceptual_spaces["string"]))
         if left_branch is None:
             left_branch = self.new_set()
         if right_branch is None:
@@ -531,6 +524,15 @@ class BubbleChamber:
             member.recalculate_exigency()
             letter_chunk.sub_chunks.add(member)
             self.loggers["structure"].log(member)
+        has_string_location = False
+        for location in letter_chunk.locations:
+            if location.space == self.conceptual_spaces["string"]:
+                location.coordinates = [[letter_chunk.name]]
+                has_string_location = True
+        if not has_string_location:
+            letter_chunk.locations.append(
+                Location([[name]], self.conceptual_spaces["string"])
+            )
         self.add(letter_chunk)
         if meaning_concept is not None:
             self.new_relation(

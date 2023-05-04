@@ -23,7 +23,7 @@
     :conceptual_spaces (StructureSet conceptual-space)))
 (define ap-sub-frame-output
   (def-contextual-space :name "ap-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space conceptual-space)))
 (define ap-sub-frame
   (def-sub-frame :name "s-expand-ap-sub" :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureSet)
@@ -36,7 +36,7 @@
     :conceptual_spaces (StructureSet location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space location-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-expand-location-sub"
     :parent_concept pp-inessive-location-concept
@@ -51,7 +51,7 @@
     :conceptual_spaces (StructureSet time-space)))
 (define time-sub-frame-output
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space time-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-expand-time-sub"
     :parent_concept pp-directional-time-concept
@@ -66,7 +66,7 @@
     :conceptual_spaces (StructureSet location-space time-space conceptual-space)))
 (define expand-sentence-output
   (def-contextual-space :name "s-expand.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space verb-space location-space time-space
+    :conceptual_spaces (StructureSet string-space grammar-space verb-space location-space time-space
 					    size-space conceptual-space)))
 (define expand-sentence
   (def-frame :name "s-expand" :parent_concept sentence-concept :parent_frame None

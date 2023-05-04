@@ -338,14 +338,13 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     child_codelet.targets["start"].start
                     in view.parent_frame.input_space.contents
                     or child_codelet.targets["start"].start
-                    in view.parent_frame.output_space.contents
+                    in view.output_space.contents
                 ):
                     child_codelet.targets["start_sub_view"] = view
                 if (
                     child_codelet.targets["start"].end
                     in view.parent_frame.input_space.contents
-                    or child_codelet.targets["start"].end
-                    in view.parent_frame.output_space.contents
+                    or child_codelet.targets["start"].end in view.output_space.contents
                 ):
                     child_codelet.targets["end_sub_view"] = view
             for sub_frame in target_frame.sub_frames:

@@ -641,7 +641,6 @@ class ViewDrivenFactory(Factory):
                 *[
                     view.output_space.contents.filter(
                         lambda x: x.is_chunk
-                        and x.members.is_empty
                         and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
                     )
                     if self.targets["slot"].start

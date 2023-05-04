@@ -137,6 +137,54 @@ class LetterChunk(Chunk):
             return self.right_branch.get().rightmost_child
         return self.left_branch.get().rightmost_child
 
+    def lowest_common_ancestor_with(self, other: LetterChunk) -> LetterChunk:
+        def path_to_root(child):
+            path = []
+            super_chunk = child
+            while True:
+                path.append(super_chunk)
+                try:
+                    super_chunk = super_chunk.super_chunks.get()
+                except MissingStructureError:
+                    break
+            return path.reverse()
+
+        self_path_to_root = path_to_root(self)
+        other_path_to_root = path_to_root(other)
+        lowest_common_ancestor = None
+        for s, o in zip(self_path_to_root, other_path_to_root):
+            if s == o:
+                lowest_common_ancestor = s
+            if s != o:
+                break
+        return lowest_common_ancestor
+
+    def is_to_the_left_of(self, other: LetterChunk) -> bool:
+        common_ancestor = self.lowest_common_ancestor_with(other)
+        if common_ancestor is None:
+            return False
+        uncommon_ancestor = self
+        while True:
+            super_chunk = uncommon_ancestor.super_chunks.get()
+            if super_chunk != common_ancestor:
+                uncommon_ancestor = super_chunk
+            else:
+                break
+        return uncommon_ancestor in common_ancestor.left_branch
+
+    def update_string_location(self):
+        not_none = False
+        if self.structure_id == "LetterChunk569" and self.name is not None:
+            not_none = True
+        for location in self.locations:
+            if location.space.name != "string":
+                continue
+            location.coordinates = [[self.name]]
+        if self.structure_id == "LetterChunk569" and self.name is None and not_none:
+            raise Exception
+        for super_chunk in self.super_chunks:
+            super_chunk.update_string_location()
+
     def recalculate_unchunkedness(self):
         if self.is_abstract:
             self.unchunkedness = 0

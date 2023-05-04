@@ -3,7 +3,7 @@
     :conceptual_spaces (StructureSet)))
 (define temporal-order-sub-1-output
   (def-contextual-space :name "temporal-order-sub-1.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define temporal-order-sub-1
   (def-sub-frame :name "temporal-order-sub-1" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureSet)
@@ -15,7 +15,7 @@
     :conceptual_spaces (StructureSet)))
 (define temporal-order-sub-2-output
   (def-contextual-space :name "temporal-order-sub-2.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define temporal-order-sub-2
   (def-sub-frame :name "temporal-order-sub-2" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureSet)
@@ -28,7 +28,7 @@
     :conceptual_spaces (StructureSet)))
 (define temporal-order-output
   (def-contextual-space :name "temporal-order.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define temporal-order
   (def-frame :name "temporal-order" :parent_concept conjunction-concept :parent_frame None
     :depth 8

@@ -20,9 +20,9 @@
     :conceptual_spaces (StructureSet)))
 (define combination-sub-1-output
   (def-contextual-space :name "combination-sub-1.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define combination-sub-1
-  (def-sub-frame :name "combination-sub-1" :parent_concept sentence-concept :parent_frame None
+  (def-sub-frame :name "combination-sub-1" :parent_concept conjunction-concept :parent_frame None
     :sub_frames (StructureSet)
     :concepts (StructureSet)
     :input_space combination-sub-1-input
@@ -32,9 +32,9 @@
     :conceptual_spaces (StructureSet)))
 (define combination-sub-2-output
   (def-contextual-space :name "combination-sub-2.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define combination-sub-2
-  (def-sub-frame :name "combination-sub-2" :parent_concept sentence-concept :parent_frame None
+  (def-sub-frame :name "combination-sub-2" :parent_concept conjunction-concept :parent_frame None
     :sub_frames (StructureSet)
     :concepts (StructureSet)
     :input_space combination-sub-2-input
@@ -45,7 +45,7 @@
     :conceptual_spaces (StructureSet)))
 (define combination-output
   (def-contextual-space :name "combination.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define combination
   (def-frame :name "combination" :parent_concept conjunction-concept :parent_frame None
     :depth 8
@@ -63,7 +63,8 @@
 (define sentence-1-sentence-label
   (def-label :start sentence-1 :parent_concept sentence-concept
     :locations (list sentence-location
-		     (Location (list) combination-sub-1-output))))
+		     (Location (list) combination-sub-1-output))
+    :is_interspatial True))
 (define sentence-2
   (def-letter-chunk :name None
     :locations (list sentence-location
@@ -73,7 +74,8 @@
 (define sentence-2-sentence-label
   (def-label :start sentence-2 :parent_concept sentence-concept
     :locations (list sentence-location
-		     (Location (list) combination-sub-1-output))))
+		     (Location (list) combination-sub-1-output))
+    :is_interspatial True))
 (define sentence-3
   (def-letter-chunk :name None
     :locations (list sentence-location
@@ -112,6 +114,8 @@
     :is_interspatial True
     :parent_space None
     :conceptual_space string-space))
+((getattr (getattr combination "interspatial_links") "add") sentence-1-sentence-label)
+((getattr (getattr combination "interspatial_links") "add") sentence-2-sentence-label)
 ((getattr (getattr combination "interspatial_links") "add") relation-1-3)
 ((getattr (getattr combination "interspatial_links") "add") relation-2-4)
 

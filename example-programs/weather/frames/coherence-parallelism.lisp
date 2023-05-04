@@ -20,7 +20,7 @@
     :conceptual_spaces (StructureSet)))
 (define parallelism-sub-1-output
   (def-contextual-space :name "parallelism-sub-1.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define parallelism-sub-1
   (def-sub-frame :name "parallelism-sub-1" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureSet)
@@ -32,7 +32,7 @@
     :conceptual_spaces (StructureSet)))
 (define parallelism-sub-2-output
   (def-contextual-space :name "parallelism-sub-2.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define parallelism-sub-2
   (def-sub-frame :name "parallelism-sub-2" :parent_concept sentence-concept :parent_frame None
     :sub_frames (StructureSet)
@@ -45,7 +45,7 @@
     :conceptual_spaces (StructureSet)))
 (define parallelism-output
   (def-contextual-space :name "parallelism.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space)))
 (define parallelism
   (def-frame :name "parallelism" :parent_concept conjunction-concept :parent_frame None
     :depth 8

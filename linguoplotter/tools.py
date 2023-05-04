@@ -34,6 +34,8 @@ def size_euclidean_distance(a, b, return_nan: bool = False) -> float:
 
 
 def centroid_difference(a, b, return_nan: bool = False) -> float:
+    if isinstance(a[0][0], str):
+        return boolean_distance(a, b, return_nan=return_nan)
     nan_return_value = math.nan if return_nan else 0.0
     difference = average_vector(a)[0] - average_vector(b)[0]
     return difference if not math.isnan(difference) else nan_return_value
@@ -41,6 +43,10 @@ def centroid_difference(a, b, return_nan: bool = False) -> float:
 
 def boolean_distance(a, b, return_nan: bool = False) -> float:
     # TODO: this is not fully general
+    if isinstance(a[0][0], str):
+        if a[0][0] == b[0][0]:
+            return 0.0
+        return math.inf
     if (len(a) == 0 or len(b) == 0) and a != b:
         return math.inf
     if all([math.isnan(coord) for a_coords in a for coord in a_coords]):

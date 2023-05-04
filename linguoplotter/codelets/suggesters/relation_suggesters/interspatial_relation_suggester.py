@@ -39,7 +39,7 @@ class InterspatialRelationSuggester(RelationSuggester):
             view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
                 and not x.is_slot
-                and x.members.is_empty
+                and x.labels.not_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             ),
         ).get(key=unrelatedness)
@@ -65,9 +65,9 @@ class InterspatialRelationSuggester(RelationSuggester):
             )
         ).get()
         potential_spaces = view.output_space.conceptual_spaces.filter(
-            lambda x: not x.is_symbolic
+            lambda x: not x != bubble_chamber.spaces["grammar"]
             and (
-                x.no_of_dimensions == 1
+                x.no_of_dimensions == 1 and not x.is_symbolic
                 if parent_concept.parent_space.name == "more-less"
                 else True
             )
@@ -79,7 +79,7 @@ class InterspatialRelationSuggester(RelationSuggester):
             view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
                 and not x.is_slot
-                and x.members.is_empty
+                and x.labels.not_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             ),
         )
@@ -157,7 +157,7 @@ class InterspatialRelationSuggester(RelationSuggester):
                     view.output_space.contents.filter(
                         lambda x: x.is_letter_chunk
                         and not x.is_slot
-                        and x.members.is_empty
+                        and x.labels.not_empty
                         and x.parent_spaces.where(is_conceptual_space=True)
                         == self.targets["start"].parent_spaces.where(
                             is_conceptual_space=True
@@ -173,8 +173,9 @@ class InterspatialRelationSuggester(RelationSuggester):
         else:
             possible_ends = [self.targets["end"]]
         if self.targets["space"] is None:
-            possible_spaces = self.targets["start"].parent_spaces.where(
-                is_conceptual_space=True
+            possible_spaces = self.targets["start"].parent_spaces.filter(
+                lambda x: x.is_conceptual_space
+                and x != self.bubble_chamber.spaces["grammar"]
             )
         else:
             possible_spaces = [self.targets["space"]]
@@ -213,7 +214,8 @@ class InterspatialRelationSuggester(RelationSuggester):
                 end=x["end"],
                 concept=x["concept"],
                 space=x["space"],
-            ),
+            )
+            / x["concept"].number_of_components,
         )
         self.targets["concept"], self.targets["end"], self.targets["space"] = (
             targets["concept"],

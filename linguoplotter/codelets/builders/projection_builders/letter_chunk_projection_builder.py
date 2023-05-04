@@ -1,6 +1,7 @@
 from linguoplotter.location import Location
 from linguoplotter.codelets.builders import ProjectionBuilder
 from linguoplotter.errors import MissingStructureError
+from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structure_collection_keys import activation
 
 
@@ -32,7 +33,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 )
             else:
                 locations = [
-                    location
+                    location.copy()
                     for location in abstract_chunk.locations
                     if location.space.is_conceptual_space
                 ] + [output_location]
@@ -85,7 +86,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                     self.targets["view"].output_space,
                 )
                 locations = [
-                    location
+                    location.copy()
                     for location in abstract_chunk.locations
                     if location.space.is_conceptual_space
                 ] + [output_location]
@@ -118,6 +119,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 word.members.add(correspondee)
                 word.sub_chunks.add(correspondee)
                 correspondee.super_chunks.add(word)
+                word.update_string_location()
         for member in self.targets["projectee"].right_branch:
             if member.has_correspondence_to_space(self.targets["view"].output_space):
                 correspondence = member.correspondences_to_space(
@@ -131,6 +133,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 word.members.add(correspondee)
                 word.sub_chunks.add(correspondee)
                 correspondee.super_chunks.add(word)
+                word.update_string_location()
         for super_chunk in self.targets["projectee"].super_chunks:
             if super_chunk.has_correspondence_to_space(
                 self.targets["view"].output_space
@@ -152,6 +155,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
                 correspondee.members.add(word)
                 correspondee.sub_chunks.add(word)
                 word.super_chunks.add(correspondee)
+                correspondee.update_string_location()
         frame_to_output_correspondence = self.bubble_chamber.new_correspondence(
             parent_id=self.codelet_id,
             start=self.targets["projectee"],
@@ -186,12 +190,48 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
         return self._get_abstract_chunk_from_labels()
 
     def _get_abstract_chunk_from_correspondence(self):
+        # TODO: if abstract chunk has a sameness relation in semantic space (not grammar space) to an item that corresponds to something earlier in the sentence, probabilistically replace with relevant pronoun or empty string.
         node_group = [
             group
             for group in self.targets["view"].node_groups
             if self.targets["projectee"] in group.values()
         ][0]
-        return [node for node in node_group.values() if node.name is not None][0]
+        abstract_chunk = [
+            node for node in node_group.values() if node.name is not None
+        ][0]
+        try:
+            return self._get_pronoun(abstract_chunk)
+        except MissingStructureError:
+            pass
+        return abstract_chunk
+
+    def _get_pronoun(self, abstract_chunk):
+        sameness_relations = abstract_chunk.relations.filter(
+            lambda x: x.parent_concept == self.bubble_chamber.concepts["same"]
+            and x.conceptual_space != self.bubble_chamber.concepts["grammar"]
+        )
+        if sameness_relations.is_empty:
+            raise MissingStructureError
+        same_item = (
+            StructureSet.union(*[r.arguments for r in sameness_relations])
+            .filter(
+                lambda x: x != abstract_chunk
+                and x.has_correspondence_to_space(self.targets["view"].output_space)
+            )
+            .get()
+        )
+        same_item_projectee = same_item.correspondees.filter(
+            lambda x: x.has_location_in_space(
+                self.targets["view"].parent_frame.output_space
+            )
+        ).get()
+        if same_item_projectee.is_to_the_left_of(self.targets["projectee"]):
+            # return null chunk to avoid repetition
+            # TODO: probabilistically if nsubj, they, if pp-location there, if pp-time ""
+            return self.bubble_chamber.letter_chunks.filter(
+                lambda x: x.name == "" and not x.is_slot
+            ).get()
+        return abstract_chunk
 
     def _get_abstract_chunk_from_relations(self):
         # TODO: further divide according to combination types of meaning concept
