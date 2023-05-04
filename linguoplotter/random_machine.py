@@ -7,6 +7,9 @@ from .hyper_parameters import HyperParameters
 
 
 class RandomMachine:
+
+    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
+
     def __init__(self, bubble_chamber: "BubbleChamber", seed: int = None):
         self.bubble_chamber = bubble_chamber
         self.seed = seed
@@ -58,14 +61,13 @@ class RandomMachine:
         )
         sample = random.sample(list(collection), sample_size)
         key_weights = [key(item) for item in sample]
-        random_weights = [
-            self.generate_number(minimum=self.determinism) for item in sample
-        ]
-
+        random_weights = [self.generate_number() for item in sample]
         highest_weight = 0
         index_of_highest_weight = 0
         for i in range(len(sample)):
-            weight = key_weights[i] * random_weights[i]
+            weight = (
+                key_weights[i] * self.determinism + random_weights[i] * self.randomness
+            )
             if weight > highest_weight:
                 highest_weight = weight
                 index_of_highest_weight = i
