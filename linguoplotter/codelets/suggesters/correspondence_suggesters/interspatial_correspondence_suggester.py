@@ -183,9 +183,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     raise MissingStructureError
                 potential_start_targets = StructureSet.union(
                     *[
-                        view.output_space.contents.filter(
-                            lambda x: x.is_chunk and x.members.is_empty
-                        )
+                        view.output_space.contents.filter(lambda x: x.is_chunk)
                         if target_end.start in target_frame.output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
@@ -224,9 +222,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 else:
                     potential_start_targets = StructureSet.union(
                         *[
-                            view.output_space.contents.filter(
-                                lambda x: x.is_chunk and x.members.is_empty
-                            )
+                            view.output_space.contents.filter(lambda x: x.is_chunk)
                             if target_end.start in target_frame.output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
@@ -245,9 +241,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     raise MissingStructureError
                 potential_end_targets = StructureSet.union(
                     *[
-                        view.output_space.contents.filter(
-                            lambda x: x.is_chunk and x.members.is_empty
-                        )
+                        view.output_space.contents.filter(lambda x: x.is_chunk)
                         if target_end.start in target_frame.output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
@@ -286,9 +280,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 else:
                     potential_end_targets = StructureSet.union(
                         *[
-                            view.output_space.contents.filter(
-                                lambda x: x.is_chunk and x.members.is_empty
-                            )
+                            view.output_space.contents.filter(lambda x: x.is_chunk)
                             if target_end.start in target_frame.output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
@@ -401,9 +393,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     raise MissingStructureError
                 potential_start_targets = StructureSet.union(
                     *[
-                        view.output_space.contents.filter(
-                            lambda x: x.is_chunk and x.members.is_empty
-                        )
+                        view.output_space.contents.filter(lambda x: x.is_chunk)
                         if target_end.start in target_frame.output_space.contents
                         else view.parent_frame.input_space.contents.filter(
                             lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
@@ -442,9 +432,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 else:
                     potential_start_targets = StructureSet.union(
                         *[
-                            view.output_space.contents.filter(
-                                lambda x: x.is_chunk and x.members.is_empty
-                            )
+                            view.output_space.contents.filter(lambda x: x.is_chunk)
                             if target_end.start in target_frame.output_space.contents
                             else view.parent_frame.input_space.contents.filter(
                                 lambda x: x.is_chunk
@@ -453,6 +441,12 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             for view in potential_start_views
                         ]
                     )
+            if parent_codelet.codelet_id == "ViewDrivenFactory1708":
+                for view in potential_start_views:
+                    print(view)
+                for start in potential_start_targets:
+                    print(start)
+                exit()
             matching_labels = source_collection.filter(
                 lambda x: x.is_label
                 and x.is_interspatial
