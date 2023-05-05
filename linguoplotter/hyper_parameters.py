@@ -13,7 +13,6 @@ class HyperParameters:
     NUMBER_OF_START_CHUNK_SUGGESTERS = 7
 
     DETERMINISM_SMOOTHING_FUNCTION = lambda x: 0.5 * x + 0.25
-    PUBLICATION_PROBABILITY_EXPONENT = 5
 
     # TODO: these ought to be specific to each conceptual space
     DISTANCE_TO_PROXIMITY_WEIGHT = 1

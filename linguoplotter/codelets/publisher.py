@@ -12,7 +12,6 @@ from linguoplotter.structure_collections import StructureDict
 
 class Publisher(Codelet):
 
-    PUBLICATION_PROBABILITY_EXPONENT = HyperParameters.PUBLICATION_PROBABILITY_EXPONENT
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
     def __init__(
@@ -88,10 +87,19 @@ class Publisher(Codelet):
         )
         if not publish_concept.is_fully_active():
             self.bubble_chamber.loggers["activity"].log("Boosting publish concept")
+            self.bubble_chamber.loggers["activity"].log(
+                f"Worldview Satisfaction: {self.bubble_chamber.worldview.satisfaction}"
+            )
             publish_concept.boost_activation(
-                statistics.fmean(
-                    [self.bubble_chamber.worldview.satisfaction, self.urgency]
-                )
+                publish_concept.activation
+                + HyperParameters.MINIMUM_ACTIVATION_UPDATE
+                # fuzzy.OR(
+                #    self.bubble_chamber.worldview.satisfaction,
+                #    publish_concept.activation,
+                # )
+                # statistics.fmean(
+                #    [self.bubble_chamber.worldview.satisfaction, self.urgency]
+                # )
             )
             self._fizzle()
             self.result = CodeletResult.FIZZLE
