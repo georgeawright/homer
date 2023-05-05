@@ -441,12 +441,6 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             for view in potential_start_views
                         ]
                     )
-            if parent_codelet.codelet_id == "ViewDrivenFactory1708":
-                for view in potential_start_views:
-                    print(view)
-                for start in potential_start_targets:
-                    print(start)
-                exit()
             matching_labels = source_collection.filter(
                 lambda x: x.is_label
                 and x.is_interspatial
