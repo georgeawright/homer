@@ -188,9 +188,11 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             letter_chunks = view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
                 and not x.is_slot
-                and x.labels.not_empty
+                and x.labels.where(is_interspatial=True).not_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             )
+            if letter_chunks.is_empty:
+                raise MissingStructureError
             relations = StructureSet.intersection(
                 *[c.relations.where(is_interspatial=True) for c in letter_chunks]
             )

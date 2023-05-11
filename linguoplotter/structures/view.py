@@ -472,9 +472,13 @@ class View(Structure):
         if (
             end.is_link
             and end.is_interspatial
-            and end.correspondences.where(end=end).not_empty
+            and sub_view is not None
+            and end.correspondences.filter(
+                lambda x: x.end == end and x not in sub_view.members
+            ).not_empty
         ):
             if verbose:
+                print(end.correspondences)
                 print("1.1")
             return False
         if (

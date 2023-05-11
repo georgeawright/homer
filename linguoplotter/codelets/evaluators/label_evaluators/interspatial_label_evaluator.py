@@ -36,17 +36,14 @@ class InterspatialLabelEvaluator(LabelEvaluator):
 
     def _calculate_confidence(self):
         target_label = self.targets.get()
-        target_node = (
-            target_label.start
-            if not target_label.start.is_slot
-            else target_label.start.non_slot_value
-        )
-        parent_concept = target_label.parent_concept
-        space = target_label.parent_spaces.where(is_conceptual_space=True).get()
-        classification = parent_concept.classifier.classify(
-            concept=parent_concept, space=space, start=target_node
+        classification = target_label.parent_concept.classifier.classify(
+            start=target_label.start,
+            concept=target_label.parent_concept,
+            space=target_label.parent_spaces.where(is_conceptual_space=True).get(),
         )
         self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
-        self.confidence = classification / parent_concept.number_of_components
+        self.confidence = (
+            classification / target_label.parent_concept.number_of_components
+        )
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_label.activation

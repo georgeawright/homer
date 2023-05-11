@@ -67,7 +67,6 @@ class ContextualSpace(Space):
 
     @property
     def quality(self):
-
         active_contents = self.contents.filter(lambda x: x.activation > 0.5)
         if active_contents.is_empty:
             return 0.0

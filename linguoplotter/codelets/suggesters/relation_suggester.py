@@ -162,16 +162,19 @@ class RelationSuggester(Suggester):
                 and concept.parent_space.name == "same-different"
             )
         ]
-        targets = self.bubble_chamber.random_machine.select(
-            possible_target_combos,
-            key=lambda x: x["concept"].classifier.classify(
-                start=x["start"],
-                end=x["end"],
-                concept=x["concept"],
-                space=x["space"],
+        try:
+            targets = self.bubble_chamber.random_machine.select(
+                possible_target_combos,
+                key=lambda x: x["concept"].classifier.classify(
+                    start=x["start"],
+                    end=x["end"],
+                    concept=x["concept"],
+                    space=x["space"],
+                )
+                / x["concept"].number_of_components,
             )
-            / x["concept"].number_of_components,
-        )
+        except MissingStructureError:
+            return False
         self.targets["concept"], self.targets["end"], self.targets["space"] = (
             targets["concept"],
             targets["end"],

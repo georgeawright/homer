@@ -21,7 +21,17 @@ class RandomMachine:
 
     @property
     def determinism(self) -> FloatBetweenOneAndZero:
-        return self.determinism_smoothing_function(self.bubble_chamber.satisfaction)
+        try:
+            improvement = (
+                1 / self.bubble_chamber.focus_setters_since_last_successful_focus_unset
+            )
+        except ZeroDivisionError:
+            improvement = 1
+        return self.determinism_smoothing_function(
+            self.bubble_chamber.satisfaction,
+            self.bubble_chamber.change_in_satisfaction,
+            improvement,
+        )
 
     @property
     def randomness(self) -> FloatBetweenOneAndZero:

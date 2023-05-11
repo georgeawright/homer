@@ -705,9 +705,7 @@ class ViewDrivenFactory(Factory):
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
                 key=lambda x: x["concept"].classifier.classify(
-                    start=x["start"].non_slot_value
-                    if x["start"].is_slot
-                    else x["start"],
+                    start=x["start"],
                     concept=x["concept"],
                     space=x["space"],
                 ),

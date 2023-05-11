@@ -39,7 +39,7 @@ class InterspatialRelationSuggester(RelationSuggester):
             view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
                 and not x.is_slot
-                and x.labels.not_empty
+                and x.labels.where(is_interspatial=True).not_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             ),
         ).get(key=unrelatedness)
@@ -79,7 +79,7 @@ class InterspatialRelationSuggester(RelationSuggester):
             view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
                 and not x.is_slot
-                and x.labels.not_empty
+                and x.labels.where(is_interspatial=True).not_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             ),
         )
@@ -157,7 +157,7 @@ class InterspatialRelationSuggester(RelationSuggester):
                     view.output_space.contents.filter(
                         lambda x: x.is_letter_chunk
                         and not x.is_slot
-                        and x.labels.not_empty
+                        and x.labels.where(is_interspatial=True).not_empty
                         and x.parent_spaces.where(is_conceptual_space=True)
                         == self.targets["start"].parent_spaces.where(
                             is_conceptual_space=True

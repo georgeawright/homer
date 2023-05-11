@@ -97,6 +97,7 @@ class Linguoplotter:
         print(
             f"codelets run: {codelets_run}; "
             + f"satisf.: {bubble_chamber_satisfaction}; "
+            + f"determ.: {self.bubble_chamber.random_machine.determinism}; "
             + f"coderack pop.: {coderack_population}; "
             + f"view count.: {view_count}; "
             + f"recycle bin: {len(self.bubble_chamber.recycle_bin)}; "

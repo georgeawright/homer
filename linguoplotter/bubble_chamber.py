@@ -56,6 +56,9 @@ class BubbleChamber:
 
         self.satisfaction = 0
         self.general_satisfaction = 0
+        self.previous_satisfaction = 0
+        self.change_in_satisfaction = 0
+        self.focus_setters_since_last_successful_focus_unset = 0
         self.result = None
         self.log_count = 0
 
@@ -88,6 +91,9 @@ class BubbleChamber:
         self.views = self.new_set()
         self.satisfaction = 0
         self.general_satisfaction = 0
+        self.previous_satisfaction = 0
+        self.change_in_satisfaction = 0
+        self.focus_setters_since_last_successful_focus_unset = 0
         self.result = None
         self.log_count = 0
 
@@ -166,6 +172,7 @@ class BubbleChamber:
             self.satisfaction = max(self.general_satisfaction, self.focus.satisfaction)
         else:
             self.satisfaction = self.general_satisfaction
+        self.change_in_satisfaction = self.satisfaction - self.previous_satisfaction
 
     def recalculate_general_satisfaction(self):
         main_input_space = self.contextual_spaces.where(is_main_input=True).get()
@@ -183,6 +190,8 @@ class BubbleChamber:
         )
 
     def update_activations(self) -> None:
+        self.change_in_satisfaction = self.satisfaction - self.previous_satisfaction
+        self.previous_satisfaction = self.satisfaction
         self.worldview.activate()
         for structure in self.structures:
             structure.recalculate_activation()

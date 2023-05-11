@@ -103,9 +103,7 @@ class InterspatialLabelSuggester(LabelSuggester):
             classification = self.targets["concept"].classifier.classify(
                 concept=self.targets["concept"],
                 space=self.targets["space"],
-                start=self.targets["start"].non_slot_value
-                if self.targets["start"].is_slot
-                else self.targets["start"],
+                start=self.targets["start"],
             )
             self.bubble_chamber.loggers["activity"].log(
                 f"Preliminary classification: {classification}"
@@ -175,9 +173,7 @@ class InterspatialLabelSuggester(LabelSuggester):
         classification = self.targets["concept"].classifier.classify(
             concept=self.targets["concept"],
             space=self.targets["space"],
-            start=self.targets["start"].non_slot_value
-            if self.targets["start"].is_slot
-            else self.targets["start"],
+            start=self.targets["start"],
         )
         self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
         self.confidence = classification / self.targets["concept"].number_of_components

@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class HyperParameters:
     FLOATING_POINT_TOLERANCE = 1e-5
     CODELET_RUN_LIMIT = 20000
@@ -12,7 +15,32 @@ class HyperParameters:
     MINIMUM_CODELET_URGENCY = 0.01
     NUMBER_OF_START_CHUNK_SUGGESTERS = 7
 
-    DETERMINISM_SMOOTHING_FUNCTION = lambda x: 0.5 * x + 0.25
+    MAXIMUM_DETERMINISM = 0.9
+    MINIMUM_DETERMINISM = 0.25
+
+    a = 0.4
+    b = 0.0
+    c = 0.6
+    d = 0.0
+
+    # some alternative weights:
+    # a = 0.7
+    # b = 25.0
+    # c = 0.0
+    # d = 0.1
+
+    DETERMINISM_SMOOTHING_FUNCTION = (
+        lambda satisfaction, change_in_satisfaction, focus_improvement: min(
+            max(
+                HyperParameters.a * satisfaction
+                + HyperParameters.b * change_in_satisfaction
+                + HyperParameters.c * focus_improvement
+                + HyperParameters.d,
+                HyperParameters.MINIMUM_DETERMINISM,
+            ),
+            HyperParameters.MAXIMUM_DETERMINISM,
+        )
+    )
 
     # TODO: these ought to be specific to each conceptual space
     DISTANCE_TO_PROXIMITY_WEIGHT = 1

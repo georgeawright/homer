@@ -62,6 +62,7 @@ class FocusSetter(Codelet):
             self.bubble_chamber.loggers["activity"].log("No view and frame found.")
             self.result = CodeletResult.FIZZLE
             self._fizzle()
+        self.bubble_chamber.focus_setters_since_last_successful_focus_unset += 1
         return self.result
 
     def _update_codelet_urgencies(self):

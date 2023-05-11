@@ -54,6 +54,8 @@ class FocusUnsetter(Codelet):
         change_in_satisfaction_score = (
             current_satisfaction_score - self.last_satisfaction_score
         )
+        if change_in_satisfaction_score > 0:
+            self.bubble_chamber.focus_setters_since_last_successful_focus_unset = 0
         transposed_change_in_satisfaction_score = (
             change_in_satisfaction_score * 0.5
         ) + 0.5
