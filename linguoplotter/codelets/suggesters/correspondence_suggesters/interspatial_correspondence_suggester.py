@@ -444,6 +444,9 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             matching_labels = source_collection.filter(
                 lambda x: x.is_label
                 and x.is_interspatial
+                and x.correspondences.filter(
+                    lambda c: c in target_view.members
+                ).is_empty
                 and x.quality > 0
                 and x.start in potential_start_targets
                 and x.parent_concept == target_end.parent_concept

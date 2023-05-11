@@ -85,7 +85,8 @@
 (define sentence-3-sentence-label
   (def-label :start sentence-3 :parent_concept sentence-concept
     :locations (list sentence-location
-		     (Location (list) combination-sub-2-output))))
+		     (Location (list) combination-sub-2-output))
+    :is_interspatial True))
 (define sentence-4
   (def-letter-chunk :name None
     :locations (list sentence-location
@@ -94,8 +95,9 @@
     :parent_space combination-sub-2-output))
 (define sentence-4-sentence-label
   (def-label :start sentence-4 :parent_concept sentence-concept
-    :locations (list (Location (list (list Nan)) conceptual-space)
-		     (Location (list) combination-sub-2-output))))
+    :locations (list sentence-location
+		     (Location (list) combination-sub-2-output))
+    :is_interspatial True))
 (define relation-1-3
   (def-relation :start sentence-1 :end sentence-3 :parent_concept same-concept
     :quality 1.0
@@ -116,6 +118,8 @@
     :conceptual_space string-space))
 ((getattr (getattr combination "interspatial_links") "add") sentence-1-sentence-label)
 ((getattr (getattr combination "interspatial_links") "add") sentence-2-sentence-label)
+((getattr (getattr combination "interspatial_links") "add") sentence-3-sentence-label)
+((getattr (getattr combination "interspatial_links") "add") sentence-4-sentence-label)
 ((getattr (getattr combination "interspatial_links") "add") relation-1-3)
 ((getattr (getattr combination "interspatial_links") "add") relation-2-4)
 
