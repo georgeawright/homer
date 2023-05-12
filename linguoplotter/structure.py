@@ -76,6 +76,8 @@ class Structure(ABC):
         self.is_conceptual_space = False
         self.is_contextual_space = False
         self.is_frame = False
+        self.is_merged_frame = False
+        self.is_sub_frame = False
         self.is_template = False
 
     @classmethod

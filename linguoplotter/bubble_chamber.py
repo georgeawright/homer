@@ -15,6 +15,7 @@ from .recycle_bin import RecycleBin
 from .structure import Structure
 from .structure_collections import StructureDict, StructureList, StructureSet
 from .structures import Frame, Space, View
+from .structures.frames import MergedFrame
 from .structures.links import Correspondence, Label, Relation
 from .structures.nodes import Chunk, Concept
 from .structures.nodes.chunks import LetterChunk
@@ -154,6 +155,7 @@ class BubbleChamber:
             ConceptualSpace: "conceptual_spaces",
             ContextualSpace: "contextual_spaces",
             Frame: "frames",
+            MergedFrame: "merged_frames",
             # nodes
             Chunk: "chunks",
             Concept: "concepts",
@@ -429,6 +431,31 @@ class BubbleChamber:
             parent_id=parent_id,
             is_sub_frame=True,
         )
+
+    def new_merged_frame(
+        self,
+        name: str,
+        parent_concept: "Concept",
+        component_frames: StructureList,
+        depth: int = None,
+        parent_id: str = None,
+    ):
+        frame = MergedFrame(
+            structure_id=ID.new(MergedFrame),
+            parent_id=parent_id,
+            name=name,
+            parent_concept=parent_concept,
+            component_frames=component_frames,
+            links_in=self.new_set(),
+            links_out=self.new_set(),
+            parent_spaces=self.new_set(),
+            instances=self.new_set(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
+            depth=depth,
+        )
+        self.add(frame)
+        return frame
 
     def new_chunk(
         self,

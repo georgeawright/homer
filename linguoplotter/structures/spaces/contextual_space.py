@@ -155,6 +155,7 @@ class ContextualSpace(Space):
                     end=new_end,
                     parent_space=new_space,
                     bubble_chamber=bubble_chamber,
+                    parent_id=self.codelet_id,
                 )
                 new_end.links_in.add(new_relation)
                 new_item.links_out.add(new_relation)

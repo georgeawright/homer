@@ -260,6 +260,25 @@ class Frame(Structure):
         input_copies: dict = None,
         output_copies: dict = None,
     ):
+        instance, _ = self.instantiate_with_copies_map(
+            input_space,
+            conceptual_spaces_map,
+            parent_id,
+            bubble_chamber,
+            input_copies,
+            output_copies,
+        )
+        return instance
+
+    def instantiate_with_copies_map(
+        self,
+        input_space: "ContextualSpace",
+        conceptual_spaces_map: dict,
+        parent_id: str,
+        bubble_chamber,
+        input_copies: dict = None,
+        output_copies: dict = None,
+    ):
         input_copies = {} if input_copies is None else input_copies
         output_copies = {} if output_copies is None else output_copies
         # need to copy the concepts to prevent interference between frame instances
@@ -384,7 +403,8 @@ class Frame(Structure):
         )
         for abstract_space, conceptual_space in conceptual_spaces_map:
             new_frame.specify_space(abstract_space, conceptual_space)
-        return new_frame
+        copies_map = dict(input_copies, **output_copies)
+        return new_frame, copies_map
 
     def __repr__(self) -> str:
         return f"<{self.structure_id} {self.name}>"
