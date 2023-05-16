@@ -42,7 +42,7 @@ class FocusSetter(Codelet):
                 and v.members.filter(
                     lambda c: c.parent_concept.name == "not(same)"
                 ).is_empty
-            ).get(key=exigency)
+            ).get(key=lambda x: fuzzy.AND(x.exigency, 1 - 1 / x.parent_frame.depth))
             self.bubble_chamber.focus.frame = target_view.parent_frame
             self.bubble_chamber.focus.view = target_view
             self.bubble_chamber.loggers["activity"].log(
