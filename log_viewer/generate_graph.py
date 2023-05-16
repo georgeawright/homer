@@ -376,7 +376,7 @@ def generate_frame_graph(run_id, frame_id, time):
                 c.node(
                     relation["structure_id"],
                     label=link_label,
-                    URL=url(label["structure_id"]),
+                    URL=url(relation["structure_id"]),
                 )
             for label in labels:
                 c.edge(label["structure_id"], label["start"], label="start")
@@ -823,7 +823,7 @@ def generate_view_graph(run_id, view_id, time):
                     c.node(
                         relation["structure_id"],
                         label=link_label,
-                        URL=url(label["structure_id"]),
+                        URL=url(relation["structure_id"]),
                     )
                 c.attr(label=space["name"])
         frame_graph.attr(label=frame["name"])
@@ -914,7 +914,7 @@ def generate_view_graph(run_id, view_id, time):
                 c.node(
                     relation["structure_id"],
                     label=link_label,
-                    URL=url(label["structure_id"]),
+                    URL=url(relation["structure_id"]),
                 )
             c.attr(label=space["name"])
     for link in correspondence_args:

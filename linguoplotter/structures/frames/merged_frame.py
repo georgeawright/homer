@@ -41,3 +41,11 @@ class MergedFrame(Frame):
         )
         self.component_frames = component_frames
         self.is_merged_frame = True
+
+    def __dict__(self) -> dict:
+        return {
+            "structure_id": self.structure_id,
+            "name": self.name,
+            "component_frames": [frame.structure_id for frame in self.component_frames],
+            "activation": self.activation,
+        }

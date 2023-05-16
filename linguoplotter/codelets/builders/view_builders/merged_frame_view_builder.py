@@ -10,9 +10,9 @@ class MergedFrameViewBuilder(ViewBuilder):
 
     def _process_structure(self):
         self._copy_view()
-        self._populate_view_output_space()
         self._generate_progenitor_frame()
         self._merge_frame()
+        self._populate_view_output_space()
         new_view = self.child_structures.get()
         new_view.parent_frame.parent_view = new_view
         new_view.parent_frame.parent_concept.instances.add(new_view)
@@ -35,8 +35,10 @@ class MergedFrameViewBuilder(ViewBuilder):
         old_view = self.targets["view"]
         old_frame = self.targets["view"].parent_frame
         view_id = ID.new(View)
-        new_output_space, output_space_copies = old_view.output_space.copy(
-            bubble_chamber=self.bubble_chamber, parent_id=self.codelet_id
+        new_output_space = self._create_view_output(
+            view_id,
+            old_view.output_space.parent_concept,
+            old_view.output_space.conceptual_spaces,
         )
         new_frame, frame_copies = old_frame.instantiate_with_copies_map(
             input_space=old_frame.input_space,
@@ -44,7 +46,6 @@ class MergedFrameViewBuilder(ViewBuilder):
             parent_id=self.codelet_id,
             bubble_chamber=self.bubble_chamber,
         )
-        new_frame.progenitor = self.targets["progenitor_frame"]
         new_view = View(
             structure_id=view_id,
             parent_id=self.codelet_id,
@@ -64,18 +65,14 @@ class MergedFrameViewBuilder(ViewBuilder):
             champion_labels=self.bubble_chamber.new_set(),
             champion_relations=self.bubble_chamber.new_set(),
         )
-        item_copies_map = dict(output_space_copies, **frame_copies)
         for correspondence in old_view.members:
-            start = (
-                item_copies_map[correspondence.start]
-                if correspondence.start in item_copies_map
-                else correspondence.start
-            )
-            end = (
-                item_copies_map[correspondence.end]
-                if correspondence.end in item_copies_map
-                else correspondence.end
-            )
+            if correspondence.end in old_view.output_space.contents:
+                continue
+            if correspondence.parent_view != old_view:
+                new_view.add(correspondence)
+                continue
+            start = correspondence.start
+            end = frame_copies[correspondence.end]
             new_correspondence = self.bubble_chamber.new_correspondence(
                 start=start,
                 end=end,
@@ -92,8 +89,11 @@ class MergedFrameViewBuilder(ViewBuilder):
     def _merge_frame(self):
         view = self.child_structures.get()
         parent_frame = view.parent_frame
+        parent_frame.name = self.targets["progenitor_frame"].name
         parent_frame_root_sentence = parent_frame.output_space.contents.filter(
-            lambda x: x.is_letter_chunk and x.super_chunks.is_empty
+            lambda x: x.is_letter_chunk
+            and x.super_chunks.is_empty
+            and x.members.not_empty
         ).get()
         parent_frame_left_sentence = parent_frame_root_sentence.left_branch.get()
         parent_frame_right_sentence = (
@@ -113,8 +113,11 @@ class MergedFrameViewBuilder(ViewBuilder):
             if parent_frame_right_sentence in s.output_space.contents
         ][0]
         new_frame = self.targets["frame"]
+        parent_frame._depth += new_frame.depth
         new_frame_root_sentence = new_frame.output_space.contents.filter(
-            lambda x: x.is_letter_chunk and x.super_chunks.is_empty
+            lambda x: x.is_letter_chunk
+            and x.super_chunks.is_empty
+            and x.members.not_empty
         ).get()
         new_frame_left_sentence = new_frame_root_sentence.left_branch.get()
         new_frame_right_sentence = (
@@ -157,7 +160,19 @@ class MergedFrameViewBuilder(ViewBuilder):
                     parent_id=self.codelet_id,
                     new_location=new_location,
                 )
-                spaces_map[arg.parent_space].add(new_item)
+                for location in arg.locations:
+                    if (
+                        location.space.is_contextual_space
+                        and location.space != arg.parent_space
+                    ):
+                        new_item.locations.append(
+                            Location(
+                                arg.location_in_space(location.space).coordinates,
+                                spaces_map[location.space],
+                            )
+                        )
+                for location in new_item.locations:
+                    location.space.add(new_item)
                 item_copies_map[arg] = new_item
                 for label in arg.labels:
                     new_label = label.copy(
@@ -177,15 +192,18 @@ class MergedFrameViewBuilder(ViewBuilder):
                     new_relation = relation.copy(
                         start=new_item,
                         end=new_end,
-                        parent_space=spaces_map[relation.parent_space],
+                        parent_space=spaces_map[relation.parent_space]
+                        if relation.parent_space is not None
+                        else None,
                         bubble_chamber=self.bubble_chamber,
                         parent_id=self.codelet_id,
                     )
                     new_end.links_in.add(new_relation)
                     new_item.links_out.add(new_relation)
-                    spaces_map[relation.parent_space].add(new_relation)
                     item_copies_map[relation] = new_relation
                     parent_frame.interspatial_links.add(relation)
+                    if relation.parent_space is not None:
+                        spaces_map[relation.parent_space].add(new_relation)
                 for relation in arg.links_in.where(is_relation=True):
                     if relation.start not in item_copies_map:
                         continue
@@ -193,35 +211,40 @@ class MergedFrameViewBuilder(ViewBuilder):
                     new_relation = relation.copy(
                         start=new_start,
                         end=new_item,
-                        parent_space=spaces_map[relation.parent_space],
+                        parent_space=spaces_map[relation.parent_space]
+                        if relation.parent_space is not None
+                        else None,
                         bubble_chamber=self.bubble_chamber,
                         parent_id=self.codelet_id,
                     )
                     new_item.links_in.add(new_relation)
                     new_start.links_out.add(new_relation)
-                    spaces_map[relation.parent_space].add(new_relation)
                     item_copies_map[relation] = new_relation
                     parent_frame.interspatial_links.add(new_relation)
+                    if relation.parent_space is not None:
+                        spaces_map[relation.parent_space].add(new_relation)
         # merge conjunctions in correct order
         parent_frame_root_sentence.right_branch.get().left_branch.remove(
             parent_frame_conjunction
         )
         new_frame_conjunction_copy = new_frame_conjunction.copy_to_location(
-            parent_frame_conjunction.location_in_space(parent_frame.output_space)
+            parent_frame_conjunction.location_in_space(parent_frame.output_space),
+            bubble_chamber=self.bubble_chamber,
+            parent_id=self.codelet_id,
         )
         (left_branch, right_branch) = (
             (
-                self.bubble_chamber.new_structure_set(new_frame_conjunction_copy),
-                self.bubble_chamber.new_structure_set(parent_frame_conjunction),
+                self.bubble_chamber.new_set(new_frame_conjunction_copy),
+                self.bubble_chamber.new_set(parent_frame_conjunction),
             )
             if new_frame_conjunction_copy.abstract_chunk.relations.where(
-                end=parent_frame_conjunction,
+                end=parent_frame_conjunction.abstract_chunk,
                 parent_concept=self.bubble_chamber.concepts["more"],
                 conceptual_space=self.bubble_chamber.spaces["grammar"],
             )
             else (
-                self.bubble_chamber.new_structure_set(parent_frame_conjunction),
-                self.bubble_chamber.new_structure_set(new_frame_conjunction_copy),
+                self.bubble_chamber.new_set(parent_frame_conjunction),
+                self.bubble_chamber.new_set(new_frame_conjunction_copy),
             )
         )
         conjunction_super_chunk = self.bubble_chamber.new_letter_chunk(
@@ -243,12 +266,12 @@ class MergedFrameViewBuilder(ViewBuilder):
         frame_2 = self.targets["frame"].progenitor
         component_frames = (
             self.bubble_chamber.new_list(frame_1, frame_2)
-            if frame_1.has_relation.where(
+            if frame_1.relations.where(
                 start=frame_1,
                 end=frame_2,
                 parent_concept=self.bubble_chamber.concepts["more"],
                 conceptual_space=self.bubble_chamber.spaces["grammar"],
-            )
+            ).not_empty
             else self.bubble_chamber.new_list(frame_2, frame_1)
         )
         name = "+".join([f.name for f in component_frames])
@@ -259,3 +282,5 @@ class MergedFrameViewBuilder(ViewBuilder):
             depth=frame_1.depth,
             parent_id=self.codelet_id,
         )
+        new_view = self.child_structures.get()
+        new_view.parent_frame.parent_frame = self.targets["progenitor_frame"]

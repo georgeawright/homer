@@ -1,3 +1,4 @@
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
@@ -52,7 +53,7 @@ class WorldviewPorter(Codelet):
                     self.bubble_chamber.spaces["grammar"]
                 )
                 and x != self.bubble_chamber.worldview.view
-            ).get(key=lambda x: x.activation)
+            ).get(key=lambda x: fuzzy.AND(x.activation, 1 - 1 / x.parent_frame.depth))
             self.run_competition()
             self._engender_follow_up()
         except MissingStructureError:

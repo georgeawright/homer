@@ -358,36 +358,33 @@ class Frame(Structure):
                     copy.parent_space = space_copies[original.parent_space]
                 elif original.is_label or original.is_relation:
                     copy._parent_space = space_copies[original.parent_space]
-        interspatial_links = StructureSet.union(
-            bubble_chamber.new_set(
-                *[
-                    relation.copy(
-                        bubble_chamber=bubble_chamber,
-                        start=input_copies[relation.start]
-                        if relation.start in input_copies
-                        else output_copies[relation.start],
-                        end=input_copies[relation.end]
-                        if relation.end in input_copies
-                        else output_copies[relation.end],
-                    )
-                    for relation in self.interspatial_links.where(is_relation=True)
-                ]
-            ),
-            bubble_chamber.new_set(
-                *[
-                    label.copy(
-                        bubble_chamber=bubble_chamber,
-                        start=input_copies[label.start]
-                        if label.start in input_copies
-                        else output_copies[label.start],
-                    )
-                    for label in self.interspatial_links.where(is_label=True)
-                ]
-            ),
-        )
-        for link in interspatial_links:
-            if link.parent_concept in concept_copies:
-                link._parent_concept = concept_copies[link.parent_concept]
+        interspatial_links = bubble_chamber.new_set()
+        interspatial_link_copies = {}
+        for relation in self.interspatial_links.where(is_relation=True):
+            relation_copy = relation.copy(
+                bubble_chamber=bubble_chamber,
+                start=input_copies[relation.start]
+                if relation.start in input_copies
+                else output_copies[relation.start],
+                end=input_copies[relation.end]
+                if relation.end in input_copies
+                else output_copies[relation.end],
+            )
+            if relation.parent_concept in concept_copies:
+                relation_copy._parent_concept = concept_copies[relation.parent_concept]
+            interspatial_links.add(relation_copy)
+            interspatial_link_copies[relation] = relation_copy
+        for label in self.interspatial_links.where(is_label=True):
+            label_copy = label.copy(
+                bubble_chamber=bubble_chamber,
+                start=input_copies[label.start]
+                if label.start in input_copies
+                else output_copies[label.start],
+            )
+            if label.parent_concept in concept_copies:
+                label_copy._parent_concept = concept_copies[label.parent_concept]
+            interspatial_links.add(label_copy)
+            interspatial_link_copies[label] = label_copy
         new_frame = bubble_chamber.new_frame(
             parent_id=parent_id,
             name=ID.new_frame_instance(self.name),
@@ -403,7 +400,13 @@ class Frame(Structure):
         )
         for abstract_space, conceptual_space in conceptual_spaces_map:
             new_frame.specify_space(abstract_space, conceptual_space)
-        copies_map = dict(input_copies, **output_copies)
+        copies_map = {}
+        for k, v in input_copies.items():
+            copies_map[k] = v
+        for k, v in output_copies.items():
+            copies_map[k] = v
+        for k, v in interspatial_link_copies.items():
+            copies_map[k] = v
         return new_frame, copies_map
 
     def __repr__(self) -> str:

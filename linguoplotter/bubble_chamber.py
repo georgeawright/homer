@@ -40,6 +40,7 @@ class BubbleChamber:
         self.conceptual_spaces = None
         self.contextual_spaces = None
         self.frames = None
+        self.merged_frames = None
         self.frame_instances = None
 
         self.concepts = None
@@ -79,6 +80,7 @@ class BubbleChamber:
         self.conceptual_spaces = self.new_set()
         self.contextual_spaces = self.new_set()
         self.frames = self.new_set()
+        self.merged_frames = self.new_set()
         self.frame_instances = self.new_set()
         self.concepts = self.new_set()
         self.chunks = self.new_set()
@@ -136,6 +138,7 @@ class BubbleChamber:
             self.conceptual_spaces,
             self.contextual_spaces,
             self.frames,
+            self.merged_frames,
             self.chunks,
             self.concepts,
             self.correspondences,

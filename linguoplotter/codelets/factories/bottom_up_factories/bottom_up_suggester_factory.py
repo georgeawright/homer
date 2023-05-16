@@ -15,6 +15,7 @@ from linguoplotter.codelets.suggesters.relation_suggesters import (
 from linguoplotter.codelets.suggesters.view_suggester import (
     BottomUpCohesionViewSuggester,
 )
+from linguoplotter.codelets.suggesters.view_suggesters import MergedFrameViewSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection_keys import activation
@@ -31,6 +32,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         text_uncohesiveness = self._uncohesiveness_of_texts()
         text_unlabeledness = self._unlabeledness_of_letter_chunks()
         text_unrelatedness = self._unrelatedness_of_letter_chunks()
+        view_unmergedness = self._unmergedness_of_views()
 
         self.bubble_chamber.loggers["activity"].log(
             f"Unchunkedness of raw chunks: {input_unchunkedness}\n"
@@ -40,7 +42,8 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             + f"Uncorrespondedness of links: {input_uncorrespondedness}\n"
             + f"Unchohesiveness of texts: {text_uncohesiveness}\n"
             + f"Unlabeledness of letter chunks: {text_unlabeledness}\n"
-            + f"Unrelatedness of letter chunks: {text_unrelatedness}",
+            + f"Unrelatedness of letter chunks: {text_unrelatedness}\n"
+            + f"Unmergedness of views: {view_unmergedness}",
         )
 
         class_urgencies = [
@@ -52,6 +55,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             (BottomUpCohesionViewSuggester, text_uncohesiveness),
             (InterspatialLabelSuggester, text_unrelatedness),
             (InterspatialRelationSuggester, text_unrelatedness),
+            (MergedFrameViewSuggester, view_unmergedness),
         ]
 
         follow_up_class = self.bubble_chamber.random_machine.select(
@@ -201,3 +205,24 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             )
         except MissingStructureError:
             return float("-inf")
+
+    def _unmergedness_of_views(self):
+        number_of_merged_frame_views = len(
+            self.bubble_chamber.views.filter(
+                lambda x: x.parent_frame.progenitor.is_merged_frame
+            )
+        )
+        number_of_views_with_mergeable_frames = len(
+            self.bubble_chamber.views.filter(
+                lambda x: x.parent_frame.progenitor.relations.where(
+                    parent_concept=self.bubble_chamber.concepts["more"],
+                    conceptual_space=self.bubble_chamber.spaces["grammar"],
+                ).not_empty
+            )
+        )
+        try:
+            return 1 - (
+                number_of_merged_frame_views / number_of_views_with_mergeable_frames
+            )
+        except ZeroDivisionError:
+            return 0.0

@@ -34,7 +34,20 @@
 (load "frames/coherence-parallelism.lisp")
 (load "frames/coherence-disanalogy-1.lisp")
 (load "frames/coherence-disanalogy-2.lisp")
-(load "frames/coherence-combination.lisp")
+
+(def-relation
+  :start disanalogy-1 :end temporal-order
+  :parent_concept more-concept :conceptual_space grammar-space)
+(def-relation
+  :start disanalogy-2 :end temporal-order
+  :parent_concept more-concept :conceptual_space grammar-space)
+(def-relation
+  :start parallelism :end temporal-order
+  :parent_concept more-concept :conceptual_space grammar-space)
+(def-relation
+  :start textual-order :end temporal-order
+  :parent_concept more-concept :conceptual_space grammar-space)
+
 
 (define input-space
   (def-contextual-space

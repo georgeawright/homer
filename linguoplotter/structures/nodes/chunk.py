@@ -245,7 +245,7 @@ class Chunk(Node):
         new_members = bubble_chamber.new_set()
         for member in self.members:
             if member not in copies:
-                copies[member] = member.copy(
+                copies[member], copies = member.copy_with_contents(
                     copies=copies,
                     bubble_chamber=bubble_chamber,
                     parent_id=parent_id,

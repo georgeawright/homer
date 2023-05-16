@@ -115,7 +115,9 @@ class ViewBuilder(Builder):
         for chunk in view.parent_frame.output_space.contents.where(
             is_chunk=True, is_slot=False
         ):
-            abstract_chunk = chunk.abstract_chunk
+            abstract_chunk = (
+                chunk.abstract_chunk if chunk.abstract_chunk is not None else chunk
+            )
             output_location = Location(chunk.location.coordinates, view.output_space)
             if abstract_chunk.members.is_empty:
                 new_chunk = abstract_chunk.copy_to_location(

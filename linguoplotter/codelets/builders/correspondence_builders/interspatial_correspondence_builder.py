@@ -43,6 +43,11 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                     correspondence.start,
                     correspondence.end,
                     sub_view=self.targets["start_sub_view"],
+                ) and not self.targets["view"].has_member(
+                    correspondence.parent_concept,
+                    correspondence.conceptual_space,
+                    correspondence.start,
+                    correspondence.end,
                 ):
                     self.bubble_chamber.loggers["activity"].log(
                         repr(self.targets["view"]) + f" cannot accept {correspondence}"
@@ -59,6 +64,11 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                     correspondence.start,
                     correspondence.end,
                     sub_view=self.targets["end_sub_view"],
+                ) and not self.targets["view"].has_member(
+                    correspondence.parent_concept,
+                    correspondence.conceptual_space,
+                    correspondence.start,
+                    correspondence.end,
                 ):
                     self.bubble_chamber.loggers["activity"].log(
                         repr(self.targets["view"]) + f" cannot accept {correspondence}"

@@ -358,6 +358,7 @@ class ViewDrivenFactory(Factory):
             target_start_space = None
             target_end_space = None
             for link in self.targets["frame"].interspatial_links:
+                # TODO: this information should be stored in the view
                 for correspondee in link.correspondees:
                     if (
                         link.start.parent_space
