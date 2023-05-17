@@ -46,6 +46,7 @@ class ViewSelector(Selector):
                             lambda v: v.parent_frame.parent_concept == f.parent_concept
                             and v.members.is_empty
                         ).is_empty
+                        and not f.is_merged_frame
                     )
                     .get(key=exigency)
                 )

@@ -14,6 +14,7 @@ from .random_machine import RandomMachine
 from .recycle_bin import RecycleBin
 from .structure import Structure
 from .structure_collections import StructureDict, StructureList, StructureSet
+from .structure_collection_keys import activation
 from .structures import Frame, Space, View
 from .structures.frames import MergedFrame
 from .structures.links import Correspondence, Label, Relation
@@ -25,6 +26,7 @@ from .worldview import Worldview
 
 
 class BubbleChamber:
+    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
     JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
     MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
     VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_VIEW_QUALITIES_WEIGHT
@@ -193,6 +195,34 @@ class BubbleChamber:
                 self.WORLDVIEW_WEIGHT * self.worldview.satisfaction,
             ]
         )
+
+    @property
+    def unrelatedness_of_letter_chunks(self):
+        try:
+            views = self.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.spaces["grammar"]
+                )
+                == self.concepts["sentence"].location_in_space(self.spaces["grammar"])
+            ).sample(2, key=activation)
+            view = views.get()
+            letter_chunks = view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and not x.is_slot
+                and x.labels.not_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            )
+            if letter_chunks.is_empty:
+                raise MissingStructureError
+            relations = StructureSet.intersection(
+                *[c.relations.where(is_interspatial=True) for c in letter_chunks]
+            )
+            return 1 - sum([r.quality * r.activation for r in relations]) / len(
+                view.output_space.conceptual_spaces
+            )
+        except MissingStructureError:
+            return float("-inf")
 
     def update_activations(self) -> None:
         self.change_in_satisfaction = self.satisfaction - self.previous_satisfaction

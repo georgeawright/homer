@@ -89,6 +89,7 @@ class MergedFrameViewBuilder(ViewBuilder):
     def _merge_frame(self):
         view = self.child_structures.get()
         parent_frame = view.parent_frame
+        parent_frame.is_merged_frame = True
         parent_frame.name = self.targets["progenitor_frame"].name
         parent_frame_root_sentence = parent_frame.output_space.contents.filter(
             lambda x: x.is_letter_chunk

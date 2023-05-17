@@ -178,33 +178,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             return float("-inf")
 
     def _unrelatedness_of_letter_chunks(self):
-        try:
-            views = self.bubble_chamber.views.filter(
-                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                and x.parent_frame.parent_concept.location_in_space(
-                    self.bubble_chamber.spaces["grammar"]
-                )
-                == self.bubble_chamber.concepts["sentence"].location_in_space(
-                    self.bubble_chamber.spaces["grammar"]
-                )
-            ).sample(2, key=activation)
-            view = views.get()
-            letter_chunks = view.output_space.contents.filter(
-                lambda x: x.is_letter_chunk
-                and not x.is_slot
-                and x.labels.where(is_interspatial=True).not_empty
-                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
-            )
-            if letter_chunks.is_empty:
-                raise MissingStructureError
-            relations = StructureSet.intersection(
-                *[c.relations.where(is_interspatial=True) for c in letter_chunks]
-            )
-            return 1 - sum([r.quality * r.activation for r in relations]) / len(
-                view.output_space.conceptual_spaces
-            )
-        except MissingStructureError:
-            return float("-inf")
+        return self.bubble_chamber.unrelatedness_of_letter_chunks
 
     def _unmergedness_of_views(self):
         number_of_merged_frame_views = len(

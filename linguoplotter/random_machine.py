@@ -55,6 +55,7 @@ class RandomMachine:
         collection: dict,
         key: callable = lambda x: 0,
         exclude: list = None,
+        verbose: bool = False,
     ):
         exclude = [] if exclude is None else exclude
         for element in exclude:
@@ -78,6 +79,8 @@ class RandomMachine:
             weight = (
                 key_weights[i] * self.determinism + random_weights[i] * self.randomness
             )
+            if verbose:
+                print(sample[i], weight)
             if weight > highest_weight:
                 highest_weight = weight
                 index_of_highest_weight = i
