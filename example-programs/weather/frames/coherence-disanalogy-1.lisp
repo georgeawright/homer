@@ -8,6 +8,8 @@
 				      height-space
 				      goodness-space)
     :no_of_dimensions Nan))
+(define subject-relation-concept
+  (def-concept :name "" :is_slot True :parent_space same-different-space))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
 (define comparison-concept
@@ -50,7 +52,7 @@
   (def-frame :name "disanalogy-1" :parent_concept conjunction-concept :parent_frame None
     :depth 8
     :sub_frames (StructureSet disanalogy-1-sub-1 disanalogy-1-sub-2)
-    :concepts (StructureSet)
+    :concepts (StructureSet subject-relation-concept)
     :input_space disanalogy-1-input
     :output_space disanalogy-1-output))
 
@@ -152,16 +154,6 @@
     :parent_space None
     :conceptual_space conceptual-space))
 
-((getattr (getattr disanalogy-1 "interspatial_links") "add") verb-1-label)
-((getattr (getattr disanalogy-1 "interspatial_links") "add") verb-2-label)
-((getattr (getattr disanalogy-1 "interspatial_links") "add") letter-chunk-1-first-label)
-((getattr (getattr disanalogy-1 "interspatial_links") "add") letter-chunk-2-last-label)
-((getattr (getattr disanalogy-1 "interspatial_links") "add") letter-chunk-3-first-label)
-((getattr (getattr disanalogy-1 "interspatial_links") "add") letter-chunk-4-last-label)
-((getattr (getattr disanalogy-1 "interspatial_links") "add") verbs-relation)
-((getattr (getattr disanalogy-1 "interspatial_links") "add") diff-relation-1)
-((getattr (getattr disanalogy-1 "interspatial_links") "add") diff-relation-2)
-
 (define subject-1
   (def-letter-chunk :name None
     :locations (list nsubj-location
@@ -171,7 +163,42 @@
 (define subject-1-grammar-label
   (def-label :start subject-1 :parent_concept nsubj-concept
     :locations (list nsubj-location
-		     (Location (list) disanalogy-1-sub-1-output))))
+		     (Location (list) disanalogy-1-sub-1-output))
+    :is_interspatial True))
+(define subject-2
+  (def-letter-chunk :name None
+    :locations (list nsubj-location
+		     (Location (list) disanalogy-1-output)
+		     (Location (list) disanalogy-1-sub-2-output))
+    :parent_space disanalogy-1-sub-2-output))
+(define subject-2-grammar-label
+  (def-label :start subject-2 :parent_concept nsubj-concept
+    :locations (list nsubj-location
+		     (Location (list) disanalogy-1-sub-2-output))
+    :is_interspatial True))
+(define subject-relation
+  (def-relation :start subject-1 :end subject-2 :parent_concept subject-relation-concept
+    :quality 1.0
+    :locations (list (Location (list (list Nan)) same-different-space)
+		     (TwoPointLocation (list (list Nan)) (list (list Nan)) string-space)
+		     (TwoPointLocation (list) (list) disanalogy-1-output))
+    :is_interspatial True
+    :parent_space None
+    :conceptual_space string-space))
+
+((getattr (getattr disanalogy-1 "interspatial_links") "add") verb-1-label)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") verb-2-label)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") letter-chunk-1-first-label)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") letter-chunk-2-last-label)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") letter-chunk-3-first-label)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") letter-chunk-4-last-label)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") subject-1-grammar-label)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") subject-2-grammar-label)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") verbs-relation)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") diff-relation-1)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") diff-relation-2)
+((getattr (getattr disanalogy-1 "interspatial_links") "add") subject-relation)
+
 (define verb-1
   (def-letter-chunk :name None
     :locations (list v-location
@@ -224,16 +251,6 @@
     :parent_space disanalogy-1-output
     :abstract_chunk but))
 
-(define subject-2
-  (def-letter-chunk :name None
-    :locations (list nsubj-location
-		     (Location (list) disanalogy-1-output)
-		     (Location (list) disanalogy-1-sub-2-output))
-    :parent_space disanalogy-1-sub-2-output))
-(define subject-2-grammar-label
-  (def-label :start subject-2 :parent_concept nsubj-concept
-    :locations (list nsubj-location
-		     (Location (list) disanalogy-1-sub-2-output))))
 (define verb-2
   (def-letter-chunk :name None
     :locations (list v-location

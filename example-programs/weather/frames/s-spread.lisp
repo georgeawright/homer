@@ -183,6 +183,7 @@
 (define sentence-word-5
   (def-letter-chunk :name "spread"
     :locations (list vb-location
+		     spread-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
     :abstract_chunk spread-word))

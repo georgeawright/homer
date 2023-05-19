@@ -1,3 +1,6 @@
+(define subject-relation-concept
+  (def-concept :name "" :is_slot True :parent_space same-different-space))
+
 (define temporal-order-sub-1-input
   (def-contextual-space :name "temporal-order-sub-1.meaning" :parent_concept input-concept
     :conceptual_spaces (StructureSet)))
@@ -33,7 +36,7 @@
   (def-frame :name "temporal-order" :parent_concept conjunction-concept :parent_frame None
     :depth 8
     :sub_frames (StructureSet temporal-order-sub-1 temporal-order-sub-2)
-    :concepts (StructureSet)
+    :concepts (StructureSet subject-relation-concept)
     :input_space temporal-order-input
     :output_space temporal-order-output))
 
@@ -104,13 +107,6 @@
     :is_interspatial True
     :parent_space None
     :conceptual_space time-space))
-((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-1-least-time)
-((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-1-most-time)
-((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-2-least-time)
-((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-2-most-time)
-((getattr (getattr temporal-order "interspatial_links") "add") less-time-relation-1)
-((getattr (getattr temporal-order "interspatial_links") "add") less-time-relation-2)
-((getattr (getattr temporal-order "interspatial_links") "add") not-more-time-relation)
 
 (define subject-1
   (def-letter-chunk :name None
@@ -121,7 +117,40 @@
 (define subject-1-grammar-label
   (def-label :start subject-1 :parent_concept nsubj-concept
     :locations (list nsubj-location
-		     (Location (list) temporal-order-sub-1-output))))
+		     (Location (list) temporal-order-sub-1-output))
+    :is_interspatial True))
+(define subject-2
+  (def-letter-chunk :name None
+    :locations (list nsubj-location
+		     (Location (list) temporal-order-output)
+		     (Location (list) temporal-order-sub-2-output))
+    :parent_space temporal-order-sub-2-output))
+(define subject-2-grammar-label
+  (def-label :start subject-2 :parent_concept nsubj-concept
+    :locations (list nsubj-location
+		     (Location (list) temporal-order-sub-2-output))
+    :is_interspatial True))
+(define subject-relation
+  (def-relation :start subject-1 :end subject-2 :parent_concept subject-relation-concept
+    :quality 1.0
+    :locations (list (Location (list (list Nan)) same-different-space)
+		     (TwoPointLocation (list (list Nan)) (list (list Nan)) string-space)
+		     (TwoPointLocation (list) (list) temporal-order-output))
+    :is_interspatial True
+    :parent_space None
+    :conceptual_space string-space))
+
+((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-1-least-time)
+((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-1-most-time)
+((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-2-least-time)
+((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-2-most-time)
+((getattr (getattr temporal-order "interspatial_links") "add") less-time-relation-1)
+((getattr (getattr temporal-order "interspatial_links") "add") less-time-relation-2)
+((getattr (getattr temporal-order "interspatial_links") "add") not-more-time-relation)
+((getattr (getattr temporal-order "interspatial_links") "add") subject-1-grammar-label)
+((getattr (getattr temporal-order "interspatial_links") "add") subject-2-grammar-label)
+((getattr (getattr temporal-order "interspatial_links") "add") subject-relation)
+
 (define verb-1
   (def-letter-chunk :name None
     :locations (list v-location
@@ -174,16 +203,6 @@
     :parent_space temporal-order-output
     :abstract_chunk then))
 
-(define subject-2
-  (def-letter-chunk :name None
-    :locations (list nsubj-location
-		     (Location (list) temporal-order-output)
-		     (Location (list) temporal-order-sub-2-output))
-    :parent_space temporal-order-sub-2-output))
-(define subject-2-grammar-label
-  (def-label :start subject-2 :parent_concept nsubj-concept
-    :locations (list nsubj-location
-		     (Location (list) temporal-order-sub-2-output))))
 (define verb-2
   (def-letter-chunk :name None
     :locations (list v-location

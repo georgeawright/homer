@@ -598,25 +598,28 @@ class ViewDrivenFactory(Factory):
             )
         elif self.targets["slot"].is_label:
             target_start_space = None
-            for link in self.targets["frame"].interspatial_links:
-                for correspondee in link.correspondees:
-                    if (
-                        link.start.parent_space
-                        == self.targets["slot"].start.parent_space
-                    ):
-                        target_start_space = correspondee.start.parent_space
-                    if (
-                        link.is_relation
-                        and link.end.parent_space
-                        == self.targets["slot"].start.parent_space
-                    ):
-                        target_start_space = correspondee.end.parent_space
             for sub_frame in self.targets["frame"].sub_frames:
-                if (
-                    self.targets["slot"].start in sub_frame.input_space.contents
-                    or self.targets["slot"].start in sub_frame.output_space.contents
-                ):
+                if self.targets["slot"].start in sub_frame.input_space.contents:
                     start_sub_frame = sub_frame
+                    if sub_frame in self.targets["view"].matched_sub_frames:
+                        target_start_space = (
+                            self.targets["view"]
+                            .matched_sub_frames[sub_frame]
+                            .input_space
+                        )
+                if self.targets["slot"].start in sub_frame.output_space.contents:
+                    start_sub_frame = sub_frame
+                    if sub_frame in self.targets["view"].matched_sub_frames:
+                        target_start_space = (
+                            self.targets["view"]
+                            .sub_views.where(
+                                parent_frame=self.targets["view"].matched_sub_frames[
+                                    sub_frame
+                                ]
+                            )
+                            .get()
+                            .output_space
+                        )
             if target_start_space is None:
                 potential_start_views = self.bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept

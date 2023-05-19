@@ -153,6 +153,7 @@
 (define sentence-word-3
   (def-letter-chunk :name "be"
     :locations (list vb-location
+		     be-location
 		     (Location (list) be-sentence-output))
     :parent_space be-sentence-output
     :abstract_chunk be))

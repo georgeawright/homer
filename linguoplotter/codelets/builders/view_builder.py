@@ -119,8 +119,8 @@ class ViewBuilder(Builder):
                 chunk.abstract_chunk if chunk.abstract_chunk is not None else chunk
             )
             output_location = Location(chunk.location.coordinates, view.output_space)
-            if abstract_chunk.members.is_empty:
-                new_chunk = abstract_chunk.copy_to_location(
+            if chunk.members.is_empty:
+                new_chunk = chunk.copy_to_location(
                     output_location,
                     parent_id=self.codelet_id,
                     bubble_chamber=self.bubble_chamber,
@@ -128,7 +128,7 @@ class ViewBuilder(Builder):
             else:
                 locations = [
                     location.copy()
-                    for location in abstract_chunk.locations
+                    for location in chunk.locations
                     if location.space.is_conceptual_space
                 ] + [output_location]
                 new_chunk = self.bubble_chamber.new_letter_chunk(

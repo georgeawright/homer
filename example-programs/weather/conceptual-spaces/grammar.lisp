@@ -32,7 +32,8 @@
 (define nsubj-location (Location (list (list 17)) grammar-space))
 (define predicate-location (Location (list (list 18)) grammar-space))
 (define conj-location (Location (list (list 19)) grammar-space))
-(define null-location (Location (list (list 20)) grammar-space))
+(define pron-location (Location (list (list 20)) grammar-space))
+(define null-location (Location (list (list 21)) grammar-space))
 
 (define sentence-concept
   (def-concept :name "sentence" :locations (list sentence-location)
@@ -220,6 +221,12 @@
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pron-concept
+  (def-concept :name "pronoun" :locations (list pron-location)
+    :classifier (ProximityClassifier)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :depth 1 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
 
 (define verb-space
   (def-conceptual-space :name "verb" :parent_concept vb-concept
@@ -247,6 +254,10 @@
 (define temperatures
   (def-letter-chunk :name "temperatures" :parent_space grammar-space
     :locations (list nn-location)))
+(define they
+  (def-letter-chunk :name "they" :parent_space grammar-space
+    :locations (list pron-location)))
+(def-relation :start nsubj-concept :end they :conceptual_space grammar-space)
 (define in
   (def-letter-chunk :name "in" :parent_space grammar-space
     :locations (list prep-location)))

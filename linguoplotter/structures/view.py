@@ -299,6 +299,7 @@ class View(Structure):
             return False
 
     def cohesiveness_with(self, other: View) -> FloatBetweenOneAndZero:
+        # TODO: store relations in view so that there is no need to recalculate
         spaces = (
             [self.output_space, other.output_space]
             + [frame.input_space for frame in self.frames]
@@ -385,7 +386,7 @@ class View(Structure):
             and correspondence.end.is_link
             and correspondence.end.parent_concept.is_slot
         ):
-            if not any(
+            if correspondence.end.is_interspatial or not any(
                 [
                     item.is_link
                     and item.parent_concept == correspondence.end.parent_concept

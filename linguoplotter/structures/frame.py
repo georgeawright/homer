@@ -156,7 +156,14 @@ class Frame(Structure):
         return self.output_space.contents.filter(
             lambda x: not x.is_correspondence
             and not x.is_interspatial
-            and x.links.where(is_interspatial=True).is_empty
+            and x.relations.filter(
+                lambda r: r.is_interspatial
+                and r.conceptual_space.name not in ("grammar", "string")
+            ).is_empty
+            and x.labels.filter(
+                lambda l: l.is_interspatial
+                and l.parent_concept.parent_space.name not in ("grammar", "string")
+            ).is_empty
             and x.correspondences.filter(lambda c: c.start == x).is_empty
         )
 
@@ -327,6 +334,7 @@ class Frame(Structure):
                 structure._parent_concept = concept_copies[structure.parent_concept]
         sub_frames = bubble_chamber.new_set()
         space_copies = {input_space: input_space_copy, output_space: output_space_copy}
+        copies_map = {}
         for sub_frame in self.sub_frames:
             (sub_frame_input_space, sub_frame_output_space) = (
                 (sub_frame.input_space, sub_frame.output_space)
@@ -341,6 +349,7 @@ class Frame(Structure):
                 input_copies=input_copies,
                 output_copies=output_copies,
             )
+            copies_map[sub_frame] = sub_frame_instance
             sub_frames.add(sub_frame_instance)
             space_copies[sub_frame_input_space] = sub_frame_instance.input_space
             space_copies[sub_frame_output_space] = sub_frame_instance.output_space
@@ -400,13 +409,13 @@ class Frame(Structure):
         )
         for abstract_space, conceptual_space in conceptual_spaces_map:
             new_frame.specify_space(abstract_space, conceptual_space)
-        copies_map = {}
         for k, v in input_copies.items():
             copies_map[k] = v
         for k, v in output_copies.items():
             copies_map[k] = v
         for k, v in interspatial_link_copies.items():
             copies_map[k] = v
+        copies_map[self] = new_frame
         return new_frame, copies_map
 
     def __repr__(self) -> str:

@@ -59,12 +59,20 @@ class MergedFrameViewBuilder(ViewBuilder):
             links_in=self.bubble_chamber.new_set(),
             links_out=self.bubble_chamber.new_set(),
             parent_spaces=self.bubble_chamber.new_set(),
-            sub_views=self.bubble_chamber.new_set(),
+            sub_views=old_view.sub_views.copy(),
             super_views=self.bubble_chamber.new_set(),
             cohesion_views=self.bubble_chamber.new_set(),
             champion_labels=self.bubble_chamber.new_set(),
             champion_relations=self.bubble_chamber.new_set(),
         )
+        for sub_view in new_view.sub_views:
+            sub_view.cohesion_views.add(new_view)
+            self.bubble_chamber.loggers["structure"].log(sub_view)
+        for k, v in old_view.matched_sub_frames.items():
+            if k in frame_copies:
+                new_view.matched_sub_frames[frame_copies[k]] = v
+            else:
+                new_view.matched_sub_frames[k] = v
         for correspondence in old_view.members:
             if correspondence.end in old_view.output_space.contents:
                 continue
@@ -146,8 +154,25 @@ class MergedFrameViewBuilder(ViewBuilder):
             new_frame_left_sub_frame.output_space: parent_frame_left_sub_frame.output_space,
         }
         item_copies_map = {}
-        # copy across interspatial links and their arguments
-        for link in new_frame.interspatial_links:
+        # copy across interspatial links and their arguments except for links that recognize interstring repetition
+        for link in new_frame.interspatial_links.filter(
+            lambda x: not (
+                x.is_label
+                and x.parent_concept.parent_space
+                in (
+                    self.bubble_chamber.spaces["grammar"],
+                    self.bubble_chamber.spaces["string"],
+                )
+            )
+            and not (
+                x.is_relation
+                and x.conceptual_space
+                in (
+                    self.bubble_chamber.spaces["grammar"],
+                    self.bubble_chamber.spaces["string"],
+                )
+            )
+        ):
             for arg in link.arguments:
                 if arg in item_copies_map:
                     continue

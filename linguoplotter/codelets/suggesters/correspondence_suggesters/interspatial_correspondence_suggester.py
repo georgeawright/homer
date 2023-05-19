@@ -354,28 +354,33 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
             source_collection = bubble_chamber.interspatial_labels
             # check if target end's container frames have already been matched
             target_start_space = None
-            target_end_space = None
             for sub_frame in target_frame.sub_frames:
-                if (
-                    target_end.start in sub_frame.input_space.contents
-                    or target_end.start in sub_frame.output_space.contents
-                ):
+                if target_end.start in sub_frame.input_space.contents:
                     child_codelet.targets["start_sub_frame"] = sub_frame
-            if (
-                child_codelet.targets["start_sub_frame"]
-                in target_view.matched_sub_frames
-            ):
-                matching_frame = target_view.matched_sub_frames[
-                    child_codelet.targets["start_sub_frame"]
-                ]
-                child_codelet.targets["start_sub_view"] = target_view.sub_views.where(
-                    parent_frame=matching_frame
-                ).get()
-                target_start_space = (
-                    matching_frame.input_space
-                    if target_end.start in target_frame.input_space.contents
-                    else child_codelet.targets["start_sub_view"].output_space
-                )
+                    if sub_frame in target_view.matched_sub_frames:
+                        matching_frame = target_view.matched_sub_frames[
+                            child_codelet.targets["start_sub_frame"]
+                        ]
+                        child_codelet.targets[
+                            "start_sub_view"
+                        ] = target_view.sub_views.where(
+                            parent_frame=matching_frame
+                        ).get()
+                        target_start_space = matching_frame.input_space
+                if target_end.start in sub_frame.output_space.contents:
+                    child_codelet.targets["start_sub_frame"] = sub_frame
+                    if sub_frame in target_view.matched_sub_frames:
+                        matching_frame = target_view.matched_sub_frames[
+                            child_codelet.targets["start_sub_frame"]
+                        ]
+                        child_codelet.targets[
+                            "start_sub_view"
+                        ] = target_view.sub_views.where(
+                            parent_frame=matching_frame
+                        ).get()
+                        target_start_space = child_codelet.targets[
+                            "start_sub_view"
+                        ].output_space
             if target_start_space is None:
                 potential_start_views = bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept

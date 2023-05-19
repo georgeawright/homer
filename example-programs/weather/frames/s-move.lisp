@@ -161,6 +161,7 @@
 (define sentence-word-5
   (def-letter-chunk :name "move"
     :locations (list vb-location
+		     move-location
 		     (Location (list) move-sentence-output))
     :parent_space move-sentence-output
     :abstract_chunk move-word))

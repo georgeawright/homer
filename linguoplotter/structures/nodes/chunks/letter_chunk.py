@@ -147,7 +147,8 @@ class LetterChunk(Chunk):
                     super_chunk = super_chunk.super_chunks.get()
                 except MissingStructureError:
                     break
-            return path.reverse()
+            path.reverse()
+            return path
 
         self_path_to_root = path_to_root(self)
         other_path_to_root = path_to_root(other)
