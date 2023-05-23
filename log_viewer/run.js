@@ -26,6 +26,9 @@ div.plot {
     <div id="satisfaction_graph" class="plot"></div>`;
     doc += satisfaction_graph_script(query);
     doc +=  `
+    <div id="determinism_graph" class="plot"></div>`;
+    doc += determinism_graph_script(query);
+    doc +=  `
     <div id="coderack_population_graph" class="plot"></div>`;
     doc += coderack_pop_graph_script(query);
     doc +=  `
@@ -44,6 +47,16 @@ const satisfaction_graph_script = function(query) {
 	satisfaction_data,
 	x_title='Codelets Run',
 	y_title='Satisfaction',
+    );
+}
+
+const determinism_graph_script = function(query) {
+    const determinism_data = data_string_from_csv(query, 'determinism.csv');
+    return tools.generate_graph_script(
+	'determinism_graph',
+	determinism_data,
+	x_title='Codelets Run',
+	y_title='Determinism',
     );
 }
 

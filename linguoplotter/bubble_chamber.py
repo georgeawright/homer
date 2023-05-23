@@ -180,6 +180,7 @@ class BubbleChamber:
         else:
             self.satisfaction = self.general_satisfaction
         self.change_in_satisfaction = self.satisfaction - self.previous_satisfaction
+        self.random_machine.recalculate_determinism()
 
     def recalculate_general_satisfaction(self):
         main_input_space = self.contextual_spaces.where(is_main_input=True).get()

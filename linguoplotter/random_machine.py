@@ -18,24 +18,22 @@ class RandomMachine:
         self.determinism_smoothing_function = (
             HyperParameters.DETERMINISM_SMOOTHING_FUNCTION
         )
+        self.determinism = 0
+        self.randomness = 1
 
-    @property
-    def determinism(self) -> FloatBetweenOneAndZero:
+    def recalculate_determinism(self) -> FloatBetweenOneAndZero:
         try:
             improvement = (
                 1 / self.bubble_chamber.focus_setters_since_last_successful_focus_unset
             )
         except ZeroDivisionError:
             improvement = 1
-        return self.determinism_smoothing_function(
+        self.determinism = self.determinism_smoothing_function(
             self.bubble_chamber.satisfaction,
             self.bubble_chamber.change_in_satisfaction,
             improvement,
         )
-
-    @property
-    def randomness(self) -> FloatBetweenOneAndZero:
-        return 1 - self.determinism
+        self.randomness = 1 - self.determinism
 
     def generate_number(self, minimum: float = 0.0) -> FloatBetweenOneAndZero:
         if minimum > 1:

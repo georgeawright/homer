@@ -44,6 +44,7 @@ for program_file in program_files:
             os.mkdir(f"{codelets_directory}/ids")
             os.mkdir(f"{codelets_directory}/times")
             satisfaction_stream = open(f"{logs_dir_path}/satisfaction.csv", "w")
+            determinism_stream = open(f"{logs_dir_path}/determinism.csv", "w")
             coderack_population_stream = open(
                 f"{logs_dir_path}/coderack_population.csv", "w"
             )
@@ -52,11 +53,12 @@ for program_file in program_files:
             codelet_run_stream = open(f"{logs_dir_path}/codelets_run", "w")
             activity_logger = ActivityLogger(
                 codelets_directory,
-                satisfaction_stream,
-                coderack_population_stream,
-                view_count_stream,
-                codelet_spawned_stream,
-                codelet_run_stream,
+                satisfaction_stream=satisfaction_stream,
+                determinism_stream=determinism_stream,
+                coderack_population_stream=coderack_population_stream,
+                view_count_stream=view_count_stream,
+                codelet_spawned_stream=codelet_spawned_stream,
+                codelet_run_stream=codelet_run_stream,
             )
             structure_logger = StructureLogger(f"{structure_logs_dir_path}")
         else:

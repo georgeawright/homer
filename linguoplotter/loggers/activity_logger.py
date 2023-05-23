@@ -1,7 +1,6 @@
 import json
 import pathlib
 
-from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.logger import Logger
 
 
@@ -10,6 +9,7 @@ class ActivityLogger(Logger):
         self,
         codelets_directory: str,
         satisfaction_stream=None,
+        determinism_stream=None,
         coderack_population_stream=None,
         view_count_stream=None,
         codelet_spawned_stream=None,
@@ -17,6 +17,7 @@ class ActivityLogger(Logger):
     ):
         self.codelets_directory = codelets_directory
         self.satisfaction_stream = satisfaction_stream
+        self.determinism_stream = determinism_stream
         self.coderack_population_stream = coderack_population_stream
         self.view_count_stream = view_count_stream
         self.codelet_spawned_stream = codelet_spawned_stream
@@ -86,7 +87,7 @@ class ActivityLogger(Logger):
         self.codelet_json["child_codelets"] = [
             c.codelet_id for c in self.codelet.child_codelets
         ]
-        self.codelet_json["result"] = self.codelet.result
+        self.codelet_json["result"] = self.codelet.result.name
         with open(codelet_log_file, "w") as f:
             json.dump(self.codelet_json, f, sort_keys=False, indent=4)
         self._log_satisfaction()
@@ -97,6 +98,10 @@ class ActivityLogger(Logger):
         if self.satisfaction_stream is not None:
             self.satisfaction_stream.write(
                 f"{self.codelets_run},{self.codelet.bubble_chamber.satisfaction}\n"
+            )
+        if self.determinism_stream is not None:
+            self.determinism_stream.write(
+                f"{self.codelets_run},{self.codelet.bubble_chamber.random_machine.determinism}\n"
             )
 
     def _log_coderack_population(self, coderack_population: int):

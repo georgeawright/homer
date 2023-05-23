@@ -133,6 +133,7 @@ class Coderack:
             self._codelets.remove(codelet)
 
     def select_and_run_codelet(self):
+        self.bubble_chamber.recalculate_satisfaction()
         codelet = self._select_a_codelet()
         self.loggers["activity"].log_codelet_start(codelet)
         if HyperParameters.TESTING:
@@ -147,7 +148,6 @@ class Coderack:
             except Exception as e:
                 self.loggers["activity"].log_codelet_end(self.population_size)
                 raise e
-        self.bubble_chamber.recalculate_satisfaction()
         self.recently_run.add(type(codelet))
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:
