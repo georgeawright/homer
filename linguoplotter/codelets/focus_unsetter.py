@@ -77,7 +77,7 @@ class FocusUnsetter(Codelet):
         ):
             probability_of_unsetting_focus = 1
             self._check_for_and_merge_with_equivalent_views()
-            self._update_worldview_porter_urgency()
+            self._update_worldview_setter_urgency()
             self._update_bottom_up_factories_urgencies()
         elif self.bubble_chamber.focus.view.members.filter(
             lambda x: x.parent_concept.is_compound_concept
@@ -113,9 +113,9 @@ class FocusUnsetter(Codelet):
             self.result = CodeletResult.FINISH
         return self.result
 
-    def _update_worldview_porter_urgency(self):
+    def _update_worldview_setter_urgency(self):
         for codelet in self.coderack._codelets:
-            if "WorldviewPorter" in codelet.codelet_id:
+            if "WorldviewSetter" in codelet.codelet_id:
                 codelet.urgency = self.bubble_chamber.focus.satisfaction
                 return
         raise Exception

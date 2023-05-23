@@ -14,7 +14,7 @@ from .codelets import (
     Selector,
     Suggester,
     Recycler,
-    WorldviewPorter,
+    WorldviewSetter,
 )
 from .codelets.factories import (
     ConceptDrivenFactory,
@@ -42,7 +42,7 @@ class Coderack:
         GarbageCollector,
         Publisher,
         Recycler,
-        WorldviewPorter,
+        WorldviewSetter,
     )
 
     def __init__(self, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
@@ -66,7 +66,7 @@ class Coderack:
             FocusSetter.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
-            WorldviewPorter.spawn(
+            WorldviewSetter.spawn(
                 "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
             ),
             CoderackCleaner.spawn(

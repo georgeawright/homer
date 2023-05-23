@@ -10,7 +10,7 @@ from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structures import View
 
 
-class WorldviewPorter(Codelet):
+class WorldviewSetter(Codelet):
 
     CORRECTNESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_CORRECTNESS_WEIGHT
     COMPLETENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COMPLETENESS_WEIGHT

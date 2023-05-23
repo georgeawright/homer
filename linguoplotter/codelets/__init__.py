@@ -9,4 +9,4 @@ from .publisher import Publisher
 from .recycler import Recycler
 from .selector import Selector
 from .suggester import Suggester
-from .worldview_porter import WorldviewPorter
+from .worldview_setter import WorldviewSetter
