@@ -18,20 +18,18 @@ class RandomMachine:
         self.determinism_smoothing_function = (
             HyperParameters.DETERMINISM_SMOOTHING_FUNCTION
         )
+        self.codelets_run = 0
         self.determinism = 0
         self.randomness = 1
 
     def recalculate_determinism(self) -> FloatBetweenOneAndZero:
-        try:
-            improvement = (
-                1 / self.bubble_chamber.focus_setters_since_last_successful_focus_unset
-            )
-        except ZeroDivisionError:
-            improvement = 1
+        codelets_since_successful_focus_unset = (
+            self.codelets_run - self.bubble_chamber.time_of_last_successful_focus_unset
+        )
         self.determinism = self.determinism_smoothing_function(
             self.bubble_chamber.satisfaction,
             self.bubble_chamber.change_in_satisfaction,
-            improvement,
+            codelets_since_successful_focus_unset,
         )
         self.randomness = 1 - self.determinism
 

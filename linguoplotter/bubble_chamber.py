@@ -62,6 +62,7 @@ class BubbleChamber:
         self.general_satisfaction = 0
         self.previous_satisfaction = 0
         self.change_in_satisfaction = 0
+        self.time_of_last_successful_focus_unset = 0
         self.focus_setters_since_last_successful_focus_unset = 0
         self.result = None
         self.log_count = 0
@@ -98,6 +99,7 @@ class BubbleChamber:
         self.general_satisfaction = 0
         self.previous_satisfaction = 0
         self.change_in_satisfaction = 0
+        self.time_of_last_successful_focus_unset = 0
         self.focus_setters_since_last_successful_focus_unset = 0
         self.result = None
         self.log_count = 0

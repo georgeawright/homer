@@ -18,9 +18,9 @@ class HyperParameters:
     MAXIMUM_DETERMINISM = 0.9
     MINIMUM_DETERMINISM = 0.25
 
-    a = 0.4
+    a = 0.8
     b = 0.0
-    c = 0.6
+    c = 0.0001
     d = 0.0
 
     # some alternative weights:
@@ -30,11 +30,11 @@ class HyperParameters:
     # d = 0.1
 
     DETERMINISM_SMOOTHING_FUNCTION = (
-        lambda satisfaction, change_in_satisfaction, focus_improvement: min(
+        lambda satisfaction, change_in_satisfaction, time_since_last_improvement: min(
             max(
                 HyperParameters.a * satisfaction
                 + HyperParameters.b * change_in_satisfaction
-                + HyperParameters.c * focus_improvement
+                - HyperParameters.c * time_since_last_improvement
                 + HyperParameters.d,
                 HyperParameters.MINIMUM_DETERMINISM,
             ),

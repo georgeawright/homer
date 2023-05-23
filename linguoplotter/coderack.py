@@ -133,6 +133,7 @@ class Coderack:
             self._codelets.remove(codelet)
 
     def select_and_run_codelet(self):
+        self.bubble_chamber.random_machine.codelets_run = self.codelets_run
         self.bubble_chamber.recalculate_satisfaction()
         codelet = self._select_a_codelet()
         self.loggers["activity"].log_codelet_start(codelet)
