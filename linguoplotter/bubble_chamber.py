@@ -305,7 +305,7 @@ class BubbleChamber:
                 argument.links_in.remove(item)
                 argument.champion_labels.remove(item)
                 argument.champion_relations.remove(item)
-                argument.recalculate_exigency()
+                argument.recalculate_salience()
         if item.is_relation:
             if item.parent_concept is not None:
                 item.parent_concept.instances.remove(item)
@@ -322,7 +322,7 @@ class BubbleChamber:
                     self.remove(view)
             for sub_chunk in item.sub_chunks:
                 sub_chunk.super_chunks.remove(item)
-                sub_chunk.recalculate_exigency()
+                sub_chunk.recalculate_salience()
             for super_chunk in item.super_chunks:
                 super_chunk.sub_chunks.remove(item)
             for link in item.links:
@@ -532,19 +532,19 @@ class BubbleChamber:
             ):
                 chunk.super_chunks.add(existing_chunk)
                 existing_chunk.sub_chunks.add(chunk)
-                existing_chunk.recalculate_exigency()
+                existing_chunk.recalculate_salience()
                 self.loggers["structure"].log(existing_chunk)
             if not existing_chunk.members.is_empty and all(
                 member in chunk.members for member in existing_chunk.members
             ):
                 chunk.sub_chunks.add(existing_chunk)
                 existing_chunk.super_chunks.add(chunk)
-                existing_chunk.recalculate_exigency()
+                existing_chunk.recalculate_salience()
                 self.loggers["structure"].log(existing_chunk)
             if existing_chunk.is_raw and existing_chunk in chunk.members:
                 existing_chunk.super_chunks.add(chunk)
                 chunk.sub_chunks.add(existing_chunk)
-                existing_chunk.recalculate_exigency()
+                existing_chunk.recalculate_salience()
                 self.loggers["structure"].log(existing_chunk)
         chunk._activation = activation
         self.add(chunk)
@@ -593,7 +593,7 @@ class BubbleChamber:
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
-            member.recalculate_exigency()
+            member.recalculate_salience()
             letter_chunk.sub_chunks.add(member)
             self.loggers["structure"].log(member)
         has_string_location = False
@@ -808,14 +808,14 @@ class BubbleChamber:
         )
         start.links_out.add(correspondence)
         start.links_in.add(correspondence)
-        start.recalculate_exigency()
+        start.recalculate_salience()
         end.links_out.add(correspondence)
         end.links_in.add(correspondence)
-        end.recalculate_exigency()
+        end.recalculate_salience()
         self.add(correspondence)
         while parent_view is not None:
             parent_view.add(correspondence)
-            parent_view.recalculate_exigency()
+            parent_view.recalculate_salience()
             self.loggers["structure"].log(parent_view)
             try:
                 parent_view = parent_view.super_views.get()
@@ -858,7 +858,7 @@ class BubbleChamber:
             label._activation = activation
         if start is not None:
             start.links_out.add(label)
-            start.recalculate_exigency()
+            start.recalculate_salience()
             self.loggers["structure"].log(start)
         self.add(label)
         parent_concept.instances.add(label)
@@ -914,8 +914,8 @@ class BubbleChamber:
             relation._activation = stable_activation
         start.links_out.add(relation)
         end.links_in.add(relation)
-        start.recalculate_exigency()
-        end.recalculate_exigency()
+        start.recalculate_salience()
+        end.recalculate_salience()
         self.add(relation)
         if parent_concept is not None:
             if is_interspatial:

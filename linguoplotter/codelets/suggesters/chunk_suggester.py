@@ -7,7 +7,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict, StructureSet
-from linguoplotter.structure_collection_keys import chunking_exigency
+from linguoplotter.structure_collection_keys import chunking_salience
 
 
 class ChunkSuggester(Suggester):
@@ -66,7 +66,7 @@ class ChunkSuggester(Suggester):
                 try:
                     self.targets["node_two"] = self.targets[
                         "node_one"
-                    ].potential_chunk_mates.get(key=chunking_exigency)
+                    ].potential_chunk_mates.get(key=chunking_salience)
                 except MissingStructureError:
                     return False
             self.targets["members"] = StructureSet.union(

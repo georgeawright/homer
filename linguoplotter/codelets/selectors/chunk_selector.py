@@ -40,7 +40,7 @@ class ChunkSelector(Selector):
                     self.codelet_id,
                     self.bubble_chamber,
                     targets,
-                    winning_chunk.chunking_exigency,
+                    winning_chunk.chunking_salience,
                 ),
             )
         except MissingStructureError:

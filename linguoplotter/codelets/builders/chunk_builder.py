@@ -81,7 +81,7 @@ class ChunkBuilder(Builder):
                     member_super_chunk.super_chunks.add(chunk)
             member.super_chunks.add(chunk)
         self._structure_concept.instances.add(chunk)
-        self._structure_concept.recalculate_exigency()
+        self._structure_concept.recalculate_salience()
         self.child_structures.add(chunk)
 
     def _fizzle(self):

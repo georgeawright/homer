@@ -6,7 +6,7 @@ from linguoplotter.errors import MissingStructureError, NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict
-from linguoplotter.structure_collection_keys import relating_exigency
+from linguoplotter.structure_collection_keys import relating_salience
 from linguoplotter.structures.links import Relation
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.spaces import ConceptualSpace
@@ -41,7 +41,7 @@ class RelationSuggester(Suggester):
         input_space = bubble_chamber.input_spaces.get()
         start = input_space.contents.filter(
             lambda x: x.is_chunk and not x.is_slot and x.quality > 0
-        ).get(key=relating_exigency)
+        ).get(key=relating_salience)
         urgency = urgency if urgency is not None else start.unrelatedness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)

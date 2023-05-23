@@ -4,7 +4,7 @@ from linguoplotter.codelets.suggesters.label_suggesters import (
     InterspatialLabelSuggester,
 )
 from linguoplotter.errors import MissingStructureError
-from linguoplotter.structure_collection_keys import activation, labeling_exigency
+from linguoplotter.structure_collection_keys import activation, labeling_salience
 from linguoplotter.structure_collections import StructureSet
 
 
@@ -55,7 +55,7 @@ class InterspatialLabelSelector(LabelSelector):
                 lambda x: x.is_letter_chunk
                 and x.members.is_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
-            ).get(key=labeling_exigency)
+            ).get(key=labeling_salience)
             space = start.parent_spaces.filter(
                 lambda x: x.is_conceptual_space
                 and x in start.parent_space.conceptual_spaces

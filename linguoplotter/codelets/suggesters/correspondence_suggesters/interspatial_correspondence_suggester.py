@@ -4,7 +4,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection_keys import (
     activation,
-    exigency,
+    salience,
     uncorrespondedness,
 )
 from linguoplotter.structure_collections import StructureSet
@@ -27,7 +27,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=salience)
         end = target_view.unfilled_interspatial_structures.get(key=uncorrespondedness)
         urgency = urgency if urgency is not None else end.uncorrespondedness
         targets = bubble_chamber.new_dict(

@@ -5,7 +5,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structure_collection_keys import (
-    exigency,
+    salience,
     uncorrespondedness,
 )
 from linguoplotter.structures.nodes import Concept
@@ -27,7 +27,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=salience)
         non_matched_sub_frame = target_view.parent_frame.sub_frames.filter(
             lambda x: x not in target_view.matched_sub_frames
         ).get(key=uncorrespondedness)
@@ -43,7 +43,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             ]
         )
         end = end_candidates.get(key=uncorrespondedness)
-        urgency = urgency if urgency is not None else target_view.exigency
+        urgency = urgency if urgency is not None else target_view.salience
         targets = bubble_chamber.new_dict(
             {
                 "target_view": target_view,
@@ -236,7 +236,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         )
         child_codelet.targets["sub_view"] = views_with_compatible_nodes.get(
             key=lambda x: fuzzy.OR(
-                x.exigency,
+                x.salience,
                 max(
                     [
                         x.cohesiveness_with(sub_view)
@@ -245,7 +245,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 ),
             )
             if target_view.sub_views.not_empty
-            else x.exigency
+            else x.salience
         )
         child_codelet.targets["start_space"] = (
             child_codelet.targets["sub_view"].parent_frame.input_space

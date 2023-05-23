@@ -54,11 +54,11 @@ class Structure(ABC):
         self.uncorrespondedness = 1.0
         self.unhappiness = 1.0
 
-        self.chunking_exigency = 0.5
-        self.labeling_exigency = 0.5
-        self.relating_exigency = 0.5
-        self.corresponding_exigency = 0.5
-        self.exigency = 0.5
+        self.chunking_salience = 0.5
+        self.labeling_salience = 0.5
+        self.relating_salience = 0.5
+        self.corresponding_salience = 0.5
+        self.salience = 0.5
 
         self.is_link_or_node = False
         self.is_node = False
@@ -142,44 +142,44 @@ class Structure(ABC):
     def is_recyclable(self) -> bool:
         return False
 
-    def recalculate_exigency(self):
+    def recalculate_salience(self):
         self.recalculate_unhappiness()
-        self.recalculate_chunking_exigency()
-        self.recalculate_labeling_exigency()
-        self.recalculate_relating_exigency()
-        self.recalculate_corresponding_exigency()
-        self.exigency = statistics.fmean([self.activation, self.unhappiness])
+        self.recalculate_chunking_salience()
+        self.recalculate_labeling_salience()
+        self.recalculate_relating_salience()
+        self.recalculate_corresponding_salience()
+        self.salience = statistics.fmean([self.activation, self.unhappiness])
 
-    def recalculate_chunking_exigency(self):
-        self.chunking_exigency = statistics.fmean([self.activation, self.unchunkedness])
+    def recalculate_chunking_salience(self):
+        self.chunking_salience = statistics.fmean([self.activation, self.unchunkedness])
 
-    def recalculate_labeling_exigency(self):
+    def recalculate_labeling_salience(self):
         if self.quality is None:
-            self.labeling_exigency = statistics.fmean(
+            self.labeling_salience = statistics.fmean(
                 [self.activation, self.unlabeledness]
             )
         else:
-            self.labeling_exigency = statistics.fmean(
+            self.labeling_salience = statistics.fmean(
                 [self.activation * self.quality, self.unlabeledness]
             )
 
-    def recalculate_relating_exigency(self):
+    def recalculate_relating_salience(self):
         if self.quality is None:
-            self.relating_exigency = statistics.fmean(
+            self.relating_salience = statistics.fmean(
                 [self.activation, self.unrelatedness]
             )
         else:
-            self.relating_exigency = statistics.fmean(
+            self.relating_salience = statistics.fmean(
                 [self.activation * self.quality, self.unrelatedness]
             )
 
-    def recalculate_corresponding_exigency(self):
+    def recalculate_corresponding_salience(self):
         if self.quality is None:
-            self.corresponding_exigency = statistics.fmean(
+            self.corresponding_salience = statistics.fmean(
                 [self.activation, self.uncorrespondedness]
             )
         else:
-            self.corresponding_exigency = statistics.fmean(
+            self.corresponding_salience = statistics.fmean(
                 [self.activation * self.quality, self.uncorrespondedness]
             )
 
@@ -476,7 +476,7 @@ class Structure(ABC):
         if self.parent_space is None or self.parent_space.is_conceptual_space:
             self._activation = self._activation_buffer
             self._activation_buffer = 0.0
-            self.recalculate_exigency()
+            self.recalculate_salience()
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

@@ -5,7 +5,7 @@ from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import corresponding_exigency, exigency
+from linguoplotter.structure_collection_keys import corresponding_salience, salience
 from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures import View
 
@@ -246,7 +246,7 @@ class CorrespondenceSuggester(Suggester):
                             ),
                         ]
                     )
-                ).get(key=corresponding_exigency)
+                ).get(key=corresponding_salience)
         if target_end.is_relation:
             if target_end.end in target_view.grouped_nodes:
                 end_node_group = [
@@ -300,7 +300,7 @@ class CorrespondenceSuggester(Suggester):
                 matching_relations, "matching input relations"
             )
             child_codelet.targets["start"] = matching_relations.get(
-                key=corresponding_exigency
+                key=corresponding_salience
             )
         if target_end.is_node:
             if target_end in target_view.grouped_nodes:
@@ -350,4 +350,4 @@ class CorrespondenceSuggester(Suggester):
                         and not child_codelet.targets["space"].is_slot
                         else True
                     )
-                ).get(key=corresponding_exigency)
+                ).get(key=corresponding_salience)

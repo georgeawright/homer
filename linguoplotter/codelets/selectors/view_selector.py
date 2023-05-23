@@ -1,7 +1,7 @@
 from linguoplotter.codelets.selector import Selector
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collection_keys import activation, exigency
+from linguoplotter.structure_collection_keys import activation, salience
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import View
 
@@ -48,7 +48,7 @@ class ViewSelector(Selector):
                         ).is_empty
                         and not f.is_merged_frame
                     )
-                    .get(key=exigency)
+                    .get(key=salience)
                 )
                 self.child_codelets.append(
                     self.get_follow_up_class().make(

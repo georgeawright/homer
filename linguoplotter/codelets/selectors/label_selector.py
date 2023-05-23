@@ -1,7 +1,7 @@
 from linguoplotter.codelets.selector import Selector
 from linguoplotter.codelets.suggesters import LabelSuggester
 from linguoplotter.errors import MissingStructureError
-from linguoplotter.structure_collection_keys import activation, labeling_exigency
+from linguoplotter.structure_collection_keys import activation, labeling_salience
 
 
 class LabelSelector(Selector):
@@ -53,7 +53,7 @@ class LabelSelector(Selector):
             new_start = (
                 winning_label.start.nearby()
                 .filter(lambda x: x.quality > 0)
-                .get(key=labeling_exigency)
+                .get(key=labeling_salience)
             )
             targets = self.bubble_chamber.new_dict(
                 {"start": new_start, "concept": parent_concept}, name="targets"

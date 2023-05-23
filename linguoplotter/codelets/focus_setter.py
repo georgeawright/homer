@@ -5,7 +5,7 @@ from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import exigency
+from linguoplotter.structure_collection_keys import salience
 from linguoplotter.structure_collections import StructureDict
 
 
@@ -42,7 +42,7 @@ class FocusSetter(Codelet):
                 and v.members.filter(
                     lambda c: c.parent_concept.name == "not(same)"
                 ).is_empty
-            ).get(key=lambda x: fuzzy.AND(x.exigency, 1 - 1 / x.parent_frame.depth))
+            ).get(key=lambda x: fuzzy.AND(x.salience, 1 - 1 / x.parent_frame.depth))
             self.bubble_chamber.focus.frame = target_view.parent_frame
             self.bubble_chamber.focus.view = target_view
             self.bubble_chamber.loggers["activity"].log(
@@ -52,7 +52,7 @@ class FocusSetter(Codelet):
             )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(
-                f"Exigency: {target_view.exigency}\n"
+                f"Exigency: {target_view.salience}\n"
                 + f"Satisfaction: {self.bubble_chamber.focus.satisfaction}"
             )
             self._update_codelet_urgencies()
@@ -96,7 +96,7 @@ class FocusSetter(Codelet):
         )
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        urgency = 1 - self.bubble_chamber.focus.view.exigency
+        urgency = 1 - self.bubble_chamber.focus.view.salience
         if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
             return urgency
         return self.coderack.MINIMUM_CODELET_URGENCY

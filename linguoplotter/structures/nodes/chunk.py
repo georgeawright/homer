@@ -5,7 +5,7 @@ from typing import List
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
-from linguoplotter.structure_collection_keys import relating_exigency
+from linguoplotter.structure_collection_keys import relating_salience
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Node, Space
 
@@ -127,13 +127,13 @@ class Chunk(Node):
     def recalculate_unchunkedness(self):
         self.unchunkedness = 0.1 ** len(self.super_chunks)
 
-    def recalculate_labeling_exigency(self):
-        self.labeling_exigency = statistics.fmean(
+    def recalculate_labeling_salience(self):
+        self.labeling_salience = statistics.fmean(
             [self.activation, self.unlabeledness, self.unchunkedness]
         )
 
-    def recalculate_relating_exigency(self):
-        self.relating_exigency = statistics.fmean(
+    def recalculate_relating_salience(self):
+        self.relating_salience = statistics.fmean(
             [self.activation, self.unrelatedness, self.unchunkedness]
         )
 
@@ -184,7 +184,7 @@ class Chunk(Node):
         try:
             return self.relatives.filter(
                 lambda x: self.relations.where(end=x, conceptual_space=space).is_empty
-            ).get(key=relating_exigency)
+            ).get(key=relating_salience)
         except MissingStructureError:
             pass
         chunks = space.contents.filter(

@@ -42,5 +42,5 @@ class InterspatialLabelBuilder(LabelBuilder):
             is_interspatial=True,
         )
         self._structure_concept.instances.add(label)
-        self._structure_concept.recalculate_exigency()
+        self._structure_concept.recalculate_salience()
         self.child_structures.add(label)

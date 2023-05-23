@@ -6,7 +6,7 @@ from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import activation, exigency
+from linguoplotter.structure_collection_keys import activation, salience
 from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures import Frame
 
@@ -48,7 +48,7 @@ class ViewSuggester(Suggester):
             targets = bubble_chamber.new_dict(
                 {"frame": frame, "contextual_space": contextual_space}, name="targets"
             )
-            urgency = urgency if urgency is not None else frame.exigency
+            urgency = urgency if urgency is not None else frame.salience
             return TopDownViewSuggester.spawn(
                 parent_id, bubble_chamber, targets, urgency
             )
@@ -74,8 +74,8 @@ class BottomUpViewSuggester(ViewSuggester):
                 lambda x: x.parent_frame is None
                 and x.parent_concept != self.bubble_chamber.concepts["conjunction"]
                 and not x.is_sub_frame
-                and x.exigency > 0
-            ).get(key=exigency)
+                and x.salience > 0
+            ).get(key=salience)
         except MissingStructureError:
             return False
         return True
@@ -122,8 +122,8 @@ class BottomUpCohesionViewSuggester(BottomUpViewSuggester):
                 lambda x: x.parent_frame is None
                 and x.parent_concept == self.bubble_chamber.concepts["conjunction"]
                 and not x.is_sub_frame
-                and x.exigency > 0
-            ).get(key=exigency)
+                and x.salience > 0
+            ).get(key=salience)
         except MissingStructureError:
             return False
         return True

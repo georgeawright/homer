@@ -9,7 +9,7 @@ from linguoplotter.structures.nodes import Concept
 from linguoplotter.tools import hasinstance
 
 # TODO: also need to implement instances based on bubble chamber structures
-# definitely: unhappiness and exigency
+# definitely: unhappiness and salience
 # possibly: activation and quality
 
 

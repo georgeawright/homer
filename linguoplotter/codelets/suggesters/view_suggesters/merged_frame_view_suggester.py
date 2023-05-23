@@ -55,7 +55,7 @@ class MergedFrameViewSuggester(BottomUpCohesionViewSuggester):
             lambda x: x.parent_frame is None
             and x.parent_concept == self.bubble_chamber.concepts["conjunction"]
             and not x.is_sub_frame
-            and x.exigency > 0
+            and x.salience > 0
         )
         possible_target_combos = [
             self.bubble_chamber.new_dict(
@@ -75,7 +75,7 @@ class MergedFrameViewSuggester(BottomUpCohesionViewSuggester):
         try:
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
-                key=lambda x: fuzzy.AND(x["view"].activation, x["frame"].exigency),
+                key=lambda x: fuzzy.AND(x["view"].activation, x["frame"].salience),
             )
             self.targets["view"] = targets["view"]
             self.targets["frame"] = targets["frame"]

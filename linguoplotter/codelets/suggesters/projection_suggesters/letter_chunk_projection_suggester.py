@@ -1,6 +1,6 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import ProjectionSuggester
-from linguoplotter.structure_collection_keys import activation, corresponding_exigency
+from linguoplotter.structure_collection_keys import activation, corresponding_salience
 from linguoplotter.structures import View
 
 
@@ -31,11 +31,11 @@ class LetterChunkProjectionSuggester(ProjectionSuggester):
         frame = target_view.parent_frame
         target_letter_chunk = frame.output_space.contents.where(
             is_letter_chunk=True
-        ).get(key=corresponding_exigency)
+        ).get(key=corresponding_salience)
         urgency = (
             urgency
             if urgency is not None
-            else target_letter_chunk.corresponding_exigency
+            else target_letter_chunk.corresponding_salience
         )
         targets = bubble_chamber.new_dict(
             {"view": target_view, "frame": frame, "projectee": target_letter_chunk},

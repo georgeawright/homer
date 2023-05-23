@@ -2,7 +2,7 @@ from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.codelets.suggesters import LabelSuggester
-from linguoplotter.structure_collection_keys import activation, labeling_exigency
+from linguoplotter.structure_collection_keys import activation, labeling_salience
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.links import Label, Relation
 from linguoplotter.structures.nodes import Concept
@@ -49,7 +49,7 @@ class InterspatialLabelSuggester(LabelSuggester):
                 and x.members.is_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             ),
-        ).get(key=labeling_exigency)
+        ).get(key=labeling_salience)
         urgency = urgency if urgency is not None else start.unlabeledness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)
@@ -74,14 +74,14 @@ class InterspatialLabelSuggester(LabelSuggester):
         start = (
             view.parent_frame.input_space.contents.filter(
                 lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
-            ).get(key=labeling_exigency)
+            ).get(key=labeling_salience)
             if concept
             in (bubble_chamber.concepts["most"], bubble_chamber.concepts["least"])
             else view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
                 and x.members.is_empty
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
-            ).get(key=labeling_exigency)
+            ).get(key=labeling_salience)
         )
         space = start.parent_spaces.filter(
             lambda x: x.is_conceptual_space

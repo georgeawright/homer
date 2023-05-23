@@ -246,9 +246,9 @@ class View(Structure):
     def recalculate_unhappiness(self):
         self.unhappiness = 1 - 0.5 ** self.parent_frame.number_of_items_left_to_process
 
-    def recalculate_exigency(self):
+    def recalculate_salience(self):
         self.recalculate_unhappiness()
-        self.exigency = fuzzy.AND(self.unhappiness, self.activation)
+        self.salience = fuzzy.AND(self.unhappiness, self.activation)
 
     def calculate_quality(self):
         for member in self.members:
@@ -441,7 +441,7 @@ class View(Structure):
             self.add(member)
         for super_view in self.super_views:
             super_view.remove(correspondence)
-        self.recalculate_exigency()
+        self.recalculate_salience()
 
     def has_member(
         self,

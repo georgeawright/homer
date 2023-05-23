@@ -92,7 +92,7 @@ class RelationBuilder(Builder):
                 )
                 self._structure_concept.instances.add(mirror_relation)
                 self.child_structures.add(mirror_relation)
-        self._structure_concept.recalculate_exigency()
+        self._structure_concept.recalculate_salience()
 
     def _fizzle(self):
         pass

@@ -205,9 +205,9 @@ class Frame(Structure):
             sum([instance.activation for instance in self.instances]) + 1
         )
 
-    def recalculate_exigency(self):
+    def recalculate_salience(self):
         self.recalculate_unhappiness()
-        self.exigency = fuzzy.AND(self.unhappiness, self.activation)
+        self.salience = fuzzy.AND(self.unhappiness, self.activation)
 
     def specify_space(self, abstract_space, conceptual_space):
         if abstract_space in self.input_space.conceptual_spaces:

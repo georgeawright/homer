@@ -21,7 +21,7 @@ class MergedFrameViewBuilder(ViewBuilder):
         self.bubble_chamber.loggers["structure"].log(new_view)
         self.bubble_chamber.views.add(new_view)
         self._structure_concept.instances.add(new_view)
-        self._structure_concept.recalculate_exigency()
+        self._structure_concept.recalculate_salience()
 
     def _copy_view(self):
         def _copy_space(space, name: str = None):

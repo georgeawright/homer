@@ -4,8 +4,8 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection_keys import (
     activation,
-    corresponding_exigency,
-    exigency,
+    corresponding_salience,
+    salience,
     uncorrespondedness,
 )
 from linguoplotter.structures.nodes import Concept
@@ -27,7 +27,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=salience)
         target_space_two = target_view.parent_frame.input_space
         end = target_space_two.contents.where(is_correspondence=False).get(
             key=uncorrespondedness
@@ -384,4 +384,4 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         and not child_codelet.targets["space"].is_slot
                         else True
                     )
-                ).get(key=corresponding_exigency)
+                ).get(key=corresponding_salience)
