@@ -26,6 +26,8 @@ class InterspatialRelationSelector(RelationSelector):
                 {
                     "start": target_start,
                     "end": target_end,
+                    "start_view": winner_relation.start_view,
+                    "end_view": winner_relation.end_view,
                 },
                 name="targets",
             )

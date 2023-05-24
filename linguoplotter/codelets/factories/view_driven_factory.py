@@ -577,6 +577,14 @@ class ViewDrivenFactory(Factory):
                     space=x["space"],
                 ),
             )
+            targets["start_view"] = potential_start_views.filter(
+                lambda x: targets["start"] in x.parent_frame.input_space.contents
+                or targets["start"] in x.output_space.contents
+            ).get()
+            targets["end_view"] = potential_end_views.filter(
+                lambda x: targets["end"] in x.parent_frame.input_space.contents
+                or targets["start"] in x.output_space.contents
+            ).get()
             self.bubble_chamber.loggers["activity"].log_dict(targets)
             return InterspatialRelationSuggester.spawn(
                 self.codelet_id,

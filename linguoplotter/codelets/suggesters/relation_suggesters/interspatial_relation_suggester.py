@@ -86,30 +86,30 @@ class InterspatialRelationSuggester(RelationSuggester):
         )
         try:
             if self.targets["start"] is None:
-                start_view = possible_views.get(key=activation)
+                self.targets["start_view"] = possible_views.get(key=activation)
                 possible_starts = StructureSet.union(
-                    start_view.output_space.contents.filter(
+                    self.targets["start_view"].output_space.contents.filter(
                         lambda x: x.is_letter_chunk
                         and not x.is_slot
                         and x.labels.not_empty
                     ),
-                    start_view.parent_frame.input_space.contents.filter(
+                    self.targets["start_view"].parent_frame.input_space.contents.filter(
                         lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                     ),
                 )
             else:
                 possible_starts = [self.targets["start"]]
             if self.targets["end"] is None:
-                end_view = possible_views.excluding(start_view).get(
-                    key=lambda x: x.cohesiveness_with(start_view)
-                )
+                self.targets["end_view"] = possible_views.excluding(
+                    self.targets["start_view"]
+                ).get(key=lambda x: x.cohesiveness_with(self.targets["start_view"]))
                 possible_ends = StructureSet.union(
-                    end_view.output_space.contents.filter(
+                    self.targets["end_view"].output_space.contents.filter(
                         lambda x: x.is_letter_chunk
                         and not x.is_slot
                         and x.labels.not_empty
                     ),
-                    end_view.parent_frame.input_space.contents.filter(
+                    self.targets["end_view"].parent_frame.input_space.contents.filter(
                         lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                     ),
                 )

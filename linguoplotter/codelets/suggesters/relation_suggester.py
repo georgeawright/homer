@@ -287,6 +287,11 @@ class RelationSuggester(Suggester):
                     space=x["space"],
                 ),
             )
+            try:
+                targets["start_view"] = self.targets["start_view"]
+                targets["end_view"] = self.targets["end_view"]
+            except KeyError:
+                pass
             self.child_codelets.append(
                 type(self).spawn(
                     self.codelet_id,

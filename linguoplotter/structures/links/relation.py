@@ -33,6 +33,8 @@ class Relation(Link):
         is_excitatory: bool = True,
         is_stable: bool = False,
         is_interspatial: bool = False,
+        start_view: "View" = None,
+        end_view: "View" = None,
     ):
         Link.__init__(
             self,
@@ -57,6 +59,8 @@ class Relation(Link):
         self.is_bidirectional = is_bidirectional
         self.is_excitatory = is_excitatory
         self.is_stable = is_stable
+        self.start_view = start_view
+        self.end_view = end_view
 
     def __dict__(self) -> dict:
         return {

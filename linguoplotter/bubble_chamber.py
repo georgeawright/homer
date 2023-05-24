@@ -307,6 +307,9 @@ class BubbleChamber:
                 argument.champion_relations.remove(item)
                 argument.recalculate_salience()
         if item.is_relation:
+            if item.is_interspatial:
+                item.start_view.remove_cross_view_relation(item)
+                item.end_view.remove_cross_view_relation(item)
             if item.parent_concept is not None:
                 item.parent_concept.instances.remove(item)
             if None not in {item.parent_concept, item.conceptual_space}:
@@ -877,6 +880,8 @@ class BubbleChamber:
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         is_interspatial: bool = False,
+        start_view: View = None,
+        end_view: View = None,
         activation: FloatBetweenOneAndZero = None,
         stable_activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
@@ -907,6 +912,8 @@ class BubbleChamber:
             is_interspatial=is_interspatial,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
+            start_view=start_view,
+            end_view=end_view,
         )
         if activation is not None:
             relation._activation = activation

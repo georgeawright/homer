@@ -28,7 +28,7 @@ class Codelet(ABC):
         self.urgency = urgency
         self.child_codelets = []
         self.child_structures = None
-        self.result = None
+        self.result = CodeletResult.FAIL
 
     @classmethod
     def get_target_class(cls):

@@ -7,7 +7,7 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.location import Location
 from linguoplotter.structure import Structure
-from linguoplotter.structure_collections import StructureSet
+from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structures import Frame
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.space import Space
@@ -39,6 +39,7 @@ class View(Structure):
         cohesion_views: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
+        cross_view_relations: StructureDict,
     ):
         Structure.__init__(
             self,
@@ -67,6 +68,8 @@ class View(Structure):
         self.slot_values = {}
         self.conceptual_spaces_map = {}
         self.is_view = True
+        self.cross_view_relations = cross_view_relations
+        self._cohesiveness_with = {}
 
     def __dict__(self) -> dict:
         return {
@@ -298,39 +301,39 @@ class View(Structure):
         except MissingStructureError:
             return False
 
-    def cohesiveness_with(self, other: View) -> FloatBetweenOneAndZero:
-        # TODO: store relations in view so that there is no need to recalculate
-        spaces = (
-            [self.output_space, other.output_space]
-            + [frame.input_space for frame in self.frames]
-            + [frame.input_space for frame in other.frames]
+    def add_cross_view_relation(self, relation: "Relation"):
+        other_view = (
+            relation.start_view if relation.start_view != self else relation.end_view
         )
-        words = StructureSet.union(
-            self.output_space.contents.filter(
-                lambda x: x.is_letter_chunk and x.members.is_empty
-            ),
-            other.output_space.contents.filter(
-                lambda x: x.is_letter_chunk and x.members.is_empty
-            ),
+        self.cross_view_relations[other_view].add(relation)
+        self.recalculate_cohesiveness_with(other_view)
+
+    def remove_cross_view_relation(self, relation: "Relation"):
+        other_view = (
+            relation.start_view if relation.start_view != self else relation.end_view
         )
-        chunks = StructureSet.union(
-            *[
-                frame.input_space.contents.filter(lambda x: x.is_chunk)
-                for frame in StructureSet.union(self.frames, other.frames)
-            ]
-        )
-        relations = StructureSet.union(
-            *[word.relations for word in words] + [chunk.relations for chunk in chunks]
-        ).filter(
-            lambda x: x.is_interspatial
-            and x.start.parent_space in spaces
-            and x.end.parent_space in spaces
-        )
+        self.cross_view_relations[other_view].remove(relation)
+        self.recalculate_cohesiveness_with(other_view)
+
+    def recalculate_cohesiveness_with(self, other: View):
         try:
-            return FloatBetweenOneAndZero(
-                sum([r.quality for r in relations]) / (len(words) * 0.5)
+            relations = self.cross_view_relations[other]
+        except KeyError:
+            self._cohesiveness_with[other] = 0.0
+        try:
+            words = self.output_space.contents.filter(
+                lambda x: x.is_letter_chunk and x.members.is_empty
+            )
+            self._cohesiveness_with[other] = FloatBetweenOneAndZero(
+                sum([r.quality for r in relations]) / (len(words))
             )
         except ZeroDivisionError:
+            self._cohesiveness_with[other] = 0.0
+
+    def cohesiveness_with(self, other: View) -> FloatBetweenOneAndZero:
+        try:
+            return self._cohesiveness_with[other]
+        except KeyError:
             return 0.0
 
     def specify_space(self, abstract_space, conceptual_space):

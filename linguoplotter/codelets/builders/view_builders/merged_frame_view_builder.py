@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from linguoplotter.codelets.builders import ViewBuilder
 from linguoplotter.id import ID
 from linguoplotter.location import Location
@@ -64,6 +66,7 @@ class MergedFrameViewBuilder(ViewBuilder):
             cohesion_views=self.bubble_chamber.new_set(),
             champion_labels=self.bubble_chamber.new_set(),
             champion_relations=self.bubble_chamber.new_set(),
+            cross_view_relations=defaultdict(self.bubble_chamber.new_set),
         )
         for sub_view in new_view.sub_views:
             sub_view.cohesion_views.add(new_view)

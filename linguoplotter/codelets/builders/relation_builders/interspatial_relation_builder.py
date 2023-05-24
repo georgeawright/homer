@@ -46,9 +46,13 @@ class InterspatialRelationBuilder(RelationBuilder):
             conceptual_space=self.targets["space"],
             quality=0,
             is_interspatial=True,
+            start_view=self.targets["start_view"],
+            end_view=self.targets["end_view"],
         )
         self._structure_concept.instances.add(relation)
         self.child_structures.add(relation)
+        self.targets["start_view"].add_cross_view_relation(relation)
+        self.targets["end_view"].add_cross_view_relation(relation)
         if self.targets["concept"].is_reversible:
             if (
                 self.targets["start"]
@@ -69,7 +73,11 @@ class InterspatialRelationBuilder(RelationBuilder):
                     conceptual_space=self.targets["space"],
                     quality=0,
                     is_interspatial=True,
+                    start_view=self.targets["end_view"],
+                    end_view=self.targets["start_view"],
                 )
                 self._structure_concept.instances.add(mirror_relation)
                 self.child_structures.add(mirror_relation)
+                self.targets["start_view"].add_cross_view_relation(mirror_relation)
+                self.targets["end_view"].add_cross_view_relation(mirror_relation)
         self._structure_concept.recalculate_salience()

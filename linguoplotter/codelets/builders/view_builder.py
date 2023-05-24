@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections import defaultdict
 
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.builder import Builder
@@ -78,6 +79,7 @@ class ViewBuilder(Builder):
             cohesion_views=self.bubble_chamber.new_set(),
             champion_labels=self.bubble_chamber.new_set(),
             champion_relations=self.bubble_chamber.new_set(),
+            cross_view_relations=defaultdict(self.bubble_chamber.new_set),
         )
         frame_instance.parent_view = view
         frame_instance.progenitor.instances.add(view)
