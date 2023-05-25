@@ -68,7 +68,8 @@ class ContextualSpace(Space):
     @property
     def quality(self):
         active_contents = self.contents.filter(
-            lambda x: x.activation > self.FLOATING_POINT_TOLERANCE
+            lambda x: (x.is_chunk or x.is_label or x.is_relation)
+            and x.activation > self.FLOATING_POINT_TOLERANCE
         )
         if active_contents.is_empty:
             return 0.0
