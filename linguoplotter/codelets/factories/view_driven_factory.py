@@ -129,9 +129,7 @@ class ViewDrivenFactory(Factory):
         cross_view_structures = self.targets["frame"].unfilled_cross_view_structures
         if cross_view_structures.not_empty:
             if cross_view_structures.where(is_label=True).not_empty:
-                self.targets["slot"] = cross_view_structures.where(
-                    is_label=True
-                ).get()
+                self.targets["slot"] = cross_view_structures.where(is_label=True).get()
             else:
                 self.targets["slot"] = cross_view_structures.get()
             return
@@ -583,7 +581,7 @@ class ViewDrivenFactory(Factory):
             ).get()
             targets["end_view"] = potential_end_views.filter(
                 lambda x: targets["end"] in x.parent_frame.input_space.contents
-                or targets["start"] in x.output_space.contents
+                or targets["end"] in x.output_space.contents
             ).get()
             self.bubble_chamber.loggers["activity"].log_dict(targets)
             return CrossViewRelationSuggester.spawn(
