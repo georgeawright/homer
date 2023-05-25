@@ -26,7 +26,7 @@ program_files = [
 start_time = time.time()
 for program_file in program_files:
     results = []
-    random_seeds = range(1)
+    random_seeds = range(10)
 
     for i in random_seeds:
         time_string = str(time.time())

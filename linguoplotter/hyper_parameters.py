@@ -20,7 +20,7 @@ class HyperParameters:
 
     a = 0.8
     b = 0.0
-    c = 0.0001
+    c = 0.00005
     d = 0.0
 
     # some alternative weights:

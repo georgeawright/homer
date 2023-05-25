@@ -97,12 +97,15 @@ class GarbageCollector(Codelet):
                     )
                 )
             ]
-            probability_of_removal = (
-                (self.bubble_chamber.random_machine.generate_number())
-                if len(relevant_codelets) == 0
-                else 0
-            )
-            if probability_of_removal > structure.quality:
+            if len(relevant_codelets) == 0:
+                probability_of_removal = 1 - (
+                    structure.quality
+                    * self.bubble_chamber.random_machine.generate_number()
+                )
+            else:
+                probability_of_removal = 0
+            # higher quality structures are more likely to be deleted as randomness increases
+            if probability_of_removal > self.bubble_chamber.random_machine.randomness:
                 self.bubble_chamber.loggers["activity"].log(f"Removing {structure}")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 self.bubble_chamber.remove(structure)
