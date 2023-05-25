@@ -67,7 +67,9 @@ class ContextualSpace(Space):
 
     @property
     def quality(self):
-        active_contents = self.contents.filter(lambda x: x.activation > 0.5)
+        active_contents = self.contents.filter(
+            lambda x: x.activation > self.FLOATING_POINT_TOLERANCE
+        )
         if active_contents.is_empty:
             return 0.0
         return statistics.fmean(
@@ -144,9 +146,7 @@ class ContextualSpace(Space):
                 new_item.links_out.add(new_label)
                 new_space.add(new_label)
                 copies[label] = new_label
-            for relation in item.links_out.where(
-                is_relation=True, is_cross_view=False
-            ):
+            for relation in item.links_out.where(is_relation=True, is_cross_view=False):
                 if relation.end not in copies:
                     continue
                 new_end = copies[relation.end]
@@ -161,9 +161,7 @@ class ContextualSpace(Space):
                 new_item.links_out.add(new_relation)
                 new_space.add(new_relation)
                 copies[relation] = new_relation
-            for relation in item.links_in.where(
-                is_relation=True, is_cross_view=False
-            ):
+            for relation in item.links_in.where(is_relation=True, is_cross_view=False):
                 if relation.start not in copies:
                     continue
                 new_start = copies[relation.start]
