@@ -4,14 +4,14 @@ from linguoplotter.locations import TwoPointLocation
 from linguoplotter.tools import centroid_difference
 
 
-class InterspatialRelationBuilder(RelationBuilder):
+class CrossViewRelationBuilder(RelationBuilder):
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.evaluators.relation_evaluators import (
-            InterspatialRelationEvaluator,
+            CrossViewRelationEvaluator,
         )
 
-        return InterspatialRelationEvaluator
+        return CrossViewRelationEvaluator
 
     def _process_structure(self):
         if self.child_structures.not_empty:
@@ -45,7 +45,7 @@ class InterspatialRelationBuilder(RelationBuilder):
             parent_space=None,
             conceptual_space=self.targets["space"],
             quality=0,
-            is_interspatial=True,
+            is_cross_view=True,
             start_view=self.targets["start_view"],
             end_view=self.targets["end_view"],
         )
@@ -72,7 +72,7 @@ class InterspatialRelationBuilder(RelationBuilder):
                     parent_space=None,
                     conceptual_space=self.targets["space"],
                     quality=0,
-                    is_interspatial=True,
+                    is_cross_view=True,
                     start_view=self.targets["end_view"],
                     end_view=self.targets["start_view"],
                 )

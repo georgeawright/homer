@@ -7,10 +7,10 @@ from linguoplotter.codelets.suggesters import (
     ViewSuggester,
 )
 from linguoplotter.codelets.suggesters.label_suggesters import (
-    InterspatialLabelSuggester,
+    CrossViewLabelSuggester,
 )
 from linguoplotter.codelets.suggesters.relation_suggesters import (
-    InterspatialRelationSuggester,
+    CrossViewRelationSuggester,
 )
 from linguoplotter.codelets.suggesters.view_suggester import (
     BottomUpCohesionViewSuggester,
@@ -53,8 +53,8 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             (ViewSuggester, input_uncorrespondedness),
             (CorrespondenceSuggester, frames_unfilledness),
             (BottomUpCohesionViewSuggester, text_uncohesiveness),
-            (InterspatialLabelSuggester, text_unrelatedness),
-            (InterspatialRelationSuggester, text_unrelatedness),
+            (CrossViewLabelSuggester, text_unrelatedness),
+            (CrossViewRelationSuggester, text_unrelatedness),
             (MergedFrameViewSuggester, view_unmergedness),
         ]
 
@@ -169,7 +169,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
             )
             labels = StructureSet.intersection(
-                *[c.labels.where(is_interspatial=True) for c in letter_chunks]
+                *[c.labels.where(is_cross_view=True) for c in letter_chunks]
             )
             return 1 - sum([l.quality * l.activation for l in labels]) / len(
                 view.output_space.conceptual_spaces

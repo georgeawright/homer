@@ -67,7 +67,7 @@
   (def-label :start verb-1 :parent_concept vb-concept
     :locations (list vb-location
 		     (Location (list) disanalogy-2-sub-1-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define verb-2
   (def-letter-chunk :name None
     :locations (list vb-location
@@ -79,14 +79,14 @@
   (def-label :start verb-2 :parent_concept vb-concept
     :locations (list vb-location
 		     (Location (list) disanalogy-2-sub-2-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define verbs-relation
   (def-relation :start verb-1 :end verb-2 :parent_concept opposite-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) oppositeness-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) verb-space)
 		     (TwoPointLocation (list) (list) disanalogy-2-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space verb-space))
 
@@ -100,7 +100,7 @@
   (def-label :start subject-1 :parent_concept nsubj-concept
     :locations (list nsubj-location
 		     (Location (list) disanalogy-2-sub-1-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define subject-2
   (def-letter-chunk :name None
     :locations (list nsubj-location
@@ -111,23 +111,23 @@
   (def-label :start subject-2 :parent_concept nsubj-concept
     :locations (list nsubj-location
 		     (Location (list) disanalogy-2-sub-2-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define subject-relation
   (def-relation :start subject-1 :end subject-2 :parent_concept subject-relation-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) string-space)
 		     (TwoPointLocation (list) (list) disanalogy-2-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space string-space))
 
-((getattr (getattr disanalogy-2 "interspatial_links") "add") verb-1-label)
-((getattr (getattr disanalogy-2 "interspatial_links") "add") verb-2-label)
-((getattr (getattr disanalogy-2 "interspatial_links") "add") subject-1-grammar-label)
-((getattr (getattr disanalogy-2 "interspatial_links") "add") subject-2-grammar-label)
-((getattr (getattr disanalogy-2 "interspatial_links") "add") verbs-relation)
-((getattr (getattr disanalogy-2 "interspatial_links") "add") subject-relation)
+((getattr (getattr disanalogy-2 "cross_view_links") "add") verb-1-label)
+((getattr (getattr disanalogy-2 "cross_view_links") "add") verb-2-label)
+((getattr (getattr disanalogy-2 "cross_view_links") "add") subject-1-grammar-label)
+((getattr (getattr disanalogy-2 "cross_view_links") "add") subject-2-grammar-label)
+((getattr (getattr disanalogy-2 "cross_view_links") "add") verbs-relation)
+((getattr (getattr disanalogy-2 "cross_view_links") "add") subject-relation)
 
 (define verb-1
   (def-letter-chunk :name None
@@ -239,7 +239,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start opposite-interspatial-concept :end disanalogy-2
+(def-relation :start opposite-cross_view-concept :end disanalogy-2
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end disanalogy-2
   :is_bidirectional True :stable_activation 0.5)

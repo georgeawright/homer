@@ -72,10 +72,10 @@ class Factory(Codelet):
             ViewSuggester,
         )
         from linguoplotter.codelets.suggesters.label_suggesters import (
-            InterspatialLabelSuggester,
+            CrossViewLabelSuggester,
         )
         from linguoplotter.codelets.suggesters.relation_suggesters import (
-            InterspatialRelationSuggester,
+            CrossViewRelationSuggester,
         )
         from linguoplotter.codelets.suggesters.correspondence_suggesters import (
             SpaceToFrameCorrespondenceSuggester,
@@ -109,8 +109,8 @@ class Factory(Codelet):
                 "outer": {
                     "forward": {
                         "correspondence": PotentialSubFrameToFrameCorrespondenceSuggester,
-                        "label": InterspatialLabelSuggester,
-                        "relation": InterspatialRelationSuggester,
+                        "label": CrossViewLabelSuggester,
+                        "relation": CrossViewRelationSuggester,
                     },
                 },
             },

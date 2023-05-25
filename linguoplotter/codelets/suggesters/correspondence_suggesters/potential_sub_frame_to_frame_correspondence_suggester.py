@@ -206,6 +206,9 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
         )
         views_with_compatible_nodes = compatible_sub_views.filter(
+            # lambda x: x.members.filter(
+            #    lambda c: c.end not in x.output_space.contents
+            # ).is_empty
             lambda x: x.members.is_empty
             or any(
                 [

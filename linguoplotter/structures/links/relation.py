@@ -32,7 +32,7 @@ class Relation(Link):
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         is_stable: bool = False,
-        is_interspatial: bool = False,
+        is_cross_view: bool = False,
         start_view: "View" = None,
         end_view: "View" = None,
     ):
@@ -55,7 +55,7 @@ class Relation(Link):
         self._parent_space = parent_space
         self.conceptual_space = conceptual_space
         self.is_relation = True
-        self.is_interspatial = is_interspatial
+        self.is_cross_view = is_cross_view
         self.is_bidirectional = is_bidirectional
         self.is_excitatory = is_excitatory
         self.is_stable = is_stable
@@ -131,7 +131,7 @@ class Relation(Link):
             locations=new_locations,
             quality=self.quality,
             parent_space=self.parent_space,
-            is_interspatial=self.is_interspatial,
+            is_cross_view=self.is_cross_view,
             activation=self.activation,
         )
 

@@ -11,6 +11,6 @@
     :classifier (AbstractRelationClassifier) :instance_type Chunk :structure_type Relation
     :parent_space oppositeness-space :distance_function centroid_euclidean_distance))
 
-(define opposite-interspatial-concept (def-concept :name "opposite-interspatial"))
-(def-relation :start opposite-concept :end opposite-interspatial-concept
+(define opposite-cross_view-concept (def-concept :name "opposite-cross_view"))
+(def-relation :start opposite-concept :end opposite-cross_view-concept
   :parent_concept outer-concept)

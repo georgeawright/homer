@@ -26,7 +26,7 @@ class CorrespondenceSuggester(Suggester):
         target_view: View = None,
     ):
         from linguoplotter.codelets.suggesters.correspondence_suggesters import (
-            InterspatialCorrespondenceSuggester,
+            CrossViewCorrespondenceSuggester,
             PotentialSubFrameToFrameCorrespondenceSuggester,
             SpaceToFrameCorrespondenceSuggester,
             SubFrameToFrameCorrespondenceSuggester,
@@ -38,31 +38,31 @@ class CorrespondenceSuggester(Suggester):
         target_frame = target_view.parent_frame
         input_structures = target_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
-            and not x.is_interspatial
+            and not x.is_cross_view
             and len(x.correspondences.where(end=x))
             < len(x.parent_spaces.where(is_contextual_space=True))
         )
         output_structures = target_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
-            and not x.is_interspatial
+            and not x.is_cross_view
             and x.parent_space != target_frame.output_space
             and x.correspondences.is_empty
         )
-        if target_frame.unfilled_interspatial_structures.not_empty:
-            if target_frame.unfilled_interspatial_structures.where(
+        if target_frame.unfilled_cross_view_structures.not_empty:
+            if target_frame.unfilled_cross_view_structures.where(
                 is_label=True
             ).not_empty:
-                end = target_frame.unfilled_interspatial_structures.where(
+                end = target_frame.unfilled_cross_view_structures.where(
                     is_label=True
                 ).get()
             else:
-                end = target_frame.unfilled_interspatial_structures.get()
+                end = target_frame.unfilled_cross_view_structures.get()
             targets = bubble_chamber.new_dict(
                 {"view": target_view, "frame": target_frame, "end": end},
                 name="targets",
             )
             urgency = urgency if urgency is not None else end.uncorrespondedness
-            return InterspatialCorrespondenceSuggester.spawn(
+            return CrossViewCorrespondenceSuggester.spawn(
                 parent_id, bubble_chamber, targets, urgency
             )
         if input_structures.where(is_relation=True).not_empty:
@@ -161,7 +161,7 @@ class CorrespondenceSuggester(Suggester):
     def _get_target_conceptual_space(parent_codelet, child_codelet):
         child_codelet.targets["space"] = None
         end = child_codelet.targets["end"]
-        if end.is_label and end.is_interspatial:
+        if end.is_label and end.is_cross_view:
             child_codelet.targets["space"] = end.parent_spaces.where(
                 is_conceptual_space=True
             ).get()

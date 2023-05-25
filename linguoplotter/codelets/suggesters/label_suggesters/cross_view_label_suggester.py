@@ -8,14 +8,14 @@ from linguoplotter.structures.links import Label, Relation
 from linguoplotter.structures.nodes import Concept
 
 
-class InterspatialLabelSuggester(LabelSuggester):
+class CrossViewLabelSuggester(LabelSuggester):
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.builders.label_builders import (
-            InterspatialLabelBuilder,
+            CrossViewLabelBuilder,
         )
 
-        return InterspatialLabelBuilder
+        return CrossViewLabelBuilder
 
     @classmethod
     def make(

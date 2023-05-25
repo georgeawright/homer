@@ -9,14 +9,14 @@ from linguoplotter.structures.links import Relation
 from linguoplotter.structures.nodes import Concept
 
 
-class InterspatialRelationSuggester(RelationSuggester):
+class CrossViewRelationSuggester(RelationSuggester):
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.builders.relation_builders import (
-            InterspatialRelationBuilder,
+            CrossViewRelationBuilder,
         )
 
-        return InterspatialRelationBuilder
+        return CrossViewRelationBuilder
 
     @classmethod
     def make(

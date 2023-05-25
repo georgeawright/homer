@@ -3,16 +3,16 @@ from linguoplotter.codelets.evaluators import RelationEvaluator
 from linguoplotter.hyper_parameters import HyperParameters
 
 
-class InterspatialRelationEvaluator(RelationEvaluator):
+class CrossViewRelationEvaluator(RelationEvaluator):
     FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
 
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.selectors.relation_selectors import (
-            InterspatialRelationSelector,
+            CrossViewRelationSelector,
         )
 
-        return InterspatialRelationSelector
+        return CrossViewRelationSelector
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
@@ -26,7 +26,7 @@ class InterspatialRelationEvaluator(RelationEvaluator):
             )
         ).get()
         target = view.output_space.contents.filter(
-            lambda x: x.is_interspatial and x.is_relation
+            lambda x: x.is_cross_view and x.is_relation
         ).get(key=lambda x: abs(x.activation - x.quality))
         targets = bubble_chamber.new_set(target, name="targets")
         return cls.spawn(

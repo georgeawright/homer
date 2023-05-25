@@ -79,7 +79,7 @@
   (def-label :start early-chunk :parent_concept least-concept
     :locations (list (Location (list (list Nan)) time-space)
 		     (Location (list) be-sentence-input))
-    :is_interspatial True
+    :is_cross_view True
     :quality 1.0 :activation 1.0))
 (define early-chunk-conceptual-label
   (def-label :start early-chunk :parent_concept conceptual-label-concept
@@ -99,7 +99,7 @@
   (def-label :start late-chunk :parent_concept most-concept
     :locations (list (Location (list (list Nan)) time-space)
 		     (Location (list) be-sentence-input))
-    :is_interspatial True
+    :is_cross_view True
     :quality 1.0 :activation 1.0))
 (define late-chunk-location-label
   (def-label :start late-chunk :parent_concept location-concept

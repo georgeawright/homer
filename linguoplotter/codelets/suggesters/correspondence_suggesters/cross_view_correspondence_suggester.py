@@ -11,14 +11,14 @@ from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures.nodes import Concept
 
 
-class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
+class CrossViewCorrespondenceSuggester(CorrespondenceSuggester):
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.builders.correspondence_builders import (
-            InterspatialCorrespondenceBuilder,
+            CrossViewCorrespondenceBuilder,
         )
 
-        return InterspatialCorrespondenceBuilder
+        return CrossViewCorrespondenceBuilder
 
     @classmethod
     def make(
@@ -28,7 +28,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = bubble_chamber.views.get(key=salience)
-        end = target_view.unfilled_interspatial_structures.get(key=uncorrespondedness)
+        end = target_view.unfilled_cross_view_structures.get(key=uncorrespondedness)
         urgency = urgency if urgency is not None else end.uncorrespondedness
         targets = bubble_chamber.new_dict(
             {"target_view": target_view, "end": end}, name="targets"
@@ -49,7 +49,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         target_view = bubble_chamber.views.get(key=activation)
-        end = target_view.unfilled_interspatial_structures.get(key=uncorrespondedness)
+        end = target_view.unfilled_cross_view_structures.get(key=uncorrespondedness)
         urgency = urgency if urgency is not None else end.uncorrespondedness
         targets = bubble_chamber.new_dict(
             {"target_view": target_view, "end": end, "concept": concept},
@@ -130,7 +130,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
         target_frame = child_codelet.targets["frame"]
         target_end = child_codelet.targets["end"]
         if target_end.is_relation:
-            source_collection = bubble_chamber.interspatial_relations
+            source_collection = bubble_chamber.cross_view_relations
             # check if target end's container frames have already been matched
             target_start_space = None
             target_end_space = None
@@ -303,7 +303,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                             and x.parent_concept.args[0] == target_end.parent_concept
                         )
                         and target_view.members.filter(
-                            lambda c: c.end in target_frame.interspatial_links
+                            lambda c: c.end in target_frame.cross_view_links
                         ).not_empty,
                     ]
                 )
@@ -351,7 +351,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                 ):
                     child_codelet.targets["end_sub_frame"] = sub_frame
         elif target_end.is_label:
-            source_collection = bubble_chamber.interspatial_labels
+            source_collection = bubble_chamber.cross_view_labels
             # check if target end's container frames have already been matched
             target_start_space = None
             for sub_frame in target_frame.sub_frames:
@@ -448,7 +448,7 @@ class InterspatialCorrespondenceSuggester(CorrespondenceSuggester):
                     )
             matching_labels = source_collection.filter(
                 lambda x: x.is_label
-                and x.is_interspatial
+                and x.is_cross_view
                 and x.correspondences.filter(
                     lambda c: c in target_view.members
                 ).is_empty

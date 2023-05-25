@@ -49,7 +49,7 @@
   (def-label :start chunk-1 :parent_concept least-concept
     :locations (list (Location (list (list Nan)) time-space)
 		     (Location (list) temporal-order-sub-1-input))
-    :is_interspatial True))
+    :is_cross_view True))
 (define chunk-2
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) temporal-order-sub-1-input)
@@ -59,7 +59,7 @@
   (def-label :start chunk-2 :parent_concept most-concept
     :locations (list (Location (list (list Nan)) time-space)
 		     (Location (list) temporal-order-sub-1-input))
-    :is_interspatial True))
+    :is_cross_view True))
 (define chunk-3
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) temporal-order-sub-2-input)
@@ -69,7 +69,7 @@
   (def-label :start chunk-3 :parent_concept least-concept
     :locations (list (Location (list (list Nan)) time-space)
 		     (Location (list) temporal-order-sub-2-input))
-    :is_interspatial True))
+    :is_cross_view True))
 (define chunk-4
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) temporal-order-sub-2-input)
@@ -79,14 +79,14 @@
   (def-label :start chunk-4 :parent_concept most-concept
     :locations (list (Location (list (list Nan)) time-space)
 		     (Location (list) temporal-order-sub-2-input))
-    :is_interspatial True))
+    :is_cross_view True))
 (define less-time-relation-1
   (def-relation :start chunk-1 :end chunk-3 :parent_concept less-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) temporal-order-input))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space time-space))
 (define less-time-relation-2
@@ -95,7 +95,7 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) temporal-order-input))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space time-space))
 (define not-more-time-relation
@@ -104,7 +104,7 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) temporal-order-input))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space time-space))
 
@@ -118,7 +118,7 @@
   (def-label :start subject-1 :parent_concept nsubj-concept
     :locations (list nsubj-location
 		     (Location (list) temporal-order-sub-1-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define subject-2
   (def-letter-chunk :name None
     :locations (list nsubj-location
@@ -129,27 +129,27 @@
   (def-label :start subject-2 :parent_concept nsubj-concept
     :locations (list nsubj-location
 		     (Location (list) temporal-order-sub-2-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define subject-relation
   (def-relation :start subject-1 :end subject-2 :parent_concept subject-relation-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) string-space)
 		     (TwoPointLocation (list) (list) temporal-order-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space string-space))
 
-((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-1-least-time)
-((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-1-most-time)
-((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-2-least-time)
-((getattr (getattr temporal-order "interspatial_links") "add") sub-frame-2-most-time)
-((getattr (getattr temporal-order "interspatial_links") "add") less-time-relation-1)
-((getattr (getattr temporal-order "interspatial_links") "add") less-time-relation-2)
-((getattr (getattr temporal-order "interspatial_links") "add") not-more-time-relation)
-((getattr (getattr temporal-order "interspatial_links") "add") subject-1-grammar-label)
-((getattr (getattr temporal-order "interspatial_links") "add") subject-2-grammar-label)
-((getattr (getattr temporal-order "interspatial_links") "add") subject-relation)
+((getattr (getattr temporal-order "cross_view_links") "add") sub-frame-1-least-time)
+((getattr (getattr temporal-order "cross_view_links") "add") sub-frame-1-most-time)
+((getattr (getattr temporal-order "cross_view_links") "add") sub-frame-2-least-time)
+((getattr (getattr temporal-order "cross_view_links") "add") sub-frame-2-most-time)
+((getattr (getattr temporal-order "cross_view_links") "add") less-time-relation-1)
+((getattr (getattr temporal-order "cross_view_links") "add") less-time-relation-2)
+((getattr (getattr temporal-order "cross_view_links") "add") not-more-time-relation)
+((getattr (getattr temporal-order "cross_view_links") "add") subject-1-grammar-label)
+((getattr (getattr temporal-order "cross_view_links") "add") subject-2-grammar-label)
+((getattr (getattr temporal-order "cross_view_links") "add") subject-relation)
 
 (define verb-1
   (def-letter-chunk :name None
@@ -261,7 +261,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start less-time-interspatial-concept :end temporal-order
+(def-relation :start less-time-cross_view-concept :end temporal-order
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end temporal-order
   :is_bidirectional True :stable_activation 0.5)

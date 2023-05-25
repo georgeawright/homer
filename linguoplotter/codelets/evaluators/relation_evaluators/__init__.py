@@ -1,1 +1,1 @@
-from .interspatial_relation_evaluator import InterspatialRelationEvaluator
+from .cross_view_relation_evaluator import CrossViewRelationEvaluator

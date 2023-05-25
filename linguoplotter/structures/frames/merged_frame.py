@@ -27,7 +27,7 @@ class MergedFrame(Frame):
             parent_frame=None,
             sub_frames=None,
             concepts=None,
-            interspatial_links=None,
+            cross_view_links=None,
             input_space=None,
             output_space=None,
             links_in=links_in,

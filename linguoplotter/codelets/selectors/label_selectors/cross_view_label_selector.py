@@ -1,14 +1,14 @@
 from linguoplotter import fuzzy
 from linguoplotter.codelets.selectors import LabelSelector
 from linguoplotter.codelets.suggesters.label_suggesters import (
-    InterspatialLabelSuggester,
+    CrossViewLabelSuggester,
 )
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.structure_collection_keys import activation, labeling_salience
 from linguoplotter.structure_collections import StructureSet
 
 
-class InterspatialLabelSelector(LabelSelector):
+class CrossViewLabelSelector(LabelSelector):
     def _passes_preliminary_checks(self):
         if self.challengers.not_empty:
             return True
@@ -71,7 +71,7 @@ class InterspatialLabelSelector(LabelSelector):
                 name="targets",
             )
             self.child_codelets.append(
-                InterspatialLabelSuggester.spawn(
+                CrossViewLabelSuggester.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
                     targets,

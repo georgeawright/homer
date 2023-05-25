@@ -6,7 +6,7 @@ from linguoplotter.codelets.suggesters import (
     ViewSuggester,
 )
 from linguoplotter.codelets.suggesters.correspondence_suggesters import (
-    InterspatialCorrespondenceSuggester,
+    CrossViewCorrespondenceSuggester,
     PotentialSubFrameToFrameCorrespondenceSuggester,
     SpaceToFrameCorrespondenceSuggester,
     SubFrameToFrameCorrespondenceSuggester,
@@ -18,10 +18,10 @@ from linguoplotter.codelets.suggesters.projection_suggesters import (
     RelationProjectionSuggester,
 )
 from linguoplotter.codelets.suggesters.label_suggesters import (
-    InterspatialLabelSuggester,
+    CrossViewLabelSuggester,
 )
 from linguoplotter.codelets.suggesters.relation_suggesters import (
-    InterspatialRelationSuggester,
+    CrossViewRelationSuggester,
 )
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -77,11 +77,11 @@ class ViewDrivenFactory(Factory):
         if self.targets["frame"].has_failed_to_match:
             return
         self._set_target_slot()
-        if self.targets["slot"].is_interspatial:
+        if self.targets["slot"].is_cross_view:
             try:
-                follow_up = self._spawn_interspatial_correspondence_suggester()
+                follow_up = self._spawn_cross_view_correspondence_suggester()
             except MissingStructureError:
-                follow_up = self._spawn_interspatial_link_suggester()
+                follow_up = self._spawn_cross_view_link_suggester()
         elif (
             len(self.targets["slot"].parent_spaces.where(is_contextual_space=True)) == 1
             and self.targets["slot"].parent_space
@@ -126,17 +126,17 @@ class ViewDrivenFactory(Factory):
             self.targets["frame"] = self.targets["view"].parent_frame
 
     def _set_target_slot(self):
-        interspatial_structures = self.targets["frame"].unfilled_interspatial_structures
-        if interspatial_structures.not_empty:
-            if interspatial_structures.where(is_label=True).not_empty:
-                self.targets["slot"] = interspatial_structures.where(
+        cross_view_structures = self.targets["frame"].unfilled_cross_view_structures
+        if cross_view_structures.not_empty:
+            if cross_view_structures.where(is_label=True).not_empty:
+                self.targets["slot"] = cross_view_structures.where(
                     is_label=True
                 ).get()
             else:
-                self.targets["slot"] = interspatial_structures.get()
+                self.targets["slot"] = cross_view_structures.get()
             return
-        if self.targets["frame"].unfilled_interspatial_structures.not_empty:
-            self.targets["frame"].unfilled_interspatial_structures.get()
+        if self.targets["frame"].unfilled_cross_view_structures.not_empty:
+            self.targets["frame"].unfilled_cross_view_structures.get()
             return
         for structures in [
             self.targets["frame"].unfilled_sub_frame_input_structures,
@@ -350,14 +350,14 @@ class ViewDrivenFactory(Factory):
             )
         raise Exception("Slot is not a label or a relation.")
 
-    def _spawn_interspatial_link_suggester(self):
+    def _spawn_cross_view_link_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
-            "Spawning interspatial link suggester"
+            "Spawning cross_view link suggester"
         )
         if self.targets["slot"].is_relation:
             target_start_space = None
             target_end_space = None
-            for link in self.targets["frame"].interspatial_links:
+            for link in self.targets["frame"].cross_view_links:
                 # TODO: this information should be stored in the view
                 for correspondee in link.correspondees:
                     if (
@@ -586,7 +586,7 @@ class ViewDrivenFactory(Factory):
                 or targets["start"] in x.output_space.contents
             ).get()
             self.bubble_chamber.loggers["activity"].log_dict(targets)
-            return InterspatialRelationSuggester.spawn(
+            return CrossViewRelationSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 targets,
@@ -723,7 +723,7 @@ class ViewDrivenFactory(Factory):
                 ),
             )
             self.bubble_chamber.loggers["activity"].log_dict(targets)
-            return InterspatialLabelSuggester.spawn(
+            return CrossViewLabelSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 targets,
@@ -766,9 +766,9 @@ class ViewDrivenFactory(Factory):
             else 1.0,
         )
 
-    def _spawn_interspatial_correspondence_suggester(self):
+    def _spawn_cross_view_correspondence_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
-            "Spawning InterspatialCorrespondenceSuggester"
+            "Spawning CrossViewCorrespondenceSuggester"
         )
         targets = self.bubble_chamber.new_dict(
             {
@@ -779,7 +779,7 @@ class ViewDrivenFactory(Factory):
             },
             name="targets",
         )
-        follow_up = InterspatialCorrespondenceSuggester.spawn(
+        follow_up = CrossViewCorrespondenceSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
             targets,

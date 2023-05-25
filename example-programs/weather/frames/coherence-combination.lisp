@@ -64,7 +64,7 @@
   (def-label :start sentence-1 :parent_concept sentence-concept
     :locations (list sentence-location
 		     (Location (list) combination-sub-1-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define sentence-2
   (def-letter-chunk :name None
     :locations (list sentence-location
@@ -75,7 +75,7 @@
   (def-label :start sentence-2 :parent_concept sentence-concept
     :locations (list sentence-location
 		     (Location (list) combination-sub-1-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define sentence-3
   (def-letter-chunk :name None
     :locations (list sentence-location
@@ -86,7 +86,7 @@
   (def-label :start sentence-3 :parent_concept sentence-concept
     :locations (list sentence-location
 		     (Location (list) combination-sub-2-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define sentence-4
   (def-letter-chunk :name None
     :locations (list sentence-location
@@ -97,14 +97,14 @@
   (def-label :start sentence-4 :parent_concept sentence-concept
     :locations (list sentence-location
 		     (Location (list) combination-sub-2-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define relation-1-3
   (def-relation :start sentence-1 :end sentence-3 :parent_concept same-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) string-space)
 		     (TwoPointLocation (list) (list) combination-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space string-space))
 (define relation-2-4
@@ -113,15 +113,15 @@
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) string-space)
 		     (TwoPointLocation (list) (list) combination-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space string-space))
-((getattr (getattr combination "interspatial_links") "add") sentence-1-sentence-label)
-((getattr (getattr combination "interspatial_links") "add") sentence-2-sentence-label)
-((getattr (getattr combination "interspatial_links") "add") sentence-3-sentence-label)
-((getattr (getattr combination "interspatial_links") "add") sentence-4-sentence-label)
-((getattr (getattr combination "interspatial_links") "add") relation-1-3)
-((getattr (getattr combination "interspatial_links") "add") relation-2-4)
+((getattr (getattr combination "cross_view_links") "add") sentence-1-sentence-label)
+((getattr (getattr combination "cross_view_links") "add") sentence-2-sentence-label)
+((getattr (getattr combination "cross_view_links") "add") sentence-3-sentence-label)
+((getattr (getattr combination "cross_view_links") "add") sentence-4-sentence-label)
+((getattr (getattr combination "cross_view_links") "add") relation-1-3)
+((getattr (getattr combination "cross_view_links") "add") relation-2-4)
 
 (define conj-word-1
   (def-letter-chunk :name None
@@ -141,7 +141,7 @@
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) grammar-space)
 		     (TwoPointLocation (list) (list) combination-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space grammar-space))
 (define conj-super-chunk

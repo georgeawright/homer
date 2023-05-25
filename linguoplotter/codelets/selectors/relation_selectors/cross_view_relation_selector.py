@@ -1,11 +1,11 @@
 from linguoplotter.codelets.selectors import RelationSelector
 from linguoplotter.codelets.suggesters.relation_suggesters import (
-    InterspatialRelationSuggester,
+    CrossViewRelationSuggester,
 )
 from linguoplotter.errors import MissingStructureError
 
 
-class InterspatialRelationSelector(RelationSelector):
+class CrossViewRelationSelector(RelationSelector):
     def _engender_follow_up(self):
         try:
             winner_relation = self.winners.get()
@@ -32,7 +32,7 @@ class InterspatialRelationSelector(RelationSelector):
                 name="targets",
             )
             self.child_codelets.append(
-                InterspatialRelationSuggester.spawn(
+                CrossViewRelationSuggester.spawn(
                     self.codelet_id,
                     self.bubble_chamber,
                     targets,

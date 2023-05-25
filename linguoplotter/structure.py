@@ -60,7 +60,6 @@ class Structure(ABC):
         self.corresponding_salience = 0.5
         self.salience = 0.5
 
-        self.is_link_or_node = False
         self.is_node = False
         self.is_concept = False
         self.is_compound_concept = False
@@ -69,7 +68,7 @@ class Structure(ABC):
         self.is_link = False
         self.is_correspondence = False
         self.is_label = False
-        self.is_interspatial = False
+        self.is_cross_view = False
         self.is_relation = False
         self.is_view = False
         self.is_space = False

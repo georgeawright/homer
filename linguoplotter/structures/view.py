@@ -185,8 +185,8 @@ class View(Structure):
         return self.activation < self.FLOATING_POINT_TOLERANCE
 
     @property
-    def unfilled_interspatial_structures(self):
-        return self.parent_frame.unfilled_interspatial_structures
+    def unfilled_cross_view_structures(self):
+        return self.parent_frame.unfilled_cross_view_structures
 
     @property
     def unfilled_sub_frame_input_structures(self):
@@ -238,7 +238,7 @@ class View(Structure):
     def number_of_items_left_to_process(self):
         return sum(
             [
-                len(self.unfilled_interspatial_structures),
+                len(self.unfilled_cross_view_structures),
                 len(self.unfilled_sub_frame_input_structures),
                 len(self.unfilled_input_structures),
                 len(self.unfilled_output_structures),
@@ -389,7 +389,7 @@ class View(Structure):
             and correspondence.end.is_link
             and correspondence.end.parent_concept.is_slot
         ):
-            if correspondence.end.is_interspatial or not any(
+            if correspondence.end.is_cross_view or not any(
                 [
                     item.is_link
                     and item.parent_concept == correspondence.end.parent_concept
@@ -475,7 +475,7 @@ class View(Structure):
             return False
         if (
             end.is_link
-            and end.is_interspatial
+            and end.is_cross_view
             and sub_view is not None
             and end.correspondences.filter(
                 lambda x: x.end == end and x not in sub_view.members
@@ -487,7 +487,7 @@ class View(Structure):
             return False
         if (
             start.is_link
-            and start.is_interspatial
+            and start.is_cross_view
             and start.correspondences.filter(lambda x: x in self.members).not_empty
         ):
             if verbose:
@@ -579,7 +579,7 @@ class View(Structure):
                             potential_node_group[space] = sub_view_node_group[space]
         if not all(
             [
-                node.links.where(is_interspatial=True).not_empty
+                node.links.where(is_cross_view=True).not_empty
                 for group in potential_node_groups
                 for node in group.values()
             ]

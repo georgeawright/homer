@@ -7,10 +7,10 @@ from linguoplotter.codelets.evaluators import (
     ViewEvaluator,
 )
 from linguoplotter.codelets.evaluators.label_evaluators import (
-    InterspatialLabelEvaluator,
+    CrossViewLabelEvaluator,
 )
 from linguoplotter.codelets.evaluators.relation_evaluators import (
-    InterspatialRelationEvaluator,
+    CrossViewRelationEvaluator,
 )
 from linguoplotter.codelets.factories import BottomUpFactory
 from linguoplotter.errors import MissingStructureError
@@ -48,8 +48,8 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             (RelationEvaluator, relations_per_space_per_end_per_chunk),
             (ViewEvaluator, views_per_frame_type_per_chunk),
             (ViewEvaluator, cohesion_views_per_view),
-            (InterspatialRelationEvaluator, related_texts_per_letter_chunk),
-            (InterspatialLabelEvaluator, labels_per_space_per_letter_chunk),
+            (CrossViewRelationEvaluator, related_texts_per_letter_chunk),
+            (CrossViewLabelEvaluator, labels_per_space_per_letter_chunk),
         ]
 
         follow_up_class = self.bubble_chamber.random_machine.select(
@@ -161,7 +161,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             return statistics.fmean(
                 [
                     (
-                        len(chunk.relations.where(is_interspatial=True))
+                        len(chunk.relations.where(is_cross_view=True))
                         / len([relative.parent_space for relative in chunk.relatives])
                     )
                     if chunk.relations.not_empty
@@ -190,7 +190,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             )
             return statistics.fmean(
                 [
-                    len(chunk.labels.where(is_interspatial=True))
+                    len(chunk.labels.where(is_cross_view=True))
                     / len(chunk.parent_spaces.where(is_conceptual_space=True))
                     for chunk in letter_chunks
                 ]

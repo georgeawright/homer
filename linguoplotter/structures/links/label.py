@@ -26,7 +26,7 @@ class Label(Link):
         parent_spaces: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
-        is_interspatial: bool = False,
+        is_cross_view: bool = False,
     ):
         Link.__init__(
             self,
@@ -46,7 +46,7 @@ class Label(Link):
         )
         self._parent_space = parent_space
         self.is_label = True
-        self.is_interspatial = is_interspatial
+        self.is_cross_view = is_cross_view
 
     def __dict__(self) -> dict:
         return {
@@ -110,7 +110,7 @@ class Label(Link):
             locations=new_locations,
             quality=self.quality,
             parent_space=parent_space,
-            is_interspatial=self.is_interspatial,
+            is_cross_view=self.is_cross_view,
             activation=self.activation,
         )
 

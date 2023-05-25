@@ -66,7 +66,7 @@
   (def-label :start letter-chunk-1 :parent_concept first-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) parallelism-sub-1-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define letter-chunk-2
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) conceptual-space)
@@ -77,7 +77,7 @@
   (def-label :start letter-chunk-2 :parent_concept last-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) parallelism-sub-1-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define letter-chunk-3
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) conceptual-space)
@@ -88,7 +88,7 @@
   (def-label :start letter-chunk-3 :parent_concept first-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) parallelism-sub-2-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define letter-chunk-4
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) conceptual-space)
@@ -99,14 +99,14 @@
   (def-label :start letter-chunk-4 :parent_concept last-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) parallelism-sub-2-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define relation-1-3
   (def-relation :start letter-chunk-1 :end letter-chunk-3 :parent_concept same-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
 		     (TwoPointLocation (list) (list) parallelism-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space conceptual-space))
 (define relation-2-4
@@ -115,7 +115,7 @@
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
 		     (TwoPointLocation (list) (list) parallelism-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space conceptual-space))
 
@@ -129,7 +129,7 @@
   (def-label :start subject-1 :parent_concept nsubj-concept
     :locations (list nsubj-location
 		     (Location (list) parallelism-sub-1-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define subject-2
   (def-letter-chunk :name None
     :locations (list nsubj-location
@@ -140,26 +140,26 @@
   (def-label :start subject-2 :parent_concept nsubj-concept
     :locations (list nsubj-location
 		     (Location (list) parallelism-sub-2-output))
-    :is_interspatial True))
+    :is_cross_view True))
 (define subject-relation
   (def-relation :start subject-1 :end subject-2 :parent_concept subject-relation-concept
     :quality 1.0
     :locations (list (Location (list (list Nan)) same-different-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) string-space)
 		     (TwoPointLocation (list) (list) parallelism-output))
-    :is_interspatial True
+    :is_cross_view True
     :parent_space None
     :conceptual_space string-space))
 
-((getattr (getattr parallelism "interspatial_links") "add") sub-frame-1-first-label)
-((getattr (getattr parallelism "interspatial_links") "add") sub-frame-1-last-label)
-((getattr (getattr parallelism "interspatial_links") "add") sub-frame-2-first-label)
-((getattr (getattr parallelism "interspatial_links") "add") sub-frame-2-last-label)
-((getattr (getattr parallelism "interspatial_links") "add") subject-1-grammar-label)
-((getattr (getattr parallelism "interspatial_links") "add") subject-2-grammar-label)
-((getattr (getattr parallelism "interspatial_links") "add") relation-1-3)
-((getattr (getattr parallelism "interspatial_links") "add") relation-2-4)
-((getattr (getattr parallelism "interspatial_links") "add") subject-relation)
+((getattr (getattr parallelism "cross_view_links") "add") sub-frame-1-first-label)
+((getattr (getattr parallelism "cross_view_links") "add") sub-frame-1-last-label)
+((getattr (getattr parallelism "cross_view_links") "add") sub-frame-2-first-label)
+((getattr (getattr parallelism "cross_view_links") "add") sub-frame-2-last-label)
+((getattr (getattr parallelism "cross_view_links") "add") subject-1-grammar-label)
+((getattr (getattr parallelism "cross_view_links") "add") subject-2-grammar-label)
+((getattr (getattr parallelism "cross_view_links") "add") relation-1-3)
+((getattr (getattr parallelism "cross_view_links") "add") relation-2-4)
+((getattr (getattr parallelism "cross_view_links") "add") subject-relation)
 
 
 (define verb-1
@@ -272,7 +272,7 @@
     :left_branch (StructureSet clause-1)
     :right_branch (StructureSet conjunction-super-chunk)))
 
-(def-relation :start same-interspatial-concept :end parallelism
+(def-relation :start same-cross_view-concept :end parallelism
   :is_bidirectional True :stable_activation 0.5)
 (def-relation :start sentence-concept :end parallelism
   :is_bidirectional True :stable_activation 0.5)

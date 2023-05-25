@@ -2,7 +2,7 @@ from linguoplotter.codelets.builders import CorrespondenceBuilder
 from linguoplotter.structure_collections import StructureSet
 
 
-class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
+class CrossViewCorrespondenceBuilder(CorrespondenceBuilder):
     def _passes_preliminary_checks(self):
         for sub_frame, sub_view_frame in self.targets[
             "view"
@@ -183,7 +183,7 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                             parent_view=self.targets["view"]
                         ).not_empty
                         for link in self.targets["start"].start.links.where(
-                            is_interspatial=True
+                            is_cross_view=True
                         )
                     ]
                 )
@@ -222,7 +222,7 @@ class InterspatialCorrespondenceBuilder(CorrespondenceBuilder):
                         ).get()
                         relation_to_remove.start.links_out.remove(relation_to_remove)
                         relation_to_remove.end.links_in.remove(relation_to_remove)
-                        self.targets["frame"].interspatial_links.remove(
+                        self.targets["frame"].cross_view_links.remove(
                             relation_to_remove
                         )
                 for space in old_end_start.parent_spaces:

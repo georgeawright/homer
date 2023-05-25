@@ -157,8 +157,8 @@ class MergedFrameViewBuilder(ViewBuilder):
             new_frame_left_sub_frame.output_space: parent_frame_left_sub_frame.output_space,
         }
         item_copies_map = {}
-        # copy across interspatial links and their arguments except for links that recognize interstring repetition
-        for link in new_frame.interspatial_links.filter(
+        # copy across cross_view links and their arguments except for links that recognize interstring repetition
+        for link in new_frame.cross_view_links.filter(
             lambda x: not (
                 x.is_label
                 and x.parent_concept.parent_space
@@ -213,7 +213,7 @@ class MergedFrameViewBuilder(ViewBuilder):
                     new_item.links_out.add(new_label)
                     spaces_map[label.parent_space].add(new_label)
                     item_copies_map[label] = new_label
-                    parent_frame.interspatial_links.add(new_label)
+                    parent_frame.cross_view_links.add(new_label)
                 for relation in arg.links_out.where(is_relation=True):
                     if relation.end not in item_copies_map:
                         continue
@@ -230,7 +230,7 @@ class MergedFrameViewBuilder(ViewBuilder):
                     new_end.links_in.add(new_relation)
                     new_item.links_out.add(new_relation)
                     item_copies_map[relation] = new_relation
-                    parent_frame.interspatial_links.add(relation)
+                    parent_frame.cross_view_links.add(relation)
                     if relation.parent_space is not None:
                         spaces_map[relation.parent_space].add(new_relation)
                 for relation in arg.links_in.where(is_relation=True):
@@ -249,7 +249,7 @@ class MergedFrameViewBuilder(ViewBuilder):
                     new_item.links_in.add(new_relation)
                     new_start.links_out.add(new_relation)
                     item_copies_map[relation] = new_relation
-                    parent_frame.interspatial_links.add(new_relation)
+                    parent_frame.cross_view_links.add(new_relation)
                     if relation.parent_space is not None:
                         spaces_map[relation.parent_space].add(new_relation)
         # merge conjunctions in correct order

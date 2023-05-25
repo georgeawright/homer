@@ -3,18 +3,18 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluators import LabelEvaluator
 
 
-class InterspatialLabelEvaluator(LabelEvaluator):
+class CrossViewLabelEvaluator(LabelEvaluator):
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.selectors.label_selectors import (
-            InterspatialLabelSelector,
+            CrossViewLabelSelector,
         )
 
-        return InterspatialLabelSelector
+        return CrossViewLabelSelector
 
     @classmethod
     def make(cls, parent_id: str, bubble_chamber: BubbleChamber):
-        target = bubble_chamber.interspatial_labels.get(
+        target = bubble_chamber.cross_view_labels.get(
             key=lambda x: fuzzy.OR(
                 abs(x.activation - x.quality),
                 bubble_chamber.worldview.view is not None
