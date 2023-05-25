@@ -6,53 +6,18 @@ def NOT(a: float) -> float:
 
 
 def AND(*args):
-    result = 1
-    for arg in args:
-        result = _AND(result, arg)
-        if result == 0:
-            return result
-    return result
+    operation = lambda a, b: a * b
+    return reduce(operation, args, 1.0)
 
 
-def OR(*arg):
-    return reduce(_OR, arg)
+def OR(*args):
+    operation = lambda a, b: a + b - a * b
+    return reduce(operation, args, 0.0)
 
 
-def NAND(*arg):
-    return reduce(_NAND, arg)
+def NAND(*args):
+    return NOT(AND(args))
 
 
-def NOR(*arg):
-    return reduce(_NOR, arg)
-
-
-def XOR(*arg):
-    return reduce(_XOR, arg)
-
-
-def XNOR(*arg):
-    return reduce(_XNOR, arg)
-
-
-def _AND(a: float, b: float) -> float:
-    return a * b
-
-
-def _OR(a: float, b: float) -> float:
-    return a + b - a * b
-
-
-def _NAND(a: float, b: float) -> float:
-    return NOT(_AND(a, b))
-
-
-def _NOR(a: float, b: float) -> float:
-    return NOT(_OR(a, b))
-
-
-def _XOR(a: float, b: float) -> float:
-    return AND(_OR(a, b), _NAND(a, b))
-
-
-def _XNOR(a: float, b: float) -> float:
-    return NOT(_XOR(a, b))
+def NOR(*args):
+    return NOT(OR(args))
