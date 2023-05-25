@@ -209,50 +209,6 @@ class LetterChunk(Chunk):
             .excluding(self)
         )
 
-    def copy_to_location(
-        self, location: Location, bubble_chamber: "BubbleChamber", parent_id: str = ""
-    ):
-        def copy_recursively(
-            chunk: Chunk,
-            location: Location,
-            bubble_chamber: "BubbleChamber",
-            parent_id: str,
-            copies: dict,
-        ):
-            locations = [
-                location.copy()
-                for location in chunk.locations
-                if location.space.is_conceptual_space
-            ] + [location]
-            members = bubble_chamber.new_set()
-            for member in chunk.members:
-                if member not in copies:
-                    copies[member] = copy_recursively(
-                        member, location, bubble_chamber, parent_id, copies
-                    )
-                members.add(copies[member])
-            new_left_branch = bubble_chamber.new_set(
-                *[copies[member] for member in chunk.left_branch]
-            )
-            new_right_branch = bubble_chamber.new_set(
-                *[copies[member] for member in chunk.right_branch]
-            )
-            return bubble_chamber.new_letter_chunk(
-                parent_id=parent_id,
-                name=chunk.name,
-                locations=locations,
-                members=members,
-                parent_space=location.space,
-                left_branch=new_left_branch,
-                right_branch=new_right_branch,
-                abstract_chunk=self
-                if self.abstract_chunk is None
-                else self.abstract_chunk,
-                quality=0.0,
-            )
-
-        return copy_recursively(self, location, bubble_chamber, parent_id, {})
-
     def copy_with_contents(
         self,
         copies: dict,

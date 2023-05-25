@@ -200,35 +200,8 @@ class Chunk(Node):
     def copy_to_location(
         self, location: Location, bubble_chamber: "BubbleChamber", parent_id: str = ""
     ):
-        def copy_recursively(
-            chunk: Chunk,
-            location: Location,
-            bubble_chamber: "BubbleChamber",
-            parent_id: str,
-            copies: dict,
-        ):
-            locations = [
-                location.copy()
-                for location in chunk.locations
-                if location.space.is_conceptual_space
-            ] + [location]
-            members = bubble_chamber.new_set()
-            for member in chunk.members:
-                if member not in copies:
-                    copies[member] = copy_recursively(
-                        member, location, bubble_chamber, parent_id, copies
-                    )
-                members.add(copies[member])
-            return bubble_chamber.new_chunk(
-                parent_id=parent_id,
-                locations=locations,
-                parent_space=location.space,
-                members=members,
-                is_raw=chunk.is_raw,
-                quality=0.0,
-            )
-
-        return copy_recursively(self, location, bubble_chamber, parent_id, {})
+        chunk_copy, _ = self.copy_with_contents({}, bubble_chamber, parent_id, location)
+        return chunk_copy
 
     def copy_with_contents(
         self,
