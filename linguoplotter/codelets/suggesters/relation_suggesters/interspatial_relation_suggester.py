@@ -1,9 +1,10 @@
+from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import RelationSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collections import StructureSet
-from linguoplotter.structure_collection_keys import activation
+from linguoplotter.structure_collection_keys import activation, relating_salience
 from linguoplotter.structures.links import Relation
 from linguoplotter.structures.nodes import Concept
 
@@ -87,7 +88,7 @@ class InterspatialRelationSuggester(RelationSuggester):
         try:
             if self.targets["start"] is None:
                 self.targets["start_view"] = possible_views.get(key=activation)
-                possible_starts = StructureSet.union(
+                self.targets["start"] = StructureSet.union(
                     self.targets["start_view"].output_space.contents.filter(
                         lambda x: x.is_letter_chunk
                         and not x.is_slot
@@ -96,71 +97,77 @@ class InterspatialRelationSuggester(RelationSuggester):
                     self.targets["start_view"].parent_frame.input_space.contents.filter(
                         lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
                     ),
-                )
-            else:
-                possible_starts = [self.targets["start"]]
+                ).get(key=relating_salience)
+        except MissingStructureError:
+            return False
+        if self.targets["space"] is None:
+            possible_spaces = self.targets["start"].parent_spaces.where(
+                is_conceptual_space=True
+            )
+        else:
+            possible_spaces = [self.targets["space"]]
+        try:
             if self.targets["end"] is None:
                 self.targets["end_view"] = possible_views.excluding(
                     self.targets["start_view"]
                 ).get(key=lambda x: x.cohesiveness_with(self.targets["start_view"]))
-                possible_ends = StructureSet.union(
+                possible_ends = (
                     self.targets["end_view"].output_space.contents.filter(
                         lambda x: x.is_letter_chunk
                         and not x.is_slot
                         and x.labels.not_empty
-                    ),
-                    self.targets["end_view"].parent_frame.input_space.contents.filter(
+                    )
+                    if self.targets["start"].is_letter_chunk
+                    else self.targets[
+                        "end_view"
+                    ].parent_frame.input_space.contents.filter(
                         lambda x: x.is_chunk and (not x.is_slot or x.is_filled_in)
-                    ),
+                    )
                 )
-            else:
-                possible_ends = [self.targets["end"]]
+                self.targets["end"] = possible_ends.get(
+                    key=lambda x: fuzzy.OR(
+                        *[
+                            space.proximity_between(x, self.targets["start"])
+                            for space in possible_spaces.filter(
+                                lambda s: s in x.parent_spaces
+                            )
+                        ]
+                    )
+                )
         except MissingStructureError:
             return False
-        if self.targets["space"] is None:
-            possible_spaces = self.bubble_chamber.conceptual_spaces.filter(
-                lambda x: x != self.bubble_chamber.spaces["grammar"]
-            )
-        else:
-            possible_spaces = [self.targets["space"]]
         possible_target_combos = [
             self.bubble_chamber.new_dict(
-                {"start": start, "end": end, "space": space, "concept": concept},
+                {
+                    "start": self.targets["start"],
+                    "end": self.targets["end"],
+                    "space": space,
+                    "concept": concept,
+                },
                 name="targets",
             )
-            for start in possible_starts
-            for end in possible_ends
             for space in possible_spaces
             for concept in possible_concepts
-            if (
-                start.is_letter_chunk == end.is_letter_chunk
-                and StructureSet.intersection(
-                    start.parent_spaces.where(is_contextual_space=True),
-                    end.parent_spaces.where(is_contextual_space=True),
-                ).is_empty
-                and space in start.parent_spaces
-                and space in end.parent_spaces
-                and (
-                    space.no_of_dimensions == 1 and not space.is_symbolic
-                    if concept.parent_space.name == "more-less"
-                    else True
-                )
-                and (
-                    concept == self.bubble_chamber.concepts["same"]
-                    if space == self.bubble_chamber.spaces["string"]
-                    else True
-                )
-                and (
-                    concept.parent_space
-                    in (
-                        self.bubble_chamber.spaces["more-less"],
-                        self.bubble_chamber.spaces["same-different"],
-                    )
-                    if start.is_chunk
-                    else True
-                )
+            if space in self.targets["end"].parent_spaces
+            and (
+                space.no_of_dimensions == 1 and not space.is_symbolic
+                if concept.parent_space.name == "more-less"
+                else True
             )
-            and end.has_location_in_space(space)
+            and (
+                concept == self.bubble_chamber.concepts["same"]
+                if space == self.bubble_chamber.spaces["string"]
+                else True
+            )
+            and (
+                concept.parent_space
+                in (
+                    self.bubble_chamber.spaces["more-less"],
+                    self.bubble_chamber.spaces["same-different"],
+                )
+                if self.targets["start"].is_chunk
+                else True
+            )
         ]
         if possible_target_combos == []:
             return False

@@ -1,3 +1,4 @@
+import time
 from typing import Dict
 
 from .bubble_chamber import BubbleChamber
@@ -51,6 +52,7 @@ class Coderack:
         self.recently_run = set()
         self.codelets_run = 0
         self.loggers = loggers
+        self.codelet_times = []
 
     @classmethod
     def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
@@ -137,6 +139,7 @@ class Coderack:
         self.bubble_chamber.recalculate_satisfaction()
         codelet = self._select_a_codelet()
         self.loggers["activity"].log_codelet_start(codelet)
+        codelet_start_time = time.time()
         if HyperParameters.TESTING:
             try:
                 codelet.run()
@@ -149,6 +152,15 @@ class Coderack:
             except Exception as e:
                 self.loggers["activity"].log_codelet_end(self.population_size)
                 raise e
+        codelet_end_time = time.time()
+        self.codelet_times.append(
+            {
+                "id": codelet.codelet_id,
+                "type": type(codelet),
+                "start": codelet_start_time,
+                "end": codelet_end_time,
+            }
+        )
         self.recently_run.add(type(codelet))
         self.codelets_run += 1
         for child_codelet in codelet.child_codelets:

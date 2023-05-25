@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import time
@@ -25,7 +26,7 @@ program_files = [
 start_time = time.time()
 for program_file in program_files:
     results = []
-    random_seeds = range(15)
+    random_seeds = range(1)
 
     for i in random_seeds:
         time_string = str(time.time())
@@ -79,6 +80,12 @@ for program_file in program_files:
         with open(f"{logs_dir_path}/details.txt", "w") as f:
             run_details = dict(run_details, **result)
             f.write(json.dumps(run_details))
+        with open(f"{logs_dir_path}/codelet_times.csv", "w", newline="") as csvfile:
+            fieldnames = list(narrator.coderack.codelet_times[0].keys())
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for codelet_time in narrator.coderack.codelet_times:
+                writer.writerow(codelet_time)
     end_time = time.time()
     print(results)
     run_length = end_time - start_time
