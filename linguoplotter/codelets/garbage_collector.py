@@ -86,7 +86,7 @@ class GarbageCollector(Codelet):
                     and any(
                         [
                             item in codelet.targets.values()
-                            for item in StructureSet.union
+                            for item in StructureSet.union(
                                 *[
                                     sub_frame.input_space.contents
                                     for sub_frame in structure.parent_frame.sub_frames
