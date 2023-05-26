@@ -31,21 +31,25 @@ class ActivityLogger(Logger):
 
     def log(self, message: str):
         self.codelet_json["activity"].append(message)
+        return self
 
     def log_dict(self, dictionary, name: str = None):
         name = dictionary.name if name is None else name
         self.codelet_json["activity"].append(name)
         self.codelet_json["activity"].append(dictionary.__dict__())
+        return self
 
     def log_set(self, structure_set, name: str = None):
         name = structure_set.name if name is None else name
         self.codelet_json["activity"].append(name)
         self.codelet_json["activity"].append(structure_set.__dict__())
+        return self
 
     def log_list(self, structure_list, name: str = None):
         name = structure_list.name if name is None else name
         self.codelet_json["activity"].append(name)
         self.codelet_json["activity"].append(structure_list.__dict__())
+        return self
 
     def log_codelet_start(self, codelet: "Codelet"):
         self.codelet = codelet
@@ -60,6 +64,7 @@ class ActivityLogger(Logger):
         self.codelet_json["urgency"] = self.codelet.urgency
         self.codelet_json["time"] = self.codelets_run
         self.codelet_json["activity"] = []
+        return self
 
     def log_codelet_end(self, coderack_population: int):
         codelet_log_file = f"{self.codelets_directory}/times/{self.codelets_run}.json"
@@ -93,6 +98,7 @@ class ActivityLogger(Logger):
         self._log_satisfaction()
         self._log_coderack_population(coderack_population)
         self._log_view_count(len(self.codelet.bubble_chamber.views))
+        return self
 
     def _log_satisfaction(self):
         if self.satisfaction_stream is not None:
@@ -103,13 +109,16 @@ class ActivityLogger(Logger):
             self.determinism_stream.write(
                 f"{self.codelets_run},{self.codelet.bubble_chamber.random_machine.determinism}\n"
             )
+        return self
 
     def _log_coderack_population(self, coderack_population: int):
         if self.coderack_population_stream is not None:
             self.coderack_population_stream.write(
                 f"{self.codelets_run},{coderack_population}\n"
             )
+        return self
 
     def _log_view_count(self, view_count: int):
         if self.view_count_stream is not None:
             self.view_count_stream.write(f"{self.codelets_run},{view_count}\n")
+        return self

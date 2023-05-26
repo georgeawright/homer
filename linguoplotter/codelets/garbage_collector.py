@@ -46,19 +46,25 @@ class GarbageCollector(Codelet):
 
     def _remove_items(self):
         for structure in self.bubble_chamber.recycle_bin:
+            self.bubble_chamber.loggers["activity"].log(f"{structure}").log(
+                f"Quality: {structure.quality}"
+            ).log(f"Activation: {structure.activation}")
             if not structure.is_recyclable:
+                self.bubble_chamber.loggers["activity"].log("NOT RECYCLABLE")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
             if self.bubble_chamber.worldview.view is not None and (
                 structure in self.bubble_chamber.worldview.view.grouped_nodes
                 or structure in self.bubble_chamber.worldview.view.members
             ):
+                self.bubble_chamber.loggers["activity"].log("IN WORLDVIEW")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
             if structure in (
                 self.bubble_chamber.focus.view,
                 self.bubble_chamber.focus.frame,
             ):
+                self.bubble_chamber.loggers["activity"].log("STRUCTURE IN FOCUS")
                 continue
             relevant_codelets = [
                 codelet
@@ -80,7 +86,7 @@ class GarbageCollector(Codelet):
                     and any(
                         [
                             item in codelet.targets.values()
-                            for item in StructureSet.union(
+                            for item in StructureSet.union
                                 *[
                                     sub_frame.input_space.contents
                                     for sub_frame in structure.parent_frame.sub_frames
@@ -97,16 +103,18 @@ class GarbageCollector(Codelet):
                     )
                 )
             ]
-            if len(relevant_codelets) == 0:
-                probability_of_removal = 1 - (
-                    structure.quality
-                    * self.bubble_chamber.random_machine.generate_number()
-                )
-            else:
-                probability_of_removal = 0
+            if len(relevant_codelets) > 0:
+                self.bubble_chamber.loggers["activity"].log("IN CODELET TARGETS")
+                continue
+            probability_of_removal = 1 - (
+                structure.quality * self.bubble_chamber.random_machine.generate_number()
+            )
+            self.bubble_chamber.loggers["activity"].log(
+                f"Probability of removal: {probability_of_removal}"
+            )
             # higher quality structures are more likely to be deleted as randomness increases
             if probability_of_removal > self.bubble_chamber.random_machine.randomness:
-                self.bubble_chamber.loggers["activity"].log(f"Removing {structure}")
+                self.bubble_chamber.loggers["activity"].log("REMOVING")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 self.bubble_chamber.remove(structure)
                 # for codelet in relevant_codelets:

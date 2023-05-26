@@ -4,7 +4,7 @@ from linguoplotter.logger import Logger
 
 class MockLogger(Logger):
     def log(self, item: Any):
-        pass
+        return self
 
     def __getattr__(self, name: str):
         return lambda *args: None

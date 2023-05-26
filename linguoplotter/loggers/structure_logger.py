@@ -24,3 +24,4 @@ class StructureLogger(Logger):
         output_file_path = f"{directory}/{codelets_run}.json"
         with open(output_file_path, "w") as f:
             json.dump(structure.__dict__(), f, sort_keys=False, indent=4)
+        return self

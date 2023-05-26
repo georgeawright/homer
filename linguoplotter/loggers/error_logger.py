@@ -7,6 +7,8 @@ class ErrorLogger(Logger):
 
     def log(self, codelet: "Codelet"):
         self.error_stream.write(codelet.codelet_id + "\n")
+        return self
 
     def log_message(self, message: str):
         self.error_stream.write(message + "\n")
+        return self
