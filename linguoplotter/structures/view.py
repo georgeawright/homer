@@ -161,6 +161,16 @@ class View(Structure):
         )
 
     @property
+    def grouped_links(self) -> StructureSet:
+        return StructureSet.difference(
+            StructureSet.union(
+                *[self.members]
+                + [m.arguments.where(is_link=True) for m in self.members]
+            ),
+            self.members,
+        )
+
+    @property
     def size(self):
         return len(self.members)
 
@@ -540,6 +550,8 @@ class View(Structure):
         if end.correspondences.filter(
             lambda x: x.end == end
             and x in self.members
+            and x.start
+            and start.parent_space is not None
             and x.start in start.parent_space.contents
         ).not_empty:
             if verbose:

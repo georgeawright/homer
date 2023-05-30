@@ -45,6 +45,8 @@ class GarbageCollector(Codelet):
         return self.result
 
     def _remove_items(self):
+        worldview = self.bubble_chamber.worldview.view
+        focus = self.bubble_chamber.focus.view
         for structure in self.bubble_chamber.recycle_bin:
             self.bubble_chamber.loggers["activity"].log(f"{structure}").log(
                 f"Quality: {structure.quality}"
@@ -53,16 +55,26 @@ class GarbageCollector(Codelet):
                 self.bubble_chamber.loggers["activity"].log("NOT RECYCLABLE")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
-            if self.bubble_chamber.worldview.view is not None and (
-                structure in self.bubble_chamber.worldview.view.grouped_nodes
-                or structure in self.bubble_chamber.worldview.view.members
+            if worldview is not None and any(
+                [
+                    structure == worldview,
+                    structure.is_view and structure in worldview.all_sub_views,
+                    structure.is_correspondence and structure in worldview.members,
+                    structure.is_link and structure in worldview.grouped_links,
+                    structure.is_node and structure in worldview.grouped_nodes,
+                ]
             ):
                 self.bubble_chamber.loggers["activity"].log("IN WORLDVIEW")
                 self.bubble_chamber.recycle_bin.remove(structure)
                 continue
-            if structure in (
-                self.bubble_chamber.focus.view,
-                self.bubble_chamber.focus.frame,
+            if focus is not None and any(
+                [
+                    structure == focus,
+                    structure.is_view and structure in focus.all_sub_views,
+                    structure.is_correspondence and structure in focus.members,
+                    structure.is_link and structure in focus.grouped_links,
+                    structure.is_node and structure in focus.grouped_nodes,
+                ]
             ):
                 self.bubble_chamber.loggers["activity"].log("STRUCTURE IN FOCUS")
                 continue

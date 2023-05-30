@@ -27,6 +27,17 @@ class ViewEvaluator(Evaluator):
 
     def _calculate_confidence(self):
         target_view = self.targets.get()
-        self.confidence = target_view.calculate_quality()
+        if target_view.members.filter(
+            lambda x: x.end not in target_view.output_space.contents
+        ).is_empty:
+            progenitor = target_view.parent_frame.progenitor
+            number_of_equivalent_views = len(
+                self.bubble_chamber.views.filter(
+                    lambda x: x.parent_frame.progenitor == progenitor
+                )
+            )
+            self.confidence = progenitor.activation * 0.5 ** number_of_equivalent_views
+        else:
+            self.confidence = target_view.calculate_quality()
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
         self.activation_difference = self.confidence - target_view.activation
