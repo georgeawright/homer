@@ -1,6 +1,10 @@
 const fs = require('fs');
 const {spawn} = require('child_process');
 
+exports.array_average = function(array) {
+    return array.reduce((a,b) => a + b, 0) / array.length;
+}
+
 exports.get_graph = function(run_id, structure_id, time) {
     const structure_directory = `logs/${run_id}/structures/structures/${structure_id}`;
     const file_name = `${time}.svg`;
