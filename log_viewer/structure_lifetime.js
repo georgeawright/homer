@@ -40,14 +40,14 @@ div.plot {
     const last_page = Math.ceil(snapshot_files.length / items_per_page);
     if (page > 1) {
 	doc +=`
-      <a href="structures?run_id=${run_id}&page=1&items_per_page=${items_per_page}">&lt;&lt;</a>
-      <a href="structures?run_id=${run_id}&page=${prev_page}&items_per_page=${items_per_page}">&lt;</a>
+      <a href="structure_lifetime?run_id=${run_id}&structure_id=${structure_id}&page=1&items_per_page=${items_per_page}">&lt;&lt;</a>
+      <a href="structure_lifetime?run_id=${run_id}&structure_id=${structure_id}&page=${prev_page}&items_per_page=${items_per_page}">&lt;</a>
 `;
     }
     if (page < last_page) {
 	doc +=`
-      <a href="structures?run_id=${run_id}&page=${next_page}&items_per_page=${items_per_page}">&gt;</a>
-      <a href="structures?run_id=${run_id}&page=${last_page}&items_per_page=${items_per_page}">&gt;&gt;</a>
+      <a href="structure_lifetime?run_id=${run_id}&structure_id=${structure_id}&page=${next_page}&items_per_page=${items_per_page}">&gt;</a>
+      <a href="structure_lifetime?run_id=${run_id}&structure_id=${structure_id}&page=${last_page}&items_per_page=${items_per_page}">&gt;&gt;</a>
 `;
     }
 
@@ -117,11 +117,9 @@ const quality_graph_script = function(query) {
 const data_string_for_field = function(query, field_name) {
     const structure_directory = `logs/${query.run_id}/structures/structures/${query.structure_id}`;
     snapshot_files = fs.readdirSync(structure_directory);
-    console.log(snapshot_files);
     snapshot_files = fs.readdirSync(structure_directory).filter(
 	file_name => {return file_name.endsWith("json")}
     );
-    console.log(snapshot_files);
     snapshot_files.sort(
 	function(a, b) {return Number(a.split(".")[0]) - Number(b.split(".")[0])}
     );
