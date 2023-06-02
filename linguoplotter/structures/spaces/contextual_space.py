@@ -50,6 +50,7 @@ class ContextualSpace(Space):
             "structure_id": self.structure_id,
             "parent_id": self.parent_id,
             "name": self.name,
+            "is_main_input": self.is_main_input,
             "contents": [item.structure_id for item in self.contents],
             "conceptual_spaces": [
                 space.structure_id for space in self.conceptual_spaces

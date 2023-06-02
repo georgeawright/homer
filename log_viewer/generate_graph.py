@@ -570,8 +570,18 @@ def generate_contextual_space_graph(run_id, space_id, time):
         if "Chunk" in item["structure_id"] and "Letter" not in item["structure_id"]
     ]
     letter_chunks = [item for item in contents if "LetterChunk" in item["structure_id"]]
-    labels = [item for item in contents if "Label" in item["structure_id"]]
-    relations = [item for item in contents if "Relation" in item["structure_id"]]
+    labels = [
+        item
+        for item in contents
+        if "Label" in item["structure_id"]
+        and (not space["is_main_input"] or item["activation"] == 1)
+    ]
+    relations = [
+        item
+        for item in contents
+        if "Relation" in item["structure_id"]
+        and (not space["is_main_input"] or item["activation"] == 1)
+    ]
     concepts = [
         get_structure_json(run_id, link["parent_concept"], time)
         for link in labels + relations

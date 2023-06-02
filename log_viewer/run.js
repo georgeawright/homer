@@ -21,6 +21,26 @@ div.plot {
     <p><a href="structures?run_id=${run_id}">Structures</a></p>
 `
     details = JSON.parse(fs.readFileSync(details_file));
+
+    structures_directory = `logs/${run_id}/structures/structures`;
+    structure_directories = fs.readdirSync(structures_directory);
+    structure_directories.forEach(directory => {
+	if (!directory.includes("ContextualSpace")) {
+	    return;
+	}
+	structure_directory = `${structures_directory}/${directory}`;
+	snapshot_files = fs.readdirSync(structure_directory);
+	try {
+	    file_path = `${structure_directory}/0.json`;
+	    structure = JSON.parse(fs.readFileSync(file_path));
+	    if (structure["is_main_input"]) {
+		details["main_input"] = structure["structure_id"];
+		return;
+	    }
+	} catch (err) {
+	}
+    });
+
     doc += tools.json_to_html(details, query);
     doc +=  `
     <div id="satisfaction_graph" class="plot"></div>`;
