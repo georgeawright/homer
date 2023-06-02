@@ -5,6 +5,7 @@ from . import structures
 from .location import Location
 from .locations import TwoPointLocation
 from .tools import (
+    average_euclidean_distance,
     boolean_distance,
     centroid_euclidean_distance,
     shortest_distance,
@@ -41,6 +42,7 @@ class Interpreter:
             "ProximityClassifier": classifiers.ProximityClassifier,
             "SamenessClassifier": classifiers.SamenessClassifier,
             # Distance Functions
+            "average_euclidean_distance": average_euclidean_distance,
             "boolean_distance": boolean_distance,
             "centroid_euclidean_distance": centroid_euclidean_distance,
             "shortest_distance": shortest_distance,

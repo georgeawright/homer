@@ -9,6 +9,17 @@ def shortest_distance(a, b, return_nan: bool = False) -> float:
     return distance if not math.isnan(distance) else nan_return_value
 
 
+def average_euclidean_distance(a, b, return_nan: bool = False) -> float:
+    distances = []
+    for a_coords in a:
+        for b_coords in b:
+            distance = math.dist(a_coords, b_coords)
+            if math.isnan(distance):
+                return math.nan if return_nan else 0.0
+            distances.append(distance)
+    return statistics.fmean(distances)
+
+
 def centroid_euclidean_distance(a, b, return_nan: bool = False) -> float:
     nan_return_value = math.nan if return_nan else 0.0
     if len(a) == len(b) == 0:

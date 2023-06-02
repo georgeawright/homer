@@ -21,12 +21,12 @@ program_files = [
     # "narration-3.lisp",
     # "narration-4.lisp",
     # "narration-5.lisp",
-    # "narration-6.lisp",
+    "narration-6.lisp",
 ]
 start_time = time.time()
 for program_file in program_files:
     results = []
-    random_seeds = range(10)
+    random_seeds = range(5)
 
     for i in random_seeds:
         time_string = str(time.time())
