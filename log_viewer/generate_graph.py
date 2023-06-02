@@ -586,6 +586,10 @@ def generate_contextual_space_graph(run_id, space_id, time):
         get_structure_json(run_id, link["parent_concept"], time)
         for link in labels + relations
     ]
+    conceptual_spaces = [
+        get_structure_json(run_id, relation["conceptual_space"], time)
+        for relation in relations
+    ]
     for chunk in chunks:
         space_graph.node(
             chunk["structure_id"], shape="rectangle", URL=url(chunk["structure_id"])
@@ -599,31 +603,44 @@ def generate_contextual_space_graph(run_id, space_id, time):
         )
     space_graph.node_attr.update(shape="ellipse", style="filled", color="lightgrey")
     for label in labels:
-        concept = [c for c in concepts if c["structure_id"] == label["parent_concept"]][
-            0
-        ]
-        if concept["name"] == "":
-            space_graph.node(label["structure_id"], URL=url(label["structure_id"]))
-        else:
-            space_graph.node(
-                label["structure_id"],
-                label=concept["name"],
-                URL=url(label["structure_id"]),
-            )
+        link_concept = [
+            c for c in concepts if c["structure_id"] == label["parent_concept"]
+        ][0]
+        link_label = (
+            link_concept["name"].upper()
+            if link_concept["name"] != ""
+            else link_concept["structure_id"]
+        )
+        space_graph.node(
+            label["structure_id"],
+            label=link_label,
+            URL=url(label["structure_id"]),
+        )
     for relation in relations:
-        concept = [
+        link_concept = [
             c for c in concepts if c["structure_id"] == relation["parent_concept"]
         ][0]
-        if concept["name"] == "":
-            space_graph.node(
-                relation["structure_id"], URL=url(relation["structure_id"])
-            )
-        else:
-            space_graph.node(
-                relation["structure_id"],
-                label=concept["name"],
-                URL=url(relation["structure_id"]),
-            )
+        link_space = [
+            s
+            for s in conceptual_spaces
+            if s["structure_id"] == relation["conceptual_space"]
+        ][0]
+        concept_name = (
+            link_concept["name"].upper()
+            if link_concept["name"] != ""
+            else link_concept["structure_id"]
+        )
+        space_name = (
+            link_space["name"].upper()
+            if link_space["name"] != ""
+            else link_space["structure_id"]
+        )
+        link_label = f"{concept_name}-{space_name}"
+        space_graph.node(
+            relation["structure_id"],
+            label=link_label,
+            URL=url(relation["structure_id"]),
+        )
     for label in labels:
         space_graph.edge(label["structure_id"], label["start"], label="start")
     for relation in relations:
