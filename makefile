@@ -4,6 +4,10 @@ clear-logs:
 	rm -rf logs/
 	mkdir logs
 
+clear-structure-logs:
+	rm -rf logs/
+	mkdir logs
+
 integration:
 	pipenv run python -m pytest tests/integration
 
