@@ -206,30 +206,24 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
         )
         views_with_compatible_nodes = compatible_sub_views.filter(
-            # lambda x: x.members.filter(
-            #    lambda c: c.end not in x.output_space.contents
-            # ).is_empty
-            lambda x: x.members.is_empty
-            or any(
+            lambda v: any(
                 [
                     target_view.can_accept_member(
-                        member.parent_concept,
-                        member.conceptual_space,
-                        member.start,
+                        bubble_chamber.concepts["same"],
+                        child_codelet.targets["space"],
+                        item,
                         child_codelet.targets["end"],
-                        sub_view=x,
+                        sub_view=v,
                     )
-                    and target_view.can_accept_member(
-                        member.parent_concept,
-                        member.conceptual_space,
-                        member.end,
-                        child_codelet.targets["end"],
-                        sub_view=x,
-                    )
-                    for member in x.members.filter(
-                        lambda c: type(c.start) == type(child_codelet.targets["end"])
-                        and c.start.parent_space.parent_concept
-                        == child_codelet.targets["end"].parent_space.parent_concept
+                    for item in (
+                        v.parent_frame.input_space.contents.filter(
+                            lambda x: type(x) == type(child_codelet.targets["end"])
+                        )
+                        if child_codelet.targets["end"].parent_space
+                        == child_codelet.targets["sub_frame"].input_space
+                        else v.parent_frame.output_space.contents.filter(
+                            lambda x: type(x) == type(child_codelet.targets["end"])
+                        )
                     )
                 ]
             )
