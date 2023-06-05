@@ -21,7 +21,6 @@ class FocusUnsetter(Codelet):
         self.coderack = coderack
         self.last_satisfaction_score = last_satisfaction_score
         self.target_view = self.bubble_chamber.focus.view
-        self.result = None
 
     @classmethod
     def spawn(

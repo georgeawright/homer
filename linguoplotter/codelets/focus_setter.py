@@ -5,7 +5,6 @@ from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import salience
 from linguoplotter.structure_collections import StructureDict
 
 
@@ -21,7 +20,6 @@ class FocusSetter(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
-        self.result = None
 
     @classmethod
     def spawn(

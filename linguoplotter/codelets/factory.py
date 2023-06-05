@@ -27,7 +27,6 @@ class Factory(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
-        self.result = None
 
     @classmethod
     def spawn(

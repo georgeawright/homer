@@ -140,15 +140,15 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                     == self.bubble_chamber.concepts["sentence"].location_in_space(
                         self.bubble_chamber.spaces["grammar"]
                     )
-                )
-                .sample(2, key=activation)
+                ).sample(2, key=activation)
+                # There must be at least 2 texts for there to be cohesion between them
                 .get()
             )
         except MissingStructureError:
             return float("-inf")
         try:
-            return 1 / sum([v.quality for v in view.cohesion_views])
-        except ZeroDivisionError:
+            return 1 - max([v.quality for v in view.cohesion_views])
+        except ValueError:
             return 1
 
     def _unlabeledness_of_letter_chunks(self):
