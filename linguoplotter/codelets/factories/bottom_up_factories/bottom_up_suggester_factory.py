@@ -188,7 +188,8 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         )
         number_of_views_with_mergeable_frames = len(
             self.bubble_chamber.views.filter(
-                lambda x: x.parent_frame.progenitor.relations.where(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.progenitor.relations.where(
                     parent_concept=self.bubble_chamber.concepts["more"],
                     conceptual_space=self.bubble_chamber.spaces["grammar"],
                 ).not_empty
