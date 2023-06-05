@@ -82,8 +82,10 @@ class ContextualSpace(Space):
         )
 
     def add(self, structure: Structure):
-        if structure not in self.contents:
-            self.contents.add(structure)
+        self.contents.add(structure)
+
+    def remove(self, structure: Structure):
+        self.contents.remove(structure)
 
     def add_conceptual_space(self, conceptual_space: "ConceptualSpace"):
         self.conceptual_spaces.add(conceptual_space)

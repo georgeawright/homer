@@ -18,7 +18,7 @@ class HyperParameters:
     MAXIMUM_DETERMINISM = 0.9
     MINIMUM_DETERMINISM = 0.25
 
-    a = 0.8
+    a = 0.9
     b = 0.0
     c = 0.00005
     d = 0.0

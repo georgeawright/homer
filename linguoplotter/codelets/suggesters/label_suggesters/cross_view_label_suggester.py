@@ -4,7 +4,6 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.codelets.suggesters import LabelSuggester
 from linguoplotter.structure_collection_keys import activation, labeling_salience
 from linguoplotter.structure_collections import StructureSet
-from linguoplotter.structures.links import Label, Relation
 from linguoplotter.structures.nodes import Concept
 
 

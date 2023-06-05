@@ -270,6 +270,9 @@ class BubbleChamber:
         if item.is_frame:
             self.frames.remove(item)
         if item.is_view:
+            correspondences = item.members.where(parent_view=item)
+            for correspondence in correspondences:
+                self.remove(correspondence)
             item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
@@ -287,9 +290,6 @@ class BubbleChamber:
                 super_view.sub_views.remove(item)
                 for frame in item.frames:
                     super_view.frames.remove(frame)
-            correspondences = item.members.where(parent_view=item)
-            for correspondence in correspondences:
-                self.remove(correspondence)
             item.parent_frame.progenitor.instances.remove(item)
             item.parent_frame.parent_concept.instances.remove(item)
             self.remove(item.parent_frame)

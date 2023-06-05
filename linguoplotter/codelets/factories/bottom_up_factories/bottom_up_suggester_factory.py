@@ -105,16 +105,22 @@ class BottomUpSuggesterFactory(BottomUpFactory):
     def _uncorrespondedness_of_links(self):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()
         try:
+            random_chunk = input_space.contents.filter(
+                lambda x: x.is_chunk and x.super_chunks.is_empty
+            ).get()
             labels_and_relations = input_space.contents.filter(
-                lambda x: x.is_label or x.is_relation
-            ).sample(10, key=lambda x: x.quality * x.activation)
+                lambda x: x.is_label
+                or x.is_relation
+                and random_chunk in x.arguments
+                and x.is_fully_active
+            )
             uncorresponded_links = labels_and_relations.filter(
                 lambda x: x.correspondences.is_empty
             )
             return sum(
                 link.quality * link.activation for link in uncorresponded_links
             ) / len(labels_and_relations)
-        except MissingStructureError:
+        except (ZeroDivisionError, MissingStructureError):
             return float("-inf")
 
     def _unfilledness_of_slots(self):

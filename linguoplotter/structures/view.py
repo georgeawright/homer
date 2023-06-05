@@ -352,6 +352,8 @@ class View(Structure):
             self.conceptual_spaces_map.pop(abstract_space)
         for frame in self.frames:
             frame.specify_space(abstract_space, conceptual_space)
+        for view in self.super_views:
+            view.specify_space(abstract_space, conceptual_space)
 
     def add(self, correspondence: "Correspondence"):
         self.members.add(correspondence)

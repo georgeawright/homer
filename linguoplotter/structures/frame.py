@@ -232,24 +232,22 @@ class Frame(Structure):
                 if location.space != abstract_space:
                     continue
                 try:
-                    item.location_in_space(abstract_space).coordinates = [
+                    location.space = conceptual_space
+                    location.coordinates = [
                         [math.nan for _ in range(conceptual_space.no_of_dimensions)]
                     ]
-                    item.location_in_space(abstract_space).space = conceptual_space
-                    conceptual_space.add(item)
-                    item.parent_spaces.remove(abstract_space)
-                    item.parent_spaces.add(conceptual_space)
                 except NotImplementedError:
-                    item.location_in_space(abstract_space).start_coordinates = [
+                    location.space = conceptual_space
+                    location.start_coordinates = [
                         [math.nan for _ in range(conceptual_space.no_of_dimensions)]
                     ]
-                    item.location_in_space(abstract_space).end_coordinates = [
+                    location.end_coordinates = [
                         [math.nan for _ in range(conceptual_space.no_of_dimensions)]
                     ]
-                    item.location_in_space(abstract_space).space = conceptual_space
-                    conceptual_space.add(item)
-                    item.parent_spaces.remove(abstract_space)
-                    item.parent_spaces.add(conceptual_space)
+                abstract_space.remove(item)
+                conceptual_space.add(item)
+                item.parent_spaces.remove(abstract_space)
+                item.parent_spaces.add(conceptual_space)
         for concept in self.concepts:
             if concept.parent_space == abstract_space:
                 concept.parent_space = conceptual_space
@@ -257,6 +255,8 @@ class Frame(Structure):
                 concept.parent_spaces.remove(abstract_space)
                 concept.parent_spaces.add(conceptual_space)
                 concept.location_in_space(abstract_space).space = conceptual_space
+        for sub_frame in self.sub_frames:
+            sub_frame.specify_space(abstract_space, conceptual_space)
 
     def instantiate(
         self,

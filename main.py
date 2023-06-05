@@ -17,10 +17,10 @@ pwd = os.getcwd()
 
 program_files = [
     "narration-1.lisp",
-    # "narration-2.lisp",
-    # "narration-3.lisp",
-    # "narration-4.lisp",
-    # "narration-5.lisp",
+    "narration-2.lisp",
+    "narration-3.lisp",
+    "narration-4.lisp",
+    "narration-5.lisp",
     "narration-6.lisp",
 ]
 start_time = time.time()
