@@ -12,6 +12,9 @@ exports.run = function(query) {
 div.plot {
   float: left;
 }
+br {
+  clear: both;
+}
     </style>
   </head>
   </body>
@@ -54,6 +57,56 @@ div.plot {
     doc +=  `
     <div id="view_count_graph" class="plot"></div>`;
     doc += view_count_graph_script(query);
+
+    worldviews = [];
+    codelets_directory = `logs/${run_id}/codelets/ids`;
+    codelet_files = fs.readdirSync(codelets_directory);
+    codelet_files.forEach(file => {
+	if (!file.includes("WorldviewSetter")) {
+	    return;
+	}
+	file_path = `${codelets_directory}/${file}`;
+	codelet = JSON.parse(fs.readFileSync(file_path));
+	worldviews.push({"worldview": codelet["worldview"], "time": codelet["time"]});
+    });
+    worldviews.sort(function(a,b) {return a["time"] - b["time"]});
+    doc += `
+    <br>
+    <h2>Worldview History</h2>
+    <ul>`;
+    previous_worldview = null;
+    worldviews.forEach(worldview => {
+	time = worldview["time"];
+	view = worldview["worldview"];
+
+	if (view === previous_worldview) {
+	    return;
+	}
+
+	structure_directory = `logs/${run_id}/structures/structures/${view}`;
+	structure_files = fs.readdirSync(structure_directory).filter(
+	    (f) => {return f.endsWith("json")}
+	);
+	structure_file = '';
+	latest_file_time = -1;
+	structure_files.forEach(file => {
+	    file_time = Number(file.split(".")[0]);
+	    if (file_time <= time && file_time > latest_file_time) {
+	    structure_file = file;
+	    latest_file_time = file_time;
+	    }
+	});
+	structure_file_path = `${structure_directory}/${structure_file}`;
+        structure_json = JSON.parse(fs.readFileSync(structure_file_path));
+
+	text = structure_json["output"];
+
+	doc += `
+      <li>${time}: <a href="structure_snapshot?run_id=${run_id}&structure_id=${view}&time=${time}">${view}</a>: ${text}</li>`;
+	previous_worldview = view;
+    });
+    doc += `
+    </ul>`;
     doc += `
   </body>
 </html>`;
