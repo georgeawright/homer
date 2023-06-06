@@ -45,7 +45,15 @@ br {
     });
 
     doc += tools.json_to_html(details, query);
+
+    program_name = details["Program"].split(".")[0];
+    graph_file_name = `maps/${program_name}.svg`;
+    graph_svg = fs.readFileSync(graph_file_name);
+    doc += `
+    <object type="image/svg+xml" with="50%">${graph_svg}</object>`;
+
     doc +=  `
+    <br>
     <div id="satisfaction_graph" class="plot"></div>`;
     doc += satisfaction_graph_script(query);
     doc +=  `

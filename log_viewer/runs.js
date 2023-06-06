@@ -74,8 +74,11 @@ exports.run = function(query) {
 `;
     Object.keys(programs_results_lists).forEach(program => {
 	program_name = program.split(".")[0];
+	graph_file_name = `maps/${program_name}.svg`;
+	graph_svg = fs.readFileSync(graph_file_name);
 	doc += `
       <h3>${program_name}</h3>
+      <object type="image/svg+xml" with="50%">${graph_svg}</object>
       <table>
         <tr>
           <th style="width:30%">Output Text</th>
