@@ -323,7 +323,8 @@ def generate_frame_graph(run_id, frame_id, time):
         conceptual_spaces = [
             get_structure_json(run_id, link["conceptual_space"], time)
             for link in relations
-        ]
+            if link["conceptual_space"] is not None
+        ] + [{"structure_id": None, "name": ""}]
         with frame_graph.subgraph(name=cluster_name) as c:
             c.attr(style="filled", color=color, URL=url(space_id))
             c.node_attr.update(shape="rectangle", style="filled", color="white")
@@ -752,7 +753,8 @@ def generate_view_graph(run_id, view_id, time):
     conceptual_spaces = [
         get_structure_json(run_id, relation["conceptual_space"], time)
         for relation in relations
-    ]
+        if relation["conceptual_space"] is not None
+    ] + [{"structure_id": None, "name": ""}]
     parent_space_ids = {
         node["parent_space"] for node in concepts + chunks + letter_chunks
     }
