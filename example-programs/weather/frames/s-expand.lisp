@@ -93,6 +93,12 @@
 		     (Location (list) ap-sub-frame-input)
 		     (Location (list) expand-sentence-input))
     :parent_space ap-sub-frame-input))
+(define early-chunk-location-label
+  (def-label :start early-chunk :parent_concept location-concept
+    :locations (list (Location (list (list Nan Nan)) location-space)
+		     (Location (list) location-sub-frame-input)
+		     (Location (list) expand-sentence-input))
+    :parent_space location-sub-frame-input))
 (define late-chunk
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
 			      (Location (list (list Nan)) time-space)

@@ -63,6 +63,8 @@ class ViewSelector(Selector):
 
     def _get_challenger(self):
         champion = self.champions.get()
+        if champion.super_views.not_empty:
+            raise MissingStructureError
         self.challengers.add(
             self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
@@ -76,7 +78,15 @@ class ViewSelector(Selector):
                     ).not_empty
                     and x.raw_input_nodes == champion.raw_input_nodes
                 )
-                or (any([x in sub_view.super_views for sub_view in champion.sub_views]))
+                and x.super_views.is_empty
+                or (
+                    any(
+                        [
+                            x in sub_view.cohesion_views
+                            for sub_view in champion.sub_views
+                        ]
+                    )
+                )
             )
             .excluding(champion)
             .get(key=activation)

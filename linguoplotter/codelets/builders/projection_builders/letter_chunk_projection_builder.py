@@ -213,7 +213,7 @@ class LetterChunkProjectionBuilder(ProjectionBuilder):
     def _get_pronoun(self, abstract_chunk):
         sameness_relations = abstract_chunk.relations.filter(
             lambda x: x.parent_concept == self.bubble_chamber.concepts["same"]
-            and x.conceptual_space != self.bubble_chamber.concepts["grammar"]
+            and x.conceptual_space != self.bubble_chamber.spaces["grammar"]
         )
         if sameness_relations.is_empty:
             raise MissingStructureError
