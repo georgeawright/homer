@@ -389,7 +389,7 @@ class CrossViewCorrespondenceSuggester(CorrespondenceSuggester):
                     and x.unhappiness < parent_codelet.FLOATING_POINT_TOLERANCE
                     and not any(
                         [
-                            x.raw_input_nodes == sub_view.raw_input_nodes
+                            x.output == sub_view.output
                             for sub_view in target_view.sub_views
                         ]
                     )

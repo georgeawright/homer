@@ -36,6 +36,13 @@ class CrossViewCorrespondenceBuilder(CorrespondenceBuilder):
                     self.bubble_chamber.loggers["activity"].log("mismatching frames")
                     return False
         if self.targets["start_sub_view"] not in self.targets["view"].sub_views:
+            if any(
+                [
+                    self.targets["start_sub_view"].output == sub_view.output
+                    for sub_view in self.targets["view"].sub_views
+                ]
+            ):
+                return False
             for correspondence in self.targets["start_sub_view"].members:
                 if not self.targets["view"].can_accept_member(
                     correspondence.parent_concept,
@@ -57,6 +64,13 @@ class CrossViewCorrespondenceBuilder(CorrespondenceBuilder):
             self.targets["end_sub_view"] is not None
             and self.targets["end_sub_view"] not in self.targets["view"].sub_views
         ):
+            if any(
+                [
+                    self.targets["end_sub_view"].output == sub_view.output
+                    for sub_view in self.targets["view"].sub_views
+                ]
+            ):
+                return False
             for correspondence in self.targets["end_sub_view"].members:
                 if not self.targets["view"].can_accept_member(
                     correspondence.parent_concept,
