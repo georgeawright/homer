@@ -112,11 +112,12 @@ class LabelSuggester(Suggester):
         if self.targets["concept"] is None:
             return
         possible_concepts = [self.targets["concept"]]
-        possible_concepts.append(
-            self.bubble_chamber.new_compound_concept(
-                self.bubble_chamber.concepts["not"], [self.targets["concept"]]
+        if self.targets["concept"].is_fully_active():
+            possible_concepts.append(
+                self.bubble_chamber.new_compound_concept(
+                    self.bubble_chamber.concepts["not"], [self.targets["concept"]]
+                )
             )
-        )
         if self.targets["concept"].is_compound_concept:
             for arg in self.targets["concept"].args:
                 possible_concepts.append(arg)
