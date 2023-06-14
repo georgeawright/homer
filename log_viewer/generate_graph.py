@@ -9,6 +9,10 @@ close_curly = "}"
 
 
 def main(run_id, structure_id, time):
+    if "ConceptualSpace" in structure_id:
+        return generate_conceptual_space_graph(run_id, structure_id, time)
+    if "ContextualSpace" in structure_id:
+        return generate_contextual_space_graph(run_id, structure_id, time)
     if "CompoundConcept" in structure_id[0:7]:
         return generate_concept_graph(run_id, structure_id, time)
     if "Concept" in structure_id[0:7]:
@@ -23,10 +27,6 @@ def main(run_id, structure_id, time):
         return generate_label_graph(run_id, structure_id, time)
     if "LetterChunk" in structure_id:
         return generate_letter_chunk_graph(run_id, structure_id, time)
-    if "ConceptualSpace" in structure_id:
-        return generate_conceptual_space_graph(run_id, structure_id, time)
-    if "ContextualSpace" in structure_id:
-        return generate_contextual_space_graph(run_id, structure_id, time)
     if "Relation" in structure_id:
         return generate_relation_graph(run_id, structure_id, time)
     if "View" in structure_id:
@@ -56,7 +56,8 @@ def generate_concept_graph(run_id, concept_id, time):
     link_concepts = [
         get_structure_json(run_id, link["parent_concept"], time)
         for link in labels + relations
-    ]
+        if link["parent_concept"] is not None
+    ] + [{"structure_id": None, "name": ""}]
     label = concept["name"].upper() if concept["name"] != "" else None
     concept_graph.node(
         concept["structure_id"],
