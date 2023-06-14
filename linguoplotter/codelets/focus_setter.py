@@ -85,11 +85,12 @@ class FocusSetter(Codelet):
 
         self.child_codelets.append(
             FocusUnsetter.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.coderack,
-                self.bubble_chamber.focus.satisfaction,
-                0.5,
+                parent_id=self.codelet_id,
+                bubble_chamber=self.bubble_chamber,
+                coderack=self.coderack,
+                last_satisfaction_score=self.bubble_chamber.focus.satisfaction,
+                time_focus_set=self.coderack.codelets_run,
+                urgency=0.5,
             )
         )
 

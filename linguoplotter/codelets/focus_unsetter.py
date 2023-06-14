@@ -15,11 +15,13 @@ class FocusUnsetter(Codelet):
         coderack: "Coderack",
         targets: StructureDict,
         last_satisfaction_score: FloatBetweenOneAndZero,
+        time_focus_set: FloatBetweenOneAndZero,
         urgency: FloatBetweenOneAndZero,
     ):
         Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
         self.last_satisfaction_score = last_satisfaction_score
+        self.time_focus_set = time_focus_set
         self.target_view = self.bubble_chamber.focus.view
 
     @classmethod
@@ -29,6 +31,7 @@ class FocusUnsetter(Codelet):
         bubble_chamber: BubbleChamber,
         coderack: "Coderack",
         last_satisfaction_score: FloatBetweenOneAndZero,
+        time_focus_set: FloatBetweenOneAndZero,
         urgency: FloatBetweenOneAndZero,
     ):
         codelet_id = ID.new(cls)
@@ -40,10 +43,12 @@ class FocusUnsetter(Codelet):
             coderack,
             targets,
             last_satisfaction_score,
+            time_focus_set,
             urgency,
         )
 
     def run(self) -> CodeletResult:
+        focus_length = self.coderack.codelets_run - self.time_focus_set
         self.bubble_chamber.focus.recalculate_satisfaction()
         self.bubble_chamber.loggers["activity"].log(
             f"Focus satisfaction: {self.bubble_chamber.focus.satisfaction}"
@@ -83,7 +88,9 @@ class FocusUnsetter(Codelet):
         ).not_empty:
             probability_of_unsetting_focus = 1
         else:
-            probability_of_unsetting_focus = 1 - transposed_change_in_satisfaction_score
+            probability_of_unsetting_focus = (
+                1 - transposed_change_in_satisfaction_score - 1 / focus_length
+            )
         self.bubble_chamber.loggers["activity"].log(
             f"Probability of unsetting focus: {probability_of_unsetting_focus}"
         )
@@ -96,6 +103,8 @@ class FocusUnsetter(Codelet):
                 self.bubble_chamber.focus.view.boost_activation(
                     transposed_change_in_satisfaction_score
                 )
+                for sub_view in self.bubble_chamber.focus.view.all_sub_views:
+                    sub_view.boost_activation(transposed_change_in_satisfaction_score)
             self.result = CodeletResult.FIZZLE
             self._fizzle()
         else:
@@ -158,11 +167,12 @@ class FocusUnsetter(Codelet):
     def _fizzle(self):
         self.child_codelets.append(
             self.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.coderack,
-                self.bubble_chamber.focus.satisfaction,
-                0.5,
+                parent_id=self.codelet_id,
+                bubble_chamber=self.bubble_chamber,
+                coderack=self.coderack,
+                last_satisfaction_score=self.bubble_chamber.focus.satisfaction,
+                time_focus_set=self.time_focus_set,
+                urgency=0.5,
             )
         )
 

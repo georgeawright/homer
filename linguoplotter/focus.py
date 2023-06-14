@@ -16,5 +16,6 @@ class Focus:
         if self.view is None:
             self.satisfaction = 0
         else:
-            self.satisfaction = self.view.calculate_quality()
-            self.view.quality = self.satisfaction
+            self.satisfaction = self.view.quality = self.view.calculate_quality()
+            for sub_view in self.view.all_sub_views:
+                sub_view.quality = sub_view.calculate_quality()
