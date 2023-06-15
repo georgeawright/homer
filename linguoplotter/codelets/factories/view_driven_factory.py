@@ -639,6 +639,8 @@ class ViewDrivenFactory(Factory):
                     and not any(
                         [
                             x.raw_input_nodes == sub_view.raw_input_nodes
+                            and x.parent_frame.progenitor
+                            == sub_view.parent_frame.progenitor
                             for sub_view in self.targets["view"].sub_views
                         ]
                     )
