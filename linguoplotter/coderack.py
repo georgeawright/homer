@@ -105,7 +105,7 @@ class Coderack:
                         type(codelet) == type(existing_codelet)
                         and codelet.targets == existing_codelet.targets
                     ):
-                        existing_codelet.urgency = (
+                        existing_codelet.urgency = FloatBetweenOneAndZero(
                             existing_codelet.urgency + codelet.urgency
                         )
                         return

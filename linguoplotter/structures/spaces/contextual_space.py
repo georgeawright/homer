@@ -140,7 +140,7 @@ class ContextualSpace(Space):
             )
             new_space.add(new_item)
             copies[item] = new_item
-            for label in item.labels:
+            for label in item.labels.where(is_cross_view=False):
                 new_label = label.copy(
                     start=new_item,
                     parent_space=new_space,

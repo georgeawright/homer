@@ -81,7 +81,10 @@ class ViewDrivenFactory(Factory):
             try:
                 follow_up = self._spawn_cross_view_correspondence_suggester()
             except MissingStructureError:
-                follow_up = self._spawn_cross_view_link_suggester()
+                try:
+                    follow_up = self._spawn_cross_view_link_suggester()
+                except MissingStructureError:
+                    follow_up = self._spawn_view_suggester()
         elif (
             len(self.targets["slot"].parent_spaces.where(is_contextual_space=True)) == 1
             and self.targets["slot"].parent_space

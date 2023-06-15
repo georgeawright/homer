@@ -148,7 +148,7 @@ class FocusUnsetter(Codelet):
                 "BottomUpSuggesterFactory" in codelet.codelet_id
                 or "BottomUpEvaluatorFactory" in codelet.codelet_id
             ):
-                codelet.urgency = 1.0
+                codelet.urgency = 1.0 - self.bubble_chamber.worldview.satisfaction
 
     def _check_for_and_merge_with_equivalent_views(self):
         # if not self.target_view.super_views.is_empty: return ?

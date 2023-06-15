@@ -381,17 +381,28 @@ class Frame(Structure):
                 relation_copy._parent_concept = concept_copies[relation.parent_concept]
             cross_view_links.add(relation_copy)
             cross_view_link_copies[relation] = relation_copy
+            for location in relation_copy.locations:
+                if location.space in space_copies:
+                    relation_copy.parent_spaces.remove(location.space)
+                    relation_copy.parent_spaces.add(space_copies[location.space])
+                    location.space = space_copies[location.space]
         for label in self.cross_view_links.where(is_label=True):
             label_copy = label.copy(
                 bubble_chamber=bubble_chamber,
                 start=input_copies[label.start]
                 if label.start in input_copies
                 else output_copies[label.start],
+                parent_space=space_copies[label.parent_space],
             )
             if label.parent_concept in concept_copies:
                 label_copy._parent_concept = concept_copies[label.parent_concept]
             cross_view_links.add(label_copy)
             cross_view_link_copies[label] = label_copy
+            for location in label_copy.locations:
+                if location.space in space_copies:
+                    label_copy.parent_spaces.remove(location.space)
+                    label_copy.parent_spaces.add(space_copies[location.space])
+                    location.space = space_copies[location.space]
         new_frame = bubble_chamber.new_frame(
             parent_id=parent_id,
             name=ID.new_frame_instance(self.name),

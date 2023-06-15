@@ -37,7 +37,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             + f"Relations per space per end per chunk: {relations_per_space_per_end_per_chunk}\n"
             + f"Labels per space per chunk: {labels_per_space_per_chunk}\n"
             + f"Super chunks per raw chunk: {super_chunks_per_raw_chunk}\n"
-            + f"Secondary frames per view: {cohesion_views_per_view}\n"
+            + f"Cohesion views per view: {cohesion_views_per_view}\n"
             + f"Related texts per letter chunk: {related_texts_per_letter_chunk}\n"
             + f"Labels per space per letter chunk: {labels_per_space_per_letter_chunk}",
         )
@@ -121,10 +121,9 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             view_types = self.bubble_chamber.new_set(
                 *[view.parent_frame.parent_concept for view in view_sample]
             )
-            return len(views) / len(non_raw_chunks)
-        except MissingStructureError:
+            return len(views) / len(view_types) / len(non_raw_chunks)
+        except (ZeroDivisionError, MissingStructureError):
             return 0
-        return len(views) / len(view_types) / len(non_raw_chunks)
 
     def _cohesion_views_per_view(self):
         try:
