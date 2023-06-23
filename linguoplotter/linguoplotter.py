@@ -76,7 +76,8 @@ class Linguoplotter:
 
     def print_status_update(self):
         codelets_run = self.coderack.codelets_run
-        bubble_chamber_satisfaction = self.bubble_chamber.satisfaction
+        satisfaction = round(self.bubble_chamber.satisfaction, 3)
+        determinism = round(self.bubble_chamber.random_machine.determinism, 3)
         coderack_population = len(self.coderack._codelets)
         view_count = len(self.bubble_chamber.views)
         focus = (
@@ -86,29 +87,26 @@ class Linguoplotter:
             else None
         )
         focus_unhappiness = (
-            self.bubble_chamber.focus.view.unhappiness
+            round(self.bubble_chamber.focus.view.unhappiness, 3)
             if self.bubble_chamber.focus.view is not None
             else "-"
         )
         focus_satisfaction = (
-            self.bubble_chamber.focus.satisfaction
+            round(self.bubble_chamber.focus.satisfaction, 3)
             if self.bubble_chamber.focus.view is not None
             else "-"
         )
-        print("=" * 200)
+        print("=" * 80)
         print(
-            f"codelets run: {codelets_run}; "
-            + f"satisf.: {bubble_chamber_satisfaction}; "
-            + f"determ.: {self.bubble_chamber.random_machine.determinism}; "
-            + f"coderack pop.: {coderack_population}; "
-            + f"view count.: {view_count}; "
-            + f"recycle bin: {len(self.bubble_chamber.recycle_bin)}; "
-            + f"Focus: {focus} (unhappy: {focus_unhappiness}; satisf.: {focus_satisfaction})"
+            f"{codelets_run}: S={satisfaction}; D={determinism}; "
+            + f"Coderack: {coderack_population}; "
+            + f"Views: {view_count}; "
+            + f"RecycleBin: {len(self.bubble_chamber.recycle_bin)}\n"
+            + f"Focus: {focus} (Unhappiness: {focus_unhappiness}; Satisfaction: {focus_satisfaction})"
         )
         if self.bubble_chamber.worldview.view is not None:
             view_output = self.bubble_chamber.worldview.output
             print(view_output)
-        print("=" * 200)
 
     def print_results(self):
         print(
