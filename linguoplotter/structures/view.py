@@ -40,6 +40,7 @@ class View(Structure):
         cohesion_views: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
+        cross_view_links: StructureSet,
         cross_view_relations: StructureDict,
     ):
         Structure.__init__(
@@ -69,6 +70,7 @@ class View(Structure):
         self.slot_values = {}
         self.conceptual_spaces_map = {}
         self.is_view = True
+        self.cross_view_links = cross_view_links
         self.cross_view_relations = cross_view_relations
         self._cohesiveness_with = {}
 
@@ -259,7 +261,7 @@ class View(Structure):
         )
 
     def recalculate_unhappiness(self):
-        self.unhappiness = 1 - 0.5 ** self.parent_frame.number_of_items_left_to_process
+        self.unhappiness = 1 - 0.5**self.parent_frame.number_of_items_left_to_process
 
     def recalculate_salience(self):
         self.recalculate_unhappiness()
@@ -309,6 +311,7 @@ class View(Structure):
             return False
 
     def add_cross_view_relation(self, relation: "Relation"):
+        self.cross_view_links.add(relation)
         other_view = (
             relation.start_view if relation.start_view != self else relation.end_view
         )

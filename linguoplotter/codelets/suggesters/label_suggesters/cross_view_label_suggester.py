@@ -50,7 +50,9 @@ class CrossViewLabelSuggester(LabelSuggester):
             ),
         ).get(key=labeling_salience)
         urgency = urgency if urgency is not None else start.unlabeledness
-        targets = bubble_chamber.new_dict({"start": start}, name="targets")
+        targets = bubble_chamber.new_dict(
+            {"start": start, "view": view}, name="targets"
+        )
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 
     @classmethod
@@ -93,7 +95,8 @@ class CrossViewLabelSuggester(LabelSuggester):
         ).get(key=activation)
         urgency = urgency if urgency is not None else start.unlabeledness
         targets = bubble_chamber.new_dict(
-            {"start": start, "concept": concept, "space": space}, name="targets"
+            {"start": start, "view": view, "concept": concept, "space": space},
+            name="targets",
         )
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)
 
@@ -135,6 +138,7 @@ class CrossViewLabelSuggester(LabelSuggester):
                 self.bubble_chamber.new_dict(
                     {
                         "start": self.targets["start"],
+                        "view": self.targets["view"],
                         "space": space,
                         "concept": concept,
                     },
@@ -161,8 +165,14 @@ class CrossViewLabelSuggester(LabelSuggester):
                     space=x["space"],
                 ),
             )
-            self.targets["start"], self.targets["concept"], self.targets["space"] = (
+            (
+                self.targets["start"],
+                self.targets["view"],
+                self.targets["concept"],
+                self.targets["space"],
+            ) = (
                 targets["start"],
+                targets["view"],
                 targets["concept"],
                 targets["space"],
             )

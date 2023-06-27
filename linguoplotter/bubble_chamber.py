@@ -273,6 +273,8 @@ class BubbleChamber:
             correspondences = item.members.where(parent_view=item)
             for correspondence in correspondences:
                 self.remove(correspondence)
+            for link in item.cross_view_links.copy():
+                self.remove(link)
             item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
@@ -299,6 +301,10 @@ class BubbleChamber:
             if item.is_cross_view:
                 self.cross_view_labels.remove(item)
                 self.cross_view_relations.remove(item)
+                for view in self.views:
+                    view.cross_view_links.remove(item)
+                    for _, relations in view.cross_view_relations.items():
+                        relations.remove(item)
             item.parent_concept.instances.remove(item)
             for argument in item.arguments:
                 argument.links_out.remove(item)

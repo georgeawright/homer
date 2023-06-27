@@ -65,6 +65,7 @@ class CrossViewLabelSelector(LabelSelector):
             targets = self.bubble_chamber.new_dict(
                 {
                     "start": start,
+                    "view": view,
                     "concept": winning_label.parent_concept,
                     "space": space,
                 },

@@ -36,10 +36,13 @@ class CrossViewLabelEvaluator(LabelEvaluator):
 
     def _calculate_confidence(self):
         target_label = self.targets.get()
+        conceptual_space = target_label.parent_spaces.filter(
+            lambda x: x.is_conceptual_space and target_label.has_location_in_space(x)
+        ).get()
         classification = target_label.parent_concept.classifier.classify(
             start=target_label.start,
             concept=target_label.parent_concept,
-            space=target_label.parent_spaces.where(is_conceptual_space=True).get(),
+            space=conceptual_space,
         )
         self.bubble_chamber.loggers["activity"].log(f"Classification: {classification}")
         self.confidence = (

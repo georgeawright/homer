@@ -44,3 +44,4 @@ class CrossViewLabelBuilder(LabelBuilder):
         self._structure_concept.instances.add(label)
         self._structure_concept.recalculate_salience()
         self.child_structures.add(label)
+        self.targets["view"].cross_view_links.add(label)

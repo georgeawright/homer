@@ -708,19 +708,25 @@ class ViewDrivenFactory(Factory):
                 )
             possible_target_combos = [
                 self.bubble_chamber.new_dict(
-                    {"start": start, "space": space, "concept": concept},
+                    {"start": start, "view": view, "space": space, "concept": concept},
                     name="targets",
                 )
                 for start in potential_start_targets
+                for view in potential_start_views
                 for space in possible_spaces
                 for concept in possible_concepts
                 if start.has_location_in_space(space)
+                and (
+                    start in view.parent_frame.input_space.contents
+                    or start in view.output_space.contents
+                )
                 and space in start.parent_space.conceptual_spaces
             ]
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
                 key=lambda x: x["concept"].classifier.classify(
                     start=x["start"],
+                    view=x["view"],
                     concept=x["concept"],
                     space=x["space"],
                 ),
