@@ -210,6 +210,7 @@ is_codelet_id = function(str) {
 	|| /Selector[0-9]+$/.exec(str)
 	|| /Suggester[0-9]+$/.exec(str)
 	|| /Setter[0-9]+$/.exec(str)
+	|| /Unsetter[0-9]+$/.exec(str)
 	|| /Factory[0-9]+$/.exec(str)
 	|| /Collector[0-9]+$/.exec(str)
 	|| /Porter[0-9]+$/.exec(str)
