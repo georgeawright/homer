@@ -285,6 +285,9 @@
 (define then
   (def-letter-chunk :name "then" :parent_space grammar-space
     :locations (list conj-location)))
+(define meanwhile
+  (def-letter-chunk :name "meanwhile" :parent_space grammar-space
+    :locations (list conj-location)))
 (define comma
   (def-letter-chunk :name "," :parent_space grammar-space
     :locations (list (Location (list) grammar-space))))

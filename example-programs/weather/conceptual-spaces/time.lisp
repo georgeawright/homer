@@ -65,3 +65,7 @@
 (define less-time-cross_view-concept (def-concept :name "less-time-cross_view"))
 (def-relation :start less-time-concept :end less-time-cross_view-concept
   :parent_concept outer-concept)
+(define same-time-cross_view-concept (def-concept :name "samw-time-cross_view"))
+(def-relation :start same-time-concept :end same-time-cross_view-concept
+  :parent_concept outer-concept)
+

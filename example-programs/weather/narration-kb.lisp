@@ -30,6 +30,7 @@
 (load "frames/s-spread.lisp")
 
 (load "frames/coherence-temporal-order.lisp")
+(load "frames/coherence-temporal-parallelism.lisp")
 (load "frames/coherence-text-order.lisp")
 (load "frames/coherence-parallelism.lisp")
 (load "frames/coherence-disanalogy-1.lisp")
