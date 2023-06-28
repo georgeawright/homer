@@ -113,13 +113,14 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 or x.is_relation
                 and random_chunk in x.arguments
                 and x.is_fully_active
+                and x.quality > 0
             )
             uncorresponded_links = labels_and_relations.filter(
                 lambda x: x.correspondences.is_empty
             )
-            return sum(
-                link.quality * link.activation for link in uncorresponded_links
-            ) / len(labels_and_relations)
+            return sum(link.quality for link in uncorresponded_links) / len(
+                labels_and_relations
+            )
         except (ZeroDivisionError, MissingStructureError):
             return float("-inf")
 
@@ -206,4 +207,4 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                 number_of_merged_frame_views / number_of_views_with_mergeable_frames
             )
         except ZeroDivisionError:
-            return 0.0
+            return float("-inf")

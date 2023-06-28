@@ -80,7 +80,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         except MissingStructureError:
             chunks = input_space.contents.filter(lambda x: x.is_chunk and not x.is_raw)
             if chunks.is_empty:
-                return 0
+                return float("-inf")
         return statistics.fmean(
             [
                 len(chunk.labels_in_space(space))
@@ -98,7 +98,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
         except MissingStructureError:
             chunks = input_space.contents.filter(lambda x: x.is_chunk and not x.is_raw)
             if chunks.is_empty:
-                return 0
+                return float("-inf")
         return statistics.fmean(
             [
                 (
@@ -123,7 +123,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             )
             return len(views) / len(view_types) / len(non_raw_chunks)
         except (ZeroDivisionError, MissingStructureError):
-            return 0
+            return float("-inf")
 
     def _cohesion_views_per_view(self):
         try:
@@ -138,7 +138,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             ).get()
             return len(view.cohesion_views)
         except MissingStructureError:
-            return 0
+            return float("-inf")
 
     def _related_texts_per_letter_chunk(self):
         try:
@@ -169,7 +169,7 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
                 ]
             )
         except MissingStructureError:
-            return 0
+            return float("-inf")
 
     def _labels_per_space_per_letter_chunk(self):
         try:
@@ -195,4 +195,4 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
                 ]
             )
         except MissingStructureError:
-            return 0
+            return float("-inf")

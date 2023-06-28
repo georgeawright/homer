@@ -209,9 +209,7 @@ class ViewDrivenFactory(Factory):
                         space.contents.filter(
                             lambda x: x.is_concept
                             and not x.is_slot
-                            and (
-                                not x.is_compound_concept or x.args[0].is_fully_active()
-                            )
+                            and (not x.is_compound_concept or x.is_fully_active())
                         )
                         for space in self.targets[
                             "slot"
@@ -224,7 +222,7 @@ class ViewDrivenFactory(Factory):
                 ].parent_concept.parent_space.contents.filter(
                     lambda x: x.is_concept
                     and not x.is_slot
-                    and (not x.is_compound_concept or x.args[0].is_fully_active())
+                    and (not x.is_compound_concept or x.is_fully_active())
                 )
             possible_target_combos = [
                 self.bubble_chamber.new_dict(
