@@ -67,17 +67,24 @@ br {
     doc += view_count_graph_script(query);
 
     worldviews = [];
+    focuses = [];
     codelets_directory = `logs/${run_id}/codelets/ids`;
     codelet_files = fs.readdirSync(codelets_directory);
     codelet_files.forEach(file => {
-	if (!file.includes("WorldviewSetter")) {
-	    return;
+	if (file.includes("WorldviewSetter")) {
+	    file_path = `${codelets_directory}/${file}`;
+	    codelet = JSON.parse(fs.readFileSync(file_path));
+	    worldviews.push({"worldview": codelet["worldview"], "time": codelet["time"]});
 	}
-	file_path = `${codelets_directory}/${file}`;
-	codelet = JSON.parse(fs.readFileSync(file_path));
-	worldviews.push({"worldview": codelet["worldview"], "time": codelet["time"]});
+	if (file.includes("Focus")) {
+	    file_path = `${codelets_directory}/${file}`;
+	    codelet = JSON.parse(fs.readFileSync(file_path));
+	    focuses.push({"focus": codelet["focus"], "time": codelet["time"]});
+	}
     });
     worldviews.sort(function(a,b) {return a["time"] - b["time"]});
+    focuses.sort(function(a,b) {return a["time"] - b["time"]});
+    
     doc += `
     <br>
     <h2>Worldview History</h2>
@@ -115,6 +122,60 @@ br {
     });
     doc += `
     </ul>`;
+
+    doc += `
+    <br>
+    <h2>Focus History</h2>
+    <ul>`;
+    previous_focus = 0;
+    focuses.forEach(focus => {
+	time = focus["time"];
+	view = focus["focus"];
+
+	if (view === previous_focus) {
+	    return;
+	}
+
+	if (view === null) {
+	    doc += `
+      <li>${time}: None</li>`;
+	    previous_focus = view
+	    return;
+	}
+
+	structure_directory = `logs/${run_id}/structures/structures/${view}`;
+	structure_files = fs.readdirSync(structure_directory).filter(
+	    (f) => {return f.endsWith("json")}
+	);
+	structure_file = '';
+	latest_file_time = -1;
+	structure_files.forEach(file => {
+	    file_time = Number(file.split(".")[0]);
+	    if (file_time <= time && file_time > latest_file_time) {
+	    structure_file = file;
+	    latest_file_time = file_time;
+	    }
+	});
+	structure_file_path = `${structure_directory}/${structure_file}`;
+        structure_json = JSON.parse(fs.readFileSync(structure_file_path));
+
+	parent_frame = structure_json["parent_frame"];
+	frame_directory = `logs/${run_id}/structures/structures/${parent_frame}`;
+	structure_files = fs.readdirSync(structure_directory).filter(
+	    (f) => {return f.endsWith("json")}
+	);
+	frame_file_name = structure_files[0];
+	frame_file_path = `${frame_directory}/${frame_file_name}`;
+	frame_json = JSON.parse(fs.readFileSync(frame_file_path));
+	frame_name = frame_json["name"];
+
+	doc += `
+      <li>${time}: <a href="structure_snapshot?run_id=${run_id}&structure_id=${view}&time=${time}">${view}</a>: ${frame_name}</li>`;
+	previous_focus = view;
+    });
+    doc += `
+    </ul>`;
+
     doc += `
   </body>
 </html>`;
