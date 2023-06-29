@@ -161,7 +161,7 @@ br {
 
 	parent_frame = structure_json["parent_frame"];
 	frame_directory = `logs/${run_id}/structures/structures/${parent_frame}`;
-	structure_files = fs.readdirSync(structure_directory).filter(
+	structure_files = fs.readdirSync(frame_directory).filter(
 	    (f) => {return f.endsWith("json")}
 	);
 	frame_file_name = structure_files[0];
