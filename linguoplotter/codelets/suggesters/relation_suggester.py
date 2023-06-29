@@ -154,8 +154,12 @@ class RelationSuggester(Suggester):
             for end in possible_ends
             for space in possible_spaces
             for concept in possible_concepts
-            if (
-                space.no_of_dimensions == 1 and concept.parent_space.name == "more-less"
+            if space.no_of_dimensions == 1
+            and concept
+            in (
+                self.bubble_chamber.concepts["same"],
+                self.bubble_chamber.concepts["more"],
+                self.bubble_chamber.concepts["less"],
             )
             or (
                 space in self.targets["start"].parent_space.conceptual_spaces
