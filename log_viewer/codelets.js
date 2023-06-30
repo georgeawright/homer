@@ -75,6 +75,31 @@ exports.run = function(query) {
 
     });
     doc += '</ul>';
+
+    doc += '<p>';
+    if (page > 1) {
+	doc += '<a href="codelets?run_id=' + run_id
+	    + '&page=1&items_per_page=' + items_per_page
+	    + '">First Page</a> ';
+	doc += '<a href="codelets?run_id=' + run_id
+	    + '&page=' + (page - 1)
+	    +'&items_per_page=' + items_per_page
+	    + '">Previous Page</a> ';
+    }
+    doc += page + ' ';
+    last_page = Math.ceil(codelet_files.length / items_per_page);
+    if (page < last_page) {
+	doc += '<a href="codelets?run_id=' + run_id
+	    + '&page=' + (page + 1)
+	    +'&items_per_page=' + items_per_page
+	    + '">Next Page</a> ';
+	doc += '<a href="codelets?run_id=' + run_id
+	    + '&page=' + last_page
+	    + '&items_per_page=' + items_per_page
+	    + '">Last Page</a> ';
+    }
+    doc += '</p>';
+
     doc += '</body></html>';
 
     return doc;
