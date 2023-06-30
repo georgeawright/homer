@@ -308,6 +308,8 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         x.quality * x.activation > 0,
                         x.start.quality * x.start.activation > 0,
                         x.end.quality * x.end.activation > 0,
+                        x.uncorrespondedness
+                        > bubble_chamber.random_machine.generate_number(),
                     ]
                 )
                 and (x.start == structure_one_start or structure_one_start is None)

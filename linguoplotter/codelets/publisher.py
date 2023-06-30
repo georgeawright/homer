@@ -11,7 +11,6 @@ from linguoplotter.structure_collections import StructureDict
 
 
 class Publisher(Codelet):
-
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
     def __init__(
@@ -134,6 +133,6 @@ class Publisher(Codelet):
                 "BottomUpSuggesterFactory" in codelet.codelet_id
                 or "BottomUpEvaluatorFactory" in codelet.codelet_id
             ):
-                codelet.urgency = 1.0
+                codelet.adjust_urgency(1.0 - self.bubble_chamber.worldview.satisfaction)
             if "Focus" in codelet.codelet_id:
-                codelet.urgency = 1.0
+                codelet.adjust_urgency(1.0 - self.bubble_chamber.worldview.satisfaction)

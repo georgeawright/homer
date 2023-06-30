@@ -37,6 +37,13 @@ class Codelet(ABC):
     def run(self) -> CodeletResult:
         raise NotImplementedError
 
+    def adjust_urgency(self, amount: FloatBetweenOneAndZero) -> None:
+        new_urgency = FloatBetweenOneAndZero(self.urgency + amount)
+        self.bubble_chamber.loggers["activity"].log(
+            f"Adjusting {self.codelet_id} urgency from {self.urgency} to {new_urgency}"
+        )
+        self.urgency = new_urgency
+
     def __repr__(self) -> str:
         if self.result is None:
             return f"<{self.codelet_id} (urgency: {self.urgency})>"

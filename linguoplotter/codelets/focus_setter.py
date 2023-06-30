@@ -50,10 +50,10 @@ class FocusSetter(Codelet):
             )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(
-                f"Exigency: {target_view.salience}\n"
+                f"Salience: {target_view.salience}\n"
                 + f"Satisfaction: {self.bubble_chamber.focus.satisfaction}"
             )
-            self._update_codelet_urgencies()
+            self._update_codelet_urgencies(target_view.salience)
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
         except MissingStructureError:
@@ -63,10 +63,10 @@ class FocusSetter(Codelet):
         self.bubble_chamber.focus_setters_since_last_successful_focus_unset += 1
         return self.result
 
-    def _update_codelet_urgencies(self):
+    def _update_codelet_urgencies(self, amount: FloatBetweenOneAndZero):
         for codelet in self.coderack._codelets:
             if "ViewDrivenFactory" in codelet.codelet_id:
-                codelet.urgency = 1.0
+                codelet.adjust_urgency(amount)
                 return
         raise Exception
 
