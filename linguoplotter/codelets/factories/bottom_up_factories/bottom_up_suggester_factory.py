@@ -29,21 +29,29 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         input_unrelatedness = self._unrelatedness_of_chunks()
         input_uncorrespondedness = self._uncorrespondedness_of_links()
         frames_unfilledness = self._unfilledness_of_slots()
-        text_uncohesiveness = self._uncohesiveness_of_texts()
+        cross_view_uncorrespondedness = self._uncorrespondedness_of_cross_view_links()
         text_unlabeledness = self._unlabeledness_of_letter_chunks()
         text_unrelatedness = self._unrelatedness_of_letter_chunks()
         view_unmergedness = self._unmergedness_of_views()
 
         self.bubble_chamber.loggers["activity"].log(
-            f"Unchunkedness of raw chunks: {input_unchunkedness}\n"
-            + f"Unlabeledness of chunks: {input_unlabeledness}\n"
-            + f"Unrelatedness of chunks: {input_unrelatedness}\n"
-            + f"Unfilledness of slots: {frames_unfilledness}\n"
-            + f"Uncorrespondedness of links: {input_uncorrespondedness}\n"
-            + f"Unchohesiveness of texts: {text_uncohesiveness}\n"
-            + f"Unlabeledness of letter chunks: {text_unlabeledness}\n"
-            + f"Unrelatedness of letter chunks: {text_unrelatedness}\n"
-            + f"Unmergedness of views: {view_unmergedness}",
+            f"Unchunkedness of raw chunks: {input_unchunkedness}",
+        ).log(
+            f"Unlabeledness of chunks: {input_unlabeledness}",
+        ).log(
+            f"Unrelatedness of chunks: {input_unrelatedness}",
+        ).log(
+            f"Unfilledness of slots: {frames_unfilledness}",
+        ).log(
+            f"Uncorrespondedness of links: {input_uncorrespondedness}",
+        ).log(
+            f"Uncorrespondedness of cross view links: {cross_view_uncorrespondedness}",
+        ).log(
+            f"Unlabeledness of letter chunks: {text_unlabeledness}",
+        ).log(
+            f"Unrelatedness of letter chunks: {text_unrelatedness}",
+        ).log(
+            f"Unmergedness of views: {view_unmergedness}",
         )
 
         class_urgencies = [
@@ -52,7 +60,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             (RelationSuggester, input_unrelatedness),
             (ViewSuggester, input_uncorrespondedness),
             (CorrespondenceSuggester, frames_unfilledness),
-            (BottomUpCohesionViewSuggester, text_uncohesiveness),
+            (BottomUpCohesionViewSuggester, cross_view_uncorrespondedness),
             (CrossViewLabelSuggester, text_unrelatedness),
             (CrossViewRelationSuggester, text_unrelatedness),
             (MergedFrameViewSuggester, view_unmergedness),
@@ -105,16 +113,12 @@ class BottomUpSuggesterFactory(BottomUpFactory):
     def _uncorrespondedness_of_links(self):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()
         try:
-            random_chunk = input_space.contents.filter(
-                lambda x: x.is_chunk and x.super_chunks.is_empty
-            ).get()
             labels_and_relations = input_space.contents.filter(
                 lambda x: x.is_label
                 or x.is_relation
-                and random_chunk in x.arguments
                 and x.is_fully_active
                 and x.quality > 0
-            )
+            ).sample(len(input_space.conceptual_spaces), key=lambda x: x.quality)
             uncorresponded_links = labels_and_relations.filter(
                 lambda x: x.correspondences.is_empty
             )
@@ -136,27 +140,28 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         except MissingStructureError:
             return float("-inf")
 
-    def _uncohesiveness_of_texts(self):
+    def _uncorrespondedness_of_cross_view_links(self):
         try:
-            view = (
-                self.bubble_chamber.views.filter(
-                    lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                    and x.parent_frame.parent_concept.location_in_space(
-                        self.bubble_chamber.spaces["grammar"]
-                    )
-                    == self.bubble_chamber.concepts["sentence"].location_in_space(
-                        self.bubble_chamber.spaces["grammar"]
-                    )
-                ).sample(2, key=activation)
-                # There must be at least 2 texts for there to be cohesion between them
-                .get()
+            sentence_views = self.bubble_chamber.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
+                == self.bubble_chamber.concepts["sentence"].location_in_space(
+                    self.bubble_chamber.spaces["grammar"]
+                )
             )
-        except MissingStructureError:
+            cross_view_relations = self.bubble_chamber.cross_view_relations.filter(
+                lambda x: x.is_fully_active and x.quality > 0
+            ).sample(len(sentence_views), key=lambda x: x.quality)
+            uncorresponded_relations = cross_view_relations.filter(
+                lambda x: x.correspondences.is_empty
+            )
+            return sum(r.quality for r in uncorresponded_relations) / len(
+                cross_view_relations
+            )
+        except (ZeroDivisionError, MissingStructureError):
             return float("-inf")
-        try:
-            return 1 - max([v.quality for v in view.cohesion_views])
-        except ValueError:
-            return 1
 
     def _unlabeledness_of_letter_chunks(self):
         try:
