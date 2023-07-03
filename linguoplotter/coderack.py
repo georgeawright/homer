@@ -32,7 +32,6 @@ from .logger import Logger
 
 
 class Coderack:
-
     MAXIMUM_POPULATION = HyperParameters.MAXIMUM_CODERACK_POPULATION
     MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
     PROTECTED_CODELET_TYPES = (

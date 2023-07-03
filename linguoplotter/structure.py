@@ -11,7 +11,6 @@ from .structure_collections import StructureSet
 
 
 class Structure(ABC):
-
     FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
     MINIMUM_ACTIVATION_UPDATE = HyperParameters.MINIMUM_ACTIVATION_UPDATE
     ACTIVATION_UPDATE_COEFFICIENT = HyperParameters.ACTIVATION_UPDATE_COEFFICIENT

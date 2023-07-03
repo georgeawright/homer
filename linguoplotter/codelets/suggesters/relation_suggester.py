@@ -6,7 +6,7 @@ from linguoplotter.errors import MissingStructureError, NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict
-from linguoplotter.structure_collection_keys import relating_salience
+from linguoplotter.structure_collection_keys import activation, relating_salience
 from linguoplotter.structures.links import Relation
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.spaces import ConceptualSpace
@@ -60,17 +60,12 @@ class RelationSuggester(Suggester):
             conceptual_space = input_space.conceptual_spaces.filter(
                 lambda x: (
                     x.no_of_dimensions == 1
-                    if parent_concept.parent_space.name == "more-less"
+                    if parent_concept.parent_space == bubble_chamber.spaces["more-less"]
                     else True
                 )
-                and (
-                    x in input_space.conceptual_spaces
-                    if parent_concept.parent_space.name == "same-different"
-                    else True
-                )
-            ).get()
+            ).get(key=activation)
         potential_targets = input_space.contents.filter(
-            lambda x: x.is_node and x.is_slot and x.quality > 0
+            lambda x: x.is_node and not x.is_slot and x.quality > 0
         )
         try:
             possible_pairs = [
