@@ -78,6 +78,8 @@ class Relation(Link):
             "parent_space": self.parent_space.structure_id
             if self.parent_space is not None
             else None,
+            "links_out": [link.structure_id for link in self.links_out],
+            "links_in": [link.structure_id for link in self.links_in],
             "quality": self.quality,
             "activation": self.activation,
         }

@@ -36,7 +36,7 @@ class FocusSetter(Codelet):
     def run(self) -> CodeletResult:
         try:
             target_view = self.bubble_chamber.views.filter(
-                lambda v: (v.unhappiness > 0)
+                lambda v: v.unhappiness > 0
                 and v.members.filter(
                     lambda c: c.parent_concept.name == "not(same)"
                 ).is_empty

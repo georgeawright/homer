@@ -34,9 +34,10 @@ class ViewEvaluator(Evaluator):
             number_of_equivalent_views = len(
                 self.bubble_chamber.views.filter(
                     lambda x: x.parent_frame.progenitor == progenitor
+                    and x.unhappiness > 0
                 )
             )
-            self.confidence = progenitor.activation * 0.5 ** number_of_equivalent_views
+            self.confidence = progenitor.activation * 0.5**number_of_equivalent_views
         else:
             self.confidence = target_view.calculate_quality()
         self.change_in_confidence = abs(self.confidence - self.original_confidence)
