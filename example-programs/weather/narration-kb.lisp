@@ -48,7 +48,18 @@
 (def-relation
   :start textual-order :end temporal-order
   :parent_concept more-concept :conceptual_space grammar-space)
-
+(def-relation
+  :start disanalogy-1 :end temporal-parallelism
+  :parent_concept more-concept :conceptual_space grammar-space)
+(def-relation
+  :start disanalogy-2 :end temporal-parallelism
+  :parent_concept more-concept :conceptual_space grammar-space)
+(def-relation
+  :start parallelism :end temporal-parallelism
+  :parent_concept more-concept :conceptual_space grammar-space)
+(def-relation
+  :start textual-order :end temporal-parallelism
+  :parent_concept more-concept :conceptual_space grammar-space)
 
 (define input-space
   (def-contextual-space

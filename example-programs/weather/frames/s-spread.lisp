@@ -284,9 +284,9 @@
 (def-relation :start pp-directional-time-concept :end spread-sentence
   :is_bidirectional True :stable_activation 0.2)
 (def-relation :start ap-concept :end spread-sentence
-  :is_bidirectional True :stable_activation 0.2)
+  :is_bidirectional True :stable_activation 0.1)
 (def-relation :start more-size-concept :end spread-sentence
-  :is_bidirectional True :stable_activation 0.2)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start same-location-concept :end spread-sentence
   :is_bidirectional True :stable_activation 0.1)
 (def-relation :start same-temperature-concept :end spread-sentence
