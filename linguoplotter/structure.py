@@ -215,7 +215,12 @@ class Structure(ABC):
     def recalculate_unlabeledness(self):
         try:
             self.unlabeledness = 1 - FloatBetweenOneAndZero(
-                sum([label.quality for label in self.labels]) / len(self.locations)
+                sum([label.quality for label in self.labels])
+                / len(
+                    self.parent_spaces.where(
+                        is_conceptual_space=True, is_basic_level=True
+                    )
+                )
             )
         except ZeroDivisionError:
             self.unlabeledness = 1

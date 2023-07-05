@@ -91,6 +91,7 @@ class BottomUpSuggesterFactory(BottomUpFactory):
             chunk = input_space.contents.where(is_chunk=True, is_raw=False).get(
                 key=activation
             )
+            return chunk.unlabeledness
             return 1 - sum([l.quality * l.activation for l in chunk.labels]) / len(
                 input_space.conceptual_spaces
             )
