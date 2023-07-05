@@ -68,6 +68,7 @@ class RelationEvaluator(Evaluator):
             / (
                 1
                 if not relation.parent_concept.is_compound_concept
+                # concepts with 2 components are fine, but more is unwieldy
                 else relation.parent_concept.number_of_components - 1
             )
             * times_are_adjacent
