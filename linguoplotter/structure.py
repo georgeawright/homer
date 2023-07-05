@@ -125,6 +125,10 @@ class Structure(ABC):
         )
 
     @property
+    def basic_level_conceptual_spaces(self) -> StructureSet:
+        return self.parent_spaces.where(is_conceptual_space=True, is_basic_level=True)
+
+    @property
     def size(self) -> int:
         return 1
 
@@ -214,13 +218,9 @@ class Structure(ABC):
 
     def recalculate_unlabeledness(self):
         try:
-            self.unlabeledness = 1 - FloatBetweenOneAndZero(
-                sum([label.quality for label in self.labels])
-                / len(
-                    self.parent_spaces.where(
-                        is_conceptual_space=True, is_basic_level=True
-                    )
-                )
+            unlabeledness = 1 - FloatBetweenOneAndZero(
+                sum([l.quality * l.activation for l in self.labels])
+                / len(self.basic_level_conceptual_spaces)
             )
         except ZeroDivisionError:
             self.unlabeledness = 1
@@ -228,16 +228,14 @@ class Structure(ABC):
     def recalculate_unrelatedness(self):
         try:
             self.unrelatedness = 1 - FloatBetweenOneAndZero(
-                sum([relation.quality for relation in self.relations])
-                / len(self.locations)
+                sum([r.quality * r.activation for r in self.relations])
+                / len(self.basic_level_conceptual_spaces)
             )
         except ZeroDivisionError:
             self.unrelatedness = 1
 
     def recalculate_uncorrespondedness(self) -> FloatBetweenOneAndZero:
-        self.uncorrespondedness = 0.5 ** sum(
-            link.activation for link in self.correspondences
-        )
+        self.uncorrespondedness = 0.5 ** sum(c.activation for c in self.correspondences)
 
     @property
     def links(self) -> StructureSet:
@@ -449,7 +447,9 @@ class Structure(ABC):
     def recalculate_activation(self):
         if self.is_stable:
             return
-        if self.parent_space is None or self.parent_space.is_conceptual_space:
+        if (
+            self.parent_space is None or self.parent_space.is_conceptual_space
+        ) and not self.is_link:
             relatives_total = FloatBetweenOneAndZero(
                 sum(
                     [
@@ -474,9 +474,22 @@ class Structure(ABC):
                 + relatives_total * self.RELATIVES_ACTIVATION_WEIGHT
                 + instances_total * self.INSTANCES_ACTIVATION_WEIGHT
             )
+        elif self.parent_space is not None and self.parent_space.is_main_input:
+            if self.is_leaf:
+                self._activation_buffer = FloatBetweenOneAndZero(
+                    self.activation - self.DECAY_RATE
+                )
+            else:
+                self._activation_buffer = self.activation
 
     def update_activation(self):
-        if self.parent_space is None or self.parent_space.is_conceptual_space:
+        if any(
+            [
+                (self.parent_space is None or self.parent_space.is_conceptual_space)
+                and not self.is_link,
+                (self.parent_space is not None and self.parent_space.is_main_input),
+            ]
+        ):
             self._activation = self._activation_buffer
             self._activation_buffer = 0.0
             self.recalculate_salience()

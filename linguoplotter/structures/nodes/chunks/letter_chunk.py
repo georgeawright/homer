@@ -95,6 +95,10 @@ class LetterChunk(Chunk):
         return self.name is None
 
     @property
+    def is_leaf(self) -> bool:
+        return False
+
+    @property
     def concepts(self):
         return self.relatives.where(is_concept=True)
 

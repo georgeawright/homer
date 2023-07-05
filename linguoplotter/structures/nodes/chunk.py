@@ -110,6 +110,10 @@ class Chunk(Node):
     def is_abstract(self):
         return self.parent_space is None
 
+    @property
+    def is_leaf(self) -> bool:
+        return self.super_chunks.is_empty and self.links.is_empty
+
     def recalculate_unhappiness(self) -> FloatBetweenOneAndZero:
         self.recalculate_unchunkedness()
         self.recalculate_unlabeledness()
