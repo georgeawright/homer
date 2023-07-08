@@ -2,11 +2,14 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict
 
 
 class FocusUnsetter(Codelet):
+    DECAY_RATE = HyperParameters.DECAY_RATE
+
     def __init__(
         self,
         codelet_id: str,
@@ -159,9 +162,9 @@ class FocusUnsetter(Codelet):
             if self.target_view.is_equivalent_to(view):
                 view.quality = 0.0
                 view.deactivate()
-                self.bubble_chamber.recycle_bin.add(view)
+                self.bubble_chamber.remove(view)
                 self.bubble_chamber.loggers["activity"].log(
-                    f"Found and recycled equivalent view: {view}"
+                    f"Found and removed equivalent view: {view}"
                 )
 
     def _fizzle(self):

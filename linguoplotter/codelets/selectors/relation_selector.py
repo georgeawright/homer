@@ -14,60 +14,39 @@ class RelationSelector(Selector):
         and the same or reverse concepts
         (eg: {less-time(x,y), more-time(y,x)}
              {different-location(x,y), different-location(y,x)})
-        Challengers are either:
-        - Relations with same arguments, same conceptual space, different concepts
-          (eg different vs more & less)
-        - Relations with same arguments, in a competing conceptual space
-          (eg north-south vs east-west)
+        Challengers are:
+        - Relations with same arguments, in the same conceptual space or a competing conceptual space
+          (eg north-south vs east-west, different-north-south vs less-north-south)
         """
+        self._assemble_supporting_champions()
         if self.challengers.not_empty:
             return True
-        try:
-            self._get_challengers_with_same_or_competing_conceptual_space()
-        except MissingStructureError:
-            pass
+        self._get_challengers_with_same_or_competing_conceptual_space()
         return True
 
-    def _get_challengers_with_same_conceptual_space(self):
+    def _assemble_supporting_champions(self):
         champion = self.champions.get()
-        try:
-            for relation in champion.start.champion_relations.filter(
-                lambda x: x.arguments == champion.arguments
-                and x.conceptual_space == champion.conceptual_space
-                and x not in self.champions
-            ):
-                self.challengers.add(relation)
-        except MissingStructureError:
-            try:
-                for relation in champion.start.relations.filter(
-                    lambda x: x.arguments == champion.arguments
-                    and x.conceptual_space == champion.conceptual_space
-                    and x not in self.champions
-                ):
-                    self.challengers.add(relation)
-            except MissingStructureError:
-                pass
+        for relation in champion.start.relations.filter(
+            lambda x: x.start == champion.end
+            and x.end == champion.start
+            and x.conceptual_space == champion.conceptual_space
+            and x.parent_concept == champion.parent_concept.reverse
+        ):
+            self.champions.add(relation)
 
     def _get_challengers_with_same_or_competing_conceptual_space(self):
         champion = self.champions.get()
-        try:
-            for relation in champion.start.champion_relations.filter(
-                lambda x: x.arguments == champion.arguments
-                and x.conceptual_space.parent_concept
-                == champion.conceptual_space.parent_concept
-                and x not in self.champions
-            ):
-                self.challengers.add(relation)
-        except MissingStructureError:
-            try:
-                for relation in champion.start.relations.filter(
-                    lambda x: x.arguments == champion.arguments
-                    and x.conceptual_space == champion.conceptual_space
-                    and x not in self.champions
-                ):
-                    self.challengers.add(relation)
-            except MissingStructureError:
-                pass
+        challengers_filter = (
+            lambda x: x.arguments == champion.arguments
+            and x.conceptual_space.parent_concept
+            == champion.conceptual_space.parent_concept
+            and x not in self.champions
+        )
+        challengers = champion.start.champion_relations.filter(challengers_filter)
+        if challengers.is_empty:
+            challengers = champion.start.relations.filter(challengers_filter)
+        for relation in challengers:
+            self.challengers.add(relation)
 
     def _fizzle(self):
         pass

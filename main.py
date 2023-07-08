@@ -23,12 +23,13 @@ program_files = [
     "narration-5.lisp",
     "narration-6.lisp",
 ]
-start_time = time.time()
-for program_file in program_files:
-    results = []
-    random_seeds = range(5)
+random_seeds = range(5)
 
-    for i in random_seeds:
+start_time = time.time()
+results = []
+
+for i in random_seeds:
+    for program_file in program_files:
         time_string = str(time.time())
         logs_dir_path = f"{pwd}/logs/{time_string}"
         os.mkdir(logs_dir_path)
@@ -86,7 +87,8 @@ for program_file in program_files:
             writer.writeheader()
             for codelet_time in narrator.coderack.codelet_times:
                 writer.writerow(codelet_time)
-    end_time = time.time()
-    print(results)
-    run_length = end_time - start_time
-    print(run_length)
+
+end_time = time.time()
+print(results)
+run_length = end_time - start_time
+print(run_length)

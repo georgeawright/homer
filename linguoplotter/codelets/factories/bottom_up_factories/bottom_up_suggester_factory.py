@@ -113,13 +113,27 @@ class BottomUpSuggesterFactory(BottomUpFactory):
 
     def _uncorrespondedness_of_links(self):
         input_space = self.bubble_chamber.spaces.where(is_main_input=True).get()
+        super_chunks = input_space.contents.filter(
+            lambda x: x.is_chunk and x.super_chunks.is_empty
+        )
+        sample_size = len(super_chunks) * len(input_space.conceptual_spaces)
         try:
-            labels_and_relations = input_space.contents.filter(
-                lambda x: x.is_label
-                or x.is_relation
-                and x.is_fully_active
-                and x.quality > 0
-            ).sample(len(input_space.conceptual_spaces), key=lambda x: x.quality)
+            labels_and_relations = (
+                StructureSet.union(
+                    self.bubble_chamber.labels, self.bubble_chamber.relations
+                )
+                .filter(
+                    lambda x: not x.is_cross_view
+                    and x.parent_space is not None
+                    and x.parent_space.is_contextual_space
+                    and (
+                        x.parent_space.is_main_input
+                        or x.correspondences.where(end=x).not_empty
+                    )
+                    and x.quality > 0
+                )
+                .sample(sample_size, key=lambda x: x.quality)
+            )
             uncorresponded_links = labels_and_relations.filter(
                 lambda x: x.correspondences.is_empty
             )
@@ -143,18 +157,24 @@ class BottomUpSuggesterFactory(BottomUpFactory):
 
     def _uncorrespondedness_of_cross_view_links(self):
         try:
-            sentence_views = self.bubble_chamber.views.filter(
-                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
-                and x.parent_frame.parent_concept.location_in_space(
-                    self.bubble_chamber.spaces["grammar"]
+            sentences = {
+                v.output: True
+                for v in self.bubble_chamber.views.filter(
+                    lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                    and x.parent_frame.parent_concept.location_in_space(
+                        self.bubble_chamber.spaces["grammar"]
+                    )
+                    == self.bubble_chamber.concepts["sentence"].location_in_space(
+                        self.bubble_chamber.spaces["grammar"]
+                    )
                 )
-                == self.bubble_chamber.concepts["sentence"].location_in_space(
-                    self.bubble_chamber.spaces["grammar"]
-                )
-            )
+            }
+            if not len(sentences) > 1:
+                # There needs to be more than one sentence for cohesion to be measured
+                raise MissingStructureError
             cross_view_relations = self.bubble_chamber.cross_view_relations.filter(
                 lambda x: x.is_fully_active and x.quality > 0
-            ).sample(len(sentence_views), key=lambda x: x.quality)
+            ).sample(len(sentences), key=lambda x: x.quality)
             uncorresponded_relations = cross_view_relations.filter(
                 lambda x: x.correspondences.is_empty
             )

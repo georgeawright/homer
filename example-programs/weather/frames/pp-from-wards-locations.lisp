@@ -175,6 +175,6 @@
 		     (Location (list) pp-from-wards-locations-output))))
 
 (def-relation :start more-location-concept :end pp-from-wards-locations
-  :is_bidirectional True :stable_activation 0.5)
+  :is_bidirectional True :stable_activation 0.7)
 (def-relation :start less-time-concept :end pp-from-wards-locations
-  :is_bidirectional True :stable_activation 0.5)
+  :is_bidirectional True :stable_activation 0.3)
