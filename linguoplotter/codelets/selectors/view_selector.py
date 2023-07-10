@@ -67,7 +67,8 @@ class ViewSelector(Selector):
             raise MissingStructureError
         self.challengers.add(
             self.bubble_chamber.views.filter(
-                lambda x: x.parent_frame.parent_concept
+                lambda x: x.is_fully_active()
+                and x.parent_frame.parent_concept
                 == champion.parent_frame.parent_concept
                 and (
                     champion.members.filter(
