@@ -243,6 +243,13 @@ class CorrespondenceSuggester(Suggester):
                                 x.parent_concept.is_compound_concept
                                 and x.parent_concept.args[0]
                                 == target_end.parent_concept
+                                and (
+                                    x.parent_concept.root.name != "not"
+                                    or target_view.members.filter(
+                                        lambda x: x.start.parent_space
+                                        in target_view.input_spaces
+                                    ).not_empty
+                                )
                             ),
                         ]
                     )
@@ -284,7 +291,10 @@ class CorrespondenceSuggester(Suggester):
                             and x.parent_concept.args[0] == target_end.parent_concept
                             and (
                                 x.parent_concept.root.name != "not"
-                                or target_view.members.not_empty
+                                or target_view.members.filter(
+                                    lambda x: x.start.parent_space
+                                    in target_view.input_spaces
+                                ).not_empty
                             )
                         ),
                     ]

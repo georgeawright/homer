@@ -268,6 +268,13 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                                 x.parent_concept.is_compound_concept
                                 and x.parent_concept.args[0]
                                 == target_end.parent_concept
+                                and (
+                                    x.parent_concept.root.name != "not"
+                                    or target_view.members.filter(
+                                        lambda x: x.start.parent_space
+                                        in target_view.input_spaces
+                                    ).not_empty
+                                )
                             ),
                         ]
                     )
@@ -321,6 +328,13 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         (
                             x.parent_concept.is_compound_concept
                             and x.parent_concept.args[0] == target_end.parent_concept
+                            and (
+                                x.parent_concept.root.name != "not"
+                                or target_view.members.filter(
+                                    lambda x: x.start.parent_space
+                                    in target_view.input_spaces
+                                ).not_empty
+                            )
                         ),
                         (
                             target_end.parent_concept.is_compound_concept
