@@ -16,9 +16,9 @@ class HyperParameters:
     NUMBER_OF_START_CHUNK_SUGGESTERS = 7
 
     MAXIMUM_DETERMINISM = 0.9
-    MINIMUM_DETERMINISM = 0.25
+    MINIMUM_DETERMINISM = 0.3
 
-    a = 1.0
+    a = 0.9
     b = 0.0
     c = 0.00005
     d = 0.0
