@@ -44,7 +44,18 @@ class RelationSelector(Selector):
         )
         challengers = champion.start.champion_relations.filter(challengers_filter)
         if challengers.is_empty:
-            challengers = champion.start.relations.filter(challengers_filter)
+            try:
+                challenger = champion.start.relations.filter(challengers_filter).get(
+                    key=lambda x: x.quality
+                )
+                challengers = champion.start.relations.filter(
+                    lambda x: x.start == challenger.end
+                    and x.end == challenger.start
+                    and x.conceptual_space == challenger.conceptual_space
+                    and x.parent_concept == challenger.parent_concept.reverse
+                )
+            except MissingStructureError:
+                pass
         for relation in challengers:
             self.challengers.add(relation)
 
