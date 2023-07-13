@@ -260,6 +260,12 @@ class View(Structure):
             ]
         )
 
+    @property
+    def has_correspondences_to_input(self):
+        return self.members.filter(
+            lambda x: x.start.parent_space in self.input_spaces
+        ).not_empty
+
     def recalculate_unhappiness(self):
         self.unhappiness = 1 - 0.5**self.parent_frame.number_of_items_left_to_process
 
@@ -309,6 +315,20 @@ class View(Structure):
             return self.structures == other.structures and self.output == other.output
         except MissingStructureError:
             return False
+
+    def is_competing_with(self, other: View):
+        return (
+            self != other
+            and self.parent_frame.parent_concept == other.parent_frame.parent_concept
+            and self.has_correspondences_to_input
+            and other.has_correspondences_to_input
+            and self.raw_input_nodes == other.raw_input_nodes
+            and other.super_views.is_empty
+            or self.is_competing_cohesion_view_with(other)
+        )
+
+    def is_competing_cohesion_view_with(self, other: View):
+        return any([other in sub_view.cohesion_views for sub_view in self.sub_views])
 
     def add_cross_view_relation(self, relation: "Relation"):
         self.cross_view_links.add(relation)
@@ -635,6 +655,11 @@ class View(Structure):
                 for super_view in self.super_views
             ]
         )
+
+    def boost_activation(self, amount: float):
+        if self.is_stable:
+            return
+        self._activation_buffer = FloatBetweenOneAndZero(self.activation + amount)
 
     def recalculate_activation(self):
         self._activation_buffer = FloatBetweenOneAndZero(

@@ -41,6 +41,7 @@ class ContextualSpace(Space):
             champion_labels=champion_labels,
             champion_relations=champion_relations,
         )
+        self.parent_frame = None
         self.conceptual_spaces = conceptual_spaces
         self.is_main_input = is_main_input
         self.is_contextual_space = True

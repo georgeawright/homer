@@ -27,27 +27,20 @@ class RelationSelector(Selector):
     def _assemble_supporting_champions(self):
         champion = self.champions.get()
         for relation in champion.start.relations.filter(
-            lambda x: x.start == champion.end
-            and x.end == champion.start
-            and x.conceptual_space == champion.conceptual_space
-            and x.parent_concept == champion.parent_concept.reverse
+            lambda x: x not in self.champions and x.is_mutually_supportive_of(champion)
         ):
             self.champions.add(relation)
 
     def _get_challengers_with_same_or_competing_conceptual_space(self):
         champion = self.champions.get()
-        challengers_filter = (
-            lambda x: x.arguments == champion.arguments
-            and x.conceptual_space.parent_concept
-            == champion.conceptual_space.parent_concept
-            and x not in self.champions
+        challengers = champion.start.champion_relations.filter(
+            lambda x: x.is_competing_with(champion)
         )
-        challengers = champion.start.champion_relations.filter(challengers_filter)
         if challengers.is_empty:
             try:
-                challenger = champion.start.relations.filter(challengers_filter).get(
-                    key=lambda x: x.quality
-                )
+                challenger = champion.start.relations.filter(
+                    lambda x: x.is_competing_with(champion)
+                ).get(key=lambda x: x.quality)
                 challengers = champion.start.relations.filter(
                     lambda x: x.start == challenger.end
                     and x.end == challenger.start

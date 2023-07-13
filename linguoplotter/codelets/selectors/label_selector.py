@@ -16,20 +16,15 @@ class LabelSelector(Selector):
         try:
             self.challengers.add(
                 champion.start.champion_labels.filter(
-                    lambda x: x.parent_concept.parent_basic_space
-                    == champion.parent_concept.parent_basic_space
-                )
-                .excluding(champion)
-                .get()
+                    lambda x: x.is_competing_with(champion)
+                ).get()
             )
         except MissingStructureError:
             try:
                 self.challengers.add(
-                    champion.start.labels_in_space(
-                        champion.parent_concept.parent_basic_space
-                    )
-                    .excluding(champion)
-                    .get(key=activation)
+                    champion.start.labels.filter(
+                        lambda x: x.is_competing_with(champion)
+                    ).get(key=activation)
                 )
             except MissingStructureError:
                 return True

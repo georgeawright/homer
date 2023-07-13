@@ -82,6 +82,14 @@ class Label(Link):
 
         return LabelSelector
 
+    def is_competing_with(self, other: Label) -> bool:
+        return (
+            self != other
+            and self.start == other.start
+            and self.parent_concept.parent_basic_space
+            == other.parent_concept.parent_basic_space
+        )
+
     def copy(self, **kwargs: dict) -> Label:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
         bubble_chamber = kwargs["bubble_chamber"]

@@ -138,7 +138,7 @@ br {
 
 	if (view === null) {
 	    doc += `
-      <li>${time}: None</li>`;
+      <li><a href="codelet?run_id=${run_id}&codelet_number=${time}">${time}: None</li>`;
 	    previous_focus = view
 	    return;
 	}
@@ -170,7 +170,7 @@ br {
 	frame_name = frame_json["name"];
 
 	doc += `
-      <li>${time}: <a href="structure_snapshot?run_id=${run_id}&structure_id=${view}&time=${time}">${view}</a>: ${frame_name}</li>`;
+      <li><a href="codelet?run_id=${run_id}&codelet_number=${time}">${time}</a>: <a href="structure_snapshot?run_id=${run_id}&structure_id=${view}&time=${time}">${view}</a>: ${frame_name}</li>`;
 	previous_focus = view;
     });
     doc += `

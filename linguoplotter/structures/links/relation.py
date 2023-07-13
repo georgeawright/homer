@@ -102,6 +102,22 @@ class Relation(Link):
 
         return RelationSelector
 
+    def is_competing_with(self, other: Relation) -> bool:
+        return (
+            self != other
+            and self.conceptual_space.parent_concept
+            == other.conceptual_space.parent_concept
+            and self.arguments == other.arguments
+            and not self.is_mutually_supportive_of(other)
+        )
+
+    def is_mutually_supportive_of(self, other: Relation) -> bool:
+        return (
+            (self.start, self.end) == (other.end, other.start)
+            and self.conceptual_space == other.conceptual_space
+            and self.parent_concept == other.parent_concept.reverse
+        )
+
     def copy(self, **kwargs) -> Relation:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
         bubble_chamber = kwargs["bubble_chamber"]

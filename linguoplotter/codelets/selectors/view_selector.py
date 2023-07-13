@@ -67,30 +67,8 @@ class ViewSelector(Selector):
             raise MissingStructureError
         self.challengers.add(
             self.bubble_chamber.views.filter(
-                lambda x: x.is_fully_active()
-                and x.parent_frame.parent_concept
-                == champion.parent_frame.parent_concept
-                and (
-                    champion.members.filter(
-                        lambda c: c.start.parent_space in x.input_spaces
-                    ).not_empty
-                    and x.members.filter(
-                        lambda c: c.start.parent_space in champion.input_spaces
-                    ).not_empty
-                    and x.raw_input_nodes == champion.raw_input_nodes
-                )
-                and x.super_views.is_empty
-                or (
-                    any(
-                        [
-                            x in sub_view.cohesion_views
-                            for sub_view in champion.sub_views
-                        ]
-                    )
-                )
-            )
-            .excluding(champion)
-            .get(key=activation)
+                lambda x: x.is_fully_active() and x.is_competing_with(champion)
+            ).get(key=activation)
         )
 
     def _fizzle(self):

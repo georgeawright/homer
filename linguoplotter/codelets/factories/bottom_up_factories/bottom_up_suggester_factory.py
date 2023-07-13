@@ -127,10 +127,20 @@ class BottomUpSuggesterFactory(BottomUpFactory):
                     and x.parent_space is not None
                     and x.parent_space.is_contextual_space
                     and (
-                        x.parent_space.is_main_input
-                        or x.correspondences.where(end=x).not_empty
+                        (x.parent_space.is_main_input and x.quality > 0)
+                        or (
+                            x.parent_space.parent_frame is not None
+                            and x.correspondences.where(end=x).not_empty
+                            and x.parent_space
+                            == x.parent_space.parent_frame.input_space
+                            and x.parent_space.parent_frame.parent_concept.location_in_space(
+                                self.bubble_chamber.spaces["grammar"]
+                            )
+                            != self.bubble_chamber.concepts[
+                                "sentence"
+                            ].location_in_space(self.bubble_chamber.spaces["grammar"])
+                        )
                     )
-                    and x.quality > 0
                 )
                 .sample(sample_size, key=lambda x: x.quality)
             )

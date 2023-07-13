@@ -209,6 +209,8 @@ class BubbleChamber:
                 )
                 == self.concepts["sentence"].location_in_space(self.spaces["grammar"])
             ).sample(2, key=activation)
+            if not len({view.output: True for view in views}) > 1:
+                raise MissingStructureError
             view = views.get()
             letter_chunks = view.output_space.contents.filter(
                 lambda x: x.is_letter_chunk
@@ -449,6 +451,8 @@ class BubbleChamber:
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
         )
+        input_space.parent_frame = frame
+        output_space.parent_frame = frame
         if parent_frame is not None:
             parent_frame.instances.add(frame)
         self.add(frame)
