@@ -30,6 +30,7 @@ results = []
 
 for i in random_seeds:
     for program_file in program_files:
+        iteration_start_time = time.time()
         time_string = str(time.time())
         logs_dir_path = f"{pwd}/logs/{time_string}"
         os.mkdir(logs_dir_path)
@@ -77,9 +78,11 @@ for i in random_seeds:
         narrator.interpreter.interpret_file(program_file)
         os.chdir("../..")
         result = narrator.run()
+        iteration_end_time = time.time()
         results.append(result)
         with open(f"{logs_dir_path}/details.txt", "w") as f:
             run_details = dict(run_details, **result)
+            run_details["time_in_seconds"] = iteration_end_time - iteration_start_time
             f.write(json.dumps(run_details))
         with open(f"{logs_dir_path}/codelet_times.csv", "w", newline="") as csvfile:
             fieldnames = list(narrator.coderack.codelet_times[0].keys())
