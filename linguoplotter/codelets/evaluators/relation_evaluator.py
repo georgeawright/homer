@@ -49,15 +49,6 @@ class RelationEvaluator(Evaluator):
         )
         parallel_relations = StructureSet.intersection(
             target_relation.start.relations, target_relation.end.relations
-        ).filter(
-            lambda x: (
-                x.conceptual_space.parent_concept
-                != target_relation.conceptual_space.parent_concept
-            )
-            or (
-                x.conceptual_space == target_relation.conceptual_space
-                and x.parent_concept == target_relation.parent_concept.reverse
-            )
         )
         self.bubble_chamber.loggers["activity"].log_set(
             parallel_relations, "Parallel relations"
