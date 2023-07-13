@@ -604,7 +604,10 @@ def generate_contextual_space_graph(run_id, space_id, time):
             shape="rectangle",
         )
     space_graph.node_attr.update(shape="ellipse", style="filled", color="lightgrey")
+    label_groups = {}
     for label in labels:
+        if label["start"] not in label_groups:
+            label_groups[label["start"]] = "Labels"
         link_concept = [
             c for c in concepts if c["structure_id"] == label["parent_concept"]
         ][0]
@@ -613,12 +616,15 @@ def generate_contextual_space_graph(run_id, space_id, time):
             if link_concept["name"] != ""
             else link_concept["structure_id"]
         )
-        space_graph.node(
-            label["structure_id"],
-            label=link_label,
-            URL=url(label["structure_id"]),
-        )
+        label_groups[label["start"]] += "\n" + link_label
+    for label_group, label_labels in label_groups.items():
+        space_graph.node(label_labels, shape="rectangle")
+    relation_groups = {}
     for relation in relations:
+        if relation["start"] not in relation_groups:
+            relation_groups[relation["start"]] = {}
+        if relation["end"] not in relation_groups[relation["start"]]:
+            relation_groups[relation["start"]][relation["end"]] = "Relations"
         link_concept = [
             c for c in concepts if c["structure_id"] == relation["parent_concept"]
         ][0]
@@ -638,16 +644,16 @@ def generate_contextual_space_graph(run_id, space_id, time):
             else link_space["structure_id"]
         )
         link_label = f"{concept_name}-{space_name}"
-        space_graph.node(
-            relation["structure_id"],
-            label=link_label,
-            URL=url(relation["structure_id"]),
-        )
-    for label in labels:
-        space_graph.edge(label["structure_id"], label["start"], label="start")
-    for relation in relations:
-        space_graph.edge(relation["structure_id"], relation["start"], label="start")
-        space_graph.edge(relation["structure_id"], relation["end"], label="end")
+        relation_groups[relation["start"]][relation["end"]] += "\n" + link_label
+    for relation_group, relation_end_groups in relation_groups.items():
+        for relation_end_group, relation_labels in relation_end_groups.items():
+            space_graph.node(relation_labels, shape="rectangle")
+    for label_group, label_labels in label_groups.items():
+        space_graph.edge(label_labels, label_group, label="start")
+    for relation_group, relation_end_groups in relation_groups.items():
+        for relation_end_group, relation_labels in relation_end_groups.items():
+            space_graph.edge(relation_labels, relation_group, label="start")
+            space_graph.edge(relation_labels, relation_end_group, label="end")
     for letter_chunk in letter_chunks:
         for child in letter_chunk["right_branch"]:
             space_graph.edge(letter_chunk["structure_id"], child, label="right")
