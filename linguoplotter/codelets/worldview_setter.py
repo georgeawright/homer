@@ -202,14 +202,48 @@ class WorldviewSetter(Codelet):
             view_two.output_space.conceptual_spaces,
         )
         relations_by_space = {
-            space: same_and_less_relations.where(conceptual_space=space)
+            space: (
+                same_and_less_relations.where(
+                    conceptual_space=space,
+                    parent_concept=self.bubble_chamber.concepts["same"],
+                ),
+                same_and_less_relations.where(
+                    conceptual_space=space,
+                    parent_concept=self.bubble_chamber.concepts["less"],
+                ),
+            )
             for space in conceptual_spaces
         }
+        # pick either less or relations for each space, whichever is more
+        # shouldn't be a mixture between ordered and not ordered
         relation_quality_by_space = {
-            space: statistics.fmean([r.quality for r in relations])
-            for space, relations in relations_by_space.items()
-            if relations.not_empty
+            space: statistics.fmean([r.quality for r in same_relations])
+            if len(same_relations) > len(less_relations)
+            else (
+                statistics.fmean([r.quality for r in less_relations])
+                * len(StructureSet.union(*[r.arguments for r in less_relations]))
+                / len(
+                    StructureSet.union(
+                        *[
+                            r.start.parent_space.contents.filter(
+                                lambda x: x.is_chunk and x.has_location_in_space(space)
+                            )
+                            for r in less_relations
+                        ]
+                        + [
+                            r.end.parent_space.contents.filter(
+                                lambda x: x.is_chunk and x.has_location_in_space(space)
+                            )
+                            for r in less_relations
+                        ]
+                    )
+                )
+            )
+            for space, (same_relations, less_relations) in relations_by_space.items()
+            if same_relations.not_empty or less_relations.not_empty
         }
+        # for less relations divided by proportion of arguments covered by relations
+        # - favour full over partial ordering
         total_cohesion_quality = sum([q for s, q in relation_quality_by_space.items()])
         average_cohesion_quality = total_cohesion_quality / len(conceptual_spaces)
         return average_cohesion_quality
