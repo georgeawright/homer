@@ -61,6 +61,9 @@ class Publisher(Codelet):
         self.bubble_chamber.loggers["activity"].log("Worldview is not empty.")
         if self.bubble_chamber.focus.view is not None:
             self.bubble_chamber.loggers["activity"].log("Focus is not empty.")
+            self.bubble_chamber.concepts["publish"].decay_activation(
+                self.bubble_chamber.focus.view.salience
+            )
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return
@@ -76,6 +79,9 @@ class Publisher(Codelet):
         if satisfaction_gradient > 0 and self.bubble_chamber.random_machine.coin_flip():
             self.bubble_chamber.loggers["activity"].log(
                 "Satisfaction is increasing too much."
+            )
+            self.bubble_chamber.concepts["publish"].decay_activation(
+                satisfaction_gradient
             )
             self._fizzle()
             self.result = CodeletResult.FIZZLE

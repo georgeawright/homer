@@ -1,3 +1,5 @@
+import statistics
+
 from linguoplotter import fuzzy
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
@@ -11,7 +13,6 @@ from linguoplotter.structures import View
 
 
 class WorldviewSetter(Codelet):
-
     CORRECTNESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_CORRECTNESS_WEIGHT
     COMPLETENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COMPLETENESS_WEIGHT
     CONCISENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_CONCISENESS_WEIGHT
@@ -61,15 +62,16 @@ class WorldviewSetter(Codelet):
         return self.result
 
     def run_competition(self):
-        chosen_worldview = self.bubble_chamber.random_machine.select(
-            [self.bubble_chamber.worldview.view, self.targets["view"]],
-            key=self._calculate_satisfaction,
+        choices = {
+            view: self._calculate_satisfaction(view)
+            for view in [self.targets["view"], self.bubble_chamber.worldview.view]
+        }
+        winner = self.bubble_chamber.random_machine.select(
+            choices.keys(), key=lambda x: choices[x]
         )
-        self.bubble_chamber.worldview.satisfaction = self._calculate_satisfaction(
-            chosen_worldview
-        )
-        if chosen_worldview != self.bubble_chamber.worldview.view:
-            self.bubble_chamber.worldview.view = chosen_worldview
+        self.bubble_chamber.worldview.satisfaction = choices[winner]
+        if winner != self.bubble_chamber.worldview.view:
+            self.bubble_chamber.worldview.view = winner
             self.bubble_chamber.concepts["publish"].decay_activation(
                 self.bubble_chamber.general_satisfaction
             )
@@ -165,13 +167,49 @@ class WorldviewSetter(Codelet):
         return 1 + max([self._calculate_conciseness(v) for v in view.sub_views])
 
     def _calculate_cohesiveness(self, view: View) -> FloatBetweenOneAndZero:
-        cross_view_relations = view.parent_frame.cross_view_links.where(
-            is_relation=True
-        )
-        if cross_view_relations.is_empty:
+        # TODO: this needs to be generalised for recursive cohesion views
+        if view.parent_frame.cross_view_links.where(is_relation=True).is_empty:
             return 0.0
-        cohesion_correspondences = StructureSet.union(
-            *[r.correspondences for r in cross_view_relations]
+        space_one = (
+            view.parent_frame.cross_view_links.where(is_relation=True)
+            .get()
+            .correspondences.get()
+            .start.start.parent_space
         )
-        total_cohesion_quality = sum([c.quality for c in cohesion_correspondences])
-        return 1 - 0.5 ** total_cohesion_quality
+        view_one = view.sub_views.filter(
+            lambda x: space_one in (x.parent_frame.input_space, x.output_space)
+        ).get()
+        view_two = view.sub_views.excluding(view_one).get()
+        same_and_less_relations = StructureSet.union(
+            view_one.parent_frame.input_space.contents, view_one.output_space.contents
+        ).filter(
+            lambda x: x.is_relation
+            and x.is_cross_view
+            and x.parent_concept
+            in (
+                self.bubble_chamber.concepts["same"],
+                self.bubble_chamber.concepts["less"],
+            )
+            and (
+                x.end in view_two.parent_frame.input_space.contents
+                or x.end in view_two.output_space.contents
+            )
+        )
+        conceptual_spaces = StructureSet.union(
+            view_one.parent_frame.input_space.conceptual_spaces,
+            view_one.output_space.conceptual_spaces,
+            view_two.parent_frame.input_space.conceptual_spaces,
+            view_two.output_space.conceptual_spaces,
+        )
+        relations_by_space = {
+            space: same_and_less_relations.where(conceptual_space=space)
+            for space in conceptual_spaces
+        }
+        relation_quality_by_space = {
+            space: statistics.fmean([r.quality for r in relations])
+            for space, relations in relations_by_space.items()
+            if relations.not_empty
+        }
+        total_cohesion_quality = sum([q for s, q in relation_quality_by_space.items()])
+        average_cohesion_quality = total_cohesion_quality / len(conceptual_spaces)
+        return average_cohesion_quality
