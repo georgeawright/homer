@@ -186,6 +186,8 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             and (
                 x.parent_frame.parent_concept
                 == child_codelet.targets["sub_frame"].parent_concept
+                or x.parent_frame.parent_concept
+                in child_codelet.targets["sub_frame"].parent_concept.possible_instances
             )
             and (x.parent_frame.progenitor != target_view.parent_frame.progenitor)
             and (x.input_spaces == target_view.input_spaces)

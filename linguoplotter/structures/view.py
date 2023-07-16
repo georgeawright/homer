@@ -379,8 +379,25 @@ class View(Structure):
         for view in self.super_views:
             view.specify_space(abstract_space, conceptual_space)
 
-    def add(self, correspondence: "Correspondence"):
+    def add(self, correspondence: "Correspondence", verbose: bool = False):
         self.members.add(correspondence)
+        # If connecting a relation with one argument, merge arguments of correspondees
+        if (
+            correspondence.start.is_relation
+            and len(correspondence.start.arguments) == 1
+            and len(correspondence.end.arguments) > 1
+        ):
+            old_end = correspondence.end.end
+            for link in old_end.links_out:
+                link.start = correspondence.end.start
+                link.arguments.remove(old_end)
+                link.arguments.add(correspondence.end.start)
+                correspondence.end.start.links_out.add(link)
+            for link in old_end.links_in:
+                link.end = correspondence.end.start
+                link.arguments.remove(old_end)
+                correspondence.end.start.links_in.add(link)
+            old_end.parent_space.contents.remove(old_end)
         for node_pair in correspondence.node_pairs:
             for node_group in self._node_groups:
                 if (

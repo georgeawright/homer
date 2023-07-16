@@ -149,6 +149,13 @@
     :instance_type LetterChunk :structure_type Label :parent_space grammar-space
     :depth 2 :distance_function boolean_distance
     :distance_to_proximity_weight grammar-distance-to-proximity))
+(define pp-time-concept
+  (def-concept :name "pp-time" :locations (list pp-location)
+    :classifier (ProximityClassifier)
+    :instance_type LetterChunk :structure_type Label :parent_space grammar-space
+    :possible_instances (StructureSet pp-inessive-time-concept pp-directional-time-concept)
+    :depth 2 :distance_function boolean_distance
+    :distance_to_proximity_weight grammar-distance-to-proximity))
 (define nn-concept
   (def-concept :name "nn" :locations (list nn-location)
     :classifier (ProximityClassifier)

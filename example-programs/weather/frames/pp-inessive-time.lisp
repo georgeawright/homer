@@ -20,8 +20,14 @@
   (def-chunk :locations (list (Location (list (list Nan)) time-space)
 			      (Location (list) pp-inessive-time-input))
     :parent_space pp-inessive-time-input))
-(setattr pp-inessive-time "early_chunk" chunk)
-(setattr pp-inessive-time "late_chunk" chunk)
+(define time-relation
+  (def-relation :start chunk :end chunk :parent_concept same-concept
+    :quality 1.0
+    :locations (list (Location (list (list Nan)) same-different-space)
+		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
+		     (TwoPointLocation (list) (list) pp-inessive-time-input))
+    :parent_space pp-inessive-time-input
+    :conceptual_space time-space))
 (define chunk-time-label
   (def-label :start chunk :parent_concept time-label-concept
     :locations (list (Location (list (list Nan)) time-space)

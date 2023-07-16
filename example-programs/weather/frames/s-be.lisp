@@ -8,6 +8,15 @@
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
+(define time-relation-space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define time-relation-space
+  (def-conceptual-space :name "" :parent_concept time-relation-space-parent-concept
+    :possible_instances (StructureSet more-less-space same-different-space)
+    :no_of_dimensions 1))
+(define time-relation-concept
+  (def-concept :name "" :is_slot True :parent_space time-relation-space
+    :possible_instances (StructureSet less-concept same-concept)))
  
 (define description-sub-frame-input
   (def-contextual-space :name "description-sub-frame.input" :parent_concept input-concept
@@ -45,10 +54,10 @@
     :conceptual_spaces (StructureSet string-space grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-be-time-sub"
-    :parent_concept pp-directional-time-concept
+    :parent_concept pp-time-concept
     :parent_frame None
     :sub_frames (StructureSet)
-    :concepts (StructureSet)
+    :concepts (StructureSet time-relation-concept)
     :input_space time-sub-frame-input
     :output_space time-sub-frame-output))
 
@@ -97,9 +106,9 @@
     :parent_space location-sub-frame-input))
 
 (define time-relation
-  (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
+  (def-relation :start early-chunk :end late-chunk :parent_concept time-relation-concept
     :quality 1.0
-    :locations (list (Location (list (list Nan)) more-less-space)
+    :locations (list (Location (list (list Nan)) time-relation-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) time-sub-frame-input)
 		     (TwoPointLocation (list) (list) be-sentence-input))
@@ -171,10 +180,6 @@
 		     (Location (list) time-sub-frame-output)
 		     (Location (list) be-sentence-output))
     :parent_space time-sub-frame-output))
-(define time-chunk-grammar-label
-  (def-label :start sentence-word-6 :parent_concept pp-directional-time-concept
-    :locations (list pp-location
-		     (Location (list) time-sub-frame-output))))
 
 (define v-super-chunk
   (def-letter-chunk :name None

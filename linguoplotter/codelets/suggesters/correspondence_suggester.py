@@ -6,7 +6,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collection_keys import corresponding_salience, salience
-from linguoplotter.structure_collections import StructureDict
+from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structures import View
 
 
@@ -69,18 +69,21 @@ class CorrespondenceSuggester(Suggester):
             end = input_structures.where(is_relation=True).get()
         elif input_structures.where(is_label=True).not_empty:
             end = input_structures.where(is_label=True).get()
-        elif input_structures.where(is_chunk=True).not_empty:
-            end = input_structures.where(is_chunk=True).get()
         elif output_structures.where(is_relation=True).not_empty:
             end = output_structures.where(is_relation=True).get()
         elif output_structures.where(is_label=True).not_empty:
             end = output_structures.where(is_label=True).get()
-        elif output_structures.where(is_chunk=True).not_empty:
-            end = output_structures.where(is_chunk=True).get()
         else:
             raise MissingStructureError
         possible_target_spaces = end.parent_spaces.filter(
             lambda s: s.is_contextual_space
+            and (
+                end.correspondences.is_empty
+                or s
+                not in StructureSet.union(
+                    *[c.parent_spaces for c in end.correspondences]
+                )
+            )
         )
         if len(possible_target_spaces) == 1:
             target_space_two = possible_target_spaces.get()

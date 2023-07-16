@@ -272,8 +272,7 @@ class ViewDrivenFactory(Factory):
                     (a, b)
                     for a in potential_targets
                     for b in potential_targets
-                    if a != b
-                    and (a == target_start if target_start is not None else True)
+                    if (a == target_start if target_start is not None else True)
                     and (b == target_end if target_end is not None else True)
                 ]
             if not self.targets["slot"].parent_concept.is_slot:
@@ -922,6 +921,7 @@ class ViewDrivenFactory(Factory):
         frame = self.bubble_chamber.frames.where(
             is_sub_frame=False,
             parent_concept=sub_frame.parent_concept,
+            # or parent_concept in sub_frame.parent_concept.possible_instances
         ).get(key=activation)
         self.bubble_chamber.loggers["activity"].log(f"Found target frame: {frame}")
         urgency = self.targets["view"].unhappiness
