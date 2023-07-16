@@ -292,6 +292,7 @@ class ViewDrivenFactory(Factory):
                     )
                     for concept in space.contents.filter(
                         lambda x: x.is_concept
+                        and x.structure_type == Relation
                         and not x.is_slot
                         and (not x.is_compound_concept or x.args[0].is_fully_active())
                     )

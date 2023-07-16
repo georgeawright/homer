@@ -12,6 +12,7 @@
     :locations (list (Location (list) more-less-space))))
 (def-relation :start label-parent-concept :end relation-parent-concept
   :parent_concept more-concept :activation 1.0)
+
 (define rp-input
   (def-contextual-space :name "rp[jjr].meaning" :parent_concept input-concept
     :conceptual_spaces (StructureSet conceptual-space)))
@@ -24,6 +25,7 @@
     :sub_frames (StructureSet)
     :concepts (StructureSet label-parent-concept relation-parent-concept)
     :input_space rp-input :output_space rp-output))
+
 (define chunk-start
   (def-chunk :locations (list (Location (list (list Nan)) conceptual-space)
 			      (Location (list) rp-input))
@@ -42,6 +44,7 @@
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-input))
     :conceptual_space conceptual-space))
+
 (define jjr-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) conceptual-space)
@@ -79,17 +82,9 @@
     :locations (list rp-location
 		     (Location (list) rp-output))))
 
-(def-relation :start label-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start relation-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jj-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jjr-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start rp-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
+(def-relation :start more-temperature-concept :end rp-frame
+  :is_bidirectional True :stable_activation 1.0)
+(def-relation :start more-height-concept :end rp-frame
+  :is_bidirectional True :stable_activation 1.0)
+(def-relation :start more-goodness-concept :end rp-frame
+  :is_bidirectional True :stable_activation 1.0)

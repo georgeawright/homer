@@ -15,6 +15,7 @@
 (load "conceptual-spaces/time.lisp")
 
 (load "frames/ap-jj.lisp")
+(load "frames/rp-jjr.lisp")
 
 (load "frames/pp-inessive-time.lisp")
 (load "frames/pp-between-times.lisp")
@@ -24,6 +25,7 @@
 (load "frames/pp-from-wards-locations.lisp")
 
 (load "frames/s-be.lisp")
+(load "frames/s-comparative.lisp")
 (load "frames/s-increase.lisp")
 (load "frames/s-expand.lisp")
 (load "frames/s-move.lisp")

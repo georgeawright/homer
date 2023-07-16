@@ -132,9 +132,6 @@ class ContextualSpace(Space):
                 new_item.parent_spaces.add(new_location.space)
                 new_location.space.add(new_item)
         for item in self.contents.filter(lambda x: x.is_node and x not in copies):
-            if parent_id == "ViewBuilder109":
-                print(item)
-                print(item.labels)
             new_location = Location(item.location_in_space(self).coordinates, new_space)
             new_item, copies = item.copy_with_contents(
                 copies=copies,

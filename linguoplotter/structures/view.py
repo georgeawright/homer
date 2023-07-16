@@ -393,10 +393,18 @@ class View(Structure):
                 link.arguments.remove(old_end)
                 link.arguments.add(correspondence.end.start)
                 correspondence.end.start.links_out.add(link)
+                if link.is_relation and link.parent_concept.is_slot:
+                    link._parent_concept = (
+                        link.parent_concept.possible_instances.where(name="same")
+                    ).get()
             for link in old_end.links_in:
                 link.end = correspondence.end.start
                 link.arguments.remove(old_end)
                 correspondence.end.start.links_in.add(link)
+                if link.is_relation and link.parent_concept.is_slot:
+                    link._parent_concept = (
+                        link.parent_concept.possible_instances.where(name="same")
+                    ).get()
             old_end.parent_space.contents.remove(old_end)
         for node_pair in correspondence.node_pairs:
             for node_group in self._node_groups:
@@ -533,6 +541,13 @@ class View(Structure):
             if verbose:
                 print(end.correspondences)
                 print("1.1")
+            return False
+        if (
+            end.is_relation
+            and len(start.arguments) == 1
+            and end.parent_concept.possible_instances.where(name="same").is_empty
+            and end.parent_concept.name != "same"
+        ):
             return False
         if (
             start.is_link

@@ -44,6 +44,7 @@ class ViewSuggester(Suggester):
         urgency: float = None,
     ):
         if frame is not None:
+            frame = frame.progenitor
             contextual_space = bubble_chamber.input_spaces.get(key=activation)
             targets = bubble_chamber.new_dict(
                 {"frame": frame, "contextual_space": contextual_space}, name="targets"
@@ -95,7 +96,7 @@ class BottomUpViewSuggester(ViewSuggester):
             f"Number of equivalent views: {number_of_equivalent_views}"
         )
         self.confidence = (
-            self.targets["frame"].activation * 0.5 ** number_of_equivalent_views
+            self.targets["frame"].activation * 0.5**number_of_equivalent_views
         )
 
 
@@ -148,6 +149,6 @@ class TopDownViewSuggester(ViewSuggester):
             f"Number of equivalent views: {number_of_equivalent_views}"
         )
         self.confidence = (
-            self.targets["frame"].activation * 0.5 ** number_of_equivalent_views
+            self.targets["frame"].activation * 0.5**number_of_equivalent_views
         )
         self.confidence = statistics.fmean([self.confidence, self.urgency])
