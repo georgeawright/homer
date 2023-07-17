@@ -545,8 +545,15 @@ class View(Structure):
         if (
             end.is_relation
             and len(start.arguments) == 1
-            and end.parent_concept.possible_instances.where(name="same").is_empty
-            and end.parent_concept.name != "same"
+            and any(
+                [
+                    r.parent_concept.possible_instances.where(name="same").is_empty
+                    and r.parent_concept.name != "same"
+                    for r in StructureSet.intersection(
+                        end.start.relations, end.end.relations
+                    )
+                ]
+            )
         ):
             return False
         if (

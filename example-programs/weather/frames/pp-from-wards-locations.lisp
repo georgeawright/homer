@@ -23,6 +23,12 @@
   (def-concept :name "" :is_slot True :parent_space time-space))
 (define late-time-concept
   (def-concept :name "" :is_slot True :parent_space time-space))
+(define similarity-space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define similarity-space
+  (def-conceptual-space :name "" :parent_concept similarity-space-parent-concept
+    :possible_instances (StructureSet temperature-space height-space goodness-space size-space)
+    :no_of_dimensions Nan))
 
 (define pp-from-wards-locations-input
   (def-contextual-space :name "pp[from-wards-locations].meaning" :parent_concept input-concept
@@ -82,6 +88,13 @@
 		      (list (list Nan)) (list (list Nan)) unidimensional-location-space)
 		     (TwoPointLocation (list) (list) pp-from-wards-locations-input))
     :conceptual_space unidimensional-location-space))
+(define sameness-relation
+  (def-relation :start early-chunk :end late-chunk :parent_concept same-concept
+    :quality 1.0
+    :locations (list (Location (list (list Nan)) same-different-space)
+		     (TwoPointLocation (list (list)) (list (list)) similarity-space)
+		     (TwoPointLocation (list (list)) (list (list)) pp-from-wards-locations-input))
+    :conceptual_space similarity-space))
 
 (define pp-word-1
   (def-letter-chunk :name "from"

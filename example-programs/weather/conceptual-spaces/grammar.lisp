@@ -271,6 +271,9 @@
 (define on
   (def-letter-chunk :name "on" :parent_space grammar-space
     :locations (list prep-location)))
+(define across
+  (def-letter-chunk :name "across" :parent_space grammar-space
+    :locations (list prep-location)))
 (define from
   (def-letter-chunk :name "from" :parent_space grammar-space
     :locations (list prep-location)))

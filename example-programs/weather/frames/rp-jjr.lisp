@@ -12,6 +12,12 @@
     :locations (list (Location (list) more-less-space))))
 (def-relation :start label-parent-concept :end relation-parent-concept
   :parent_concept more-concept :activation 1.0)
+(define similarity-space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define similarity-space
+  (def-conceptual-space :name "" :parent_concept similarity-space-parent-concept
+    :possible_instances (StructureSet time-space location-space)
+    :no_of_dimensions Nan))
 
 (define rp-input
   (def-contextual-space :name "rp[jjr].meaning" :parent_concept input-concept
@@ -38,12 +44,20 @@
   (def-label :start chunk-start :parent_concept label-parent-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) rp-input))))
-(define relation
+(define comparative-relation
   (def-relation :start chunk-start :end chunk-end :parent_concept relation-parent-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-input))
     :conceptual_space conceptual-space))
+(define sameness-relation
+  (def-relation :start chunk-start :end chunk-end :parent_concept same-concept
+    :quality 1.0
+    :locations (list (Location (list (list Nan)) same-different-space)
+		     (TwoPointLocation (list (list)) (list (list)) similarity-space)
+		     (TwoPointLocation (list (list)) (list (list)) rp-input))
+    :conceptual_space similarity-space))
 
 (define jjr-chunk
   (def-letter-chunk :name None

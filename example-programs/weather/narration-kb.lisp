@@ -21,6 +21,7 @@
 (load "frames/pp-between-times.lisp")
 
 (load "frames/pp-inessive-location.lisp")
+(load "frames/pp-across-location.lisp")
 (load "frames/pp-from-to-different-locations.lisp")
 (load "frames/pp-from-wards-locations.lisp")
 
