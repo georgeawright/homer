@@ -55,15 +55,19 @@ class BottomUpSuggesterFactory(BottomUpFactory):
         )
 
         class_urgencies = [
-            (ChunkSuggester, input_unchunkedness),
-            (LabelSuggester, input_unlabeledness),
-            (RelationSuggester, input_unrelatedness),
-            (ViewSuggester, input_uncorrespondedness),
-            (CorrespondenceSuggester, frames_unfilledness),
-            (BottomUpCohesionViewSuggester, cross_view_uncorrespondedness),
-            (CrossViewLabelSuggester, text_unrelatedness),
-            (CrossViewRelationSuggester, text_unrelatedness),
-            (MergedFrameViewSuggester, view_unmergedness),
+            (codelet_type, urgency)
+            for codelet_type, urgency in [
+                (ChunkSuggester, input_unchunkedness),
+                (LabelSuggester, input_unlabeledness),
+                (RelationSuggester, input_unrelatedness),
+                (ViewSuggester, input_uncorrespondedness),
+                (CorrespondenceSuggester, frames_unfilledness),
+                (BottomUpCohesionViewSuggester, cross_view_uncorrespondedness),
+                (CrossViewLabelSuggester, text_unrelatedness),
+                (CrossViewRelationSuggester, text_unrelatedness),
+                (MergedFrameViewSuggester, view_unmergedness),
+            ]
+            if urgency > float("-inf")
         ]
 
         follow_up_class = self.bubble_chamber.random_machine.select(

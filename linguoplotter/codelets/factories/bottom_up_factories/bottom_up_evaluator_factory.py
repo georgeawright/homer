@@ -44,12 +44,16 @@ class BottomUpEvaluatorFactory(BottomUpFactory):
             f"Cross label competition: {cross_view_label_competition}",
         )
         class_urgencies = [
-            (ChunkEvaluator, chunk_competition),
-            (LabelEvaluator, label_competition),
-            (RelationEvaluator, relation_competition),
-            (ViewEvaluator, view_competition),
-            (CrossViewRelationEvaluator, cross_view_relation_competition),
-            (CrossViewLabelEvaluator, cross_view_label_competition),
+            (codelet_type, urgency)
+            for codelet_type, urgency in [
+                (ChunkEvaluator, chunk_competition),
+                (LabelEvaluator, label_competition),
+                (RelationEvaluator, relation_competition),
+                (ViewEvaluator, view_competition),
+                (CrossViewRelationEvaluator, cross_view_relation_competition),
+                (CrossViewLabelEvaluator, cross_view_label_competition),
+            ]
+            if urgency > float("-inf")
         ]
         follow_up_class = self.bubble_chamber.random_machine.select(
             class_urgencies, key=lambda x: x[1]
