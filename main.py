@@ -1,7 +1,10 @@
 import csv
 import json
 import os
+import statistics
 import time
+
+from rouge_score.rouge_scorer import RougeScorer
 
 from linguoplotter import Linguoplotter
 from linguoplotter.loggers import (
@@ -78,6 +81,7 @@ for i in random_seeds:
         narrator.interpreter.interpret_file(program_file)
         os.chdir("../..")
         result = narrator.run()
+        result["Program"] = program_file
         iteration_end_time = time.time()
         results.append(result)
         with open(f"{logs_dir_path}/details.txt", "w") as f:
@@ -95,3 +99,23 @@ end_time = time.time()
 print(results)
 run_length = end_time - start_time
 print(run_length)
+
+# calculate string and tree similarity and output to a statistics file
+rouge_scorer = RougeScorer(["rougeL"], use_stemmer=True)
+results_stats = {program_file: {} for program_file in program_files}
+for program_file in program_files:
+    program_results = [r for r in results if r["Program"] == program_file]
+    texts = [r["result"] for r in program_results]
+    results_stats[program_file]["mean_satisfaction"] = statistics.fmean(
+        [r["satisfaction"] for r in program_results]
+    )
+    results_stats[program_file]["mean_pairwise_rouge"] = statistics.fmean(
+        [
+            rouge_scorer.score(texts[i], texts[j])["rougeL"].fmeasure
+            for i in range(len(texts))
+            for j in range(len(texts))
+            if j > i
+        ]
+    )
+with open(f"{pwd}/logs/stats.txt", "w") as f:
+    f.write(json.dumps(results_stats))

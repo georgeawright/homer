@@ -2,9 +2,13 @@ var fs = require('fs');
 var tools = require('./tools');
 
 exports.run = function(query) {
+    stats = JSON.parse(fs.readFileSync("logs/stats.txt"));
     programs_results = {};
     directories = [];
     fs.readdirSync('logs/').forEach(directory => {
+	if (directory == "stats.txt") {
+	    return;
+	}
 	directories.push(directory);
 	details_file = `logs/${directory}/details.txt`;
 	details = JSON.parse(fs.readFileSync(details_file));
@@ -76,9 +80,13 @@ exports.run = function(query) {
 	program_name = program.split(".")[0];
 	graph_file_name = `maps/${program_name}.svg`;
 	graph_svg = fs.readFileSync(graph_file_name);
+	program_stats = stats[program];
+	mean_rouge = program_stats["mean_pairwise_rouge"];
+	mean_satisfaction = program_stats["mean_statisfaction"];
 	doc += `
       <h3>${program_name}</h3>
       <object type="image/svg+xml" with="50%">${graph_svg}</object>
+      <p>Mean pairwise rouge: ${mean_rouge}</p>
       <table>
         <tr>
           <th style="width:30%">Output Text</th>
