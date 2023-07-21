@@ -2,6 +2,8 @@ from __future__ import annotations
 import statistics
 from typing import List
 
+import zss
+
 from linguoplotter import fuzzy
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -100,6 +102,42 @@ class View(Structure):
             "unhappiness": self.unhappiness,
             "output": self.output,
         }
+
+    def to_zss_tree(self) -> zss.Node:
+        root = zss.Node(self.parent_frame.progenitor.name)
+        args = []
+        for frame in self.parent_frame.sub_frames:
+            if frame not in self.matched_sub_frames:
+                continue
+            args.append(
+                self.sub_views.where(parent_frame=self.matched_sub_frames[frame])
+                .get()
+                .to_zss_tree()
+            )
+        if len(self.parent_frame.sub_frames) == 0:
+            content_words = [
+                w.name
+                for w in self.output_space.contents.filter(
+                    lambda x: x.is_letter_chunk
+                    and x.parent_spaces.filter(
+                        lambda s: s in self.parent_frame.input_space.conceptual_spaces
+                    ).not_empty
+                )
+            ]
+            previous_word_is_not = False
+            for word in self.output.split(" "):
+                if word in content_words:
+                    if previous_word_is_not:
+                        args.append(zss.Node(f"not {word}"))
+                    else:
+                        args.append(zss.Node(word))
+                if word == "not":
+                    previous_word_is_not = True
+                else:
+                    previous_word_is_not = False
+        for arg in args:
+            root.addkid(arg)
+        return root
 
     @classmethod
     def get_builder_class(cls):

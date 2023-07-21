@@ -2,7 +2,11 @@ var fs = require('fs');
 var tools = require('./tools');
 
 exports.run = function(query) {
-    stats = JSON.parse(fs.readFileSync("logs/stats.txt"));
+    try {
+	stats = JSON.parse(fs.readFileSync("logs/stats.txt"));
+    } catch (err) {
+	stats = {};
+    }
     programs_results = {};
     directories = [];
     fs.readdirSync('logs/').forEach(directory => {
@@ -81,12 +85,30 @@ exports.run = function(query) {
 	graph_file_name = `maps/${program_name}.svg`;
 	graph_svg = fs.readFileSync(graph_file_name);
 	program_stats = stats[program];
-	mean_rouge = program_stats["mean_pairwise_rouge"];
-	mean_satisfaction = program_stats["mean_statisfaction"];
+	try {
+	    mean_satisfaction = program_stats["mean_satisfaction"];
+	    mean_rouge = program_stats["mean_pairwise_rouge"];
+	    mean_zss = program_stats["mean_pairwise_zss"];
+	    median_satisfaction = program_stats["median_satisfaction"];
+	    median_rouge = program_stats["median_pairwise_rouge"];
+	    median_zss = program_stats["median_pairwise_zss"];
+	} catch(err) {
+	    mean_satisfaction = undefined;
+	    mean_rouge = undefined;
+	    mean_zss = undefined;
+	    median_satisfaction = undefined;
+	    median_rouge = undefined;
+	    median_zss = undefined;
+	}
 	doc += `
       <h3>${program_name}</h3>
       <object type="image/svg+xml" with="50%">${graph_svg}</object>
-      <p>Mean pairwise rouge: ${mean_rouge}</p>
+      <p>Mean satisfaction: ${mean_satisfaction};
+         Mean pairwise rouge: ${mean_rouge};
+         Mean pairwise ZSS: ${mean_zss}</p>
+      <p>Median satisfaction: ${median_satisfaction};
+         Median pairwise rouge: ${median_rouge};
+         Median pairwise ZSS: ${median_zss}</p>
       <table>
         <tr>
           <th style="width:30%">Output Text</th>

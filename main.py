@@ -5,6 +5,7 @@ import statistics
 import time
 
 from rouge_score.rouge_scorer import RougeScorer
+import zss
 
 from linguoplotter import Linguoplotter
 from linguoplotter.loggers import (
@@ -94,6 +95,8 @@ for i in random_seeds:
             writer.writeheader()
             for codelet_time in narrator.coderack.codelet_times:
                 writer.writerow(codelet_time)
+        if result["result"] is not None:
+            result["tree"] = narrator.bubble_chamber.worldview.view.to_zss_tree()
 
 end_time = time.time()
 print(results)
@@ -105,17 +108,45 @@ rouge_scorer = RougeScorer(["rougeL"], use_stemmer=True)
 results_stats = {program_file: {} for program_file in program_files}
 for program_file in program_files:
     program_results = [r for r in results if r["Program"] == program_file]
-    texts = [r["result"] for r in program_results]
+    texts = [r["result"] for r in program_results if r["result"] is not None]
+    trees = [r["tree"] for r in program_results if r["result"] is not None]
     results_stats[program_file]["mean_satisfaction"] = statistics.fmean(
         [r["satisfaction"] for r in program_results]
     )
-    results_stats[program_file]["mean_pairwise_rouge"] = statistics.fmean(
-        [
+    results_stats[program_file]["median_satisfaction"] = statistics.median(
+        [r["satisfaction"] for r in program_results]
+    )
+    try:
+        rouge_scores = [
             rouge_scorer.score(texts[i], texts[j])["rougeL"].fmeasure
             for i in range(len(texts))
             for j in range(len(texts))
             if j > i
         ]
-    )
+        results_stats[program_file]["mean_pairwise_rouge"] = statistics.fmean(
+            rouge_scores,
+        )
+        results_stats[program_file]["median_pairwise_rouge"] = statistics.median(
+            rouge_scores,
+        )
+    except statistics.StatisticsError:
+        results_stats[program_file]["mean_pairwise_rouge"] = None
+        results_stats[program_file]["median_pairwise_rouge"] = None
+    try:
+        zss_scores = [
+            zss.simple_distance(trees[i], trees[j])
+            for i in range(len(trees))
+            for j in range(len(trees))
+            if j > i
+        ]
+        results_stats[program_file]["mean_pairwise_zss"] = statistics.fmean(
+            zss_scores,
+        )
+        results_stats[program_file]["median_pairwise_zss"] = statistics.median(
+            zss_scores,
+        )
+    except statistics.StatisticsError:
+        results_stats[program_file]["mean_pairwise_zss"] = None
+        results_stats[program_file]["median_pairwise_zss"] = None
 with open(f"{pwd}/logs/stats.txt", "w") as f:
     f.write(json.dumps(results_stats))
