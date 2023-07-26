@@ -41,6 +41,12 @@ for i in random_seeds:
         with open(f"{logs_dir_path}/details.txt", "w") as f:
             run_details = {"Program": program_file, "random_seed": i}
             f.write(json.dumps(run_details))
+        with open(
+            "linguoplotter/hyper_parameters.py", "r"
+        ) as hyper_parameters_file, open(
+            f"{logs_dir_path}/hyper_parameters.py", "w"
+        ) as f:
+            f.write(hyper_parameters_file.read())
         error_file_name = f"{logs_dir_path}/errors.log"
         error_stream = open(error_file_name, "w")
         if DEVELOPMENT:
