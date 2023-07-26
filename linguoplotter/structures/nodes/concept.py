@@ -155,27 +155,21 @@ class Concept(Node):
     def distance_from(self, other: Node, return_nan: bool = False):
         try:
             return self.distance_function(
-                self.location_in_space(self.parent_basic_space).coordinates,
-                other.location_in_space(self.parent_basic_space).coordinates,
+                self.location_in_space(self.parent_space).coordinates,
+                other.location_in_space(self.parent_space).coordinates,
                 return_nan=return_nan,
             )
         except NotImplementedError:
             return statistics.mean(
                 [
                     self.distance_function(
-                        self.location_in_space(
-                            self.parent_basic_space
-                        ).start_coordinates,
-                        other.location_in_space(
-                            self.parent_basic_space
-                        ).start_coordinates,
+                        self.location_in_space(self.parent_space).start_coordinates,
+                        other.location_in_space(self.parent_space).start_coordinates,
                         return_nan=return_nan,
                     ),
                     self.distance_function(
-                        self.location_in_space(self.parent_basic_space).end_coordinates,
-                        other.location_in_space(
-                            self.parent_basic_space
-                        ).end_coordinates,
+                        self.location_in_space(self.parent_space).end_coordinates,
+                        other.location_in_space(self.parent_space).end_coordinates,
                         return_nan=return_nan,
                     ),
                 ]
@@ -186,7 +180,7 @@ class Concept(Node):
                 if location.space.is_conceptual_space:
                     try:
                         new_location = (
-                            self.parent_basic_space.location_from_super_space_location(
+                            self.parent_space.location_from_super_space_location(
                                 location
                             )
                         )
