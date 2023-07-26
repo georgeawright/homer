@@ -158,13 +158,7 @@ class WorldviewSetter(Codelet):
         return proportion
 
     def _calculate_conciseness(self, view: View) -> FloatBetweenOneAndZero:
-        if view.parent_frame.parent_concept.location_in_space(
-            self.bubble_chamber.spaces["grammar"]
-        ) != self.bubble_chamber.concepts["sentence"].location_in_space(
-            self.bubble_chamber.spaces["grammar"]
-        ):
-            return 0
-        return 1 + max([self._calculate_conciseness(v) for v in view.sub_views])
+        return FloatBetweenOneAndZero(len(view.raw_input_nodes) / len(view.output))
 
     def _calculate_cohesiveness(self, view: View) -> FloatBetweenOneAndZero:
         # TODO: this needs to be generalised for recursive cohesion views
