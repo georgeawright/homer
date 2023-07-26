@@ -139,7 +139,7 @@ class TopDownViewSuggester(ViewSuggester):
             self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
                 == self.targets["frame"].parent_concept
-                and x.unhappiness > self.FLOATING_POINT_TOLERANCE
+                and x.salience > self.FLOATING_POINT_TOLERANCE
             )
         )  # these views should be completed or deleted before more are built
         self.bubble_chamber.loggers["activity"].log(
