@@ -288,7 +288,6 @@ class CorrespondenceSuggester(Suggester):
                 and any(
                     [
                         target_end.parent_concept.subsumes(x.parent_concept),
-                        target_end.parent_concept.is_slot,
                         (
                             x.parent_concept.is_compound_concept
                             and x.parent_concept.args[0] == target_end.parent_concept
