@@ -55,6 +55,7 @@ class Publisher(Codelet):
     def run(self) -> CodeletResult:
         if self.bubble_chamber.worldview.view is None:
             self.bubble_chamber.loggers["activity"].log("Worldview is empty.")
+            self._update_bottom_up_factories_urgencies()
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return
@@ -64,6 +65,7 @@ class Publisher(Codelet):
             self.bubble_chamber.concepts["publish"].decay_activation(
                 self.bubble_chamber.focus.view.salience
             )
+            self._update_focus_codelet_urgencies()
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return
@@ -114,7 +116,6 @@ class Publisher(Codelet):
         self.result = CodeletResult.FINISH
 
     def _fizzle(self) -> CodeletResult:
-        self._update_bottom_up_factories_urgencies()
         urgency = (
             fuzzy.OR(self.bubble_chamber.worldview.satisfaction, self.urgency)
             if self.last_satisfaction <= self.bubble_chamber.general_satisfaction
@@ -140,5 +141,8 @@ class Publisher(Codelet):
                 or "BottomUpEvaluatorFactory" in codelet.codelet_id
             ):
                 codelet.adjust_urgency(1.0 - self.bubble_chamber.worldview.satisfaction)
+
+    def _update_focus_codelet_urgencies(self):
+        for codelet in self.coderack._codelets:
             if "Focus" in codelet.codelet_id:
                 codelet.adjust_urgency(1.0 - self.bubble_chamber.worldview.satisfaction)
