@@ -256,6 +256,8 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     )
                     and x.start.quality * x.start.activation > 0
                     and x.quality * x.activation > 0
+                    and x.uncorrespondedness
+                    > bubble_chamber.random_machine.generate_number()
                     and child_codelet.targets["space"].subsumes(
                         x.parent_concept.parent_and_super_spaces
                     )

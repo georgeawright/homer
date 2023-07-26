@@ -292,6 +292,8 @@ class CrossViewCorrespondenceSuggester(CorrespondenceSuggester):
             matching_relations = source_collection.filter(
                 lambda x: x.is_relation
                 and x.quality > 0
+                and x.uncorrespondedness
+                > bubble_chamber.random_machine.generate_number()
                 and x.start in potential_start_targets
                 and x.end in potential_end_targets
                 and any(
@@ -454,6 +456,8 @@ class CrossViewCorrespondenceSuggester(CorrespondenceSuggester):
                 and x.correspondences.filter(
                     lambda c: c in target_view.members
                 ).is_empty
+                and x.uncorrespondedness
+                > bubble_chamber.random_machine.generate_number()
                 and x.quality > 0
                 and x.start in potential_start_targets
                 and x.parent_concept == target_end.parent_concept
