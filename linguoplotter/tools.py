@@ -3,6 +3,13 @@ import statistics
 from typing import Iterable, List, Union
 
 
+def generalized_mean(values: list, weights: list, exponent: float, tolerance: float):
+    return (
+        sum([w * (v + tolerance) ** exponent for w, v in zip(weights, values)])
+        / sum(weights)
+    ) ** (1 / exponent)
+
+
 def shortest_distance(a, b, return_nan: bool = False) -> float:
     nan_return_value = math.nan if return_nan else 0.0
     distance = min([math.dist(a_point, b_point) for a_point in a for b_point in b])

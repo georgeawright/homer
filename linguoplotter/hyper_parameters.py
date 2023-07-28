@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from .tools import generalized_mean
+
 
 class HyperParameters:
     FLOATING_POINT_TOLERANCE = 1e-5
@@ -18,16 +20,10 @@ class HyperParameters:
     MAXIMUM_DETERMINISM = 0.9
     MINIMUM_DETERMINISM = 0.3
 
-    a = 0.9
+    a = 1.0
     b = 0.0
     c = 0.00005
     d = 0.0
-
-    # some alternative weights:
-    # a = 0.7
-    # b = 25.0
-    # c = 0.0
-    # d = 0.1
 
     DETERMINISM_SMOOTHING_FUNCTION = (
         lambda satisfaction, change_in_satisfaction, time_since_last_improvement: min(
@@ -61,11 +57,14 @@ class HyperParameters:
     RELATION_QUALITY_TIME_WEIGHT = 0.0
 
     # Accuracy:
-    WORLDVIEW_QUALITY_CORRECTNESS_WEIGHT = 0.25  # relationships between input and text
-    WORLDVIEW_QUALITY_COMPLETENESS_WEIGHT = 0.15  # size of input
+    WORLDVIEW_QUALITY_CORRECTNESS_WEIGHT = 0.25  # relations between input and text
+    WORLDVIEW_QUALITY_COMPLETENESS_WEIGHT = 0.25  # size of input
     # Quality:
-    WORLDVIEW_QUALITY_COHESION_WEIGHT = 0.6  # relationships within text
-    WORLDVIEW_QUALITY_CONCISENESS_WEIGHT = 0.0  # size of text
+    WORLDVIEW_QUALITY_COHESIVENESS_WEIGHT = 0.25  # relations within text
+    WORLDVIEW_QUALITY_CONCISENESS_WEIGHT = 0.25  # size of output
+
+    # infinity = max, 1 = arithmetic, 0 = geometric, -1 = harmonic, -infinity = min
+    WORLDVIEW_QUALITY_EXPONENT = -1
 
     BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT = 0.4
     BUBBLE_CHAMBER_SATISFACTION_VIEW_QUALITIES_WEIGHT = 0.2

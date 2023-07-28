@@ -10,13 +10,15 @@ from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structures import View
+from linguoplotter.tools import generalized_mean
 
 
 class WorldviewSetter(Codelet):
     CORRECTNESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_CORRECTNESS_WEIGHT
     COMPLETENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COMPLETENESS_WEIGHT
+    COHESIVENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COHESIVENESS_WEIGHT
     CONCISENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_CONCISENESS_WEIGHT
-    COHESIVENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_COHESION_WEIGHT
+    QUALITY_EXPONENT = HyperParameters.WORLDVIEW_QUALITY_EXPONENT
 
     def __init__(
         self,
@@ -111,23 +113,31 @@ class WorldviewSetter(Codelet):
             return 0.0
         correctness = self._calculate_correctness(view)
         completeness = self._calculate_completeness(view)
-        conciseness = self._calculate_conciseness(view)
         cohesiveness = self._calculate_cohesiveness(view)
-        satisfaction = sum(
-            [
-                self.CORRECTNESS_WEIGHT * correctness,
-                self.COMPLETENESS_WEIGHT * completeness,
-                self.CONCISENESS_WEIGHT * conciseness,
-                self.COHESIVENESS_WEIGHT * cohesiveness,
-            ]
+        conciseness = self._calculate_conciseness(view)
+        satisfaction = generalized_mean(
+            values=[correctness, completeness, cohesiveness, conciseness],
+            weights=[
+                self.CORRECTNESS_WEIGHT,
+                self.COMPLETENESS_WEIGHT,
+                self.COHESIVENESS_WEIGHT,
+                self.CONCISENESS_WEIGHT,
+            ],
+            exponent=self.QUALITY_EXPONENT,
+            tolerance=self.FLOATING_POINT_TOLERANCE,
         )
         self.bubble_chamber.loggers["activity"].log(
-            f"Calculating satisfaction for {view}\n"
-            + f"Correctness: {correctness}\n"
-            + f"Completeness: {completeness}\n"
-            + f"Conciseness: {conciseness}\n"
-            + f"Cohesiveness: {cohesiveness}\n"
-            + f"Overall satisfaction: {satisfaction}"
+            f"Calculating satisfaction for {view}",
+        ).log(
+            f"Correctness: {correctness}",
+        ).log(
+            f"Completeness: {completeness}",
+        ).log(
+            f"Conciseness: {conciseness}",
+        ).log(
+            f"Cohesiveness: {cohesiveness}",
+        ).log(
+            f"Overall satisfaction: {satisfaction}",
         )
         return satisfaction
 
