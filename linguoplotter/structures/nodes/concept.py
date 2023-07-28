@@ -34,7 +34,7 @@ class Concept(Node):
         champion_labels: StructureSet,
         champion_relations: StructureSet,
         depth: int = 1,
-        distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
+        distance_to_proximity_weight: float = HyperParameters.DEFAULT_DISTANCE_TO_PROXIMITY_WEIGHT,
         is_slot: bool = False,
         reverse: Concept = None,
     ):

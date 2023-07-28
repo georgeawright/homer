@@ -15,13 +15,15 @@ from linguoplotter.structures import Frame
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.space import Space
 from linguoplotter.structures.spaces import ContextualSpace
+from linguoplotter.tools import generalized_mean
 
 
 class View(Structure):
     """A collection of spaces and self-consistent correspondences between them."""
 
-    CORRESPONDENCE_WEIGHT = HyperParameters.VIEW_QUALITY_CORRESPONDENCE_WEIGHT
-    INPUT_WEIGHT = HyperParameters.VIEW_QUALITY_INPUT_WEIGHT
+    CORRESPONDENCE_WEIGHT = HyperParameters.VIEW_QUALITY_WEIGHTS["correspondences"]
+    INPUT_WEIGHT = HyperParameters.VIEW_QUALITY_WEIGHTS["input"]
+    VIEW_QUALITY_EXPONENT = HyperParameters.VIEW_QUALITY_EXPONENT
 
     def __init__(
         self,
@@ -346,7 +348,12 @@ class View(Structure):
             )
         except ValueError:
             input_quality = 0
-        return fuzzy.AND(correspondence_quality, input_quality)
+        return generalized_mean(
+            values=[correspondence_quality, input_quality],
+            weights=[self.CORRESPONDENCE_WEIGHT, self.INPUT_WEIGHT],
+            tolerance=self.FLOATING_POINT_TOLERANCE,
+            exponent=self.VIEW_QUALITY_EXPONENT,
+        )
 
     def is_equivalent_to(self, other: View):
         try:

@@ -2,12 +2,14 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluator import Evaluator
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.structure_collections import StructureSet
+from linguoplotter.tools import generalized_mean
 
 
 class RelationEvaluator(Evaluator):
-    CLASSIFICATION_WEIGHT = HyperParameters.RELATION_QUALITY_CLASSIFICATION_WEIGHT
-    SAMENESS_WEIGHT = HyperParameters.RELATION_QUALITY_SAMENESS_WEIGHT
-    TIME_WEIGHT = HyperParameters.RELATION_QUALITY_TIME_WEIGHT
+    CLASSIFICATION_WEIGHT = HyperParameters.RELATION_QUALITY_WEIGHTS["classification"]
+    SAMENESS_WEIGHT = HyperParameters.RELATION_QUALITY_WEIGHTS["sameness"]
+    TIME_WEIGHT = HyperParameters.RELATION_QUALITY_WEIGHTS["time"]
+    RELATION_QUALITY_EXPONENT = HyperParameters.RELATION_QUALITY_EXPONENT
 
     @classmethod
     def get_follow_up_class(cls) -> type:
@@ -92,12 +94,19 @@ class RelationEvaluator(Evaluator):
             ):
                 time_difference_confidence = classification
         for relation in classifications:
-            relation.quality = sum(
-                [
-                    classifications[relation] * self.CLASSIFICATION_WEIGHT,
-                    sameness_confidence * self.SAMENESS_WEIGHT,
-                    time_difference_confidence * self.TIME_WEIGHT,
-                ]
+            relation.quality = generalized_mean(
+                values=[
+                    classifications[relation],
+                    sameness_confidence,
+                    time_difference_confidence,
+                ],
+                weights=[
+                    self.CLASSIFICATION_WEIGHT,
+                    self.SAMENESS_WEIGHT,
+                    self.TIME_WEIGHT,
+                ],
+                tolerance=self.FLOATING_POINT_TOLERANCE,
+                exponent=self.RELATION_QUALITY_EXPONENT,
             )
         self.confidence = target_relation.quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

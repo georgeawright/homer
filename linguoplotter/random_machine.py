@@ -4,20 +4,27 @@ import random
 from .errors import MissingStructureError
 from .float_between_one_and_zero import FloatBetweenOneAndZero
 from .hyper_parameters import HyperParameters
+from .tools import generalized_mean
 
 
 class RandomMachine:
-
     FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
+    SATISFACTION_WEIGHT = HyperParameters.DETERMINISM_WEIGHTS["satisfaction"]
+    CHANGE_IN_SATISFACTION_WEIGHT = HyperParameters.DETERMINISM_WEIGHTS[
+        "change_in_satisfaction"
+    ]
+    TIME_SINCE_IMPROVEMENT_WEIGHT = HyperParameters.DETERMINISM_WEIGHTS[
+        "time_since_last_improvement"
+    ]
+    BIAS_WEIGHT = HyperParameters.DETERMINISM_WEIGHTS["bias"]
+    MINIMUM_DETERMINISM = HyperParameters.MINIMUM_DETERMINISM
+    MAXIMUM_DETERMINISM = HyperParameters.MAXIMUM_DETERMINISM
 
     def __init__(self, bubble_chamber: "BubbleChamber", seed: int = None):
         self.bubble_chamber = bubble_chamber
         self.seed = seed
         if seed is not None:
             random.seed(seed)
-        self.determinism_smoothing_function = (
-            HyperParameters.DETERMINISM_SMOOTHING_FUNCTION
-        )
         self.codelets_run = 0
         self.determinism = 0
         self.randomness = 1
@@ -26,11 +33,17 @@ class RandomMachine:
         codelets_since_successful_focus_unset = (
             self.codelets_run - self.bubble_chamber.time_of_last_successful_focus_unset
         )
-        self.determinism = self.determinism_smoothing_function(
-            self.bubble_chamber.satisfaction,
-            self.bubble_chamber.change_in_satisfaction,
-            codelets_since_successful_focus_unset,
+        self.determinism = (
+            self.BIAS_WEIGHT
+            + self.bubble_chamber.satisfaction * self.SATISFACTION_WEIGHT
+            + self.bubble_chamber.change_in_satisfaction
+            * self.CHANGE_IN_SATISFACTION_WEIGHT
+            - codelets_since_successful_focus_unset * self.TIME_SINCE_IMPROVEMENT_WEIGHT
         )
+        if self.determinism < self.MINIMUM_DETERMINISM:
+            self.determinism = self.MINIMUM_DETERMINISM
+        elif self.determinism > self.MAXIMUM_DETERMINISM:
+            self.determinism = self.MAXIMUM_DETERMINISM
         self.randomness = 1 - self.determinism
 
     def generate_number(self, minimum: float = 0.0) -> FloatBetweenOneAndZero:

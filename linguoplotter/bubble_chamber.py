@@ -22,15 +22,19 @@ from .structures.nodes import Chunk, Concept
 from .structures.nodes.chunks import LetterChunk
 from .structures.nodes.concepts import CompoundConcept
 from .structures.spaces import ConceptualSpace, ContextualSpace
+from .tools import generalized_mean
 from .worldview import Worldview
 
 
 class BubbleChamber:
     FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
     JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
-    MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
-    VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_VIEW_QUALITIES_WEIGHT
-    WORLDVIEW_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WORLDVIEW_WEIGHT
+    MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WEIGHTS[
+        "main_input"
+    ]
+    VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WEIGHTS["views"]
+    WORLDVIEW_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WEIGHTS["worldview"]
+    SATISFACTION_EXPONENT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_EXPONENT
 
     def __init__(self, focus, recycle_bin):
         self.loggers = {}
@@ -177,10 +181,7 @@ class BubbleChamber:
     def recalculate_satisfaction(self):
         self.focus.recalculate_satisfaction()
         self.recalculate_general_satisfaction()
-        if self.focus.view is not None:
-            self.satisfaction = max(self.general_satisfaction, self.focus.satisfaction)
-        else:
-            self.satisfaction = self.general_satisfaction
+        self.satisfaction = max(self.general_satisfaction, self.focus.satisfaction)
         self.change_in_satisfaction = self.satisfaction - self.previous_satisfaction
         self.random_machine.recalculate_determinism()
 
@@ -191,12 +192,15 @@ class BubbleChamber:
             if not self.views.is_empty
             else 0
         )
-        self.general_satisfaction = sum(
-            [
-                self.MAIN_INPUT_WEIGHT * main_input_space.quality,
-                self.VIEWS_WEIGHT * average_view_quality,
-                self.WORLDVIEW_WEIGHT * self.worldview.satisfaction,
-            ]
+        self.general_satisfaction = generalized_mean(
+            values=[
+                main_input_space.quality,
+                average_view_quality,
+                self.worldview.satisfaction,
+            ],
+            weights=[self.MAIN_INPUT_WEIGHT, self.VIEWS_WEIGHT, self.WORLDVIEW_WEIGHT],
+            tolerance=self.FLOATING_POINT_TOLERANCE,
+            exponent=self.SATISFACTION_EXPONENT,
         )
 
     @property
@@ -645,7 +649,7 @@ class BubbleChamber:
         possible_instances: StructureSet = None,
         subsumes: StructureSet = None,
         depth: int = 1,
-        distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
+        distance_to_proximity_weight: float = HyperParameters.DEFAULT_DISTANCE_TO_PROXIMITY_WEIGHT,
         activation: FloatBetweenOneAndZero = None,
         is_slot: bool = False,
         reverse: Concept = None,

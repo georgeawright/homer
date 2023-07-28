@@ -4,6 +4,14 @@ from typing import Iterable, List, Union
 
 
 def generalized_mean(values: list, weights: list, exponent: float, tolerance: float):
+    if exponent == 0:
+        return math.prod([(v + tolerance) ** w for w, v in zip(weights, values)]) ** (
+            1 / sum(weights)
+        )
+    if exponent == math.inf:
+        return max(values)
+    if exponent == -math.inf:
+        return min(values)
     return (
         sum([w * (v + tolerance) ** exponent for w, v in zip(weights, values)])
         / sum(weights)

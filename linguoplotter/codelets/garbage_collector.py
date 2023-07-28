@@ -5,10 +5,10 @@ from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.structure_collections import StructureDict, StructureSet
+from linguoplotter.structures import View
 
 
 class GarbageCollector(Codelet):
-
     MINIMUM_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
 
     def __init__(
@@ -85,6 +85,16 @@ class GarbageCollector(Codelet):
                     structure in codelet.targets.values()
                     or any(
                         [link in codelet.targets.values() for link in structure.links]
+                    )
+                    or any(
+                        [
+                            structure in view.grouped_nodes
+                            for view in [
+                                t
+                                for t in codelet.targets.values()
+                                if isinstance(t, View)
+                            ]
+                        ]
                     )
                     or (
                         isinstance(codelet.targets, StructureDict)
