@@ -6,11 +6,6 @@ from linguoplotter.tools import generalized_mean
 
 
 class RelationEvaluator(Evaluator):
-    CLASSIFICATION_WEIGHT = HyperParameters.RELATION_QUALITY_WEIGHTS["classification"]
-    SAMENESS_WEIGHT = HyperParameters.RELATION_QUALITY_WEIGHTS["sameness"]
-    TIME_WEIGHT = HyperParameters.RELATION_QUALITY_WEIGHTS["time"]
-    RELATION_QUALITY_EXPONENT = HyperParameters.RELATION_QUALITY_EXPONENT
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.selectors import RelationSelector
@@ -101,12 +96,12 @@ class RelationEvaluator(Evaluator):
                     time_difference_confidence,
                 ],
                 weights=[
-                    self.CLASSIFICATION_WEIGHT,
-                    self.SAMENESS_WEIGHT,
-                    self.TIME_WEIGHT,
+                    self.bubble_chamber.hyper_parameters.RELATION_QUALITY_CLASSIFICATION_WEIGHT,
+                    self.bubble_chamber.hyper_parameters.RELATION_QUALITY_SAMENESS_WEIGHT,
+                    self.bubble_chamber.hyper_parameters.RELATION_QUALITY_TIME_WEIGHT,
                 ],
                 tolerance=self.FLOATING_POINT_TOLERANCE,
-                exponent=self.RELATION_QUALITY_EXPONENT,
+                exponent=self.bubble_chamber.hyper_parameters.RELATION_QUALITY_EXPONENT,
             )
         self.confidence = target_relation.quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

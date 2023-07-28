@@ -11,31 +11,41 @@ from .logger import Logger
 
 
 class Linguoplotter:
-    CODELET_RUN_LIMIT = HyperParameters.CODELET_RUN_LIMIT
-    NUMBER_OF_START_CHUNK_SUGGESTERS = HyperParameters.NUMBER_OF_START_CHUNK_SUGGESTERS
-
     def __init__(
         self,
         bubble_chamber: BubbleChamber,
         coderack: Coderack,
         interpreter: Interpreter,
+        hyper_parameters: HyperParameters,
         loggers: Dict[str, Logger],
         activation_update_frequency: int = HyperParameters.ACTIVATION_UPDATE_FREQUENCY,
     ):
         self.bubble_chamber = bubble_chamber
         self.coderack = coderack
         self.interpreter = interpreter
+        self.hyper_parameters = hyper_parameters
         self.loggers = loggers
         self.activation_update_frequency = activation_update_frequency
+        self.CODELET_RUN_LIMIT = self.hyper_parameters.CODELET_RUN_LIMIT
+        self.NUMBER_OF_START_CHUNK_SUGGESTERS = (
+            self.hyper_parameters.NUMBER_OF_START_CHUNK_SUGGESTERS
+        )
 
     @classmethod
-    def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
+    def setup(
+        cls,
+        hyper_parameters: HyperParameters,
+        loggers: Dict[str, Logger],
+        random_seed: int = None,
+    ):
         ID.reset()
-        bubble_chamber = BubbleChamber.setup(loggers, random_seed=random_seed)
-        coderack = Coderack.setup(bubble_chamber, loggers)
+        bubble_chamber = BubbleChamber.setup(
+            hyper_parameters, loggers, random_seed=random_seed
+        )
+        coderack = Coderack.setup(bubble_chamber, hyper_parameters, loggers)
         loggers["structure"].coderack = coderack
         interpreter = Interpreter(bubble_chamber)
-        return cls(bubble_chamber, coderack, interpreter, loggers)
+        return cls(bubble_chamber, coderack, interpreter, hyper_parameters, loggers)
 
     def run_program(self, program: str):
         self.interpreter.interpret_string(program)

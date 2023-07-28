@@ -14,12 +14,6 @@ from linguoplotter.tools import generalized_mean
 
 
 class WorldviewSetter(Codelet):
-    CORRECTNESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_WEIGHTS["correctness"]
-    COMPLETENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_WEIGHTS["completeness"]
-    COHESIVENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_WEIGHTS["cohesiveness"]
-    CONCISENESS_WEIGHT = HyperParameters.WORLDVIEW_QUALITY_WEIGHTS["conciseness"]
-    QUALITY_EXPONENT = HyperParameters.WORLDVIEW_QUALITY_EXPONENT
-
     def __init__(
         self,
         codelet_id: str,
@@ -31,6 +25,21 @@ class WorldviewSetter(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
+        self.CORRECTNESS_WEIGHT = (
+            self.bubble_chamber.hyper_parameters.WORLDVIEW_QUALITY_CORRECTNESS_WEIGHT
+        )
+        self.COMPLETENESS_WEIGHT = (
+            self.bubble_chamber.hyper_parameters.WORLDVIEW_QUALITY_COMPLETENESS_WEIGHT
+        )
+        self.COHESIVENESS_WEIGHT = (
+            self.bubble_chamber.hyper_parameters.WORLDVIEW_QUALITY_COHESIVENESS_WEIGHT
+        )
+        self.CONCISENESS_WEIGHT = (
+            self.bubble_chamber.hyper_parameters.WORLDVIEW_QUALITY_CONCISENESS_WEIGHT
+        )
+        self.QUALITY_EXPONENT = (
+            self.bubble_chamber.hyper_parameters.WORLDVIEW_QUALITY_EXPONENT
+        )
 
     @classmethod
     def spawn(

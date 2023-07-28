@@ -32,8 +32,6 @@ from .logger import Logger
 
 
 class Coderack:
-    MAXIMUM_POPULATION = HyperParameters.MAXIMUM_CODERACK_POPULATION
-    MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
     PROTECTED_CODELET_TYPES = (
         CoderackCleaner,
         Factory,
@@ -45,8 +43,16 @@ class Coderack:
         WorldviewSetter,
     )
 
-    def __init__(self, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
+    def __init__(
+        self,
+        bubble_chamber: BubbleChamber,
+        hyper_parameters: HyperParameters,
+        loggers: Dict[str, Logger],
+    ):
         self.bubble_chamber = bubble_chamber
+        self.hyper_parameters = hyper_parameters
+        self.MAXIMUM_POPULATION = hyper_parameters.MAXIMUM_CODERACK_POPULATION
+        self.MINIMUM_CODELET_URGENCY = hyper_parameters.MINIMUM_CODELET_URGENCY
         self._codelets = []
         self.recently_run = set()
         self.codelets_run = 0
@@ -54,36 +60,40 @@ class Coderack:
         self.codelet_times = []
 
     @classmethod
-    def setup(cls, bubble_chamber: BubbleChamber, loggers: Dict[str, Logger]):
-        coderack = cls(bubble_chamber, loggers)
+    def setup(
+        cls,
+        bubble_chamber: BubbleChamber,
+        hyper_parameters: HyperParameters,
+        loggers: Dict[str, Logger],
+    ):
+        MINIMUM_CODELET_URGENCY = hyper_parameters.MINIMUM_CODELET_URGENCY
+        coderack = cls(bubble_chamber, hyper_parameters, loggers)
         meta_codelets = [
             Publisher.spawn(
-                "", bubble_chamber, coderack, 0.0, 0, cls.MINIMUM_CODELET_URGENCY
+                "", bubble_chamber, coderack, 0.0, 0, MINIMUM_CODELET_URGENCY
             ),
             GarbageCollector.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+                "", bubble_chamber, coderack, MINIMUM_CODELET_URGENCY
             ),
-            Recycler.spawn("", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY),
-            FocusSetter.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
-            ),
+            Recycler.spawn("", bubble_chamber, coderack, MINIMUM_CODELET_URGENCY),
+            FocusSetter.spawn("", bubble_chamber, coderack, MINIMUM_CODELET_URGENCY),
             WorldviewSetter.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+                "", bubble_chamber, coderack, MINIMUM_CODELET_URGENCY
             ),
             CoderackCleaner.spawn(
-                "", bubble_chamber, coderack, 0.0, cls.MINIMUM_CODELET_URGENCY
+                "", bubble_chamber, coderack, 0.0, MINIMUM_CODELET_URGENCY
             ),
             ConceptDrivenFactory.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+                "", bubble_chamber, coderack, MINIMUM_CODELET_URGENCY
             ),
             ViewDrivenFactory.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+                "", bubble_chamber, coderack, MINIMUM_CODELET_URGENCY
             ),
             BottomUpEvaluatorFactory.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+                "", bubble_chamber, coderack, MINIMUM_CODELET_URGENCY
             ),
             BottomUpSuggesterFactory.spawn(
-                "", bubble_chamber, coderack, cls.MINIMUM_CODELET_URGENCY
+                "", bubble_chamber, coderack, MINIMUM_CODELET_URGENCY
             ),
         ]
         for codelet in meta_codelets:

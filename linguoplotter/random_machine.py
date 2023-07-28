@@ -8,26 +8,32 @@ from .tools import generalized_mean
 
 
 class RandomMachine:
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
-    SATISFACTION_WEIGHT = HyperParameters.DETERMINISM_WEIGHTS["satisfaction"]
-    CHANGE_IN_SATISFACTION_WEIGHT = HyperParameters.DETERMINISM_WEIGHTS[
-        "change_in_satisfaction"
-    ]
-    TIME_SINCE_IMPROVEMENT_WEIGHT = HyperParameters.DETERMINISM_WEIGHTS[
-        "time_since_last_improvement"
-    ]
-    BIAS_WEIGHT = HyperParameters.DETERMINISM_WEIGHTS["bias"]
-    MINIMUM_DETERMINISM = HyperParameters.MINIMUM_DETERMINISM
-    MAXIMUM_DETERMINISM = HyperParameters.MAXIMUM_DETERMINISM
-
-    def __init__(self, bubble_chamber: "BubbleChamber", seed: int = None):
+    def __init__(
+        self,
+        bubble_chamber: "BubbleChamber",
+        hyper_parameters: HyperParameters,
+        seed: int = None,
+    ):
         self.bubble_chamber = bubble_chamber
+        self.hyper_parameters = hyper_parameters
         self.seed = seed
         if seed is not None:
             random.seed(seed)
         self.codelets_run = 0
         self.determinism = 0
         self.randomness = 1
+
+        self.FLOATING_POINT_TOLERANCE = hyper_parameters.FLOATING_POINT_TOLERANCE
+        self.SATISFACTION_WEIGHT = hyper_parameters.DETERMINISM_SATISFACTION_WEIGHT
+        self.CHANGE_IN_SATISFACTION_WEIGHT = (
+            hyper_parameters.DETERMINISM_CHANGE_IN_SATISFACTION_WEIGHT
+        )
+        self.TIME_SINCE_IMPROVEMENT_WEIGHT = (
+            hyper_parameters.DETERMINISM_TIME_SINCE_IMPROVEMENT_WEIGHT
+        )
+        self.BIAS_WEIGHT = hyper_parameters.DETERMINISM_BIAS_WEIGHT
+        self.MINIMUM_DETERMINISM = hyper_parameters.MINIMUM_DETERMINISM
+        self.MAXIMUM_DETERMINISM = hyper_parameters.MAXIMUM_DETERMINISM
 
     def recalculate_determinism(self) -> FloatBetweenOneAndZero:
         codelets_since_successful_focus_unset = (

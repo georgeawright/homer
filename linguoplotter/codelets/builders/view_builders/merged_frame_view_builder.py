@@ -21,7 +21,7 @@ class MergedFrameViewBuilder(ViewBuilder):
         new_view.parent_frame.progenitor.instances.add(new_view)
         self.bubble_chamber.loggers["structure"].log(new_view.output_space)
         self.bubble_chamber.loggers["structure"].log(new_view)
-        self.bubble_chamber.views.add(new_view)
+        self.bubble_chamber.add(new_view)
         self._structure_concept.instances.add(new_view)
         self._structure_concept.recalculate_salience()
 

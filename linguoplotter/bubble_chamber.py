@@ -27,16 +27,23 @@ from .worldview import Worldview
 
 
 class BubbleChamber:
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
-    JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
-    MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WEIGHTS[
-        "main_input"
-    ]
-    VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WEIGHTS["views"]
-    WORLDVIEW_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WEIGHTS["worldview"]
-    SATISFACTION_EXPONENT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_EXPONENT
+    def __init__(
+        self, hyper_parameters: HyperParameters, focus: Focus, recycle_bin: RecycleBin
+    ):
+        self.hyper_parameters = hyper_parameters
+        self.FLOATING_POINT_TOLERANCE = hyper_parameters.FLOATING_POINT_TOLERANCE
+        self.JUMP_THRESHOLD = hyper_parameters.JUMP_THRESHOLD
+        self.MAIN_INPUT_WEIGHT = (
+            hyper_parameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
+        )
+        self.VIEWS_WEIGHT = hyper_parameters.BUBBLE_CHAMBER_SATISFACTION_VIEWS_WEIGHT
+        self.WORLDVIEW_WEIGHT = (
+            hyper_parameters.BUBBLE_CHAMBER_SATISFACTION_WORLDVIEW_WEIGHT
+        )
+        self.SATISFACTION_EXPONENT = (
+            hyper_parameters.BUBBLE_CHAMBER_SATISFACTION_EXPONENT
+        )
 
-    def __init__(self, focus, recycle_bin):
         self.loggers = {}
         self.random_machine = None
         self.worldview = None
@@ -74,9 +81,16 @@ class BubbleChamber:
         self.ACTIVATION_LOGGING_FREQUENCY = HyperParameters.ACTIVATION_LOGGING_FREQUENCY
 
     @classmethod
-    def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
-        bubble_chamber = cls(Focus(), RecycleBin())
-        bubble_chamber.random_machine = RandomMachine(bubble_chamber, random_seed)
+    def setup(
+        cls,
+        hyper_parameters: HyperParameters,
+        loggers: Dict[str, Logger],
+        random_seed: int = None,
+    ):
+        bubble_chamber = cls(hyper_parameters, Focus(), RecycleBin())
+        bubble_chamber.random_machine = RandomMachine(
+            bubble_chamber, hyper_parameters, random_seed
+        )
         bubble_chamber.reset(loggers)
         return bubble_chamber
 
@@ -261,6 +275,19 @@ class BubbleChamber:
         return StructureSet(self, structures, name=name)
 
     def add(self, item):
+        item.hyper_parameters = self.hyper_parameters
+        item.FLOATING_POINT_TOLERANCE = self.hyper_parameters.FLOATING_POINT_TOLERANCE
+        item.MINIMUM_ACTIVATION_UPDATE = self.hyper_parameters.MINIMUM_ACTIVATION_UPDATE
+        item.ACTIVATION_UPDATE_COEFFICIENT = (
+            self.hyper_parameters.ACTIVATION_UPDATE_COEFFICIENT
+        )
+        item.DECAY_RATE = self.hyper_parameters.DECAY_RATE
+        item.RELATIVES_ACTIVATION_WEIGHT = (
+            self.hyper_parameters.ACTIVATION_UPDATE_RELATIVES_WEIGHT
+        )
+        item.INSTANCES_ACTIVATION_WEIGHT = (
+            self.hyper_parameters.ACTIVATION_UPDATE_INSTANCES_WEIGHT
+        )
         self.loggers["structure"].log(item)
         for space in item.parent_spaces:
             space.add(item)

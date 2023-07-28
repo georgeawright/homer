@@ -2,14 +2,11 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelet import Codelet
 from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
-from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict
 
 
 class FocusUnsetter(Codelet):
-    DECAY_RATE = HyperParameters.DECAY_RATE
-
     def __init__(
         self,
         codelet_id: str,

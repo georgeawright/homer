@@ -11,9 +11,6 @@ from linguoplotter.structure_collections import StructureDict, StructureSet
 
 
 class Recycler(Codelet):
-
-    MINIMUM_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-
     def __init__(
         self,
         codelet_id: str,
@@ -92,7 +89,7 @@ class Recycler(Codelet):
             proportion_recyclable = 0
         urgency = max(
             proportion_recyclable,
-            self.MINIMUM_URGENCY,
+            self.MINIMUM_CODELET_URGENCY,
         )
         self.child_codelets.append(
             self.spawn(self.codelet_id, self.bubble_chamber, self.coderack, urgency)

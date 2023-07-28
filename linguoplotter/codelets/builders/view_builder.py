@@ -88,25 +88,18 @@ class ViewBuilder(Builder):
         self.bubble_chamber.loggers["structure"].log(view_output)
         self.bubble_chamber.contextual_spaces.add(view_output)
         self.bubble_chamber.loggers["structure"].log(view)
-        self.bubble_chamber.views.add(view)
+        self.bubble_chamber.add(view)
         self._structure_concept.instances.add(view)
         self._structure_concept.recalculate_salience()
         self.child_structures.add(view)
         self._populate_view_output_space()
 
     def _create_view_output(self, view_id, parent_concept, conceptual_spaces):
-        view_output = ContextualSpace(
-            structure_id=ID.new(ContextualSpace),
+        view_output = self.bubble_chamber.new_contextual_space(
             parent_id=self.codelet_id,
             name=f"output for {view_id}",
             parent_concept=parent_concept,
-            contents=self.bubble_chamber.new_set(),
             conceptual_spaces=conceptual_spaces,
-            links_in=self.bubble_chamber.new_set(),
-            links_out=self.bubble_chamber.new_set(),
-            parent_spaces=self.bubble_chamber.new_set(),
-            champion_labels=self.bubble_chamber.new_set(),
-            champion_relations=self.bubble_chamber.new_set(),
         )
         self.bubble_chamber.loggers["activity"].log(
             f"Created output space: {view_output}"

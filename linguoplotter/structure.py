@@ -11,13 +11,6 @@ from .structure_collections import StructureSet
 
 
 class Structure(ABC):
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
-    MINIMUM_ACTIVATION_UPDATE = HyperParameters.MINIMUM_ACTIVATION_UPDATE
-    ACTIVATION_UPDATE_COEFFICIENT = HyperParameters.ACTIVATION_UPDATE_COEFFICIENT
-    DECAY_RATE = HyperParameters.DECAY_RATE
-    RELATIVES_ACTIVATION_WEIGHT = HyperParameters.ACTIVATION_UPDATE_WEIGHTS["relatives"]
-    INSTANCES_ACTIVATION_WEIGHT = HyperParameters.ACTIVATION_UPDATE_WEIGHTS["instances"]
-
     def __init__(
         self,
         structure_id: str,
@@ -43,7 +36,6 @@ class Structure(ABC):
         self.is_stable = False
         self._depth = 1
         self._activation_buffer = 0.0
-        self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
         self._parent_space = None
         self._parent_concept = None
 
@@ -77,6 +69,14 @@ class Structure(ABC):
         self.is_merged_frame = False
         self.is_sub_frame = False
         self.is_template = False
+
+        self.hyper_parameters = None
+        self.FLOATING_POINT_TOLERANCE = None
+        self.MINIMUM_ACTIVATION_UPDATE = None
+        self.ACTIVATION_UPDATE_COEFFICIENT = None
+        self.DECAY_RATE = None
+        self.RELATIVES_ACTIVATION_WEIGHT = None
+        self.INSTANCES_ACTIVATION_WEIGHT = None
 
     @classmethod
     def get_builder_class(cls):

@@ -24,7 +24,8 @@ class CrossViewLabelSuggester(LabelSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         view = bubble_chamber.views.filter(
-            lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
+            lambda x: x.unhappiness
+            < bubble_chamber.hyper_parameters.FLOATING_POINT_TOLERANCE
             and x.parent_frame.parent_concept.location_in_space(
                 bubble_chamber.spaces["grammar"]
             )
@@ -64,7 +65,8 @@ class CrossViewLabelSuggester(LabelSuggester):
         urgency: FloatBetweenOneAndZero = None,
     ):
         view = bubble_chamber.views.filter(
-            lambda x: x.unhappiness < cls.FLOATING_POINT_TOLERANCE
+            lambda x: x.unhappiness
+            < bubble_chamber.hyper_parameters.FLOATING_POINT_TOLERANCE
             and x.parent_frame.parent_concept.location_in_space(
                 bubble_chamber.spaces["grammar"]
             )

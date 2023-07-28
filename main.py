@@ -8,6 +8,7 @@ from rouge_score.rouge_scorer import RougeScorer
 import zss
 
 from linguoplotter import Linguoplotter
+from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.loggers import (
     ActivityLogger,
     ErrorLogger,
@@ -19,6 +20,7 @@ DEVELOPMENT = True
 
 pwd = os.getcwd()
 
+hyper_parameters_file = "default_hyper_parameters.json"
 program_files = [
     "narration-1.lisp",
     "narration-2.lisp",
@@ -41,12 +43,6 @@ for i in random_seeds:
         with open(f"{logs_dir_path}/details.txt", "w") as f:
             run_details = {"Program": program_file, "random_seed": i}
             f.write(json.dumps(run_details))
-        with open(
-            "linguoplotter/hyper_parameters.py", "r"
-        ) as hyper_parameters_file, open(
-            f"{logs_dir_path}/hyper_parameters.py", "w"
-        ) as f:
-            f.write(hyper_parameters_file.read())
         error_file_name = f"{logs_dir_path}/errors.log"
         error_stream = open(error_file_name, "w")
         if DEVELOPMENT:
@@ -82,7 +78,15 @@ for i in random_seeds:
             "structure": structure_logger,
             "error": ErrorLogger(error_stream),
         }
-        narrator = Linguoplotter.setup(loggers, random_seed=i)
+        with open(hyper_parameters_file, "r") as f, open(
+            f"{logs_dir_path}/hyper_parameters.json", "w"
+        ) as f2:
+            hyper_parameters_json = f.read()
+            f2.write(hyper_parameters_json)
+            hyper_parameters = HyperParameters.from_dict(
+                json.loads(hyper_parameters_json)
+            )
+        narrator = Linguoplotter.setup(hyper_parameters, loggers, random_seed=i)
         narrator.interpreter.interpret_file("builtin.lisp")
         os.chdir("example-programs/weather")
         narrator.interpreter.interpret_file(program_file)

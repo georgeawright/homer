@@ -9,8 +9,6 @@ from linguoplotter.structures import View
 
 
 class GarbageCollector(Codelet):
-    MINIMUM_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-
     def __init__(
         self,
         codelet_id: str,
@@ -145,8 +143,8 @@ class GarbageCollector(Codelet):
 
     def _engender_follow_up(self):
         urgency = max(
-            min(1, self.MINIMUM_URGENCY * len(self.bubble_chamber.recycle_bin)),
-            self.MINIMUM_URGENCY,
+            min(1, self.MINIMUM_CODELET_URGENCY * len(self.bubble_chamber.recycle_bin)),
+            self.MINIMUM_CODELET_URGENCY,
         )
         self.child_codelets.append(
             self.spawn(self.codelet_id, self.bubble_chamber, self.coderack, urgency)

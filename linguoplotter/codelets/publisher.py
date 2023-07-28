@@ -11,8 +11,6 @@ from linguoplotter.structure_collections import StructureDict
 
 
 class Publisher(Codelet):
-    MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-
     def __init__(
         self,
         codelet_id: str,
@@ -39,8 +37,11 @@ class Publisher(Codelet):
         last_time: int,
         urgency: FloatBetweenOneAndZero,
     ):
+        MINIMUM_CODELET_URGENCY = (
+            bubble_chamber.hyper_parameters.MINIMUM_CODELET_URGENCY
+        )
         targets = bubble_chamber.new_dict(name="targets")
-        urgency = max(urgency, cls.MINIMUM_CODELET_URGENCY)
+        urgency = max(urgency, MINIMUM_CODELET_URGENCY)
         return cls(
             ID.new(cls),
             parent_id,

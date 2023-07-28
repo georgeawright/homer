@@ -21,10 +21,6 @@ from linguoplotter.tools import generalized_mean
 class View(Structure):
     """A collection of spaces and self-consistent correspondences between them."""
 
-    CORRESPONDENCE_WEIGHT = HyperParameters.VIEW_QUALITY_WEIGHTS["correspondences"]
-    INPUT_WEIGHT = HyperParameters.VIEW_QUALITY_WEIGHTS["input"]
-    VIEW_QUALITY_EXPONENT = HyperParameters.VIEW_QUALITY_EXPONENT
-
     def __init__(
         self,
         structure_id: str,
@@ -350,9 +346,12 @@ class View(Structure):
             input_quality = 0
         return generalized_mean(
             values=[correspondence_quality, input_quality],
-            weights=[self.CORRESPONDENCE_WEIGHT, self.INPUT_WEIGHT],
+            weights=[
+                self.hyper_parameters.VIEW_QUALITY_CORRESPONDENCE_WEIGHT,
+                self.hyper_parameters.VIEW_QUALITY_INPUT_WEIGHT,
+            ],
             tolerance=self.FLOATING_POINT_TOLERANCE,
-            exponent=self.VIEW_QUALITY_EXPONENT,
+            exponent=self.hyper_parameters.VIEW_QUALITY_EXPONENT,
         )
 
     def is_equivalent_to(self, other: View):
