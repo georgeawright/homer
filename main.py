@@ -14,9 +14,11 @@ from linguoplotter.loggers import (
     ErrorLogger,
     MockLogger,
     StructureLogger,
+    TextLogger,
 )
 
 DEVELOPMENT = False
+LOG_INTERMMEDIATE_TEXTS = True
 
 pwd = os.getcwd()
 
@@ -95,9 +97,19 @@ for hyper_parameters_file in hyper_parameters_files:
             else:
                 activity_logger = MockLogger()
                 structure_logger = MockLogger()
+            if LOG_INTERMMEDIATE_TEXTS:
+                text_logger = TextLogger(
+                    hyper_parameters=hyper_parameters_file,
+                    seed=i,
+                    program=program_file,
+                    stream=open(f"{pwd}/logs/texts.csv", "a"),
+                )
+            else:
+                text_logger = MockLogger()
             loggers = {
                 "activity": activity_logger,
                 "structure": structure_logger,
+                "text": text_logger,
                 "error": ErrorLogger(error_stream),
             }
             with open(hyper_parameters_file, "r") as f, open(

@@ -10,7 +10,7 @@ exports.run = function(query) {
     hyperparams_programs_results = {};
     directories = [];
     fs.readdirSync('logs/').forEach(directory => {
-	if (directory == "stats.txt") {
+	if (directory == "stats.txt" || directory ==  "texts.csv") {
 	    return;
 	}
 	directories.push(directory);
