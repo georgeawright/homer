@@ -22,18 +22,19 @@ exports.run = function(query) {
 	}
 	program_results = programs_results[program_name];
 	output = details["result"];
+	hyperparams = details["hyper_parameters"].split("/")[1].split(".")[0]
 	if (!(output in program_results)) {
 	    program_results[output] = {
 		"satisfaction": [details["satisfaction"]],
 		"codelets_run": [details["codelets_run"]],
 		"directory": [directory],
-		"seed": [details["random_seed"]],
+		"run": [[hyperparams, details["random_seed"]]],
 	    };
 	} else {
 	    program_results[output]["satisfaction"].push(details["satisfaction"]);
 	    program_results[output]["codelets_run"].push(details["codelets_run"]);
 	    program_results[output]["directory"].push(directory);
-	    program_results[output]["seed"].push(details["random_seed"]);
+	    program_results[output]["run"].push([hyperparams, details["random_seed"]]);
 	}
     });
     Object.keys(programs_results).forEach(program => {
@@ -56,7 +57,7 @@ exports.run = function(query) {
 		"output": output,
 		"satisfaction": program_results[output]["satisfaction"],
 		"codelets_run": program_results[output]["codelets_run"],
-		"seed": program_results[output]["seed"],
+		"run": program_results[output]["run"],
 		"directory": program_results[output]["directory"],
 	    });
 	});
@@ -114,7 +115,7 @@ exports.run = function(query) {
           <th style="width:30%">Output Text</th>
           <th style="width:10%">Mean Satisfaction</th>
           <th style="width:10%">Mean Run Length (Codelets)</th>
-          <th style="width:10%">Random Seeds</th>
+          <th style="width:10%">Runs</th>
         <tr>
 `;
 	program_results = programs_results_lists[program];
@@ -122,7 +123,7 @@ exports.run = function(query) {
 	    output = result["output"]
 	    satisfaction = result["satisfaction"];
 	    codelets_run = result["codelets_run"];
-	    seeds = result["seed"];
+	    runs = result["run"];
 	    program_directories = result["directory"];
 	    doc += `
         <tr>
@@ -131,10 +132,10 @@ exports.run = function(query) {
           <td>${codelets_run}</td>
           <td>
 `;
-	    seeds.forEach((seed, index) => {
+	    runs.forEach((run, index) => {
 		directory = program_directories[index];
 		doc += `
-            <a href="log_viewer/run?run_id=${directory}">${seed}</a>
+            <a href="log_viewer/run?run_id=${directory}">${run}</a>
 `;
 	    });
 	    doc += `

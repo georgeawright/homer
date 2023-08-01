@@ -62,7 +62,7 @@ class Linguoplotter:
         while self.bubble_chamber.result is None:
             try:
                 if self.coderack.codelets_run % self.activation_update_frequency == 0:
-                    if not HyperParameters.TESTING:
+                    if not self.hyper_parameters.TESTING:
                         self.print_status_update()
                     self.bubble_chamber.update_activations()
                 if self.coderack.codelets_run >= self.CODELET_RUN_LIMIT:
