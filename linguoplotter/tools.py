@@ -3,7 +3,10 @@ import statistics
 from typing import Iterable, List, Union
 
 
-def generalized_mean(values: list, weights: list, exponent: float, tolerance: float):
+def generalized_mean(
+    values: list, weights: list = None, exponent: float = 1.0, tolerance: float = 0.0
+):
+    weights = [1 for _ in values] if weights is None else weights
     if exponent == 0:
         return math.prod([(v + tolerance) ** w for w, v in zip(weights, values)]) ** (
             1 / sum(weights)

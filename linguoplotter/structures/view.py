@@ -331,18 +331,17 @@ class View(Structure):
             / total_slots
         )
         try:
-            input_quality = statistics.fmean(
-                [
+            input_quality = generalized_mean(
+                values=[
                     correspondence.start.quality
-                    * correspondence.end.parent_concept.number_of_components
-                    if correspondence.end.is_link
-                    else correspondence.start.quality
                     for correspondence in self.members
                     if correspondence.start.parent_space is not None
                     and correspondence.start.parent_space.is_main_input
-                ]
+                ],
+                tolerance=self.FLOATING_POINT_TOLERANCE,
+                exponent=self.hyper_parameters.VIEW_QUALITY_INPUT_EXPONENT,
             )
-        except ValueError:
+        except ZeroDivisionError:
             input_quality = 0
         return generalized_mean(
             values=[correspondence_quality, input_quality],

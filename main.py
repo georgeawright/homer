@@ -54,6 +54,7 @@ start_time = time.time()
 results = []
 
 for hyper_parameters_file in hyper_parameters_files:
+    print(hyper_parameters_file)
     for i in random_seeds:
         for program_file in program_files:
             iteration_start_time = time.time()
