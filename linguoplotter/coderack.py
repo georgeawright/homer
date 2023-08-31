@@ -149,7 +149,7 @@ class Coderack:
         codelet = self._select_a_codelet()
         self.loggers["activity"].log_codelet_start(codelet)
         codelet_start_time = time.time()
-        if HyperParameters.TESTING:
+        if self.hyper_parameters.TESTING:
             try:
                 codelet.run()
             except Exception:
