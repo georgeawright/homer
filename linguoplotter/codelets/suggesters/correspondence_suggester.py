@@ -4,6 +4,7 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
 from linguoplotter.structure_collection_keys import corresponding_salience, salience
 from linguoplotter.structure_collections import StructureDict, StructureSet

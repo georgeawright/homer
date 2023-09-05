@@ -189,6 +189,9 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     @staticmethod
     def _get_target_structure_one(parent_codelet, child_codelet):
         bubble_chamber = parent_codelet.bubble_chamber
+        RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH = (
+            bubble_chamber.hyper_parameters.RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+        )
         target_view = child_codelet.targets["view"]
         target_end = child_codelet.targets["end"]
         start_space = target_view.input_spaces.get()
@@ -232,7 +235,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         )
                         and x.quality * x.activation > 0
                         and x.uncorrespondedness
-                        > bubble_chamber.random_machine.generate_number()
+                        > (
+                            bubble_chamber.random_machine.generate_number()
+                            * RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+                        )
                         and x.parent_concept
                         in child_codelet.targets[
                             "end"
@@ -257,7 +263,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     and x.start.quality * x.start.activation > 0
                     and x.quality * x.activation > 0
                     and x.uncorrespondedness
-                    > bubble_chamber.random_machine.generate_number()
+                    > (
+                        bubble_chamber.random_machine.generate_number()
+                        * RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+                    )
                     and child_codelet.targets["space"].subsumes(
                         x.parent_concept.parent_and_super_spaces
                     )
@@ -318,7 +327,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         x.start.quality * x.start.activation > 0,
                         x.end.quality * x.end.activation > 0,
                         x.uncorrespondedness
-                        > bubble_chamber.random_machine.generate_number(),
+                        > (
+                            bubble_chamber.random_machine.generate_number()
+                            * RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+                        ),
                     ]
                 )
                 and (x.start == structure_one_start or structure_one_start is None)

@@ -126,6 +126,9 @@ class CrossViewCorrespondenceSuggester(CorrespondenceSuggester):
     @staticmethod
     def _get_target_structure_one(parent_codelet, child_codelet):
         bubble_chamber = parent_codelet.bubble_chamber
+        RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH = (
+            bubble_chamber.hyper_parameters.RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+        )
         target_view = child_codelet.targets["view"]
         target_frame = child_codelet.targets["frame"]
         target_end = child_codelet.targets["end"]
@@ -293,7 +296,10 @@ class CrossViewCorrespondenceSuggester(CorrespondenceSuggester):
                 lambda x: x.is_relation
                 and x.quality > 0
                 and x.uncorrespondedness
-                > bubble_chamber.random_machine.generate_number()
+                > (
+                    bubble_chamber.random_machine.generate_number()
+                    * RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+                )
                 and x.start in potential_start_targets
                 and x.end in potential_end_targets
                 and any(
@@ -457,7 +463,10 @@ class CrossViewCorrespondenceSuggester(CorrespondenceSuggester):
                     lambda c: c in target_view.members
                 ).is_empty
                 and x.uncorrespondedness
-                > bubble_chamber.random_machine.generate_number()
+                > (
+                    bubble_chamber.random_machine.generate_number()
+                    * RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+                )
                 and x.quality > 0
                 and x.start in potential_start_targets
                 and x.parent_concept == target_end.parent_concept
