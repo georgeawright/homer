@@ -19,51 +19,43 @@ from linguoplotter.loggers import (
 )
 
 DEVELOPMENT = False
-LOG_INTERMMEDIATE_TEXTS = True
+LOG_INTERMMEDIATE_TEXTS = False
 
 pwd = os.getcwd()
 
 hyper_parameters_files = [
-    "hyper_parameters_files/h01.json",
-    "hyper_parameters_files/h02.json",
-    "hyper_parameters_files/h03.json",
-    "hyper_parameters_files/h04.json",
-    "hyper_parameters_files/h05.json",
-    "hyper_parameters_files/h06.json",
-    "hyper_parameters_files/h07.json",
-    "hyper_parameters_files/h08.json",
-    "hyper_parameters_files/h09.json",
-    "hyper_parameters_files/h10.json",
-    "hyper_parameters_files/h11.json",
-    "hyper_parameters_files/h12.json",
-    "hyper_parameters_files/h13.json",
-    "hyper_parameters_files/h14.json",
-    "hyper_parameters_files/h15.json",
-    "hyper_parameters_files/h16.json",
-    "hyper_parameters_files/h17.json",
-    "hyper_parameters_files/h18.json",
-    "hyper_parameters_files/h19.json",
-    "hyper_parameters_files/h20.json",
-    "hyper_parameters_files/h21.json",
-    "hyper_parameters_files/h22.json",
-    "hyper_parameters_files/h23.json",
-    "hyper_parameters_files/h24.json",
-    "hyper_parameters_files/h25.json",
-    "hyper_parameters_files/h26.json",
-    "hyper_parameters_files/h27.json",
-    "hyper_parameters_files/h28.json",
-    "hyper_parameters_files/h29.json",
-    "hyper_parameters_files/h30.json",
-    "hyper_parameters_files/h31.json",
-    "hyper_parameters_files/h32.json",
-    "hyper_parameters_files/h33.json",
-    "hyper_parameters_files/h34.json",
-    "hyper_parameters_files/h35.json",
-    "hyper_parameters_files/h36.json",
-    "hyper_parameters_files/h37.json",
-    "hyper_parameters_files/h38.json",
-    "hyper_parameters_files/h39.json",
-    "hyper_parameters_files/h40.json",
+    "hyper_parameters_files/h06-001.json",
+    "hyper_parameters_files/h06-002.json",
+    "hyper_parameters_files/h06-003.json",
+    "hyper_parameters_files/h06-004.json",
+    "hyper_parameters_files/h06-005.json",
+    "hyper_parameters_files/h06-006.json",
+    "hyper_parameters_files/h06-007.json",
+    "hyper_parameters_files/h06-008.json",
+    "hyper_parameters_files/h06-009.json",
+    "hyper_parameters_files/h06-010.json",
+    "hyper_parameters_files/h06-011.json",
+    "hyper_parameters_files/h06-012.json",
+    "hyper_parameters_files/h06-013.json",
+    "hyper_parameters_files/h06-014.json",
+    "hyper_parameters_files/h06-015.json",
+    "hyper_parameters_files/h06-016.json",
+    "hyper_parameters_files/h06-017.json",
+    "hyper_parameters_files/h06-018.json",
+    "hyper_parameters_files/h06-019.json",
+    "hyper_parameters_files/h06-020.json",
+    "hyper_parameters_files/h06-021.json",
+    "hyper_parameters_files/h06-022.json",
+    "hyper_parameters_files/h06-023.json",
+    "hyper_parameters_files/h06-024.json",
+    "hyper_parameters_files/h06-025.json",
+    "hyper_parameters_files/h06-026.json",
+    "hyper_parameters_files/h06-027.json",
+    "hyper_parameters_files/h06-028.json",
+    "hyper_parameters_files/h06-029.json",
+    "hyper_parameters_files/h06-030.json",
+    "hyper_parameters_files/h06-031.json",
+    "hyper_parameters_files/h06-032.json",
 ]
 program_files = [
     "narration-1.lisp",
@@ -73,7 +65,7 @@ program_files = [
     "narration-5.lisp",
     "narration-6.lisp",
 ]
-random_seeds = range(20)
+random_seeds = range(10)
 
 start_time = time.time()
 results = []
