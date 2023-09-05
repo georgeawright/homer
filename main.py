@@ -23,22 +23,22 @@ LOG_INTERMMEDIATE_TEXTS = True
 pwd = os.getcwd()
 
 hyper_parameters_files = [
-    # "hyper_parameters_files/h01.json",
-    # "hyper_parameters_files/h02.json",
-    # "hyper_parameters_files/h03.json",
-    # "hyper_parameters_files/h04.json",
-    # "hyper_parameters_files/h05.json",
-    # "hyper_parameters_files/h06.json",
-    # "hyper_parameters_files/h07.json",
-    # "hyper_parameters_files/h08.json",
-    # "hyper_parameters_files/h09.json",
-    # "hyper_parameters_files/h10.json",
-    # "hyper_parameters_files/h11.json",
-    # "hyper_parameters_files/h12.json",
-    # "hyper_parameters_files/h13.json",
-    # "hyper_parameters_files/h14.json",
-    # "hyper_parameters_files/h15.json",
-    # "hyper_parameters_files/h16.json",
+    "hyper_parameters_files/h01.json",
+    "hyper_parameters_files/h02.json",
+    "hyper_parameters_files/h03.json",
+    "hyper_parameters_files/h04.json",
+    "hyper_parameters_files/h05.json",
+    "hyper_parameters_files/h06.json",
+    "hyper_parameters_files/h07.json",
+    "hyper_parameters_files/h08.json",
+    "hyper_parameters_files/h09.json",
+    "hyper_parameters_files/h10.json",
+    "hyper_parameters_files/h11.json",
+    "hyper_parameters_files/h12.json",
+    "hyper_parameters_files/h13.json",
+    "hyper_parameters_files/h14.json",
+    "hyper_parameters_files/h15.json",
+    "hyper_parameters_files/h16.json",
     "hyper_parameters_files/h17.json",
     "hyper_parameters_files/h18.json",
     "hyper_parameters_files/h19.json",
@@ -72,7 +72,7 @@ program_files = [
     "narration-5.lisp",
     "narration-6.lisp",
 ]
-random_seeds = range(5)
+random_seeds = range(20)
 
 start_time = time.time()
 results = []
