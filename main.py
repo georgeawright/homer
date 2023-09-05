@@ -3,6 +3,7 @@ import json
 import os
 import statistics
 import time
+from unittest.mock import Mock
 
 from rouge_score.rouge_scorer import RougeScorer
 import zss
@@ -130,7 +131,12 @@ for hyper_parameters_file in hyper_parameters_files:
                     stream=open(f"{pwd}/logs/texts.csv", "a"),
                 )
             else:
-                text_logger = MockLogger()
+                text_logger = TextLogger(
+                    hyper_parameters=hyper_parameters_file,
+                    seed=i,
+                    program=program_file,
+                    stream=Mock(),
+                )
             loggers = {
                 "activity": activity_logger,
                 "structure": structure_logger,
