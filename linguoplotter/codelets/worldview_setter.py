@@ -148,13 +148,9 @@ class WorldviewSetter(Codelet):
         ).log(
             f"Overall satisfaction: {satisfaction}",
         )
-        try:
-            self.bubble_chamber.loggers["text"].log_text(
-                time=self.coderack.codelets_run, text=view.output, quality=satisfaction
-            )
-        except Exception as ex:
-            print(ex)
-            exit()
+        self.bubble_chamber.loggers["text"].log_text(
+            time=self.coderack.codelets_run, text=view.output, quality=satisfaction
+        )
         return satisfaction
 
     def _calculate_correctness(self, view: View) -> FloatBetweenOneAndZero:
