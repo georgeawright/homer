@@ -49,6 +49,7 @@ exports.run = function(query) {
 	    hyperparams_programs_table[hyperparams][program] = {
 		"mean_satisfaction": mathjs.mean(satisfactions),
 		"median_satisfaction": mathjs.median(satisfactions),
+		"max_satisfaction": mathjs.max(satisfactions),
 		"mean_run_length": mathjs.mean(run_lengths),
 		"median_run_length": mathjs.median(run_lengths),
 		"timeout_rate": null_count / satisfactions.length,
@@ -60,6 +61,7 @@ exports.run = function(query) {
     Object.keys(hyperparams_programs_table).forEach(hyperparams => {
 	mean_satisfactions = [];
 	median_satisfactions = [];
+	max_satisfactions = [];
 	mean_run_lengths = [];
 	median_run_lengths = [];
 	timeout_rates = [];
@@ -67,6 +69,7 @@ exports.run = function(query) {
 	    p = hyperparams_programs_table[hyperparams][program];
 	    mean_satisfactions.push(p["mean_satisfaction"]);
 	    median_satisfactions.push(p["median_satisfaction"]);
+	    max_satisfactions.push(p["max_satisfaction"]);
 	    mean_run_lengths.push(p["mean_run_length"]);
 	    median_run_lengths.push(p["median_run_length"]);
 	    timeout_rates.push(p["timeout_rate"]);
@@ -74,6 +77,8 @@ exports.run = function(query) {
 	hyperparams_table[hyperparams] = {
 	    "mean_satisfaction": mathjs.mean(mean_satisfactions),
 	    "median_satisfaction": mathjs.median(median_satisfactions),
+	    "mean_max_satisfaction": mathjs.mean(max_satisfactions),
+	    "median_max_satisfaction": mathjs.median(max_satisfactions),
 	    "mean_run_length": mathjs.mean(mean_run_lengths),
 	    "median_run_length": mathjs.median(median_run_lengths),
 	    "mean_timeout_rate": mathjs.mean(timeout_rates),
@@ -81,11 +86,13 @@ exports.run = function(query) {
 	}
 	mean_satisfaction = hyperparams_table[hyperparams]["mean_satisfaction"];
 	median_satisfaction = hyperparams_table[hyperparams]["median_satisfaction"];
+	mean_max_satisfaction = hyperparams_table[hyperparams]["mean_max_satisfaction"];
+	median_max_satisfaction = hyperparams_table[hyperparams]["median_max_satisfaction"];
 	mean_run_length = hyperparams_table[hyperparams]["mean_run_length"];
 	median_run_length = hyperparams_table[hyperparams]["median_run_length"];
 	mean_timeout_rate = hyperparams_table[hyperparams]["mean_timeout_rate"];
 	median_timeout_rate = hyperparams_table[hyperparams]["median_timeout_rate"];
-	doc += `${hyperparams}\t${mean_satisfaction}\t${median_satisfaction}\t${mean_run_length}\t${median_run_length}\t${mean_timeout_rate}\t${median_timeout_rate}\n`;
+	doc += `${hyperparams}\t${mean_satisfaction}\t${median_satisfaction}\t${mean_max_satisfaction}\t${median_max_satisfaction}\t${mean_run_length}\t${median_run_length}\t${mean_timeout_rate}\t${median_timeout_rate}\n`;
     });
     return doc;
 }
