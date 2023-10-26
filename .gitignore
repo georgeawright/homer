@@ -4,3 +4,4 @@
 logs/
 notes/
 *.sqlite3
+node_modules/
