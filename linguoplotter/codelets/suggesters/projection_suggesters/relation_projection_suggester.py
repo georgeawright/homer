@@ -1,6 +1,6 @@
 from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.suggesters import ProjectionSuggester
-from linguoplotter.structure_collection_keys import activation, corresponding_exigency
+from linguoplotter.structure_collection_keys import activation, corresponding_salience
 from linguoplotter.structures import View
 
 
@@ -30,7 +30,7 @@ class RelationProjectionSuggester(ProjectionSuggester):
         )
         frame = target_view.input_spaces.where(is_frame=True).get()
         target_relation = frame.contents.where(is_relation=True).get(
-            key=corresponding_exigency
+            key=corresponding_salience
         )
         urgency = urgency if urgency is not None else target_view.activation
         targets = bubble_chamber.new_dict(

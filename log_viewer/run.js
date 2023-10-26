@@ -12,6 +12,9 @@ exports.run = function(query) {
 div.plot {
   float: left;
 }
+br {
+  clear: both;
+}
     </style>
   </head>
   </body>
@@ -21,16 +24,158 @@ div.plot {
     <p><a href="structures?run_id=${run_id}">Structures</a></p>
 `
     details = JSON.parse(fs.readFileSync(details_file));
+
+    structures_directory = `logs/${run_id}/structures/structures`;
+    structure_directories = fs.readdirSync(structures_directory);
+    structure_directories.forEach(directory => {
+	if (!directory.includes("ContextualSpace")) {
+	    return;
+	}
+	structure_directory = `${structures_directory}/${directory}`;
+	snapshot_files = fs.readdirSync(structure_directory);
+	try {
+	    file_path = `${structure_directory}/0.json`;
+	    structure = JSON.parse(fs.readFileSync(file_path));
+	    if (structure["is_main_input"]) {
+		details["main_input"] = structure["structure_id"];
+		return;
+	    }
+	} catch (err) {
+	}
+    });
+
     doc += tools.json_to_html(details, query);
+
+    program_name = details["Program"].split(".")[0];
+    graph_file_name = `maps/${program_name}.svg`;
+    graph_svg = fs.readFileSync(graph_file_name);
+    doc += `
+    <object type="image/svg+xml" with="50%">${graph_svg}</object>`;
+
     doc +=  `
+    <br>
     <div id="satisfaction_graph" class="plot"></div>`;
     doc += satisfaction_graph_script(query);
+    doc +=  `
+    <div id="determinism_graph" class="plot"></div>`;
+    doc += determinism_graph_script(query);
     doc +=  `
     <div id="coderack_population_graph" class="plot"></div>`;
     doc += coderack_pop_graph_script(query);
     doc +=  `
     <div id="view_count_graph" class="plot"></div>`;
     doc += view_count_graph_script(query);
+
+    worldviews = [];
+    focuses = [];
+    codelets_directory = `logs/${run_id}/codelets/ids`;
+    codelet_files = fs.readdirSync(codelets_directory);
+    codelet_files.forEach(file => {
+	if (file.includes("WorldviewSetter")) {
+	    file_path = `${codelets_directory}/${file}`;
+	    codelet = JSON.parse(fs.readFileSync(file_path));
+	    worldviews.push({"worldview": codelet["worldview"], "time": codelet["time"]});
+	}
+	if (file.includes("Focus")) {
+	    file_path = `${codelets_directory}/${file}`;
+	    codelet = JSON.parse(fs.readFileSync(file_path));
+	    focuses.push({"focus": codelet["focus"], "time": codelet["time"]});
+	}
+    });
+    worldviews.sort(function(a,b) {return a["time"] - b["time"]});
+    focuses.sort(function(a,b) {return a["time"] - b["time"]});
+    
+    doc += `
+    <br>
+    <h2>Worldview History</h2>
+    <ul>`;
+    previous_worldview = null;
+    worldviews.forEach(worldview => {
+	time = worldview["time"];
+	view = worldview["worldview"];
+
+	if (view === previous_worldview) {
+	    return;
+	}
+
+	structure_directory = `logs/${run_id}/structures/structures/${view}`;
+	structure_files = fs.readdirSync(structure_directory).filter(
+	    (f) => {return f.endsWith("json")}
+	);
+	structure_file = '';
+	latest_file_time = -1;
+	structure_files.forEach(file => {
+	    file_time = Number(file.split(".")[0]);
+	    if (file_time <= time && file_time > latest_file_time) {
+	    structure_file = file;
+	    latest_file_time = file_time;
+	    }
+	});
+	structure_file_path = `${structure_directory}/${structure_file}`;
+        structure_json = JSON.parse(fs.readFileSync(structure_file_path));
+
+	text = structure_json["output"];
+
+	doc += `
+      <li><a href="codelet?run_id=${run_id}&codelet_number=${time}">${time}</a>: <a href="structure_snapshot?run_id=${run_id}&structure_id=${view}&time=${time}">${view}</a>: ${text}</li>`;
+	previous_worldview = view;
+    });
+    doc += `
+    </ul>`;
+
+    doc += `
+    <br>
+    <h2>Focus History</h2>
+    <ul>`;
+    previous_focus = 0;
+    focuses.forEach(focus => {
+	time = focus["time"];
+	view = focus["focus"];
+
+	if (view === previous_focus) {
+	    return;
+	}
+
+	if (view === null) {
+	    doc += `
+      <li><a href="codelet?run_id=${run_id}&codelet_number=${time}">${time}: None</li>`;
+	    previous_focus = view
+	    return;
+	}
+
+	structure_directory = `logs/${run_id}/structures/structures/${view}`;
+	structure_files = fs.readdirSync(structure_directory).filter(
+	    (f) => {return f.endsWith("json")}
+	);
+	structure_file = '';
+	latest_file_time = -1;
+	structure_files.forEach(file => {
+	    file_time = Number(file.split(".")[0]);
+	    if (file_time <= time && file_time > latest_file_time) {
+	    structure_file = file;
+	    latest_file_time = file_time;
+	    }
+	});
+	structure_file_path = `${structure_directory}/${structure_file}`;
+        structure_json = JSON.parse(fs.readFileSync(structure_file_path));
+
+	parent_frame = structure_json["parent_frame"];
+	frame_directory = `logs/${run_id}/structures/structures/${parent_frame}`;
+	structure_files = fs.readdirSync(frame_directory).filter(
+	    (f) => {return f.endsWith("json")}
+	);
+	frame_file_name = structure_files[0];
+	frame_file_path = `${frame_directory}/${frame_file_name}`;
+	frame_json = JSON.parse(fs.readFileSync(frame_file_path));
+	frame_name = frame_json["name"];
+
+	doc += `
+      <li><a href="codelet?run_id=${run_id}&codelet_number=${time}">${time}</a>: <a href="structure_snapshot?run_id=${run_id}&structure_id=${view}&time=${time}">${view}</a>: ${frame_name}</li>`;
+	previous_focus = view;
+    });
+    doc += `
+    </ul>`;
+
     doc += `
   </body>
 </html>`;
@@ -44,6 +189,16 @@ const satisfaction_graph_script = function(query) {
 	satisfaction_data,
 	x_title='Codelets Run',
 	y_title='Satisfaction',
+    );
+}
+
+const determinism_graph_script = function(query) {
+    const determinism_data = data_string_from_csv(query, 'determinism.csv');
+    return tools.generate_graph_script(
+	'determinism_graph',
+	determinism_data,
+	x_title='Codelets Run',
+	y_title='Determinism',
     );
 }
 

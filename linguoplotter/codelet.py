@@ -10,9 +10,6 @@ from .structure_collections import StructureSet
 class Codelet(ABC):
     """A unit of work to be carried out in the bubble chamber."""
 
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
-    MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-
     def __init__(
         self,
         codelet_id: str,
@@ -28,7 +25,13 @@ class Codelet(ABC):
         self.urgency = urgency
         self.child_codelets = []
         self.child_structures = None
-        self.result = None
+        self.result = CodeletResult.FAIL
+        self.FLOATING_POINT_TOLERANCE = (
+            self.bubble_chamber.hyper_parameters.FLOATING_POINT_TOLERANCE
+        )
+        self.MINIMUM_CODELET_URGENCY = (
+            self.bubble_chamber.hyper_parameters.MINIMUM_CODELET_URGENCY
+        )
 
     @classmethod
     def get_target_class(cls):
@@ -36,6 +39,13 @@ class Codelet(ABC):
 
     def run(self) -> CodeletResult:
         raise NotImplementedError
+
+    def adjust_urgency(self, amount: FloatBetweenOneAndZero) -> None:
+        new_urgency = FloatBetweenOneAndZero(self.urgency + amount)
+        self.bubble_chamber.loggers["activity"].log(
+            f"Adjusting {self.codelet_id} urgency from {self.urgency} to {new_urgency}"
+        )
+        self.urgency = new_urgency
 
     def __repr__(self) -> str:
         if self.result is None:

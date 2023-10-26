@@ -4,9 +4,10 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
+from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import corresponding_exigency, exigency
-from linguoplotter.structure_collections import StructureDict
+from linguoplotter.structure_collection_keys import corresponding_salience, salience
+from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structures import View
 
 
@@ -26,7 +27,7 @@ class CorrespondenceSuggester(Suggester):
         target_view: View = None,
     ):
         from linguoplotter.codelets.suggesters.correspondence_suggesters import (
-            InterspatialCorrespondenceSuggester,
+            CrossViewCorrespondenceSuggester,
             PotentialSubFrameToFrameCorrespondenceSuggester,
             SpaceToFrameCorrespondenceSuggester,
             SubFrameToFrameCorrespondenceSuggester,
@@ -38,49 +39,52 @@ class CorrespondenceSuggester(Suggester):
         target_frame = target_view.parent_frame
         input_structures = target_frame.input_space.contents.filter(
             lambda x: not x.is_correspondence
-            and not x.is_interspatial
+            and not x.is_cross_view
             and len(x.correspondences.where(end=x))
             < len(x.parent_spaces.where(is_contextual_space=True))
         )
         output_structures = target_frame.output_space.contents.filter(
             lambda x: not x.is_correspondence
-            and not x.is_interspatial
+            and not x.is_cross_view
             and x.parent_space != target_frame.output_space
             and x.correspondences.is_empty
         )
-        if target_frame.unfilled_interspatial_structures.not_empty:
-            if target_frame.unfilled_interspatial_structures.where(
+        if target_frame.unfilled_cross_view_structures.not_empty:
+            if target_frame.unfilled_cross_view_structures.where(
                 is_label=True
             ).not_empty:
-                end = target_frame.unfilled_interspatial_structures.where(
+                end = target_frame.unfilled_cross_view_structures.where(
                     is_label=True
                 ).get()
             else:
-                end = target_frame.unfilled_interspatial_structures.get()
+                end = target_frame.unfilled_cross_view_structures.get()
             targets = bubble_chamber.new_dict(
                 {"view": target_view, "frame": target_frame, "end": end},
                 name="targets",
             )
             urgency = urgency if urgency is not None else end.uncorrespondedness
-            return InterspatialCorrespondenceSuggester.spawn(
+            return CrossViewCorrespondenceSuggester.spawn(
                 parent_id, bubble_chamber, targets, urgency
             )
         if input_structures.where(is_relation=True).not_empty:
             end = input_structures.where(is_relation=True).get()
         elif input_structures.where(is_label=True).not_empty:
             end = input_structures.where(is_label=True).get()
-        elif input_structures.where(is_chunk=True).not_empty:
-            end = input_structures.where(is_chunk=True).get()
         elif output_structures.where(is_relation=True).not_empty:
             end = output_structures.where(is_relation=True).get()
         elif output_structures.where(is_label=True).not_empty:
             end = output_structures.where(is_label=True).get()
-        elif output_structures.where(is_chunk=True).not_empty:
-            end = output_structures.where(is_chunk=True).get()
         else:
             raise MissingStructureError
         possible_target_spaces = end.parent_spaces.filter(
             lambda s: s.is_contextual_space
+            and (
+                end.correspondences.is_empty
+                or s
+                not in StructureSet.union(
+                    *[c.parent_spaces for c in end.correspondences]
+                )
+            )
         )
         if len(possible_target_spaces) == 1:
             target_space_two = possible_target_spaces.get()
@@ -161,7 +165,7 @@ class CorrespondenceSuggester(Suggester):
     def _get_target_conceptual_space(parent_codelet, child_codelet):
         child_codelet.targets["space"] = None
         end = child_codelet.targets["end"]
-        if end.is_label and end.is_interspatial:
+        if end.is_label and end.is_cross_view:
             child_codelet.targets["space"] = end.parent_spaces.where(
                 is_conceptual_space=True
             ).get()
@@ -243,10 +247,17 @@ class CorrespondenceSuggester(Suggester):
                                 x.parent_concept.is_compound_concept
                                 and x.parent_concept.args[0]
                                 == target_end.parent_concept
+                                and (
+                                    x.parent_concept.root.name != "not"
+                                    or target_view.members.filter(
+                                        lambda x: x.start.parent_space
+                                        in target_view.input_spaces
+                                    ).not_empty
+                                )
                             ),
                         ]
                     )
-                ).get(key=corresponding_exigency)
+                ).get(key=corresponding_salience)
         if target_end.is_relation:
             if target_end.end in target_view.grouped_nodes:
                 end_node_group = [
@@ -278,13 +289,15 @@ class CorrespondenceSuggester(Suggester):
                 and any(
                     [
                         target_end.parent_concept.subsumes(x.parent_concept),
-                        target_end.parent_concept.is_slot,
                         (
                             x.parent_concept.is_compound_concept
                             and x.parent_concept.args[0] == target_end.parent_concept
                             and (
                                 x.parent_concept.root.name != "not"
-                                or target_view.members.not_empty
+                                or target_view.members.filter(
+                                    lambda x: x.start.parent_space
+                                    in target_view.input_spaces
+                                ).not_empty
                             )
                         ),
                     ]
@@ -300,7 +313,7 @@ class CorrespondenceSuggester(Suggester):
                 matching_relations, "matching input relations"
             )
             child_codelet.targets["start"] = matching_relations.get(
-                key=corresponding_exigency
+                key=corresponding_salience
             )
         if target_end.is_node:
             if target_end in target_view.grouped_nodes:
@@ -350,4 +363,4 @@ class CorrespondenceSuggester(Suggester):
                         and not child_codelet.targets["space"].is_slot
                         else True
                     )
-                ).get(key=corresponding_exigency)
+                ).get(key=corresponding_salience)

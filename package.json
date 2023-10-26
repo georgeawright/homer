@@ -19,5 +19,7 @@
     "url": "https://github.com/georgeawright/linguoplotter/issues"
   },
   "homepage": "https://github.com/georgeawright/linguoplotter#readme",
-  "dependencies": {}
+  "dependencies": {
+    "mathjs": "^11.11.0"
+  }
 }

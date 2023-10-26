@@ -49,49 +49,49 @@
 
 (define hot-word
   (def-letter-chunk :name "hot" :parent_space temperature-space
-    :locations (list (Location (list (list 22)) temperature-space))))
+    :locations (list jj-location (Location (list (list 22)) temperature-space))))
 (def-relation :start hot-concept :end hot-word :parent_concept jj-concept)
 (define hott-word
   (def-letter-chunk :name "hott" :parent_space temperature-space
-    :locations (list (Location (list (list 22)) temperature-space))))
+    :locations (list jjr-location (Location (list (list 22)) temperature-space))))
 (def-relation :start hot-concept :end hott-word :parent_concept jjr-concept)
 (def-relation :start hott-word :end -er :parent_concept jjr-concept)
 (define heat-word
   (def-letter-chunk :name "heat" :parent_space temperature-space
-    :locations (list (Location (list (list 22)) temperature-space))))
+    :locations (list nn-location (Location (list (list 22)) temperature-space))))
 (def-relation :start hot-concept :end heat-word :parent_concept nn-concept)
 (define warm-word
   (def-letter-chunk :name "warm" :parent_space temperature-space
-    :locations (list (Location (list (list 18)) temperature-space))))
+    :locations (list jj-location (Location (list (list 18)) temperature-space))))
 (def-relation :start warm-concept :end warm-word :parent_concept jj-concept)
 (def-relation :start warm-concept :end warm-word :parent_concept jjr-concept)
 (def-relation :start warm-word :end -er :parent_concept jjr-concept)
 (define warmth-word
   (def-letter-chunk :name "warmth" :parent_space temperature-space
-    :locations (list (Location (list (list 18)) temperature-space))))
+    :locations (list nn-location (Location (list (list 18)) temperature-space))))
 (def-relation :start warm-concept :end warmth-word :parent_concept nn-concept)
 (define cool-word
   (def-letter-chunk :name "cool" :parent_space temperature-space
-    :locations (list (Location (list (list 8)) temperature-space))))
+    :locations (list jj-location (Location (list (list 8)) temperature-space))))
 (def-relation :start cool-concept :end cool-word :parent_concept jj-concept)
 (def-relation :start cool-concept :end cool-word :parent_concept jjr-concept)
 (def-relation :start cool-word :end -er :parent_concept jjr-concept)
 (define cold-word
   (def-letter-chunk :name "cold" :parent_space temperature-space
-    :locations (list (Location (list (list 4)) temperature-space))))
+    :locations (list jj-location (Location (list (list 4)) temperature-space))))
 (def-relation :start cold-concept :end cold-word :parent_concept jj-concept)
 (def-relation :start cold-concept :end cold-word :parent_concept jjr-concept)
 (def-relation :start cold-word :end -er :parent_concept jjr-concept)
 
 (define mild-word
   (def-letter-chunk :name "mild" :parent_space extremeness-space
-    :locations (list (Location (list (list 0)) extremeness-space))))
+    :locations (list jj-location (Location (list (list 0)) extremeness-space))))
 (def-relation :start mild-concept :end mild-word :parent_concept jj-concept)
 (def-relation :start mild-concept :end mild-word :parent_concept jjr-concept)
 (def-relation :start mild-word :end -er :parent_concept jjr-concept)
 (define extreme-word
   (def-letter-chunk :name "extreme" :parent_space extremeness-space
-    :locations (list (Location (list (list 10)) extremeness-space))))
+    :locations (list jj-location (Location (list (list 10)) extremeness-space))))
 (def-relation :start extreme-concept :end extreme-word :parent_concept jj-concept)
 
 (define same-temperature-concept (def-concept :name "same-temperature"))

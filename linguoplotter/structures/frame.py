@@ -20,7 +20,7 @@ class Frame(Structure):
         sub_frames: StructureSet,  # collection of frames (all slots)
         # structures have locations in frame and sub-frame spaces
         concepts: StructureSet,
-        interspatial_links: StructureSet,
+        cross_view_links: StructureSet,
         input_space: "ContextualSpace",
         output_space: "ContextualSpace",
         links_in: StructureSet,
@@ -50,7 +50,7 @@ class Frame(Structure):
         self.parent_frame = parent_frame
         self.sub_frames = sub_frames
         self.concepts = concepts
-        self.interspatial_links = interspatial_links
+        self.cross_view_links = cross_view_links
         self.input_space = input_space
         self.output_space = output_space
         self.slot_values = {}
@@ -115,8 +115,8 @@ class Frame(Structure):
         return self_progenitor
 
     @property
-    def unfilled_interspatial_structures(self):
-        return self.interspatial_links.filter(
+    def unfilled_cross_view_structures(self):
+        return self.cross_view_links.filter(
             lambda x: x.correspondences.where(end=x).is_empty
         )
 
@@ -124,7 +124,7 @@ class Frame(Structure):
     def unfilled_sub_frame_input_structures(self):
         return self.input_space.contents.filter(
             lambda x: not x.is_correspondence
-            and not x.is_interspatial
+            and not x.is_cross_view
             and not x.is_chunk
             and (
                 len(x.correspondences.where(end=x))
@@ -136,7 +136,7 @@ class Frame(Structure):
     def unfilled_input_structures(self):
         return self.input_space.contents.filter(
             lambda x: not x.is_correspondence
-            and not x.is_interspatial
+            and not x.is_cross_view
             and not x.is_chunk
             and x.correspondences.where(end=x).is_empty
         )
@@ -145,8 +145,8 @@ class Frame(Structure):
     def unfilled_output_structures(self):
         return self.output_space.contents.filter(
             lambda x: not x.is_correspondence
-            and not x.is_interspatial
-            and x.links.where(is_interspatial=True).is_empty
+            and not x.is_cross_view
+            and x.links.where(is_cross_view=True).is_empty
             and x.parent_space != self.output_space
             and x.correspondences.where(end=x).is_empty
         )
@@ -155,8 +155,15 @@ class Frame(Structure):
     def unfilled_projectable_structures(self):
         return self.output_space.contents.filter(
             lambda x: not x.is_correspondence
-            and not x.is_interspatial
-            and x.links.where(is_interspatial=True).is_empty
+            and not x.is_cross_view
+            and x.relations.filter(
+                lambda r: r.is_cross_view
+                and r.conceptual_space.name not in ("grammar", "string")
+            ).is_empty
+            and x.labels.filter(
+                lambda l: l.is_cross_view
+                and l.parent_concept.parent_space.name not in ("grammar", "string")
+            ).is_empty
             and x.correspondences.filter(lambda c: c.start == x).is_empty
         )
 
@@ -164,7 +171,7 @@ class Frame(Structure):
     def number_of_items_left_to_process(self):
         return sum(
             [
-                len(self.unfilled_interspatial_structures),
+                len(self.unfilled_cross_view_structures),
                 len(self.unfilled_sub_frame_input_structures),
                 len(self.unfilled_input_structures),
                 len(self.unfilled_output_structures),
@@ -198,9 +205,9 @@ class Frame(Structure):
             sum([instance.activation for instance in self.instances]) + 1
         )
 
-    def recalculate_exigency(self):
+    def recalculate_salience(self):
         self.recalculate_unhappiness()
-        self.exigency = fuzzy.AND(self.unhappiness, self.activation)
+        self.salience = fuzzy.AND(self.unhappiness, self.activation)
 
     def specify_space(self, abstract_space, conceptual_space):
         if abstract_space in self.input_space.conceptual_spaces:
@@ -215,7 +222,7 @@ class Frame(Structure):
         for item in StructureSet.union(
             self.input_space.contents,
             self.output_space.contents,
-            self.interspatial_links,
+            self.cross_view_links,
         ):
             if item.parent_space == abstract_space:
                 item.parent_space = conceptual_space
@@ -225,24 +232,22 @@ class Frame(Structure):
                 if location.space != abstract_space:
                     continue
                 try:
-                    item.location_in_space(abstract_space).coordinates = [
+                    location.space = conceptual_space
+                    location.coordinates = [
                         [math.nan for _ in range(conceptual_space.no_of_dimensions)]
                     ]
-                    item.location_in_space(abstract_space).space = conceptual_space
-                    conceptual_space.add(item)
-                    item.parent_spaces.remove(abstract_space)
-                    item.parent_spaces.add(conceptual_space)
                 except NotImplementedError:
-                    item.location_in_space(abstract_space).start_coordinates = [
+                    location.space = conceptual_space
+                    location.start_coordinates = [
                         [math.nan for _ in range(conceptual_space.no_of_dimensions)]
                     ]
-                    item.location_in_space(abstract_space).end_coordinates = [
+                    location.end_coordinates = [
                         [math.nan for _ in range(conceptual_space.no_of_dimensions)]
                     ]
-                    item.location_in_space(abstract_space).space = conceptual_space
-                    conceptual_space.add(item)
-                    item.parent_spaces.remove(abstract_space)
-                    item.parent_spaces.add(conceptual_space)
+                abstract_space.remove(item)
+                conceptual_space.add(item)
+                item.parent_spaces.remove(abstract_space)
+                item.parent_spaces.add(conceptual_space)
         for concept in self.concepts:
             if concept.parent_space == abstract_space:
                 concept.parent_space = conceptual_space
@@ -250,8 +255,29 @@ class Frame(Structure):
                 concept.parent_spaces.remove(abstract_space)
                 concept.parent_spaces.add(conceptual_space)
                 concept.location_in_space(abstract_space).space = conceptual_space
+        for sub_frame in self.sub_frames:
+            sub_frame.specify_space(abstract_space, conceptual_space)
 
     def instantiate(
+        self,
+        input_space: "ContextualSpace",
+        conceptual_spaces_map: dict,
+        parent_id: str,
+        bubble_chamber,
+        input_copies: dict = None,
+        output_copies: dict = None,
+    ):
+        instance, _ = self.instantiate_with_copies_map(
+            input_space,
+            conceptual_spaces_map,
+            parent_id,
+            bubble_chamber,
+            input_copies,
+            output_copies,
+        )
+        return instance
+
+    def instantiate_with_copies_map(
         self,
         input_space: "ContextualSpace",
         conceptual_spaces_map: dict,
@@ -308,6 +334,7 @@ class Frame(Structure):
                 structure._parent_concept = concept_copies[structure.parent_concept]
         sub_frames = bubble_chamber.new_set()
         space_copies = {input_space: input_space_copy, output_space: output_space_copy}
+        copies_map = {}
         for sub_frame in self.sub_frames:
             (sub_frame_input_space, sub_frame_output_space) = (
                 (sub_frame.input_space, sub_frame.output_space)
@@ -322,14 +349,13 @@ class Frame(Structure):
                 input_copies=input_copies,
                 output_copies=output_copies,
             )
+            copies_map[sub_frame] = sub_frame_instance
             sub_frames.add(sub_frame_instance)
             space_copies[sub_frame_input_space] = sub_frame_instance.input_space
             space_copies[sub_frame_output_space] = sub_frame_instance.output_space
         for original, copy in input_copies.items():
             if original.parent_space in space_copies:
-                if original.is_link_or_node:
-                    copy._parent_space = space_copies[original.parent_space]
-                elif original.is_node:
+                if original.is_node:
                     copy.parent_space = space_copies[original.parent_space]
                 elif original.is_label or original.is_relation:
                     copy._parent_space = space_copies[original.parent_space]
@@ -339,36 +365,44 @@ class Frame(Structure):
                     copy.parent_space = space_copies[original.parent_space]
                 elif original.is_label or original.is_relation:
                     copy._parent_space = space_copies[original.parent_space]
-        interspatial_links = StructureSet.union(
-            bubble_chamber.new_set(
-                *[
-                    relation.copy(
-                        bubble_chamber=bubble_chamber,
-                        start=input_copies[relation.start]
-                        if relation.start in input_copies
-                        else output_copies[relation.start],
-                        end=input_copies[relation.end]
-                        if relation.end in input_copies
-                        else output_copies[relation.end],
-                    )
-                    for relation in self.interspatial_links.where(is_relation=True)
-                ]
-            ),
-            bubble_chamber.new_set(
-                *[
-                    label.copy(
-                        bubble_chamber=bubble_chamber,
-                        start=input_copies[label.start]
-                        if label.start in input_copies
-                        else output_copies[label.start],
-                    )
-                    for label in self.interspatial_links.where(is_label=True)
-                ]
-            ),
-        )
-        for link in interspatial_links:
-            if link.parent_concept in concept_copies:
-                link._parent_concept = concept_copies[link.parent_concept]
+        cross_view_links = bubble_chamber.new_set()
+        cross_view_link_copies = {}
+        for relation in self.cross_view_links.where(is_relation=True):
+            relation_copy = relation.copy(
+                bubble_chamber=bubble_chamber,
+                start=input_copies[relation.start]
+                if relation.start in input_copies
+                else output_copies[relation.start],
+                end=input_copies[relation.end]
+                if relation.end in input_copies
+                else output_copies[relation.end],
+            )
+            if relation.parent_concept in concept_copies:
+                relation_copy._parent_concept = concept_copies[relation.parent_concept]
+            cross_view_links.add(relation_copy)
+            cross_view_link_copies[relation] = relation_copy
+            for location in relation_copy.locations:
+                if location.space in space_copies:
+                    relation_copy.parent_spaces.remove(location.space)
+                    relation_copy.parent_spaces.add(space_copies[location.space])
+                    location.space = space_copies[location.space]
+        for label in self.cross_view_links.where(is_label=True):
+            label_copy = label.copy(
+                bubble_chamber=bubble_chamber,
+                start=input_copies[label.start]
+                if label.start in input_copies
+                else output_copies[label.start],
+                parent_space=space_copies[label.parent_space],
+            )
+            if label.parent_concept in concept_copies:
+                label_copy._parent_concept = concept_copies[label.parent_concept]
+            cross_view_links.add(label_copy)
+            cross_view_link_copies[label] = label_copy
+            for location in label_copy.locations:
+                if location.space in space_copies:
+                    label_copy.parent_spaces.remove(location.space)
+                    label_copy.parent_spaces.add(space_copies[location.space])
+                    location.space = space_copies[location.space]
         new_frame = bubble_chamber.new_frame(
             parent_id=parent_id,
             name=ID.new_frame_instance(self.name),
@@ -376,7 +410,7 @@ class Frame(Structure):
             parent_frame=self,
             sub_frames=sub_frames,
             concepts=concepts,
-            interspatial_links=interspatial_links,
+            cross_view_links=cross_view_links,
             input_space=input_space_copy,
             output_space=output_space_copy,
             is_sub_frame=self.is_sub_frame,
@@ -384,7 +418,14 @@ class Frame(Structure):
         )
         for abstract_space, conceptual_space in conceptual_spaces_map:
             new_frame.specify_space(abstract_space, conceptual_space)
-        return new_frame
+        for k, v in input_copies.items():
+            copies_map[k] = v
+        for k, v in output_copies.items():
+            copies_map[k] = v
+        for k, v in cross_view_link_copies.items():
+            copies_map[k] = v
+        copies_map[self] = new_frame
+        return new_frame, copies_map
 
     def __repr__(self) -> str:
         return f"<{self.structure_id} {self.name}>"

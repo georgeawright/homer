@@ -41,6 +41,7 @@ class ContextualSpace(Space):
             champion_labels=champion_labels,
             champion_relations=champion_relations,
         )
+        self.parent_frame = None
         self.conceptual_spaces = conceptual_spaces
         self.is_main_input = is_main_input
         self.is_contextual_space = True
@@ -50,6 +51,7 @@ class ContextualSpace(Space):
             "structure_id": self.structure_id,
             "parent_id": self.parent_id,
             "name": self.name,
+            "is_main_input": self.is_main_input,
             "contents": [item.structure_id for item in self.contents],
             "conceptual_spaces": [
                 space.structure_id for space in self.conceptual_spaces
@@ -67,8 +69,10 @@ class ContextualSpace(Space):
 
     @property
     def quality(self):
-
-        active_contents = self.contents.filter(lambda x: x.activation > 0.5)
+        active_contents = self.contents.filter(
+            lambda x: (x.is_chunk or x.is_label or x.is_relation)
+            and x.activation > self.FLOATING_POINT_TOLERANCE
+        )
         if active_contents.is_empty:
             return 0.0
         return statistics.fmean(
@@ -79,8 +83,10 @@ class ContextualSpace(Space):
         )
 
     def add(self, structure: Structure):
-        if structure not in self.contents:
-            self.contents.add(structure)
+        self.contents.add(structure)
+
+    def remove(self, structure: Structure):
+        self.contents.remove(structure)
 
     def add_conceptual_space(self, conceptual_space: "ConceptualSpace"):
         self.conceptual_spaces.add(conceptual_space)
@@ -135,7 +141,7 @@ class ContextualSpace(Space):
             )
             new_space.add(new_item)
             copies[item] = new_item
-            for label in item.labels:
+            for label in item.labels.where(is_cross_view=False):
                 new_label = label.copy(
                     start=new_item,
                     parent_space=new_space,
@@ -145,9 +151,9 @@ class ContextualSpace(Space):
                 new_item.links_out.add(new_label)
                 new_space.add(new_label)
                 copies[label] = new_label
-            for relation in item.links_out.where(
-                is_relation=True, is_interspatial=False
-            ):
+            for relation in item.links_out.where(is_relation=True, is_cross_view=False):
+                if relation in copies:
+                    continue
                 if relation.end not in copies:
                     continue
                 new_end = copies[relation.end]
@@ -156,14 +162,15 @@ class ContextualSpace(Space):
                     end=new_end,
                     parent_space=new_space,
                     bubble_chamber=bubble_chamber,
+                    parent_id=parent_id,
                 )
                 new_end.links_in.add(new_relation)
                 new_item.links_out.add(new_relation)
                 new_space.add(new_relation)
                 copies[relation] = new_relation
-            for relation in item.links_in.where(
-                is_relation=True, is_interspatial=False
-            ):
+            for relation in item.links_in.where(is_relation=True, is_cross_view=False):
+                if relation in copies:
+                    continue
                 if relation.start not in copies:
                     continue
                 new_start = copies[relation.start]
@@ -178,20 +185,4 @@ class ContextualSpace(Space):
                 new_start.links_out.add(new_relation)
                 new_space.add(new_relation)
                 copies[relation] = new_relation
-            while True:
-                try:
-                    label = self.contents.filter(
-                        lambda x: x.is_label and x.start in copies and x not in copies
-                    ).get()
-                    new_label = label.copy(
-                        start=copies[label.start],
-                        parent_space=new_space,
-                        parent_id=parent_id,
-                        bubble_chamber=bubble_chamber,
-                    )
-                    copies[label.start].links_out.add(new_label)
-                    new_space.add(new_label)
-                    copies[label] = new_label
-                except MissingStructureError:
-                    break
         return new_space, copies

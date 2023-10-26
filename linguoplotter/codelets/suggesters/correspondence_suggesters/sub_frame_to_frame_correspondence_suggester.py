@@ -3,7 +3,7 @@ from linguoplotter.codelets.suggesters import CorrespondenceSuggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collections import StructureSet
-from linguoplotter.structure_collection_keys import exigency, uncorrespondedness
+from linguoplotter.structure_collection_keys import salience, uncorrespondedness
 from linguoplotter.structures.nodes import Concept
 
 
@@ -23,7 +23,7 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=salience)
         target_space_two_candidates = bubble_chamber.new_set()
         for frame in target_view.matched_sub_frames.keys():
             target_space_two_candidates.add(frame.input_space)
@@ -37,7 +37,7 @@ class SubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             ]
         )
         end = end_candidates.get(key=uncorrespondedness)
-        urgency = urgency if urgency is not None else target_view.exigency
+        urgency = urgency if urgency is not None else target_view.salience
         targets = bubble_chamber.new_dict(
             {"target_view": target_view, "end": end}, name="targets"
         )

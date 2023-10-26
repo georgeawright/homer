@@ -11,6 +11,8 @@ flake8 = "*"
 pytest = "*"
 pyyaml = "*"
 graphviz = "*"
+rouge-score = "*"
+zss = "*"
 
 [requires]
 python_version = "3.8"

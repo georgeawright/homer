@@ -1,5 +1,5 @@
-from .interspatial_correspondence_builder import (
-    InterspatialCorrespondenceBuilder,
+from .cross_view_correspondence_builder import (
+    CrossViewCorrespondenceBuilder,
 )
 from .space_to_frame_correspondence_builder import (
     SpaceToFrameCorrespondenceBuilder,

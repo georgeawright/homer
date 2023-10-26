@@ -1,1 +1,1 @@
-from .interspatial_relation_builder import InterspatialRelationBuilder
+from .cross_view_relation_builder import CrossViewRelationBuilder

@@ -1,7 +1,7 @@
 from linguoplotter.codelets.selector import Selector
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.hyper_parameters import HyperParameters
-from linguoplotter.structure_collection_keys import activation, exigency
+from linguoplotter.structure_collection_keys import activation, salience
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import View
 
@@ -46,8 +46,9 @@ class ViewSelector(Selector):
                             lambda v: v.parent_frame.parent_concept == f.parent_concept
                             and v.members.is_empty
                         ).is_empty
+                        and not f.is_merged_frame
                     )
-                    .get(key=exigency)
+                    .get(key=salience)
                 )
                 self.child_codelets.append(
                     self.get_follow_up_class().make(
@@ -62,23 +63,12 @@ class ViewSelector(Selector):
 
     def _get_challenger(self):
         champion = self.champions.get()
+        if champion.super_views.not_empty:
+            raise MissingStructureError
         self.challengers.add(
             self.bubble_chamber.views.filter(
-                lambda x: x.parent_frame.parent_concept
-                == champion.parent_frame.parent_concept
-                and (
-                    champion.members.filter(
-                        lambda c: c.start.parent_space in x.input_spaces
-                    ).not_empty
-                    and x.members.filter(
-                        lambda c: c.start.parent_space in champion.input_spaces
-                    ).not_empty
-                    and x.raw_input_nodes == champion.raw_input_nodes
-                )
-                or (any([x in sub_view.super_views for sub_view in champion.sub_views]))
-            )
-            .excluding(champion)
-            .get(key=activation)
+                lambda x: x.is_fully_active() and x.is_competing_with(champion)
+            ).get(key=activation)
         )
 
     def _fizzle(self):

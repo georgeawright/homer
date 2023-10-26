@@ -6,7 +6,7 @@ from linguoplotter.codelets import Suggester
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import activation, exigency
+from linguoplotter.structure_collection_keys import activation, salience
 from linguoplotter.structure_collections import StructureDict
 from linguoplotter.structures import Frame
 
@@ -44,11 +44,12 @@ class ViewSuggester(Suggester):
         urgency: float = None,
     ):
         if frame is not None:
+            frame = frame.progenitor
             contextual_space = bubble_chamber.input_spaces.get(key=activation)
             targets = bubble_chamber.new_dict(
                 {"frame": frame, "contextual_space": contextual_space}, name="targets"
             )
-            urgency = urgency if urgency is not None else frame.exigency
+            urgency = urgency if urgency is not None else frame.salience
             return TopDownViewSuggester.spawn(
                 parent_id, bubble_chamber, targets, urgency
             )
@@ -74,8 +75,8 @@ class BottomUpViewSuggester(ViewSuggester):
                 lambda x: x.parent_frame is None
                 and x.parent_concept != self.bubble_chamber.concepts["conjunction"]
                 and not x.is_sub_frame
-                and x.exigency > 0
-            ).get(key=exigency)
+                and x.salience > 0
+            ).get(key=salience)
         except MissingStructureError:
             return False
         return True
@@ -95,7 +96,7 @@ class BottomUpViewSuggester(ViewSuggester):
             f"Number of equivalent views: {number_of_equivalent_views}"
         )
         self.confidence = (
-            self.targets["frame"].activation * 0.5 ** number_of_equivalent_views
+            self.targets["frame"].activation * 0.5**number_of_equivalent_views
         )
 
 
@@ -122,8 +123,8 @@ class BottomUpCohesionViewSuggester(BottomUpViewSuggester):
                 lambda x: x.parent_frame is None
                 and x.parent_concept == self.bubble_chamber.concepts["conjunction"]
                 and not x.is_sub_frame
-                and x.exigency > 0
-            ).get(key=exigency)
+                and x.salience > 0
+            ).get(key=salience)
         except MissingStructureError:
             return False
         return True
@@ -138,7 +139,7 @@ class TopDownViewSuggester(ViewSuggester):
             self.bubble_chamber.views.filter(
                 lambda x: x.parent_frame.parent_concept
                 == self.targets["frame"].parent_concept
-                and x.unhappiness > self.FLOATING_POINT_TOLERANCE
+                and x.salience > self.FLOATING_POINT_TOLERANCE
             )
         )  # these views should be completed or deleted before more are built
         self.bubble_chamber.loggers["activity"].log(
@@ -148,6 +149,6 @@ class TopDownViewSuggester(ViewSuggester):
             f"Number of equivalent views: {number_of_equivalent_views}"
         )
         self.confidence = (
-            self.targets["frame"].activation * 0.5 ** number_of_equivalent_views
+            self.targets["frame"].activation * 0.5**number_of_equivalent_views
         )
         self.confidence = statistics.fmean([self.confidence, self.urgency])

@@ -1,5 +1,5 @@
-from .interspatial_correspondence_suggester import (
-    InterspatialCorrespondenceSuggester,
+from .cross_view_correspondence_suggester import (
+    CrossViewCorrespondenceSuggester,
 )
 from .space_to_frame_correspondence_suggester import (
     SpaceToFrameCorrespondenceSuggester,

@@ -23,7 +23,7 @@
     :conceptual_spaces (StructureSet conceptual-space)))
 (define ap-sub-frame-output
   (def-contextual-space :name "ap-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space conceptual-space)))
 (define ap-sub-frame
   (def-sub-frame :name "s-expand-ap-sub" :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureSet)
@@ -36,7 +36,7 @@
     :conceptual_spaces (StructureSet location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space location-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-expand-location-sub"
     :parent_concept pp-inessive-location-concept
@@ -51,7 +51,7 @@
     :conceptual_spaces (StructureSet time-space)))
 (define time-sub-frame-output
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space time-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-expand-time-sub"
     :parent_concept pp-directional-time-concept
@@ -66,7 +66,7 @@
     :conceptual_spaces (StructureSet location-space time-space conceptual-space)))
 (define expand-sentence-output
   (def-contextual-space :name "s-expand.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space verb-space location-space time-space
+    :conceptual_spaces (StructureSet string-space grammar-space verb-space location-space time-space
 					    size-space conceptual-space)))
 (define expand-sentence
   (def-frame :name "s-expand" :parent_concept sentence-concept :parent_frame None
@@ -93,6 +93,12 @@
 		     (Location (list) ap-sub-frame-input)
 		     (Location (list) expand-sentence-input))
     :parent_space ap-sub-frame-input))
+(define early-chunk-location-label
+  (def-label :start early-chunk :parent_concept location-concept
+    :locations (list (Location (list (list Nan Nan)) location-space)
+		     (Location (list) location-sub-frame-input)
+		     (Location (list) expand-sentence-input))
+    :parent_space location-sub-frame-input))
 (define late-chunk
   (def-chunk :locations (list (Location (list (list Nan Nan)) location-space)
 			      (Location (list (list Nan)) time-space)
@@ -185,7 +191,7 @@
 		     (Location (list) location-sub-frame-output))))
 (define sentence-word-5
   (def-letter-chunk :name "will"
-    :locations (list vb-location
+    :locations (list aux-location
 		     (Location (list) expand-sentence-output))
     :parent_space expand-sentence-output
     :abstract_chunk will))
@@ -306,6 +312,10 @@
 (def-relation :start pp-directional-time-concept :end expand-sentence
   :is_bidirectional True :stable_activation 0.2)
 (def-relation :start ap-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.2)
+  :is_bidirectional True :stable_activation 0.1)
 (def-relation :start more-size-concept :end expand-sentence
-  :is_bidirectional True :stable_activation 0.4)
+  :is_bidirectional True :stable_activation 0.3)
+(def-relation :start same-location-concept :end expand-sentence
+  :is_bidirectional True :stable_activation 0.1)
+(def-relation :start same-temperature-concept :end expand-sentence
+  :is_bidirectional True :stable_activation 0.1)

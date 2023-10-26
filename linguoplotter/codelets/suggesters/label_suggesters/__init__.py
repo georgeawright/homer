@@ -1,1 +1,1 @@
-from .interspatial_label_suggester import InterspatialLabelSuggester
+from .cross_view_label_suggester import CrossViewLabelSuggester

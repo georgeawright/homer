@@ -5,7 +5,7 @@ from typing import List
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.location import Location
-from linguoplotter.structure_collection_keys import relating_exigency
+from linguoplotter.structure_collection_keys import relating_salience
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structures import Node, Space
 
@@ -110,6 +110,10 @@ class Chunk(Node):
     def is_abstract(self):
         return self.parent_space is None
 
+    @property
+    def is_leaf(self) -> bool:
+        return self.super_chunks.is_empty and self.links.is_empty
+
     def recalculate_unhappiness(self) -> FloatBetweenOneAndZero:
         self.recalculate_unchunkedness()
         self.recalculate_unlabeledness()
@@ -127,13 +131,13 @@ class Chunk(Node):
     def recalculate_unchunkedness(self):
         self.unchunkedness = 0.1 ** len(self.super_chunks)
 
-    def recalculate_labeling_exigency(self):
-        self.labeling_exigency = statistics.fmean(
+    def recalculate_labeling_salience(self):
+        self.labeling_salience = statistics.fmean(
             [self.activation, self.unlabeledness, self.unchunkedness]
         )
 
-    def recalculate_relating_exigency(self):
-        self.relating_exigency = statistics.fmean(
+    def recalculate_relating_salience(self):
+        self.relating_salience = statistics.fmean(
             [self.activation, self.unrelatedness, self.unchunkedness]
         )
 
@@ -184,7 +188,7 @@ class Chunk(Node):
         try:
             return self.relatives.filter(
                 lambda x: self.relations.where(end=x, conceptual_space=space).is_empty
-            ).get(key=relating_exigency)
+            ).get(key=relating_salience)
         except MissingStructureError:
             pass
         chunks = space.contents.filter(
@@ -200,35 +204,8 @@ class Chunk(Node):
     def copy_to_location(
         self, location: Location, bubble_chamber: "BubbleChamber", parent_id: str = ""
     ):
-        def copy_recursively(
-            chunk: Chunk,
-            location: Location,
-            bubble_chamber: "BubbleChamber",
-            parent_id: str,
-            copies: dict,
-        ):
-            locations = [
-                location.copy()
-                for location in chunk.locations
-                if location.space.is_conceptual_space
-            ] + [location]
-            members = bubble_chamber.new_set()
-            for member in chunk.members:
-                if member not in copies:
-                    copies[member] = copy_recursively(
-                        member, location, bubble_chamber, parent_id, copies
-                    )
-                members.add(copies[member])
-            return bubble_chamber.new_chunk(
-                parent_id=parent_id,
-                locations=locations,
-                parent_space=location.space,
-                members=members,
-                is_raw=chunk.is_raw,
-                quality=0.0,
-            )
-
-        return copy_recursively(self, location, bubble_chamber, parent_id, {})
+        chunk_copy, _ = self.copy_with_contents({}, bubble_chamber, parent_id, location)
+        return chunk_copy
 
     def copy_with_contents(
         self,
@@ -245,7 +222,7 @@ class Chunk(Node):
         new_members = bubble_chamber.new_set()
         for member in self.members:
             if member not in copies:
-                copies[member] = member.copy(
+                copies[member], copies = member.copy_with_contents(
                     copies=copies,
                     bubble_chamber=bubble_chamber,
                     parent_id=parent_id,

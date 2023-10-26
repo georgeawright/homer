@@ -5,7 +5,7 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collections import StructureSet
 from linguoplotter.structure_collection_keys import (
-    exigency,
+    salience,
     uncorrespondedness,
 )
 from linguoplotter.structures.nodes import Concept
@@ -27,7 +27,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=salience)
         non_matched_sub_frame = target_view.parent_frame.sub_frames.filter(
             lambda x: x not in target_view.matched_sub_frames
         ).get(key=uncorrespondedness)
@@ -43,7 +43,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             ]
         )
         end = end_candidates.get(key=uncorrespondedness)
-        urgency = urgency if urgency is not None else target_view.exigency
+        urgency = urgency if urgency is not None else target_view.salience
         targets = bubble_chamber.new_dict(
             {
                 "target_view": target_view,
@@ -186,8 +186,9 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             and (
                 x.parent_frame.parent_concept
                 == child_codelet.targets["sub_frame"].parent_concept
+                or x.parent_frame.parent_concept
+                in child_codelet.targets["sub_frame"].parent_concept.possible_instances
             )
-            and (x.parent_frame.progenitor != target_view.parent_frame.progenitor)
             and (x.input_spaces == target_view.input_spaces)
             and x.members.filter(
                 lambda c: c.parent_concept.is_compound_concept
@@ -206,27 +207,24 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
             )
         )
         views_with_compatible_nodes = compatible_sub_views.filter(
-            lambda x: x.members.is_empty
-            or any(
+            lambda v: any(
                 [
                     target_view.can_accept_member(
-                        member.parent_concept,
-                        member.conceptual_space,
-                        member.start,
+                        bubble_chamber.concepts["same"],
+                        child_codelet.targets["space"],
+                        item,
                         child_codelet.targets["end"],
-                        sub_view=x,
+                        sub_view=v,
                     )
-                    and target_view.can_accept_member(
-                        member.parent_concept,
-                        member.conceptual_space,
-                        member.end,
-                        child_codelet.targets["end"],
-                        sub_view=x,
-                    )
-                    for member in x.members.filter(
-                        lambda c: type(c.start) == type(child_codelet.targets["end"])
-                        and c.start.parent_space.parent_concept
-                        == child_codelet.targets["end"].parent_space.parent_concept
+                    for item in (
+                        v.parent_frame.input_space.contents.filter(
+                            lambda x: type(x) == type(child_codelet.targets["end"])
+                        )
+                        if child_codelet.targets["end"].parent_space
+                        == child_codelet.targets["sub_frame"].input_space
+                        else v.parent_frame.output_space.contents.filter(
+                            lambda x: type(x) == type(child_codelet.targets["end"])
+                        )
                     )
                 ]
             )
@@ -236,7 +234,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         )
         child_codelet.targets["sub_view"] = views_with_compatible_nodes.get(
             key=lambda x: fuzzy.OR(
-                x.exigency,
+                x.salience,
                 max(
                     [
                         x.cohesiveness_with(sub_view)
@@ -245,7 +243,7 @@ class PotentialSubFrameToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                 ),
             )
             if target_view.sub_views.not_empty
-            else x.exigency
+            else x.salience
         )
         child_codelet.targets["start_space"] = (
             child_codelet.targets["sub_view"].parent_frame.input_space

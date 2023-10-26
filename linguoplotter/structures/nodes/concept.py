@@ -34,7 +34,7 @@ class Concept(Node):
         champion_labels: StructureSet,
         champion_relations: StructureSet,
         depth: int = 1,
-        distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
+        distance_to_proximity_weight: float = HyperParameters.DEFAULT_DISTANCE_TO_PROXIMITY_WEIGHT,
         is_slot: bool = False,
         reverse: Concept = None,
     ):
@@ -211,7 +211,7 @@ class Concept(Node):
         distance_function: callable = None,
         return_nan: bool = False,
     ):
-        space = self.parent_space if space is None else space
+        space = self.parent_basic_space if space is None else space
         distance_function = (
             self.distance_function if distance_function is None else distance_function
         )

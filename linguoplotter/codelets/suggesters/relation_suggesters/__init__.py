@@ -1,1 +1,1 @@
-from .interspatial_relation_suggester import InterspatialRelationSuggester
+from .cross_view_relation_suggester import CrossViewRelationSuggester

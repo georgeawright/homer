@@ -80,6 +80,15 @@ class RelationBuilder(Builder):
                 )
                 .is_empty
             ):
+                locations = [
+                    Location([], self.targets["start"].parent_space),
+                    Location(
+                        [[location_coordinates]], self.targets["concept"].parent_space
+                    ),
+                    TwoPointLocation(
+                        end_coordinates, start_coordinates, self.targets["space"]
+                    ),
+                ]
                 mirror_relation = self.bubble_chamber.new_relation(
                     parent_id=self.codelet_id,
                     start=self.targets["end"],
@@ -92,7 +101,7 @@ class RelationBuilder(Builder):
                 )
                 self._structure_concept.instances.add(mirror_relation)
                 self.child_structures.add(mirror_relation)
-        self._structure_concept.recalculate_exigency()
+        self._structure_concept.recalculate_salience()
 
     def _fizzle(self):
         pass

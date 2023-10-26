@@ -11,14 +11,6 @@ from .structure_collections import StructureSet
 
 
 class Structure(ABC):
-
-    FLOATING_POINT_TOLERANCE = HyperParameters.FLOATING_POINT_TOLERANCE
-    MINIMUM_ACTIVATION_UPDATE = HyperParameters.MINIMUM_ACTIVATION_UPDATE
-    ACTIVATION_UPDATE_COEFFICIENT = HyperParameters.ACTIVATION_UPDATE_COEFFICIENT
-    DECAY_RATE = HyperParameters.DECAY_RATE
-    RELATIVES_ACTIVATION_WEIGHT = HyperParameters.RELATIVES_ACTIVATION_WEIGHT
-    INSTANCES_ACTIVATION_WEIGHT = HyperParameters.INSTANCES_ACTIVATION_WEIGHT
-
     def __init__(
         self,
         structure_id: str,
@@ -44,7 +36,6 @@ class Structure(ABC):
         self.is_stable = False
         self._depth = 1
         self._activation_buffer = 0.0
-        self._activation_update_coefficient = self.ACTIVATION_UPDATE_COEFFICIENT
         self._parent_space = None
         self._parent_concept = None
 
@@ -54,13 +45,12 @@ class Structure(ABC):
         self.uncorrespondedness = 1.0
         self.unhappiness = 1.0
 
-        self.chunking_exigency = 0.5
-        self.labeling_exigency = 0.5
-        self.relating_exigency = 0.5
-        self.corresponding_exigency = 0.5
-        self.exigency = 0.5
+        self.chunking_salience = 0.5
+        self.labeling_salience = 0.5
+        self.relating_salience = 0.5
+        self.corresponding_salience = 0.5
+        self.salience = 0.5
 
-        self.is_link_or_node = False
         self.is_node = False
         self.is_concept = False
         self.is_compound_concept = False
@@ -69,14 +59,24 @@ class Structure(ABC):
         self.is_link = False
         self.is_correspondence = False
         self.is_label = False
-        self.is_interspatial = False
+        self.is_cross_view = False
         self.is_relation = False
         self.is_view = False
         self.is_space = False
         self.is_conceptual_space = False
         self.is_contextual_space = False
         self.is_frame = False
+        self.is_merged_frame = False
+        self.is_sub_frame = False
         self.is_template = False
+
+        self.hyper_parameters = None
+        self.FLOATING_POINT_TOLERANCE = None
+        self.MINIMUM_ACTIVATION_UPDATE = None
+        self.ACTIVATION_UPDATE_COEFFICIENT = None
+        self.DECAY_RATE = None
+        self.RELATIVES_ACTIVATION_WEIGHT = None
+        self.INSTANCES_ACTIVATION_WEIGHT = None
 
     @classmethod
     def get_builder_class(cls):
@@ -125,6 +125,10 @@ class Structure(ABC):
         )
 
     @property
+    def basic_level_conceptual_spaces(self) -> StructureSet:
+        return self.parent_spaces.where(is_conceptual_space=True, is_basic_level=True)
+
+    @property
     def size(self) -> int:
         return 1
 
@@ -140,44 +144,44 @@ class Structure(ABC):
     def is_recyclable(self) -> bool:
         return False
 
-    def recalculate_exigency(self):
+    def recalculate_salience(self):
         self.recalculate_unhappiness()
-        self.recalculate_chunking_exigency()
-        self.recalculate_labeling_exigency()
-        self.recalculate_relating_exigency()
-        self.recalculate_corresponding_exigency()
-        self.exigency = statistics.fmean([self.activation, self.unhappiness])
+        self.recalculate_chunking_salience()
+        self.recalculate_labeling_salience()
+        self.recalculate_relating_salience()
+        self.recalculate_corresponding_salience()
+        self.salience = statistics.fmean([self.activation, self.unhappiness])
 
-    def recalculate_chunking_exigency(self):
-        self.chunking_exigency = statistics.fmean([self.activation, self.unchunkedness])
+    def recalculate_chunking_salience(self):
+        self.chunking_salience = statistics.fmean([self.activation, self.unchunkedness])
 
-    def recalculate_labeling_exigency(self):
+    def recalculate_labeling_salience(self):
         if self.quality is None:
-            self.labeling_exigency = statistics.fmean(
+            self.labeling_salience = statistics.fmean(
                 [self.activation, self.unlabeledness]
             )
         else:
-            self.labeling_exigency = statistics.fmean(
+            self.labeling_salience = statistics.fmean(
                 [self.activation * self.quality, self.unlabeledness]
             )
 
-    def recalculate_relating_exigency(self):
+    def recalculate_relating_salience(self):
         if self.quality is None:
-            self.relating_exigency = statistics.fmean(
+            self.relating_salience = statistics.fmean(
                 [self.activation, self.unrelatedness]
             )
         else:
-            self.relating_exigency = statistics.fmean(
+            self.relating_salience = statistics.fmean(
                 [self.activation * self.quality, self.unrelatedness]
             )
 
-    def recalculate_corresponding_exigency(self):
+    def recalculate_corresponding_salience(self):
         if self.quality is None:
-            self.corresponding_exigency = statistics.fmean(
+            self.corresponding_salience = statistics.fmean(
                 [self.activation, self.uncorrespondedness]
             )
         else:
-            self.corresponding_exigency = statistics.fmean(
+            self.corresponding_salience = statistics.fmean(
                 [self.activation * self.quality, self.uncorrespondedness]
             )
 
@@ -214,8 +218,9 @@ class Structure(ABC):
 
     def recalculate_unlabeledness(self):
         try:
-            self.unlabeledness = 1 - FloatBetweenOneAndZero(
-                sum([label.quality for label in self.labels]) / len(self.locations)
+            unlabeledness = 1 - FloatBetweenOneAndZero(
+                sum([l.quality * l.activation for l in self.labels])
+                / len(self.basic_level_conceptual_spaces)
             )
         except ZeroDivisionError:
             self.unlabeledness = 1
@@ -223,16 +228,14 @@ class Structure(ABC):
     def recalculate_unrelatedness(self):
         try:
             self.unrelatedness = 1 - FloatBetweenOneAndZero(
-                sum([relation.quality for relation in self.relations])
-                / len(self.locations)
+                sum([r.quality * r.activation for r in self.relations])
+                / len(self.basic_level_conceptual_spaces)
             )
         except ZeroDivisionError:
             self.unrelatedness = 1
 
     def recalculate_uncorrespondedness(self) -> FloatBetweenOneAndZero:
-        self.uncorrespondedness = 0.5 ** sum(
-            link.activation for link in self.correspondences
-        )
+        self.uncorrespondedness = 0.5 ** sum(c.activation for c in self.correspondences)
 
     @property
     def links(self) -> StructureSet:
@@ -444,7 +447,9 @@ class Structure(ABC):
     def recalculate_activation(self):
         if self.is_stable:
             return
-        if self.parent_space is None or self.parent_space.is_conceptual_space:
+        if (
+            self.parent_space is None or self.parent_space.is_conceptual_space
+        ) and not self.is_link:
             relatives_total = FloatBetweenOneAndZero(
                 sum(
                     [
@@ -469,12 +474,25 @@ class Structure(ABC):
                 + relatives_total * self.RELATIVES_ACTIVATION_WEIGHT
                 + instances_total * self.INSTANCES_ACTIVATION_WEIGHT
             )
+        elif self.parent_space is not None and self.parent_space.is_main_input:
+            if self.is_leaf:
+                self._activation_buffer = FloatBetweenOneAndZero(
+                    self.activation - self.DECAY_RATE
+                )
+            else:
+                self._activation_buffer = self.activation
 
     def update_activation(self):
-        if self.parent_space is None or self.parent_space.is_conceptual_space:
+        if any(
+            [
+                (self.parent_space is None or self.parent_space.is_conceptual_space)
+                and not self.is_link,
+                (self.parent_space is not None and self.parent_space.is_main_input),
+            ]
+        ):
             self._activation = self._activation_buffer
             self._activation_buffer = 0.0
-            self.recalculate_exigency()
+            self.recalculate_salience()
 
     def copy(self, **kwargs: dict):
         raise NotImplementedError

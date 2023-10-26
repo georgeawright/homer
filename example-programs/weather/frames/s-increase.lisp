@@ -16,7 +16,7 @@
     :conceptual_spaces (StructureSet location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space location-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-[in/de]crease-location-sub"
     :parent_concept pp-inessive-location-concept
@@ -31,7 +31,7 @@
     :conceptual_spaces (StructureSet time-space)))
 (define time-sub-frame-output
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space time-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-[in/de]crease-time-sub"
     :parent_concept pp-directional-time-concept
@@ -47,7 +47,7 @@
 (define increase-sentence-output
   (def-contextual-space :name "s-[in/de]crease.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet
-			grammar-space verb-space location-space time-space conceptual-space)))
+			string-space grammar-space verb-space location-space time-space conceptual-space)))
 (define increase-sentence
   (def-frame :name "s-[in/de]crease" :parent_concept sentence-concept :parent_frame None
     :depth 6
@@ -123,7 +123,7 @@
 		     (Location (list) increase-sentence-output))))
 (define sentence-word-2
   (def-letter-chunk :name "will"
-    :locations (list vb-location
+    :locations (list aux-location
 		     (Location (list) increase-sentence-output))
     :parent_space increase-sentence-output
     :abstract_chunk will))

@@ -1,1 +1,1 @@
-from .interspatial_label_builder import InterspatialLabelBuilder
+from .cross_view_label_builder import CrossViewLabelBuilder

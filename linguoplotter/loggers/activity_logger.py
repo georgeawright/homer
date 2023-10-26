@@ -1,7 +1,6 @@
 import json
 import pathlib
 
-from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.logger import Logger
 
 
@@ -10,6 +9,7 @@ class ActivityLogger(Logger):
         self,
         codelets_directory: str,
         satisfaction_stream=None,
+        determinism_stream=None,
         coderack_population_stream=None,
         view_count_stream=None,
         codelet_spawned_stream=None,
@@ -17,6 +17,7 @@ class ActivityLogger(Logger):
     ):
         self.codelets_directory = codelets_directory
         self.satisfaction_stream = satisfaction_stream
+        self.determinism_stream = determinism_stream
         self.coderack_population_stream = coderack_population_stream
         self.view_count_stream = view_count_stream
         self.codelet_spawned_stream = codelet_spawned_stream
@@ -30,21 +31,25 @@ class ActivityLogger(Logger):
 
     def log(self, message: str):
         self.codelet_json["activity"].append(message)
+        return self
 
     def log_dict(self, dictionary, name: str = None):
         name = dictionary.name if name is None else name
         self.codelet_json["activity"].append(name)
         self.codelet_json["activity"].append(dictionary.__dict__())
+        return self
 
     def log_set(self, structure_set, name: str = None):
         name = structure_set.name if name is None else name
         self.codelet_json["activity"].append(name)
         self.codelet_json["activity"].append(structure_set.__dict__())
+        return self
 
     def log_list(self, structure_list, name: str = None):
         name = structure_list.name if name is None else name
         self.codelet_json["activity"].append(name)
         self.codelet_json["activity"].append(structure_list.__dict__())
+        return self
 
     def log_codelet_start(self, codelet: "Codelet"):
         self.codelet = codelet
@@ -59,6 +64,7 @@ class ActivityLogger(Logger):
         self.codelet_json["urgency"] = self.codelet.urgency
         self.codelet_json["time"] = self.codelets_run
         self.codelet_json["activity"] = []
+        return self
 
     def log_codelet_end(self, coderack_population: int):
         codelet_log_file = f"{self.codelets_directory}/times/{self.codelets_run}.json"
@@ -86,25 +92,33 @@ class ActivityLogger(Logger):
         self.codelet_json["child_codelets"] = [
             c.codelet_id for c in self.codelet.child_codelets
         ]
-        self.codelet_json["result"] = self.codelet.result
+        self.codelet_json["result"] = self.codelet.result.name
         with open(codelet_log_file, "w") as f:
             json.dump(self.codelet_json, f, sort_keys=False, indent=4)
         self._log_satisfaction()
         self._log_coderack_population(coderack_population)
         self._log_view_count(len(self.codelet.bubble_chamber.views))
+        return self
 
     def _log_satisfaction(self):
         if self.satisfaction_stream is not None:
             self.satisfaction_stream.write(
                 f"{self.codelets_run},{self.codelet.bubble_chamber.satisfaction}\n"
             )
+        if self.determinism_stream is not None:
+            self.determinism_stream.write(
+                f"{self.codelets_run},{self.codelet.bubble_chamber.random_machine.determinism}\n"
+            )
+        return self
 
     def _log_coderack_population(self, coderack_population: int):
         if self.coderack_population_stream is not None:
             self.coderack_population_stream.write(
                 f"{self.codelets_run},{coderack_population}\n"
             )
+        return self
 
     def _log_view_count(self, view_count: int):
         if self.view_count_stream is not None:
             self.view_count_stream.write(f"{self.codelets_run},{view_count}\n")
+        return self

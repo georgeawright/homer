@@ -33,7 +33,7 @@ class CorrespondenceSelector(Selector):
                     self.codelet_id,
                     self.bubble_chamber,
                     target_view=target_view,
-                    urgency=target_view.exigency,
+                    urgency=target_view.salience,
                 )
             )
         except MissingStructureError:

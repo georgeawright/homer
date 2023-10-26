@@ -26,7 +26,7 @@ class Label(Link):
         parent_spaces: StructureSet,
         champion_labels: StructureSet,
         champion_relations: StructureSet,
-        is_interspatial: bool = False,
+        is_cross_view: bool = False,
     ):
         Link.__init__(
             self,
@@ -46,7 +46,7 @@ class Label(Link):
         )
         self._parent_space = parent_space
         self.is_label = True
-        self.is_interspatial = is_interspatial
+        self.is_cross_view = is_cross_view
 
     def __dict__(self) -> dict:
         return {
@@ -58,6 +58,8 @@ class Label(Link):
             "start": self.start.structure_id,
             "locations": [str(location) for location in self.locations],
             "parent_space": self.parent_space.structure_id,
+            "links_out": [link.structure_id for link in self.links_out],
+            "links_in": [link.structure_id for link in self.links_in],
             "quality": self.quality,
             "activation": self.activation,
         }
@@ -79,6 +81,14 @@ class Label(Link):
         from linguoplotter.codelets.selectors import LabelSelector
 
         return LabelSelector
+
+    def is_competing_with(self, other: Label) -> bool:
+        return (
+            self != other
+            and self.start == other.start
+            and self.parent_concept.parent_basic_space
+            == other.parent_concept.parent_basic_space
+        )
 
     def copy(self, **kwargs: dict) -> Label:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
@@ -110,7 +120,7 @@ class Label(Link):
             locations=new_locations,
             quality=self.quality,
             parent_space=parent_space,
-            is_interspatial=self.is_interspatial,
+            is_cross_view=self.is_cross_view,
             activation=self.activation,
         )
 

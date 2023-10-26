@@ -56,9 +56,12 @@
 (define not-less-concept
   (def-compound-concept :root not-concept :args (list less-concept)))
 
-(define more-interspatial-concept (def-concept :name "more-interspatial"))
-(def-relation :start more-concept :end more-interspatial-concept
+(define more-cross_view-concept (def-concept :name "more-cross_view"))
+(def-relation :start more-concept :end more-cross_view-concept
   :parent_concept outer-concept)
-(define less-interspatial-concept (def-concept :name "less-interspatial"))
-(def-relation :start less-concept :end less-interspatial-concept
+(define less-cross_view-concept (def-concept :name "less-cross_view"))
+(def-relation :start less-concept :end less-cross_view-concept
   :parent_concept outer-concept)
+
+(def-relation :start and :end then :parent_concept more-concept :conceptual_space grammar-space)
+(def-relation :start but :end then :parent_concept more-concept :conceptual_space grammar-space)

@@ -1,6 +1,10 @@
 const fs = require('fs');
 const {spawn} = require('child_process');
 
+exports.array_average = function(array) {
+    return array.reduce((a,b) => a + b, 0) / array.length;
+}
+
 exports.get_graph = function(run_id, structure_id, time) {
     const structure_directory = `logs/${run_id}/structures/structures/${structure_id}`;
     const file_name = `${time}.svg`;
@@ -206,6 +210,7 @@ is_codelet_id = function(str) {
 	|| /Selector[0-9]+$/.exec(str)
 	|| /Suggester[0-9]+$/.exec(str)
 	|| /Setter[0-9]+$/.exec(str)
+	|| /Unsetter[0-9]+$/.exec(str)
 	|| /Factory[0-9]+$/.exec(str)
 	|| /Collector[0-9]+$/.exec(str)
 	|| /Porter[0-9]+$/.exec(str)

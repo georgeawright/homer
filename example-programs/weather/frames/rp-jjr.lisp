@@ -12,6 +12,13 @@
     :locations (list (Location (list) more-less-space))))
 (def-relation :start label-parent-concept :end relation-parent-concept
   :parent_concept more-concept :activation 1.0)
+(define similarity-space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define similarity-space
+  (def-conceptual-space :name "" :parent_concept similarity-space-parent-concept
+    :possible_instances (StructureSet time-space location-space)
+    :no_of_dimensions Nan))
+
 (define rp-input
   (def-contextual-space :name "rp[jjr].meaning" :parent_concept input-concept
     :conceptual_spaces (StructureSet conceptual-space)))
@@ -24,6 +31,7 @@
     :sub_frames (StructureSet)
     :concepts (StructureSet label-parent-concept relation-parent-concept)
     :input_space rp-input :output_space rp-output))
+
 (define chunk-start
   (def-chunk :locations (list (Location (list (list Nan)) conceptual-space)
 			      (Location (list) rp-input))
@@ -36,12 +44,21 @@
   (def-label :start chunk-start :parent_concept label-parent-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
 		     (Location (list) rp-input))))
-(define relation
+(define comparative-relation
   (def-relation :start chunk-start :end chunk-end :parent_concept relation-parent-concept
+    :quality 1.0
     :locations (list (Location (list (list Nan)) more-less-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) conceptual-space)
 		     (TwoPointLocation (list) (list) rp-input))
     :conceptual_space conceptual-space))
+(define sameness-relation
+  (def-relation :start chunk-start :end chunk-end :parent_concept same-concept
+    :quality 1.0
+    :locations (list (Location (list (list Nan)) same-different-space)
+		     (TwoPointLocation (list (list)) (list (list)) similarity-space)
+		     (TwoPointLocation (list (list)) (list (list)) rp-input))
+    :conceptual_space similarity-space))
+
 (define jjr-chunk
   (def-letter-chunk :name None
     :locations (list (Location (list (list Nan)) conceptual-space)
@@ -79,17 +96,9 @@
     :locations (list rp-location
 		     (Location (list) rp-output))))
 
-(def-relation :start label-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start relation-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start chunk-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start letter-chunk-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jj-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start jjr-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
-(def-relation :start rp-concept :end rp-frame
-  :is_bidirectional True :activation 1.0)
+(def-relation :start more-temperature-concept :end rp-frame
+  :is_bidirectional True :stable_activation 1.0)
+(def-relation :start more-height-concept :end rp-frame
+  :is_bidirectional True :stable_activation 1.0)
+(def-relation :start more-goodness-concept :end rp-frame
+  :is_bidirectional True :stable_activation 1.0)

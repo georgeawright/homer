@@ -53,6 +53,10 @@ class Link(Structure):
         return self.parent_concept.is_slot
 
     @property
+    def is_leaf(self) -> bool:
+        return self.correspondences.is_empty
+
+    @property
     def is_recyclable(self) -> bool:
         return (
             self.parent_space is not None
@@ -68,12 +72,6 @@ class Link(Structure):
         self.unrelatedness = 0.5 * 0.5 ** sum(
             link.activation for link in self.relations
         )
-
-    def recalculate_activation(self):
-        pass
-
-    def update_activation(self):
-        pass
 
     def is_between(self, a: Structure, b: Structure):
         return self.start == a and self.end == b or self.end == a and self.start == a

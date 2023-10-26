@@ -102,6 +102,10 @@ class Correspondence(Link):
             return [(self.start.start, self.end.start)]
         return [(self.start.start, self.end.start), (self.start.end, self.end.end)]
 
+    @property
+    def is_leaf(self) -> bool:
+        return False
+
     def nearby(self):
         return StructureSet.difference(
             StructureSet.union(
@@ -132,6 +136,9 @@ class Correspondence(Link):
 
     def common_arguments_with(self, other: Correspondence) -> StructureSet:
         return StructureSet.intersection(self.arguments, other.arguments)
+
+    def recalculate_activation(self):
+        pass
 
     def __repr__(self) -> str:
         return (

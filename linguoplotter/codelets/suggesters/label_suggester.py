@@ -2,7 +2,7 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets import Suggester
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import activation, labeling_exigency
+from linguoplotter.structure_collection_keys import activation, labeling_salience
 from linguoplotter.structure_collections import StructureDict, StructureSet
 from linguoplotter.structures.links import Label
 from linguoplotter.structures.nodes import Concept
@@ -36,7 +36,7 @@ class LabelSuggester(Suggester):
     ):
         space = bubble_chamber.input_spaces.get(key=activation)
         start = space.contents.filter(lambda x: x.is_chunk and x.quality > 0).get(
-            key=labeling_exigency
+            key=labeling_salience
         )
         urgency = urgency if urgency is not None else start.unlabeledness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
@@ -112,11 +112,12 @@ class LabelSuggester(Suggester):
         if self.targets["concept"] is None:
             return
         possible_concepts = [self.targets["concept"]]
-        possible_concepts.append(
-            self.bubble_chamber.new_compound_concept(
-                self.bubble_chamber.concepts["not"], [self.targets["concept"]]
+        if self.targets["concept"].is_fully_active():
+            possible_concepts.append(
+                self.bubble_chamber.new_compound_concept(
+                    self.bubble_chamber.concepts["not"], [self.targets["concept"]]
+                )
             )
-        )
         if self.targets["concept"].is_compound_concept:
             for arg in self.targets["concept"].args:
                 possible_concepts.append(arg)

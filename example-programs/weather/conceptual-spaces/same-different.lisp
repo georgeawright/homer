@@ -24,16 +24,16 @@
 (define different-word (def-letter-chunk :name "different" :locations (list)))
 (def-relation :start different-concept :end different-word :parent_concept jj-concept)
 
-(define same-interspatial-concept (def-concept :name "same-interspatial"))
-(def-relation :start same-concept :end same-interspatial-concept
+(define same-cross_view-concept (def-concept :name "same-cross_view"))
+(def-relation :start same-concept :end same-cross_view-concept
   :parent_concept outer-concept)
-(define different-interspatial-concept (def-concept :name "different-interspatial"))
-(def-relation :start different-concept :end different-interspatial-concept
+(define different-cross_view-concept (def-concept :name "different-cross_view"))
+(def-relation :start different-concept :end different-cross_view-concept
   :parent_concept outer-concept)
 
 (define same-verb-concept (def-concept :name "same-verb"))
 (def-relation :start same-concept :end same-verb-concept
   :parent_concept vb-concept)
-(define same-verb-interspatial-concept (def-concept :name "same-verb-interspatial"))
-(def-relation :start same-verb-concept :end same-verb-interspatial-concept
+(define same-verb-cross_view-concept (def-concept :name "same-verb-cross_view"))
+(def-relation :start same-verb-concept :end same-verb-cross_view-concept
   :parent_concept outer-concept)

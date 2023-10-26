@@ -1,1 +1,1 @@
-from .interspatial_label_evaluator import InterspatialLabelEvaluator
+from .cross_view_label_evaluator import CrossViewLabelEvaluator

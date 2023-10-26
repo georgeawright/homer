@@ -11,10 +11,6 @@ from linguoplotter.structure_collections import StructureDict
 
 
 class Publisher(Codelet):
-
-    PUBLICATION_PROBABILITY_EXPONENT = HyperParameters.PUBLICATION_PROBABILITY_EXPONENT
-    MINIMUM_CODELET_URGENCY = HyperParameters.MINIMUM_CODELET_URGENCY
-
     def __init__(
         self,
         codelet_id: str,
@@ -41,8 +37,11 @@ class Publisher(Codelet):
         last_time: int,
         urgency: FloatBetweenOneAndZero,
     ):
+        MINIMUM_CODELET_URGENCY = (
+            bubble_chamber.hyper_parameters.MINIMUM_CODELET_URGENCY
+        )
         targets = bubble_chamber.new_dict(name="targets")
-        urgency = max(urgency, cls.MINIMUM_CODELET_URGENCY)
+        urgency = max(urgency, MINIMUM_CODELET_URGENCY)
         return cls(
             ID.new(cls),
             parent_id,
@@ -57,12 +56,17 @@ class Publisher(Codelet):
     def run(self) -> CodeletResult:
         if self.bubble_chamber.worldview.view is None:
             self.bubble_chamber.loggers["activity"].log("Worldview is empty.")
+            self._update_bottom_up_factories_urgencies()
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return
         self.bubble_chamber.loggers["activity"].log("Worldview is not empty.")
         if self.bubble_chamber.focus.view is not None:
             self.bubble_chamber.loggers["activity"].log("Focus is not empty.")
+            self.bubble_chamber.concepts["publish"].decay_activation(
+                self.bubble_chamber.focus.view.salience
+            )
+            self._update_focus_codelet_urgencies()
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return
@@ -79,6 +83,9 @@ class Publisher(Codelet):
             self.bubble_chamber.loggers["activity"].log(
                 "Satisfaction is increasing too much."
             )
+            self.bubble_chamber.concepts["publish"].decay_activation(
+                satisfaction_gradient
+            )
             self._fizzle()
             self.result = CodeletResult.FIZZLE
             return
@@ -88,10 +95,19 @@ class Publisher(Codelet):
         )
         if not publish_concept.is_fully_active():
             self.bubble_chamber.loggers["activity"].log("Boosting publish concept")
+            self.bubble_chamber.loggers["activity"].log(
+                f"Worldview Satisfaction: {self.bubble_chamber.worldview.satisfaction}"
+            )
             publish_concept.boost_activation(
-                statistics.fmean(
-                    [self.bubble_chamber.worldview.satisfaction, self.urgency]
-                )
+                publish_concept.activation
+                + HyperParameters.MINIMUM_ACTIVATION_UPDATE
+                # fuzzy.OR(
+                #    self.bubble_chamber.worldview.satisfaction,
+                #    publish_concept.activation,
+                # )
+                # statistics.fmean(
+                #    [self.bubble_chamber.worldview.satisfaction, self.urgency]
+                # )
             )
             self._fizzle()
             self.result = CodeletResult.FIZZLE
@@ -101,7 +117,6 @@ class Publisher(Codelet):
         self.result = CodeletResult.FINISH
 
     def _fizzle(self) -> CodeletResult:
-        self._update_bottom_up_factories_urgencies()
         urgency = (
             fuzzy.OR(self.bubble_chamber.worldview.satisfaction, self.urgency)
             if self.last_satisfaction <= self.bubble_chamber.general_satisfaction
@@ -126,6 +141,9 @@ class Publisher(Codelet):
                 "BottomUpSuggesterFactory" in codelet.codelet_id
                 or "BottomUpEvaluatorFactory" in codelet.codelet_id
             ):
-                codelet.urgency = 1.0
+                codelet.adjust_urgency(1.0 - self.bubble_chamber.worldview.satisfaction)
+
+    def _update_focus_codelet_urgencies(self):
+        for codelet in self.coderack._codelets:
             if "Focus" in codelet.codelet_id:
-                codelet.urgency = 1.0
+                codelet.adjust_urgency(1.0 - self.bubble_chamber.worldview.satisfaction)

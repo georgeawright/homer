@@ -3,10 +3,39 @@ import statistics
 from typing import Iterable, List, Union
 
 
+def generalized_mean(
+    values: list, weights: list = None, exponent: float = 1.0, tolerance: float = 0.0
+):
+    weights = [1 for _ in values] if weights is None else weights
+    if exponent == 0:
+        return math.prod([(v + tolerance) ** w for w, v in zip(weights, values)]) ** (
+            1 / sum(weights)
+        )
+    if exponent == math.inf:
+        return max(values)
+    if exponent == -math.inf:
+        return min(values)
+    return (
+        sum([w * (v + tolerance) ** exponent for w, v in zip(weights, values)])
+        / sum(weights)
+    ) ** (1 / exponent)
+
+
 def shortest_distance(a, b, return_nan: bool = False) -> float:
     nan_return_value = math.nan if return_nan else 0.0
     distance = min([math.dist(a_point, b_point) for a_point in a for b_point in b])
     return distance if not math.isnan(distance) else nan_return_value
+
+
+def average_euclidean_distance(a, b, return_nan: bool = False) -> float:
+    distances = []
+    for a_coords in a:
+        for b_coords in b:
+            distance = math.dist(a_coords, b_coords)
+            if math.isnan(distance):
+                return math.nan if return_nan else 0.0
+            distances.append(distance)
+    return statistics.fmean(distances)
 
 
 def centroid_euclidean_distance(a, b, return_nan: bool = False) -> float:
@@ -34,6 +63,8 @@ def size_euclidean_distance(a, b, return_nan: bool = False) -> float:
 
 
 def centroid_difference(a, b, return_nan: bool = False) -> float:
+    if isinstance(a[0][0], str):
+        return boolean_distance(a, b, return_nan=return_nan)
     nan_return_value = math.nan if return_nan else 0.0
     difference = average_vector(a)[0] - average_vector(b)[0]
     return difference if not math.isnan(difference) else nan_return_value
@@ -41,6 +72,10 @@ def centroid_difference(a, b, return_nan: bool = False) -> float:
 
 def boolean_distance(a, b, return_nan: bool = False) -> float:
     # TODO: this is not fully general
+    if isinstance(a[0][0], str):
+        if a[0][0] == b[0][0]:
+            return 0.0
+        return math.inf
     if (len(a) == 0 or len(b) == 0) and a != b:
         return math.inf
     if all([math.isnan(coord) for a_coords in a for coord in a_coords]):

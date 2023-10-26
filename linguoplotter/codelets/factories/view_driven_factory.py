@@ -6,7 +6,7 @@ from linguoplotter.codelets.suggesters import (
     ViewSuggester,
 )
 from linguoplotter.codelets.suggesters.correspondence_suggesters import (
-    InterspatialCorrespondenceSuggester,
+    CrossViewCorrespondenceSuggester,
     PotentialSubFrameToFrameCorrespondenceSuggester,
     SpaceToFrameCorrespondenceSuggester,
     SubFrameToFrameCorrespondenceSuggester,
@@ -18,10 +18,10 @@ from linguoplotter.codelets.suggesters.projection_suggesters import (
     RelationProjectionSuggester,
 )
 from linguoplotter.codelets.suggesters.label_suggesters import (
-    InterspatialLabelSuggester,
+    CrossViewLabelSuggester,
 )
 from linguoplotter.codelets.suggesters.relation_suggesters import (
-    InterspatialRelationSuggester,
+    CrossViewRelationSuggester,
 )
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
@@ -77,11 +77,14 @@ class ViewDrivenFactory(Factory):
         if self.targets["frame"].has_failed_to_match:
             return
         self._set_target_slot()
-        if self.targets["slot"].is_interspatial:
+        if self.targets["slot"].is_cross_view:
             try:
-                follow_up = self._spawn_interspatial_correspondence_suggester()
+                follow_up = self._spawn_cross_view_correspondence_suggester()
             except MissingStructureError:
-                follow_up = self._spawn_interspatial_link_suggester()
+                try:
+                    follow_up = self._spawn_cross_view_link_suggester()
+                except MissingStructureError:
+                    follow_up = self._spawn_view_suggester()
         elif (
             len(self.targets["slot"].parent_spaces.where(is_contextual_space=True)) == 1
             and self.targets["slot"].parent_space
@@ -126,17 +129,15 @@ class ViewDrivenFactory(Factory):
             self.targets["frame"] = self.targets["view"].parent_frame
 
     def _set_target_slot(self):
-        interspatial_structures = self.targets["frame"].unfilled_interspatial_structures
-        if interspatial_structures.not_empty:
-            if interspatial_structures.where(is_label=True).not_empty:
-                self.targets["slot"] = interspatial_structures.where(
-                    is_label=True
-                ).get()
+        cross_view_structures = self.targets["frame"].unfilled_cross_view_structures
+        if cross_view_structures.not_empty:
+            if cross_view_structures.where(is_label=True).not_empty:
+                self.targets["slot"] = cross_view_structures.where(is_label=True).get()
             else:
-                self.targets["slot"] = interspatial_structures.get()
+                self.targets["slot"] = cross_view_structures.get()
             return
-        if self.targets["frame"].unfilled_interspatial_structures.not_empty:
-            self.targets["frame"].unfilled_interspatial_structures.get()
+        if self.targets["frame"].unfilled_cross_view_structures.not_empty:
+            self.targets["frame"].unfilled_cross_view_structures.get()
             return
         for structures in [
             self.targets["frame"].unfilled_sub_frame_input_structures,
@@ -208,9 +209,7 @@ class ViewDrivenFactory(Factory):
                         space.contents.filter(
                             lambda x: x.is_concept
                             and not x.is_slot
-                            and (
-                                not x.is_compound_concept or x.args[0].is_fully_active()
-                            )
+                            and (not x.is_compound_concept or x.is_fully_active())
                         )
                         for space in self.targets[
                             "slot"
@@ -223,7 +222,7 @@ class ViewDrivenFactory(Factory):
                 ].parent_concept.parent_space.contents.filter(
                     lambda x: x.is_concept
                     and not x.is_slot
-                    and (not x.is_compound_concept or x.args[0].is_fully_active())
+                    and (not x.is_compound_concept or x.is_fully_active())
                 )
             possible_target_combos = [
                 self.bubble_chamber.new_dict(
@@ -273,8 +272,7 @@ class ViewDrivenFactory(Factory):
                     (a, b)
                     for a in potential_targets
                     for b in potential_targets
-                    if a != b
-                    and (a == target_start if target_start is not None else True)
+                    if (a == target_start if target_start is not None else True)
                     and (b == target_end if target_end is not None else True)
                 ]
             if not self.targets["slot"].parent_concept.is_slot:
@@ -294,6 +292,7 @@ class ViewDrivenFactory(Factory):
                     )
                     for concept in space.contents.filter(
                         lambda x: x.is_concept
+                        and x.structure_type == Relation
                         and not x.is_slot
                         and (not x.is_compound_concept or x.args[0].is_fully_active())
                     )
@@ -350,14 +349,15 @@ class ViewDrivenFactory(Factory):
             )
         raise Exception("Slot is not a label or a relation.")
 
-    def _spawn_interspatial_link_suggester(self):
+    def _spawn_cross_view_link_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
-            "Spawning interspatial link suggester"
+            "Spawning cross_view link suggester"
         )
         if self.targets["slot"].is_relation:
             target_start_space = None
             target_end_space = None
-            for link in self.targets["frame"].interspatial_links:
+            for link in self.targets["frame"].cross_view_links:
+                # TODO: this information should be stored in the view
                 for correspondee in link.correspondees:
                     if (
                         link.start.parent_space
@@ -393,6 +393,7 @@ class ViewDrivenFactory(Factory):
                 potential_start_views = self.bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
+                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
                 )
                 potential_start_targets = StructureSet.union(
                     *[
@@ -456,6 +457,7 @@ class ViewDrivenFactory(Factory):
                 potential_end_views = self.bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == end_sub_frame.parent_concept
+                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
                 )
                 if potential_end_views.is_empty:
                     raise MissingStructureError
@@ -574,8 +576,16 @@ class ViewDrivenFactory(Factory):
                     space=x["space"],
                 ),
             )
+            targets["start_view"] = potential_start_views.filter(
+                lambda x: targets["start"] in x.parent_frame.input_space.contents
+                or targets["start"] in x.output_space.contents
+            ).get()
+            targets["end_view"] = potential_end_views.filter(
+                lambda x: targets["end"] in x.parent_frame.input_space.contents
+                or targets["end"] in x.output_space.contents
+            ).get()
             self.bubble_chamber.loggers["activity"].log_dict(targets)
-            return InterspatialRelationSuggester.spawn(
+            return CrossViewRelationSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 targets,
@@ -595,31 +605,43 @@ class ViewDrivenFactory(Factory):
             )
         elif self.targets["slot"].is_label:
             target_start_space = None
-            for link in self.targets["frame"].interspatial_links:
-                for correspondee in link.correspondees:
-                    if (
-                        link.start.parent_space
-                        == self.targets["slot"].start.parent_space
-                    ):
-                        target_start_space = correspondee.start.parent_space
-                    if (
-                        link.is_relation
-                        and link.end.parent_space
-                        == self.targets["slot"].start.parent_space
-                    ):
-                        target_start_space = correspondee.end.parent_space
             for sub_frame in self.targets["frame"].sub_frames:
-                if (
-                    self.targets["slot"].start in sub_frame.input_space.contents
-                    or self.targets["slot"].start in sub_frame.output_space.contents
-                ):
+                if self.targets["slot"].start in sub_frame.input_space.contents:
                     start_sub_frame = sub_frame
+                    if sub_frame in self.targets["view"].matched_sub_frames:
+                        target_start_space = (
+                            self.targets["view"]
+                            .matched_sub_frames[sub_frame]
+                            .input_space
+                        )
+                if self.targets["slot"].start in sub_frame.output_space.contents:
+                    start_sub_frame = sub_frame
+                    if sub_frame in self.targets["view"].matched_sub_frames:
+                        target_start_space = (
+                            self.targets["view"]
+                            .sub_views.where(
+                                parent_frame=self.targets["view"].matched_sub_frames[
+                                    sub_frame
+                                ]
+                            )
+                            .get()
+                            .output_space
+                        )
             if target_start_space is None:
                 potential_start_views = self.bubble_chamber.views.filter(
                     lambda x: x.parent_frame.parent_concept
                     == start_sub_frame.parent_concept
                     and x.parent_frame
                     not in self.targets["view"].matched_sub_frames.values()
+                    and x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                    and not any(
+                        [
+                            x.raw_input_nodes == sub_view.raw_input_nodes
+                            and x.parent_frame.progenitor
+                            == sub_view.parent_frame.progenitor
+                            for sub_view in self.targets["view"].sub_views
+                        ]
+                    )
                 )
             else:
                 potential_start_views = self.bubble_chamber.views.filter(
@@ -632,7 +654,6 @@ class ViewDrivenFactory(Factory):
                 *[
                     view.output_space.contents.filter(
                         lambda x: x.is_chunk
-                        and x.members.is_empty
                         and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
                     )
                     if self.targets["slot"].start
@@ -685,27 +706,31 @@ class ViewDrivenFactory(Factory):
                 )
             possible_target_combos = [
                 self.bubble_chamber.new_dict(
-                    {"start": start, "space": space, "concept": concept},
+                    {"start": start, "view": view, "space": space, "concept": concept},
                     name="targets",
                 )
                 for start in potential_start_targets
+                for view in potential_start_views
                 for space in possible_spaces
                 for concept in possible_concepts
                 if start.has_location_in_space(space)
+                and (
+                    start in view.parent_frame.input_space.contents
+                    or start in view.output_space.contents
+                )
                 and space in start.parent_space.conceptual_spaces
             ]
             targets = self.bubble_chamber.random_machine.select(
                 possible_target_combos,
                 key=lambda x: x["concept"].classifier.classify(
-                    start=x["start"].non_slot_value
-                    if x["start"].is_slot
-                    else x["start"],
+                    start=x["start"],
+                    view=x["view"],
                     concept=x["concept"],
                     space=x["space"],
                 ),
             )
             self.bubble_chamber.loggers["activity"].log_dict(targets)
-            return InterspatialLabelSuggester.spawn(
+            return CrossViewLabelSuggester.spawn(
                 self.codelet_id,
                 self.bubble_chamber,
                 targets,
@@ -748,9 +773,9 @@ class ViewDrivenFactory(Factory):
             else 1.0,
         )
 
-    def _spawn_interspatial_correspondence_suggester(self):
+    def _spawn_cross_view_correspondence_suggester(self):
         self.bubble_chamber.loggers["activity"].log(
-            "Spawning InterspatialCorrespondenceSuggester"
+            "Spawning CrossViewCorrespondenceSuggester"
         )
         targets = self.bubble_chamber.new_dict(
             {
@@ -761,7 +786,7 @@ class ViewDrivenFactory(Factory):
             },
             name="targets",
         )
-        follow_up = InterspatialCorrespondenceSuggester.spawn(
+        follow_up = CrossViewCorrespondenceSuggester.spawn(
             self.codelet_id,
             self.bubble_chamber,
             targets,
@@ -897,6 +922,7 @@ class ViewDrivenFactory(Factory):
         frame = self.bubble_chamber.frames.where(
             is_sub_frame=False,
             parent_concept=sub_frame.parent_concept,
+            # or parent_concept in sub_frame.parent_concept.possible_instances
         ).get(key=activation)
         self.bubble_chamber.loggers["activity"].log(f"Found target frame: {frame}")
         urgency = self.targets["view"].unhappiness

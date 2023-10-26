@@ -25,9 +25,7 @@ class TwoPointLocation(Location):
         raise NotImplementedError
 
     def __repr__(self):
-        return (
-            f"({self.start_coordinates} to {self.end_coordinates}, {self.space.name})"
-        )
+        return f"({self.start_coordinates} to {self.end_coordinates}, {self.space})"
 
     def __eq__(self, other: TwoPointLocation) -> bool:
         return (

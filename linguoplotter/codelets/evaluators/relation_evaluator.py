@@ -2,13 +2,10 @@ from linguoplotter.bubble_chamber import BubbleChamber
 from linguoplotter.codelets.evaluator import Evaluator
 from linguoplotter.hyper_parameters import HyperParameters
 from linguoplotter.structure_collections import StructureSet
+from linguoplotter.tools import generalized_mean
 
 
 class RelationEvaluator(Evaluator):
-    CLASSIFICATION_WEIGHT = HyperParameters.RELATION_QUALITY_CLASSIFICATION_WEIGHT
-    SAMENESS_WEIGHT = HyperParameters.RELATION_QUALITY_SAMENESS_WEIGHT
-    TIME_WEIGHT = HyperParameters.RELATION_QUALITY_TIME_WEIGHT
-
     @classmethod
     def get_follow_up_class(cls) -> type:
         from linguoplotter.codelets.selectors import RelationSelector
@@ -68,6 +65,7 @@ class RelationEvaluator(Evaluator):
             / (
                 1
                 if not relation.parent_concept.is_compound_concept
+                # concepts with 2 components are fine, but more is unwieldy
                 else relation.parent_concept.number_of_components - 1
             )
             * times_are_adjacent
@@ -91,12 +89,19 @@ class RelationEvaluator(Evaluator):
             ):
                 time_difference_confidence = classification
         for relation in classifications:
-            relation.quality = sum(
-                [
-                    classifications[relation] * self.CLASSIFICATION_WEIGHT,
-                    sameness_confidence * self.SAMENESS_WEIGHT,
-                    time_difference_confidence * self.TIME_WEIGHT,
-                ]
+            relation.quality = generalized_mean(
+                values=[
+                    classifications[relation],
+                    sameness_confidence,
+                    time_difference_confidence,
+                ],
+                weights=[
+                    self.bubble_chamber.hyper_parameters.RELATION_QUALITY_CLASSIFICATION_WEIGHT,
+                    self.bubble_chamber.hyper_parameters.RELATION_QUALITY_SAMENESS_WEIGHT,
+                    self.bubble_chamber.hyper_parameters.RELATION_QUALITY_TIME_WEIGHT,
+                ],
+                tolerance=self.FLOATING_POINT_TOLERANCE,
+                exponent=self.bubble_chamber.hyper_parameters.RELATION_QUALITY_EXPONENT,
             )
         self.confidence = target_relation.quality
         self.change_in_confidence = abs(self.confidence - self.original_confidence)

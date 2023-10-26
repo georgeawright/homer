@@ -9,7 +9,7 @@ from linguoplotter.structures.nodes import Concept
 from linguoplotter.tools import hasinstance
 
 # TODO: also need to implement instances based on bubble chamber structures
-# definitely: unhappiness and exigency
+# definitely: unhappiness and salience
 # possibly: activation and quality
 
 
@@ -27,7 +27,6 @@ class Factory(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
-        self.result = None
 
     @classmethod
     def spawn(
@@ -72,10 +71,10 @@ class Factory(Codelet):
             ViewSuggester,
         )
         from linguoplotter.codelets.suggesters.label_suggesters import (
-            InterspatialLabelSuggester,
+            CrossViewLabelSuggester,
         )
         from linguoplotter.codelets.suggesters.relation_suggesters import (
-            InterspatialRelationSuggester,
+            CrossViewRelationSuggester,
         )
         from linguoplotter.codelets.suggesters.correspondence_suggesters import (
             SpaceToFrameCorrespondenceSuggester,
@@ -109,8 +108,8 @@ class Factory(Codelet):
                 "outer": {
                     "forward": {
                         "correspondence": PotentialSubFrameToFrameCorrespondenceSuggester,
-                        "label": InterspatialLabelSuggester,
-                        "relation": InterspatialRelationSuggester,
+                        "label": CrossViewLabelSuggester,
+                        "relation": CrossViewRelationSuggester,
                     },
                 },
             },

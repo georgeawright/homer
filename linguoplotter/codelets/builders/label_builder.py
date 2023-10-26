@@ -76,7 +76,7 @@ class LabelBuilder(Builder):
             quality=0,
         )
         self._structure_concept.instances.add(label)
-        self._structure_concept.recalculate_exigency()
+        self._structure_concept.recalculate_salience()
         self.child_structures.add(label)
 
     def _fizzle(self):

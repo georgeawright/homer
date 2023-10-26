@@ -1,1 +1,1 @@
-from .interspatial_relation_selector import InterspatialRelationSelector
+from .cross_view_relation_selector import CrossViewRelationSelector

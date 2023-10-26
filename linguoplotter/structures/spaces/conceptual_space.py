@@ -117,6 +117,11 @@ class ConceptualSpace(Space):
                     structure.locations.append(location_in_sub_space)
                 sub_space.add(structure)
 
+    def remove(self, structure: Structure):
+        self.contents.remove(structure)
+        for sub_space in self.sub_spaces:
+            sub_space.remove(structure)
+
     def subsumes(self, other) -> bool:
         if isinstance(other, ConceptualSpace):
             if self == other:

@@ -4,8 +4,8 @@ from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.structure_collection_keys import (
     activation,
-    corresponding_exigency,
-    exigency,
+    corresponding_salience,
+    salience,
     uncorrespondedness,
 )
 from linguoplotter.structures.nodes import Concept
@@ -27,7 +27,7 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
         bubble_chamber: BubbleChamber,
         urgency: FloatBetweenOneAndZero = None,
     ):
-        target_view = bubble_chamber.views.get(key=exigency)
+        target_view = bubble_chamber.views.get(key=salience)
         target_space_two = target_view.parent_frame.input_space
         end = target_space_two.contents.where(is_correspondence=False).get(
             key=uncorrespondedness
@@ -189,6 +189,9 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
     @staticmethod
     def _get_target_structure_one(parent_codelet, child_codelet):
         bubble_chamber = parent_codelet.bubble_chamber
+        RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH = (
+            bubble_chamber.hyper_parameters.RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+        )
         target_view = child_codelet.targets["view"]
         target_end = child_codelet.targets["end"]
         start_space = target_view.input_spaces.get()
@@ -232,7 +235,10 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         )
                         and x.quality * x.activation > 0
                         and x.uncorrespondedness
-                        > bubble_chamber.random_machine.generate_number()
+                        > (
+                            bubble_chamber.random_machine.generate_number()
+                            * RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+                        )
                         and x.parent_concept
                         in child_codelet.targets[
                             "end"
@@ -256,6 +262,11 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                     )
                     and x.start.quality * x.start.activation > 0
                     and x.quality * x.activation > 0
+                    and x.uncorrespondedness
+                    > (
+                        bubble_chamber.random_machine.generate_number()
+                        * RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+                    )
                     and child_codelet.targets["space"].subsumes(
                         x.parent_concept.parent_and_super_spaces
                     )
@@ -268,6 +279,13 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                                 x.parent_concept.is_compound_concept
                                 and x.parent_concept.args[0]
                                 == target_end.parent_concept
+                                and (
+                                    x.parent_concept.root.name != "not"
+                                    or target_view.members.filter(
+                                        lambda x: x.start.parent_space
+                                        in target_view.input_spaces
+                                    ).not_empty
+                                )
                             ),
                         ]
                     )
@@ -308,6 +326,11 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         x.quality * x.activation > 0,
                         x.start.quality * x.start.activation > 0,
                         x.end.quality * x.end.activation > 0,
+                        x.uncorrespondedness
+                        > (
+                            bubble_chamber.random_machine.generate_number()
+                            * RANDOMNESS_IN_CORRESPONDENCE_START_SEARCH
+                        ),
                     ]
                 )
                 and (x.start == structure_one_start or structure_one_start is None)
@@ -319,6 +342,13 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         (
                             x.parent_concept.is_compound_concept
                             and x.parent_concept.args[0] == target_end.parent_concept
+                            and (
+                                x.parent_concept.root.name != "not"
+                                or target_view.members.filter(
+                                    lambda x: x.start.parent_space
+                                    in target_view.input_spaces
+                                ).not_empty
+                            )
                         ),
                         (
                             target_end.parent_concept.is_compound_concept
@@ -384,4 +414,4 @@ class SpaceToFrameCorrespondenceSuggester(CorrespondenceSuggester):
                         and not child_codelet.targets["space"].is_slot
                         else True
                     )
-                ).get(key=corresponding_exigency)
+                ).get(key=corresponding_salience)

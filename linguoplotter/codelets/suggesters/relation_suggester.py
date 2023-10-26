@@ -6,7 +6,7 @@ from linguoplotter.errors import MissingStructureError, NoLocationError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
 from linguoplotter.structure_collections import StructureDict
-from linguoplotter.structure_collection_keys import relating_exigency
+from linguoplotter.structure_collection_keys import activation, relating_salience
 from linguoplotter.structures.links import Relation
 from linguoplotter.structures.nodes import Concept
 from linguoplotter.structures.spaces import ConceptualSpace
@@ -41,7 +41,7 @@ class RelationSuggester(Suggester):
         input_space = bubble_chamber.input_spaces.get()
         start = input_space.contents.filter(
             lambda x: x.is_chunk and not x.is_slot and x.quality > 0
-        ).get(key=relating_exigency)
+        ).get(key=relating_salience)
         urgency = urgency if urgency is not None else start.unrelatedness
         targets = bubble_chamber.new_dict({"start": start}, name="targets")
         return cls.spawn(parent_id, bubble_chamber, targets, urgency)
@@ -60,17 +60,12 @@ class RelationSuggester(Suggester):
             conceptual_space = input_space.conceptual_spaces.filter(
                 lambda x: (
                     x.no_of_dimensions == 1
-                    if parent_concept.parent_space.name == "more-less"
+                    if parent_concept.parent_space == bubble_chamber.spaces["more-less"]
                     else True
                 )
-                and (
-                    x in input_space.conceptual_spaces
-                    if parent_concept.parent_space.name == "same-different"
-                    else True
-                )
-            ).get()
+            ).get(key=activation)
         potential_targets = input_space.contents.filter(
-            lambda x: x.is_node and x.is_slot and x.quality > 0
+            lambda x: x.is_node and not x.is_slot and x.quality > 0
         )
         try:
             possible_pairs = [
@@ -155,23 +150,32 @@ class RelationSuggester(Suggester):
             for space in possible_spaces
             for concept in possible_concepts
             if (
-                space.no_of_dimensions == 1 and concept.parent_space.name == "more-less"
+                space.no_of_dimensions == 1
+                and concept
+                in (
+                    self.bubble_chamber.concepts["same"],
+                    self.bubble_chamber.concepts["more"],
+                    self.bubble_chamber.concepts["less"],
+                )
             )
             or (
-                space in self.targets["start"].parent_space.conceptual_spaces
-                and concept.parent_space.name == "same-different"
+                space.no_of_dimensions != 1
+                and concept.parent_space == self.bubble_chamber.spaces["same-different"]
             )
         ]
-        targets = self.bubble_chamber.random_machine.select(
-            possible_target_combos,
-            key=lambda x: x["concept"].classifier.classify(
-                start=x["start"],
-                end=x["end"],
-                concept=x["concept"],
-                space=x["space"],
+        try:
+            targets = self.bubble_chamber.random_machine.select(
+                possible_target_combos,
+                key=lambda x: x["concept"].classifier.classify(
+                    start=x["start"],
+                    end=x["end"],
+                    concept=x["concept"],
+                    space=x["space"],
+                )
+                / x["concept"].number_of_components,
             )
-            / x["concept"].number_of_components,
-        )
+        except MissingStructureError:
+            return False
         self.targets["concept"], self.targets["end"], self.targets["space"] = (
             targets["concept"],
             targets["end"],
@@ -284,6 +288,11 @@ class RelationSuggester(Suggester):
                     space=x["space"],
                 ),
             )
+            try:
+                targets["start_view"] = self.targets["start_view"]
+                targets["end_view"] = self.targets["end_view"]
+            except KeyError:
+                pass
             self.child_codelets.append(
                 type(self).spawn(
                     self.codelet_id,

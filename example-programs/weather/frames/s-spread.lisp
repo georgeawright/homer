@@ -26,7 +26,7 @@
     :conceptual_spaces (StructureSet conceptual-space)))
 (define ap-sub-frame-output
   (def-contextual-space :name "ap-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space conceptual-space)))
 (define ap-sub-frame
   (def-sub-frame :name "s-spread-ap-sub" :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureSet)
@@ -39,7 +39,7 @@
     :conceptual_spaces (StructureSet unidimensional-location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space unidimensional-location-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space unidimensional-location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-spread-location-sub"
     :parent_concept pp-directional-location-concept
@@ -54,7 +54,7 @@
     :conceptual_spaces (StructureSet time-space)))
 (define time-sub-frame-output
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space time-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-spread-time-sub"
     :parent_concept pp-directional-time-concept
@@ -71,7 +71,7 @@
 (define spread-sentence-output
   (def-contextual-space :name "s-spread.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet unidimensional-location-space
-			grammar-space verb-space location-space time-space conceptual-space)))
+			string-space grammar-space verb-space location-space time-space conceptual-space)))
 (define spread-sentence
   (def-frame :name "s-spread" :parent_concept sentence-concept :parent_frame None
     :depth 6
@@ -176,13 +176,14 @@
     :abstract_chunk temperatures))
 (define sentence-word-4
   (def-letter-chunk :name "will"
-    :locations (list vb-location
+    :locations (list aux-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
     :abstract_chunk will))
 (define sentence-word-5
   (def-letter-chunk :name "spread"
     :locations (list vb-location
+		     spread-location
 		     (Location (list) spread-sentence-output))
     :parent_space spread-sentence-output
     :abstract_chunk spread-word))
@@ -283,9 +284,9 @@
 (def-relation :start pp-directional-time-concept :end spread-sentence
   :is_bidirectional True :stable_activation 0.2)
 (def-relation :start ap-concept :end spread-sentence
-  :is_bidirectional True :stable_activation 0.2)
+  :is_bidirectional True :stable_activation 0.1)
 (def-relation :start more-size-concept :end spread-sentence
-  :is_bidirectional True :stable_activation 0.2)
+  :is_bidirectional True :stable_activation 0.3)
 (def-relation :start same-location-concept :end spread-sentence
   :is_bidirectional True :stable_activation 0.1)
 (def-relation :start same-temperature-concept :end spread-sentence

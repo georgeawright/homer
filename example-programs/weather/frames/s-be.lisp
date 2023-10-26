@@ -8,13 +8,22 @@
   (def-concept :name "" :is_slot True :parent_space conceptual-space))
 (define location-concept
   (def-concept :name "" :is_slot True :parent_space location-space))
+(define time-relation-space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define time-relation-space
+  (def-conceptual-space :name "" :parent_concept time-relation-space-parent-concept
+    :possible_instances (StructureSet more-less-space same-different-space)
+    :no_of_dimensions 1))
+(define time-relation-concept
+  (def-concept :name "" :is_slot True :parent_space time-relation-space
+    :possible_instances (StructureSet less-concept same-concept)))
  
 (define description-sub-frame-input
   (def-contextual-space :name "description-sub-frame.input" :parent_concept input-concept
     :conceptual_spaces (StructureSet conceptual-space)))
 (define description-sub-frame-output
   (def-contextual-space :name "description-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space conceptual-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space conceptual-space)))
 (define description-sub-frame
   (def-sub-frame :name "s-be-ap-sub" :parent_concept ap-concept :parent_frame None
     :sub_frames (StructureSet)
@@ -27,7 +36,7 @@
     :conceptual_spaces (StructureSet location-space)))
 (define location-sub-frame-output
   (def-contextual-space :name "location-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space location-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space location-space)))
 (define location-sub-frame
   (def-sub-frame :name "s-be-location-sub"
     :parent_concept pp-inessive-location-concept
@@ -42,13 +51,13 @@
     :conceptual_spaces (StructureSet time-space)))
 (define time-sub-frame-output
   (def-contextual-space :name "time-sub-frame.text" :parent_concept text-concept
-    :conceptual_spaces (StructureSet grammar-space time-space)))
+    :conceptual_spaces (StructureSet string-space grammar-space time-space)))
 (define time-sub-frame
   (def-sub-frame :name "s-be-time-sub"
-    :parent_concept pp-directional-time-concept
+    :parent_concept pp-time-concept
     :parent_frame None
     :sub_frames (StructureSet)
-    :concepts (StructureSet)
+    :concepts (StructureSet time-relation-concept)
     :input_space time-sub-frame-input
     :output_space time-sub-frame-output))
 
@@ -58,7 +67,7 @@
 (define be-sentence-output
   (def-contextual-space :name "s-be.text" :parent_concept text-concept
     :conceptual_spaces (StructureSet
-			grammar-space verb-space location-space time-space conceptual-space)))
+			string-space grammar-space verb-space location-space time-space conceptual-space)))
 (define be-sentence
   (def-frame :name "s-be" :parent_concept sentence-concept :parent_frame None
     :depth 6
@@ -75,12 +84,6 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) be-sentence-input))
     :parent_space be-sentence-input))
-(define early-chunk-least-time-label
-  (def-label :start early-chunk :parent_concept least-concept
-    :locations (list (Location (list (list Nan)) time-space)
-		     (Location (list) be-sentence-input))
-    :is_interspatial True
-    :quality 1.0 :activation 1.0))
 (define early-chunk-conceptual-label
   (def-label :start early-chunk :parent_concept conceptual-label-concept
     :locations (list (Location (list (list Nan)) conceptual-space)
@@ -95,12 +98,6 @@
 			      (Location (list) time-sub-frame-input)
 			      (Location (list) be-sentence-input))
     :parent_space be-sentence-input))
-(define late-chunk-most-time-label
-  (def-label :start late-chunk :parent_concept most-concept
-    :locations (list (Location (list (list Nan)) time-space)
-		     (Location (list) be-sentence-input))
-    :is_interspatial True
-    :quality 1.0 :activation 1.0))
 (define late-chunk-location-label
   (def-label :start late-chunk :parent_concept location-concept
     :locations (list (Location (list (list Nan Nan)) location-space)
@@ -109,9 +106,9 @@
     :parent_space location-sub-frame-input))
 
 (define time-relation
-  (def-relation :start early-chunk :end late-chunk :parent_concept less-concept
+  (def-relation :start early-chunk :end late-chunk :parent_concept time-relation-concept
     :quality 1.0
-    :locations (list (Location (list (list Nan)) more-less-space)
+    :locations (list (Location (list (list Nan)) time-relation-space)
 		     (TwoPointLocation (list (list Nan)) (list (list Nan)) time-space)
 		     (TwoPointLocation (list) (list) time-sub-frame-input)
 		     (TwoPointLocation (list) (list) be-sentence-input))
@@ -146,13 +143,14 @@
 		     (Location (list) be-sentence-output))))
 (define sentence-word-2
   (def-letter-chunk :name "will"
-    :locations (list vb-location
+    :locations (list aux-location
 		     (Location (list) be-sentence-output))
     :parent_space be-sentence-output
     :abstract_chunk will))
 (define sentence-word-3
   (def-letter-chunk :name "be"
     :locations (list vb-location
+		     be-location
 		     (Location (list) be-sentence-output))
     :parent_space be-sentence-output
     :abstract_chunk be))
@@ -182,10 +180,6 @@
 		     (Location (list) time-sub-frame-output)
 		     (Location (list) be-sentence-output))
     :parent_space time-sub-frame-output))
-(define time-chunk-grammar-label
-  (def-label :start sentence-word-6 :parent_concept pp-directional-time-concept
-    :locations (list pp-location
-		     (Location (list) time-sub-frame-output))))
 
 (define v-super-chunk
   (def-letter-chunk :name None

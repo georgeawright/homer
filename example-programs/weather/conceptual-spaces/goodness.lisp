@@ -23,20 +23,20 @@ lambda location: [[(c[0]-4)/1.8] for c in location.coordinates]
 
 (define good-word
   (def-letter-chunk :name "good" :parent_space goodness-space
-    :locations (list (Location (list (list 10)) goodness-space))))
+    :locations (list jj-location (Location (list (list 10)) goodness-space))))
 (def-relation :start good-concept :end good-word :parent_concept jj-concept)
 (define bett-word
   (def-letter-chunk :name "bett" :parent_space goodness-space
-    :locations (list (Location (list (list 10)) goodness-space))))
+    :locations (list jjr-location (Location (list (list 10)) goodness-space))))
 (def-relation :start good-concept :end bett-word :parent_concept jjr-concept)
 (def-relation :start bett-word :end -er :parent_concept jjr-concept)
 (define bad-word
   (def-letter-chunk :name "bad" :parent_space goodness-space
-    :locations (list (Location (list (list 0)) goodness-space))))
+    :locations (list jj-location (Location (list (list 0)) goodness-space))))
 (def-relation :start bad-concept :end bad-word :parent_concept jj-concept)
 (define worse-word
   (def-letter-chunk :name "worse" :parent_space goodness-space
-    :locations (list (Location (list (list 0)) goodness-space))))
+    :locations (list jjr-location (Location (list (list 0)) goodness-space))))
 (def-relation :start bad-concept :end worse-word :parent_concept jjr-concept)
 (def-relation :start worse-word :end null :parent_concept jjr-concept)
 

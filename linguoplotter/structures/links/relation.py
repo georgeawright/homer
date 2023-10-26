@@ -32,7 +32,9 @@ class Relation(Link):
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
         is_stable: bool = False,
-        is_interspatial: bool = False,
+        is_cross_view: bool = False,
+        start_view: "View" = None,
+        end_view: "View" = None,
     ):
         Link.__init__(
             self,
@@ -53,10 +55,12 @@ class Relation(Link):
         self._parent_space = parent_space
         self.conceptual_space = conceptual_space
         self.is_relation = True
-        self.is_interspatial = is_interspatial
+        self.is_cross_view = is_cross_view
         self.is_bidirectional = is_bidirectional
         self.is_excitatory = is_excitatory
         self.is_stable = is_stable
+        self.start_view = start_view
+        self.end_view = end_view
 
     def __dict__(self) -> dict:
         return {
@@ -74,6 +78,8 @@ class Relation(Link):
             "parent_space": self.parent_space.structure_id
             if self.parent_space is not None
             else None,
+            "links_out": [link.structure_id for link in self.links_out],
+            "links_in": [link.structure_id for link in self.links_in],
             "quality": self.quality,
             "activation": self.activation,
         }
@@ -95,6 +101,22 @@ class Relation(Link):
         from linguoplotter.codelets.selectors import RelationSelector
 
         return RelationSelector
+
+    def is_competing_with(self, other: Relation) -> bool:
+        return (
+            self != other
+            and self.conceptual_space.parent_concept
+            == other.conceptual_space.parent_concept
+            and self.arguments == other.arguments
+            and not self.is_mutually_supportive_of(other)
+        )
+
+    def is_mutually_supportive_of(self, other: Relation) -> bool:
+        return (
+            (self.start, self.end) == (other.end, other.start)
+            and self.conceptual_space == other.conceptual_space
+            and self.parent_concept == other.parent_concept.reverse
+        )
 
     def copy(self, **kwargs) -> Relation:
         """Takes keyword arguments 'start', 'end', 'parent_space', and 'parent_id'."""
@@ -127,7 +149,7 @@ class Relation(Link):
             locations=new_locations,
             quality=self.quality,
             parent_space=self.parent_space,
-            is_interspatial=self.is_interspatial,
+            is_cross_view=self.is_cross_view,
             activation=self.activation,
         )
 

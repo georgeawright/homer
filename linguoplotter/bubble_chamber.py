@@ -14,22 +14,36 @@ from .random_machine import RandomMachine
 from .recycle_bin import RecycleBin
 from .structure import Structure
 from .structure_collections import StructureDict, StructureList, StructureSet
+from .structure_collection_keys import activation
 from .structures import Frame, Space, View
+from .structures.frames import MergedFrame
 from .structures.links import Correspondence, Label, Relation
 from .structures.nodes import Chunk, Concept
 from .structures.nodes.chunks import LetterChunk
 from .structures.nodes.concepts import CompoundConcept
 from .structures.spaces import ConceptualSpace, ContextualSpace
+from .tools import generalized_mean
 from .worldview import Worldview
 
 
 class BubbleChamber:
-    JUMP_THRESHOLD = HyperParameters.JUMP_THRESHOLD
-    MAIN_INPUT_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
-    VIEWS_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_VIEW_QUALITIES_WEIGHT
-    WORLDVIEW_WEIGHT = HyperParameters.BUBBLE_CHAMBER_SATISFACTION_WORLDVIEW_WEIGHT
+    def __init__(
+        self, hyper_parameters: HyperParameters, focus: Focus, recycle_bin: RecycleBin
+    ):
+        self.hyper_parameters = hyper_parameters
+        self.FLOATING_POINT_TOLERANCE = hyper_parameters.FLOATING_POINT_TOLERANCE
+        self.JUMP_THRESHOLD = hyper_parameters.JUMP_THRESHOLD
+        self.MAIN_INPUT_WEIGHT = (
+            hyper_parameters.BUBBLE_CHAMBER_SATISFACTION_MAIN_INPUT_WEIGHT
+        )
+        self.VIEWS_WEIGHT = hyper_parameters.BUBBLE_CHAMBER_SATISFACTION_VIEWS_WEIGHT
+        self.WORLDVIEW_WEIGHT = (
+            hyper_parameters.BUBBLE_CHAMBER_SATISFACTION_WORLDVIEW_WEIGHT
+        )
+        self.SATISFACTION_EXPONENT = (
+            hyper_parameters.BUBBLE_CHAMBER_SATISFACTION_EXPONENT
+        )
 
-    def __init__(self, focus, recycle_bin):
         self.loggers = {}
         self.random_machine = None
         self.worldview = None
@@ -39,6 +53,7 @@ class BubbleChamber:
         self.conceptual_spaces = None
         self.contextual_spaces = None
         self.frames = None
+        self.merged_frames = None
         self.frame_instances = None
 
         self.concepts = None
@@ -48,23 +63,34 @@ class BubbleChamber:
         self.concept_links = None
         self.correspondences = None
         self.labels = None
-        self.interspatial_labels = None
+        self.cross_view_labels = None
         self.relations = None
-        self.interspatial_relations = None
+        self.cross_view_relations = None
 
         self.views = None
 
         self.satisfaction = 0
         self.general_satisfaction = 0
+        self.previous_satisfaction = 0
+        self.change_in_satisfaction = 0
+        self.time_of_last_successful_focus_unset = 0
+        self.focus_setters_since_last_successful_focus_unset = 0
         self.result = None
         self.log_count = 0
 
         self.ACTIVATION_LOGGING_FREQUENCY = HyperParameters.ACTIVATION_LOGGING_FREQUENCY
 
     @classmethod
-    def setup(cls, loggers: Dict[str, Logger], random_seed: int = None):
-        bubble_chamber = cls(Focus(), RecycleBin())
-        bubble_chamber.random_machine = RandomMachine(bubble_chamber, random_seed)
+    def setup(
+        cls,
+        hyper_parameters: HyperParameters,
+        loggers: Dict[str, Logger],
+        random_seed: int = None,
+    ):
+        bubble_chamber = cls(hyper_parameters, Focus(), RecycleBin())
+        bubble_chamber.random_machine = RandomMachine(
+            bubble_chamber, hyper_parameters, random_seed
+        )
         bubble_chamber.reset(loggers)
         return bubble_chamber
 
@@ -75,6 +101,7 @@ class BubbleChamber:
         self.conceptual_spaces = self.new_set()
         self.contextual_spaces = self.new_set()
         self.frames = self.new_set()
+        self.merged_frames = self.new_set()
         self.frame_instances = self.new_set()
         self.concepts = self.new_set()
         self.chunks = self.new_set()
@@ -82,12 +109,16 @@ class BubbleChamber:
         self.concept_links = self.new_set()
         self.correspondences = self.new_set()
         self.labels = self.new_set()
-        self.interspatial_labels = self.new_set()
+        self.cross_view_labels = self.new_set()
         self.relations = self.new_set()
-        self.interspatial_relations = self.new_set()
+        self.cross_view_relations = self.new_set()
         self.views = self.new_set()
         self.satisfaction = 0
         self.general_satisfaction = 0
+        self.previous_satisfaction = 0
+        self.change_in_satisfaction = 0
+        self.time_of_last_successful_focus_unset = 0
+        self.focus_setters_since_last_successful_focus_unset = 0
         self.result = None
         self.log_count = 0
 
@@ -129,6 +160,7 @@ class BubbleChamber:
             self.conceptual_spaces,
             self.contextual_spaces,
             self.frames,
+            self.merged_frames,
             self.chunks,
             self.concepts,
             self.correspondences,
@@ -148,6 +180,7 @@ class BubbleChamber:
             ConceptualSpace: "conceptual_spaces",
             ContextualSpace: "contextual_spaces",
             Frame: "frames",
+            MergedFrame: "merged_frames",
             # nodes
             Chunk: "chunks",
             Concept: "concepts",
@@ -162,10 +195,9 @@ class BubbleChamber:
     def recalculate_satisfaction(self):
         self.focus.recalculate_satisfaction()
         self.recalculate_general_satisfaction()
-        if self.focus.view is not None:
-            self.satisfaction = max(self.general_satisfaction, self.focus.satisfaction)
-        else:
-            self.satisfaction = self.general_satisfaction
+        self.satisfaction = max(self.general_satisfaction, self.focus.satisfaction)
+        self.change_in_satisfaction = self.satisfaction - self.previous_satisfaction
+        self.random_machine.recalculate_determinism()
 
     def recalculate_general_satisfaction(self):
         main_input_space = self.contextual_spaces.where(is_main_input=True).get()
@@ -174,15 +206,50 @@ class BubbleChamber:
             if not self.views.is_empty
             else 0
         )
-        self.general_satisfaction = sum(
-            [
-                self.MAIN_INPUT_WEIGHT * main_input_space.quality,
-                self.VIEWS_WEIGHT * average_view_quality,
-                self.WORLDVIEW_WEIGHT * self.worldview.satisfaction,
-            ]
+        self.general_satisfaction = generalized_mean(
+            values=[
+                main_input_space.quality,
+                average_view_quality,
+                self.worldview.satisfaction,
+            ],
+            weights=[self.MAIN_INPUT_WEIGHT, self.VIEWS_WEIGHT, self.WORLDVIEW_WEIGHT],
+            tolerance=self.FLOATING_POINT_TOLERANCE,
+            exponent=self.SATISFACTION_EXPONENT,
         )
 
+    @property
+    def unrelatedness_of_letter_chunks(self):
+        try:
+            views = self.views.filter(
+                lambda x: x.unhappiness < self.FLOATING_POINT_TOLERANCE
+                and x.parent_frame.parent_concept.location_in_space(
+                    self.spaces["grammar"]
+                )
+                == self.concepts["sentence"].location_in_space(self.spaces["grammar"])
+            ).sample(2, key=activation)
+            if not len({view.output: True for view in views}) > 1:
+                raise MissingStructureError
+            view = views.get()
+            letter_chunks = view.output_space.contents.filter(
+                lambda x: x.is_letter_chunk
+                and not x.is_slot
+                and x.labels.not_empty
+                and len(x.parent_spaces.where(is_conceptual_space=True)) > 1
+            )
+            if letter_chunks.is_empty:
+                raise MissingStructureError
+            relations = StructureSet.intersection(
+                *[c.relations.where(is_cross_view=True) for c in letter_chunks]
+            )
+            return 1 - sum([r.quality * r.activation for r in relations]) / len(
+                view.output_space.conceptual_spaces
+            )
+        except MissingStructureError:
+            return float("-inf")
+
     def update_activations(self) -> None:
+        self.change_in_satisfaction = self.satisfaction - self.previous_satisfaction
+        self.previous_satisfaction = self.satisfaction
         self.worldview.activate()
         for structure in self.structures:
             structure.recalculate_activation()
@@ -208,21 +275,39 @@ class BubbleChamber:
         return StructureSet(self, structures, name=name)
 
     def add(self, item):
+        item.hyper_parameters = self.hyper_parameters
+        item.FLOATING_POINT_TOLERANCE = self.hyper_parameters.FLOATING_POINT_TOLERANCE
+        item.MINIMUM_ACTIVATION_UPDATE = self.hyper_parameters.MINIMUM_ACTIVATION_UPDATE
+        item.ACTIVATION_UPDATE_COEFFICIENT = (
+            self.hyper_parameters.ACTIVATION_UPDATE_COEFFICIENT
+        )
+        item.DECAY_RATE = self.hyper_parameters.DECAY_RATE
+        item.RELATIVES_ACTIVATION_WEIGHT = (
+            self.hyper_parameters.ACTIVATION_UPDATE_RELATIVES_WEIGHT
+        )
+        item.INSTANCES_ACTIVATION_WEIGHT = (
+            self.hyper_parameters.ACTIVATION_UPDATE_INSTANCES_WEIGHT
+        )
         self.loggers["structure"].log(item)
         for space in item.parent_spaces:
             space.add(item)
             self.loggers["structure"].log(space)
         collection_name = self.collections[type(item)]
         getattr(self, collection_name).add(item)
-        if item.is_interspatial and item.is_label:
-            self.interspatial_labels.add(item)
-        if item.is_interspatial and item.is_relation:
-            self.interspatial_relations.add(item)
+        if item.is_cross_view and item.is_label:
+            self.cross_view_labels.add(item)
+        if item.is_cross_view and item.is_relation:
+            self.cross_view_relations.add(item)
 
     def remove(self, item):
         if item.is_frame:
             self.frames.remove(item)
         if item.is_view:
+            correspondences = item.members.where(parent_view=item)
+            for correspondence in correspondences:
+                self.remove(correspondence)
+            for link in item.cross_view_links.copy():
+                self.remove(link)
             item_sub_views = item.sub_views.copy()
             for sub_view in item.sub_views:
                 sub_view.super_views.remove(item)
@@ -240,26 +325,30 @@ class BubbleChamber:
                 super_view.sub_views.remove(item)
                 for frame in item.frames:
                     super_view.frames.remove(frame)
-            correspondences = item.members.where(parent_view=item)
-            for correspondence in correspondences:
-                self.remove(correspondence)
             item.parent_frame.progenitor.instances.remove(item)
             item.parent_frame.parent_concept.instances.remove(item)
             self.remove(item.parent_frame)
         if item.is_correspondence:
             item.parent_view.remove(item)
         if item.is_link:
-            if item.is_interspatial:
-                self.interspatial_labels.remove(item)
-                self.interspatial_relations.remove(item)
+            if item.is_cross_view:
+                self.cross_view_labels.remove(item)
+                self.cross_view_relations.remove(item)
+                for view in self.views:
+                    view.cross_view_links.remove(item)
+                    for _, relations in view.cross_view_relations.items():
+                        relations.remove(item)
             item.parent_concept.instances.remove(item)
             for argument in item.arguments:
                 argument.links_out.remove(item)
                 argument.links_in.remove(item)
                 argument.champion_labels.remove(item)
                 argument.champion_relations.remove(item)
-                argument.recalculate_exigency()
+                argument.recalculate_salience()
         if item.is_relation:
+            if item.is_cross_view:
+                item.start_view.remove_cross_view_relation(item)
+                item.end_view.remove_cross_view_relation(item)
             if item.parent_concept is not None:
                 item.parent_concept.instances.remove(item)
             if None not in {item.parent_concept, item.conceptual_space}:
@@ -275,7 +364,7 @@ class BubbleChamber:
                     self.remove(view)
             for sub_chunk in item.sub_chunks:
                 sub_chunk.super_chunks.remove(item)
-                sub_chunk.recalculate_exigency()
+                sub_chunk.recalculate_salience()
             for super_chunk in item.super_chunks:
                 super_chunk.sub_chunks.remove(item)
             for link in item.links:
@@ -365,13 +454,13 @@ class BubbleChamber:
         concepts: StructureSet,
         input_space: ContextualSpace,
         output_space: ContextualSpace,
-        interspatial_links: StructureSet = None,
+        cross_view_links: StructureSet = None,
         parent_id: str = "",
         is_sub_frame: bool = False,
         depth: int = None,
     ) -> Frame:
-        interspatial_links = (
-            self.new_set() if interspatial_links is None else interspatial_links
+        cross_view_links = (
+            self.new_set() if cross_view_links is None else cross_view_links
         )
         frame = Frame(
             structure_id=ID.new(Frame),
@@ -381,7 +470,7 @@ class BubbleChamber:
             parent_frame=parent_frame,
             sub_frames=sub_frames,
             concepts=concepts,
-            interspatial_links=interspatial_links,
+            cross_view_links=cross_view_links,
             input_space=input_space,
             output_space=output_space,
             links_in=self.new_set(),
@@ -393,6 +482,8 @@ class BubbleChamber:
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
         )
+        input_space.parent_frame = frame
+        output_space.parent_frame = frame
         if parent_frame is not None:
             parent_frame.instances.add(frame)
         self.add(frame)
@@ -420,6 +511,31 @@ class BubbleChamber:
             parent_id=parent_id,
             is_sub_frame=True,
         )
+
+    def new_merged_frame(
+        self,
+        name: str,
+        parent_concept: "Concept",
+        component_frames: StructureList,
+        depth: int = None,
+        parent_id: str = None,
+    ):
+        frame = MergedFrame(
+            structure_id=ID.new(MergedFrame),
+            parent_id=parent_id,
+            name=name,
+            parent_concept=parent_concept,
+            component_frames=component_frames,
+            links_in=self.new_set(),
+            links_out=self.new_set(),
+            parent_spaces=self.new_set(),
+            instances=self.new_set(),
+            champion_labels=self.new_set(),
+            champion_relations=self.new_set(),
+            depth=depth,
+        )
+        self.add(frame)
+        return frame
 
     def new_chunk(
         self,
@@ -460,19 +576,19 @@ class BubbleChamber:
             ):
                 chunk.super_chunks.add(existing_chunk)
                 existing_chunk.sub_chunks.add(chunk)
-                existing_chunk.recalculate_exigency()
+                existing_chunk.recalculate_salience()
                 self.loggers["structure"].log(existing_chunk)
             if not existing_chunk.members.is_empty and all(
                 member in chunk.members for member in existing_chunk.members
             ):
                 chunk.sub_chunks.add(existing_chunk)
                 existing_chunk.super_chunks.add(chunk)
-                existing_chunk.recalculate_exigency()
+                existing_chunk.recalculate_salience()
                 self.loggers["structure"].log(existing_chunk)
             if existing_chunk.is_raw and existing_chunk in chunk.members:
                 existing_chunk.super_chunks.add(chunk)
                 chunk.sub_chunks.add(existing_chunk)
-                existing_chunk.recalculate_exigency()
+                existing_chunk.recalculate_salience()
                 self.loggers["structure"].log(existing_chunk)
         chunk._activation = activation
         self.add(chunk)
@@ -521,9 +637,18 @@ class BubbleChamber:
         )
         for member in members:
             member.super_chunks.add(letter_chunk)
-            member.recalculate_exigency()
+            member.recalculate_salience()
             letter_chunk.sub_chunks.add(member)
             self.loggers["structure"].log(member)
+        has_string_location = False
+        for location in letter_chunk.locations:
+            if location.space == self.conceptual_spaces["string"]:
+                location.coordinates = [[letter_chunk.name]]
+                has_string_location = True
+        if not has_string_location:
+            letter_chunk.locations.append(
+                Location([[name]], self.conceptual_spaces["string"])
+            )
         self.add(letter_chunk)
         if meaning_concept is not None:
             self.new_relation(
@@ -551,7 +676,7 @@ class BubbleChamber:
         possible_instances: StructureSet = None,
         subsumes: StructureSet = None,
         depth: int = 1,
-        distance_to_proximity_weight: float = HyperParameters.DISTANCE_TO_PROXIMITY_WEIGHT,
+        distance_to_proximity_weight: float = HyperParameters.DEFAULT_DISTANCE_TO_PROXIMITY_WEIGHT,
         activation: FloatBetweenOneAndZero = None,
         is_slot: bool = False,
         reverse: Concept = None,
@@ -651,35 +776,6 @@ class BubbleChamber:
             self.new_relation(root, concept, quality=1.0, parent_id=parent_id)
             for arg in args:
                 self.new_relation(arg, concept, quality=1.0, parent_id=parent_id)
-            try:
-                if all(
-                    arg.has_relation_with(
-                        self.concepts["more"], parent_concept=self.concepts["more"]
-                    )
-                    for arg in args
-                ):
-                    self.new_relation(
-                        concept,
-                        self.concepts["more"],
-                        self.concepts["more"],
-                        quality=1.0,
-                        parent_id=parent_id,
-                    )
-                elif all(
-                    arg.has_relation_with(
-                        self.concepts["less"], parent_concept=self.concepts["more"]
-                    )
-                    for arg in args
-                ):
-                    self.new_relation(
-                        concept,
-                        self.concepts["less"],
-                        self.concepts["more"],
-                        quality=1.0,
-                        parent_id=parent_id,
-                    )
-            except KeyError:
-                pass
             return concept
 
     def new_correspondence(
@@ -727,14 +823,14 @@ class BubbleChamber:
         )
         start.links_out.add(correspondence)
         start.links_in.add(correspondence)
-        start.recalculate_exigency()
+        start.recalculate_salience()
         end.links_out.add(correspondence)
         end.links_in.add(correspondence)
-        end.recalculate_exigency()
+        end.recalculate_salience()
         self.add(correspondence)
         while parent_view is not None:
             parent_view.add(correspondence)
-            parent_view.recalculate_exigency()
+            parent_view.recalculate_salience()
             self.loggers["structure"].log(parent_view)
             try:
                 parent_view = parent_view.super_views.get()
@@ -752,7 +848,7 @@ class BubbleChamber:
         parent_id: str = "",
         quality: FloatBetweenOneAndZero = 0.0,
         parent_space: ContextualSpace = None,
-        is_interspatial: bool = False,
+        is_cross_view: bool = False,
         activation: FloatBetweenOneAndZero = None,
     ) -> Label:
         parent_space = start.parent_space if parent_space is None else parent_space
@@ -771,13 +867,13 @@ class BubbleChamber:
             parent_spaces=parent_spaces,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
-            is_interspatial=is_interspatial,
+            is_cross_view=is_cross_view,
         )
         if activation is not None:
             label._activation = activation
         if start is not None:
             start.links_out.add(label)
-            start.recalculate_exigency()
+            start.recalculate_salience()
             self.loggers["structure"].log(start)
         self.add(label)
         parent_concept.instances.add(label)
@@ -795,7 +891,9 @@ class BubbleChamber:
         conceptual_space: ConceptualSpace = None,
         is_bidirectional: bool = True,
         is_excitatory: bool = True,
-        is_interspatial: bool = False,
+        is_cross_view: bool = False,
+        start_view: View = None,
+        end_view: View = None,
         activation: FloatBetweenOneAndZero = None,
         stable_activation: FloatBetweenOneAndZero = None,
     ) -> Relation:
@@ -823,9 +921,11 @@ class BubbleChamber:
             is_bidirectional=is_bidirectional,
             is_excitatory=is_excitatory,
             is_stable=stable_activation is not None,
-            is_interspatial=is_interspatial,
+            is_cross_view=is_cross_view,
             champion_labels=self.new_set(),
             champion_relations=self.new_set(),
+            start_view=start_view,
+            end_view=end_view,
         )
         if activation is not None:
             relation._activation = activation
@@ -833,11 +933,11 @@ class BubbleChamber:
             relation._activation = stable_activation
         start.links_out.add(relation)
         end.links_in.add(relation)
-        start.recalculate_exigency()
-        end.recalculate_exigency()
+        start.recalculate_salience()
+        end.recalculate_salience()
         self.add(relation)
         if parent_concept is not None:
-            if is_interspatial:
+            if is_cross_view:
                 try:
                     parent_concept.relations.where(
                         parent_concept=self.concepts["outer"]
@@ -855,7 +955,7 @@ class BubbleChamber:
                     .get()
                     .end
                 )
-                if is_interspatial:
+                if is_cross_view:
                     concept_to_space_concept.relations.where(
                         parent_concept=self.concepts["outer"]
                     ).get().end.instances.add(relation)

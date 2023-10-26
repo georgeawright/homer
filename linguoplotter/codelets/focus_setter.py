@@ -5,7 +5,6 @@ from linguoplotter.codelet_result import CodeletResult
 from linguoplotter.errors import MissingStructureError
 from linguoplotter.float_between_one_and_zero import FloatBetweenOneAndZero
 from linguoplotter.id import ID
-from linguoplotter.structure_collection_keys import exigency
 from linguoplotter.structure_collections import StructureDict
 
 
@@ -21,7 +20,6 @@ class FocusSetter(Codelet):
     ):
         Codelet.__init__(self, codelet_id, parent_id, bubble_chamber, targets, urgency)
         self.coderack = coderack
-        self.result = None
 
     @classmethod
     def spawn(
@@ -38,11 +36,11 @@ class FocusSetter(Codelet):
     def run(self) -> CodeletResult:
         try:
             target_view = self.bubble_chamber.views.filter(
-                lambda v: (v.unhappiness > 0)
+                lambda v: v.unhappiness > 0
                 and v.members.filter(
                     lambda c: c.parent_concept.name == "not(same)"
                 ).is_empty
-            ).get(key=exigency)
+            ).get(key=lambda x: fuzzy.AND(x.salience, 1 - 1 / x.parent_frame.depth))
             self.bubble_chamber.focus.frame = target_view.parent_frame
             self.bubble_chamber.focus.view = target_view
             self.bubble_chamber.loggers["activity"].log(
@@ -52,22 +50,23 @@ class FocusSetter(Codelet):
             )
             self.bubble_chamber.focus.recalculate_satisfaction()
             self.bubble_chamber.loggers["activity"].log(
-                f"Exigency: {target_view.exigency}\n"
+                f"Salience: {target_view.salience}\n"
                 + f"Satisfaction: {self.bubble_chamber.focus.satisfaction}"
             )
-            self._update_codelet_urgencies()
+            self._update_codelet_urgencies(target_view.salience)
             self._engender_follow_up()
             self.result = CodeletResult.FINISH
         except MissingStructureError:
             self.bubble_chamber.loggers["activity"].log("No view and frame found.")
             self.result = CodeletResult.FIZZLE
             self._fizzle()
+        self.bubble_chamber.focus_setters_since_last_successful_focus_unset += 1
         return self.result
 
-    def _update_codelet_urgencies(self):
+    def _update_codelet_urgencies(self, amount: FloatBetweenOneAndZero):
         for codelet in self.coderack._codelets:
             if "ViewDrivenFactory" in codelet.codelet_id:
-                codelet.urgency = 1.0
+                codelet.adjust_urgency(amount)
                 return
         raise Exception
 
@@ -86,16 +85,17 @@ class FocusSetter(Codelet):
 
         self.child_codelets.append(
             FocusUnsetter.spawn(
-                self.codelet_id,
-                self.bubble_chamber,
-                self.coderack,
-                self.bubble_chamber.focus.satisfaction,
-                0.5,
+                parent_id=self.codelet_id,
+                bubble_chamber=self.bubble_chamber,
+                coderack=self.coderack,
+                last_satisfaction_score=self.bubble_chamber.focus.satisfaction,
+                time_focus_set=self.coderack.codelets_run,
+                urgency=0.5,
             )
         )
 
     def follow_up_urgency(self) -> FloatBetweenOneAndZero:
-        urgency = 1 - self.bubble_chamber.focus.view.exigency
+        urgency = 1 - self.bubble_chamber.focus.view.salience
         if urgency > self.coderack.MINIMUM_CODELET_URGENCY:
             return urgency
         return self.coderack.MINIMUM_CODELET_URGENCY

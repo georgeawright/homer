@@ -11,7 +11,7 @@ class Location:
         self.space = space
 
     def __repr__(self):
-        return f"({self.coordinates}, {self.space.name})"
+        return f"({self.coordinates}, {self.space})"
 
     @property
     def coordinates(self):

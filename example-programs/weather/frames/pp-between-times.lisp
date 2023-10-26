@@ -6,6 +6,12 @@
     :locations (list (Location (list (list Nan)) time-space))))
 (def-relation :start early-time-concept :end late-time-concept
   :parent_concept different-concept)
+(define similarity-space-parent-concept
+  (def-concept :name "" :is_slot True))
+(define similarity-space
+  (def-conceptual-space :name "" :parent_concept similarity-space-parent-concept
+    :possible_instances (StructureSet temperature-space height-space goodness-space size-space location-space)
+    :no_of_dimensions Nan))
 
 (define pp-directional-time-input
   (def-contextual-space :name "pp[between-times].meaning" :parent_concept input-concept
@@ -48,6 +54,13 @@
 		     (TwoPointLocation (list) (list) pp-directional-time-input))
     :parent_space pp-directional-time-input
     :conceptual_space time-space))
+(define sameness-relation
+  (def-relation :start early-chunk :end late-chunk :parent_concept same-concept
+    :quality 1.0
+    :locations (list (Location (list (list Nan)) same-different-space)
+		     (TwoPointLocation (list (list)) (list (list)) similarity-space)
+		     (TwoPointLocation (list (list)) (list (list)) pp-directional-time-input))
+    :conceptual_space similarity-space))
 
 (define pp-word-1
   (def-letter-chunk :name "between"
