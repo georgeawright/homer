@@ -143,6 +143,7 @@ for hyper_parameters_file in hyper_parameters_files:
             os.chdir("../..")
             result = narrator.run()
             result["Program"] = program_file
+            result["hyper_parameters"] = hyper_parameters_file
             iteration_end_time = time.time()
             results.append(result)
             with open(f"{logs_dir_path}/details.txt", "w") as f:
@@ -167,48 +168,83 @@ print(run_length)
 
 # calculate string and tree similarity and output to a statistics file
 rouge_scorer = RougeScorer(["rougeL"], use_stemmer=True)
-results_stats = {program_file: {} for program_file in program_files}
-for program_file in program_files:
-    program_results = [r for r in results if r["Program"] == program_file]
-    texts = [r["result"] for r in program_results if r["result"] is not None]
-    trees = [r["tree"] for r in program_results if r["result"] is not None]
-    results_stats[program_file]["mean_satisfaction"] = statistics.fmean(
-        [r["satisfaction"] for r in program_results]
-    )
-    results_stats[program_file]["median_satisfaction"] = statistics.median(
-        [r["satisfaction"] for r in program_results]
-    )
-    try:
-        rouge_scores = [
-            rouge_scorer.score(texts[i], texts[j])["rougeL"].fmeasure
-            for i in range(len(texts))
-            for j in range(len(texts))
-            if j > i
+results_stats = {
+    hyper_parameters_file: {program_file: {} for program_file in program_files}
+    for hyper_parameters_file in hyper_parameters_files
+}
+for hyper_parameters_file in hyper_parameters_files:
+    for program_file in program_files:
+        program_results = [
+            r
+            for r in results
+            if r["hyper_parameters"] == hyper_parameters_file
+            and r["Program"] == program_file
         ]
-        results_stats[program_file]["mean_pairwise_rouge"] = statistics.fmean(
-            rouge_scores,
-        )
-        results_stats[program_file]["median_pairwise_rouge"] = statistics.median(
-            rouge_scores,
-        )
-    except statistics.StatisticsError:
-        results_stats[program_file]["mean_pairwise_rouge"] = None
-        results_stats[program_file]["median_pairwise_rouge"] = None
-    try:
-        zss_scores = [
-            zss.simple_distance(trees[i], trees[j])
-            for i in range(len(trees))
-            for j in range(len(trees))
-            if j > i
-        ]
-        results_stats[program_file]["mean_pairwise_zss"] = statistics.fmean(
-            zss_scores,
-        )
-        results_stats[program_file]["median_pairwise_zss"] = statistics.median(
-            zss_scores,
-        )
-    except statistics.StatisticsError:
-        results_stats[program_file]["mean_pairwise_zss"] = None
-        results_stats[program_file]["median_pairwise_zss"] = None
+        texts = [r["result"] for r in program_results if r["result"] is not None]
+        trees = [r["tree"] for r in program_results if r["result"] is not None]
+        try:
+            results_stats[hyper_parameters_file][program_file][
+                "mean_satisfaction"
+            ] = statistics.fmean([r["satisfaction"] for r in program_results])
+        except statistics.StatisticsError:
+            results_stats[hyper_parameters_file][program_file][
+                "mean_satisfaction"
+            ] = None
+        try:
+            results_stats[hyper_parameters_file][program_file][
+                "median_satisfaction"
+            ] = statistics.median([r["satisfaction"] for r in program_results])
+        except statistics.StatisticsError:
+            results_stats[hyper_parameters_file][program_file][
+                "median_satisfaction"
+            ] = None
+        try:
+            rouge_scores = [
+                rouge_scorer.score(texts[i], texts[j])["rougeL"].fmeasure
+                for i in range(len(texts))
+                for j in range(len(texts))
+                if j > i
+            ]
+            results_stats[hyper_parameters_file][program_file][
+                "mean_pairwise_rouge"
+            ] = statistics.fmean(
+                rouge_scores,
+            )
+            results_stats[hyper_parameters_file][program_file][
+                "median_pairwise_rouge"
+            ] = statistics.median(
+                rouge_scores,
+            )
+        except statistics.StatisticsError:
+            results_stats[hyper_parameters_file][program_file][
+                "mean_pairwise_rouge"
+            ] = None
+            results_stats[hyper_parameters_file][program_file][
+                "median_pairwise_rouge"
+            ] = None
+        try:
+            zss_scores = [
+                zss.simple_distance(trees[i], trees[j])
+                for i in range(len(trees))
+                for j in range(len(trees))
+                if j > i and trees[i] is not None and trees[j] is not None
+            ]
+            results_stats[hyper_parameters_file][program_file][
+                "mean_pairwise_zss"
+            ] = statistics.fmean(
+                zss_scores,
+            )
+            results_stats[hyper_parameters_file][program_file][
+                "median_pairwise_zss"
+            ] = statistics.median(
+                zss_scores,
+            )
+        except statistics.StatisticsError:
+            results_stats[hyper_parameters_file][program_file][
+                "mean_pairwise_zss"
+            ] = None
+            results_stats[hyper_parameters_file][program_file][
+                "median_pairwise_zss"
+            ] = None
 with open(f"{pwd}/logs/stats.txt", "w") as f:
     f.write(json.dumps(results_stats))
