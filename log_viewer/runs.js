@@ -82,7 +82,7 @@ exports.run = function(query) {
     <h2>Summary of Results</h2>
 `;
     Object.keys(programs_results_lists).forEach(program => {
-	program_name = program.split(".")[0];
+	program_name = program.split(".lisp")[0];
 	graph_file_name = `maps/${program_name}.svg`;
 	graph_svg = fs.readFileSync(graph_file_name);
 	program_stats = stats[program];
