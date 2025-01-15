@@ -16,4 +16,8 @@ class MostOfTheCountryClassifier(Classifier):
         if item.is_slot:
             return math.nan if return_nan else 1.0
 
-        return 0.5 ** abs(13 - item.size)
+        # 4x4: 13
+        # 7x7: 39
+        # 13x13: 135
+        # round(number_of_points_on_map x 0.8)
+        return 0.5 ** abs(135 - item.size)
